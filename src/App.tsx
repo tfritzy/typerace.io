@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { DbConnection, Person } from './module_bindings';
+import { Person } from './module_bindings';
 import { useSpacetimeDB, useTable } from 'spacetimedb/react';
 
 function App() {
   const [name, setName] = useState('');
 
-  const conn = useSpacetimeDB<DbConnection>();
+  const conn = useSpacetimeDB<any>();
   const { isActive: connected } = conn;
 
   // Subscribe to all people in the database
-  const { rows: people } = useTable<DbConnection, Person>('person');
+  const { rows: people } = useTable<any, Person>('person');
 
   const addPerson = (e: React.FormEvent) => {
     e.preventDefault();
