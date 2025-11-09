@@ -54,11 +54,6 @@ export function TypeBox({ phrase, onComplete }: TypeBoxProps) {
         className += ' incomplete';
       }
 
-      // Mark current character (next to be typed)
-      if (index === userInput.length && !isCompleted) {
-        className += ' current';
-      }
-
       return (
         <span key={index} className={className}>
           {char}
@@ -68,14 +63,14 @@ export function TypeBox({ phrase, onComplete }: TypeBoxProps) {
   };
 
   return (
-    <div className="typebox-container">
-      <div className="typebox-display">
+    <div className="w-full max-w-[800px] mx-auto font-mono">
+      <div className="bg-background-secondary border-2 border-border rounded-lg p-8 text-2xl leading-8 min-h-[150px] cursor-text select-none break-words">
         {renderCharacters()}
       </div>
       <input
         ref={inputRef}
         type="text"
-        className="typebox-input"
+        className="absolute opacity-0 pointer-events-none"
         value={userInput}
         onChange={handleInputChange}
         disabled={isCompleted}
@@ -85,9 +80,14 @@ export function TypeBox({ phrase, onComplete }: TypeBoxProps) {
         spellCheck="false"
       />
       {isCompleted && (
-        <div className="typebox-complete">
-          <p>✓ Completed!</p>
-          <button onClick={handleReset}>Try Again</button>
+        <div className="mt-6 text-center">
+          <p className="text-correct text-2xl mb-4">✓ Completed!</p>
+          <button 
+            onClick={handleReset}
+            className="bg-primary text-background border-none rounded-md px-6 py-3 text-base font-semibold cursor-pointer transition-opacity hover:opacity-80 active:opacity-60"
+          >
+            Try Again
+          </button>
         </div>
       )}
     </div>
