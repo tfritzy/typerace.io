@@ -37,6 +37,15 @@ export const spacetimedb = schema(
       game_id: t.u64(),
       scheduled_at: t.scheduleAt(),
     }
+  ),
+  table(
+    { name: 'player_progress' },
+    {
+      id: t.u64().primaryKey().autoInc(),
+      player_id: t.identity().index(),
+      game_id: t.u64().index(),
+      progress_index: t.u64(),
+    }
   )
 );
 
@@ -111,3 +120,48 @@ spacetimedb.reducer('start_game_countdown', { game_id: t.u64() }, (ctx, { game_i
     console.info(`Game ${game_id} transitioned to Starting state`);
   }
 });
+
+spacetimedb.reducer(
+  'update_progress',
+  { game_id: t.u64(), new_index: t.u64() },
+  (ctx, { game_id, new_index }) => {
+    // Get the sender's identity from context
+    const player_id = ctx.sender;
+
+    // Use index to find the game by id
+    const game = ctx.db.game.id.find(game_id);
+
+    // Only update progress if the game is in Racing state
+    if (!game || game.state !== GameState.Racing) {
+      console.info(`Cannot update progress: game ${game_id} is not in Racing state`);
+      return;
+    }
+
+    // Use indexes to find the player's progress for this game
+    let existingProgress = null;
+    for (const progress of ctx.db.player_progress.player_id.filter(player_id)) {
+      if (progress.game_id === game_id) {
+        existingProgress = progress;
+        break;
+      }
+    }
+
+    if (existingProgress) {
+      // Update existing progress using the primary key
+      ctx.db.player_progress.id.update({
+        ...existingProgress,
+        progress_index: new_index,
+      });
+      console.info(`Updated progress for player ${player_id} in game ${game_id} to ${new_index}`);
+    } else {
+      // Insert new progress record
+      ctx.db.player_progress.insert({
+        id: 0n, // Auto-incremented, this value will be replaced
+        player_id: player_id,
+        game_id: game_id,
+        progress_index: new_index,
+      });
+      console.info(`Created progress for player ${player_id} in game ${game_id} with index ${new_index}`);
+    }
+  }
+);
