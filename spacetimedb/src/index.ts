@@ -103,17 +103,17 @@ spacetimedb.reducer(
 
 // Scheduled reducer that runs when a game countdown completes
 spacetimedb.reducer('start_game_countdown', { game_id: t.u64() }, (ctx, { game_id }) => {
-  // Find the game by ID and check if it's still in Lobby state
-  for (const game of ctx.db.game.iter()) {
-    if (game.id === game_id && game.state === GameState.Lobby) {
-      // Transition the game to Starting state
-      ctx.db.game.delete(game);
-      ctx.db.game.insert({
-        ...game,
-        state: GameState.Starting,
-      });
-      console.info(`Game ${game_id} transitioned to Starting state`);
-      break;
-    }
+  // Find the game by ID using primary key index
+  const game = ctx.db.game.id.find(game_id);
+  
+  // Check if the game exists and is still in Lobby state
+  if (game && game.state === GameState.Lobby) {
+    // Transition the game to Starting state
+    ctx.db.game.delete(game);
+    ctx.db.game.insert({
+      ...game,
+      state: GameState.Starting,
+    });
+    console.info(`Game ${game_id} transitioned to Starting state`);
   }
 });
