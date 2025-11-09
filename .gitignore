@@ -16,10 +16,6 @@ dist-ssr
 # SpacetimeDB generated bindings
 src/module_bindings
 
-# C# build artifacts
-bin/
-obj/
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
