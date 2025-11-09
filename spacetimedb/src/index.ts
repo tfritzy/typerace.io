@@ -26,8 +26,8 @@ export const spacetimedb = schema(
       id: t.u64().primaryKey().autoInc(),
       phrase: t.string(),
       created_at: t.u64(),
-      state: t.string(),
-      game_mode: t.string(),
+      state: t.string().index(),
+      game_mode: t.string().index(),
     }
   )
 );
