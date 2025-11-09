@@ -59,10 +59,10 @@ spacetimedb.reducer(
   'join_game',
   { player: t.string(), game_mode: t.string() },
   (ctx, { player, game_mode }) => {
-    // Look for an eligible game (same mode, in Lobby state)
+    // Use index to efficiently find games in Lobby state with matching game mode
     let foundGame = null;
-    for (const game of ctx.db.game.iter()) {
-      if (game.game_mode === game_mode && game.state === GameState.Lobby) {
+    for (const game of ctx.db.game.state.filter(GameState.Lobby)) {
+      if (game.game_mode === game_mode) {
         foundGame = game;
         break;
       }
