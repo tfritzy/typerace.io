@@ -4,9 +4,9 @@ using static SpacetimeDB.Module.Runtime;
 public enum GameState
 {
     Lobby,
-    Starting,
+    Countdown,
     Racing,
-    Finished
+    Archived
 }
 
 public enum GameMode
@@ -151,9 +151,9 @@ public static partial class Module
         if (game != null && game.Value.State == GameState.Lobby.ToString())
         {
             var updatedGame = game.Value;
-            updatedGame.State = GameState.Starting.ToString();
+            updatedGame.State = GameState.Countdown.ToString();
             ctx.Db.Game.Id.Update(updatedGame);
-            Log($"Game {gameId} transitioned to Starting state");
+            Log($"Game {gameId} transitioned to Countdown state");
 
             // Schedule the game to start after 3 seconds
             var threeSecondsInMicros = 3UL * 1000000UL;
@@ -172,7 +172,7 @@ public static partial class Module
     {
         var game = ctx.Db.Game.Id.Find(gameId);
 
-        if (game != null && game.Value.State == GameState.Starting.ToString())
+        if (game != null && game.Value.State == GameState.Countdown.ToString())
         {
             var updatedGame = game.Value;
             updatedGame.State = GameState.Racing.ToString();
@@ -199,9 +199,9 @@ public static partial class Module
         if (game != null && game.Value.State == GameState.Racing.ToString())
         {
             var updatedGame = game.Value;
-            updatedGame.State = GameState.Finished.ToString();
+            updatedGame.State = GameState.Archived.ToString();
             ctx.Db.Game.Id.Update(updatedGame);
-            Log($"Game {gameId} transitioned to Finished state");
+            Log($"Game {gameId} transitioned to Archived state");
         }
     }
 
