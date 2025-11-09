@@ -42,24 +42,19 @@ export const spacetimedb = schema(
     { name: 'player_progress' },
     {
       id: t.u64().primaryKey().autoInc(),
-      player_id: t.identity().index(),
-      game_id: t.u64().index(),
+      player_id: t.identity(),
+      game_id: t.u64(),
       progress_index: t.u64(),
-    }
+    },
+    [[t.identity(), t.u64()]]
   )
 );
 
-spacetimedb.reducer('init', (_ctx) => {
-  // Called when the module is initially published
-});
+spacetimedb.reducer('init', (_ctx) => {});
 
-spacetimedb.reducer('client_connected', (_ctx) => {
-  // Called every time a new client connects
-});
+spacetimedb.reducer('client_connected', (_ctx) => {});
 
-spacetimedb.reducer('client_disconnected', (_ctx) => {
-  // Called every time a client disconnects
-});
+spacetimedb.reducer('client_disconnected', (_ctx) => {});
 
 spacetimedb.reducer('add', { name: t.string() }, (ctx, { name }) => {
   ctx.db.person.insert({ name });
@@ -76,7 +71,6 @@ spacetimedb.reducer(
   'join_game',
   { player: t.string(), game_mode: t.string() },
   (ctx, { player, game_mode }) => {
-    // Use index to efficiently find games in Lobby state with matching game mode
     let foundGame = null;
     for (const game of ctx.db.game.state.filter(GameState.Lobby)) {
       if (game.game_mode === game_mode) {
@@ -86,18 +80,30 @@ spacetimedb.reducer(
     }
 
     if (foundGame) {
-      // Join existing game
       console.info(`Player ${player} joined game ${foundGame.id}`);
+      
+      ctx.db.player_progress.insert({
+        id: 0n,
+        player_id: ctx.sender,
+        game_id: foundGame.id,
+        progress_index: 0n,
+      });
     } else {
-      // Create a new game
       const newGame = ctx.db.game.insert({
-        id: 0n, // Auto-incremented, this value will be replaced
+        id: 0n,
         phrase: 'The quick brown fox jumps over the lazy dog',
         created_at: BigInt(Date.now()),
         state: GameState.Lobby,
         game_mode: game_mode,
       });
       console.info(`Player ${player} created and joined game ${newGame.id}`);
+
+      ctx.db.player_progress.insert({
+        id: 0n,
+        player_id: ctx.sender,
+        game_id: newGame.id,
+        progress_index: 0n,
+      });
 
       const eightSecondsInMicros = 8n * 1000000n;
       const scheduledTime = newGame.created_at * 1000n + eightSecondsInMicros;
@@ -125,43 +131,30 @@ spacetimedb.reducer(
   'update_progress',
   { game_id: t.u64(), new_index: t.u64() },
   (ctx, { game_id, new_index }) => {
-    // Get the sender's identity from context
     const player_id = ctx.sender;
 
-    // Use index to find the game by id
     const game = ctx.db.game.id.find(game_id);
 
-    // Only update progress if the game is in Racing state
     if (!game || game.state !== GameState.Racing) {
       console.info(`Cannot update progress: game ${game_id} is not in Racing state`);
       return;
     }
 
-    // Use indexes to find the player's progress for this game
     let existingProgress = null;
-    for (const progress of ctx.db.player_progress.player_id.filter(player_id)) {
-      if (progress.game_id === game_id) {
-        existingProgress = progress;
-        break;
-      }
+    for (const progress of ctx.db.player_progress[0].filter([player_id, game_id])) {
+      existingProgress = progress;
+      break;
     }
 
-    if (existingProgress) {
-      // Update existing progress using the primary key
-      ctx.db.player_progress.id.update({
-        ...existingProgress,
-        progress_index: new_index,
-      });
-      console.info(`Updated progress for player ${player_id} in game ${game_id} to ${new_index}`);
-    } else {
-      // Insert new progress record
-      ctx.db.player_progress.insert({
-        id: 0n, // Auto-incremented, this value will be replaced
-        player_id: player_id,
-        game_id: game_id,
-        progress_index: new_index,
-      });
-      console.info(`Created progress for player ${player_id} in game ${game_id} with index ${new_index}`);
+    if (!existingProgress) {
+      console.info(`No progress found for player ${player_id} in game ${game_id}`);
+      return;
     }
+
+    ctx.db.player_progress.id.update({
+      ...existingProgress,
+      progress_index: new_index,
+    });
+    console.info(`Updated progress for player ${player_id} in game ${game_id} to ${new_index}`);
   }
 );
