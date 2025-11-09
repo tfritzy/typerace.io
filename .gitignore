@@ -13,6 +13,10 @@ dist-ssr
 *.local
 *.tsbuildinfo
 
+# C# build artifacts
+bin/
+obj/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
