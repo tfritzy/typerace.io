@@ -108,9 +108,8 @@ spacetimedb.reducer('start_game_countdown', { game_id: t.u64() }, (ctx, { game_i
   
   // Check if the game exists and is still in Lobby state
   if (game && game.state === GameState.Lobby) {
-    // Transition the game to Starting state
-    ctx.db.game.delete(game);
-    ctx.db.game.insert({
+    // Transition the game to Starting state using update
+    ctx.db.game.id.update({
       ...game,
       state: GameState.Starting,
     });
