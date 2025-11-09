@@ -1,4 +1,5 @@
 import { schema, table, t } from 'spacetimedb/server';
+import { ScheduleAt } from 'spacetimedb';
 
 // Enum for game state
 export enum GameState {
@@ -28,6 +29,13 @@ export const spacetimedb = schema(
       created_at: t.u64(),
       state: t.string().index(),
       game_mode: t.string().index(),
+    }
+  ),
+  table(
+    { name: 'game_countdown', scheduled: 'start_game_countdown' },
+    {
+      game_id: t.u64(),
+      scheduled_at: t.scheduleAt(),
     }
   )
 );
@@ -81,6 +89,25 @@ spacetimedb.reducer(
         game_mode: game_mode,
       });
       console.info(`Player ${player} created and joined game ${newGame.id}`);
+
+      const eightSecondsInMicros = 8n * 1000000n;
+      const scheduledTime = newGame.created_at * 1000n + eightSecondsInMicros;
+      ctx.db.game_countdown.insert({
+        game_id: newGame.id,
+        scheduled_at: ScheduleAt.time(scheduledTime),
+      });
     }
   }
 );
+
+spacetimedb.reducer('start_game_countdown', { game_id: t.u64() }, (ctx, { game_id }) => {
+  const game = ctx.db.game.id.find(game_id);
+  
+  if (game && game.state === GameState.Lobby) {
+    ctx.db.game.id.update({
+      ...game,
+      state: GameState.Starting,
+    });
+    console.info(`Game ${game_id} transitioned to Starting state`);
+  }
+});
