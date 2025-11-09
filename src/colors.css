@@ -1,0 +1,18 @@
+:root {
+  /* Main colors */
+  --color-primary: #e2b714;
+  --color-text: #d1d0c5;
+  --color-text-dim: #646669;
+  --color-background: #323437;
+  --color-background-secondary: #2c2e31;
+  
+  /* TypeBox specific colors */
+  --color-correct: #d1d0c5;
+  --color-incorrect: #ca4754;
+  --color-incomplete: rgba(209, 208, 197, 0.3);
+  --color-current: #e2b714;
+  
+  /* UI elements */
+  --color-border: #646669;
+  --color-focus: #e2b714;
+}
