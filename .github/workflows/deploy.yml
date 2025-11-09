@@ -28,10 +28,29 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Install SpacetimeDB CLI
+        run: |
+          curl -fsSL https://install.spacetimedb.com | bash
+          echo "$HOME/.spacetime/bin" >> $GITHUB_PATH
+
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      - name: Deploy SpacetimeDB module
+        env:
+          SPACETIME_TOKEN: ${{ secrets.SPACETIME_TOKEN }}
+        run: |
+          if [ -n "$SPACETIME_TOKEN" ]; then
+            spacetime identity set-default --token "$SPACETIME_TOKEN"
+            npm run deploy
+          else
+            echo "Warning: SPACETIME_TOKEN not set, skipping SpacetimeDB deployment"
+            echo "Generating module bindings locally for build"
+            cd spacetimedb && npm run build && cd ..
+            spacetime generate --lang typescript --out-dir src/module_bindings --project-path spacetimedb
+          fi
+
+      - name: Build frontend
         run: npm run build
 
       - name: Add .nojekyll

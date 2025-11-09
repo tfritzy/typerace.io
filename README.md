@@ -9,7 +9,17 @@ This app is configured to be deployed to GitHub Pages automatically. To enable G
 1. Go to your repository settings on GitHub
 2. Navigate to **Settings** → **Pages**
 3. Under **Source**, select **GitHub Actions**
-4. Push to the `main` branch or manually trigger the workflow
+4. Add your SpacetimeDB token as a repository secret:
+   - Go to **Settings** → **Secrets and variables** → **Actions**
+   - Click **New repository secret**
+   - Name: `SPACETIME_TOKEN`
+   - Value: Your SpacetimeDB authentication token
+5. Push to the `main` branch or manually trigger the workflow
+
+The workflow will:
+- Deploy the SpacetimeDB backend to SpacetimeDB cloud
+- Generate TypeScript client bindings
+- Build and deploy the frontend to GitHub Pages
 
 Once deployed, the app will be available at: `https://tfritzy.github.io/typerace.io/`
 
@@ -27,6 +37,13 @@ npm install
 ### Run Development Server
 ```bash
 npm run dev
+```
+
+Note: You'll need to deploy the SpacetimeDB module first:
+```bash
+npm run local  # For local development
+# or
+npm run deploy # For production deployment
 ```
 
 ### Build for Production
