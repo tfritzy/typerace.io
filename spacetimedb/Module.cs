@@ -21,6 +21,7 @@ public partial struct Person
 }
 
 [SpacetimeDB.Table]
+[SpacetimeDB.Index(nameof(State), nameof(GameMode))]
 public partial struct Game
 {
     [SpacetimeDB.AutoInc]
@@ -28,9 +29,7 @@ public partial struct Game
     public ulong Id;
     public string Phrase;
     public ulong CreatedAt;
-    [SpacetimeDB.Index]
     public string State;
-    [SpacetimeDB.Index]
     public string GameMode;
 }
 
@@ -89,27 +88,12 @@ public static partial class Module
     [SpacetimeDB.Reducer]
     public static void JoinGame(ReducerContext ctx, string player, string gameMode)
     {
-        Game? foundGame = null;
-        foreach (var game in ctx.Db.Game.State.Filter(GameState.Lobby.ToString()))
-        {
-            if (game.GameMode == gameMode)
-            {
-                foundGame = game;
-                break;
-            }
-        }
+        var foundGame = ctx.Db.Game.State.GameMode.Find(GameState.Lobby.ToString(), gameMode);
 
         if (foundGame != null)
         {
             Log($"Player {player} joined game {foundGame.Value.Id}");
-
-            ctx.Db.PlayerProgress.Insert(new PlayerProgress
-            {
-                Id = 0,
-                PlayerId = ctx.Sender,
-                GameId = foundGame.Value.Id,
-                ProgressIndex = 0
-            });
+            InsertPlayerProgress(ctx, foundGame.Value.Id);
         }
         else
         {
@@ -123,13 +107,7 @@ public static partial class Module
             });
             Log($"Player {player} created and joined game {newGame.Id}");
 
-            ctx.Db.PlayerProgress.Insert(new PlayerProgress
-            {
-                Id = 0,
-                PlayerId = ctx.Sender,
-                GameId = newGame.Id,
-                ProgressIndex = 0
-            });
+            InsertPlayerProgress(ctx, newGame.Id);
 
             var eightSecondsInMicros = 8UL * 1000000UL;
             var scheduledTime = newGame.CreatedAt * 1000UL + eightSecondsInMicros;
@@ -141,6 +119,16 @@ public static partial class Module
         }
     }
 
+    private static void InsertPlayerProgress(ReducerContext ctx, ulong gameId)
+    {
+        ctx.Db.PlayerProgress.Insert(new PlayerProgress
+        {
+            PlayerId = ctx.Sender,
+            GameId = gameId,
+            ProgressIndex = 0
+        });
+    }
+
     [SpacetimeDB.Reducer]
     public static void StartGameCountdown(ReducerContext ctx, ulong gameId)
     {
@@ -148,14 +136,9 @@ public static partial class Module
 
         if (game != null && game.Value.State == GameState.Lobby.ToString())
         {
-            ctx.Db.Game.Id.Update(new Game
-            {
-                Id = game.Value.Id,
-                Phrase = game.Value.Phrase,
-                CreatedAt = game.Value.CreatedAt,
-                State = GameState.Starting.ToString(),
-                GameMode = game.Value.GameMode
-            });
+            var updatedGame = game.Value;
+            updatedGame.State = GameState.Starting.ToString();
+            ctx.Db.Game.Id.Update(updatedGame);
             Log($"Game {gameId} transitioned to Starting state");
         }
     }
@@ -173,15 +156,7 @@ public static partial class Module
             return;
         }
 
-        PlayerProgress? existingProgress = null;
-        foreach (var progress in ctx.Db.PlayerProgress.PlayerId.Filter(playerId))
-        {
-            if (progress.GameId == gameId)
-            {
-                existingProgress = progress;
-                break;
-            }
-        }
+        var existingProgress = ctx.Db.PlayerProgress.PlayerId.GameId.Find(playerId, gameId);
 
         if (existingProgress == null)
         {
@@ -189,13 +164,9 @@ public static partial class Module
             return;
         }
 
-        ctx.Db.PlayerProgress.Id.Update(new PlayerProgress
-        {
-            Id = existingProgress.Value.Id,
-            PlayerId = existingProgress.Value.PlayerId,
-            GameId = existingProgress.Value.GameId,
-            ProgressIndex = newIndex
-        });
+        var updatedProgress = existingProgress.Value;
+        updatedProgress.ProgressIndex = newIndex;
+        ctx.Db.PlayerProgress.Id.Update(updatedProgress);
         Log($"Updated progress for player {playerId} in game {gameId} to {newIndex}");
     }
 }
