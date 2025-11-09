@@ -1,4 +1,5 @@
 import { schema, table, t } from 'spacetimedb/server';
+import { ScheduleAt } from 'spacetimedb';
 
 // Enum for game state
 export enum GameState {
@@ -28,6 +29,13 @@ export const spacetimedb = schema(
       created_at: t.u64(),
       state: t.string().index(),
       game_mode: t.string().index(),
+    }
+  ),
+  table(
+    { name: 'game_countdown', scheduled: 'start_game_countdown' },
+    {
+      game_id: t.u64(),
+      scheduled_at: t.scheduleAt(),
     }
   )
 );
@@ -81,6 +89,31 @@ spacetimedb.reducer(
         game_mode: game_mode,
       });
       console.info(`Player ${player} created and joined game ${newGame.id}`);
+
+      // Schedule the game to start 8 seconds after creation
+      const eightSecondsInMicros = 8n * 1000000n; // 8 seconds in microseconds
+      const scheduledTime = newGame.created_at * 1000n + eightSecondsInMicros; // Convert ms to microseconds
+      ctx.db.game_countdown.insert({
+        game_id: newGame.id,
+        scheduled_at: ScheduleAt.time(scheduledTime),
+      });
     }
   }
 );
+
+// Scheduled reducer that runs when a game countdown completes
+spacetimedb.reducer('start_game_countdown', { game_id: t.u64() }, (ctx, { game_id }) => {
+  // Find the game by ID and check if it's still in Lobby state
+  for (const game of ctx.db.game.iter()) {
+    if (game.id === game_id && game.state === GameState.Lobby) {
+      // Transition the game to Starting state
+      ctx.db.game.delete(game);
+      ctx.db.game.insert({
+        ...game,
+        state: GameState.Starting,
+      });
+      console.info(`Game ${game_id} transitioned to Starting state`);
+      break;
+    }
+  }
+});
