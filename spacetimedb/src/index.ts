@@ -32,8 +32,9 @@ export const spacetimedb = schema(
     }
   ),
   table(
-    { name: 'game_countdown', scheduled: 'start_game_countdown' },
+    { name: 'game_countdown' },
     {
+      scheduled_id: t.u64().autoInc(),
       game_id: t.u64(),
       scheduled_at: t.scheduleAt(),
     }
@@ -93,6 +94,7 @@ spacetimedb.reducer(
       const eightSecondsInMicros = 8n * 1000000n;
       const scheduledTime = newGame.created_at * 1000n + eightSecondsInMicros;
       ctx.db.game_countdown.insert({
+        scheduled_id: 0n, // Auto-incremented
         game_id: newGame.id,
         scheduled_at: ScheduleAt.time(scheduledTime),
       });
