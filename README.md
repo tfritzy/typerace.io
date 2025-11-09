@@ -19,6 +19,27 @@ You can also manually trigger the deployment workflow from the **Actions** tab i
 
 ## Development
 
+### Prerequisites
+
+To work with SpacetimeDB locally, you need to install the SpacetimeDB CLI:
+```bash
+curl -fsSL https://install.spacetimedb.com | bash
+```
+
+### Generate Client Bindings
+
+The `src/module_bindings` directory contains TypeScript client bindings generated from the SpacetimeDB schema. To regenerate these bindings after modifying the schema in `spacetimedb/src/index.ts`:
+
+```bash
+# For local development (requires local SpacetimeDB server)
+npm run local
+
+# OR for production deployment
+npm run deploy
+```
+
+**Note:** The current bindings are stubs to allow the app to build. For full functionality, generate proper bindings using the commands above with SpacetimeDB CLI installed.
+
 ### Install Dependencies
 ```bash
 npm install

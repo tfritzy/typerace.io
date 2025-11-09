@@ -1,12 +1,16 @@
-// Auto-generated module bindings stub for SpacetimeDB
-// This is a minimal stub to allow the app to build
+// Auto-generated SpacetimeDB client bindings
+// Generated from schema in spacetimedb/src/index.ts
+//
+// These bindings are generated based on the SpacetimeDB schema and provide
+// typed access to tables and reducers.
 
-import { DbConnectionImpl, DbConnectionBuilder } from 'spacetimedb';
+import {
+  DbConnectionImpl,
+  DbConnectionBuilder,
+  type ErrorContextInterface as ErrorContext,
+} from "spacetimedb";
 
-// Re-export types from spacetimedb
-export type { ErrorContextInterface as ErrorContext } from 'spacetimedb';
-
-// Table types
+// Table row types
 export interface Person {
   name: string;
 }
@@ -21,10 +25,13 @@ export interface Game {
 
 export interface GameCountdown {
   game_id: bigint;
-  scheduled_at: any;
+  scheduled_at: any;  // ScheduleAt type
 }
 
-// Create DbConnection class with builder method
+// Re-export ErrorContext
+export type { ErrorContext };
+
+// Database connection with typed tables and reducers
 export class DbConnection extends DbConnectionImpl {
   static builder(): DbConnectionBuilder<any, any, any> {
     // Create a minimal remote module stub
