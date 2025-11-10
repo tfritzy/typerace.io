@@ -38,7 +38,7 @@ public partial struct Game
     public ulong CreatedAt;
     public string State;
     public string GameMode;
-    public SpacetimeDB.List<SpacetimeDB.Identity> FinishedPlayers; // List of players who have completed the game
+    public SpacetimeDB.List<SpacetimeDB.Identity> FinishedPlayers;
 }
 
 [SpacetimeDB.Table(Scheduled = nameof(StartGameCountdown))]
@@ -72,7 +72,7 @@ public partial struct PlayerProgress
     public SpacetimeDB.Identity PlayerId;
     public ulong GameId;
     public ulong ProgressIndex;
-    public ulong CompletedAt; // Timestamp when player completed the game (0 if not completed)
+    public ulong CompletedAt;
 }
 
 [SpacetimeDB.Table]
@@ -95,9 +95,9 @@ public partial struct PlayerStats
     [SpacetimeDB.PrimaryKey]
     public ulong Id;
     public SpacetimeDB.Identity PlayerId;
-    public ulong Month; // Unix timestamp of the start of the month (YYYY-MM-01 00:00:00)
+    public ulong Month;
     public string GameMode;
-    public SpacetimeDB.List<CompletedGameStats> CompletedGames; // List of game stats
+    public SpacetimeDB.List<CompletedGameStats> CompletedGames;
 }
 
 public static partial class Module
@@ -191,7 +191,6 @@ public static partial class Module
             ctx.Db.Game.Id.Update(updatedGame);
             Log($"Game {gameId} transitioned to Countdown state");
 
-            // Schedule the game to start after 3 seconds
             var threeSecondsInMicros = 3UL * 1000000UL;
             var currentTime = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 1000UL;
             var scheduledTime = currentTime + threeSecondsInMicros;
@@ -215,7 +214,6 @@ public static partial class Module
             ctx.Db.Game.Id.Update(updatedGame);
             Log($"Game {gameId} transitioned to Racing state");
 
-            // Schedule the game to complete after 5 minutes
             var fiveMinutesInMicros = 5UL * 60UL * 1000000UL;
             var currentTime = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 1000UL;
             var scheduledTime = currentTime + fiveMinutesInMicros;
@@ -250,15 +248,12 @@ public static partial class Module
             return;
         }
 
-        // Add player to finished players list
         var updatedGame = game.Value;
         updatedGame.FinishedPlayers.Add(playerId);
         ctx.Db.Game.Id.Update(updatedGame);
 
-        // Calculate placement based on position in finished players list
         var placement = (ulong)updatedGame.FinishedPlayers.Count;
 
-        // Get player progress to calculate completion time
         var progress = ctx.Db.PlayerProgress.PlayerId.GameId.Find(playerId, gameId);
         if (progress == null)
         {
@@ -268,7 +263,6 @@ public static partial class Module
 
         var completionTime = progress.Value.CompletedAt - game.Value.CreatedAt;
 
-        // Calculate XP based on placement (1st = 100, 2nd = 75, 3rd = 50, rest = 25)
         ulong xpGained = placement switch
         {
             1 => 100,
@@ -277,7 +271,6 @@ public static partial class Module
             _ => 25
         };
 
-        // Update or create Player record
         var player = ctx.Db.Player.PlayerId.Find(playerId);
         if (player != null)
         {
@@ -288,7 +281,6 @@ public static partial class Module
                 updatedPlayer.WinCount++;
             }
             updatedPlayer.Xp += xpGained;
-            // Simple leveling: level = XP / 1000
             updatedPlayer.Level = updatedPlayer.Xp / 1000;
             ctx.Db.Player.PlayerId.Update(updatedPlayer);
         }
@@ -304,15 +296,12 @@ public static partial class Module
             });
         }
 
-        // Calculate word count from phrase
         var wordCount = (ulong)game.Value.Phrase.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries).Length;
 
-        // Calculate month timestamp (start of current month)
         var now = DateTimeOffset.UtcNow;
         var monthStart = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero);
         var monthTimestamp = (ulong)monthStart.ToUnixTimeMilliseconds();
 
-        // Update or create PlayerStats record for this month
         var existingStats = ctx.Db.PlayerStats.PlayerId.Month.GameMode.Find(
             playerId, monthTimestamp, game.Value.GameMode);
 
@@ -369,17 +358,14 @@ public static partial class Module
         var updatedProgress = existingProgress.Value;
         updatedProgress.ProgressIndex = newIndex;
         
-        // Check if player just completed the game (reached the end of the phrase)
         var phraseLength = (ulong)game.Value.Phrase.Length;
         if (newIndex >= phraseLength && updatedProgress.CompletedAt == 0)
         {
             updatedProgress.CompletedAt = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             Log($"Player {playerId} completed game {gameId} at {updatedProgress.CompletedAt}");
             
-            // Update progress first, then call PlayerCompleted
             ctx.Db.PlayerProgress.Id.Update(updatedProgress);
             
-            // Call PlayerCompleted to handle stats
             PlayerCompleted(ctx, gameId, playerId);
         }
         else
