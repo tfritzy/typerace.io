@@ -307,7 +307,7 @@ public static partial class Module
                     // Append new game stats to JSON array
                     // Format: [{wordCount, time, placement}, ...]
                     var newGameData = $"{{\"wordCount\":{wordCount},\"time\":{completionTime},\"placement\":{placement}}}";
-                    if (updatedStats.CompletedGames == "")
+                    if (string.IsNullOrEmpty(updatedStats.CompletedGames))
                     {
                         updatedStats.CompletedGames = $"[{newGameData}]";
                     }
