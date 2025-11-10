@@ -17,6 +17,9 @@ dist-ssr
 bin/
 obj/
 
+# SpacetimeDB generated bindings
+src/module_bindings/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
