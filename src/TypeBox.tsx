@@ -48,6 +48,11 @@ export const TypeBox = ({ phrase, onComplete, onReset }: TypeBoxProps) => {
     inputRef.current?.focus();
   };
 
+  const handlePhraseClick = () => {
+    // Focus the hidden input when the phrase area is clicked
+    inputRef.current?.focus();
+  };
+
   const renderCharacter = (char: string, index: number) => {
     const userChar = userInput[index];
     const isTyped = index < userInput.length;
@@ -79,27 +84,30 @@ export const TypeBox = ({ phrase, onComplete, onReset }: TypeBoxProps) => {
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-4xl mx-auto p-8">
-      <div className="w-full bg-[var(--color-background-input)] rounded-lg p-8 shadow-2xl">
-        {/* Display area */}
-        <div className="text-3xl font-mono leading-relaxed mb-6 min-h-[120px] flex items-center">
+      <div className="w-full bg-[var(--color-background-input)] rounded-lg p-8 shadow-2xl relative">
+        {/* Display area - clickable to focus input */}
+        <div 
+          className="text-3xl font-mono leading-relaxed mb-6 min-h-[120px] flex items-center cursor-text"
+          onClick={handlePhraseClick}
+        >
           <div className="w-full">
             {phrase.split('').map((char, index) => renderCharacter(char, index))}
           </div>
         </div>
 
-        {/* Hidden input field */}
+        {/* Completely hidden input field - drives the typing process */}
         <input
           ref={inputRef}
           type="text"
           value={userInput}
           onChange={handleInputChange}
-          className="w-full px-4 py-3 bg-transparent border-2 border-[var(--color-text-incomplete)] rounded-md text-[var(--color-text-complete)] font-mono text-lg focus:outline-none focus:border-[var(--color-caret)] transition-colors"
-          placeholder="Start typing..."
+          className="absolute opacity-0 pointer-events-none"
           disabled={isCompleted}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
           spellCheck="false"
+          aria-hidden="true"
         />
 
         {/* Status and controls */}
