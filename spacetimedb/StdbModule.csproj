@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
+ <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <RuntimeIdentifier>wasi-wasm</RuntimeIdentifier>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <PackageReference Include="SpacetimeDB.ClientSDK" Version="0.10.0" />
+    <PackageReference Include="SpacetimeDB.Runtime" Version="1.7.0" />
   </ItemGroup>
 </Project>
