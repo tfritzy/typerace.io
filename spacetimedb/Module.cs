@@ -14,6 +14,13 @@ public enum GameMode
     English500
 }
 
+public partial struct CompletedGameStats
+{
+    public ulong WordCount;
+    public ulong Time;
+    public ulong Placement;
+}
+
 [SpacetimeDB.Table]
 public partial struct Person
 {
@@ -31,6 +38,7 @@ public partial struct Game
     public ulong CreatedAt;
     public string State;
     public string GameMode;
+    public SpacetimeDB.List<SpacetimeDB.Identity> FinishedPlayers; // List of players who have completed the game
 }
 
 [SpacetimeDB.Table(Scheduled = nameof(StartGameCountdown))]
@@ -89,7 +97,7 @@ public partial struct PlayerStats
     public SpacetimeDB.Identity PlayerId;
     public ulong Month; // Unix timestamp of the start of the month (YYYY-MM-01 00:00:00)
     public string GameMode;
-    public string CompletedGames; // JSON array of game stats: [{wordCount, time, placement}]
+    public SpacetimeDB.List<CompletedGameStats> CompletedGames; // List of game stats
 }
 
 public static partial class Module
@@ -143,7 +151,8 @@ public static partial class Module
                 Phrase = "The quick brown fox jumps over the lazy dog",
                 CreatedAt = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 State = GameState.Lobby.ToString(),
-                GameMode = gameMode
+                GameMode = gameMode,
+                FinishedPlayers = new SpacetimeDB.List<SpacetimeDB.Identity>()
             });
             Log($"Player {player} created and joined game {newGame.Id}");
 
@@ -229,111 +238,111 @@ public static partial class Module
             updatedGame.State = GameState.Archived.ToString();
             ctx.Db.Game.Id.Update(updatedGame);
             Log($"Game {gameId} transitioned to Archived state");
-
-            // Process player stats for all players who participated in the game
-            var allProgress = ctx.Db.PlayerProgress.GameId.Filter(gameId);
-            
-            // Find all completed players and sort by completion time
-            var completedPlayers = new System.Collections.Generic.List<PlayerProgress>();
-            foreach (var progress in allProgress)
-            {
-                if (progress.CompletedAt > 0)
-                {
-                    completedPlayers.Add(progress);
-                }
-            }
-            
-            // Sort by completion time to determine placement
-            completedPlayers.Sort((a, b) => a.CompletedAt.CompareTo(b.CompletedAt));
-            
-            // Calculate word count from phrase
-            var wordCount = (ulong)game.Value.Phrase.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries).Length;
-            
-            // Calculate month timestamp (start of current month)
-            var now = DateTimeOffset.UtcNow;
-            var monthStart = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero);
-            var monthTimestamp = (ulong)monthStart.ToUnixTimeMilliseconds();
-            
-            // Update stats for each completed player
-            for (int i = 0; i < completedPlayers.Count; i++)
-            {
-                var progress = completedPlayers[i];
-                var placement = (ulong)(i + 1); // 1-indexed placement
-                var completionTime = progress.CompletedAt - game.Value.CreatedAt;
-                
-                // Calculate XP based on placement (1st = 100, 2nd = 75, 3rd = 50, rest = 25)
-                ulong xpGained = placement switch
-                {
-                    1 => 100,
-                    2 => 75,
-                    3 => 50,
-                    _ => 25
-                };
-                
-                // Update or create Player record
-                var player = ctx.Db.Player.PlayerId.Find(progress.PlayerId);
-                if (player != null)
-                {
-                    var updatedPlayer = player.Value;
-                    updatedPlayer.TotalGames++;
-                    if (placement == 1)
-                    {
-                        updatedPlayer.WinCount++;
-                    }
-                    updatedPlayer.Xp += xpGained;
-                    // Simple leveling: level = XP / 1000
-                    updatedPlayer.Level = updatedPlayer.Xp / 1000;
-                    ctx.Db.Player.PlayerId.Update(updatedPlayer);
-                }
-                else
-                {
-                    ctx.Db.Player.Insert(new Player
-                    {
-                        PlayerId = progress.PlayerId,
-                        TotalGames = 1,
-                        WinCount = placement == 1 ? 1UL : 0UL,
-                        Level = xpGained / 1000,
-                        Xp = xpGained
-                    });
-                }
-                
-                // Update or create PlayerStats record for this month
-                var existingStats = ctx.Db.PlayerStats.PlayerId.Month.GameMode.Find(
-                    progress.PlayerId, monthTimestamp, game.Value.GameMode);
-                
-                if (existingStats != null)
-                {
-                    var updatedStats = existingStats.Value;
-                    // Append new game stats to JSON array
-                    // Format: [{wordCount, time, placement}, ...]
-                    var newGameData = $"{{\"wordCount\":{wordCount},\"time\":{completionTime},\"placement\":{placement}}}";
-                    if (string.IsNullOrEmpty(updatedStats.CompletedGames))
-                    {
-                        updatedStats.CompletedGames = $"[{newGameData}]";
-                    }
-                    else
-                    {
-                        // Remove closing bracket, add comma, add new data, add closing bracket
-                        updatedStats.CompletedGames = updatedStats.CompletedGames.Substring(0, updatedStats.CompletedGames.Length - 1) 
-                            + $",{newGameData}]";
-                    }
-                    ctx.Db.PlayerStats.Id.Update(updatedStats);
-                }
-                else
-                {
-                    var newGameData = $"{{\"wordCount\":{wordCount},\"time\":{completionTime},\"placement\":{placement}}}";
-                    ctx.Db.PlayerStats.Insert(new PlayerStats
-                    {
-                        PlayerId = progress.PlayerId,
-                        Month = monthTimestamp,
-                        GameMode = game.Value.GameMode,
-                        CompletedGames = $"[{newGameData}]"
-                    });
-                }
-                
-                Log($"Updated stats for player {progress.PlayerId}: placement={placement}, xp={xpGained}, time={completionTime}ms");
-            }
         }
+    }
+
+    private static void PlayerCompleted(ReducerContext ctx, ulong gameId, SpacetimeDB.Identity playerId)
+    {
+        var game = ctx.Db.Game.Id.Find(gameId);
+        if (game == null)
+        {
+            Log($"Game {gameId} not found");
+            return;
+        }
+
+        // Add player to finished players list
+        var updatedGame = game.Value;
+        updatedGame.FinishedPlayers.Add(playerId);
+        ctx.Db.Game.Id.Update(updatedGame);
+
+        // Calculate placement based on position in finished players list
+        var placement = (ulong)updatedGame.FinishedPlayers.Count;
+
+        // Get player progress to calculate completion time
+        var progress = ctx.Db.PlayerProgress.PlayerId.GameId.Find(playerId, gameId);
+        if (progress == null)
+        {
+            Log($"No progress found for player {playerId}");
+            return;
+        }
+
+        var completionTime = progress.Value.CompletedAt - game.Value.CreatedAt;
+
+        // Calculate XP based on placement (1st = 100, 2nd = 75, 3rd = 50, rest = 25)
+        ulong xpGained = placement switch
+        {
+            1 => 100,
+            2 => 75,
+            3 => 50,
+            _ => 25
+        };
+
+        // Update or create Player record
+        var player = ctx.Db.Player.PlayerId.Find(playerId);
+        if (player != null)
+        {
+            var updatedPlayer = player.Value;
+            updatedPlayer.TotalGames++;
+            if (placement == 1)
+            {
+                updatedPlayer.WinCount++;
+            }
+            updatedPlayer.Xp += xpGained;
+            // Simple leveling: level = XP / 1000
+            updatedPlayer.Level = updatedPlayer.Xp / 1000;
+            ctx.Db.Player.PlayerId.Update(updatedPlayer);
+        }
+        else
+        {
+            ctx.Db.Player.Insert(new Player
+            {
+                PlayerId = playerId,
+                TotalGames = 1,
+                WinCount = placement == 1 ? 1UL : 0UL,
+                Level = xpGained / 1000,
+                Xp = xpGained
+            });
+        }
+
+        // Calculate word count from phrase
+        var wordCount = (ulong)game.Value.Phrase.Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries).Length;
+
+        // Calculate month timestamp (start of current month)
+        var now = DateTimeOffset.UtcNow;
+        var monthStart = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero);
+        var monthTimestamp = (ulong)monthStart.ToUnixTimeMilliseconds();
+
+        // Update or create PlayerStats record for this month
+        var existingStats = ctx.Db.PlayerStats.PlayerId.Month.GameMode.Find(
+            playerId, monthTimestamp, game.Value.GameMode);
+
+        var newGameStats = new CompletedGameStats
+        {
+            WordCount = wordCount,
+            Time = completionTime,
+            Placement = placement
+        };
+
+        if (existingStats != null)
+        {
+            var updatedStats = existingStats.Value;
+            updatedStats.CompletedGames.Add(newGameStats);
+            ctx.Db.PlayerStats.Id.Update(updatedStats);
+        }
+        else
+        {
+            var newStatsList = new SpacetimeDB.List<CompletedGameStats>();
+            newStatsList.Add(newGameStats);
+            ctx.Db.PlayerStats.Insert(new PlayerStats
+            {
+                PlayerId = playerId,
+                Month = monthTimestamp,
+                GameMode = game.Value.GameMode,
+                CompletedGames = newStatsList
+            });
+        }
+
+        Log($"Updated stats for player {playerId}: placement={placement}, xp={xpGained}, time={completionTime}ms");
     }
 
     [SpacetimeDB.Reducer]
@@ -366,9 +375,18 @@ public static partial class Module
         {
             updatedProgress.CompletedAt = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             Log($"Player {playerId} completed game {gameId} at {updatedProgress.CompletedAt}");
+            
+            // Update progress first, then call PlayerCompleted
+            ctx.Db.PlayerProgress.Id.Update(updatedProgress);
+            
+            // Call PlayerCompleted to handle stats
+            PlayerCompleted(ctx, gameId, playerId);
+        }
+        else
+        {
+            ctx.Db.PlayerProgress.Id.Update(updatedProgress);
         }
         
-        ctx.Db.PlayerProgress.Id.Update(updatedProgress);
         Log($"Updated progress for player {playerId} in game {gameId} to {newIndex}");
     }
 }
