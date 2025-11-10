@@ -4,9 +4,9 @@ using static SpacetimeDB.Module.Runtime;
 public enum GameState
 {
     Lobby,
-    Starting,
+    Countdown,
     Racing,
-    Finished
+    Archived
 }
 
 public enum GameMode
@@ -35,6 +35,20 @@ public partial struct Game
 
 [SpacetimeDB.Table(Scheduled = nameof(StartGameCountdown))]
 public partial struct GameCountdown
+{
+    public ulong GameId;
+    public SpacetimeDB.ScheduleAt ScheduledAt;
+}
+
+[SpacetimeDB.Table(Scheduled = nameof(StartGame))]
+public partial struct GameStart
+{
+    public ulong GameId;
+    public SpacetimeDB.ScheduleAt ScheduledAt;
+}
+
+[SpacetimeDB.Table(Scheduled = nameof(CompleteGame))]
+public partial struct GameCompletion
 {
     public ulong GameId;
     public SpacetimeDB.ScheduleAt ScheduledAt;
@@ -109,8 +123,8 @@ public static partial class Module
 
             InsertPlayerProgress(ctx, newGame.Id);
 
-            var eightSecondsInMicros = 8UL * 1000000UL;
-            var scheduledTime = newGame.CreatedAt * 1000UL + eightSecondsInMicros;
+            var fiveSecondsInMicros = 5UL * 1000000UL;
+            var scheduledTime = newGame.CreatedAt * 1000UL + fiveSecondsInMicros;
             ctx.Db.GameCountdown.Insert(new GameCountdown
             {
                 GameId = newGame.Id,
@@ -137,9 +151,57 @@ public static partial class Module
         if (game != null && game.Value.State == GameState.Lobby.ToString())
         {
             var updatedGame = game.Value;
-            updatedGame.State = GameState.Starting.ToString();
+            updatedGame.State = GameState.Countdown.ToString();
             ctx.Db.Game.Id.Update(updatedGame);
-            Log($"Game {gameId} transitioned to Starting state");
+            Log($"Game {gameId} transitioned to Countdown state");
+
+            // Schedule the game to start after 3 seconds
+            var threeSecondsInMicros = 3UL * 1000000UL;
+            var currentTime = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 1000UL;
+            var scheduledTime = currentTime + threeSecondsInMicros;
+            ctx.Db.GameStart.Insert(new GameStart
+            {
+                GameId = gameId,
+                ScheduledAt = SpacetimeDB.ScheduleAt.Time(scheduledTime)
+            });
+        }
+    }
+
+    [SpacetimeDB.Reducer]
+    public static void StartGame(ReducerContext ctx, ulong gameId)
+    {
+        var game = ctx.Db.Game.Id.Find(gameId);
+
+        if (game != null && game.Value.State == GameState.Countdown.ToString())
+        {
+            var updatedGame = game.Value;
+            updatedGame.State = GameState.Racing.ToString();
+            ctx.Db.Game.Id.Update(updatedGame);
+            Log($"Game {gameId} transitioned to Racing state");
+
+            // Schedule the game to complete after 5 minutes
+            var fiveMinutesInMicros = 5UL * 60UL * 1000000UL;
+            var currentTime = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 1000UL;
+            var scheduledTime = currentTime + fiveMinutesInMicros;
+            ctx.Db.GameCompletion.Insert(new GameCompletion
+            {
+                GameId = gameId,
+                ScheduledAt = SpacetimeDB.ScheduleAt.Time(scheduledTime)
+            });
+        }
+    }
+
+    [SpacetimeDB.Reducer]
+    public static void CompleteGame(ReducerContext ctx, ulong gameId)
+    {
+        var game = ctx.Db.Game.Id.Find(gameId);
+
+        if (game != null && game.Value.State == GameState.Racing.ToString())
+        {
+            var updatedGame = game.Value;
+            updatedGame.State = GameState.Archived.ToString();
+            ctx.Db.Game.Id.Update(updatedGame);
+            Log($"Game {gameId} transitioned to Archived state");
         }
     }
 
