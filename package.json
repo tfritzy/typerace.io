@@ -11,14 +11,18 @@
     "deploy": "spacetime publish --project-path spacetimedb && spacetime generate --lang typescript --out-dir src/module_bindings --project-path spacetimedb"
   },
   "dependencies": {
-    "spacetimedb": "^1.7.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "spacetimedb": "^1.7.0"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.17",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^5.0.2",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.0.0",
     "typescript": "~5.6.2",
     "vite": "^7.1.5"
   }
