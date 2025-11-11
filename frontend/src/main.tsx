@@ -1,18 +1,33 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
 import App from "./App.tsx";
 import { Identity } from "spacetimedb";
 import { SpacetimeDBProvider } from "spacetimedb/react";
 import { DbConnection, type ErrorContext } from "../module_bindings";
+import { GamePage } from "./pages/GamePage.tsx";
 
 const onConnect = (conn: DbConnection, _identity: Identity, token: string) => {
   localStorage.setItem("auth_token", token);
+  
   conn.subscriptionBuilder()
-    .onError((error) => {
+    .onError((error: any) => {
       console.error(error);
     })
     .subscribe("select * from person");
+  
+  conn.subscriptionBuilder()
+    .onError((error: any) => {
+      console.error(error);
+    })
+    .subscribe("select * from game");
+  
+  conn.subscriptionBuilder()
+    .onError((error: any) => {
+      console.error(error);
+    })
+    .subscribe("select * from player_progress");
 };
 
 const onDisconnect = () => {
@@ -34,7 +49,12 @@ const connectionBuilder = DbConnection.builder()
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <SpacetimeDBProvider connectionBuilder={connectionBuilder}>
-      <App />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/game/:gameId" element={<GamePage />} />
+        </Routes>
+      </BrowserRouter>
     </SpacetimeDBProvider>
   </StrictMode>
 );
