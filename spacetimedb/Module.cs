@@ -35,7 +35,7 @@ public static partial class Module
     public partial struct Person
     {
         [PrimaryKey]
-        public string Id;
+        public Identity Id;
         public string Name;
     }
 
@@ -114,10 +114,22 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void Add(ReducerContext ctx, string name)
+    public static void SetPersonName(ReducerContext ctx, string name)
     {
-        Log.Info("Added person", name);
-        ctx.Db.person.Insert(new Person { Id = IdGenerator.Generate("person_"), Name = name });
+        var existingPerson = ctx.Db.person.Id.Find(ctx.Sender);
+        
+        if (existingPerson != null)
+        {
+            var updatedPerson = existingPerson.Value;
+            updatedPerson.Name = name;
+            ctx.Db.person.Id.Update(updatedPerson);
+            Log.Info($"Updated person name for {ctx.Sender.ToHexString()} to {name}");
+        }
+        else
+        {
+            ctx.Db.person.Insert(new Person { Id = ctx.Sender, Name = name });
+            Log.Info($"Created person for {ctx.Sender.ToHexString()} with name {name}");
+        }
     }
 
     [Reducer]
@@ -131,13 +143,13 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void JoinGame(ReducerContext ctx, string player, GameMode gameMode)
+    public static void JoinGame(ReducerContext ctx, GameMode gameMode)
     {
         var foundGame = FindLobbyGame(ctx, gameMode);
 
         if (foundGame != null)
         {
-            Log.Info($"Player {player} joined game {foundGame.Value.Id}");
+            Log.Info($"Player {ctx.Sender.ToHexString()} joined game {foundGame.Value.Id}");
             InsertPlayerProgress(ctx, foundGame.Value.Id);
 
             int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
@@ -174,7 +186,7 @@ public static partial class Module
                 GameMode = gameMode
             });
 
-            Log.Info($"Player {player} created and joined game {newGame.Id}");
+            Log.Info($"Player {ctx.Sender.ToHexString()} created and joined game {newGame.Id}");
             InsertPlayerProgress(ctx, newGame.Id);
 
             var fiveSeconds = new TimeDuration { Microseconds = +5_000_000 };

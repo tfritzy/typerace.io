@@ -18,7 +18,7 @@ function App() {
 
   const handlePhraseComplete = useCallback(() => {
     if (conn) {
-      conn.reducers.JoinGame("Player", selectedMode);
+      conn.reducers.JoinGame(selectedMode);
     }
   }, [conn, selectedMode]);
 
