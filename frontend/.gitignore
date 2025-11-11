@@ -11,14 +11,6 @@ node_modules
 dist
 dist-ssr
 *.local
-*.tsbuildinfo
-
-# C# build artifacts
-bin/
-obj/
-
-# SpacetimeDB generated bindings
-frontend/module_bindings/
 
 # Editor directories and files
 .vscode/*

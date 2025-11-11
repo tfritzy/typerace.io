@@ -17,15 +17,16 @@ public enum GameMode
 
 public static partial class Module
 {
-
-
-    [Table]
+    [Table(Name = "person", Public=true)]
     public partial struct Person
     {
+        [AutoInc]
+        [PrimaryKey]
+        public ulong Id;
         public string Name;
     }
 
-    [Table]
+    [Table(Name = "game", Public=true)]
     public partial struct Game
     {
         [AutoInc]
@@ -71,7 +72,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table]
+    [Table(Name="player_progress", Public=true)]
     public partial struct PlayerProgress
     {
         [AutoInc]
@@ -102,13 +103,14 @@ public static partial class Module
     [Reducer]
     public static void Add(ReducerContext ctx, string name)
     {
-        ctx.Db.Person.Insert(new Person { Name = name });
+        Log.Info("Added person", name);
+        ctx.Db.person.Insert(new Person { Name = name });
     }
 
     [Reducer]
     public static void SayHello(ReducerContext ctx)
     {
-        foreach (var person in ctx.Db.Person.Iter())
+        foreach (var person in ctx.Db.person.Iter())
         {
             Log.Info($"Hello, {person.Name}!");
         }
@@ -128,7 +130,7 @@ public static partial class Module
         else
         {
             var createdAtMs = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            var newGame = ctx.Db.Game.Insert(new Game
+            var newGame = ctx.Db.game.Insert(new Game
             {
                 Id = 0,
                 Phrase = "The quick brown fox jumps over the lazy dog",
@@ -154,7 +156,7 @@ public static partial class Module
 
     private static Game? FindLobbyGame(ReducerContext ctx, GameMode gameMode)
     {
-        foreach (var game in ctx.Db.Game.Iter())
+        foreach (var game in ctx.Db.game.Iter())
         {
             if (game.State == GameState.Lobby && game.GameMode == gameMode)
             {
@@ -166,7 +168,7 @@ public static partial class Module
 
     private static void InsertPlayerProgress(ReducerContext ctx, ulong gameId)
     {
-        ctx.Db.PlayerProgress.Insert(new PlayerProgress
+        ctx.Db.player_progress.Insert(new PlayerProgress
         {
             Id = 0,
             PlayerId = ctx.Sender,
@@ -178,13 +180,13 @@ public static partial class Module
     [Reducer]
     public static void StartGameCountdown(ReducerContext ctx, GameCountdown args)
     {
-        var game = ctx.Db.Game.Id.Find(args.GameId);
+        var game = ctx.Db.game.Id.Find(args.GameId);
 
         if (game != null && game.Value.State == GameState.Lobby)
         {
             var updatedGame = game.Value;
             updatedGame.State = GameState.Countdown;
-            ctx.Db.Game.Id.Update(updatedGame);
+            ctx.Db.game.Id.Update(updatedGame);
 
             Log.Info($"Game {args.GameId} transitioned to Countdown state");
 
@@ -203,13 +205,13 @@ public static partial class Module
     [Reducer]
     public static void StartGame(ReducerContext ctx, GameStart args)
     {
-        var game = ctx.Db.Game.Id.Find(args.GameId);
+        var game = ctx.Db.game.Id.Find(args.GameId);
 
         if (game != null && game.Value.State == GameState.Countdown)
         {
             var updatedGame = game.Value;
             updatedGame.State = GameState.Racing;
-            ctx.Db.Game.Id.Update(updatedGame);
+            ctx.Db.game.Id.Update(updatedGame);
 
             Log.Info($"Game {args.GameId} transitioned to Racing state");
 
@@ -228,13 +230,13 @@ public static partial class Module
     [Reducer]
     public static void CompleteGame(ReducerContext ctx, GameCompletion args)
     {
-        var game = ctx.Db.Game.Id.Find(args.GameId);
+        var game = ctx.Db.game.Id.Find(args.GameId);
 
         if (game != null && game.Value.State == GameState.Racing)
         {
             var updatedGame = game.Value;
             updatedGame.State = GameState.Archived;
-            ctx.Db.Game.Id.Update(updatedGame);
+            ctx.Db.game.Id.Update(updatedGame);
 
             Log.Info($"Game {args.GameId} transitioned to Archived state");
         }
@@ -244,7 +246,7 @@ public static partial class Module
     public static void UpdateProgress(ReducerContext ctx, ulong gameId, ulong newIndex)
     {
         var playerId = ctx.Sender;
-        var game = ctx.Db.Game.Id.Find(gameId);
+        var game = ctx.Db.game.Id.Find(gameId);
 
         if (game == null || game.Value.State != GameState.Racing)
         {
@@ -262,14 +264,14 @@ public static partial class Module
 
         var updatedProgress = existingProgress.Value;
         updatedProgress.ProgressIndex = newIndex;
-        ctx.Db.PlayerProgress.Id.Update(updatedProgress);
+        ctx.Db.player_progress.Id.Update(updatedProgress);
 
         Log.Info($"Updated progress for player {playerId} in game {gameId} to {newIndex}");
     }
 
     private static PlayerProgress? FindPlayerProgress(ReducerContext ctx, Identity playerId, ulong gameId)
     {
-        foreach (var progress in ctx.Db.PlayerProgress.Iter())
+        foreach (var progress in ctx.Db.player_progress.Iter())
         {
             if (progress.PlayerId == playerId && progress.GameId == gameId)
             {

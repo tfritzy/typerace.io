@@ -1,2 +1,6 @@
-spacetime generate --lang typescript --out-dir src/module_bindings --
-project-path spacetimedb
+spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
+
+spacetime sql typerace "SELECT * from person"
+
+spacetime publish --project-path spacetimedb typerace
+spacetime publish -c --project-path spacetimedb typerace -y
