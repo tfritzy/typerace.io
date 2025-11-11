@@ -21,3 +21,16 @@ Do not add:
 - Any other form of code comments
 
 The only exception is for legally required copyright notices or license headers if absolutely necessary.
+
+### Documentation Policy
+
+**DO NOT create documentation files** such as README files, markdown documentation, or explanation files to describe code changes.
+
+Do not create:
+- README files explaining features
+- Markdown documentation files (*.md)
+- Explanation or guide files
+- Design documents
+- Usage documentation
+
+The code itself should be clear enough without additional documentation files.
