@@ -4,9 +4,10 @@ import { Cursor } from "./Cursor";
 type TypeBoxProps = {
   phrase: string;
   onComplete?: () => void;
+  onProgress?: (correctCharCount: number) => void;
 };
 
-export const TypeBox = ({ phrase, onComplete }: TypeBoxProps) => {
+export const TypeBox = ({ phrase, onComplete, onProgress }: TypeBoxProps) => {
   const [focused, setFocused] = useState(true);
   const [input, setInput] = useState("");
   const [inputWidth, setInputWidth] = useState(0);
@@ -52,11 +53,24 @@ export const TypeBox = ({ phrase, onComplete }: TypeBoxProps) => {
 
       setInput(newValue);
       
+      let correctCharCount = 0;
+      for (let i = 0; i < newValue.length; i++) {
+        if (newValue[i] === phrase[i]) {
+          correctCharCount++;
+        } else {
+          break;
+        }
+      }
+      
+      if (onProgress) {
+        onProgress(correctCharCount);
+      }
+      
       if (newValue === phrase && onComplete) {
         onComplete();
       }
     },
-    [phrase, onComplete]
+    [phrase, onComplete, onProgress]
   );
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
