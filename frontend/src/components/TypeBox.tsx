@@ -3,16 +3,17 @@ import { Cursor } from "./Cursor";
 
 type TypeBoxProps = {
   phrase: string;
+  onComplete?: () => void;
 };
 
-export const TypeBox = ({ phrase }: TypeBoxProps) => {
+export const TypeBox = ({ phrase, onComplete }: TypeBoxProps) => {
   const [focused, setFocused] = useState(true);
   const [input, setInput] = useState("");
   const [inputWidth, setInputWidth] = useState(0);
 
   const targetRef = useRef<HTMLElement>(null);
 
-  const phraseRef = useRef<HTMLElement>(null);
+  const phraseRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -50,8 +51,12 @@ export const TypeBox = ({ phrase }: TypeBoxProps) => {
       }
 
       setInput(newValue);
+      
+      if (newValue === phrase && onComplete) {
+        onComplete();
+      }
     },
-    [input.length, phrase]
+    [phrase, onComplete]
   );
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -76,7 +81,7 @@ export const TypeBox = ({ phrase }: TypeBoxProps) => {
       const isCorrect = input[i] === char;
       const isCursor = i === input.length;
 
-      let style: React.CSSProperties = {};
+      const style: React.CSSProperties = {};
       if (isTyped && isCorrect) {
         style.color = "var(--color-white)";
       } else if (isTyped && !isCorrect) {
