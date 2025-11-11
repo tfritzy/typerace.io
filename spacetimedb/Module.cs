@@ -106,6 +106,13 @@ public static partial class Module
     [Reducer]
     public static void ClientConnected(ReducerContext ctx)
     {
+        var existingPerson = ctx.Db.person.Id.Find(ctx.Sender);
+        
+        if (existingPerson == null)
+        {
+            ctx.Db.person.Insert(new Person { Id = ctx.Sender, Name = "Anonymous" });
+            Log.Info($"Created person record for new client {ctx.Sender.ToHexString()}");
+        }
     }
 
     [Reducer]

@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useCallback } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import type { DbConnection, Game, PlayerProgress } from "../../module_bindings";
+import type { DbConnection, Game, PlayerProgress, Person } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { TypeBox } from "../components/TypeBox";
 
@@ -24,17 +24,33 @@ export const GamePage = () => {
       })
       .subscribe(`select * from player_progress where GameId = ${gameId}`);
     
+    const personSubscription = conn.subscriptionBuilder()
+      .onError((error: ErrorContextInterface) => {
+        console.error("Error subscribing to person:", error);
+      })
+      .subscribe(`select * from person`);
+    
     return () => {
       gameSubscription.unsubscribe();
       playerProgressSubscription.unsubscribe();
+      personSubscription.unsubscribe();
     };
   }, [conn, gameId]);
   
   const { rows: games } = useTable<DbConnection, Game>("game");
   const { rows: playerProgress } = useTable<DbConnection, PlayerProgress>("player_progress");
+  const { rows: persons } = useTable<DbConnection, Person>("person");
 
   const game = games.find(g => g.Id.toString() === gameId);
   const gamePlayerProgress = playerProgress.filter(pp => pp.GameId.toString() === gameId);
+  
+  const getPlayerName = (playerId: any) => {
+    if (!playerId || playerId.toHexString() === "0000000000000000000000000000000000000000000000000000000000000000") {
+      return "Bot";
+    }
+    const person = persons.find(p => p.Id.isEqual(playerId));
+    return person?.Name || "Unknown";
+  };
 
   const handleProgress = useCallback((correctCharCount: number) => {
     if (!conn || !gameId) return;
@@ -67,9 +83,8 @@ export const GamePage = () => {
         <h2>Player Progress:</h2>
         {gamePlayerProgress.map((pp) => (
           <div key={pp.Id.toString()} style={{ marginTop: "10px", border: "1px solid #ccc", padding: "10px" }}>
-            <div>Id: {pp.Id.toString()}</div>
+            <div>Name: {getPlayerName(pp.PlayerId)}</div>
             <div>PlayerId: {pp.PlayerId.toHexString()}</div>
-            <div>GameId: {pp.GameId.toString()}</div>
             <div>ProgressIndex: {pp.ProgressIndex.toString()}</div>
             <div>IsBot: {pp.IsBot.toString()}</div>
           </div>
