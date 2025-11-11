@@ -34,18 +34,16 @@ public static partial class Module
     [Table(Name = "person", Public = true)]
     public partial struct Person
     {
-        [AutoInc]
         [PrimaryKey]
-        public ulong Id;
+        public string Id;
         public string Name;
     }
 
     [Table(Name = "game", Public = true)]
     public partial struct Game
     {
-        [AutoInc]
         [PrimaryKey]
-        public ulong Id;
+        public string Id;
         public string Phrase;
         public ulong CreatedAt;
 
@@ -63,7 +61,7 @@ public static partial class Module
         [PrimaryKey]
         public ulong ScheduledId;
         [SpacetimeDB.Index.BTree]
-        public ulong GameId;
+        public string GameId;
         public ScheduleAt ScheduledAt;
     }
 
@@ -73,7 +71,7 @@ public static partial class Module
         [AutoInc]
         [PrimaryKey]
         public ulong ScheduledId;
-        public ulong GameId;
+        public string GameId;
         public ScheduleAt ScheduledAt;
     }
 
@@ -83,20 +81,19 @@ public static partial class Module
         [AutoInc]
         [PrimaryKey]
         public ulong ScheduledId;
-        public ulong GameId;
+        public string GameId;
         public ScheduleAt ScheduledAt;
     }
 
     [Table(Name = "player_progress", Public = true)]
     public partial struct PlayerProgress
     {
-        [AutoInc]
         [PrimaryKey]
-        public ulong Id;
+        public string Id;
         [SpacetimeDB.Index.BTree]
         public Identity PlayerId;
         [SpacetimeDB.Index.BTree]
-        public ulong GameId;
+        public string GameId;
         public ulong ProgressIndex;
         public bool IsBot;
     }
@@ -120,7 +117,7 @@ public static partial class Module
     public static void Add(ReducerContext ctx, string name)
     {
         Log.Info("Added person", name);
-        ctx.Db.person.Insert(new Person { Name = name });
+        ctx.Db.person.Insert(new Person { Id = IdGenerator.Generate("person_"), Name = name });
     }
 
     [Reducer]
@@ -170,7 +167,7 @@ public static partial class Module
             var createdAtMs = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             var newGame = ctx.Db.game.Insert(new Game
             {
-                Id = 0,
+                Id = IdGenerator.Generate("game_"),
                 Phrase = "The quick brown fox jumps over the lazy dog",
                 CreatedAt = createdAtMs,
                 State = GameState.Lobby,
@@ -207,7 +204,7 @@ public static partial class Module
         return null;
     }
 
-    private static int CountPlayersInGame(ReducerContext ctx, ulong gameId)
+    private static int CountPlayersInGame(ReducerContext ctx, string gameId)
     {
         int count = 0;
         foreach (var progress in ctx.Db.player_progress.GameId.Filter(gameId))
@@ -217,7 +214,7 @@ public static partial class Module
         return count;
     }
 
-    private static void CancelBotFillTrigger(ReducerContext ctx, ulong gameId)
+    private static void CancelBotFillTrigger(ReducerContext ctx, string gameId)
     {
         var triggersToDelete = new List<BotFillTrigger>();
         foreach (var trigger in ctx.Db.BotFillTrigger.GameId.Filter(gameId))
@@ -232,11 +229,11 @@ public static partial class Module
         }
     }
 
-    private static void InsertPlayerProgress(ReducerContext ctx, ulong gameId)
+    private static void InsertPlayerProgress(ReducerContext ctx, string gameId)
     {
         ctx.Db.player_progress.Insert(new PlayerProgress
         {
-            Id = 0,
+            Id = IdGenerator.Generate("pp_"),
             PlayerId = ctx.Sender,
             GameId = gameId,
             ProgressIndex = 0,
@@ -259,7 +256,7 @@ public static partial class Module
             {
                 ctx.Db.player_progress.Insert(new PlayerProgress
                 {
-                    Id = 0,
+                    Id = IdGenerator.Generate("pp_"),
                     PlayerId = Identity.ZERO,
                     GameId = args.GameId,
                     ProgressIndex = 0,
@@ -328,7 +325,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void UpdateProgress(ReducerContext ctx, ulong gameId, ulong newIndex)
+    public static void UpdateProgress(ReducerContext ctx, string gameId, ulong newIndex)
     {
         var playerId = ctx.Sender;
         var game = ctx.Db.game.Id.Find(gameId);
@@ -354,7 +351,7 @@ public static partial class Module
         Log.Info($"Updated progress for player {playerId} in game {gameId} to {newIndex}");
     }
 
-    private static PlayerProgress? FindPlayerProgress(ReducerContext ctx, Identity playerId, ulong gameId)
+    private static PlayerProgress? FindPlayerProgress(ReducerContext ctx, Identity playerId, string gameId)
     {
         foreach (var progress in ctx.Db.player_progress.Iter())
         {
