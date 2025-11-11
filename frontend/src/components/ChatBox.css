@@ -1,0 +1,9 @@
+
+
+
+.chat-box {
+  background-color: var(--color-chat-box-bg);
+  border: 1px solid var(--color-chat-box-border);
+  box-shadow: var(--shadow-chat-box);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}

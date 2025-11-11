@@ -12,12 +12,26 @@ public enum GameState
 [Type]
 public enum GameMode
 {
-    English500
+    English500,
+    Spanish500,
+    French500,
+    German500,
+    Italian500,
+    Portuguese500,
+    Japanese500,
+    Korean500,
+    Chinese500,
+    Russian500,
+    Arabic500,
+    Hindi500,
+    Dutch500,
+    Swedish500,
+    Turkish500
 }
 
 public static partial class Module
 {
-    [Table(Name = "person", Public=true)]
+    [Table(Name = "person", Public = true)]
     public partial struct Person
     {
         [AutoInc]
@@ -26,7 +40,7 @@ public static partial class Module
         public string Name;
     }
 
-    [Table(Name = "game", Public=true)]
+    [Table(Name = "game", Public = true)]
     public partial struct Game
     {
         [AutoInc]
@@ -72,7 +86,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Name="player_progress", Public=true)]
+    [Table(Name = "player_progress", Public = true)]
     public partial struct PlayerProgress
     {
         [AutoInc]

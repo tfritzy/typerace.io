@@ -1,0 +1,33 @@
+.selection-button {
+  padding: 0.875rem 1rem;
+  background-color: var(--color-chat-box-bg);
+  border: 1px solid var(--color-chat-box-border);
+  border-radius: 12px;
+  color: var(--color-white);
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  opacity: 0.5;
+}
+
+.selection-button:hover {
+  border-color: var(--color-white-25);
+  background-color: #333333;
+  transform: translateY(-1px);
+  opacity: 0.8;
+}
+
+.selection-button.selected {
+  border-color: var(--color-white-25);
+  background-color: #333333;
+  opacity: 1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.selection-button:active {
+  transform: translateY(0);
+}

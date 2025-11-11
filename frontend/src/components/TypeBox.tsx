@@ -102,7 +102,7 @@ export const TypeBox = ({ phrase }: TypeBoxProps) => {
     <div className="relative select-none">
       <div className="type-box">
         <div
-          className="rounded-lg transition-colors whitespace-pre-wrap text-start text-3xl"
+          className="rounded-lg transition-colors whitespace-pre-wrap text-start text-2xl font-light"
           ref={phraseRef}
         >
           {renderText()}
