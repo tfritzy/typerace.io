@@ -56,8 +56,8 @@ public static partial class Module
         public GameMode GameMode;
     }
 
-    [Table(Scheduled = nameof(StartGameCountdown))]
-    public partial struct GameCountdown
+    [Table(Scheduled = nameof(FillGameWithBots))]
+    public partial struct BotFillTrigger
     {
         [AutoInc]
         [PrimaryKey]
@@ -140,6 +140,29 @@ public static partial class Module
         {
             Log.Info($"Player {player} joined game {foundGame.Value.Id}");
             InsertPlayerProgress(ctx, foundGame.Value.Id);
+
+            // Check if this is the 4th player
+            int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
+            if (playerCount >= 4)
+            {
+                // Transition to Countdown state immediately
+                var updatedGame = foundGame.Value;
+                updatedGame.State = GameState.Countdown;
+                ctx.Db.game.Id.Update(updatedGame);
+
+                Log.Info($"Game {foundGame.Value.Id} reached 4 players, transitioning to Countdown state");
+
+                // Schedule StartGame after 3 seconds
+                var threeSeconds = new TimeDuration { Microseconds = +3_000_000 };
+                var scheduledTime = ctx.Timestamp + threeSeconds;
+
+                ctx.Db.GameStart.Insert(new GameStart
+                {
+                    ScheduledId = 0,
+                    GameId = foundGame.Value.Id,
+                    ScheduledAt = new ScheduleAt.Time(scheduledTime)
+                });
+            }
         }
         else
         {
@@ -156,10 +179,11 @@ public static partial class Module
             Log.Info($"Player {player} created and joined game {newGame.Id}");
             InsertPlayerProgress(ctx, newGame.Id);
 
+            // Schedule bot fill after 5 seconds instead of countdown
             var fiveSeconds = new TimeDuration { Microseconds = +5_000_000 };
             var futureTimestamp = ctx.Timestamp + fiveSeconds;
 
-            ctx.Db.GameCountdown.Insert(new GameCountdown
+            ctx.Db.BotFillTrigger.Insert(new BotFillTrigger
             {
                 ScheduledId = 0,
                 GameId = newGame.Id,
@@ -174,10 +198,27 @@ public static partial class Module
         {
             if (game.State == GameState.Lobby && game.GameMode == gameMode)
             {
-                return game;
+                // Check if game has less than 4 players
+                if (CountPlayersInGame(ctx, game.Id) < 4)
+                {
+                    return game;
+                }
             }
         }
         return null;
+    }
+
+    private static int CountPlayersInGame(ReducerContext ctx, ulong gameId)
+    {
+        int count = 0;
+        foreach (var progress in ctx.Db.player_progress.Iter())
+        {
+            if (progress.GameId == gameId)
+            {
+                count++;
+            }
+        }
+        return count;
     }
 
     private static void InsertPlayerProgress(ReducerContext ctx, ulong gameId)
@@ -192,18 +233,41 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void StartGameCountdown(ReducerContext ctx, GameCountdown args)
+    public static void FillGameWithBots(ReducerContext ctx, BotFillTrigger args)
     {
         var game = ctx.Db.game.Id.Find(args.GameId);
 
         if (game != null && game.Value.State == GameState.Lobby)
         {
+            int currentPlayerCount = CountPlayersInGame(ctx, args.GameId);
+            
+            // Fill with bots up to 4 players
+            int botsToAdd = 4 - currentPlayerCount;
+            
+            for (int i = 0; i < botsToAdd; i++)
+            {
+                // Create a bot identity (using a special marker for bots)
+                // Note: In SpacetimeDB, we can't create arbitrary identities, so we'll use the system identity
+                // and rely on separate tracking if needed, or add player records
+                ctx.Db.player_progress.Insert(new PlayerProgress
+                {
+                    Id = 0,
+                    PlayerId = Identity.ZERO, // Bot marker
+                    GameId = args.GameId,
+                    ProgressIndex = 0
+                });
+                
+                Log.Info($"Added bot {i + 1} to game {args.GameId}");
+            }
+
+            // Transition to Countdown state after adding bots
             var updatedGame = game.Value;
             updatedGame.State = GameState.Countdown;
             ctx.Db.game.Id.Update(updatedGame);
 
-            Log.Info($"Game {args.GameId} transitioned to Countdown state");
+            Log.Info($"Game {args.GameId} filled with {botsToAdd} bots and transitioned to Countdown state");
 
+            // Schedule StartGame after 3 seconds
             var threeSeconds = new TimeDuration { Microseconds = +3_000_000 };
             var scheduledTime = ctx.Timestamp + threeSeconds;
 
