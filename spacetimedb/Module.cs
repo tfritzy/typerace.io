@@ -56,12 +56,13 @@ public static partial class Module
         public GameMode GameMode;
     }
 
-    [Table(Scheduled = nameof(StartGameCountdown))]
-    public partial struct GameCountdown
+    [Table(Scheduled = nameof(FillGameWithBots))]
+    public partial struct BotFillTrigger
     {
         [AutoInc]
         [PrimaryKey]
         public ulong ScheduledId;
+        [SpacetimeDB.Index.BTree]
         public ulong GameId;
         public ScheduleAt ScheduledAt;
     }
@@ -97,6 +98,7 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         public ulong GameId;
         public ulong ProgressIndex;
+        public bool IsBot;
     }
 
     [Reducer]
@@ -140,6 +142,28 @@ public static partial class Module
         {
             Log.Info($"Player {player} joined game {foundGame.Value.Id}");
             InsertPlayerProgress(ctx, foundGame.Value.Id);
+
+            int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
+            if (playerCount >= 4)
+            {
+                CancelBotFillTrigger(ctx, foundGame.Value.Id);
+
+                var updatedGame = foundGame.Value;
+                updatedGame.State = GameState.Countdown;
+                ctx.Db.game.Id.Update(updatedGame);
+
+                Log.Info($"Game {foundGame.Value.Id} reached 4 players, transitioning to Countdown state");
+
+                var threeSeconds = new TimeDuration { Microseconds = +3_000_000 };
+                var scheduledTime = ctx.Timestamp + threeSeconds;
+
+                ctx.Db.GameStart.Insert(new GameStart
+                {
+                    ScheduledId = 0,
+                    GameId = foundGame.Value.Id,
+                    ScheduledAt = new ScheduleAt.Time(scheduledTime)
+                });
+            }
         }
         else
         {
@@ -159,7 +183,7 @@ public static partial class Module
             var fiveSeconds = new TimeDuration { Microseconds = +5_000_000 };
             var futureTimestamp = ctx.Timestamp + fiveSeconds;
 
-            ctx.Db.GameCountdown.Insert(new GameCountdown
+            ctx.Db.BotFillTrigger.Insert(new BotFillTrigger
             {
                 ScheduledId = 0,
                 GameId = newGame.Id,
@@ -170,14 +194,42 @@ public static partial class Module
 
     private static Game? FindLobbyGame(ReducerContext ctx, GameMode gameMode)
     {
-        foreach (var game in ctx.Db.game.Iter())
+        foreach (var game in ctx.Db.game.State.Filter(GameState.Lobby))
         {
-            if (game.State == GameState.Lobby && game.GameMode == gameMode)
+            if (game.GameMode == gameMode)
             {
-                return game;
+                if (CountPlayersInGame(ctx, game.Id) < 4)
+                {
+                    return game;
+                }
             }
         }
         return null;
+    }
+
+    private static int CountPlayersInGame(ReducerContext ctx, ulong gameId)
+    {
+        int count = 0;
+        foreach (var progress in ctx.Db.player_progress.GameId.Filter(gameId))
+        {
+            count++;
+        }
+        return count;
+    }
+
+    private static void CancelBotFillTrigger(ReducerContext ctx, ulong gameId)
+    {
+        var triggersToDelete = new List<BotFillTrigger>();
+        foreach (var trigger in ctx.Db.BotFillTrigger.GameId.Filter(gameId))
+        {
+            triggersToDelete.Add(trigger);
+        }
+
+        foreach (var trigger in triggersToDelete)
+        {
+            ctx.Db.BotFillTrigger.ScheduledId.Delete(trigger.ScheduledId);
+            Log.Info($"Cancelled bot fill trigger for game {gameId}");
+        }
     }
 
     private static void InsertPlayerProgress(ReducerContext ctx, ulong gameId)
@@ -187,22 +239,41 @@ public static partial class Module
             Id = 0,
             PlayerId = ctx.Sender,
             GameId = gameId,
-            ProgressIndex = 0
+            ProgressIndex = 0,
+            IsBot = false
         });
     }
 
     [Reducer]
-    public static void StartGameCountdown(ReducerContext ctx, GameCountdown args)
+    public static void FillGameWithBots(ReducerContext ctx, BotFillTrigger args)
     {
         var game = ctx.Db.game.Id.Find(args.GameId);
 
         if (game != null && game.Value.State == GameState.Lobby)
         {
+            int currentPlayerCount = CountPlayersInGame(ctx, args.GameId);
+            
+            int botsToAdd = 4 - currentPlayerCount;
+            
+            for (int i = 0; i < botsToAdd; i++)
+            {
+                ctx.Db.player_progress.Insert(new PlayerProgress
+                {
+                    Id = 0,
+                    PlayerId = Identity.ZERO,
+                    GameId = args.GameId,
+                    ProgressIndex = 0,
+                    IsBot = true
+                });
+                
+                Log.Info($"Added bot {i + 1} to game {args.GameId}");
+            }
+
             var updatedGame = game.Value;
             updatedGame.State = GameState.Countdown;
             ctx.Db.game.Id.Update(updatedGame);
 
-            Log.Info($"Game {args.GameId} transitioned to Countdown state");
+            Log.Info($"Game {args.GameId} filled with {botsToAdd} bots and transitioned to Countdown state");
 
             var threeSeconds = new TimeDuration { Microseconds = +3_000_000 };
             var scheduledTime = ctx.Timestamp + threeSeconds;
