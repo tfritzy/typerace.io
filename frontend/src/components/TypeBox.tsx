@@ -76,19 +76,20 @@ export const TypeBox = ({ phrase }: TypeBoxProps) => {
       const isCorrect = input[i] === char;
       const isCursor = i === input.length;
 
-      let className = "";
+      let style: React.CSSProperties = {};
       if (isTyped && isCorrect) {
-        className = "text-white";
+        style.color = "var(--color-white)";
       } else if (isTyped && !isCorrect) {
-        className = "text-red-500 underline decoration-3";
+        style.color = "var(--color-error)";
       } else {
-        className = "text-white/25";
+        style.color = "var(--color-white-25)";
       }
 
       return (
         <span
           key={i}
-          className={`${className} transition-colors`}
+          className={`transition-colors ${isTyped && !isCorrect ? 'underline decoration-3' : ''}`}
+          style={style}
         >
           {isCursor && <span id="target" ref={targetRef} />}
           {char}
@@ -100,12 +101,12 @@ export const TypeBox = ({ phrase }: TypeBoxProps) => {
   return (
     <div className="relative select-none">
       <div className="type-box">
-        <h1
-          className="rounded-lg transition-colors whitespace-pre-wrap text-start"
+        <div
+          className="rounded-lg transition-colors whitespace-pre-wrap text-start text-3xl"
           ref={phraseRef}
         >
           {renderText()}
-        </h1>
+        </div>
 
         <Cursor targetRef={targetRef} lerp={0.15} fadeDelay={500} />
 

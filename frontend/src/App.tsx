@@ -5,6 +5,7 @@ import "./App.css";
 import type { DbConnection, Person } from "../module_bindings";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import { TypeBox } from "./components/TypeBox";
+import { ChatBox } from "./components/ChatBox";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -14,7 +15,9 @@ function App() {
 
   return (
     <>
-      <TypeBox phrase="the quick red fox jumps over the brown fence." />
+      <ChatBox>
+        <TypeBox phrase="Put me in coach" />
+      </ChatBox>
     </>
   );
 }
