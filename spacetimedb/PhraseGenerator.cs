@@ -16,15 +16,15 @@ public static class PhraseGenerator
         return random;
     }
 
-    public static string GeneratePhrase(int wordCount = 10)
+    public static string GeneratePhrase(string[] wordList, int wordCount = 10)
     {
         var words = new List<string>();
         var rng = GetRandom();
         
         for (int i = 0; i < wordCount; i++)
         {
-            int index = rng.Next(English500Words.Words.Length);
-            words.Add(English500Words.Words[index]);
+            int index = rng.Next(wordList.Length);
+            words.Add(wordList[index]);
         }
         
         return string.Join(" ", words);
@@ -35,7 +35,9 @@ public static class PhraseGenerator
         switch (mode)
         {
             case GameMode.English500:
-                return GeneratePhrase(10);
+                return GeneratePhrase(English500Words.Words, 10);
+            case GameMode.Spanish500:
+                return GeneratePhrase(Spanish500Words.Words, 10);
             default:
                 return "The quick brown fox jumps over the lazy dog";
         }
