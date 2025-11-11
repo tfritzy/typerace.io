@@ -1,17 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Cursor } from "./Cursor";
 
 type TypeBoxProps = {
   phrase: string;
 };
 
-export const TypeBox = ({
-  phrase,
-}: TypeBoxProps) => {
+export const TypeBox = ({ phrase }: TypeBoxProps) => {
   const [focused, setFocused] = useState(true);
   const [input, setInput] = useState("");
   const [inputWidth, setInputWidth] = useState(0);
-  
-  const phraseRef = useRef<HTMLDivElement>(null);
+
+  const targetRef = useRef<HTMLElement>(null);
+
+  const phraseRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export const TypeBox = ({
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       const newValue = event.target.value;
-      
+
       if (newValue.length > phrase.length) {
         return;
       }
@@ -53,16 +54,20 @@ export const TypeBox = ({
     [input.length, phrase]
   );
 
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent) => {
-      const cursorKeys = ["ArrowLeft", "ArrowRight", "Home", "End", "PageUp", "PageDown"];
+  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    const cursorKeys = [
+      "ArrowLeft",
+      "ArrowRight",
+      "Home",
+      "End",
+      "PageUp",
+      "PageDown",
+    ];
 
-      if (cursorKeys.includes(event.key)) {
-        event.preventDefault();
-      }
-    },
-    []
-  );
+    if (cursorKeys.includes(event.key)) {
+      event.preventDefault();
+    }
+  }, []);
 
   const renderText = () => {
     const chars = phrase.split("");
@@ -70,18 +75,22 @@ export const TypeBox = ({
       const isTyped = i < input.length;
       const isCorrect = input[i] === char;
       const isCursor = i === input.length;
-      
+
       let className = "";
       if (isTyped && isCorrect) {
         className = "text-white";
       } else if (isTyped && !isCorrect) {
-        className = "text-red-400 underline decoration-3";
+        className = "text-red-500 underline decoration-3";
       } else {
         className = "text-white/25";
       }
 
       return (
-        <span key={i} className={`${className} ${isCursor ? "border-l" : ""} transition-colors`}>
+        <span
+          key={i}
+          className={`${className} transition-colors`}
+        >
+          {isCursor && <span id="target" ref={targetRef} />}
           {char}
         </span>
       );
@@ -97,6 +106,8 @@ export const TypeBox = ({
         >
           {renderText()}
         </h1>
+
+        <Cursor targetRef={targetRef} lerp={0.15} fadeDelay={500} />
 
         <textarea
           ref={inputRef}

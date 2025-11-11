@@ -6,28 +6,11 @@ import { Identity } from "spacetimedb";
 import { SpacetimeDBProvider } from "spacetimedb/react";
 import { DbConnection, type ErrorContext } from "../module_bindings";
 
-const onConnect = (conn: DbConnection, identity: Identity, token: string) => {
+const onConnect = (conn: DbConnection, _identity: Identity, token: string) => {
   localStorage.setItem("auth_token", token);
-  console.log(
-    "Connected to SpacetimeDB with identity:",
-    identity.toHexString()
-  );
-  
-  // Subscribe with all possible callbacks
   conn.subscriptionBuilder()
-    .onApplied(() => {
-      console.log(conn.db);
-      console.log("✅ Subscription applied!");
-      console.log("Person count:", conn.db.person.count());
-      console.log("Persons:", Array.from(conn.db.person.iter()));
-    })
-    .onError((error) => console.error(error))
-    .onError((...args) => {
-      console.error("❌ Subscription error - args:", args);
-      console.error("❌ Subscription error - arg count:", args.length);
-      args.forEach((arg, i) => {
-        console.error(`❌ Arg ${i}:`, arg);
-      });
+    .onError((error) => {
+      console.error(error);
     })
     .subscribe("select * from person");
 };
