@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
 import "./components/SelectionButton.css";
-import type { DbConnection, Person, GameMode, PlayerProgress } from "../module_bindings";
+import type { DbConnection, GameMode, PlayerProgress } from "../module_bindings";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import { TypeBox } from "./components/TypeBox";
 import { ChatBox } from "./components/ChatBox";
@@ -14,12 +14,11 @@ function App() {
   const [isPrivate, setIsPrivate] = useState(false);
 
   const conn = useSpacetimeDB<DbConnection>();
-  useTable<DbConnection, Person>("person");
   const navigate = useNavigate();
 
   const handlePhraseComplete = useCallback(() => {
     if (conn) {
-      conn.call("JoinGame", "Player", selectedMode);
+      conn.reducers.JoinGame("Player", selectedMode);
     }
   }, [conn, selectedMode]);
 

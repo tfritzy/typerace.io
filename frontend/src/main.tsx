@@ -16,18 +16,6 @@ const onConnect = (conn: DbConnection, _identity: Identity, token: string) => {
     .onError((error: ErrorContextInterface) => {
       console.error(error);
     })
-    .subscribe("select * from person");
-  
-  conn.subscriptionBuilder()
-    .onError((error: ErrorContextInterface) => {
-      console.error(error);
-    })
-    .subscribe("select * from game");
-  
-  conn.subscriptionBuilder()
-    .onError((error: ErrorContextInterface) => {
-      console.error(error);
-    })
     .subscribe("select * from player_progress");
 };
 

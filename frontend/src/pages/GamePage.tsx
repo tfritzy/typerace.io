@@ -1,9 +1,34 @@
 import { useParams } from "react-router-dom";
-import { useTable } from "spacetimedb/react";
+import { useEffect } from "react";
+import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import type { DbConnection, Game, PlayerProgress } from "../../module_bindings";
+import type { ErrorContextInterface } from "spacetimedb/sdk";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
+  const conn = useSpacetimeDB<DbConnection>();
+  
+  useEffect(() => {
+    if (!conn || !gameId) return;
+    
+    const gameSubscription = conn.subscriptionBuilder()
+      .onError((error: ErrorContextInterface) => {
+        console.error("Error subscribing to game:", error);
+      })
+      .subscribe(`select * from game where Id = ${gameId}`);
+    
+    const playerProgressSubscription = conn.subscriptionBuilder()
+      .onError((error: ErrorContextInterface) => {
+        console.error("Error subscribing to player_progress:", error);
+      })
+      .subscribe(`select * from player_progress where GameId = ${gameId}`);
+    
+    return () => {
+      gameSubscription.unsubscribe();
+      playerProgressSubscription.unsubscribe();
+    };
+  }, [conn, gameId]);
+  
   const { rows: games } = useTable<DbConnection, Game>("game");
   const { rows: playerProgress } = useTable<DbConnection, PlayerProgress>("player_progress");
 
