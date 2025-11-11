@@ -20,15 +20,15 @@ spacetime start
 spacetime publish --project-path spacetimedb typerace
 ```
 
-3. Install dependencies:
+3. Generate TypeScript bindings from the SpacetimeDB module:
+```bash
+spacetime generate --lang typescript --out-dir src/module_bindings --project-path spacetimedb
+```
+
+4. Install dependencies:
 ```bash
 cd frontend
 npm install
-```
-
-4. Generate TypeScript bindings from the SpacetimeDB module:
-```bash
-spacetime generate --lang typescript --out-dir src/module_bindings --project-path spacetimedb
 ```
 
 5. Start the development server:
