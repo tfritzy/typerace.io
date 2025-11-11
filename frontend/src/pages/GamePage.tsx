@@ -1,8 +1,9 @@
 import { useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import type { DbConnection, Game, PlayerProgress } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
+import { TypeBox } from "../components/TypeBox";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -35,6 +36,12 @@ export const GamePage = () => {
   const game = games.find(g => g.Id.toString() === gameId);
   const gamePlayerProgress = playerProgress.filter(pp => pp.GameId.toString() === gameId);
 
+  const handleProgress = useCallback((correctCharCount: number) => {
+    if (!conn || !gameId) return;
+    
+    conn.reducers.UpdateProgress(gameId, correctCharCount);
+  }, [conn, gameId]);
+
   if (!game) {
     return <div>Game not found</div>;
   }
@@ -49,6 +56,11 @@ export const GamePage = () => {
         <div>CreatedAt: {game.CreatedAt.toString()}</div>
         <div>State: {game.State}</div>
         <div>GameMode: {game.GameMode.tag}</div>
+      </div>
+      
+      <div style={{ marginTop: "20px" }}>
+        <h2>Type the phrase:</h2>
+        <TypeBox phrase={game.Phrase} onProgress={handleProgress} />
       </div>
       
       <div style={{ marginTop: "20px" }}>
