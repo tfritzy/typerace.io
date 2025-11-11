@@ -168,7 +168,7 @@ public static partial class Module
             var newGame = ctx.Db.game.Insert(new Game
             {
                 Id = IdGenerator.Generate("game_"),
-                Phrase = "The quick brown fox jumps over the lazy dog",
+                Phrase = PhraseGenerator.GeneratePhraseForMode(gameMode),
                 CreatedAt = createdAtMs,
                 State = GameState.Lobby,
                 GameMode = gameMode
