@@ -62,6 +62,7 @@ public static partial class Module
         [AutoInc]
         [PrimaryKey]
         public ulong ScheduledId;
+        [SpacetimeDB.Index.BTree]
         public ulong GameId;
         public ScheduleAt ScheduledAt;
     }
@@ -97,6 +98,7 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         public ulong GameId;
         public ulong ProgressIndex;
+        public bool IsBot;
     }
 
     [Reducer]
@@ -197,9 +199,10 @@ public static partial class Module
 
     private static Game? FindLobbyGame(ReducerContext ctx, GameMode gameMode)
     {
-        foreach (var game in ctx.Db.game.Iter())
+        // Use State index to only iterate over Lobby games
+        foreach (var game in ctx.Db.game.State.Filter(GameState.Lobby))
         {
-            if (game.State == GameState.Lobby && game.GameMode == gameMode)
+            if (game.GameMode == gameMode)
             {
                 // Check if game has less than 4 players
                 if (CountPlayersInGame(ctx, game.Id) < 4)
@@ -214,26 +217,21 @@ public static partial class Module
     private static int CountPlayersInGame(ReducerContext ctx, ulong gameId)
     {
         int count = 0;
-        foreach (var progress in ctx.Db.player_progress.Iter())
+        // Use GameId index to only iterate over progress for this game
+        foreach (var progress in ctx.Db.player_progress.GameId.Filter(gameId))
         {
-            if (progress.GameId == gameId)
-            {
-                count++;
-            }
+            count++;
         }
         return count;
     }
 
     private static void CancelBotFillTrigger(ReducerContext ctx, ulong gameId)
     {
-        // Find and delete any pending bot fill triggers for this game
+        // Use GameId index to only iterate over triggers for this game
         var triggersToDelete = new List<BotFillTrigger>();
-        foreach (var trigger in ctx.Db.BotFillTrigger.Iter())
+        foreach (var trigger in ctx.Db.BotFillTrigger.GameId.Filter(gameId))
         {
-            if (trigger.GameId == gameId)
-            {
-                triggersToDelete.Add(trigger);
-            }
+            triggersToDelete.Add(trigger);
         }
 
         foreach (var trigger in triggersToDelete)
@@ -250,7 +248,8 @@ public static partial class Module
             Id = 0,
             PlayerId = ctx.Sender,
             GameId = gameId,
-            ProgressIndex = 0
+            ProgressIndex = 0,
+            IsBot = false
         });
     }
 
@@ -268,15 +267,13 @@ public static partial class Module
             
             for (int i = 0; i < botsToAdd; i++)
             {
-                // Create a bot identity (using a special marker for bots)
-                // Note: In SpacetimeDB, we can't create arbitrary identities, so we'll use the system identity
-                // and rely on separate tracking if needed, or add player records
                 ctx.Db.player_progress.Insert(new PlayerProgress
                 {
                     Id = 0,
                     PlayerId = Identity.ZERO, // Bot marker
                     GameId = args.GameId,
-                    ProgressIndex = 0
+                    ProgressIndex = 0,
+                    IsBot = true
                 });
                 
                 Log.Info($"Added bot {i + 1} to game {args.GameId}");
