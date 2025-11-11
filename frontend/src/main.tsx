@@ -5,26 +5,27 @@ import "./index.css";
 import App from "./App.tsx";
 import { Identity } from "spacetimedb";
 import { SpacetimeDBProvider } from "spacetimedb/react";
-import { DbConnection, type ErrorContext } from "../module_bindings";
+import { DbConnection } from "../module_bindings";
+import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { GamePage } from "./pages/GamePage.tsx";
 
 const onConnect = (conn: DbConnection, _identity: Identity, token: string) => {
   localStorage.setItem("auth_token", token);
   
   conn.subscriptionBuilder()
-    .onError((error: any) => {
+    .onError((error: ErrorContextInterface) => {
       console.error(error);
     })
     .subscribe("select * from person");
   
   conn.subscriptionBuilder()
-    .onError((error: any) => {
+    .onError((error: ErrorContextInterface) => {
       console.error(error);
     })
     .subscribe("select * from game");
   
   conn.subscriptionBuilder()
-    .onError((error: any) => {
+    .onError((error: ErrorContextInterface) => {
       console.error(error);
     })
     .subscribe("select * from player_progress");
@@ -34,7 +35,7 @@ const onDisconnect = () => {
   console.log("Disconnected from SpacetimeDB");
 };
 
-const onConnectError = (_ctx: ErrorContext, err: Error) => {
+const onConnectError = (_ctx: ErrorContextInterface, err: Error) => {
   console.log("Error connecting to SpacetimeDB:", err);
 };
 

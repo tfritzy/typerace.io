@@ -56,7 +56,7 @@ export const TypeBox = ({ phrase, onComplete }: TypeBoxProps) => {
         onComplete();
       }
     },
-    [input.length, phrase, onComplete]
+    [phrase, onComplete]
   );
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -81,7 +81,7 @@ export const TypeBox = ({ phrase, onComplete }: TypeBoxProps) => {
       const isCorrect = input[i] === char;
       const isCursor = i === input.length;
 
-      let style: React.CSSProperties = {};
+      const style: React.CSSProperties = {};
       if (isTyped && isCorrect) {
         style.color = "var(--color-white)";
       } else if (isTyped && !isCorrect) {
