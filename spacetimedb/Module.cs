@@ -145,6 +145,9 @@ public static partial class Module
             int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
             if (playerCount >= 4)
             {
+                // Cancel any pending bot fill triggers for this game
+                CancelBotFillTrigger(ctx, foundGame.Value.Id);
+
                 // Transition to Countdown state immediately
                 var updatedGame = foundGame.Value;
                 updatedGame.State = GameState.Countdown;
@@ -219,6 +222,25 @@ public static partial class Module
             }
         }
         return count;
+    }
+
+    private static void CancelBotFillTrigger(ReducerContext ctx, ulong gameId)
+    {
+        // Find and delete any pending bot fill triggers for this game
+        var triggersToDelete = new List<BotFillTrigger>();
+        foreach (var trigger in ctx.Db.BotFillTrigger.Iter())
+        {
+            if (trigger.GameId == gameId)
+            {
+                triggersToDelete.Add(trigger);
+            }
+        }
+
+        foreach (var trigger in triggersToDelete)
+        {
+            ctx.Db.BotFillTrigger.ScheduledId.Delete(trigger.ScheduledId);
+            Log.Info($"Cancelled bot fill trigger for game {gameId}");
+        }
     }
 
     private static void InsertPlayerProgress(ReducerContext ctx, ulong gameId)
