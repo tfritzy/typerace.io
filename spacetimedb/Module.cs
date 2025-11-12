@@ -31,11 +31,11 @@ public enum GameMode
 
 public static partial class Module
 {
-    [Table(Name = "person", Public = true)]
-    public partial struct Person
+    [Table(Name = "player", Public = true)]
+    public partial struct Player
     {
         [PrimaryKey]
-        public string Id;
+        public Identity Id;
         public string Name;
     }
 
@@ -106,6 +106,14 @@ public static partial class Module
     [Reducer]
     public static void ClientConnected(ReducerContext ctx)
     {
+        var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
+        
+        if (existingPlayer == null)
+        {
+            var animalName = AnimalNameGenerator.Generate();
+            ctx.Db.player.Insert(new Player { Id = ctx.Sender, Name = $"Anonymous {animalName}" });
+            Log.Info($"Created player record for new client {ctx.Sender.ToHexString()}");
+        }
     }
 
     [Reducer]
@@ -114,30 +122,27 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void Add(ReducerContext ctx, string name)
+    public static void SetPlayerName(ReducerContext ctx, string name)
     {
-        Log.Info("Added person", name);
-        ctx.Db.person.Insert(new Person { Id = IdGenerator.Generate("person_"), Name = name });
-    }
-
-    [Reducer]
-    public static void SayHello(ReducerContext ctx)
-    {
-        foreach (var person in ctx.Db.person.Iter())
+        var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
+        
+        if (existingPlayer != null)
         {
-            Log.Info($"Hello, {person.Name}!");
+            var updatedPlayer = existingPlayer.Value;
+            updatedPlayer.Name = name;
+            ctx.Db.player.Id.Update(updatedPlayer);
+            Log.Info($"Updated player name for {ctx.Sender.ToHexString()} to {name}");
         }
-        Log.Info("Hello, World!");
     }
 
     [Reducer]
-    public static void JoinGame(ReducerContext ctx, string player, GameMode gameMode)
+    public static void JoinGame(ReducerContext ctx, GameMode gameMode)
     {
         var foundGame = FindLobbyGame(ctx, gameMode);
 
         if (foundGame != null)
         {
-            Log.Info($"Player {player} joined game {foundGame.Value.Id}");
+            Log.Info($"Player {ctx.Sender.ToHexString()} joined game {foundGame.Value.Id}");
             InsertPlayerProgress(ctx, foundGame.Value.Id);
 
             int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
@@ -174,7 +179,7 @@ public static partial class Module
                 GameMode = gameMode
             });
 
-            Log.Info($"Player {player} created and joined game {newGame.Id}");
+            Log.Info($"Player {ctx.Sender.ToHexString()} created and joined game {newGame.Id}");
             InsertPlayerProgress(ctx, newGame.Id);
 
             var fiveSeconds = new TimeDuration { Microseconds = +5_000_000 };
