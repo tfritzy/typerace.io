@@ -565,9 +565,9 @@ public static partial class Module
 
     private static PlayerProgress? FindPlayerProgress(ReducerContext ctx, Identity playerId, string gameId)
     {
-        foreach (var progress in ctx.Db.playerprogress.Iter())
+        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(gameId))
         {
-            if (progress.PlayerId == playerId && progress.GameId == gameId)
+            if (progress.PlayerId == playerId)
             {
                 return progress;
             }
