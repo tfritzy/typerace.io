@@ -4,6 +4,7 @@ import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import type { DbConnection, Game, PlayerProgress } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { TypeBox } from "../components/TypeBox";
+import { ProfileButton } from "../components/ProfileButton";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -47,7 +48,11 @@ export const GamePage = () => {
   }
 
   return (
-    <div style={{ padding: "20px", fontFamily: "monospace" }}>
+    <div style={{ padding: "20px", fontFamily: "monospace", position: "relative" }}>
+      <div style={{ position: "fixed", top: "16px", right: "16px", zIndex: 50 }}>
+        <ProfileButton />
+      </div>
+
       <h1>Game Details</h1>
       <div>
         <h2>Game Table:</h2>

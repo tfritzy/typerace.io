@@ -8,6 +8,7 @@ import { TypeBox } from "./components/TypeBox";
 import { ChatBox } from "./components/ChatBox";
 import { ModeSelector } from "./components/ModeSelector";
 import { MatchTypeSelector } from "./components/MatchTypeSelector";
+import { ProfileButton } from "./components/ProfileButton";
 
 function App() {
   const [selectedMode, setSelectedMode] = useState<GameMode>({ tag: "English500" });
@@ -32,6 +33,10 @@ function App() {
 
   return (
     <div className="relative min-h-screen">
+      <div className="fixed top-4 right-4 z-50">
+        <ProfileButton />
+      </div>
+
       <div className="flex items-center justify-center min-h-screen p-4" style={{ paddingBottom: '400px' }}>
         <ChatBox>
           <TypeBox phrase="Put me in coach" onComplete={handlePhraseComplete} />
