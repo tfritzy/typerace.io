@@ -123,10 +123,6 @@ public static partial class Module
     [Reducer]
     public static void SayHello(ReducerContext ctx)
     {
-        foreach (var person in ctx.Db.person.Iter())
-        {
-            Log.Info($"Hello, {person.Name}!");
-        }
         Log.Info("Hello, World!");
     }
 
@@ -353,9 +349,9 @@ public static partial class Module
 
     private static PlayerProgress? FindPlayerProgress(ReducerContext ctx, Identity playerId, string gameId)
     {
-        foreach (var progress in ctx.Db.player_progress.Iter())
+        foreach (var progress in ctx.Db.player_progress.PlayerId.Filter(playerId))
         {
-            if (progress.PlayerId == playerId && progress.GameId == gameId)
+            if (progress.GameId == gameId)
             {
                 return progress;
             }

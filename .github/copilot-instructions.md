@@ -34,3 +34,33 @@ Do not create:
 - Usage documentation
 
 The code itself should be clear enough without additional documentation files.
+
+### Database Access Policy
+
+**NEVER access data without using an index.**
+
+This is a critical performance requirement for this codebase:
+- Always use indexed fields when querying database tables
+- Use `.Filter()` on indexed fields instead of `.Iter()`
+- **You are BANNED from using `.Iter()` method** - it scans all rows without using indexes
+- Ensure all table queries utilize the `[SpacetimeDB.Index.BTree]` or `[PrimaryKey]` attributes
+- When filtering by multiple fields, filter by one indexed field first, then check other conditions in the loop
+
+Example of correct usage:
+```csharp
+foreach (var progress in ctx.Db.player_progress.PlayerId.Filter(playerId))
+{
+    if (progress.GameId == gameId)
+    {
+        return progress;
+    }
+}
+```
+
+Example of BANNED usage:
+```csharp
+foreach (var progress in ctx.Db.player_progress.Iter())
+{
+}
+```
+
