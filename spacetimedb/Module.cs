@@ -110,7 +110,8 @@ public static partial class Module
         
         if (existingPlayer == null)
         {
-            ctx.Db.player.Insert(new Player { Id = ctx.Sender, Name = "Anonymous" });
+            var animalName = AnimalNameGenerator.Generate();
+            ctx.Db.player.Insert(new Player { Id = ctx.Sender, Name = $"Anonymous {animalName}" });
             Log.Info($"Created player record for new client {ctx.Sender.ToHexString()}");
         }
     }
@@ -131,11 +132,6 @@ public static partial class Module
             updatedPlayer.Name = name;
             ctx.Db.player.Id.Update(updatedPlayer);
             Log.Info($"Updated player name for {ctx.Sender.ToHexString()} to {name}");
-        }
-        else
-        {
-            ctx.Db.player.Insert(new Player { Id = ctx.Sender, Name = name });
-            Log.Info($"Created player for {ctx.Sender.ToHexString()} with name {name}");
         }
     }
 
