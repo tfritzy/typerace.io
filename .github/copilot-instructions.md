@@ -34,3 +34,20 @@ Do not create:
 - Usage documentation
 
 The code itself should be clear enough without additional documentation files.
+
+### Database Access Policy
+
+**NEVER access database tables without using an index.**
+
+This is a critical requirement for performance and scalability. When querying SpacetimeDB tables:
+- Always use indexed fields for filtering and lookups
+- Use `Filter()` on indexed fields (marked with `[SpacetimeDB.Index.BTree]`)
+- Use `Find()` on primary key fields (marked with `[PrimaryKey]`)
+- **BANNED**: Never use `Iter()` to iterate through all records without an index
+
+Examples of correct usage:
+- `ctx.Db.playerprogress.GameId.Filter(gameId)` - uses indexed GameId field
+- `ctx.Db.player.Id.Find(playerId)` - uses primary key Id field
+- `ctx.Db.game.State.Filter(GameState.Lobby)` - uses indexed State field
+
+Always check the table definition for available indexes before writing queries.
