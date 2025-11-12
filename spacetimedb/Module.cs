@@ -103,13 +103,12 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Scheduled = nameof(CompleteGame))]
-    public partial struct GameCompletion
+    [Table(Scheduled = nameof(ArchiveOldGames))]
+    public partial struct GameArchiver
     {
         [AutoInc]
         [PrimaryKey]
         public ulong ScheduledId;
-        public string GameId;
         public ScheduleAt ScheduledAt;
     }
 
@@ -136,6 +135,20 @@ public static partial class Module
         public string PlayerProgressId;
         public int PhraseLength;
         public ScheduleAt ScheduledAt;
+    }
+
+    [Reducer(ReducerKind.Init)]
+    public static void Init(ReducerContext ctx)
+    {
+        var fiveMinutes = new TimeDuration { Microseconds = 300_000_000 };
+
+        ctx.Db.GameArchiver.Insert(new GameArchiver
+        {
+            ScheduledId = 0,
+            ScheduledAt = new ScheduleAt.Interval(fiveMinutes)
+        });
+
+        Log.Info("Initialized game archiver with 5-minute interval");
     }
 
     [Reducer(ReducerKind.ClientConnected)]
@@ -405,31 +418,24 @@ public static partial class Module
                     });
                 }
             }
-
-            var fiveMinutes = new TimeDuration { Microseconds = +300_000_000 };
-            var scheduledTime = ctx.Timestamp + fiveMinutes;
-
-            ctx.Db.GameCompletion.Insert(new GameCompletion
-            {
-                ScheduledId = 0,
-                GameId = args.GameId,
-                ScheduledAt = new ScheduleAt.Time(scheduledTime)
-            });
         }
     }
 
     [Reducer]
-    public static void CompleteGame(ReducerContext ctx, GameCompletion args)
+    public static void ArchiveOldGames(ReducerContext ctx, GameArchiver args)
     {
-        var game = ctx.Db.game.Id.Find(args.GameId);
+        var fiveMinutesAgo = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 300_000_000;
 
-        if (game != null && game.Value.State == GameState.Racing)
+        foreach (var game in ctx.Db.game.State.Filter(GameState.Racing))
         {
-            var updatedGame = game.Value;
-            updatedGame.State = GameState.Archived;
-            ctx.Db.game.Id.Update(updatedGame);
+            if (game.CreatedAt < fiveMinutesAgo)
+            {
+                var updatedGame = game;
+                updatedGame.State = GameState.Archived;
+                ctx.Db.game.Id.Update(updatedGame);
 
-            Log.Info($"Game {args.GameId} transitioned to Archived state");
+                Log.Info($"Game {game.Id} transitioned to Archived state");
+            }
         }
     }
 
