@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using SpacetimeDB;
 
 [Type]
@@ -46,6 +48,7 @@ public static partial class Module
         public string Id;
         public string Phrase;
         public ulong CreatedAt;
+        public ulong StartedAt;
 
         [SpacetimeDB.Index.BTree]
         public GameState State;
@@ -96,6 +99,35 @@ public static partial class Module
         public string GameId;
         public ulong ProgressIndex;
         public bool IsBot;
+    }
+
+    [Table(Name = "player", Public = true)]
+    public partial struct Player
+    {
+        [PrimaryKey]
+        public Identity PlayerId;
+        public uint TotalGames;
+        public uint WinCount;
+        public uint Level;
+        public uint Xp;
+    }
+
+    [Table(Name = "player_stats", Public = true)]
+    public partial struct PlayerStats
+    {
+        [PrimaryKey]
+        public string Id;
+        [SpacetimeDB.Index.BTree]
+        public Identity PlayerId;
+        [SpacetimeDB.Index.BTree]
+        public GameMode GameMode;
+        [SpacetimeDB.Index.BTree]
+        public uint Year;
+        [SpacetimeDB.Index.BTree]
+        public uint Month;
+        public uint WordCount;
+        public ulong TimeMs;
+        public uint Placement;
     }
 
     [Reducer]
@@ -170,6 +202,7 @@ public static partial class Module
                 Id = IdGenerator.Generate("game_"),
                 Phrase = PhraseGenerator.GeneratePhraseForMode(gameMode),
                 CreatedAt = createdAtMs,
+                StartedAt = 0,
                 State = GameState.Lobby,
                 GameMode = gameMode
             });
@@ -291,8 +324,10 @@ public static partial class Module
 
         if (game != null && game.Value.State == GameState.Countdown)
         {
+            var startedAtMs = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             var updatedGame = game.Value;
             updatedGame.State = GameState.Racing;
+            updatedGame.StartedAt = startedAtMs;
             ctx.Db.game.Id.Update(updatedGame);
 
             Log.Info($"Game {args.GameId} transitioned to Racing state");
@@ -321,6 +356,30 @@ public static partial class Module
             ctx.Db.game.Id.Update(updatedGame);
 
             Log.Info($"Game {args.GameId} transitioned to Archived state");
+
+            var completedAtMs = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var playerProgressList = GetPlayerProgressForGame(ctx, args.GameId);
+            var sortedPlayers = SortPlayersByProgress(playerProgressList);
+
+            uint placement = 1;
+            foreach (var progress in sortedPlayers)
+            {
+                if (progress.IsBot)
+                {
+                    placement++;
+                    continue;
+                }
+
+                var timeMs = completedAtMs - game.Value.StartedAt;
+                var wordCount = CalculateWordCount(game.Value.Phrase, progress.ProgressIndex);
+                var xpGained = CalculateXp(placement);
+
+                UpdateOrCreatePlayer(ctx, progress.PlayerId, placement == 1, xpGained);
+                InsertPlayerStats(ctx, progress.PlayerId, game.Value.GameMode, wordCount, timeMs, placement);
+
+                Log.Info($"Player {progress.PlayerId} finished game {args.GameId} in place {placement} with {wordCount} words, {timeMs}ms, and gained {xpGained} XP");
+                placement++;
+            }
         }
     }
 
@@ -361,5 +420,104 @@ public static partial class Module
             }
         }
         return null;
+    }
+
+    private static List<PlayerProgress> GetPlayerProgressForGame(ReducerContext ctx, string gameId)
+    {
+        var playerProgressList = new List<PlayerProgress>();
+        foreach (var progress in ctx.Db.player_progress.GameId.Filter(gameId))
+        {
+            playerProgressList.Add(progress);
+        }
+        return playerProgressList;
+    }
+
+    private static List<PlayerProgress> SortPlayersByProgress(List<PlayerProgress> players)
+    {
+        players.Sort((a, b) => b.ProgressIndex.CompareTo(a.ProgressIndex));
+        return players;
+    }
+
+    private static uint CalculateWordCount(string phrase, ulong progressIndex)
+    {
+        if (progressIndex == 0)
+        {
+            return 0;
+        }
+
+        var phraseLength = (ulong)phrase.Length;
+        if (progressIndex >= phraseLength)
+        {
+            return (uint)phrase.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+        }
+
+        var completedText = phrase.Substring(0, (int)progressIndex);
+        return (uint)completedText.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+    }
+
+    private static uint CalculateXp(uint placement)
+    {
+        return placement switch
+        {
+            1 => 100,
+            2 => 75,
+            3 => 50,
+            4 => 25,
+            _ => 10
+        };
+    }
+
+    private static void UpdateOrCreatePlayer(ReducerContext ctx, Identity playerId, bool isWinner, uint xpGained)
+    {
+        var existingPlayer = ctx.Db.player.PlayerId.Find(playerId);
+
+        if (existingPlayer != null)
+        {
+            var updatedPlayer = existingPlayer.Value;
+            updatedPlayer.TotalGames++;
+            if (isWinner)
+            {
+                updatedPlayer.WinCount++;
+            }
+            updatedPlayer.Xp += xpGained;
+            updatedPlayer.Level = CalculateLevel(updatedPlayer.Xp);
+            ctx.Db.player.PlayerId.Update(updatedPlayer);
+        }
+        else
+        {
+            var newPlayer = new Player
+            {
+                PlayerId = playerId,
+                TotalGames = 1,
+                WinCount = isWinner ? 1u : 0u,
+                Xp = xpGained,
+                Level = CalculateLevel(xpGained)
+            };
+            ctx.Db.player.Insert(newPlayer);
+        }
+    }
+
+    private static uint CalculateLevel(uint xp)
+    {
+        return (uint)(xp / 1000) + 1;
+    }
+
+    private static void InsertPlayerStats(ReducerContext ctx, Identity playerId, GameMode gameMode, uint wordCount, ulong timeMs, uint placement)
+    {
+        var now = DateTimeOffset.UtcNow;
+        var year = (uint)now.Year;
+        var month = (uint)now.Month;
+
+        ctx.Db.player_stats.Insert(new PlayerStats
+        {
+            Id = IdGenerator.Generate("ps_"),
+            PlayerId = playerId,
+            GameMode = gameMode,
+            Year = year,
+            Month = month,
+            WordCount = wordCount,
+            TimeMs = timeMs,
+            Placement = placement
+        });
     }
 }
