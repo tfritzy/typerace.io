@@ -26,7 +26,7 @@ export function ModeSelector({ selectedMode, onModeSelect }: ModeSelectorProps) 
     ];
 
     return (
-        <div className="w-full max-w-5xl mx-auto pb-8">
+        <div className="pb-8">
             <h2 className="text-white/80 text-lg font-medium mb-3">Select Language</h2>
             <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
                 {modes.map((modeOption) => (
