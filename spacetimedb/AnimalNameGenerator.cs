@@ -1,11 +1,10 @@
 using System;
-using System.Security.Cryptography;
 
 namespace SpacetimeDB;
 
 public static class AnimalNameGenerator
 {
-    private static readonly string[] Animals = 
+    private static readonly string[] Animals =
     {
         "Aardvark", "Albatross", "Alligator", "Alpaca", "Ant", "Anteater", "Antelope", "Ape",
         "Badger", "Barracuda", "Bat", "Bear", "Beaver", "Bee", "Bison", "Butterfly",
@@ -44,11 +43,9 @@ public static class AnimalNameGenerator
         "Zebra"
     };
 
-    public static string Generate()
+    public static string Generate(Random rng)
     {
-        var randomBytes = RandomNumberGenerator.GetBytes(4);
-        var randomValue = BitConverter.ToUInt32(randomBytes, 0);
-        var index = randomValue % (uint)Animals.Length;
+        var index = rng.Next(Animals.Length);
         return Animals[index];
     }
 }

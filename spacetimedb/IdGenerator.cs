@@ -8,11 +8,13 @@ public static class IdGenerator
     private static readonly char[] Base62Chars =
         "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".ToCharArray();
 
-    public static string Generate(string prefix)
+    public static string Generate(string prefix, Random rng)
     {
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        var random = new Random();
-        var randomValue = ((ulong)(uint)random.Next() << 32) | (ulong)(uint)random.Next();
+
+        var high = (ulong)rng.Next() << 32;
+        var low = (ulong)rng.Next();
+        var randomValue = high | low;
 
         var timestampEncoded = EncodeBase62((ulong)timestamp);
         var randomEncoded = EncodeBase62(randomValue);

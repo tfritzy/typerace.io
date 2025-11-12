@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
 import "./components/SelectionButton.css";
@@ -12,24 +12,28 @@ import { MatchTypeSelector } from "./components/MatchTypeSelector";
 function App() {
   const [selectedMode, setSelectedMode] = useState<GameMode>({ tag: "English500" });
   const [isPrivate, setIsPrivate] = useState(false);
-
   const conn = useSpacetimeDB<DbConnection>();
   const navigate = useNavigate();
 
   const handlePhraseComplete = useCallback(() => {
     if (conn) {
-      console.log("Calling join game ", selectedMode);
+      conn.reducers.onJoinGame((ctx) => {
+        if (ctx.event.status.tag === "Committed") {
+          const myProgress = Array.from(conn.db.playerprogress.iter())
+            .filter(row => row.playerId.isEqual(conn.identity!))
+            .sort((a, b) => Number(b.createdAt - a.createdAt));
+
+          console.log(myProgress);
+
+          if (myProgress.length > 0) {
+            navigate(`/game/${myProgress[0].gameId.toString()}`);
+          }
+        }
+      });
       conn.reducers.joinGame(selectedMode);
     }
-  }, [conn, selectedMode]);
+  }, [conn, selectedMode, navigate]);
 
-  useTable<DbConnection, PlayerProgress>("playerprogress", {
-    onInsert: (row: PlayerProgress) => {
-      if (conn.identity && row.playerId.isEqual(conn.identity)) {
-        navigate(`/game/${row.gameId.toString()}`);
-      }
-    }
-  });
   const player_progress = useTable("player");
   console.log(player_progress);
 
@@ -40,11 +44,9 @@ function App() {
           <TypeBox phrase="Put me in coach" onComplete={handlePhraseComplete} />
         </ChatBox>
       </div>
-
       <div className="fixed bottom-0 left-0 right-0 p-4">
         <div className="w-full max-w-5xl mx-auto">
           <MatchTypeSelector isPrivate={isPrivate} setIsPrivate={setIsPrivate} />
-
           <ModeSelector
             selectedMode={selectedMode}
             onModeSelect={setSelectedMode}

@@ -45,7 +45,7 @@ public static partial class Module
         [PrimaryKey]
         public string Id;
         public string Phrase;
-        public ulong CreatedAt;
+        public long CreatedAt;
 
         [SpacetimeDB.Index.BTree]
         public GameState State;
@@ -96,6 +96,7 @@ public static partial class Module
         public string GameId;
         public ulong ProgressIndex;
         public bool IsBot;
+        public long CreatedAt;
     }
 
     [Reducer]
@@ -110,7 +111,7 @@ public static partial class Module
 
         if (existingPlayer == null)
         {
-            var animalName = AnimalNameGenerator.Generate();
+            var animalName = AnimalNameGenerator.Generate(ctx.Rng);
             ctx.Db.player.Insert(new Player { Id = ctx.Sender, Name = $"Anonymous {animalName}" });
             Log.Info($"Created player record for new client {ctx.Sender}");
         }
@@ -170,12 +171,11 @@ public static partial class Module
         }
         else
         {
-            var createdAtMs = (ulong)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             var newGame = ctx.Db.game.Insert(new Game
             {
-                Id = IdGenerator.Generate("game_"),
-                Phrase = PhraseGenerator.GeneratePhraseForMode(gameMode),
-                CreatedAt = createdAtMs,
+                Id = IdGenerator.Generate("game_", ctx.Rng),
+                Phrase = PhraseGenerator.GeneratePhraseForMode(gameMode, ctx.Rng),
+                CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
                 State = GameState.Lobby,
                 GameMode = gameMode
             });
@@ -239,11 +239,12 @@ public static partial class Module
     {
         ctx.Db.playerprogress.Insert(new PlayerProgress
         {
-            Id = IdGenerator.Generate("pp_"),
+            Id = IdGenerator.Generate("pp_", ctx.Rng),
             PlayerId = ctx.Sender,
             GameId = gameId,
             ProgressIndex = 0,
-            IsBot = false
+            IsBot = false,
+            CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch
         });
     }
 
@@ -262,11 +263,12 @@ public static partial class Module
             {
                 ctx.Db.playerprogress.Insert(new PlayerProgress
                 {
-                    Id = IdGenerator.Generate("pp_"),
+                    Id = IdGenerator.Generate("pp_", ctx.Rng),
                     PlayerId = new Identity(),
                     GameId = args.GameId,
                     ProgressIndex = 0,
-                    IsBot = true
+                    IsBot = true,
+                    CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch
                 });
 
                 Log.Info($"Added bot {i + 1} to game {args.GameId}");

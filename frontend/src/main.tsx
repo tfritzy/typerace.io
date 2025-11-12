@@ -9,7 +9,7 @@ import { DbConnection } from "../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { GamePage } from "./pages/GamePage.tsx";
 
-const onConnect = (conn: DbConnection, _identity: Identity, token: string) => {
+const onConnect = (conn: DbConnection, identity: Identity, token: string) => {
   localStorage.setItem("auth_token", token);
 
   conn
@@ -17,7 +17,10 @@ const onConnect = (conn: DbConnection, _identity: Identity, token: string) => {
     .onError((error: ErrorContextInterface) => {
       console.error(error);
     })
-    .subscribe(["select * from playerprogress", "select * from player"]);
+    .subscribe([
+      `select * from playerprogress where PlayerId = '${identity}'`,
+      `select * from player where Id = '${identity}'`,
+    ]);
 };
 
 const onDisconnect = () => {

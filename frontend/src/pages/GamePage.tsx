@@ -87,6 +87,7 @@ export const GamePage = () => {
             <div>PlayerId: {pp.playerId.toHexString()}</div>
             <div>ProgressIndex: {pp.progressIndex.toString()}</div>
             <div>IsBot: {pp.isBot.toString()}</div>
+            <div>CreatedAt: {pp.createdAt.toString()}</div>
           </div>
         ))}
       </div>
