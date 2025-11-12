@@ -85,7 +85,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Name = "player_progress", Public = true)]
+    [Table(Name = "playerprogress", Public = true)]
     public partial struct PlayerProgress
     {
         [PrimaryKey]
@@ -107,12 +107,12 @@ public static partial class Module
     public static void ClientConnected(ReducerContext ctx)
     {
         var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
-        
+
         if (existingPlayer == null)
         {
             var animalName = AnimalNameGenerator.Generate();
             ctx.Db.player.Insert(new Player { Id = ctx.Sender, Name = $"Anonymous {animalName}" });
-            Log.Info($"Created player record for new client {ctx.Sender.ToHexString()}");
+            Log.Info($"Created player record for new client {ctx.Sender}");
         }
     }
 
@@ -125,24 +125,25 @@ public static partial class Module
     public static void SetPlayerName(ReducerContext ctx, string name)
     {
         var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
-        
+
         if (existingPlayer != null)
         {
             var updatedPlayer = existingPlayer.Value;
             updatedPlayer.Name = name;
             ctx.Db.player.Id.Update(updatedPlayer);
-            Log.Info($"Updated player name for {ctx.Sender.ToHexString()} to {name}");
+            Log.Info($"Updated player name for {ctx.Sender} to {name}");
         }
     }
 
     [Reducer]
     public static void JoinGame(ReducerContext ctx, GameMode gameMode)
     {
+        Log.Info($"Player {ctx.Sender} looking for game.");
         var foundGame = FindLobbyGame(ctx, gameMode);
 
         if (foundGame != null)
         {
-            Log.Info($"Player {ctx.Sender.ToHexString()} joined game {foundGame.Value.Id}");
+            Log.Info($"Player {ctx.Sender} joined game {foundGame.Value.Id}");
             InsertPlayerProgress(ctx, foundGame.Value.Id);
 
             int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
@@ -179,7 +180,7 @@ public static partial class Module
                 GameMode = gameMode
             });
 
-            Log.Info($"Player {ctx.Sender.ToHexString()} created and joined game {newGame.Id}");
+            Log.Info($"Player {ctx.Sender} created and joined game {newGame.Id}");
             InsertPlayerProgress(ctx, newGame.Id);
 
             var fiveSeconds = new TimeDuration { Microseconds = +5_000_000 };
@@ -212,7 +213,7 @@ public static partial class Module
     private static int CountPlayersInGame(ReducerContext ctx, string gameId)
     {
         int count = 0;
-        foreach (var progress in ctx.Db.player_progress.GameId.Filter(gameId))
+        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(gameId))
         {
             count++;
         }
@@ -236,7 +237,7 @@ public static partial class Module
 
     private static void InsertPlayerProgress(ReducerContext ctx, string gameId)
     {
-        ctx.Db.player_progress.Insert(new PlayerProgress
+        ctx.Db.playerprogress.Insert(new PlayerProgress
         {
             Id = IdGenerator.Generate("pp_"),
             PlayerId = ctx.Sender,
@@ -254,20 +255,20 @@ public static partial class Module
         if (game != null && game.Value.State == GameState.Lobby)
         {
             int currentPlayerCount = CountPlayersInGame(ctx, args.GameId);
-            
+
             int botsToAdd = 4 - currentPlayerCount;
-            
+
             for (int i = 0; i < botsToAdd; i++)
             {
-                ctx.Db.player_progress.Insert(new PlayerProgress
+                ctx.Db.playerprogress.Insert(new PlayerProgress
                 {
                     Id = IdGenerator.Generate("pp_"),
-                    PlayerId = Identity.ZERO,
+                    PlayerId = new Identity(),
                     GameId = args.GameId,
                     ProgressIndex = 0,
                     IsBot = true
                 });
-                
+
                 Log.Info($"Added bot {i + 1} to game {args.GameId}");
             }
 
@@ -351,14 +352,14 @@ public static partial class Module
 
         var updatedProgress = existingProgress.Value;
         updatedProgress.ProgressIndex = newIndex;
-        ctx.Db.player_progress.Id.Update(updatedProgress);
+        ctx.Db.playerprogress.Id.Update(updatedProgress);
 
         Log.Info($"Updated progress for player {playerId} in game {gameId} to {newIndex}");
     }
 
     private static PlayerProgress? FindPlayerProgress(ReducerContext ctx, Identity playerId, string gameId)
     {
-        foreach (var progress in ctx.Db.player_progress.Iter())
+        foreach (var progress in ctx.Db.playerprogress.Iter())
         {
             if (progress.PlayerId == playerId && progress.GameId == gameId)
             {

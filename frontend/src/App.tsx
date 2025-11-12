@@ -18,17 +18,20 @@ function App() {
 
   const handlePhraseComplete = useCallback(() => {
     if (conn) {
-      conn.reducers.JoinGame(selectedMode);
+      console.log("Calling join game ", selectedMode);
+      conn.reducers.joinGame(selectedMode);
     }
   }, [conn, selectedMode]);
 
-  useTable<DbConnection, PlayerProgress>("player_progress", {
+  useTable<DbConnection, PlayerProgress>("playerprogress", {
     onInsert: (row: PlayerProgress) => {
-      if (conn.identity && row.PlayerId.isEqual(conn.identity)) {
-        navigate(`/game/${row.GameId.toString()}`);
+      if (conn.identity && row.playerId.isEqual(conn.identity)) {
+        navigate(`/game/${row.gameId.toString()}`);
       }
     }
   });
+  const player_progress = useTable("player");
+  console.log(player_progress);
 
   return (
     <div className="relative min-h-screen">

@@ -15,7 +15,7 @@
 }
 
 .selection-button:hover {
-  border-color: var(--color-white-25);
+  border-color: color-mix(in srgb, var(--color-white) 50%, transparent);
   background-color: #333333;
   transform: translateY(-1px);
   opacity: 0.8;
@@ -25,7 +25,6 @@
   border-color: var(--color-white-25);
   background-color: #333333;
   opacity: 1;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .selection-button:active {

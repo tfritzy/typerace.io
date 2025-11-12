@@ -11,12 +11,13 @@ import { GamePage } from "./pages/GamePage.tsx";
 
 const onConnect = (conn: DbConnection, _identity: Identity, token: string) => {
   localStorage.setItem("auth_token", token);
-  
-  conn.subscriptionBuilder()
+
+  conn
+    .subscriptionBuilder()
     .onError((error: ErrorContextInterface) => {
       console.error(error);
     })
-    .subscribe("select * from player_progress");
+    .subscribe(["select * from playerprogress", "select * from player"]);
 };
 
 const onDisconnect = () => {
