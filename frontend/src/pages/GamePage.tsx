@@ -39,7 +39,7 @@ export const GamePage = () => {
   const handleProgress = useCallback((correctCharCount: number) => {
     if (!conn || !gameId) return;
     
-    conn.reducers.UpdateProgress(gameId, correctCharCount);
+    conn.reducers.UpdateProgress(gameId, BigInt(correctCharCount));
   }, [conn, gameId]);
 
   if (!game) {
@@ -54,7 +54,7 @@ export const GamePage = () => {
         <div>Id: {game.Id.toString()}</div>
         <div>Phrase: {game.Phrase}</div>
         <div>CreatedAt: {game.CreatedAt.toString()}</div>
-        <div>State: {game.State}</div>
+        <div>State: {game.State.tag}</div>
         <div>GameMode: {game.GameMode.tag}</div>
       </div>
       
