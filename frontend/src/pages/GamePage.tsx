@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useCallback } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import type { DbConnection, Game, PlayerProgress, Person } from "../../module_bindings";
+import type { DbConnection, Game, PlayerProgress, Player } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { TypeBox } from "../components/TypeBox";
 
@@ -24,22 +24,22 @@ export const GamePage = () => {
       })
       .subscribe(`select * from player_progress where GameId = ${gameId}`);
     
-    const personSubscription = conn.subscriptionBuilder()
+    const playerSubscription = conn.subscriptionBuilder()
       .onError((error: ErrorContextInterface) => {
-        console.error("Error subscribing to person:", error);
+        console.error("Error subscribing to player:", error);
       })
-      .subscribe(`select * from person`);
+      .subscribe(`select * from player`);
     
     return () => {
       gameSubscription.unsubscribe();
       playerProgressSubscription.unsubscribe();
-      personSubscription.unsubscribe();
+      playerSubscription.unsubscribe();
     };
   }, [conn, gameId]);
   
   const { rows: games } = useTable<DbConnection, Game>("game");
   const { rows: playerProgress } = useTable<DbConnection, PlayerProgress>("player_progress");
-  const { rows: persons } = useTable<DbConnection, Person>("person");
+  const { rows: players } = useTable<DbConnection, Player>("player");
 
   const game = games.find(g => g.Id.toString() === gameId);
   const gamePlayerProgress = playerProgress.filter(pp => pp.GameId.toString() === gameId);
@@ -48,8 +48,8 @@ export const GamePage = () => {
     if (!playerId || playerId.toHexString() === "0000000000000000000000000000000000000000000000000000000000000000") {
       return "Bot";
     }
-    const person = persons.find(p => p.Id.isEqual(playerId));
-    return person?.Name || "Unknown";
+    const player = players.find(p => p.Id.isEqual(playerId));
+    return player?.Name || "Unknown";
   };
 
   const handleProgress = useCallback((correctCharCount: number) => {

@@ -31,8 +31,8 @@ public enum GameMode
 
 public static partial class Module
 {
-    [Table(Name = "person", Public = true)]
-    public partial struct Person
+    [Table(Name = "player", Public = true)]
+    public partial struct Player
     {
         [PrimaryKey]
         public Identity Id;
@@ -106,12 +106,12 @@ public static partial class Module
     [Reducer]
     public static void ClientConnected(ReducerContext ctx)
     {
-        var existingPerson = ctx.Db.person.Id.Find(ctx.Sender);
+        var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
         
-        if (existingPerson == null)
+        if (existingPlayer == null)
         {
-            ctx.Db.person.Insert(new Person { Id = ctx.Sender, Name = "Anonymous" });
-            Log.Info($"Created person record for new client {ctx.Sender.ToHexString()}");
+            ctx.Db.player.Insert(new Player { Id = ctx.Sender, Name = "Anonymous" });
+            Log.Info($"Created player record for new client {ctx.Sender.ToHexString()}");
         }
     }
 
@@ -121,32 +121,22 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void SetPersonName(ReducerContext ctx, string name)
+    public static void SetPlayerName(ReducerContext ctx, string name)
     {
-        var existingPerson = ctx.Db.person.Id.Find(ctx.Sender);
+        var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
         
-        if (existingPerson != null)
+        if (existingPlayer != null)
         {
-            var updatedPerson = existingPerson.Value;
-            updatedPerson.Name = name;
-            ctx.Db.person.Id.Update(updatedPerson);
-            Log.Info($"Updated person name for {ctx.Sender.ToHexString()} to {name}");
+            var updatedPlayer = existingPlayer.Value;
+            updatedPlayer.Name = name;
+            ctx.Db.player.Id.Update(updatedPlayer);
+            Log.Info($"Updated player name for {ctx.Sender.ToHexString()} to {name}");
         }
         else
         {
-            ctx.Db.person.Insert(new Person { Id = ctx.Sender, Name = name });
-            Log.Info($"Created person for {ctx.Sender.ToHexString()} with name {name}");
+            ctx.Db.player.Insert(new Player { Id = ctx.Sender, Name = name });
+            Log.Info($"Created player for {ctx.Sender.ToHexString()} with name {name}");
         }
-    }
-
-    [Reducer]
-    public static void SayHello(ReducerContext ctx)
-    {
-        foreach (var person in ctx.Db.person.Iter())
-        {
-            Log.Info($"Hello, {person.Name}!");
-        }
-        Log.Info("Hello, World!");
     }
 
     [Reducer]
