@@ -27,17 +27,13 @@ export const ProfileAvatar = () => {
             onClick={() => navigate("/profile")}
             className="flex items-center gap-4 p-3 rounded-lg bg-[#2a2a2a] border border-white/15 hover:bg-[#333333] transition-all duration-200 shadow-[0_2px_8px_rgba(0,0,0,0.2)]"
         >
-            <div className="relative w-[50px] h-[50px] shrink-0">
-                <div className="absolute inset-0 rounded-full bg-linear-to-br from-amber-400 via-amber-500 to-amber-600 p-0.5 shadow-[0_0_12px_rgba(251,191,36,0.3)]">
-                    <div className="w-full h-full rounded-full overflow-hidden bg-[#2a2a2a]">
-                        <Avatar
-                            size={46}
-                            name={identityHash}
-                            variant="geometric"
-                            colors={["#fbbf24", "#f59e0b", "#d97706", "#b45309", "#92400e"]}
-                        />
-                    </div>
-                </div>
+            <div className="relative shrink-0 border-2 border-amber-400 rounded-full">
+                <Avatar
+                    size={40}
+                    name={identityHash}
+                    variant="pixel"
+                    colors={["#fbbf24", "#f59e0b", "#d97706", "#b45309", "#92400e"]}
+                />
             </div>
 
             <div className="flex flex-col items-start gap-1 min-w-50">
