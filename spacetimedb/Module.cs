@@ -37,6 +37,10 @@ public static partial class Module
         [PrimaryKey]
         public Identity Id;
         public string Name;
+        public int TotalGames;
+        public int Wins;
+        public int Level;
+        public int Xp;
     }
 
     [Table(Name = "game", Public = true)]
@@ -52,6 +56,30 @@ public static partial class Module
 
         [SpacetimeDB.Index.BTree]
         public GameMode GameMode;
+
+        public List<Identity> Placements;
+    }
+
+    [Table(Name = "playerstats", Public = true)]
+    public partial struct PlayerStats
+    {
+        [PrimaryKey]
+        public string Id;
+        [SpacetimeDB.Index.BTree]
+        public Identity PlayerId;
+        [SpacetimeDB.Index.BTree]
+        public GameMode GameMode;
+        public int Year;
+        public int Month;
+        public List<GameRecord> Games;
+    }
+
+    [Type]
+    public partial struct GameRecord
+    {
+        public int WordCount;
+        public long TimeMs;
+        public int Placement;
     }
 
     [Table(Scheduled = nameof(FillGameWithBots))]
@@ -110,13 +138,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-
-    [Reducer]
-    public static void Init(ReducerContext ctx)
-    {
-    }
-
-    [Reducer]
+    [Reducer(ReducerKind.ClientConnected)]
     public static void ClientConnected(ReducerContext ctx)
     {
         var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
@@ -124,12 +146,20 @@ public static partial class Module
         if (existingPlayer == null)
         {
             var animalName = AnimalNameGenerator.Generate(ctx.Rng);
-            ctx.Db.player.Insert(new Player { Id = ctx.Sender, Name = $"Anonymous {animalName}" });
+            ctx.Db.player.Insert(new Player
+            {
+                Id = ctx.Sender,
+                Name = $"Anonymous {animalName}",
+                TotalGames = 0,
+                Wins = 0,
+                Level = 1,
+                Xp = 0
+            });
             Log.Info($"Created player record for new client {ctx.Sender}");
         }
     }
 
-    [Reducer]
+    [Reducer(ReducerKind.ClientDisconnected)]
     public static void ClientDisconnected(ReducerContext ctx)
     {
     }
@@ -189,7 +219,8 @@ public static partial class Module
                 Phrase = PhraseGenerator.GeneratePhraseForMode(gameMode, ctx.Rng),
                 CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
                 State = GameState.Lobby,
-                GameMode = gameMode
+                GameMode = gameMode,
+                Placements = new List<Identity>()
             });
 
             Log.Info($"Player {ctx.Sender} created and joined game {newGame.Id}");
@@ -319,7 +350,15 @@ public static partial class Module
                 updatedProgress.ProgressIndex += 1;
                 ctx.Db.playerprogress.Id.Update(updatedProgress);
 
-                if (updatedProgress.ProgressIndex < args.PhraseLength)
+                if (updatedProgress.ProgressIndex >= args.PhraseLength)
+                {
+                    var updatedGame = game.Value;
+                    updatedGame.Placements.Add(progress.Value.PlayerId);
+                    ctx.Db.game.Id.Update(updatedGame);
+
+                    Log.Info($"Bot {progress.Value.PlayerId} finished game {game.Value.Id} in place {updatedGame.Placements.Count}");
+                }
+                else
                 {
                     var delay = new TimeDuration { Microseconds = GenerateBotDelay(ctx.Rng) };
                     ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
@@ -394,6 +433,86 @@ public static partial class Module
         }
     }
 
+    private static void UpdatePlayerStatsForGame(ReducerContext ctx, PlayerProgress progress, Game game, int placement)
+    {
+        var player = ctx.Db.player.Id.Find(progress.PlayerId);
+        if (player == null) return;
+
+        var timeMs = ctx.Timestamp.MicrosecondsSinceUnixEpoch - progress.CreatedAt;
+        timeMs = timeMs / 1000;
+
+        var wordCount = game.Phrase.Split(' ').Length;
+
+        var year = 2025;
+        var month = 11;
+
+        var statsId = $"{progress.PlayerId}_{game.GameMode}_{year}_{month}";
+        var existingStats = ctx.Db.playerstats.Id.Find(statsId);
+
+        var gameRecord = new GameRecord
+        {
+            WordCount = wordCount,
+            TimeMs = timeMs,
+            Placement = placement
+        };
+
+        if (existingStats == null)
+        {
+            var games = new List<GameRecord> { gameRecord };
+            ctx.Db.playerstats.Insert(new PlayerStats
+            {
+                Id = statsId,
+                PlayerId = progress.PlayerId,
+                GameMode = game.GameMode,
+                Year = year,
+                Month = month,
+                Games = games
+            });
+        }
+        else
+        {
+            var updatedStats = existingStats.Value;
+            updatedStats.Games.Add(gameRecord);
+            ctx.Db.playerstats.Id.Update(updatedStats);
+        }
+
+        var xpEarned = CalculateXpForPlacement(placement);
+
+        var updatedPlayer = player.Value;
+        updatedPlayer.TotalGames += 1;
+        if (placement == 1)
+        {
+            updatedPlayer.Wins += 1;
+        }
+        updatedPlayer.Xp += xpEarned;
+
+        while (updatedPlayer.Xp >= XpRequiredForLevel(updatedPlayer.Level + 1))
+        {
+            updatedPlayer.Level += 1;
+        }
+
+        ctx.Db.player.Id.Update(updatedPlayer);
+
+        Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}, earned {xpEarned} XP");
+    }
+
+    private static int CalculateXpForPlacement(int placement)
+    {
+        return placement switch
+        {
+            1 => 100,
+            2 => 50,
+            3 => 25,
+            4 => 10,
+            _ => 5
+        };
+    }
+
+    private static int XpRequiredForLevel(int level)
+    {
+        return level * 100;
+    }
+
     [Reducer]
     public static void UpdateProgress(ReducerContext ctx, string gameId, int newIndex)
     {
@@ -418,7 +537,24 @@ public static partial class Module
         updatedProgress.ProgressIndex = newIndex;
         ctx.Db.playerprogress.Id.Update(updatedProgress);
 
-        Log.Info($"Updated progress for player {playerId} in game {gameId} to {newIndex}");
+        if (newIndex >= game.Value.Phrase.Length)
+        {
+            var updatedGame = game.Value;
+            updatedGame.Placements.Add(playerId);
+            var placement = updatedGame.Placements.Count;
+            ctx.Db.game.Id.Update(updatedGame);
+
+            if (!existingProgress.Value.IsBot)
+            {
+                UpdatePlayerStatsForGame(ctx, updatedProgress, updatedGame, placement);
+            }
+
+            Log.Info($"Player {playerId} finished game {gameId} in place {placement}");
+        }
+        else
+        {
+            Log.Info($"Updated progress for player {playerId} in game {gameId} to {newIndex}");
+        }
     }
 
     private static PlayerProgress? FindPlayerProgress(ReducerContext ctx, Identity playerId, string gameId)

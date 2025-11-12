@@ -1,37 +1,56 @@
 import { useNavigate } from "react-router-dom";
+import { useSpacetimeDB, useTable } from "spacetimedb/react";
+import type { DbConnection, Player } from "../../module_bindings";
+import Avatar from "boring-avatars";
 
 export const ProfileAvatar = () => {
     const navigate = useNavigate();
+    const conn = useSpacetimeDB<DbConnection>();
+    const { rows: players } = useTable<DbConnection, Player>(
+        "player"
+    );
 
-    const level = 17;
-    const currentXP = 650;
-    const xpForNextLevel = 1000;
+    const myPlayer = conn?.identity
+        ? players.find((p) => p.id.isEqual(conn.identity!))
+        : null;
+
+    const name = myPlayer?.name ?? "Guest";
+    const level = myPlayer?.level ?? 1;
+    const currentXP = myPlayer?.xp ?? 0;
+    const xpForNextLevel = (level + 1) * 100;
     const xpProgress = (currentXP / xpForNextLevel) * 100;
+
+    const identityHash = conn?.identity?.toHexString() ?? "default";
 
     return (
         <button
-            onClick={() => navigate('/profile')}
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            onClick={() => navigate("/profile")}
+            className="flex items-center gap-4 p-3 rounded-lg bg-[#2a2a2a] border border-white/15 hover:bg-[#333333] transition-all duration-200 shadow-[0_2px_8px_rgba(0,0,0,0.2)]"
         >
-            <div className="relative w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center overflow-hidden">
-                <svg
-                    viewBox="0 0 100 100"
-                    className="w-12 h-12 text-white/60"
-                    fill="currentColor"
-                >
-                    <circle cx="50" cy="35" r="20" />
-                </svg>
+            <div className="relative w-[50px] h-[50px] shrink-0">
+                <div className="absolute inset-0 rounded-full bg-linear-to-br from-amber-400 via-amber-500 to-amber-600 p-0.5 shadow-[0_0_12px_rgba(251,191,36,0.3)]">
+                    <div className="w-full h-full rounded-full overflow-hidden bg-[#2a2a2a]">
+                        <Avatar
+                            size={46}
+                            name={identityHash}
+                            variant="geometric"
+                            colors={["#fbbf24", "#f59e0b", "#d97706", "#b45309", "#92400e"]}
+                        />
+                    </div>
+                </div>
             </div>
 
-            <div className="flex flex-col items-start min-w-[200px]">
-                <div className="text-sm font-medium text-white/80 mb-1">
-                    Level {level}
-                </div>
-                <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                    <div
-                        className="h-full bg-blue-500 rounded-full transition-all duration-300"
-                        style={{ width: `${xpProgress}%` }}
-                    />
+            <div className="flex flex-col items-start gap-1 min-w-50">
+                <div className="text-sm font-semibold text-white">{name}</div>
+                <div className="flex items-center gap-2 w-full">
+                    <span className="text-xs font-medium text-white/60">Lvl {level}</span>
+                    <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-linear-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-300"
+                            style={{ width: `${xpProgress}%` }}
+                        />
+                    </div>
+                    <span className="text-xs font-medium text-white/60">Lvl {level + 1}</span>
                 </div>
             </div>
         </button>

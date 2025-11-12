@@ -14,6 +14,10 @@ export const ProfilePage = () => {
                 <div style={{ marginTop: "20px", border: "1px solid #ccc", padding: "10px" }}>
                     <div>ID: {myPlayer.id.toHexString()}</div>
                     <div>Name: {myPlayer.name}</div>
+                    <div>Level: {myPlayer.level}</div>
+                    <div>Xp: {myPlayer.xp}</div>
+                    <div>Games: {myPlayer.totalGames}</div>
+                    <div>Wins: {myPlayer.wins}</div>
                 </div>
             ) : (
                 <div>No player data found</div>
