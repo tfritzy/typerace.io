@@ -55,7 +55,7 @@ export const GamePage = () => {
   const handleProgress = useCallback((correctCharCount: number) => {
     if (!conn || !gameId) return;
 
-    conn.reducers.updateProgress(gameId, BigInt(correctCharCount));
+    conn.reducers.updateProgress(gameId, correctCharCount);
   }, [conn, gameId]);
 
   if (!game) {

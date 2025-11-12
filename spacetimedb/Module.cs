@@ -94,10 +94,22 @@ public static partial class Module
         public Identity PlayerId;
         [SpacetimeDB.Index.BTree]
         public string GameId;
-        public ulong ProgressIndex;
+        public int ProgressIndex;
         public bool IsBot;
         public long CreatedAt;
     }
+
+    [Table(Scheduled = nameof(UpdateBotProgress))]
+    public partial struct BotProgressUpdate
+    {
+        [AutoInc]
+        [PrimaryKey]
+        public ulong ScheduledId;
+        public string PlayerProgressId;
+        public int PhraseLength;
+        public ScheduleAt ScheduledAt;
+    }
+
 
     [Reducer]
     public static void Init(ReducerContext ctx)
@@ -293,6 +305,41 @@ public static partial class Module
     }
 
     [Reducer]
+    public static void UpdateBotProgress(ReducerContext ctx, BotProgressUpdate args)
+    {
+        var progress = ctx.Db.playerprogress.Id.Find(args.PlayerProgressId);
+
+        if (progress != null && progress.Value.IsBot)
+        {
+            var game = ctx.Db.game.Id.Find(progress.Value.GameId);
+
+            if (game != null && game.Value.State == GameState.Racing)
+            {
+                var updatedProgress = progress.Value;
+                updatedProgress.ProgressIndex += 1;
+                ctx.Db.playerprogress.Id.Update(updatedProgress);
+
+                if (updatedProgress.ProgressIndex < args.PhraseLength)
+                {
+                    var delay = new TimeDuration { Microseconds = GenerateBotDelay(ctx.Rng) };
+                    ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
+                    {
+                        ScheduledId = 0,
+                        PlayerProgressId = args.PlayerProgressId,
+                        PhraseLength = args.PhraseLength,
+                        ScheduledAt = new ScheduleAt.Time(ctx.Timestamp + delay)
+                    });
+                }
+            }
+        }
+    }
+
+    private static long GenerateBotDelay(Random rng)
+    {
+        return 100_000 + rng.Next(150_000);
+    }
+
+    [Reducer]
     public static void StartGame(ReducerContext ctx, GameStart args)
     {
         var game = ctx.Db.game.Id.Find(args.GameId);
@@ -304,6 +351,21 @@ public static partial class Module
             ctx.Db.game.Id.Update(updatedGame);
 
             Log.Info($"Game {args.GameId} transitioned to Racing state");
+
+            foreach (var progress in ctx.Db.playerprogress.GameId.Filter(args.GameId))
+            {
+                if (progress.IsBot)
+                {
+                    var delay = new TimeDuration { Microseconds = GenerateBotDelay(ctx.Rng) };
+                    ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
+                    {
+                        ScheduledId = 0,
+                        PlayerProgressId = progress.Id,
+                        PhraseLength = updatedGame.Phrase.Length,
+                        ScheduledAt = new ScheduleAt.Time(ctx.Timestamp + delay)
+                    });
+                }
+            }
 
             var fiveMinutes = new TimeDuration { Microseconds = +300_000_000 };
             var scheduledTime = ctx.Timestamp + fiveMinutes;
@@ -333,7 +395,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void UpdateProgress(ReducerContext ctx, string gameId, ulong newIndex)
+    public static void UpdateProgress(ReducerContext ctx, string gameId, int newIndex)
     {
         var playerId = ctx.Sender;
         var game = ctx.Db.game.Id.Find(gameId);
