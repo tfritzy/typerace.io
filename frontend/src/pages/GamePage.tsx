@@ -89,7 +89,7 @@ export const GamePage = () => {
 
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
         <div className="content-container w-full">
-          <div className="mb-8 space-y-3">
+          <div className="mb-20 space-y-3">
             {gamePlayerProgress.map((pp) => {
               const isCurrentPlayer = currentPlayerId && pp.playerId.isEqual(currentPlayerId);
               return (
@@ -107,16 +107,11 @@ export const GamePage = () => {
           </div>
 
           <ChatBox focused={typeBoxFocused}>
-            <div 
-              className="text-3xl"
-              style={{
-                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-                letterSpacing: '0.02em',
-                lineHeight: '1.6',
-              }}
+            <div
+              className="text-2xl font-mono" style={{ lineHeight: 1.6 }}
             >
-              <TypeBox 
-                phrase={game.phrase} 
+              <TypeBox
+                phrase={game.phrase}
                 onProgress={handleProgress}
                 onFocusChange={setTypeBoxFocused}
               />
@@ -124,7 +119,7 @@ export const GamePage = () => {
           </ChatBox>
         </div>
 
-        <div className="min-h-[100px]" />
+        <div className="min-h-[100px] mt-40" />
       </div>
     </div>
   );
