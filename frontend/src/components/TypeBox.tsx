@@ -5,9 +5,10 @@ type TypeBoxProps = {
   phrase: string;
   onComplete?: () => void;
   onProgress?: (correctCharCount: number) => void;
+  onFocusChange?: (focused: boolean) => void;
 };
 
-export const TypeBox = ({ phrase, onComplete, onProgress }: TypeBoxProps) => {
+export const TypeBox = ({ phrase, onComplete, onProgress, onFocusChange }: TypeBoxProps) => {
   const [focused, setFocused] = useState(true);
   const [input, setInput] = useState("");
   const [inputWidth, setInputWidth] = useState(0);
@@ -33,11 +34,17 @@ export const TypeBox = ({ phrase, onComplete, onProgress }: TypeBoxProps) => {
   const handleFocus = useCallback(() => {
     setFocused(true);
     resetCursorToEnd();
-  }, [resetCursorToEnd]);
+    if (onFocusChange) {
+      onFocusChange(true);
+    }
+  }, [resetCursorToEnd, onFocusChange]);
 
   const handleBlur = useCallback(() => {
     setFocused(false);
-  }, []);
+    if (onFocusChange) {
+      onFocusChange(false);
+    }
+  }, [onFocusChange]);
 
   const handlePaste = useCallback((event: React.ClipboardEvent) => {
     event.preventDefault();
@@ -52,7 +59,7 @@ export const TypeBox = ({ phrase, onComplete, onProgress }: TypeBoxProps) => {
       }
 
       setInput(newValue);
-      
+
       let correctCharCount = 0;
       for (let i = 0; i < newValue.length; i++) {
         if (newValue[i] === phrase[i]) {
@@ -61,11 +68,11 @@ export const TypeBox = ({ phrase, onComplete, onProgress }: TypeBoxProps) => {
           break;
         }
       }
-      
+
       if (onProgress) {
         onProgress(correctCharCount);
       }
-      
+
       if (newValue === phrase && onComplete) {
         onComplete();
       }
@@ -101,13 +108,13 @@ export const TypeBox = ({ phrase, onComplete, onProgress }: TypeBoxProps) => {
       } else if (isTyped && !isCorrect) {
         style.color = "var(--color-error)";
       } else {
-        style.color = "var(--color-white-25)";
+        style.color = "rgba(255, 255, 255, 0.35)";
       }
 
       return (
         <span
           key={i}
-          className={`transition-colors ${isTyped && !isCorrect ? 'underline decoration-3' : ''}`}
+          className={`transition-all duration-150 ${isTyped && !isCorrect ? 'underline decoration-2 decoration-red-500' : ''}`}
           style={style}
         >
           {isCursor && <span id="target" ref={targetRef} />}
@@ -121,7 +128,7 @@ export const TypeBox = ({ phrase, onComplete, onProgress }: TypeBoxProps) => {
     <div className="relative select-none">
       <div className="type-box">
         <div
-          className="rounded-lg transition-colors whitespace-pre-wrap text-start text-2xl font-light"
+          className="whitespace-pre-wrap text-start"
           ref={phraseRef}
         >
           {renderText()}

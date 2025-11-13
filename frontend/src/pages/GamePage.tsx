@@ -1,15 +1,17 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import type { DbConnection, Game, PlayerProgress, Player } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { TypeBox } from "../components/TypeBox";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
+import { ChatBox } from "../components/ChatBox";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const conn = useSpacetimeDB<DbConnection>();
+  const [typeBoxFocused, setTypeBoxFocused] = useState(false);
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -104,12 +106,25 @@ export const GamePage = () => {
             })}
           </div>
 
-          <div className="bg-(--color-chat-box-bg) border border-(--color-chat-box-border) rounded-lg p-8 shadow-(--shadow-chat-box)">
-            <TypeBox phrase={game.phrase} onProgress={handleProgress} />
-          </div>
+          <ChatBox focused={typeBoxFocused}>
+            <div 
+              className="text-3xl"
+              style={{
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                letterSpacing: '0.02em',
+                lineHeight: '1.6',
+              }}
+            >
+              <TypeBox 
+                phrase={game.phrase} 
+                onProgress={handleProgress}
+                onFocusChange={setTypeBoxFocused}
+              />
+            </div>
+          </ChatBox>
         </div>
 
-        <div className="min-h-[200px]" />
+        <div className="min-h-[100px]" />
       </div>
     </div>
   );

@@ -39,11 +39,11 @@ export const PlayerProgressBar = ({
                         Lvl {level}
                     </span>
                 </div>
-                <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+                <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
                     <div
                         className={`h-full rounded-full transition-all duration-200 ${isCurrentPlayer
-                                ? 'bg-linear-to-r from-amber-500 to-amber-400'
-                                : 'bg-linear-to-r from-blue-500 to-blue-400'
+                            ? 'bg-linear-to-r from-amber-500 to-amber-400'
+                            : 'bg-linear-to-r from-stone-500 to-stone-400'
                             }`}
                         style={{ width: `${Math.min(100, progressPercentage)}%` }}
                     />

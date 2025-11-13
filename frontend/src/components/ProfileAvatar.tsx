@@ -25,7 +25,7 @@ export const ProfileAvatar = () => {
     return (
         <button
             onClick={() => navigate("/profile")}
-            className="flex items-center gap-4 p-3 rounded-lg bg-[#2a2a2a] border border-white/15 hover:bg-[#333333] transition-all duration-200 shadow-[0_2px_8px_rgba(0,0,0,0.2)]"
+            className="flex items-center gap-4 py-3 rounded-lg"
         >
             <div className="relative shrink-0 border-2 border-amber-400 rounded-full">
                 <Avatar
