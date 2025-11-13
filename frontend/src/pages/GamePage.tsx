@@ -4,6 +4,8 @@ import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import type { DbConnection, Game, PlayerProgress, Player } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { TypeBox } from "../components/TypeBox";
+import { PlayerProgressBar } from "../components/PlayerProgressBar";
+import { Header } from "../components/Header";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -52,6 +54,21 @@ export const GamePage = () => {
     return player?.name || "Unknown";
   };
 
+  const getPlayerLevel = (playerId: any) => {
+    if (!playerId || playerId.toHexString() === "0000000000000000000000000000000000000000000000000000000000000000") {
+      return 1;
+    }
+    const player = players.find(p => p.id.isEqual(playerId));
+    return player?.level || 1;
+  };
+
+  const getIdentityHash = (playerId: any) => {
+    if (!playerId) {
+      return "bot";
+    }
+    return playerId.toHexString();
+  };
+
   const handleProgress = useCallback((correctCharCount: number) => {
     if (!conn || !gameId) return;
 
@@ -62,34 +79,37 @@ export const GamePage = () => {
     return <div>Game not found</div>;
   }
 
+  const currentPlayerId = conn?.identity;
+
   return (
-    <div className="text-white" style={{ padding: "20px", fontFamily: "monospace" }}>
-      <h1>Game Details</h1>
-      <div>
-        <h2>Game Table:</h2>
-        <div>Id: {game.id.toString()}</div>
-        <div>Phrase: {game.phrase}</div>
-        <div>CreatedAt: {game.createdAt.toString()}</div>
-        <div>State: {game.state.toString()}</div>
-        <div>GameMode: {game.gameMode.tag}</div>
-      </div>
+    <div className="relative min-h-screen">
+      <Header />
 
-      <div style={{ marginTop: "20px" }}>
-        <h2>Type the phrase:</h2>
-        <TypeBox phrase={game.phrase} onProgress={handleProgress} />
-      </div>
-
-      <div style={{ marginTop: "20px" }}>
-        <h2>Player Progress:</h2>
-        {gamePlayerProgress.map((pp) => (
-          <div key={pp.id.toString()} style={{ marginTop: "10px", border: "1px solid #ccc", padding: "10px" }}>
-            <div>Name: {getPlayerName(pp.playerId)}</div>
-            <div>PlayerId: {pp.playerId.toHexString()}</div>
-            <div>ProgressIndex: {pp.progressIndex.toString()}</div>
-            <div>IsBot: {pp.isBot.toString()}</div>
-            <div>CreatedAt: {pp.createdAt.toString()}</div>
+      <div className="flex flex-col items-center justify-center min-h-screen px-4">
+        <div className="content-container w-full">
+          <div className="mb-8 space-y-3">
+            {gamePlayerProgress.map((pp) => {
+              const isCurrentPlayer = currentPlayerId && pp.playerId.isEqual(currentPlayerId);
+              return (
+                <PlayerProgressBar
+                  key={pp.id.toString()}
+                  name={getPlayerName(pp.playerId)}
+                  level={getPlayerLevel(pp.playerId)}
+                  progress={pp.progressIndex}
+                  phraseLength={game.phrase.length}
+                  identityHash={getIdentityHash(pp.playerId)}
+                  isCurrentPlayer={isCurrentPlayer}
+                />
+              );
+            })}
           </div>
-        ))}
+
+          <div className="bg-(--color-chat-box-bg) border border-(--color-chat-box-border) rounded-lg p-8 shadow-(--shadow-chat-box)">
+            <TypeBox phrase={game.phrase} onProgress={handleProgress} />
+          </div>
+        </div>
+
+        <div className="min-h-[200px]" />
       </div>
     </div>
   );

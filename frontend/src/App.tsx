@@ -8,7 +8,7 @@ import { TypeBox } from "./components/TypeBox";
 import { ChatBox } from "./components/ChatBox";
 import { ModeSelector } from "./components/ModeSelector";
 import { MatchTypeSelector } from "./components/MatchTypeSelector";
-import { ProfileAvatar } from "./components/ProfileAvatar";
+import { Header } from "./components/Header";
 
 function App() {
   const [selectedMode, setSelectedMode] = useState<GameMode>({ tag: "English500" });
@@ -40,11 +40,7 @@ function App() {
 
   return (
     <div className="relative min-h-screen">
-      <div className="fixed top-4 left-0 right-0 z-10 px-4">
-        <div className="content-container flex justify-end">
-          <ProfileAvatar />
-        </div>
-      </div>
+      <Header />
       <div className="flex items-center justify-center min-h-screen p-4" style={{ paddingBottom: '400px' }}>
         <div className="content-container">
           <ChatBox>
