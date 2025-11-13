@@ -35,7 +35,7 @@ export const ProfilePage = () => {
                 <div className="content-container" style={{ maxWidth: "1200px", width: "100%" }}>
                     <div style={{ padding: "20px" }}>
                         <h1 style={{ 
-                            color: "var(--color-white)", 
+                            color: "var(--color-text-primary)", 
                             fontSize: "2rem", 
                             marginBottom: "30px",
                             fontWeight: 700
@@ -46,36 +46,36 @@ export const ProfilePage = () => {
                             <>
                                 <div style={{ 
                                     marginBottom: "30px",
-                                    backgroundColor: "var(--color-chat-box-bg)",
-                                    border: "1px solid var(--color-chat-box-border)",
+                                    backgroundColor: "var(--color-surface-elevated)",
+                                    border: "1px solid var(--color-border-subtle)",
                                     borderRadius: "8px",
                                     padding: "20px",
-                                    boxShadow: "var(--shadow-chat-box)"
+                                    boxShadow: "var(--shadow-elevated-surface)"
                                 }}>
                                     <div style={{ 
                                         display: "grid", 
                                         gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
                                         gap: "15px",
-                                        color: "var(--color-white)"
+                                        color: "var(--color-text-primary)"
                                     }}>
                                         <div>
-                                            <div style={{ color: "var(--color-white-25)", fontSize: "0.9rem" }}>Name</div>
+                                            <div style={{ color: "var(--color-text-secondary)", fontSize: "0.9rem" }}>Name</div>
                                             <div style={{ fontSize: "1.1rem", fontWeight: 600 }}>{myPlayer.name}</div>
                                         </div>
                                         <div>
-                                            <div style={{ color: "var(--color-white-25)", fontSize: "0.9rem" }}>Level</div>
+                                            <div style={{ color: "var(--color-text-secondary)", fontSize: "0.9rem" }}>Level</div>
                                             <div style={{ fontSize: "1.1rem", fontWeight: 600 }}>{myPlayer.level}</div>
                                         </div>
                                         <div>
-                                            <div style={{ color: "var(--color-white-25)", fontSize: "0.9rem" }}>XP</div>
+                                            <div style={{ color: "var(--color-text-secondary)", fontSize: "0.9rem" }}>XP</div>
                                             <div style={{ fontSize: "1.1rem", fontWeight: 600 }}>{myPlayer.xp}</div>
                                         </div>
                                         <div>
-                                            <div style={{ color: "var(--color-white-25)", fontSize: "0.9rem" }}>Games</div>
+                                            <div style={{ color: "var(--color-text-secondary)", fontSize: "0.9rem" }}>Games</div>
                                             <div style={{ fontSize: "1.1rem", fontWeight: 600 }}>{myPlayer.totalGames}</div>
                                         </div>
                                         <div>
-                                            <div style={{ color: "var(--color-white-25)", fontSize: "0.9rem" }}>Wins</div>
+                                            <div style={{ color: "var(--color-text-secondary)", fontSize: "0.9rem" }}>Wins</div>
                                             <div style={{ fontSize: "1.1rem", fontWeight: 600 }}>{myPlayer.wins}</div>
                                         </div>
                                     </div>
@@ -84,7 +84,7 @@ export const ProfilePage = () => {
                                 <WpmChart games={allGames} />
                             </>
                         ) : (
-                            <div style={{ color: "var(--color-white-25)" }}>No player data found</div>
+                            <div style={{ color: "var(--color-text-secondary)" }}>No player data found</div>
                         )}
                     </div>
                 </div>

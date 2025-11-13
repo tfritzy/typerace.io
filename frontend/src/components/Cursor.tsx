@@ -82,7 +82,7 @@ export const Cursor = ({ targetRef, lerp = 0.15, fadeDelay = 2000 }: CursorProps
             className="max-w-0 h-6 fixed top-0 left-0 transition-opacity duration-500"
             style={{ opacity }}
         >
-            <div className="h-full" style={{ borderRight: '1px solid var(--color-white)' }} />
+            <div className="h-full" style={{ borderRight: '1px solid var(--color-text-primary)' }} />
         </div>
     );
 };

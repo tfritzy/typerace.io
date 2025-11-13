@@ -3,13 +3,13 @@
 :root {
   /* Color Variables */
   --color-bg-primary: #202020;
-  --color-white: #ffffff;
-  --color-white-25: rgba(255, 255, 255, 0.25);
-  --color-error: #ef4444;
-  --color-accent: #fbbf24;
-  --color-chat-box-bg: #272727;
-  --color-chat-box-border: rgba(255, 255, 255, 0.15);
-  --shadow-chat-box: 0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
+  --color-text-primary: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.25);
+  --color-alert-error: #ef4444;
+  --color-highlight-accent: #fbbf24;
+  --color-surface-elevated: #272727;
+  --color-border-subtle: rgba(255, 255, 255, 0.15);
+  --shadow-elevated-surface: 0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
   
   --max-content-width: 60rem;
   

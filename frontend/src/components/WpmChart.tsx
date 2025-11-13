@@ -14,8 +14,10 @@ import {
 
 interface GameRecord {
   wordCount: number;
+  charCount: number;
   timeMs: bigint;
   placement: number;
+  wpm: number;
 }
 
 interface WpmChartProps {
@@ -31,16 +33,11 @@ interface ChartDataPoint {
   lowerBound: number;
 }
 
-const calculateWpm = (wordCount: number, timeMs: bigint): number => {
-  const timeMinutes = Number(timeMs) / (1000 * 60);
-  return wordCount / timeMinutes;
-};
-
 export const WpmChart = ({ games }: WpmChartProps) => {
   const chartData = useMemo(() => {
     if (!games || games.length === 0) return [];
 
-    const wpmValues = games.map((game) => calculateWpm(game.wordCount, game.timeMs));
+    const wpmValues = games.map((game) => game.wpm);
     
     const avgWpm = wpmValues.reduce((sum, wpm) => sum + wpm, 0) / wpmValues.length;
     const maxWpm = Math.max(...wpmValues);
@@ -52,10 +49,9 @@ export const WpmChart = ({ games }: WpmChartProps) => {
     const upperBound = sortedWpms[upperIndex];
 
     const data: ChartDataPoint[] = games.map((game, index) => {
-      const wpm = calculateWpm(game.wordCount, game.timeMs);
       return {
         gameNumber: index + 1,
-        wpm,
+        wpm: game.wpm,
         avgWpm,
         maxWpm,
         upperBound,
@@ -71,7 +67,7 @@ export const WpmChart = ({ games }: WpmChartProps) => {
       <div style={{ 
         padding: "20px", 
         textAlign: "center", 
-        color: "var(--color-white-25)" 
+        color: "var(--color-text-secondary)" 
       }}>
         No game data available
       </div>
@@ -82,13 +78,13 @@ export const WpmChart = ({ games }: WpmChartProps) => {
     <div style={{ 
       width: "100%", 
       padding: "20px",
-      backgroundColor: "var(--color-chat-box-bg)",
+      backgroundColor: "var(--color-surface-elevated)",
       borderRadius: "8px",
-      border: "1px solid var(--color-chat-box-border)",
-      boxShadow: "var(--shadow-chat-box)"
+      border: "1px solid var(--color-border-subtle)",
+      boxShadow: "var(--shadow-elevated-surface)"
     }}>
       <h2 style={{ 
-        color: "var(--color-white)", 
+        color: "var(--color-text-primary)", 
         marginBottom: "20px",
         fontSize: "1.5rem",
         fontWeight: 600
@@ -102,33 +98,33 @@ export const WpmChart = ({ games }: WpmChartProps) => {
         >
           <defs>
             <linearGradient id="confidenceInterval" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--color-accent)" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="var(--color-accent)" stopOpacity={0.1} />
+              <stop offset="5%" stopColor="var(--color-highlight-accent)" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="var(--color-highlight-accent)" stopOpacity={0.1} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-white-25)" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-text-secondary)" />
           <XAxis 
             dataKey="gameNumber" 
-            label={{ value: "Game Number", position: "insideBottom", offset: -10, fill: "var(--color-white)" }}
-            stroke="var(--color-white)"
-            tick={{ fill: "var(--color-white)" }}
+            label={{ value: "Game Number", position: "insideBottom", offset: -10, fill: "var(--color-text-primary)" }}
+            stroke="var(--color-text-primary)"
+            tick={{ fill: "var(--color-text-primary)" }}
           />
           <YAxis 
-            label={{ value: "WPM", angle: -90, position: "insideLeft", fill: "var(--color-white)" }}
-            stroke="var(--color-white)"
-            tick={{ fill: "var(--color-white)" }}
+            label={{ value: "WPM", angle: -90, position: "insideLeft", fill: "var(--color-text-primary)" }}
+            stroke="var(--color-text-primary)"
+            tick={{ fill: "var(--color-text-primary)" }}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: "var(--color-chat-box-bg)",
-              border: "1px solid var(--color-chat-box-border)",
+              backgroundColor: "var(--color-surface-elevated)",
+              border: "1px solid var(--color-border-subtle)",
               borderRadius: "4px",
-              color: "var(--color-white)",
+              color: "var(--color-text-primary)",
             }}
-            labelStyle={{ color: "var(--color-white)" }}
+            labelStyle={{ color: "var(--color-text-primary)" }}
           />
           <Legend 
-            wrapperStyle={{ color: "var(--color-white)" }}
+            wrapperStyle={{ color: "var(--color-text-primary)" }}
           />
           
           <Area
@@ -142,14 +138,14 @@ export const WpmChart = ({ games }: WpmChartProps) => {
             type="monotone"
             dataKey="lowerBound"
             stroke="none"
-            fill="var(--color-chat-box-bg)"
+            fill="var(--color-surface-elevated)"
             name=""
           />
           
           <Line
             type="monotone"
             dataKey="avgWpm"
-            stroke="var(--color-white)"
+            stroke="var(--color-text-primary)"
             strokeWidth={2}
             dot={false}
             name="Average WPM"
@@ -157,7 +153,7 @@ export const WpmChart = ({ games }: WpmChartProps) => {
           <Line
             type="monotone"
             dataKey="maxWpm"
-            stroke="var(--color-error)"
+            stroke="var(--color-alert-error)"
             strokeWidth={2}
             strokeDasharray="5 5"
             dot={false}
@@ -166,7 +162,7 @@ export const WpmChart = ({ games }: WpmChartProps) => {
           
           <Scatter
             dataKey="wpm"
-            fill="var(--color-accent)"
+            fill="var(--color-highlight-accent)"
             name="Game WPM"
           />
         </ComposedChart>
@@ -176,7 +172,7 @@ export const WpmChart = ({ games }: WpmChartProps) => {
         marginTop: "20px",
         display: "flex",
         justifyContent: "space-around",
-        color: "var(--color-white)",
+        color: "var(--color-text-primary)",
         fontSize: "0.9rem"
       }}>
         <div>

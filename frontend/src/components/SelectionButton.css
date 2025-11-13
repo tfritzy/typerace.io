@@ -1,9 +1,9 @@
 .selection-button {
   padding: 0.875rem 1rem;
-  background-color: var(--color-chat-box-bg);
-  border: 1px solid var(--color-chat-box-border);
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-subtle);
   border-radius: 6px;
-  color: var(--color-white);
+  color: var(--color-text-primary);
   font-size: 0.9375rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -15,14 +15,14 @@
 }
 
 .selection-button:hover {
-  border-color: color-mix(in srgb, var(--color-white) 50%, transparent);
+  border-color: color-mix(in srgb, var(--color-text-primary) 50%, transparent);
   background-color: #333333;
   transform: translateY(-1px);
   opacity: 0.8;
 }
 
 .selection-button.selected {
-  border-color: var(--color-white-25);
+  border-color: var(--color-text-secondary);
   background-color: #333333;
   opacity: 1;
 }

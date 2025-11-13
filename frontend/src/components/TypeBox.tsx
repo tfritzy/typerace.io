@@ -104,9 +104,9 @@ export const TypeBox = ({ phrase, onComplete, onProgress, onFocusChange }: TypeB
 
       const style: React.CSSProperties = {};
       if (isTyped && isCorrect) {
-        style.color = "var(--color-white)";
+        style.color = "var(--color-text-primary)";
       } else if (isTyped && !isCorrect) {
-        style.color = "var(--color-error)";
+        style.color = "var(--color-alert-error)";
       } else {
         style.color = "rgba(255, 255, 255, 0.35)";
       }

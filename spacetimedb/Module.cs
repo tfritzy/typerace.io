@@ -78,8 +78,10 @@ public static partial class Module
     public partial struct GameRecord
     {
         public int WordCount;
+        public int CharCount;
         public long TimeMs;
         public int Placement;
+        public double Wpm;
     }
 
     [Table(Scheduled = nameof(FillGameWithBots))]
@@ -448,6 +450,10 @@ public static partial class Module
         timeMs = timeMs / 1000;
 
         var wordCount = game.Phrase.Split(' ').Length;
+        var charCount = game.Phrase.Length;
+        
+        var timeMinutes = timeMs / (1000.0 * 60.0);
+        var wpm = (charCount / 5.0) / timeMinutes;
 
         var year = 2025;
         var month = 11;
@@ -458,8 +464,10 @@ public static partial class Module
         var gameRecord = new GameRecord
         {
             WordCount = wordCount,
+            CharCount = charCount,
             TimeMs = timeMs,
-            Placement = placement
+            Placement = placement,
+            Wpm = wpm
         };
 
         if (existingStats == null)
