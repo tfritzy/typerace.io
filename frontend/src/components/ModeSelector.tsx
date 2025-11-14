@@ -17,7 +17,7 @@ export function ModeSelector({ selectedMode, onModeSelect }: ModeSelectorProps) 
         { mode: GameMode.Japanese500, label: "Japanese", flag: "🇯🇵" },
         { mode: GameMode.Korean500, label: "Korean", flag: "🇰🇷" },
         { mode: GameMode.Chinese500, label: "Chinese", flag: "🇨🇳" },
-        { mode: GameMode.Russian500, label: "Russian", flag: "🇷🇺" },
+        { mode: GameMode.Ukrainian500, label: "Ukrainian", flag: "🇺🇦" },
         { mode: GameMode.Arabic500, label: "Arabic", flag: "🇸🇦" },
         { mode: GameMode.Hindi500, label: "Hindi", flag: "🇮🇳" },
         { mode: GameMode.Dutch500, label: "Dutch", flag: "🇳🇱" },

@@ -1,0 +1,52 @@
+using System;
+
+public static class German500Words
+{
+    public static readonly string[] Words = new string[]
+    {
+        "der", "die", "und", "in", "den", "von", "zu", "das", "mit", "sich",
+        "des", "auf", "für", "ist", "im", "dem", "nicht", "ein", "eine", "als",
+        "auch", "es", "an", "werden", "aus", "er", "hat", "dass", "sie", "nach",
+        "wird", "bei", "einer", "um", "am", "sind", "noch", "wie", "einem", "über",
+        "einen", "so", "zum", "war", "haben", "nur", "oder", "aber", "vor", "zur",
+        "bis", "mehr", "durch", "man", "sein", "wurde", "sei", "in", "prozent", "hatte",
+        "kann", "gegen", "vom", "können", "schon", "wenn", "habe", "seine", "mark", "ihre",
+        "dann", "unter", "wir", "soll", "ich", "eines", "es", "jahr", "zwei", "jahren",
+        "diese", "dieser", "wieder", "keine", "seiner", "werden", "wohl", "will", "zwischen", "im",
+        "immer", "million", "ein", "ein", "neue", "jahren", "gibt", "es", "viele", "muss",
+        "jetzt", "sagen", "stadt", "damit", "ging", "weit", "jedoch", "gegen", "teil", "zehn",
+        "wurden", "dabei", "zum", "wurde", "schon", "allem", "doch", "da", "waren", "will",
+        "ja", "heute", "gut", "all", "heute", "ersten", "bereits", "gibt", "wo", "land",
+        "gilt", "europa", "erst", "tag", "beiden", "machen", "steht", "konnte", "wer", "hätten",
+        "mann", "mir", "während", "drei", "etwas", "kommt", "diesem", "wochen", "über", "zusammen",
+        "leben", "wenig", "sollte", "weitere", "frau", "euro", "stelle", "sollen", "werde", "dieses",
+        "welt", "seit", "wollen", "daher", "deutschland", "nie", "gewesen", "zeit", "herr", "sowie",
+        "ab", "lag", "neben", "damit", "menschen", "nun", "vier", "darauf", "staat", "seite",
+        "immer", "vor", "sieht", "lässt", "lang", "neue", "punkt", "hinter", "hoch", "besonders",
+        "dann", "richtig", "ganz", "recht", "wohl", "könnte", "gut", "deutschen", "weg", "wäre",
+        "kleine", "dazu", "deshalb", "ihrer", "haus", "solche", "deutsche", "dies", "sei", "macht",
+        "großen", "zweiten", "bisher", "gemacht", "eigenen", "kam", "dort", "weiter", "kommen", "lassen",
+        "jeder", "deutschen", "obwohl", "stehen", "letzten", "sondern", "geschichte", "fünf", "müssen", "liegt",
+        "fall", "gruppe", "frage", "kein", "stelle", "fall", "anderen", "deutschen", "ihnen", "bringen",
+        "nächsten", "hier", "meisten", "denn", "deutschen", "geben", "rund", "stelle", "eben", "seien",
+        "gerade", "große", "deutschland", "nehmen", "weise", "stellt", "einige", "viel", "etwa", "völlig",
+        "ihrem", "leben", "sehen", "teil", "hand", "fall", "grund", "deutschen", "halten", "europa",
+        "länder", "deutschen", "finden", "vielleicht", "andere", "wasser", "personen", "geld", "platz", "zwar",
+        "besser", "einmal", "deutlich", "deutschen", "ihres", "lage", "versucht", "spiel", "verschiedene", "seines",
+        "deutsche", "geht", "deutsche", "rolle", "recht", "erhielt", "kind", "besonders", "deutschen", "muss",
+        "verloren", "einigen", "gesellschaft", "zeigen", "deutschen", "bekannt", "wegen", "könne", "deutschen", "eher",
+        "gegenüber", "treffen", "setzt", "daran", "namen", "zudem", "selbst", "gerade", "ebenfalls", "schwer",
+        "stelle", "deutschen", "frauen", "neben", "deutschen", "freiheit", "kinder", "solchen", "genau", "rechts",
+        "statt", "deutschen", "deutschen", "vielen", "geführt", "etwa", "deutschen", "muss", "ehemaligen", "müssen",
+        "deutschen", "deutschen", "solche", "lage", "deutschen", "lage", "solchen", "deutschen", "erhalten", "deutschen",
+        "deutschen", "form", "deutschen", "deutschen", "reihe", "gehen", "gebracht", "deren", "mitglieder", "betrug",
+        "deutschen", "deutschen", "früh", "deutschen", "deutschen", "einzelnen", "angesichts", "mitte", "zahlreiche", "zeigt",
+        "deutschen", "gemeinsam", "deutschen", "deutschen", "unternehmen", "häufig", "verlassen", "deutschen", "ausland", "grund",
+        "deutschen", "deutschen", "stellt", "deutschen", "deutschen", "deutschen", "außer", "gegenüber", "deutschen", "arbeit",
+        "deutschen", "situation", "deutschen", "deutschen", "rechte", "deutschen", "deutschen", "wert", "deutschen", "stärker",
+        "deutschen", "kraft", "verschiedenen", "deutschen", "deutschen", "deutschen", "gesamten", "deutschen", "deutschen", "deutschen",
+        "deutschen", "solche", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen",
+        "deutschen", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen",
+        "deutschen", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen", "deutschen"
+    };
+}

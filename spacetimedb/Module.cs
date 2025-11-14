@@ -21,7 +21,7 @@ public enum GameMode
     Japanese500,
     Korean500,
     Chinese500,
-    Russian500,
+    Ukrainian500,
     Arabic500,
     Hindi500,
     Dutch500,

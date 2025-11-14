@@ -1,0 +1,50 @@
+using System;
+
+public static class Turkish500Words
+{
+    public static readonly string[] Words = new string[]
+    {
+        "bir", "ve", "bu", "da", "için", "ne", "ile", "o", "daha", "var",
+        "mi", "gibi", "çok", "ben", "sen", "de", "ki", "en", "şey", "olan",
+        "olarak", "kadar", "ya", "ancak", "ama", "nasıl", "değil", "sonra", "böyle", "çünkü",
+        "her", "yani", "şu", "olan", "aynı", "işte", "neden", "artık", "tüm", "başka",
+        "olan", "ise", "öyle", "olan", "biri", "bazı", "kendi", "yine", "birçok", "iki",
+        "hangi", "hiç", "bile", "diğer", "hem", "üç", "üzere", "hiçbir", "göre", "kim",
+        "bazı", "dört", "olan", "birkaç", "beş", "altı", "üzerinde", "yedi", "sekiz", "dokuz",
+        "on", "bütün", "hep", "şimdi", "olan", "nerede", "iken", "yüz", "ilk", "biz",
+        "siz", "onlar", "şu", "bunlar", "şunlar", "onlar", "benim", "senin", "bizim", "sizin",
+        "onların", "kendi", "kendine", "kendisi", "kendimiz", "kendiniz", "kendileri", "ne", "kim", "hangi",
+        "nerede", "nasıl", "neden", "niçin", "ne", "zaman", "kaç", "kimse", "hiçbiri", "hepsi",
+        "her", "biri", "bazıları", "diğerleri", "çoğu", "kimi", "birisi", "herhangi", "olan", "demek",
+        "etmek", "olmak", "yapmak", "vermek", "gelmek", "görmek", "almak", "gitmek", "söylemek", "bilmek",
+        "çıkmak", "getirmek", "kalmak", "bulmak", "bakmak", "çalışmak", "konuşmak", "yemek", "içmek", "istemek",
+        "anlamak", "düşünmek", "girmek", "okumak", "yazmak", "öğrenmek", "öğretmek", "sevmek", "duymak", "dinlemek",
+        "göstermek", "tutmak", "açmak", "kapamak", "oturmak", "kalkmak", "yürümek", "koşmak", "durmak", "beklemek",
+        "gülmek", "ağlamak", "oynamak", "kazanmak", "kaybetmek", "aramak", "bulmak", "içmek", "yemek", "içmek",
+        "zaman", "gün", "saat", "dakika", "saniye", "hafta", "ay", "yıl", "sabah", "öğle",
+        "akşam", "gece", "bugün", "dün", "yarın", "önceki", "sonraki", "ilk", "son", "şimdi",
+        "önce", "sonra", "hemen", "daima", "hiç", "bazen", "sık", "ara", "sıra", "genellikle",
+        "hep", "çok", "az", "biraz", "daha", "en", "pek", "oldukça", "çok", "fazla",
+        "az", "yeterli", "tam", "hemen", "hepsi", "yarı", "tam", "yarım", "bütün", "tüm",
+        "kişi", "insan", "adam", "kadın", "erkek", "çocuk", "bebek", "kız", "oğlan", "genç",
+        "yaşlı", "anne", "baba", "ana", "ata", "oğul", "kız", "kardeş", "abi", "abla",
+        "aile", "arkadaş", "dost", "eş", "komşu", "öğrenci", "öğretmen", "doktor", "hemşire", "polis",
+        "asker", "işçi", "memur", "patron", "müdür", "başkan", "reis", "şef", "yönetici", "müdür",
+        "ev", "oda", "salon", "mutfak", "banyo", "yatak", "masa", "sandalye", "kapı", "pencere",
+        "duvar", "tavan", "zemin", "kat", "bina", "apartman", "sokak", "cadde", "yol", "köprü",
+        "park", "bahçe", "alan", "meydan", "okul", "hastane", "kilise", "cami", "müze", "tiyatro",
+        "sinema", "otel", "restoran", "mağaza", "market", "banka", "postane", "istasyon", "havaalanı", "liman",
+        "şehir", "kasaba", "köy", "ülke", "devlet", "dünya", "toprak", "yeryüzü", "kara", "deniz",
+        "göl", "nehir", "dağ", "tepe", "vadi", "orman", "ağaç", "çiçek", "bitki", "ot",
+        "koku", "renk", "şekil", "büyüklük", "boy", "en", "yükseklik", "derinlik", "ağırlık", "hız",
+        "hava", "su", "ateş", "toprak", "rüzgar", "yağmur", "kar", "buz", "bulut", "güneş",
+        "ay", "yıldız", "gök", "uzay", "hayvan", "kuş", "balık", "böcek", "kedi", "köpek",
+        "at", "inek", "koyun", "tavuk", "fare", "yılan", "kurbağa", "kelebek", "arı", "karınca",
+        "ses", "gürültü", "müzik", "şarkı", "dans", "oyun", "spor", "iş", "görev", "hizmet",
+        "para", "altın", "gümüş", "değer", "fiyat", "ücret", "maaş", "borç", "alacak", "vergi",
+        "kural", "kanun", "yasa", "hak", "görev", "sorumluluk", "güç", "kuvvet", "erk", "iktidar",
+        "hürriyet", "özgürlük", "bağımsızlık", "barış", "savaş", "çatışma", "kavga", "dövüş", "mücadele", "yarışma",
+        "bilim", "sanat", "edebiyat", "dil", "din", "felsefe", "tarih", "coğrafya", "matematik", "fizik",
+        "kimya", "biyoloji", "tıp", "teknik", "teknoloji", "sanayi", "tarım", "ticaret", "ekonomi", "politika"
+    };
+}
