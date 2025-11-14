@@ -8,8 +8,7 @@
   --color-error: #ef4444;
   --color-accent: #fbbf24;
   --color-chat-box-bg: #272727;
-  --color-chat-box-border: rgba(255, 255, 255, 0.15);
-  --shadow-chat-box: 0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
+  --color-chat-box-border: rgba(255, 255, 255, 0.12);
   
   --max-content-width: 1000px;
   
@@ -36,4 +35,15 @@ body {
   max-width: var(--max-content-width);
   margin-left: auto;
   margin-right: auto;
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }

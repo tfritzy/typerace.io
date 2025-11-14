@@ -7,11 +7,13 @@ import { TypeBox } from "../components/TypeBox";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { ChatBox } from "../components/ChatBox";
+import { Countdown } from "../components/Countdown";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const conn = useSpacetimeDB<DbConnection>();
-  const [typeBoxFocused, setTypeBoxFocused] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
+  const [previousGameState, setPreviousGameState] = useState<string | null>(null);
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -47,6 +49,18 @@ export const GamePage = () => {
 
   const game = games.find(g => g.id.toString() === gameId);
   const gamePlayerProgress = playerProgress.filter(pp => pp.gameId.toString() === gameId);
+
+  useEffect(() => {
+    if (!game) return;
+
+    const currentState = game.state.tag;
+
+    if (previousGameState === "Lobby" && currentState === "Countdown") {
+      setShowCountdown(true);
+    }
+
+    setPreviousGameState(currentState);
+  }, [game, previousGameState]);
 
   const getPlayerName = (playerId: any) => {
     if (!playerId || playerId.toHexString() === "0000000000000000000000000000000000000000000000000000000000000000") {
@@ -87,11 +101,32 @@ export const GamePage = () => {
     <div className="relative min-h-screen">
       <Header />
 
+      {showCountdown && (
+        <Countdown onComplete={() => setShowCountdown(false)} />
+      )}
+
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
         <div className="content-container w-full">
           <div className="mb-20 space-y-3">
-            {gamePlayerProgress.map((pp) => {
-              const isCurrentPlayer = currentPlayerId && pp.playerId.isEqual(currentPlayerId);
+            {Array.from({ length: 4 }).map((_, index) => {
+              const pp = gamePlayerProgress[index];
+              const isCurrentPlayer = pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
+
+              if (!pp) {
+                return (
+                  <PlayerProgressBar
+                    key={`loading-${index}`}
+                    name="Waiting for player..."
+                    level={1}
+                    progress={0}
+                    phraseLength={game.phrase.length}
+                    identityHash={`loading-${index}`}
+                    isCurrentPlayer={false}
+                    isLoading={true}
+                  />
+                );
+              }
+
               return (
                 <PlayerProgressBar
                   key={pp.id.toString()}
@@ -106,20 +141,19 @@ export const GamePage = () => {
             })}
           </div>
 
-          <ChatBox focused={typeBoxFocused}>
+          <ChatBox>
             <div
-              className="text-2xl font-mono" style={{ lineHeight: 1.6 }}
+              className="text-xl font-mono" style={{ lineHeight: 1.6 }}
             >
               <TypeBox
                 phrase={game.phrase}
                 onProgress={handleProgress}
-                onFocusChange={setTypeBoxFocused}
               />
             </div>
           </ChatBox>
         </div>
 
-        <div className="min-h-[100px] mt-40" />
+        <div className="min-h-[100px] mt-100" />
       </div>
     </div>
   );
