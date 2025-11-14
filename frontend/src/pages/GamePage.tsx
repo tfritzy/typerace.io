@@ -3,7 +3,7 @@ import { useEffect, useCallback, useState } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import { type DbConnection, type Game, PlayerProgress, type Player } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
-import { TypeBox } from "../components/TypeBox";
+import { TypeBox, type KeystrokeEvent } from "../components/TypeBox";
 import { InlinePlayerProgress } from "../components/InlinePlayerProgress";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
@@ -15,6 +15,8 @@ export const GamePage = () => {
   const conn = useSpacetimeDB<DbConnection>();
   const [showCountdown, setShowCountdown] = useState(false);
   const [previousGameState, setPreviousGameState] = useState<string | null>(null);
+  const [keystrokeEvents, setKeystrokeEvents] = useState<KeystrokeEvent[]>([]);
+  const [raceStartTime, setRaceStartTime] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -60,6 +62,11 @@ export const GamePage = () => {
       setShowCountdown(true);
     }
 
+    if (currentState === "Racing" && previousGameState !== "Racing") {
+      setRaceStartTime(Date.now());
+      setKeystrokeEvents([]);
+    }
+
     setPreviousGameState(currentState);
   }, [game, previousGameState]);
 
@@ -91,6 +98,14 @@ export const GamePage = () => {
 
     conn.reducers.updateProgress(gameId, correctCharCount);
   }, [conn, gameId]);
+
+  const handleKeystroke = useCallback((event: KeystrokeEvent) => {
+    setKeystrokeEvents(prev => {
+      const updated = [...prev, event];
+      console.log('Keystroke event:', event, 'Total events:', updated.length);
+      return updated;
+    });
+  }, []);
 
   if (!game) {
     return <div>Game not found</div>;
@@ -169,7 +184,9 @@ export const GamePage = () => {
             >
               <TypeBox
                 phrase={game.phrase}
+                raceStartTime={raceStartTime}
                 onProgress={handleProgress}
+                onKeystroke={handleKeystroke}
               />
             </div>
           </ChatBox>

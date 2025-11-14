@@ -1,17 +1,24 @@
 import React, { useCallback, useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import { Cursor } from "./Cursor";
 
+export type KeystrokeEvent = {
+  timestamp: number;
+  isCorrect: boolean;
+};
+
 type TypeBoxProps = {
   phrase: string;
+  raceStartTime?: number;
   onComplete?: () => void;
   onProgress?: (correctCharCount: number) => void;
+  onKeystroke?: (event: KeystrokeEvent) => void;
 };
 
 export type TypeBoxRef = {
   focus: () => void;
 };
 
-export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplete, onProgress }, ref) => {
+export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, raceStartTime, onComplete, onProgress, onKeystroke }, ref) => {
   const [focused, setFocused] = useState(true);
   const [input, setInput] = useState("");
   const [inputWidth, setInputWidth] = useState(0);
@@ -61,6 +68,23 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
         return;
       }
 
+      const oldLength = input.length;
+      const newLength = newValue.length;
+
+      if (newLength > oldLength && onKeystroke && raceStartTime) {
+        const currentTime = Date.now();
+        const timeSinceStart = currentTime - raceStartTime;
+        const charIndex = newLength - 1;
+        const typedChar = newValue[charIndex];
+        const expectedChar = phrase[charIndex];
+        const isCorrect = typedChar === expectedChar;
+
+        onKeystroke({
+          timestamp: timeSinceStart,
+          isCorrect: isCorrect
+        });
+      }
+
       setInput(newValue);
 
       let correctCharCount = 0;
@@ -80,7 +104,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
         onComplete();
       }
     },
-    [phrase, onComplete, onProgress]
+    [phrase, input.length, onComplete, onProgress, onKeystroke, raceStartTime]
   );
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
