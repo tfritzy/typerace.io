@@ -1,14 +1,17 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import { Cursor } from "./Cursor";
 
 type TypeBoxProps = {
   phrase: string;
   onComplete?: () => void;
   onProgress?: (correctCharCount: number) => void;
-  onFocusChange?: (focused: boolean) => void;
 };
 
-export const TypeBox = ({ phrase, onComplete, onProgress, onFocusChange }: TypeBoxProps) => {
+export type TypeBoxRef = {
+  focus: () => void;
+};
+
+export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplete, onProgress }, ref) => {
   const [focused, setFocused] = useState(true);
   const [input, setInput] = useState("");
   const [inputWidth, setInputWidth] = useState(0);
@@ -17,6 +20,12 @@ export const TypeBox = ({ phrase, onComplete, onProgress, onFocusChange }: TypeB
 
   const phraseRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current?.focus();
+    }
+  }));
 
   useEffect(() => {
     if (phraseRef.current) {
@@ -34,17 +43,11 @@ export const TypeBox = ({ phrase, onComplete, onProgress, onFocusChange }: TypeB
   const handleFocus = useCallback(() => {
     setFocused(true);
     resetCursorToEnd();
-    if (onFocusChange) {
-      onFocusChange(true);
-    }
-  }, [resetCursorToEnd, onFocusChange]);
+  }, [resetCursorToEnd]);
 
   const handleBlur = useCallback(() => {
     setFocused(false);
-    if (onFocusChange) {
-      onFocusChange(false);
-    }
-  }, [onFocusChange]);
+  }, []);
 
   const handlePaste = useCallback((event: React.ClipboardEvent) => {
     event.preventDefault();
@@ -163,4 +166,4 @@ export const TypeBox = ({ phrase, onComplete, onProgress, onFocusChange }: TypeB
       </div>
     </div>
   );
-};
+});

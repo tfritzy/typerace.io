@@ -1,10 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
 import "./components/SelectionButton.css";
 import type { DbConnection, GameMode } from "../module_bindings";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import { TypeBox } from "./components/TypeBox";
+import { TypeBox, type TypeBoxRef } from "./components/TypeBox";
 import { ChatBox } from "./components/ChatBox";
 import { ModeSelector } from "./components/ModeSelector";
 import { MatchTypeSelector } from "./components/MatchTypeSelector";
@@ -15,6 +15,7 @@ function App() {
   const [isPrivate, setIsPrivate] = useState(false);
   const conn = useSpacetimeDB<DbConnection>();
   const navigate = useNavigate();
+  const typeBoxRef = useRef<TypeBoxRef>(null);
 
   const handlePhraseComplete = useCallback(() => {
     if (conn) {
@@ -43,8 +44,8 @@ function App() {
       <Header />
       <div className="flex items-center justify-center min-h-screen p-4" style={{ paddingBottom: '400px' }}>
         <div className="content-container">
-          <ChatBox>
-            <TypeBox phrase="Put me in coach" onComplete={handlePhraseComplete} />
+          <ChatBox onFocus={() => typeBoxRef.current?.focus()} className="text-xl">
+            <TypeBox ref={typeBoxRef} phrase="A" onComplete={handlePhraseComplete} />
           </ChatBox>
         </div>
       </div>
