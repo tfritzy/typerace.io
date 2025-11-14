@@ -2,18 +2,24 @@ import { ProfileAvatar } from "./ProfileAvatar";
 import "../App.css";
 import { useNavigate } from "react-router-dom";
 
-export const Header = () => {
+interface HeaderProps {
+    hideAvatar?: boolean;
+}
+
+export const Header = ({ hideAvatar = false }: HeaderProps) => {
     const navigate = useNavigate();
 
     return (
-        <div className="fixed top-4 left-0 right-0 z-10 px-4">
+        <div className="w-full px-4 py-4">
             <div className="content-container flex justify-between items-center">
                 <button className="logo" onClick={() => navigate("/")}>
                     <span className="logo-text">Type</span>
                     <span className="logo-accent">Race</span>
                     <span className="logo-io">.io</span>
                 </button>
-                <ProfileAvatar />
+                <div className={hideAvatar ? "invisible" : ""}>
+                    <ProfileAvatar />
+                </div>
             </div>
         </div>
     );

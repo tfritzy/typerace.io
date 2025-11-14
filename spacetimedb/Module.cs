@@ -78,10 +78,11 @@ public static partial class Module
     [Type]
     public partial struct GameRecord
     {
-        public int WordCount;
+        public long Date;
         public long TimeMs;
         public int Placement;
         public double Wpm;
+        public GameMode GameMode;
     }
 
     [Table(Scheduled = nameof(FillGameWithBots))]
@@ -463,10 +464,11 @@ public static partial class Module
 
         var gameRecord = new GameRecord
         {
-            WordCount = wordCount,
+            Date = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
             TimeMs = timeMs,
             Placement = placement,
-            Wpm = wpm
+            Wpm = wpm,
+            GameMode = game.GameMode
         };
 
         if (existingStats == null)
