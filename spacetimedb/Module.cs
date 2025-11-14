@@ -50,6 +50,7 @@ public static partial class Module
         public string Id;
         public string Phrase;
         public long CreatedAt;
+        public long RacingStartedAt;
 
         [SpacetimeDB.Index.BTree]
         public GameState State;
@@ -80,6 +81,7 @@ public static partial class Module
         public int WordCount;
         public long TimeMs;
         public int Placement;
+        public double Wpm;
     }
 
     [Table(Scheduled = nameof(FillGameWithBots))]
@@ -231,6 +233,7 @@ public static partial class Module
                 Id = IdGenerator.Generate("game_", ctx.Rng),
                 Phrase = PhraseGenerator.GeneratePhraseForMode(gameMode, ctx.Rng),
                 CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+                RacingStartedAt = 0,
                 State = GameState.Lobby,
                 GameMode = gameMode,
                 Placements = new List<Identity>()
@@ -400,6 +403,7 @@ public static partial class Module
         {
             var updatedGame = game.Value;
             updatedGame.State = GameState.Racing;
+            updatedGame.RacingStartedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
             ctx.Db.game.Id.Update(updatedGame);
 
             Log.Info($"Game {args.GameId} transitioned to Racing state");
@@ -444,10 +448,12 @@ public static partial class Module
         var player = ctx.Db.player.Id.Find(progress.PlayerId);
         if (player == null) return;
 
-        var timeMs = ctx.Timestamp.MicrosecondsSinceUnixEpoch - progress.CreatedAt;
+        var timeMs = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.RacingStartedAt;
         timeMs = timeMs / 1000;
 
         var wordCount = game.Phrase.Split(' ').Length;
+        var timeMinutes = timeMs / 60000.0;
+        var wpm = game.Phrase.Length / 5.0 / timeMinutes;
 
         var year = 2025;
         var month = 11;
@@ -459,7 +465,8 @@ public static partial class Module
         {
             WordCount = wordCount,
             TimeMs = timeMs,
-            Placement = placement
+            Placement = placement,
+            Wpm = wpm
         };
 
         if (existingStats == null)
