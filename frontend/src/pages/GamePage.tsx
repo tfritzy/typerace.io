@@ -102,10 +102,15 @@ export const GamePage = () => {
   const handleKeystroke = useCallback((event: KeystrokeEvent) => {
     setKeystrokeEvents(prev => {
       const updated = [...prev, event];
-      console.log('Keystroke event:', event, 'Total events:', updated.length);
       return updated;
     });
   }, []);
+
+  useEffect(() => {
+    if (keystrokeEvents.length > 0) {
+      console.log(`Keystroke data collected: ${keystrokeEvents.length} events`);
+    }
+  }, [keystrokeEvents]);
 
   if (!game) {
     return <div>Game not found</div>;
