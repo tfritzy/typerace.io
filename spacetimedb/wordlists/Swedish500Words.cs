@@ -1,0 +1,51 @@
+using System;
+
+public static class Swedish500Words
+{
+    public static readonly string[] Words = new string[]
+    {
+        "och", "i", "att", "det", "som", "en", "på", "är", "av", "för",
+        "den", "med", "till", "har", "inte", "om", "ett", "kan", "de", "var",
+        "man", "han", "men", "så", "vid", "från", "hon", "ska", "hade", "skulle",
+        "dig", "vara", "nu", "efter", "än", "blir", "sin", "där", "varit", "eller",
+        "alla", "också", "igen", "dag", "under", "upp", "hur", "utan", "dock", "över",
+        "första", "två", "år", "kom", "andra", "blir", "sina", "många", "stor", "mycket",
+        "då", "tid", "säga", "ut", "varje", "får", "just", "hela", "mer", "här",
+        "fram", "sådan", "måste", "dessa", "redan", "finns", "när", "se", "bli", "sedan",
+        "kunde", "där", "fick", "dessa", "alla", "nya", "mitt", "vilket", "sätt", "mycket",
+        "göra", "folk", "stor", "barn", "mycket", "annat", "land", "nya", "olika", "endast",
+        "igen", "själv", "några", "samma", "alltid", "någon", "oss", "annat", "väg", "bort",
+        "ännu", "honom", "kring", "dessa", "mycket", "sådan", "denna", "olika", "fick", "länge",
+        "lika", "något", "barn", "liten", "samma", "varje", "gamla", "olika", "varit", "varför",
+        "hemma", "annan", "henne", "någon", "stora", "andra", "vissa", "kunna", "detta", "blivit",
+        "stora", "ibland", "gamla", "större", "gjort", "vilket", "båda", "hennes", "många", "plats",
+        "lille", "gamla", "enda", "gång", "lång", "sista", "detta", "olika", "vilka", "vissa",
+        "emot", "enligt", "nära", "omkring", "ända", "deras", "flera", "därför", "borta", "någon",
+        "dessa", "senare", "mellan", "vidare", "bättre", "sådana", "litet", "mänskliga", "rätt", "livet",
+        "några", "bland", "höger", "nästa", "länge", "nästan", "värld", "sista", "gick", "kunnat",
+        "istället", "mitt", "nära", "varje", "större", "mindre", "dina", "långa", "gamla", "första",
+        "män", "kvinnor", "barn", "folk", "tid", "år", "dag", "hand", "liv", "ord",
+        "hem", "ögon", "namn", "fråga", "ansikte", "rum", "stund", "sak", "mor", "far",
+        "natt", "gång", "väg", "del", "stad", "bok", "land", "vatten", "arbete", "huvud",
+        "kropp", "ord", "brev", "död", "person", "tanke", "fall", "sida", "människa", "känsla",
+        "mening", "förhållande", "värde", "skola", "själ", "sätt", "grund", "form", "kraft", "gata",
+        "sanning", "kärlek", "intresse", "kamrat", "röst", "kyrka", "blick", "land", "parti", "historia",
+        "fråga", "samhälle", "dörr", "musik", "krig", "konst", "djur", "hus", "rike", "kung",
+        "folk", "varma", "månad", "häst", "bild", "luft", "natur", "timme", "far", "skola",
+        "ålder", "vän", "skäl", "dotter", "son", "hustru", "mor", "far", "bror", "syster",
+        "barn", "vin", "dryck", "mat", "sten", "skog", "träd", "berg", "flod", "sjö",
+        "plats", "vinter", "sommar", "vår", "höst", "vind", "regn", "snö", "mörker", "ljus",
+        "värme", "kyla", "hetta", "storm", "sol", "måne", "stjärna", "himmel", "moln", "dag",
+        "natt", "morgon", "kväll", "middag", "fågel", "fisk", "blomma", "gräs", "säd", "bröd",
+        "dricka", "äta", "komma", "gå", "stå", "ligga", "sitta", "springa", "falla", "flyga",
+        "taga", "göra", "säga", "ge", "hålla", "lämna", "föra", "skriva", "läsa", "tala",
+        "höra", "se", "känna", "veta", "tänka", "vilja", "kunna", "måste", "skola", "böra",
+        "tycka", "tro", "förstå", "älska", "hata", "minnas", "glömma", "önska", "hoppas", "frukta",
+        "tala", "fråga", "svara", "fråga", "ropa", "skrika", "vispa", "sjunga", "skratta", "gråta",
+        "le", "sucka", "sorg", "glädje", "lycka", "kärlek", "vrede", "frid", "hopp", "tro",
+        "liv", "död", "kraft", "svaghet", "sanning", "lögn", "dygd", "synd", "ära", "vanära",
+        "frid", "strid", "styrka", "mat", "törst", "hunger", "trötthet", "vila", "arbete", "lek",
+        "fest", "kamp", "seger", "nederlag", "fara", "trygghet", "lugn", "oro", "frid", "krig",
+        "vän", "fiende", "glädje", "sorg", "nöje", "smärta", "mod", "feghet", "vilja", "tvång"
+    };
+}

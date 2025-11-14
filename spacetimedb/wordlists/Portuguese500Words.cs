@@ -1,0 +1,50 @@
+using System;
+
+public static class Portuguese500Words
+{
+    public static readonly string[] Words = new string[]
+    {
+        "o", "a", "de", "e", "que", "do", "da", "em", "um", "para",
+        "é", "com", "não", "uma", "os", "no", "se", "na", "por", "mais",
+        "as", "dos", "como", "mas", "foi", "ao", "ele", "das", "tem", "à",
+        "seu", "sua", "ou", "ser", "quando", "muito", "há", "nos", "já", "está",
+        "eu", "também", "só", "pelo", "pela", "até", "isso", "ela", "entre", "era",
+        "depois", "sem", "mesmo", "aos", "ter", "seus", "quem", "nas", "me", "esse",
+        "eles", "estão", "você", "tinha", "foram", "essa", "num", "nem", "suas", "meu",
+        "às", "minha", "têm", "numa", "pelos", "elas", "havia", "seja", "qual", "será",
+        "nós", "tenho", "lhe", "deles", "essas", "esses", "pelas", "este", "fosse", "dele",
+        "tu", "te", "vocês", "vos", "lhes", "meus", "minhas", "teu", "tua", "teus",
+        "tuas", "nosso", "nossa", "nossos", "nossas", "dela", "delas", "esta", "estes", "estas",
+        "aquele", "aquela", "aqueles", "aquelas", "isto", "aquilo", "estou", "está", "estamos", "estão",
+        "estive", "esteve", "estivemos", "estiveram", "estava", "estávamos", "estavam", "estivera", "estivéramos", "esteja",
+        "estejamos", "estejam", "estivesse", "estivéssemos", "estivessem", "estiver", "estivermos", "estiverem", "hei", "há",
+        "havemos", "hão", "houve", "houvemos", "houveram", "houvera", "houvéramos", "haja", "hajamos", "hajam",
+        "houvesse", "houvéssemos", "houvessem", "houver", "houvermos", "houverem", "houverei", "houverá", "houveremos", "houverão",
+        "houveria", "houveríamos", "houveriam", "sou", "somos", "são", "era", "éramos", "eram", "fui",
+        "foi", "fomos", "foram", "fora", "fôramos", "seja", "sejamos", "sejam", "fosse", "fôssemos",
+        "fossem", "for", "formos", "forem", "serei", "será", "seremos", "serão", "seria", "seríamos",
+        "seriam", "tenho", "tem", "temos", "têm", "tinha", "tínhamos", "tinham", "tive", "teve",
+        "tivemos", "tiveram", "tivera", "tivéramos", "tenha", "tenhamos", "tenham", "tivesse", "tivéssemos", "tivessem",
+        "tiver", "tivermos", "tiverem", "terei", "terá", "teremos", "terão", "teria", "teríamos", "teriam",
+        "ano", "anos", "vez", "dia", "tempo", "casa", "país", "pessoa", "vida", "parte",
+        "estado", "governo", "homem", "trabalho", "cidade", "forma", "caso", "mulher", "lugar", "grupo",
+        "mão", "mundo", "água", "pai", "hora", "história", "lado", "poder", "lei", "guerra",
+        "vez", "filho", "momento", "maior", "presidente", "coisa", "palavra", "corpo", "criança", "terra",
+        "ponto", "questão", "livro", "escola", "Brasil", "nome", "fato", "noite", "número", "cada",
+        "sociedade", "milhão", "parte", "conta", "rio", "exemplo", "cabeça", "partir", "mês", "ideia",
+        "olho", "razão", "verdade", "serviço", "igreja", "morte", "mesa", "figura", "porta", "amor",
+        "novo", "outro", "grande", "primeiro", "todo", "mesmo", "nacional", "qualquer", "político", "público",
+        "social", "melhor", "pequeno", "último", "segundo", "próprio", "geral", "novo", "maior", "importante",
+        "tal", "único", "jovem", "principal", "velho", "atual", "federal", "comum", "diferente", "novo",
+        "real", "cultural", "direito", "natural", "humano", "brasileiro", "branco", "português", "certo", "europeu",
+        "negro", "internacional", "igual", "necessário", "especial", "militar", "possível", "difícil", "bom", "grande",
+        "meio", "norte", "econômico", "forte", "longo", "alto", "central", "civil", "baixo", "simples",
+        "popular", "pobre", "tradicional", "principal", "livre", "próximo", "contrário", "maior", "religioso", "médio",
+        "local", "claro", "brasileiro", "forte", "maior", "industrial", "próximo", "rico", "superior", "final",
+        "branco", "comercial", "financeiro", "interior", "esquerdo", "inglês", "rápido", "próprio", "total", "rural",
+        "novo", "oficial", "presente", "brasileiro", "técnico", "longo", "verde", "mínimo", "político", "atual",
+        "maior", "comum", "grave", "vermelho", "antigo", "maior", "máximo", "maior", "exterior", "direto",
+        "largo", "fundamental", "maior", "importante", "privado", "maior", "científico", "católico", "maior", "judicial",
+        "azul", "completo", "francês", "maior", "maior", "maior", "maior", "maior", "maior", "maior"
+    };
+}

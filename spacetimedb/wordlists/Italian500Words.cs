@@ -1,0 +1,52 @@
+using System;
+
+public static class Italian500Words
+{
+    public static readonly string[] Words = new string[]
+    {
+        "il", "di", "e", "la", "un", "essere", "a", "in", "che", "avere",
+        "per", "da", "non", "con", "uno", "suo", "questo", "anche", "ma", "al",
+        "più", "da", "si", "io", "come", "se", "tutto", "fare", "dire", "suo",
+        "quando", "molto", "potere", "noi", "chi", "tempo", "dove", "perché", "cosa", "vedere",
+        "lui", "lei", "nostro", "loro", "altro", "prima", "dopo", "sapere", "volere", "quale",
+        "solo", "anno", "ancora", "ogni", "due", "bene", "poi", "così", "uomo", "donna",
+        "giorno", "parte", "casa", "mano", "ora", "venire", "stato", "mondo", "vita", "andare",
+        "paese", "sempre", "mai", "volta", "essere", "grande", "città", "quel", "quella", "nuovo",
+        "primo", "stesso", "fra", "tanto", "poco", "donna", "momento", "oggi", "senza", "niente",
+        "caso", "lavoro", "altro", "alcuni", "trovare", "qualche", "poco", "dare", "parola", "dire",
+        "lungo", "allora", "nostro", "numero", "punto", "stesso", "problema", "dentro", "parte", "meno",
+        "occhio", "nulla", "fatto", "tempo", "storia", "strada", "partire", "voce", "notte", "fare",
+        "mezzo", "gente", "verso", "libro", "morire", "anno", "modo", "cielo", "cosa", "fuori",
+        "terra", "politica", "acqua", "guerra", "insieme", "forza", "porta", "testa", "fine", "già",
+        "parlare", "luce", "male", "volta", "periodo", "amico", "guerra", "chiamare", "corpo", "mezzo",
+        "giovane", "pensare", "ragione", "poco", "avere", "cuore", "prendere", "lasciare", "vista", "nuovo",
+        "padre", "madre", "tardi", "tornare", "figura", "legge", "passare", "chiesa", "basso", "sangue",
+        "potere", "storia", "restare", "stare", "certo", "vicino", "signore", "alto", "cammino", "via",
+        "domanda", "nero", "forma", "musica", "circa", "cento", "nazione", "servizio", "sistema", "tale",
+        "governo", "gruppo", "ordine", "centro", "posto", "lato", "infatti", "studio", "tutto", "diventare",
+        "valore", "secondo", "comune", "particolare", "campo", "piano", "azione", "idea", "fronte", "lungo",
+        "dunque", "avanti", "ultimo", "fatto", "maggiore", "piuttosto", "mentre", "natura", "bisogno", "tipo",
+        "opera", "famiglia", "viso", "serie", "scrivere", "guerra", "portare", "condizione", "qualcosa", "proprio",
+        "esercito", "lontano", "buono", "mese", "nessuno", "tratto", "ufficio", "scuola", "generale", "maggior",
+        "morte", "qualsiasi", "anima", "compagno", "interesse", "scopo", "sicuro", "presenza", "giro", "base",
+        "arte", "fine", "presente", "avvenire", "ragazzo", "minuto", "fortuna", "maniera", "memoria", "gioco",
+        "principio", "braccio", "senso", "piede", "stato", "guerra", "nemico", "camera", "tavola", "tenere",
+        "punto", "lettera", "specie", "colore", "movimento", "presto", "movimento", "mezzo", "sole", "soldo",
+        "oggetto", "popolo", "amore", "figlio", "mente", "realtà", "capitale", "bianco", "persona", "rosso",
+        "sorta", "stato", "fianco", "guerra", "tratto", "parete", "cima", "giorno", "stanza", "letto",
+        "sotto", "terra", "mare", "aria", "secolo", "lingua", "rosso", "verde", "giallo", "bianco",
+        "nero", "azzurro", "grande", "piccolo", "nuovo", "vecchio", "giovane", "bello", "brutto", "buono",
+        "cattivo", "alto", "basso", "lungo", "corto", "forte", "debole", "pieno", "vuoto", "caldo",
+        "freddo", "vicino", "lontano", "primo", "ultimo", "solo", "doppio", "molto", "poco", "tutto",
+        "niente", "altro", "stesso", "diverso", "simile", "uguale", "vario", "tale", "certo", "sicuro",
+        "vero", "falso", "possibile", "impossibile", "facile", "difficile", "semplice", "complesso", "chiaro", "oscuro",
+        "pubblico", "privato", "generale", "speciale", "comune", "raro", "normale", "strano", "naturale", "artificiale",
+        "libero", "uguale", "differente", "contrario", "anteriore", "posteriore", "interiore", "esteriore", "superiore", "inferiore",
+        "centrale", "laterale", "totale", "parziale", "completo", "incompleto", "pieno", "vuoto", "pulito", "sporco",
+        "sano", "malato", "vivo", "morto", "aperto", "chiuso", "destro", "sinistro", "sopra", "sotto",
+        "davanti", "dietro", "dentro", "fuori", "vicino", "lontano", "qui", "là", "sempre", "mai",
+        "anche", "neanche", "si", "no", "tale", "quale", "chi", "dove", "quando", "come",
+        "perché", "per", "da", "con", "senza", "sopra", "sotto", "davanti", "dietro", "tra",
+        "durante", "mediante", "secondo", "fino", "verso", "contro", "eccetto", "salvo", "meno", "anche"
+    };
+}
