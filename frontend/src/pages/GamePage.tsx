@@ -86,10 +86,11 @@ export const GamePage = () => {
     return playerId.toHexString();
   };
 
-  const handleProgress = useCallback((correctCharCount: number) => {
+  const handleProgress = useCallback((correctCharCount: number, eventType: "Correct" | "Incorrect" | "Backspace") => {
     if (!conn || !gameId) return;
 
-    conn.reducers.updateProgress(gameId, correctCharCount);
+    const eventTypeEnum = { tag: eventType };
+    conn.reducers.updateProgress(gameId, correctCharCount, eventTypeEnum);
   }, [conn, gameId]);
 
   if (!game) {

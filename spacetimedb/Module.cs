@@ -29,6 +29,21 @@ public enum GameMode
     Turkish500
 }
 
+[Type]
+public enum CharacterEventType
+{
+    Correct,
+    Incorrect,
+    Backspace
+}
+
+[Type]
+public partial struct CharacterEvent
+{
+    public long Timestamp;
+    public CharacterEventType EventType;
+}
+
 public static partial class Module
 {
     [Table(Name = "player", Public = true)]
@@ -127,6 +142,7 @@ public static partial class Module
         public int ProgressIndex;
         public bool IsBot;
         public long CreatedAt;
+        public List<CharacterEvent> CharacterHistory;
     }
 
     [Table(Scheduled = nameof(UpdateBotProgress))]
@@ -304,7 +320,8 @@ public static partial class Module
             GameId = gameId,
             ProgressIndex = 0,
             IsBot = false,
-            CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch
+            CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+            CharacterHistory = new List<CharacterEvent>()
         });
     }
 
@@ -328,7 +345,8 @@ public static partial class Module
                     GameId = args.GameId,
                     ProgressIndex = 0,
                     IsBot = true,
-                    CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch
+                    CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+                    CharacterHistory = new List<CharacterEvent>()
                 });
 
                 Log.Info($"Added bot {i + 1} to game {args.GameId}");
@@ -529,7 +547,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void UpdateProgress(ReducerContext ctx, string gameId, int newIndex)
+    public static void UpdateProgress(ReducerContext ctx, string gameId, int newIndex, CharacterEventType eventType)
     {
         var playerId = ctx.Sender;
         var game = ctx.Db.game.Id.Find(gameId);
@@ -550,6 +568,14 @@ public static partial class Module
 
         var updatedProgress = existingProgress.Value;
         updatedProgress.ProgressIndex = newIndex;
+        
+        var characterEvent = new CharacterEvent
+        {
+            Timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+            EventType = eventType
+        };
+        updatedProgress.CharacterHistory.Add(characterEvent);
+        
         ctx.Db.playerprogress.Id.Update(updatedProgress);
 
         if (newIndex >= game.Value.Phrase.Length)
