@@ -11,7 +11,7 @@
   --color-chat-box-border: rgba(255, 255, 255, 0.15);
   --shadow-chat-box: 0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
   
-  --max-content-width: 60rem;
+  --max-content-width: 1000px;
   
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

@@ -1,27 +1,262 @@
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import type { DbConnection, Player } from "../../module_bindings";
+import type { DbConnection, Player, PlayerStats } from "../../module_bindings";
+import { WpmChart } from "../components/WpmChart";
+import { useMemo } from "react";
+import { Header } from "../components/Header";
+import Avatar from "boring-avatars";
 
 export const ProfilePage = () => {
     const conn = useSpacetimeDB<DbConnection>();
     const { rows: players } = useTable<DbConnection, Player>("player");
+    const { rows: playerStats } = useTable<DbConnection, PlayerStats>("playerstats");
 
     const myPlayer = players.find(p => p.id.isEqual(conn?.identity!));
 
+    const realGameData = useMemo(() => {
+        if (!conn?.identity) return [];
+
+        const myStats = playerStats.filter(stat =>
+            stat.playerId.isEqual(conn.identity!)
+        );
+
+        const gameData = myStats.flatMap(stat => stat.games);
+
+        return gameData.sort((a, b) => {
+            if (a.timeMs < b.timeMs) {
+                return -1;
+            }
+            if (a.timeMs > b.timeMs) {
+                return 1;
+            }
+            return 0;
+        });
+    }, [playerStats, conn?.identity]);
+
     return (
-        <div className="text-white" style={{ padding: "20px", fontFamily: "monospace" }}>
-            <h1>Profile</h1>
-            {myPlayer ? (
-                <div style={{ marginTop: "20px", border: "1px solid #ccc", padding: "10px" }}>
-                    <div>ID: {myPlayer.id.toHexString()}</div>
-                    <div>Name: {myPlayer.name}</div>
-                    <div>Level: {myPlayer.level}</div>
-                    <div>Xp: {myPlayer.xp}</div>
-                    <div>Games: {myPlayer.totalGames}</div>
-                    <div>Wins: {myPlayer.wins}</div>
+        <div className="min-h-screen">
+            <Header hideAvatar={true} />
+
+            <div className="flex flex-col items-center px-4 pb-12">
+                <div className="content-container">
+                    <div style={{
+                        backgroundColor: '#272727',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '8px',
+                        padding: '32px',
+                        marginBottom: '32px',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1)'
+                    }}>
+                        {myPlayer ? (
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px', marginBottom: '32px' }}>
+                                    <div style={{
+                                        border: '2px solid #fbbf24',
+                                        borderRadius: '50%',
+                                        overflow: 'hidden',
+                                        flexShrink: 0
+                                    }}>
+                                        <Avatar
+                                            size={80}
+                                            name={myPlayer.id.toHexString()}
+                                            variant="pixel"
+                                            colors={["#fbbf24", "#f59e0b", "#d97706", "#b45309", "#92400e"]}
+                                        />
+                                    </div>
+
+                                    <div style={{ flex: 1 }}>
+                                        <h1 style={{
+                                            color: '#ffffff',
+                                            fontSize: '1.875rem',
+                                            fontWeight: 700,
+                                            marginBottom: '12px'
+                                        }}>
+                                            {myPlayer.name}
+                                        </h1>
+
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '12px'
+                                        }}>
+                                            <span style={{
+                                                color: 'rgba(255, 255, 255, 0.6)',
+                                                fontSize: '0.875rem',
+                                                fontWeight: 500
+                                            }}>
+                                                Level {myPlayer.level}
+                                            </span>
+                                            <div style={{
+                                                flex: 1,
+                                                height: '10px',
+                                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                                borderRadius: '5px',
+                                                overflow: 'hidden'
+                                            }}>
+                                                <div style={{
+                                                    height: '100%',
+                                                    background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+                                                    borderRadius: '5px',
+                                                    width: `${(myPlayer.xp / ((myPlayer.level + 1) * 100)) * 100}%`,
+                                                    transition: 'width 0.3s ease'
+                                                }} />
+                                            </div>
+                                            <span style={{
+                                                color: 'rgba(255, 255, 255, 0.6)',
+                                                fontSize: '0.875rem',
+                                                fontWeight: 500
+                                            }}>
+                                                Level {myPlayer.level + 1}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(2, 1fr)',
+                                    gap: '16px'
+                                }}>
+                                    <div style={{
+                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                                        borderRadius: '8px',
+                                        padding: '20px',
+                                        border: '1px solid rgba(255, 255, 255, 0.06)'
+                                    }}>
+                                        <div style={{
+                                            color: 'rgba(255, 255, 255, 0.5)',
+                                            fontSize: '0.8125rem',
+                                            marginBottom: '12px',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.05em',
+                                            fontWeight: 600
+                                        }}>
+                                            Career Stats
+                                        </div>
+                                        <div style={{
+                                            display: 'grid',
+                                            gridTemplateColumns: 'repeat(2, 1fr)',
+                                            gap: '16px'
+                                        }}>
+                                            <div>
+                                                <div style={{
+                                                    color: 'rgba(255, 255, 255, 0.6)',
+                                                    fontSize: '0.8125rem',
+                                                    marginBottom: '6px'
+                                                }}>
+                                                    Games Played
+                                                </div>
+                                                <div style={{
+                                                    color: '#ffffff',
+                                                    fontSize: '1.5rem',
+                                                    fontWeight: 700
+                                                }}>
+                                                    {myPlayer.totalGames}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div style={{
+                                                    color: 'rgba(255, 255, 255, 0.6)',
+                                                    fontSize: '0.8125rem',
+                                                    marginBottom: '6px'
+                                                }}>
+                                                    Wins
+                                                </div>
+                                                <div style={{
+                                                    color: '#ffffff',
+                                                    fontSize: '1.5rem',
+                                                    fontWeight: 700
+                                                }}>
+                                                    {myPlayer.wins}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style={{
+                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                                        borderRadius: '8px',
+                                        padding: '20px',
+                                        border: '1px solid rgba(255, 255, 255, 0.06)'
+                                    }}>
+                                        <div style={{
+                                            color: 'rgba(255, 255, 255, 0.5)',
+                                            fontSize: '0.8125rem',
+                                            marginBottom: '12px',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.05em',
+                                            fontWeight: 600
+                                        }}>
+                                            Performance
+                                        </div>
+                                        <div style={{
+                                            display: 'grid',
+                                            gridTemplateColumns: 'repeat(2, 1fr)',
+                                            gap: '16px'
+                                        }}>
+                                            <div>
+                                                <div style={{
+                                                    color: 'rgba(255, 255, 255, 0.6)',
+                                                    fontSize: '0.8125rem',
+                                                    marginBottom: '6px'
+                                                }}>
+                                                    Highest WPM
+                                                </div>
+                                                <div style={{
+                                                    color: '#fbbf24',
+                                                    fontSize: '1.5rem',
+                                                    fontWeight: 700
+                                                }}>
+                                                    127
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div style={{
+                                                    color: 'rgba(255, 255, 255, 0.6)',
+                                                    fontSize: '0.8125rem',
+                                                    marginBottom: '6px'
+                                                }}>
+                                                    Words Typed
+                                                </div>
+                                                <div style={{
+                                                    color: '#ffffff',
+                                                    fontSize: '1.5rem',
+                                                    fontWeight: 700
+                                                }}>
+                                                    8,432
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div style={{
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                textAlign: 'center',
+                                padding: '24px'
+                            }}>
+                                No player data found
+                            </div>
+                        )}
+                    </div>
+
+                    <div>
+                        <h2 style={{
+                            color: '#ffffff',
+                            fontSize: '1.5rem',
+                            fontWeight: 700,
+                            marginBottom: '24px'
+                        }}>
+                            Performance History
+                        </h2>
+
+                        <WpmChart
+                            data={realGameData}
+                            title="Your Games"
+                        />
+                    </div>
                 </div>
-            ) : (
-                <div>No player data found</div>
-            )}
+            </div>
         </div>
     );
 };
