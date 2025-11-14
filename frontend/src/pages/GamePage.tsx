@@ -1,9 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useCallback, useState } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import type { DbConnection, Game, PlayerProgress, Player } from "../../module_bindings";
+import { type DbConnection, type Game, PlayerProgress, type Player } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { TypeBox } from "../components/TypeBox";
+import { InlinePlayerProgress } from "../components/InlinePlayerProgress";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { ChatBox } from "../components/ChatBox";
@@ -114,36 +115,57 @@ export const GamePage = () => {
 
               if (!pp) {
                 return (
-                  <PlayerProgressBar
-                    key={`loading-${index}`}
-                    name="Waiting for player..."
-                    level={1}
-                    progress={0}
-                    phraseLength={game.phrase.length}
-                    identityHash={`loading-${index}`}
-                    isCurrentPlayer={false}
-                    isLoading={true}
-                  />
+                  <ChatBox>
+                    <PlayerProgressBar
+                      key={`loading-${index}`}
+                      name="Waiting for player..."
+                      level={1}
+                      progress={0}
+                      phraseLength={game.phrase.length}
+                      identityHash={`loading-${index}`}
+                      isCurrentPlayer={false}
+                      isLoading={true}
+                    />
+                  </ChatBox>
                 );
               }
 
+              if (isCurrentPlayer) {
+                return null;
+              }
+
               return (
-                <PlayerProgressBar
-                  key={pp.id.toString()}
-                  name={getPlayerName(pp.playerId)}
-                  level={getPlayerLevel(pp.playerId)}
-                  progress={pp.progressIndex}
-                  phraseLength={game.phrase.length}
-                  identityHash={getIdentityHash(pp.playerId)}
-                  isCurrentPlayer={isCurrentPlayer}
-                />
+                <ChatBox>
+                  <PlayerProgressBar
+                    key={pp.id.toString()}
+                    name={getPlayerName(pp.playerId)}
+                    level={getPlayerLevel(pp.playerId)}
+                    progress={pp.progressIndex}
+                    phraseLength={game.phrase.length}
+                    identityHash={getIdentityHash(pp.playerId)}
+                    isCurrentPlayer={false}
+                  />
+                </ChatBox>
               );
             })}
           </div>
 
           <ChatBox>
+            {(() => {
+              const currentPP = gamePlayerProgress.find(pp => currentPlayerId && pp.playerId.isEqual(currentPlayerId));
+              return currentPP ? (
+                <PlayerProgressBar
+                  name={getPlayerName(currentPP.playerId)}
+                  level={getPlayerLevel(currentPP.playerId)}
+                  progress={currentPP.progressIndex}
+                  phraseLength={game.phrase.length}
+                  identityHash={getIdentityHash(currentPP.playerId)}
+                  isCurrentPlayer
+                />
+              ) : null;
+            })()}
             <div
-              className="text-xl font-mono" style={{ lineHeight: 1.6 }}
+              className="text-xl font-mono pt-10" style={{ lineHeight: 1.6 }}
             >
               <TypeBox
                 phrase={game.phrase}

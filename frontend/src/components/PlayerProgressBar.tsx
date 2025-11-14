@@ -23,8 +23,8 @@ export const PlayerProgressBar = ({
     const progressPercentage = (progress / phraseLength) * 100;
 
     return (
-        <ChatBox
-            className={`w-full mb-3 flex items-center gap-5 transition-all duration-500 ${isLoading
+        <div
+            className={`w-full flex items-center gap-5 transition-all duration-500 ${isLoading
                 ? 'opacity-20'
                 : 'opacity-100 animate-[slideInFromLeft_0.5s_ease-out]'
                 }`}
@@ -67,6 +67,6 @@ export const PlayerProgressBar = ({
                     />
                 </div>
             </div>
-        </ChatBox>
+        </div>
     );
 };

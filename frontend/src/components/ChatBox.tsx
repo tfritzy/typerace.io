@@ -10,7 +10,7 @@ type ChatBoxProps = {
 export const ChatBox = ({ children, onFocus, className }: ChatBoxProps) => {
     return (
         <div
-            className={`chat-box w-full rounded-lg px-8 py-6 mb-4 ${onFocus ? 'cursor-pointer' : ''} ${className || ""}`}
+            className={`chat-box w-full rounded-lg px-8 py-6 ${onFocus ? 'cursor-pointer' : ''} ${className || ""}`}
             onClick={onFocus}
         >
             {children}
