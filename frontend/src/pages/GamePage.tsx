@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useCallback, useState, useRef } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import { type DbConnection, type Game, PlayerProgress, type Player } from "../../module_bindings";
+import { type DbConnection, type Game, PlayerProgress } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
@@ -31,40 +31,24 @@ export const GamePage = () => {
       })
       .subscribe(`select * from playerprogress where GameId = '${gameId}'`);
 
-    const playerSubscription = conn.subscriptionBuilder()
-      .onError((error: ErrorContextInterface) => {
-        console.error("Error subscribing to player:", error);
-      })
-      .subscribe(`select * from player`);
-
     return () => {
       gameSubscription.unsubscribe();
       playerProgressSubscription.unsubscribe();
-      playerSubscription.unsubscribe();
     };
   }, [conn, gameId]);
 
   const { rows: games } = useTable<DbConnection, Game>("game");
   const { rows: playerProgress } = useTable<DbConnection, PlayerProgress>("playerprogress");
-  const { rows: players } = useTable<DbConnection, Player>("player");
 
   const game = games.find(g => g.id.toString() === gameId);
   const gamePlayerProgress = playerProgress.filter(pp => pp.gameId.toString() === gameId);
 
-  const getPlayerName = (playerId: any) => {
-    if (!playerId || playerId.toHexString() === "0000000000000000000000000000000000000000000000000000000000000000") {
-      return "Bot";
-    }
-    const player = players.find(p => p.id.isEqual(playerId));
-    return player?.name || "Unknown";
+  const getPlayerName = (pp: PlayerProgress) => {
+    return pp.playerName;
   };
 
-  const getPlayerLevel = (playerId: any) => {
-    if (!playerId || playerId.toHexString() === "0000000000000000000000000000000000000000000000000000000000000000") {
-      return 1;
-    }
-    const player = players.find(p => p.id.isEqual(playerId));
-    return player?.level || 1;
+  const getPlayerLevel = (pp: PlayerProgress) => {
+    return pp.playerLevel;
   };
 
   const getIdentityHash = (playerId: any) => {
@@ -125,8 +109,8 @@ export const GamePage = () => {
                 <ChatBox onFocus={() => typeBoxRef.current?.focus()}>
                   <PlayerProgressBar
                     key={pp.id.toString()}
-                    name={getPlayerName(pp.playerId)}
-                    level={getPlayerLevel(pp.playerId)}
+                    name={getPlayerName(pp)}
+                    level={getPlayerLevel(pp)}
                     progress={pp.progressIndex}
                     phraseLength={game.phrase.length}
                     identityHash={getIdentityHash(pp.playerId)}
