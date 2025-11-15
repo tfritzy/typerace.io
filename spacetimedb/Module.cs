@@ -44,6 +44,13 @@ public partial struct CharacterEvent
     public CharacterEventType EventType;
 }
 
+[Type]
+public partial struct BotConfig
+{
+    public double TypingRate;
+    public double ErrorRate;
+}
+
 public static partial class Module
 {
     [Table(Name = "player", Public = true)]
@@ -56,6 +63,9 @@ public static partial class Module
         public int Wins;
         public int Level;
         public int Xp;
+        [SpacetimeDB.Index.BTree]
+        public bool IsBot;
+        public BotConfig? BotConfig;
     }
 
     [Table(Name = "game", Public = true)]
@@ -168,6 +178,62 @@ public static partial class Module
         });
 
         Log.Info("Initialized game archiver with 5-minute interval");
+
+        for (int i = 0; i < 100; i++)
+        {
+            var botName = RobotNameGenerator.Generate(ctx.Rng);
+            var typingRate = GenerateTypingRate(ctx.Rng);
+            var errorRate = GenerateErrorRate(ctx.Rng);
+            
+            var identityBytes = Guid.NewGuid().ToByteArray();
+            Array.Resize(ref identityBytes, 32);
+            var identity = new Identity(identityBytes);
+            
+            ctx.Db.player.Insert(new Player
+            {
+                Id = identity,
+                Name = botName,
+                TotalGames = 0,
+                Wins = 0,
+                Level = 1,
+                Xp = 0,
+                IsBot = true,
+                BotConfig = new BotConfig
+                {
+                    TypingRate = typingRate,
+                    ErrorRate = errorRate
+                }
+            });
+        }
+
+        Log.Info("Initialized 100 bot players");
+    }
+
+    private static double GenerateTypingRate(Random rng)
+    {
+        var meanWpm = 40.0;
+        var stdDev = 15.0;
+        var wpm = GenerateNormalDistribution(rng, meanWpm, stdDev);
+        wpm = Math.Max(20.0, Math.Min(80.0, wpm));
+        var charactersPerSecond = (wpm * 5.0) / 60.0;
+        var microsecondsPerCharacter = 1_000_000.0 / charactersPerSecond;
+        return microsecondsPerCharacter;
+    }
+
+    private static double GenerateErrorRate(Random rng)
+    {
+        var meanErrorRate = 0.05;
+        var stdDev = 0.03;
+        var errorRate = GenerateNormalDistribution(rng, meanErrorRate, stdDev);
+        return Math.Max(0.0, Math.Min(0.15, errorRate));
+    }
+
+    private static double GenerateNormalDistribution(Random rng, double mean, double stdDev)
+    {
+        var u1 = 1.0 - rng.NextDouble();
+        var u2 = 1.0 - rng.NextDouble();
+        var randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
+        return mean + stdDev * randStdNormal;
     }
 
     [Reducer(ReducerKind.ClientConnected)]
@@ -185,7 +251,9 @@ public static partial class Module
                 TotalGames = 0,
                 Wins = 0,
                 Level = 1,
-                Xp = 0
+                Xp = 0,
+                IsBot = false,
+                BotConfig = null
             });
             Log.Info($"Created player record for new client {ctx.Sender}");
         }
@@ -345,16 +413,30 @@ public static partial class Module
 
             int botsToAdd = 3 - currentPlayerCount;
 
+            var availableBots = new List<Player>();
+            foreach (var player in ctx.Db.player.IsBot.Filter(true))
+            {
+                availableBots.Add(player);
+            }
+
+            if (availableBots.Count == 0)
+            {
+                Log.Info($"No bot players available to fill game {args.GameId}");
+                return;
+            }
+
             for (int i = 0; i < botsToAdd; i++)
             {
-                var botName = AnimalNameGenerator.Generate(ctx.Rng);
+                var botIndex = ctx.Rng.Next(availableBots.Count);
+                var selectedBot = availableBots[botIndex];
+
                 ctx.Db.playerprogress.Insert(new PlayerProgress
                 {
                     Id = IdGenerator.Generate("pp_", ctx.Rng),
-                    PlayerId = new Identity(),
+                    PlayerId = selectedBot.Id,
                     GameId = args.GameId,
-                    PlayerName = botName,
-                    PlayerLevel = 1,
+                    PlayerName = selectedBot.Name,
+                    PlayerLevel = selectedBot.Level,
                     ProgressIndex = 0,
                     IsBot = true,
                     CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
@@ -364,7 +446,7 @@ public static partial class Module
                     JoinCode = ""
                 });
 
-                Log.Info($"Added bot {i + 1} to game {args.GameId}");
+                Log.Info($"Added bot {selectedBot.Name} to game {args.GameId}");
             }
 
             var updatedGame = game.Value;
@@ -396,37 +478,86 @@ public static partial class Module
 
             if (game != null && game.Value.State == GameState.Racing)
             {
-                var updatedProgress = progress.Value;
-                updatedProgress.ProgressIndex += 1;
-                ctx.Db.playerprogress.Id.Update(updatedProgress);
-
-                if (updatedProgress.ProgressIndex >= args.PhraseLength)
+                var botPlayer = ctx.Db.player.Id.Find(progress.Value.PlayerId);
+                if (botPlayer == null || botPlayer.Value.BotConfig == null)
                 {
-                    var updatedGame = game.Value;
-                    updatedGame.Placements.Add(progress.Value.PlayerId);
-                    var placement = updatedGame.Placements.Count;
-                    ctx.Db.game.Id.Update(updatedGame);
-
-                    var timeElapsed = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.Value.RacingStartedAt;
-                    updatedProgress.Time = timeElapsed;
-                    updatedProgress.Placement = placement;
-                    ctx.Db.playerprogress.Id.Update(updatedProgress);
-
-                    Log.Info($"Bot {progress.Value.PlayerId} finished game {game.Value.Id} in place {placement}");
+                    Log.Info($"Bot player {progress.Value.PlayerId} not found or missing BotConfig");
+                    return;
                 }
-                else
+
+                var botConfig = botPlayer.Value.BotConfig.Value;
+                var shouldError = ctx.Rng.NextDouble() < botConfig.ErrorRate;
+
+                var updatedProgress = progress.Value;
+                
+                if (shouldError)
                 {
-                    var delay = new TimeDuration { Microseconds = GenerateBotDelay(ctx.Rng) };
+                    updatedProgress.CharacterHistory.Add(new CharacterEvent
+                    {
+                        Timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+                        EventType = CharacterEventType.Incorrect
+                    });
+                    updatedProgress.CharacterHistory.Add(new CharacterEvent
+                    {
+                        Timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+                        EventType = CharacterEventType.Backspace
+                    });
+                    ctx.Db.playerprogress.Id.Update(updatedProgress);
+                    
+                    var errorDelay = new TimeDuration { Microseconds = (long)(botConfig.TypingRate * 0.5) };
                     ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
                     {
                         ScheduledId = 0,
                         PlayerProgressId = args.PlayerProgressId,
                         PhraseLength = args.PhraseLength,
-                        ScheduledAt = new ScheduleAt.Time(ctx.Timestamp + delay)
+                        ScheduledAt = new ScheduleAt.Time(ctx.Timestamp + errorDelay)
                     });
+                }
+                else
+                {
+                    updatedProgress.ProgressIndex += 1;
+                    updatedProgress.CharacterHistory.Add(new CharacterEvent
+                    {
+                        Timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+                        EventType = CharacterEventType.Correct
+                    });
+                    ctx.Db.playerprogress.Id.Update(updatedProgress);
+
+                    if (updatedProgress.ProgressIndex >= args.PhraseLength)
+                    {
+                        var updatedGame = game.Value;
+                        updatedGame.Placements.Add(progress.Value.PlayerId);
+                        var placement = updatedGame.Placements.Count;
+                        ctx.Db.game.Id.Update(updatedGame);
+
+                        var timeElapsed = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.Value.RacingStartedAt;
+                        updatedProgress.Time = timeElapsed;
+                        updatedProgress.Placement = placement;
+                        ctx.Db.playerprogress.Id.Update(updatedProgress);
+
+                        Log.Info($"Bot {progress.Value.PlayerId} finished game {game.Value.Id} in place {placement}");
+                    }
+                    else
+                    {
+                        var delay = new TimeDuration { Microseconds = GenerateBotDelayWithVariance(ctx.Rng, botConfig.TypingRate) };
+                        ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
+                        {
+                            ScheduledId = 0,
+                            PlayerProgressId = args.PlayerProgressId,
+                            PhraseLength = args.PhraseLength,
+                            ScheduledAt = new ScheduleAt.Time(ctx.Timestamp + delay)
+                        });
+                    }
                 }
             }
         }
+    }
+
+    private static long GenerateBotDelayWithVariance(Random rng, double baseTypingRate)
+    {
+        var variance = 0.2;
+        var randomFactor = 1.0 + (rng.NextDouble() * 2.0 - 1.0) * variance;
+        return (long)(baseTypingRate * randomFactor);
     }
 
     private static long GenerateBotDelay(Random rng)
@@ -452,7 +583,20 @@ public static partial class Module
             {
                 if (progress.IsBot)
                 {
-                    var delay = new TimeDuration { Microseconds = GenerateBotDelay(ctx.Rng) };
+                    var botPlayer = ctx.Db.player.Id.Find(progress.PlayerId);
+                    long delayMicroseconds;
+                    
+                    if (botPlayer != null && botPlayer.Value.BotConfig != null)
+                    {
+                        var botConfig = botPlayer.Value.BotConfig.Value;
+                        delayMicroseconds = GenerateBotDelayWithVariance(ctx.Rng, botConfig.TypingRate);
+                    }
+                    else
+                    {
+                        delayMicroseconds = GenerateBotDelay(ctx.Rng);
+                    }
+                    
+                    var delay = new TimeDuration { Microseconds = delayMicroseconds };
                     ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
                     {
                         ScheduledId = 0,
