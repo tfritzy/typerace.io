@@ -76,8 +76,8 @@ public static partial class Module
         public List<Identity> Placements;
     }
 
-    [Table(Name = "playerstats", Public = true)]
-    public partial struct PlayerStats
+    [Table(Name = "gamerecord", Public = true)]
+    public partial struct GameRecord
     {
         [PrimaryKey]
         public string Id;
@@ -85,6 +85,10 @@ public static partial class Module
         public Identity PlayerId;
         [SpacetimeDB.Index.BTree]
         public GameMode GameMode;
+        [SpacetimeDB.Index.BTree]
+        public int Year;
+        [SpacetimeDB.Index.BTree]
+        public int Month;
         public long Date;
         public long TimeMs;
         public int Placement;
@@ -489,12 +493,19 @@ public static partial class Module
 
         var statsId = IdGenerator.Generate("stats_", ctx.Rng);
 
-        ctx.Db.playerstats.Insert(new PlayerStats
+        var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
+        var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000);
+        var year = dateTime.Year;
+        var month = dateTime.Month;
+
+        ctx.Db.gamerecord.Insert(new GameRecord
         {
             Id = statsId,
             PlayerId = progress.PlayerId,
             GameMode = game.GameMode,
-            Date = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+            Year = year,
+            Month = month,
+            Date = timestamp,
             TimeMs = timeMs,
             Placement = placement,
             Wpm = wpm
