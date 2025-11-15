@@ -30,6 +30,14 @@ public enum GameMode
 }
 
 [Type]
+public enum GameType
+{
+    Public,
+    Private,
+    Practice
+}
+
+[Type]
 public enum CharacterEventType
 {
     Correct,
@@ -55,6 +63,7 @@ public static partial class Module
 {
     private const long PUBLIC_GAME_COUNTDOWN_MICROSECONDS = 3_000_000;
     private const long PRIVATE_GAME_COUNTDOWN_MICROSECONDS = 5_000_000;
+    private const long PRACTICE_GAME_COUNTDOWN_MICROSECONDS = 5_000_000;
     private const long BOT_FILL_DELAY_MICROSECONDS = 5_000_000;
 
     [Table(Name = "player", Public = true)]
@@ -88,7 +97,7 @@ public static partial class Module
         public GameMode GameMode;
 
         [SpacetimeDB.Index.BTree]
-        public bool IsPrivate;
+        public GameType GameType;
 
         public List<Identity> Placements;
     }
@@ -286,10 +295,10 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void JoinGame(ReducerContext ctx, GameMode gameMode, string joinCode, bool isPrivate)
+    public static void JoinGame(ReducerContext ctx, GameMode gameMode, string joinCode, GameType gameType)
     {
         Log.Info($"Player {ctx.Sender} looking for game.");
-        var foundGame = FindLobbyGame(ctx, gameMode);
+        var foundGame = FindLobbyGame(ctx, gameMode, gameType);
 
         if (foundGame != null)
         {
@@ -297,7 +306,10 @@ public static partial class Module
             InsertPlayerProgress(ctx, foundGame.Value.Id, joinCode);
 
             int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
-            if (playerCount >= 3)
+            
+            int requiredPlayers = foundGame.Value.GameType == GameType.Practice ? 1 : 3;
+            
+            if (playerCount >= requiredPlayers)
             {
                 CancelBotFillTrigger(ctx, foundGame.Value.Id);
 
@@ -305,11 +317,18 @@ public static partial class Module
                 updatedGame.State = GameState.Countdown;
                 ctx.Db.game.Id.Update(updatedGame);
 
-                Log.Info($"Game {foundGame.Value.Id} reached 3 players, transitioning to Countdown state");
+                Log.Info($"Game {foundGame.Value.Id} reached {requiredPlayers} players, transitioning to Countdown state");
 
-                var countdownDuration = foundGame.Value.IsPrivate 
-                    ? PRIVATE_GAME_COUNTDOWN_MICROSECONDS 
-                    : PUBLIC_GAME_COUNTDOWN_MICROSECONDS;
+                long countdownDuration;
+                if (foundGame.Value.GameType == GameType.Private || foundGame.Value.GameType == GameType.Practice)
+                {
+                    countdownDuration = PRIVATE_GAME_COUNTDOWN_MICROSECONDS;
+                }
+                else
+                {
+                    countdownDuration = PUBLIC_GAME_COUNTDOWN_MICROSECONDS;
+                }
+                
                 var countdownTime = new TimeDuration { Microseconds = countdownDuration };
                 var scheduledTime = ctx.Timestamp + countdownTime;
 
@@ -331,14 +350,14 @@ public static partial class Module
                 RacingStartedAt = 0,
                 State = GameState.Lobby,
                 GameMode = gameMode,
-                IsPrivate = isPrivate,
+                GameType = gameType,
                 Placements = new List<Identity>()
             });
 
             Log.Info($"Player {ctx.Sender} created and joined game {newGame.Id}");
             InsertPlayerProgress(ctx, newGame.Id, joinCode);
 
-            if (!isPrivate)
+            if (gameType == GameType.Public)
             {
                 var botFillDelay = new TimeDuration { Microseconds = BOT_FILL_DELAY_MICROSECONDS };
                 var futureTimestamp = ctx.Timestamp + botFillDelay;
@@ -353,13 +372,14 @@ public static partial class Module
         }
     }
 
-    private static Game? FindLobbyGame(ReducerContext ctx, GameMode gameMode)
+    private static Game? FindLobbyGame(ReducerContext ctx, GameMode gameMode, GameType gameType)
     {
         foreach (var game in ctx.Db.game.State.Filter(GameState.Lobby))
         {
-            if (game.GameMode == gameMode && !game.IsPrivate)
+            if (game.GameMode == gameMode && game.GameType == gameType)
             {
-                if (CountPlayersInGame(ctx, game.Id) < 3)
+                int maxPlayers = gameType == GameType.Practice ? 1 : 3;
+                if (CountPlayersInGame(ctx, game.Id) < maxPlayers)
                 {
                     return game;
                 }
@@ -421,7 +441,7 @@ public static partial class Module
     {
         var game = ctx.Db.game.Id.Find(args.GameId);
 
-        if (game != null && game.Value.State == GameState.Lobby && !game.Value.IsPrivate)
+        if (game != null && game.Value.State == GameState.Lobby && game.Value.GameType == GameType.Public)
         {
             int currentPlayerCount = CountPlayersInGame(ctx, args.GameId);
 
@@ -634,9 +654,9 @@ public static partial class Module
             return;
         }
 
-        if (!game.Value.IsPrivate)
+        if (game.Value.GameType == GameType.Public)
         {
-            Log.Info($"Game {gameId} is not a private game");
+            Log.Info($"Game {gameId} is not a private or practice game");
             return;
         }
 
@@ -650,7 +670,7 @@ public static partial class Module
         updatedGame.State = GameState.Countdown;
         ctx.Db.game.Id.Update(updatedGame);
 
-        Log.Info($"Private game {gameId} transitioned to Countdown state");
+        Log.Info($"Private/practice game {gameId} transitioned to Countdown state");
 
         var countdownTime = new TimeDuration { Microseconds = PRIVATE_GAME_COUNTDOWN_MICROSECONDS };
         var scheduledTime = ctx.Timestamp + countdownTime;
