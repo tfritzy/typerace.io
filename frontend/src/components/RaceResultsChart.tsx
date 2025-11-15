@@ -170,14 +170,10 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp }: RaceRes
     if (rawWpmData.length === 0 && aggWpmData.length === 0) {
         return (
             <div style={{
-                backgroundColor: '#272727',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '8px',
-                padding: '24px',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1)',
                 width: '100%',
                 textAlign: 'center',
-                color: 'rgba(255, 255, 255, 0.6)'
+                color: 'rgba(255, 255, 255, 0.6)',
+                padding: '24px 0'
             }}>
                 No typing data available
             </div>
@@ -185,17 +181,8 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp }: RaceRes
     }
 
     return (
-        <div style={{
-            backgroundColor: '#272727',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            borderRadius: '8px',
-            padding: '24px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1)',
-            width: '100%'
-        }}>
-            <div style={{ height: '280px', position: 'relative', width: '100%' }}>
-                <Line data={chartData} options={options} />
-            </div>
+        <div style={{ height: '280px', position: 'relative', width: '100%' }}>
+            <Line data={chartData} options={options} />
         </div>
     );
 };

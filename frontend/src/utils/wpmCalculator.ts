@@ -1,4 +1,5 @@
 import { CharacterEvent } from "../../module_bindings/character_event_type";
+import type { PlayerProgress } from "../../module_bindings/player_progress_type";
 
 const CHARS_PER_WORD = 5;
 
@@ -127,4 +128,47 @@ export function getAggWpmBySecond(
   }
 
   return wpmBySecond;
+}
+
+export function getFinalWpm(playerProgress: PlayerProgress): number {
+  if (playerProgress.time === 0n || playerProgress.placement === 0) {
+    return 0;
+  }
+  
+  const timeSeconds = Number(playerProgress.time) / 1_000_000.0;
+  const charCount = playerProgress.progressIndex;
+  
+  return getWpm(charCount, timeSeconds);
+}
+
+export function getRaceTime(playerProgress: PlayerProgress): number {
+  if (playerProgress.time === 0n) {
+    return 0;
+  }
+  
+  return Number(playerProgress.time) / 1_000_000.0;
+}
+
+export function getAccuracy(events: CharacterEvent[]): number {
+  if (!events || events.length === 0) {
+    return 0;
+  }
+
+  let correctChars = 0;
+  let totalKeystrokes = 0;
+
+  for (const evt of events) {
+    if (evt.eventType.tag === "Correct") {
+      correctChars++;
+      totalKeystrokes++;
+    } else if (evt.eventType.tag === "Incorrect" || evt.eventType.tag === "Backspace") {
+      totalKeystrokes++;
+    }
+  }
+
+  if (totalKeystrokes === 0) {
+    return 0;
+  }
+
+  return (correctChars / totalKeystrokes) * 100;
 }

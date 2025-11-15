@@ -8,7 +8,7 @@ import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { ChatBox } from "../components/ChatBox";
 import { Countdown } from "../components/Countdown";
-import { RaceResultsChart } from "../components/RaceResultsChart";
+import { RaceResults } from "../components/RaceResults";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -156,14 +156,15 @@ export const GamePage = () => {
           {hasFinished ? (
             (() => {
               const currentPP = gamePlayerProgress.find(pp => currentPlayerId && pp.playerId.isEqual(currentPlayerId));
-              return currentPP ? (
-                <div className="">
-                  <RaceResultsChart
-                    playerProgress={currentPP}
-                    raceStartTimestamp={game.racingStartedAt}
-                  />
-                </div>
-              ) : null;
+              if (!currentPP) return null;
+
+              return (
+                <RaceResults
+                  playerProgress={currentPP}
+                  raceStartTimestamp={game.racingStartedAt}
+                  placement={currentPP.placement}
+                />
+              );
             })()
           ) : (
             <ChatBox>

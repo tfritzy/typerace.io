@@ -11,6 +11,7 @@ import type { ChartOptions } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import type { GameRecord } from '../../module_bindings/game_record_type';
+import { formatStopwatchTime, getOrdinalPlacement } from '../utils/formatters';
 
 ChartJS.register(
     LinearScale,
@@ -170,21 +171,12 @@ export const WpmChart = ({ data, title }: WpmChartProps) => {
                         if (!dataPoint) return `${context.parsed.y.toFixed(1)} WPM`;
 
                         const totalSeconds = Number(dataPoint.timeMs) / 1000;
-                        const minutes = Math.floor(totalSeconds / 60);
-                        const seconds = Math.floor(totalSeconds % 60);
-                        const deciseconds = Math.floor((totalSeconds % 1) * 10);
-                        const time = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(deciseconds).padEnd(2, '0')}`;
-
-                        const getOrdinal = (n: number) => {
-                            const s = ["th", "st", "nd", "rd"];
-                            const v = n % 100;
-                            return n + (s[(v - 20) % 10] || s[v] || s[0]);
-                        };
+                        const time = formatStopwatchTime(totalSeconds);
 
                         return [
                             `${context.parsed.y.toFixed(1)} WPM`,
                             `Time: ${time}`,
-                            `Place: ${getOrdinal(dataPoint.placement)}`,
+                            `Place: ${getOrdinalPlacement(dataPoint.placement)}`,
                             `Mode: ${dataPoint.gameMode.tag}`
                         ];
                     }
