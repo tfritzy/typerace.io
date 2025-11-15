@@ -19,9 +19,7 @@ export const ProfilePage = () => {
             stat.playerId.isEqual(conn.identity!)
         );
 
-        const gameData = myStats.flatMap(stat => stat.games);
-
-        return gameData.sort((a, b) => {
+        return myStats.sort((a, b) => {
             if (a.timeMs < b.timeMs) {
                 return -1;
             }

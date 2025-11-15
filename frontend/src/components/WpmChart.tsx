@@ -10,7 +10,7 @@ import {
 import type { ChartOptions } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
-import type { GameRecord } from '../../module_bindings/game_record_type';
+import type { PlayerStats } from '../../module_bindings';
 import { formatStopwatchTime, getOrdinalPlacement } from '../utils/formatters';
 
 ChartJS.register(
@@ -23,7 +23,7 @@ ChartJS.register(
 );
 
 interface WpmChartProps {
-    data: GameRecord[];
+    data: PlayerStats[];
     title: string;
 }
 
