@@ -1,5 +1,5 @@
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import type { DbConnection, Player, PlayerStats } from "../../module_bindings";
+import type { DbConnection, Player, GameRecord } from "../../module_bindings";
 import { WpmChart } from "../components/WpmChart";
 import { useMemo } from "react";
 import { Header } from "../components/Header";
@@ -8,20 +8,18 @@ import Avatar from "boring-avatars";
 export const ProfilePage = () => {
     const conn = useSpacetimeDB<DbConnection>();
     const { rows: players } = useTable<DbConnection, Player>("player");
-    const { rows: playerStats } = useTable<DbConnection, PlayerStats>("playerstats");
+    const { rows: gameRecords } = useTable<DbConnection, GameRecord>("gamerecord");
 
     const myPlayer = players.find(p => p.id.isEqual(conn?.identity!));
 
     const realGameData = useMemo(() => {
         if (!conn?.identity) return [];
 
-        const myStats = playerStats.filter(stat =>
+        const myStats = gameRecords.filter(stat =>
             stat.playerId.isEqual(conn.identity!)
         );
 
-        const gameData = myStats.flatMap(stat => stat.games);
-
-        return gameData.sort((a, b) => {
+        return myStats.sort((a, b) => {
             if (a.timeMs < b.timeMs) {
                 return -1;
             }
@@ -30,7 +28,7 @@ export const ProfilePage = () => {
             }
             return 0;
         });
-    }, [playerStats, conn?.identity]);
+    }, [gameRecords, conn?.identity]);
 
     return (
         <div className="min-h-screen">
