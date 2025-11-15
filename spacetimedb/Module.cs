@@ -63,6 +63,7 @@ public static partial class Module
         public int Wins;
         public int Level;
         public int Xp;
+        [SpacetimeDB.Index.BTree]
         public bool IsBot;
         public BotConfig? BotConfig;
     }
@@ -363,12 +364,9 @@ public static partial class Module
     private static List<Player> GetRandomBotPlayers(ReducerContext ctx, int count)
     {
         var allBots = new List<Player>();
-        foreach (var player in ctx.Db.player.Iter())
+        foreach (var player in ctx.Db.player.IsBot.Filter(true))
         {
-            if (player.IsBot)
-            {
-                allBots.Add(player);
-            }
+            allBots.Add(player);
         }
 
         var selectedBots = new List<Player>();
