@@ -18,11 +18,12 @@ function App() {
 
   const handlePhraseComplete = useCallback(() => {
     if (conn) {
+      const joinCode = `join_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      
       conn.reducers.onJoinGame((ctx) => {
         if (ctx.event.status.tag === "Committed") {
           const myProgress = Array.from(conn.db.playerprogress.iter())
-            .filter(row => row.playerId.isEqual(conn.identity!))
-            .sort((a, b) => Number(b.createdAt - a.createdAt));
+            .filter(row => row.playerId.isEqual(conn.identity!) && row.joinCode === joinCode);
 
           console.log(myProgress);
 
@@ -31,7 +32,7 @@ function App() {
           }
         }
       });
-      conn.reducers.joinGame(selectedMode);
+      conn.reducers.joinGame(selectedMode, joinCode);
     }
   }, [conn, selectedMode, navigate]);
 
