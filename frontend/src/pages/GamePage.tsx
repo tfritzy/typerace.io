@@ -4,17 +4,18 @@ import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import { type DbConnection, type Game, PlayerProgress, type Player } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { TypeBox } from "../components/TypeBox";
-import { InlinePlayerProgress } from "../components/InlinePlayerProgress";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { ChatBox } from "../components/ChatBox";
 import { Countdown } from "../components/Countdown";
+import { RaceResultsChart } from "../components/RaceResultsChart";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const conn = useSpacetimeDB<DbConnection>();
   const [showCountdown, setShowCountdown] = useState(false);
   const [previousGameState, setPreviousGameState] = useState<string | null>(null);
+  const [hasFinished, setHasFinished] = useState(false);
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -93,6 +94,10 @@ export const GamePage = () => {
     conn.reducers.updateProgress(gameId, correctCharCount, eventTypeEnum);
   }, [conn, gameId]);
 
+  const handleComplete = useCallback(() => {
+    setHasFinished(true);
+  }, []);
+
   if (!game) {
     return <div>Game not found</div>;
   }
@@ -131,10 +136,6 @@ export const GamePage = () => {
                 );
               }
 
-              if (isCurrentPlayer) {
-                return null;
-              }
-
               return (
                 <ChatBox>
                   <PlayerProgressBar
@@ -144,39 +145,43 @@ export const GamePage = () => {
                     progress={pp.progressIndex}
                     phraseLength={game.phrase.length}
                     identityHash={getIdentityHash(pp.playerId)}
-                    isCurrentPlayer={false}
+                    isCurrentPlayer={isCurrentPlayer}
                   />
                 </ChatBox>
               );
             })}
           </div>
 
-          <ChatBox>
-            {(() => {
+
+          {hasFinished ? (
+            (() => {
               const currentPP = gamePlayerProgress.find(pp => currentPlayerId && pp.playerId.isEqual(currentPlayerId));
               return currentPP ? (
-                <PlayerProgressBar
-                  name={getPlayerName(currentPP.playerId)}
-                  level={getPlayerLevel(currentPP.playerId)}
-                  progress={currentPP.progressIndex}
-                  phraseLength={game.phrase.length}
-                  identityHash={getIdentityHash(currentPP.playerId)}
-                  isCurrentPlayer
-                />
+                <div className="">
+                  <RaceResultsChart
+                    playerProgress={currentPP}
+                    raceStartTimestamp={game.racingStartedAt}
+                  />
+                </div>
               ) : null;
-            })()}
-            <div
-              className="text-xl font-mono pt-10" style={{ lineHeight: 1.6 }}
-            >
-              <TypeBox
-                phrase={game.phrase}
-                onProgress={handleProgress}
-              />
-            </div>
-          </ChatBox>
+            })()
+          ) : (
+            <ChatBox>
+              <div
+                className="text-xl font-mono pt-10" style={{ lineHeight: 1.6 }}
+              >
+                <TypeBox
+                  phrase={game.phrase}
+                  onProgress={handleProgress}
+                  onComplete={handleComplete}
+                />
+              </div>
+            </ChatBox>
+          )}
+
         </div>
 
-        <div className="min-h-[100px] mt-100" />
+        <div className="min-h-[100px] mt-40" />
       </div>
     </div>
   );

@@ -45,7 +45,7 @@ function App() {
       <div className="flex items-center justify-center min-h-screen p-4" style={{ paddingBottom: '400px' }}>
         <div className="content-container">
           <ChatBox onFocus={() => typeBoxRef.current?.focus()} className="text-xl">
-            <TypeBox ref={typeBoxRef} phrase="A" onComplete={handlePhraseComplete} />
+            <TypeBox ref={typeBoxRef} phrase="asdf" onComplete={handlePhraseComplete} />
           </ChatBox>
         </div>
       </div>
