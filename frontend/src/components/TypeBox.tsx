@@ -1,25 +1,30 @@
 import React, { useCallback, useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import { Cursor } from "./Cursor";
+import "./ChatBox.css";
 
 type TypeBoxProps = {
   phrase: string;
   onComplete?: () => void;
   onProgress?: (correctCharCount: number, eventType: "Correct" | "Incorrect" | "Backspace") => void;
+  className?: string;
+  style?: React.CSSProperties;
 };
 
 export type TypeBoxRef = {
   focus: () => void;
 };
 
-export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplete, onProgress }, ref) => {
+export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplete, onProgress, className, style }, ref) => {
   const [focused, setFocused] = useState(true);
   const [input, setInput] = useState("");
   const [inputWidth, setInputWidth] = useState(0);
+  const [hasError, setHasError] = useState(false);
 
   const targetRef = useRef<HTMLElement>(null);
 
   const phraseRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const chatBoxRef = useRef<HTMLDivElement>(null);
 
   useImperativeHandle(ref, () => ({
     focus: () => {
@@ -65,17 +70,21 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       setInput(newValue);
 
       let correctCharCount = 0;
+      let hasIncorrectChar = false;
       for (let i = 0; i < newValue.length; i++) {
         if (newValue[i] === phrase[i]) {
           correctCharCount++;
         } else {
+          hasIncorrectChar = true;
           break;
         }
       }
 
+      setHasError(hasIncorrectChar);
+
       if (onProgress && newValue.length !== oldValue.length) {
         let eventType: "Correct" | "Incorrect" | "Backspace";
-        
+
         if (newValue.length < oldValue.length) {
           eventType = "Backspace";
         } else {
@@ -83,7 +92,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
           const expectedChar = phrase[newValue.length - 1];
           eventType = newChar === expectedChar ? "Correct" : "Incorrect";
         }
-        
+
         onProgress(correctCharCount, eventType);
       }
 
@@ -139,41 +148,48 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
   };
 
   return (
-    <div className="relative select-none">
-      <div className="type-box">
-        <div
-          className="whitespace-pre-wrap text-start"
-          ref={phraseRef}
-        >
-          {renderText()}
+    <div
+      ref={chatBoxRef}
+      className={`chat-box w-full rounded-lg px-8 py-6 cursor-pointer ${hasError ? 'border-red-500' : ''} ${className || ''}`}
+      style={style}
+      onClick={() => inputRef.current?.focus()}
+    >
+      <div className="relative select-none">
+        <div className="type-box">
+          <div
+            className="whitespace-pre-wrap text-start"
+            ref={phraseRef}
+          >
+            {renderText()}
+          </div>
+
+          <Cursor targetRef={targetRef} lerp={0.15} fadeDelay={500} />
+
+          <textarea
+            ref={inputRef}
+            value={input}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onSelect={resetCursorToEnd}
+            onMouseDown={resetCursorToEnd}
+            onMouseUp={resetCursorToEnd}
+            onClick={resetCursorToEnd}
+            id="type-box"
+            className="w-full min-h-full outline-none typebox absolute top-0 left-0 bg-transparent text-transparent resize-none"
+            autoCorrect="false"
+            autoCapitalize="none"
+            autoComplete="off"
+            spellCheck={false}
+            autoFocus
+            style={{
+              width: `${inputWidth}px`,
+              cursor: focused ? "auto" : "pointer",
+            }}
+          />
         </div>
-
-        <Cursor targetRef={targetRef} lerp={0.15} fadeDelay={500} />
-
-        <textarea
-          ref={inputRef}
-          value={input}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          onSelect={resetCursorToEnd}
-          onMouseDown={resetCursorToEnd}
-          onMouseUp={resetCursorToEnd}
-          onClick={resetCursorToEnd}
-          id="type-box"
-          className="w-full min-h-full outline-none typebox absolute top-0 left-0 bg-transparent text-transparent resize-none"
-          autoCorrect="false"
-          autoCapitalize="none"
-          autoComplete="off"
-          spellCheck={false}
-          autoFocus
-          style={{
-            width: `${inputWidth}px`,
-            cursor: focused ? "auto" : "pointer",
-          }}
-        />
       </div>
     </div>
   );

@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import { type DbConnection, type Game, PlayerProgress, type Player } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
-import { TypeBox } from "../components/TypeBox";
+import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { ChatBox } from "../components/ChatBox";
@@ -16,6 +16,7 @@ export const GamePage = () => {
   const [showCountdown, setShowCountdown] = useState(false);
   const [previousGameState, setPreviousGameState] = useState<string | null>(null);
   const [hasFinished, setHasFinished] = useState(false);
+  const typeBoxRef = useRef<TypeBoxRef>(null);
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -105,23 +106,23 @@ export const GamePage = () => {
   const currentPlayerId = conn?.identity;
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen flex flex-col">
       <Header />
 
       {showCountdown && (
         <Countdown onComplete={() => setShowCountdown(false)} />
       )}
 
-      <div className="flex flex-col items-center justify-center min-h-screen px-4">
+      <div className="flex-1 flex flex-col items-center justify-center px-4">
         <div className="content-container w-full">
-          <div className="mb-20 space-y-3">
-            {Array.from({ length: 4 }).map((_, index) => {
+          <div className="mb-4 space-y-3">
+            {Array.from({ length: 3 }).map((_, index) => {
               const pp = gamePlayerProgress[index];
               const isCurrentPlayer = pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
 
               if (!pp) {
                 return (
-                  <ChatBox>
+                  <ChatBox onFocus={() => typeBoxRef.current?.focus()}>
                     <PlayerProgressBar
                       key={`loading-${index}`}
                       name="Waiting for player..."
@@ -137,7 +138,7 @@ export const GamePage = () => {
               }
 
               return (
-                <ChatBox>
+                <ChatBox onFocus={() => typeBoxRef.current?.focus()}>
                   <PlayerProgressBar
                     key={pp.id.toString()}
                     name={getPlayerName(pp.playerId)}
@@ -167,22 +168,20 @@ export const GamePage = () => {
               );
             })()
           ) : (
-            <ChatBox>
-              <div
-                className="text-xl font-mono pt-10" style={{ lineHeight: 1.6 }}
-              >
-                <TypeBox
-                  phrase={game.phrase}
-                  onProgress={handleProgress}
-                  onComplete={handleComplete}
-                />
-              </div>
-            </ChatBox>
+            <div
+              className="text-2xl font-mono" style={{ lineHeight: 1.6 }}
+            >
+              <TypeBox
+                ref={typeBoxRef}
+                phrase={game.phrase}
+                onProgress={handleProgress}
+                onComplete={handleComplete}
+                style={{ height: '430px', display: 'flex', alignItems: 'flex-start' }}
+              />
+            </div>
           )}
 
         </div>
-
-        <div className="min-h-[100px] mt-40" />
       </div>
     </div>
   );

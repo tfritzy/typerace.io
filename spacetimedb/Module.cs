@@ -224,7 +224,7 @@ public static partial class Module
             InsertPlayerProgress(ctx, foundGame.Value.Id);
 
             int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
-            if (playerCount >= 4)
+            if (playerCount >= 3)
             {
                 CancelBotFillTrigger(ctx, foundGame.Value.Id);
 
@@ -232,7 +232,7 @@ public static partial class Module
                 updatedGame.State = GameState.Countdown;
                 ctx.Db.game.Id.Update(updatedGame);
 
-                Log.Info($"Game {foundGame.Value.Id} reached 4 players, transitioning to Countdown state");
+                Log.Info($"Game {foundGame.Value.Id} reached 3 players, transitioning to Countdown state");
 
                 var threeSeconds = new TimeDuration { Microseconds = +3_000_000 };
                 var scheduledTime = ctx.Timestamp + threeSeconds;
@@ -279,7 +279,7 @@ public static partial class Module
         {
             if (game.GameMode == gameMode)
             {
-                if (CountPlayersInGame(ctx, game.Id) < 4)
+                if (CountPlayersInGame(ctx, game.Id) < 3)
                 {
                     return game;
                 }
@@ -338,7 +338,7 @@ public static partial class Module
         {
             int currentPlayerCount = CountPlayersInGame(ctx, args.GameId);
 
-            int botsToAdd = 4 - currentPlayerCount;
+            int botsToAdd = 3 - currentPlayerCount;
 
             for (int i = 0; i < botsToAdd; i++)
             {
@@ -493,7 +493,6 @@ public static partial class Module
 
         var timeMs = timeElapsed / 1000;
 
-        var wordCount = game.Phrase.Split(' ').Length;
         var timeMinutes = timeMs / 60000.0;
         var wpm = game.Phrase.Length / 5.0 / timeMinutes;
 

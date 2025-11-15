@@ -15,8 +15,6 @@ export const InlinePlayerProgress = ({
     phraseLength,
     identityHash,
 }: InlinePlayerProgressProps) => {
-    const progressPercentage = (progress / phraseLength) * 100;
-
     return (
         <div className="mb-6">
             <div className="flex items-center gap-3 mb-3">

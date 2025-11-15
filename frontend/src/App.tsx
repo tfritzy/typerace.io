@@ -5,7 +5,6 @@ import "./components/SelectionButton.css";
 import type { DbConnection, GameMode } from "../module_bindings";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import { TypeBox, type TypeBoxRef } from "./components/TypeBox";
-import { ChatBox } from "./components/ChatBox";
 import { ModeSelector } from "./components/ModeSelector";
 import { MatchTypeSelector } from "./components/MatchTypeSelector";
 import { Header } from "./components/Header";
@@ -40,13 +39,13 @@ function App() {
   console.log(player_progress);
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen flex flex-col">
       <Header />
-      <div className="flex items-center justify-center min-h-screen p-4" style={{ paddingBottom: '400px' }}>
+      <div className="flex-1 flex items-center justify-center p-4">
         <div className="content-container">
-          <ChatBox onFocus={() => typeBoxRef.current?.focus()} className="text-xl">
+          <div className="text-xl mb-[400px]">
             <TypeBox ref={typeBoxRef} phrase="asdf" onComplete={handlePhraseComplete} />
-          </ChatBox>
+          </div>
         </div>
       </div>
       <div className="fixed bottom-0 left-0 right-0 p-4">
