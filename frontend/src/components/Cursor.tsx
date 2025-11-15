@@ -4,9 +4,10 @@ type CursorProps = {
     targetRef: RefObject<HTMLElement | null>;
     lerp?: number;
     fadeDelay?: number;
+    visible?: boolean;
 };
 
-export const Cursor = ({ targetRef, lerp = 0.15, fadeDelay = 2000 }: CursorProps) => {
+export const Cursor = ({ targetRef, lerp = 0.15, fadeDelay = 2000, visible = true }: CursorProps) => {
     const followerRef = useRef<HTMLDivElement>(null);
     const position = useRef({ x: 0, y: 0 });
     const target = useRef({ x: 0, y: 0 });
@@ -80,7 +81,7 @@ export const Cursor = ({ targetRef, lerp = 0.15, fadeDelay = 2000 }: CursorProps
         <div
             ref={followerRef}
             className="max-w-0 h-6 fixed top-0 left-0 transition-opacity duration-500"
-            style={{ opacity }}
+            style={{ opacity: visible ? opacity : 0 }}
         >
             <div className="h-full" style={{ borderRight: '1px solid var(--color-white)' }} />
         </div>
