@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
+import React, { useCallback, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import { Cursor } from "./Cursor";
 import "./ChatBox.css";
 
@@ -17,26 +17,18 @@ export type TypeBoxRef = {
 export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplete, onProgress, className, style }, ref) => {
   const [focused, setFocused] = useState(true);
   const [input, setInput] = useState("");
-  const [inputWidth, setInputWidth] = useState(0);
   const [hasError, setHasError] = useState(false);
 
   const targetRef = useRef<HTMLElement>(null);
 
   const phraseRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const chatBoxRef = useRef<HTMLDivElement>(null);
 
   useImperativeHandle(ref, () => ({
     focus: () => {
       inputRef.current?.focus();
     }
   }));
-
-  useEffect(() => {
-    if (phraseRef.current) {
-      setInputWidth(phraseRef.current.clientWidth);
-    }
-  }, [phrase]);
 
   const resetCursorToEnd = useCallback(() => {
     if (inputRef.current) {
@@ -149,7 +141,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
 
   return (
     <div
-      ref={chatBoxRef}
       className={`chat-box w-full rounded-lg px-8 py-6 cursor-pointer ${hasError ? 'border-red-500' : ''} ${className || ''}`}
       style={style}
       onClick={() => inputRef.current?.focus()}
@@ -185,7 +176,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
             spellCheck={false}
             autoFocus
             style={{
-              width: `${inputWidth}px`,
               cursor: focused ? "auto" : "pointer",
             }}
           />
