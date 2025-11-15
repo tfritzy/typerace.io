@@ -53,6 +53,10 @@ public partial struct BotConfig
 
 public static partial class Module
 {
+    private const long PUBLIC_GAME_COUNTDOWN_MICROSECONDS = 3_000_000;
+    private const long PRIVATE_GAME_COUNTDOWN_MICROSECONDS = 5_000_000;
+    private const long BOT_FILL_DELAY_MICROSECONDS = 5_000_000;
+
     [Table(Name = "player", Public = true)]
     public partial struct Player
     {
@@ -293,7 +297,7 @@ public static partial class Module
             InsertPlayerProgress(ctx, foundGame.Value.Id, joinCode);
 
             int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
-            if (playerCount >= 3 && !foundGame.Value.IsPrivate)
+            if (playerCount >= 3)
             {
                 CancelBotFillTrigger(ctx, foundGame.Value.Id);
 
@@ -303,8 +307,11 @@ public static partial class Module
 
                 Log.Info($"Game {foundGame.Value.Id} reached 3 players, transitioning to Countdown state");
 
-                var threeSeconds = new TimeDuration { Microseconds = +3_000_000 };
-                var scheduledTime = ctx.Timestamp + threeSeconds;
+                var countdownDuration = foundGame.Value.IsPrivate 
+                    ? PRIVATE_GAME_COUNTDOWN_MICROSECONDS 
+                    : PUBLIC_GAME_COUNTDOWN_MICROSECONDS;
+                var countdownTime = new TimeDuration { Microseconds = countdownDuration };
+                var scheduledTime = ctx.Timestamp + countdownTime;
 
                 ctx.Db.GameStart.Insert(new GameStart
                 {
@@ -333,8 +340,8 @@ public static partial class Module
 
             if (!isPrivate)
             {
-                var fiveSeconds = new TimeDuration { Microseconds = +5_000_000 };
-                var futureTimestamp = ctx.Timestamp + fiveSeconds;
+                var botFillDelay = new TimeDuration { Microseconds = BOT_FILL_DELAY_MICROSECONDS };
+                var futureTimestamp = ctx.Timestamp + botFillDelay;
 
                 ctx.Db.BotFillTrigger.Insert(new BotFillTrigger
                 {
@@ -462,8 +469,8 @@ public static partial class Module
 
             Log.Info($"Game {args.GameId} filled with {botsToAdd} bots and transitioned to Countdown state");
 
-            var threeSeconds = new TimeDuration { Microseconds = +3_000_000 };
-            var scheduledTime = ctx.Timestamp + threeSeconds;
+            var countdownTime = new TimeDuration { Microseconds = PUBLIC_GAME_COUNTDOWN_MICROSECONDS };
+            var scheduledTime = ctx.Timestamp + countdownTime;
 
             ctx.Db.GameStart.Insert(new GameStart
             {
@@ -645,8 +652,8 @@ public static partial class Module
 
         Log.Info($"Private game {gameId} transitioned to Countdown state");
 
-        var threeSeconds = new TimeDuration { Microseconds = +3_000_000 };
-        var scheduledTime = ctx.Timestamp + threeSeconds;
+        var countdownTime = new TimeDuration { Microseconds = PRIVATE_GAME_COUNTDOWN_MICROSECONDS };
+        var scheduledTime = ctx.Timestamp + countdownTime;
 
         ctx.Db.GameStart.Insert(new GameStart
         {
