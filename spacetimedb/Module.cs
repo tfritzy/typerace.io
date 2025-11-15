@@ -140,6 +140,7 @@ public static partial class Module
         public List<CharacterEvent> CharacterHistory;
         public long Time;
         public int Placement;
+        public string JoinCode;
     }
 
     [Table(Scheduled = nameof(UpdateBotProgress))]
@@ -208,7 +209,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void JoinGame(ReducerContext ctx, GameMode gameMode)
+    public static void JoinGame(ReducerContext ctx, GameMode gameMode, string joinCode)
     {
         Log.Info($"Player {ctx.Sender} looking for game.");
         var foundGame = FindLobbyGame(ctx, gameMode);
@@ -216,7 +217,7 @@ public static partial class Module
         if (foundGame != null)
         {
             Log.Info($"Player {ctx.Sender} joined game {foundGame.Value.Id}");
-            InsertPlayerProgress(ctx, foundGame.Value.Id);
+            InsertPlayerProgress(ctx, foundGame.Value.Id, joinCode);
 
             int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
             if (playerCount >= 3)
@@ -254,7 +255,7 @@ public static partial class Module
             });
 
             Log.Info($"Player {ctx.Sender} created and joined game {newGame.Id}");
-            InsertPlayerProgress(ctx, newGame.Id);
+            InsertPlayerProgress(ctx, newGame.Id, joinCode);
 
             var fiveSeconds = new TimeDuration { Microseconds = +5_000_000 };
             var futureTimestamp = ctx.Timestamp + fiveSeconds;
@@ -308,7 +309,7 @@ public static partial class Module
         }
     }
 
-    private static void InsertPlayerProgress(ReducerContext ctx, string gameId)
+    private static void InsertPlayerProgress(ReducerContext ctx, string gameId, string joinCode)
     {
         ctx.Db.playerprogress.Insert(new PlayerProgress
         {
@@ -320,7 +321,8 @@ public static partial class Module
             CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
             CharacterHistory = new List<CharacterEvent>(),
             Time = 0,
-            Placement = -1
+            Placement = -1,
+            JoinCode = joinCode
         });
     }
 
@@ -347,7 +349,8 @@ public static partial class Module
                     CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
                     CharacterHistory = new List<CharacterEvent>(),
                     Time = 0,
-                    Placement = -1
+                    Placement = -1,
+                    JoinCode = ""
                 });
 
                 Log.Info($"Added bot {i + 1} to game {args.GameId}");
