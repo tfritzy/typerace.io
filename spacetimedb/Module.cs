@@ -135,6 +135,7 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         public string GameId;
         public string PlayerName;
+        public int PlayerLevel;
         public int ProgressIndex;
         public bool IsBot;
         public long CreatedAt;
@@ -314,6 +315,7 @@ public static partial class Module
     {
         var player = ctx.Db.player.Id.Find(ctx.Sender);
         var playerName = player?.Name ?? "Unknown";
+        var playerLevel = player?.Level ?? 1;
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
         {
@@ -321,6 +323,7 @@ public static partial class Module
             PlayerId = ctx.Sender,
             GameId = gameId,
             PlayerName = playerName,
+            PlayerLevel = playerLevel,
             ProgressIndex = 0,
             IsBot = false,
             CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
@@ -351,6 +354,7 @@ public static partial class Module
                     PlayerId = new Identity(),
                     GameId = args.GameId,
                     PlayerName = botName,
+                    PlayerLevel = 1,
                     ProgressIndex = 0,
                     IsBot = true,
                     CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
