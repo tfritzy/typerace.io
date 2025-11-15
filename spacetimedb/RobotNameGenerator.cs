@@ -18,14 +18,7 @@ public static class RobotNameGenerator
 
     private static readonly string[] Nouns =
     {
-        "Bot", "Droid", "Cyborg", "Android", "Robot", "Automaton", "Machine", "Unit",
-        "Core", "Processor", "Circuit", "Chip", "Module", "System", "Engine", "Drive",
-        "Matrix", "Network", "Node", "Server", "Terminal", "Interface", "Portal", "Gateway",
-        "Scanner", "Sensor", "Beacon", "Radar", "Probe", "Drone", "Mech", "Pilot",
-        "Guardian", "Sentinel", "Warden", "Keeper", "Defender", "Protector", "Agent", "Operative",
-        "Commander", "Captain", "Marshal", "Chief", "Leader", "Master", "Prime", "Ace",
-        "Ranger", "Scout", "Voyager", "Explorer", "Pioneer", "Pathfinder", "Navigator", "Pilot",
-        "Striker", "Fighter", "Warrior", "Soldier", "Trooper", "Battler", "Gladiator", "Champion"
+        "Bot", "Droid", "Cyborg", "Android", "Robot"
     };
 
     public static string Generate(Random rng)

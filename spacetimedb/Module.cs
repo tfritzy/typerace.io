@@ -185,8 +185,8 @@ public static partial class Module
             var typingRate = GenerateTypingRate(ctx.Rng);
             var errorRate = GenerateErrorRate(ctx.Rng);
             
-            var identityBytes = new byte[32];
-            ctx.Rng.NextBytes(identityBytes);
+            var identityBytes = Guid.NewGuid().ToByteArray();
+            Array.Resize(ref identityBytes, 32);
             var identity = new Identity(identityBytes);
             
             ctx.Db.player.Insert(new Player
