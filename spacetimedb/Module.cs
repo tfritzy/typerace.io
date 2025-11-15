@@ -83,6 +83,9 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         public GameMode GameMode;
 
+        [SpacetimeDB.Index.BTree]
+        public bool IsPrivate;
+
         public List<Identity> Placements;
     }
 
@@ -279,7 +282,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void JoinGame(ReducerContext ctx, GameMode gameMode, string joinCode)
+    public static void JoinGame(ReducerContext ctx, GameMode gameMode, string joinCode, bool isPrivate)
     {
         Log.Info($"Player {ctx.Sender} looking for game.");
         var foundGame = FindLobbyGame(ctx, gameMode);
@@ -290,7 +293,7 @@ public static partial class Module
             InsertPlayerProgress(ctx, foundGame.Value.Id, joinCode);
 
             int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
-            if (playerCount >= 3)
+            if (playerCount >= 3 && !foundGame.Value.IsPrivate)
             {
                 CancelBotFillTrigger(ctx, foundGame.Value.Id);
 
@@ -321,21 +324,25 @@ public static partial class Module
                 RacingStartedAt = 0,
                 State = GameState.Lobby,
                 GameMode = gameMode,
+                IsPrivate = isPrivate,
                 Placements = new List<Identity>()
             });
 
             Log.Info($"Player {ctx.Sender} created and joined game {newGame.Id}");
             InsertPlayerProgress(ctx, newGame.Id, joinCode);
 
-            var fiveSeconds = new TimeDuration { Microseconds = +5_000_000 };
-            var futureTimestamp = ctx.Timestamp + fiveSeconds;
-
-            ctx.Db.BotFillTrigger.Insert(new BotFillTrigger
+            if (!isPrivate)
             {
-                ScheduledId = 0,
-                GameId = newGame.Id,
-                ScheduledAt = new ScheduleAt.Time(futureTimestamp)
-            });
+                var fiveSeconds = new TimeDuration { Microseconds = +5_000_000 };
+                var futureTimestamp = ctx.Timestamp + fiveSeconds;
+
+                ctx.Db.BotFillTrigger.Insert(new BotFillTrigger
+                {
+                    ScheduledId = 0,
+                    GameId = newGame.Id,
+                    ScheduledAt = new ScheduleAt.Time(futureTimestamp)
+                });
+            }
         }
     }
 
@@ -343,7 +350,7 @@ public static partial class Module
     {
         foreach (var game in ctx.Db.game.State.Filter(GameState.Lobby))
         {
-            if (game.GameMode == gameMode)
+            if (game.GameMode == gameMode && !game.IsPrivate)
             {
                 if (CountPlayersInGame(ctx, game.Id) < 3)
                 {
@@ -407,7 +414,7 @@ public static partial class Module
     {
         var game = ctx.Db.game.Id.Find(args.GameId);
 
-        if (game != null && game.Value.State == GameState.Lobby)
+        if (game != null && game.Value.State == GameState.Lobby && !game.Value.IsPrivate)
         {
             int currentPlayerCount = CountPlayersInGame(ctx, args.GameId);
 
@@ -607,6 +614,46 @@ public static partial class Module
                 }
             }
         }
+    }
+
+    [Reducer]
+    public static void StartPrivateGame(ReducerContext ctx, string gameId)
+    {
+        var game = ctx.Db.game.Id.Find(gameId);
+
+        if (game == null)
+        {
+            Log.Info($"Game {gameId} not found");
+            return;
+        }
+
+        if (!game.Value.IsPrivate)
+        {
+            Log.Info($"Game {gameId} is not a private game");
+            return;
+        }
+
+        if (game.Value.State != GameState.Lobby)
+        {
+            Log.Info($"Game {gameId} is not in Lobby state");
+            return;
+        }
+
+        var updatedGame = game.Value;
+        updatedGame.State = GameState.Countdown;
+        ctx.Db.game.Id.Update(updatedGame);
+
+        Log.Info($"Private game {gameId} transitioned to Countdown state");
+
+        var threeSeconds = new TimeDuration { Microseconds = +3_000_000 };
+        var scheduledTime = ctx.Timestamp + threeSeconds;
+
+        ctx.Db.GameStart.Insert(new GameStart
+        {
+            ScheduledId = 0,
+            GameId = gameId,
+            ScheduledAt = new ScheduleAt.Time(scheduledTime)
+        });
     }
 
     [Reducer]
