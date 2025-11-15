@@ -24,7 +24,7 @@ export const ProfileAvatar = () => {
 
     return (
         <button
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate(`/profile/${identityHash}`)}
             className="flex items-center gap-4 py-3 rounded-lg cursor-pointer"
         >
             <div className="relative shrink-0 border-2 border-amber-400 rounded-full">
