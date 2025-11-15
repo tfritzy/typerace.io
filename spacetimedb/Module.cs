@@ -491,7 +491,7 @@ public static partial class Module
         var timeMinutes = timeMs / 60000.0;
         var wpm = game.Phrase.Length / 5.0 / timeMinutes;
 
-        var statsId = IdGenerator.Generate("stats_", ctx.Rng);
+        var statsId = IdGenerator.Generate("gr_", ctx.Rng);
 
         var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
         var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000);
