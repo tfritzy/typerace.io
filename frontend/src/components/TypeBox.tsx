@@ -8,16 +8,18 @@ type TypeBoxProps = {
   onProgress?: (correctCharCount: number, eventType: "Correct" | "Incorrect" | "Backspace") => void;
   className?: string;
   style?: React.CSSProperties;
+  resetOnComplete?: boolean;
 };
 
 export type TypeBoxRef = {
   focus: () => void;
 };
 
-export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplete, onProgress, className, style }, ref) => {
+export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplete, onProgress, className, style, resetOnComplete = false }, ref) => {
   const [focused, setFocused] = useState(true);
   const [input, setInput] = useState("");
   const [hasError, setHasError] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
 
   const targetRef = useRef<HTMLElement>(null);
 
@@ -89,10 +91,18 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       }
 
       if (newValue === phrase && onComplete) {
+        setIsComplete(true);
         onComplete();
+        if (resetOnComplete) {
+          setTimeout(() => {
+            setInput("");
+            setIsComplete(false);
+            setHasError(false);
+          }, 0);
+        }
       }
     },
-    [phrase, onComplete, onProgress, input]
+    [phrase, onComplete, onProgress, input, resetOnComplete]
   );
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -154,7 +164,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
             {renderText()}
           </div>
 
-          <Cursor targetRef={targetRef} lerp={0.15} fadeDelay={500} />
+          <Cursor targetRef={targetRef} lerp={0.15} fadeDelay={500} visible={focused && !isComplete} />
 
           <textarea
             ref={inputRef}

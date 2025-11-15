@@ -45,7 +45,7 @@ export const LobbyPage = () => {
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="content-container">
           <div className="text-xl mb-[400px]">
-            <TypeBox ref={typeBoxRef} phrase="asdf" onComplete={handlePhraseComplete} />
+            <TypeBox ref={typeBoxRef} phrase="asdf" onComplete={handlePhraseComplete} resetOnComplete={true} />
           </div>
         </div>
       </div>
