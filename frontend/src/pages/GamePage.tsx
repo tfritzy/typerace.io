@@ -13,8 +13,6 @@ import { RaceResults } from "../components/RaceResults";
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const conn = useSpacetimeDB<DbConnection>();
-  const [showCountdown, setShowCountdown] = useState(false);
-  const [previousGameState, setPreviousGameState] = useState<string | null>(null);
   const [hasFinished, setHasFinished] = useState(false);
   const typeBoxRef = useRef<TypeBoxRef>(null);
 
@@ -52,18 +50,6 @@ export const GamePage = () => {
 
   const game = games.find(g => g.id.toString() === gameId);
   const gamePlayerProgress = playerProgress.filter(pp => pp.gameId.toString() === gameId);
-
-  useEffect(() => {
-    if (!game) return;
-
-    const currentState = game.state.tag;
-
-    if (previousGameState === "Lobby" && currentState === "Countdown") {
-      setShowCountdown(true);
-    }
-
-    setPreviousGameState(currentState);
-  }, [game, previousGameState]);
 
   const getPlayerName = (playerId: any) => {
     if (!playerId || playerId.toHexString() === "0000000000000000000000000000000000000000000000000000000000000000") {
@@ -109,9 +95,7 @@ export const GamePage = () => {
     <div className="relative min-h-screen flex flex-col">
       <Header />
 
-      {showCountdown && (
-        <Countdown onComplete={() => setShowCountdown(false)} />
-      )}
+      <Countdown />
 
       <div className="flex-1 flex flex-col items-center justify-center px-4">
         <div className="content-container w-full">

@@ -1,17 +1,39 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useTable, where, eq } from "spacetimedb/react";
+import type { DbConnection, Game } from "../../module_bindings";
 
-interface CountdownProps {
-    onComplete?: () => void;
-}
-
-export const Countdown = ({ onComplete }: CountdownProps) => {
+export const Countdown = () => {
+    const { gameId } = useParams<{ gameId: string }>();
     const [count, setCount] = useState(3);
-    const [isVisible, setIsVisible] = useState(true);
+    const [isVisible, setIsVisible] = useState(false);
+    const [previousGameState, setPreviousGameState] = useState<string | null>(null);
+
+    const { rows: games } = useTable<DbConnection, Game>(
+        "game",
+        where(eq("id", gameId || ""))
+    );
+
+    const game = games[0];
 
     useEffect(() => {
+        if (!game) return;
+
+        const currentState = game.state.tag;
+
+        if (previousGameState === "Lobby" && currentState === "Countdown") {
+            setIsVisible(true);
+            setCount(3);
+        }
+
+        setPreviousGameState(currentState);
+    }, [game, previousGameState]);
+
+    useEffect(() => {
+        if (!isVisible) return;
+
         if (count === 0) {
             setIsVisible(false);
-            onComplete?.();
             return;
         }
 
@@ -20,7 +42,7 @@ export const Countdown = ({ onComplete }: CountdownProps) => {
         }, 1000);
 
         return () => clearTimeout(timer);
-    }, [count, onComplete]);
+    }, [count, isVisible]);
 
     if (!isVisible) {
         return null;
