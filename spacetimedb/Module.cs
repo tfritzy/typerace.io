@@ -63,6 +63,7 @@ public static partial class Module
         public int Wins;
         public int Level;
         public int Xp;
+        [SpacetimeDB.Index.BTree]
         public bool IsBot;
         public BotConfig? BotConfig;
     }
@@ -413,12 +414,9 @@ public static partial class Module
             int botsToAdd = 3 - currentPlayerCount;
 
             var availableBots = new List<Player>();
-            foreach (var player in ctx.Db.player.Iter())
+            foreach (var player in ctx.Db.player.IsBot.Filter(true))
             {
-                if (player.IsBot)
-                {
-                    availableBots.Add(player);
-                }
+                availableBots.Add(player);
             }
 
             if (availableBots.Count == 0)
