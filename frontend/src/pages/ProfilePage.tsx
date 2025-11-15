@@ -1,25 +1,53 @@
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import type { DbConnection, Player, GameRecord } from "../../module_bindings";
 import { WpmChart } from "../components/WpmChart";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Header } from "../components/Header";
 import Avatar from "boring-avatars";
+import { useParams } from "react-router-dom";
+import { Identity } from "spacetimedb";
+import type { ErrorContextInterface } from "spacetimedb/sdk";
 
 export const ProfilePage = () => {
+    const { playerId } = useParams<{ playerId: string }>();
     const conn = useSpacetimeDB<DbConnection>();
     const { rows: players } = useTable<DbConnection, Player>("player");
     const { rows: gameRecords } = useTable<DbConnection, GameRecord>("gamerecord");
 
-    const myPlayer = players.find(p => p.id.isEqual(conn?.identity!));
+    useEffect(() => {
+        if (!conn || !playerId) return;
+
+        const playerIdentity = Identity.fromString(playerId);
+
+        const playerSubscription = conn.subscriptionBuilder()
+            .onError((error: ErrorContextInterface) => {
+                console.error("Error subscribing to player:", error);
+            })
+            .subscribe(`select * from player where Id = '${playerIdentity}'`);
+
+        const gameRecordSubscription = conn.subscriptionBuilder()
+            .onError((error: ErrorContextInterface) => {
+                console.error("Error subscribing to gamerecord:", error);
+            })
+            .subscribe(`select * from gamerecord where PlayerId = '${playerIdentity}'`);
+
+        return () => {
+            playerSubscription.unsubscribe();
+            gameRecordSubscription.unsubscribe();
+        };
+    }, [conn, playerId]);
+
+    const playerIdentity = playerId ? Identity.fromString(playerId) : null;
+    const viewedPlayer = playerIdentity ? players.find(p => p.id.isEqual(playerIdentity)) : null;
 
     const realGameData = useMemo(() => {
-        if (!conn?.identity) return [];
+        if (!playerIdentity) return [];
 
-        const myStats = gameRecords.filter(stat =>
-            stat.playerId.isEqual(conn.identity!)
+        const playerStats = gameRecords.filter(stat =>
+            stat.playerId.isEqual(playerIdentity)
         );
 
-        return myStats.sort((a, b) => {
+        return playerStats.sort((a, b) => {
             if (a.timeMs < b.timeMs) {
                 return -1;
             }
@@ -28,7 +56,7 @@ export const ProfilePage = () => {
             }
             return 0;
         });
-    }, [gameRecords, conn?.identity]);
+    }, [gameRecords, playerIdentity]);
 
     return (
         <div className="min-h-screen">
@@ -44,7 +72,7 @@ export const ProfilePage = () => {
                         marginBottom: '32px',
                         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1)'
                     }}>
-                        {myPlayer ? (
+                        {viewedPlayer ? (
                             <div>
                                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px', marginBottom: '32px' }}>
                                     <div style={{
@@ -55,7 +83,7 @@ export const ProfilePage = () => {
                                     }}>
                                         <Avatar
                                             size={80}
-                                            name={myPlayer.id.toHexString()}
+                                            name={viewedPlayer.id.toHexString()}
                                             variant="pixel"
                                             colors={["#fbbf24", "#f59e0b", "#d97706", "#b45309", "#92400e"]}
                                         />
@@ -68,7 +96,7 @@ export const ProfilePage = () => {
                                             fontWeight: 700,
                                             marginBottom: '12px'
                                         }}>
-                                            {myPlayer.name}
+                                            {viewedPlayer.name}
                                         </h1>
 
                                         <div style={{
@@ -81,7 +109,7 @@ export const ProfilePage = () => {
                                                 fontSize: '0.875rem',
                                                 fontWeight: 500
                                             }}>
-                                                Level {myPlayer.level}
+                                                Level {viewedPlayer.level}
                                             </span>
                                             <div style={{
                                                 flex: 1,
@@ -94,7 +122,7 @@ export const ProfilePage = () => {
                                                     height: '100%',
                                                     background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
                                                     borderRadius: '5px',
-                                                    width: `${(myPlayer.xp / ((myPlayer.level + 1) * 100)) * 100}%`,
+                                                    width: `${(viewedPlayer.xp / ((viewedPlayer.level + 1) * 100)) * 100}%`,
                                                     transition: 'width 0.3s ease'
                                                 }} />
                                             </div>
@@ -103,7 +131,7 @@ export const ProfilePage = () => {
                                                 fontSize: '0.875rem',
                                                 fontWeight: 500
                                             }}>
-                                                Level {myPlayer.level + 1}
+                                                Level {viewedPlayer.level + 1}
                                             </span>
                                         </div>
                                     </div>
@@ -148,7 +176,7 @@ export const ProfilePage = () => {
                                                     fontSize: '1.5rem',
                                                     fontWeight: 700
                                                 }}>
-                                                    {myPlayer.totalGames}
+                                                    {viewedPlayer.totalGames}
                                                 </div>
                                             </div>
                                             <div>
@@ -164,7 +192,7 @@ export const ProfilePage = () => {
                                                     fontSize: '1.5rem',
                                                     fontWeight: 700
                                                 }}>
-                                                    {myPlayer.wins}
+                                                    {viewedPlayer.wins}
                                                 </div>
                                             </div>
                                         </div>
@@ -250,7 +278,7 @@ export const ProfilePage = () => {
 
                         <WpmChart
                             data={realGameData}
-                            title="Your Games"
+                            title={`${viewedPlayer?.name || 'Player'}'s Games`}
                         />
                     </div>
                 </div>
