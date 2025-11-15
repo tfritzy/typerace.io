@@ -457,6 +457,13 @@ public static partial class Module
                 updatedGame.State = GameState.Archived;
                 ctx.Db.game.Id.Update(updatedGame);
 
+                foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
+                {
+                    var updatedProgress = progress;
+                    updatedProgress.CharacterHistory.Clear();
+                    ctx.Db.playerprogress.Id.Update(updatedProgress);
+                }
+
                 Log.Info($"Game {game.Id} transitioned to Archived state");
             }
         }
