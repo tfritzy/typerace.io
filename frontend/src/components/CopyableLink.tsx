@@ -17,7 +17,7 @@ export const CopyableLink = ({ url }: CopyableLinkProps) => {
   return (
     <div className="mt-4">
       <div 
-        className="app-container rounded-lg px-6 py-4 cursor-pointer hover:bg-opacity-80 transition-all"
+        className="box rounded-lg px-6 py-4 cursor-pointer hover:bg-opacity-80 transition-all"
         onClick={handleCopyLink}
       >
         <div className="flex items-center justify-between">

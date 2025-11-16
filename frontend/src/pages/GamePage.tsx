@@ -87,7 +87,7 @@ export const GamePage = () => {
               if (!pp) {
                 return (
                   <div
-                    className="app-container w-full rounded-lg px-8 py-6 cursor-pointer"
+                    className="box w-full rounded-lg px-8 py-6 cursor-pointer"
                     onClick={() => typeBoxRef.current?.focus()}
                   >
                     <PlayerProgressBar
@@ -106,7 +106,7 @@ export const GamePage = () => {
 
               return (
                 <div
-                  className="app-container w-full rounded-lg px-8 py-6 cursor-pointer"
+                  className="box w-full rounded-lg px-8 py-6 cursor-pointer"
                   onClick={() => typeBoxRef.current?.focus()}
                 >
                   <PlayerProgressBar

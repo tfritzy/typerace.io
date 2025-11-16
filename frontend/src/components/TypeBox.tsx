@@ -150,7 +150,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
 
   return (
     <div
-      className={`app-container w-full rounded-lg px-8 py-6 cursor-pointer ${hasError ? 'border-red-500' : ''} ${className || ''}`}
+      className={`box w-full rounded-lg px-8 py-6 cursor-pointer ${hasError ? 'border-red-500' : ''} ${className || ''}`}
       style={style}
       onClick={() => inputRef.current?.focus()}
     >

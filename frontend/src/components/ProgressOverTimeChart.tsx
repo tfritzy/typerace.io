@@ -106,7 +106,7 @@ export const ProgressOverTimeChart = ({
     raceStartTimestamp 
 }: ProgressOverTimeChartProps) => {
     const borderColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-chat-box-border').trim();
+        .getPropertyValue('--color-box-border').trim();
 
     const datasets = allPlayerProgress.map((playerProgress, index) => {
         const progressData = getProgressBySecond(

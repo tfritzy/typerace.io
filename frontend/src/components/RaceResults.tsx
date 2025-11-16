@@ -38,8 +38,8 @@ export const RaceResults = ({
             }}>
                 <div style={{
                     flex: '1',
-                    backgroundColor: isHighWpm ? 'rgba(255, 183, 0, 0.08)' : 'var(--color-chat-box-bg)',
-                    border: `1px solid ${isHighWpm ? 'rgba(255, 183, 0, 0.3)' : 'var(--color-chat-box-border)'}`,
+                    backgroundColor: isHighWpm ? 'rgba(255, 183, 0, 0.08)' : 'var(--color-box-bg)',
+                    border: `1px solid ${isHighWpm ? 'rgba(255, 183, 0, 0.3)' : 'var(--color-box-border)'}`,
                     borderRadius: '8px',
                     padding: '24px',
                     display: 'flex',
@@ -70,8 +70,8 @@ export const RaceResults = ({
 
                 <div style={{
                     flex: '1',
-                    backgroundColor: isFirstPlace ? 'rgba(255, 183, 0, 0.08)' : 'var(--color-chat-box-bg)',
-                    border: `1px solid ${isFirstPlace ? 'rgba(255, 183, 0, 0.3)' : 'var(--color-chat-box-border)'}`,
+                    backgroundColor: isFirstPlace ? 'rgba(255, 183, 0, 0.08)' : 'var(--color-box-bg)',
+                    border: `1px solid ${isFirstPlace ? 'rgba(255, 183, 0, 0.3)' : 'var(--color-box-border)'}`,
                     borderRadius: '8px',
                     padding: '24px',
                     display: 'flex',
@@ -104,8 +104,8 @@ export const RaceResults = ({
 
                 <div style={{
                     flex: '1',
-                    backgroundColor: isFirstPlace ? 'rgba(255, 183, 0, 0.08)' : 'var(--color-chat-box-bg)',
-                    border: `1px solid ${isFirstPlace ? 'rgba(255, 183, 0, 0.3)' : 'var(--color-chat-box-border)'}`,
+                    backgroundColor: isFirstPlace ? 'rgba(255, 183, 0, 0.08)' : 'var(--color-box-bg)',
+                    border: `1px solid ${isFirstPlace ? 'rgba(255, 183, 0, 0.3)' : 'var(--color-box-border)'}`,
                     borderRadius: '8px',
                     padding: '24px',
                     display: 'flex',
@@ -136,8 +136,8 @@ export const RaceResults = ({
 
                 <div style={{
                     flex: '1',
-                    backgroundColor: isPerfectAccuracy ? 'rgba(255, 183, 0, 0.08)' : 'var(--color-chat-box-bg)',
-                    border: `1px solid ${isPerfectAccuracy ? 'rgba(255, 183, 0, 0.3)' : 'var(--color-chat-box-border)'}`,
+                    backgroundColor: isPerfectAccuracy ? 'rgba(255, 183, 0, 0.08)' : 'var(--color-box-bg)',
+                    border: `1px solid ${isPerfectAccuracy ? 'rgba(255, 183, 0, 0.3)' : 'var(--color-box-border)'}`,
                     borderRadius: '8px',
                     padding: '24px',
                     display: 'flex',
@@ -168,8 +168,8 @@ export const RaceResults = ({
             </div>
 
             <div style={{
-                backgroundColor: 'var(--color-chat-box-bg)',
-                border: '1px solid var(--color-chat-box-border)',
+                backgroundColor: 'var(--color-box-bg)',
+                border: '1px solid var(--color-box-border)',
                 borderRadius: '8px',
                 padding: '24px'
             }}>
@@ -180,8 +180,8 @@ export const RaceResults = ({
             </div>
 
             <div style={{
-                backgroundColor: 'var(--color-chat-box-bg)',
-                border: '1px solid var(--color-chat-box-border)',
+                backgroundColor: 'var(--color-box-bg)',
+                border: '1px solid var(--color-box-border)',
                 borderRadius: '8px',
                 padding: '24px',
                 marginTop: '16px'
