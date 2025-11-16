@@ -24,6 +24,9 @@ export const Countdown = () => {
         if (previousGameState === "Lobby" && currentState === "Countdown") {
             setIsVisible(true);
             setCount(3);
+        } else if (previousGameState === null && currentState === "Countdown") {
+            setIsVisible(true);
+            setCount(3);
         }
 
         setPreviousGameState(currentState);
