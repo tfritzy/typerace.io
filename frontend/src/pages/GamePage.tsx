@@ -3,12 +3,13 @@ import { useEffect, useCallback, useState, useRef } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import { type DbConnection, type Game, PlayerProgress } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
-import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
+import { type TypeBoxRef } from "../components/TypeBox";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { ChatBox } from "../components/ChatBox";
 import { Countdown } from "../components/Countdown";
 import { RaceResults } from "../components/RaceResults";
+import { GamePageTypeBox } from "../components/GamePageTypeBox";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -58,14 +59,7 @@ export const GamePage = () => {
     return playerId.toHexString();
   };
 
-  const handleProgress = useCallback((correctCharCount: number, eventType: "Correct" | "Incorrect" | "Backspace") => {
-    if (!conn || !gameId) return;
-
-    const eventTypeEnum = { tag: eventType };
-    conn.reducers.updateProgress(gameId, correctCharCount, eventTypeEnum);
-  }, [conn, gameId]);
-
-  const handleComplete = useCallback(() => {
+  const handleFinish = useCallback(() => {
     setHasFinished(true);
   }, []);
 
@@ -75,6 +69,8 @@ export const GamePage = () => {
 
   const currentPlayerId = conn?.identity;
   const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
+  const isInLobby = game.state?.tag === "Lobby";
+  const isLobby = game.gameType?.tag === "Private" && isInLobby;
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -137,17 +133,13 @@ export const GamePage = () => {
               );
             })()
           ) : (
-            <div
-              className="text-2xl font-mono" style={{ lineHeight: 1.6 }}
-            >
-              <TypeBox
-                ref={typeBoxRef}
-                phrase={game.phrase}
-                onProgress={handleProgress}
-                onComplete={handleComplete}
-                style={{ height: '430px', display: 'flex', alignItems: 'flex-start' }}
-              />
-            </div>
+            <GamePageTypeBox
+              phrase={game.phrase}
+              gameId={gameId!}
+              isLobby={isLobby}
+              conn={conn}
+              onFinish={handleFinish}
+            />
           )}
 
         </div>
