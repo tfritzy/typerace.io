@@ -3,18 +3,18 @@ import { useEffect, useCallback, useState, useRef } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import { type DbConnection, type Game, PlayerProgress } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
-import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
+import { type TypeBoxRef } from "../components/TypeBox";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { ChatBox } from "../components/ChatBox";
 import { Countdown } from "../components/Countdown";
 import { RaceResults } from "../components/RaceResults";
+import { GamePageTypeBox } from "../components/GamePageTypeBox";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const conn = useSpacetimeDB<DbConnection>();
   const [hasFinished, setHasFinished] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false);
   const typeBoxRef = useRef<TypeBoxRef>(null);
 
   useEffect(() => {
@@ -59,29 +59,9 @@ export const GamePage = () => {
     return playerId.toHexString();
   };
 
-  const handleProgress = useCallback((correctCharCount: number, eventType: "Correct" | "Incorrect" | "Backspace") => {
-    if (!conn || !gameId) return;
-
-    const eventTypeEnum = { tag: eventType };
-    conn.reducers.updateProgress(gameId, correctCharCount, eventTypeEnum);
-  }, [conn, gameId]);
-
-  const handleComplete = useCallback(() => {
+  const handleFinish = useCallback(() => {
     setHasFinished(true);
   }, []);
-
-  const handleStartGame = useCallback(() => {
-    if (!conn || !gameId) return;
-    conn.reducers.startPrivateGame(gameId);
-  }, [conn, gameId]);
-
-  const handleCopyLink = useCallback(() => {
-    const gameUrl = `${window.location.origin}/game/${gameId}`;
-    navigator.clipboard.writeText(gameUrl).then(() => {
-      setLinkCopied(true);
-      setTimeout(() => setLinkCopied(false), 2000);
-    });
-  }, [gameId]);
 
   if (!game) {
     return <div>Game not found</div>;
@@ -154,43 +134,13 @@ export const GamePage = () => {
               );
             })()
           ) : (
-            <>
-              <div
-                className="text-2xl font-mono" style={{ lineHeight: 1.6 }}
-              >
-                <TypeBox
-                  ref={typeBoxRef}
-                  phrase={shouldShowStartPrompt ? "start game" : game.phrase}
-                  onProgress={shouldShowStartPrompt ? undefined : handleProgress}
-                  onComplete={shouldShowStartPrompt ? handleStartGame : handleComplete}
-                  style={{ height: '430px', display: 'flex', alignItems: 'flex-start' }}
-                />
-              </div>
-              
-              {shouldShowStartPrompt && (
-                <div className="mt-4">
-                  <div 
-                    className="chat-box rounded-lg px-6 py-4 cursor-pointer hover:bg-opacity-80 transition-all"
-                    onClick={handleCopyLink}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="text-white/60 text-sm mb-1">Share this link with friends:</div>
-                        <div className="text-white font-mono text-sm break-all">
-                          {window.location.origin}/game/{gameId}
-                        </div>
-                      </div>
-                      <div className="ml-4 text-2xl">
-                        {linkCopied ? "✓" : "📋"}
-                      </div>
-                    </div>
-                    {linkCopied && (
-                      <div className="text-green-400 text-sm mt-2">Link copied to clipboard!</div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </>
+            <GamePageTypeBox
+              phrase={game.phrase}
+              gameId={gameId!}
+              shouldShowStartPrompt={shouldShowStartPrompt}
+              conn={conn}
+              onFinish={handleFinish}
+            />
           )}
 
         </div>
