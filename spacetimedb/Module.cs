@@ -65,6 +65,7 @@ public static partial class Module
     private const long PRIVATE_GAME_COUNTDOWN_MICROSECONDS = 5_000_000;
     private const long PRACTICE_GAME_COUNTDOWN_MICROSECONDS = 5_000_000;
     private const long BOT_FILL_DELAY_MICROSECONDS = 5_000_000;
+    private const long PRACTICE_GAME_COUNTDOWN_START_DELAY_MICROSECONDS = 1_000_000;
 
     [Table(Name = "player", Public = true)]
     public partial struct Player
@@ -89,6 +90,7 @@ public static partial class Module
         public string Phrase;
         public long CreatedAt;
         public long RacingStartedAt;
+        public long CountdownDurationMs;
 
         [SpacetimeDB.Index.BTree]
         public GameState State;
@@ -128,6 +130,16 @@ public static partial class Module
         [PrimaryKey]
         public ulong ScheduledId;
         [SpacetimeDB.Index.BTree]
+        public string GameId;
+        public ScheduleAt ScheduledAt;
+    }
+
+    [Table(Scheduled = nameof(StartCountdown))]
+    public partial struct CountdownStart
+    {
+        [AutoInc]
+        [PrimaryKey]
+        public ulong ScheduledId;
         public string GameId;
         public ScheduleAt ScheduledAt;
     }
@@ -342,22 +354,39 @@ public static partial class Module
 
             if (playerCount >= requiredPlayers)
             {
-                var updatedGame = newGame;
-                updatedGame.State = GameState.Countdown;
-                ctx.Db.game.Id.Update(updatedGame);
-
-                Log.Info($"Game {newGame.Id} reached {requiredPlayers} players, transitioning to Countdown state");
-
-                long countdownDuration = GetCountdownDuration(gameType);
-                var countdownTime = new TimeDuration { Microseconds = countdownDuration };
-                var scheduledTime = ctx.Timestamp + countdownTime;
-
-                ctx.Db.GameStart.Insert(new GameStart
+                if (gameType == GameType.Practice)
                 {
-                    ScheduledId = 0,
-                    GameId = newGame.Id,
-                    ScheduledAt = new ScheduleAt.Time(scheduledTime)
-                });
+                    var startDelay = new TimeDuration { Microseconds = PRACTICE_GAME_COUNTDOWN_START_DELAY_MICROSECONDS };
+                    var scheduledTime = ctx.Timestamp + startDelay;
+
+                    ctx.Db.CountdownStart.Insert(new CountdownStart
+                    {
+                        ScheduledId = 0,
+                        GameId = newGame.Id,
+                        ScheduledAt = new ScheduleAt.Time(scheduledTime)
+                    });
+
+                    Log.Info($"Practice game {newGame.Id} scheduled to start countdown in 1 second");
+                }
+                else
+                {
+                    var updatedGame = newGame;
+                    updatedGame.State = GameState.Countdown;
+                    ctx.Db.game.Id.Update(updatedGame);
+
+                    Log.Info($"Game {newGame.Id} reached {requiredPlayers} players, transitioning to Countdown state");
+
+                    long countdownDuration = GetCountdownDuration(gameType);
+                    var countdownTime = new TimeDuration { Microseconds = countdownDuration };
+                    var scheduledTime = ctx.Timestamp + countdownTime;
+
+                    ctx.Db.GameStart.Insert(new GameStart
+                    {
+                        ScheduledId = 0,
+                        GameId = newGame.Id,
+                        ScheduledAt = new ScheduleAt.Time(scheduledTime)
+                    });
+                }
             }
             else if (gameType == GameType.Public)
             {
@@ -417,12 +446,16 @@ public static partial class Module
 
     private static Game InsertGame(ReducerContext ctx, GameMode gameMode, GameType gameType)
     {
+        long countdownDurationMicros = GetCountdownDuration(gameType);
+        long countdownDurationMs = countdownDurationMicros / 1000;
+        
         return ctx.Db.game.Insert(new Game
         {
             Id = IdGenerator.Generate("game_", ctx.Rng),
             Phrase = PhraseGenerator.GeneratePhraseForMode(gameMode, ctx.Rng),
             CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
             RacingStartedAt = 0,
+            CountdownDurationMs = countdownDurationMs,
             State = GameState.Lobby,
             GameMode = gameMode,
             GameType = gameType,
@@ -630,6 +663,32 @@ public static partial class Module
     private static long GenerateBotDelay(Random rng)
     {
         return 100_000 + rng.Next(150_000);
+    }
+
+    [Reducer]
+    public static void StartCountdown(ReducerContext ctx, CountdownStart args)
+    {
+        var game = ctx.Db.game.Id.Find(args.GameId);
+
+        if (game != null && game.Value.State == GameState.Lobby)
+        {
+            var updatedGame = game.Value;
+            updatedGame.State = GameState.Countdown;
+            ctx.Db.game.Id.Update(updatedGame);
+
+            Log.Info($"Game {args.GameId} transitioned to Countdown state");
+
+            long countdownDuration = GetCountdownDuration(game.Value.GameType);
+            var countdownTime = new TimeDuration { Microseconds = countdownDuration };
+            var scheduledTime = ctx.Timestamp + countdownTime;
+
+            ctx.Db.GameStart.Insert(new GameStart
+            {
+                ScheduledId = 0,
+                GameId = args.GameId,
+                ScheduledAt = new ScheduleAt.Time(scheduledTime)
+            });
+        }
     }
 
     [Reducer]

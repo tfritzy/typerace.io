@@ -22,8 +22,10 @@ export const Countdown = () => {
         const currentState = game.state.tag;
 
         if (previousGameState === "Lobby" && currentState === "Countdown") {
+            const countdownDurationMs = Number(game.countdownDurationMs);
+            const initialCount = Math.ceil(countdownDurationMs / 1000);
             setIsVisible(true);
-            setCount(3);
+            setCount(initialCount);
         }
 
         setPreviousGameState(currentState);
