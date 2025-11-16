@@ -32,18 +32,6 @@ export const Countdown = () => {
             const initialCount = Math.ceil(countdownDurationMs / 1000);
             setIsVisible(true);
             setCount(initialCount);
-        } else if (previousGameState === null && currentState === "Countdown") {
-            const countdownDurationMs = COUNTDOWN_DURATIONS_MS[game.gameType.tag as keyof typeof COUNTDOWN_DURATIONS_MS] || 3000;
-            const currentTimeMicros = BigInt(Date.now()) * 1000n;
-            const elapsedMicros = currentTimeMicros - BigInt(game.countdownStartedAt);
-            const elapsedMs = Number(elapsedMicros / 1000n);
-            const remainingMs = Math.max(0, countdownDurationMs - elapsedMs);
-            const remainingCount = Math.ceil(remainingMs / 1000);
-            
-            if (remainingCount > 0) {
-                setIsVisible(true);
-                setCount(remainingCount);
-            }
         }
 
         setPreviousGameState(currentState);
