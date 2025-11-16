@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import type { DbConnection, Player } from "../../module_bindings";
 import Avatar from "boring-avatars";
+import { xpProgressToNextLevel } from "../utils/xpCalculator";
 
 export const ProfileAvatar = () => {
     const navigate = useNavigate();
@@ -17,8 +18,7 @@ export const ProfileAvatar = () => {
     const name = myPlayer?.name ?? "Guest";
     const level = myPlayer?.level ?? 1;
     const currentXP = myPlayer?.xp ?? 0;
-    const xpForNextLevel = (level + 1) * 100;
-    const xpProgress = (currentXP / xpForNextLevel) * 100;
+    const xpProgress = xpProgressToNextLevel(currentXP, level);
 
     const identityHash = conn?.identity?.toHexString() ?? "default";
 
