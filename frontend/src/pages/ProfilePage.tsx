@@ -7,6 +7,7 @@ import Avatar from "boring-avatars";
 import { useParams } from "react-router-dom";
 import { Identity } from "spacetimedb";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
+import { xpProgressToNextLevel } from "../utils/xpCalculator";
 
 type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
@@ -164,7 +165,7 @@ export const ProfilePage = () => {
                                                     height: '100%',
                                                     background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
                                                     borderRadius: '5px',
-                                                    width: `${(viewedPlayer.xp / ((viewedPlayer.level + 1) * 100)) * 100}%`,
+                                                    width: `${viewedPlayer ? xpProgressToNextLevel(viewedPlayer.xp, viewedPlayer.level) : 0}%`,
                                                     transition: 'width 0.3s ease'
                                                 }} />
                                             </div>

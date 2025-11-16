@@ -793,6 +793,7 @@ public static partial class Module
 
         while (updatedPlayer.Xp >= XpRequiredForLevel(updatedPlayer.Level + 1))
         {
+            updatedPlayer.Xp -= XpRequiredForLevel(updatedPlayer.Level + 1);
             updatedPlayer.Level += 1;
         }
 
@@ -805,17 +806,31 @@ public static partial class Module
     {
         return placement switch
         {
-            1 => 100,
-            2 => 50,
-            3 => 25,
-            4 => 10,
-            _ => 5
+            1 => 50,
+            2 => 25,
+            3 => 13,
+            4 => 5,
+            _ => 3
         };
     }
 
     private static int XpRequiredForLevel(int level)
     {
-        return level * 100;
+        if (level <= 1)
+        {
+            return 0;
+        }
+        
+        if (level > 100)
+        {
+            return 5000;
+        }
+        
+        double baseXp = 100.0;
+        double maxXp = 5000.0;
+        double growthRate = Math.Log(maxXp / baseXp) / (100.0 - 2.0);
+        
+        return (int)Math.Round(baseXp * Math.Exp(growthRate * (level - 2)));
     }
 
     [Reducer]
