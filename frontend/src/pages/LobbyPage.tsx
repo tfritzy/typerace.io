@@ -1,45 +1,54 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 import "../components/SelectionButton.css";
-import type { DbConnection, GameMode } from "../../module_bindings";
+import type {
+  DbConnection,
+  GameMode,
+} from "../../module_bindings";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
 import { ModeSelector } from "../components/ModeSelector";
-import { MatchTypeSelector, type GameTypeValue } from "../components/MatchTypeSelector";
+import {
+  MatchTypeSelector,
+  type GameTypeValue,
+} from "../components/MatchTypeSelector";
 import { Header } from "../components/Header";
 
 export const LobbyPage = () => {
-  const [selectedMode, setSelectedMode] = useState<GameMode>({ tag: "English500" });
+  const [selectedMode, setSelectedMode] = useState<GameMode>({
+    tag: "English500",
+  });
   const [gameType, setGameType] = useState<GameTypeValue>("Public");
+  const [joinCode, setJoinCode] = useState<string | null>(null);
   const conn = useSpacetimeDB<DbConnection>();
   const navigate = useNavigate();
   const typeBoxRef = useRef<TypeBoxRef>(null);
+  const playerProgress = useTable(
+    "playerprogress"
+  ).rows;
+
+  useEffect(() => {
+    if (!joinCode || !conn.identity) return;
+
+    const myProgress = playerProgress.find(
+      (row) => row.playerId.isEqual(conn.identity!) && row.joinCode === joinCode
+    );
+
+    if (myProgress) {
+      navigate(`/game/${myProgress.gameId.toString()}`);
+    }
+  }, [playerProgress, joinCode, conn.identity, navigate]);
 
   const handlePhraseComplete = useCallback(() => {
     if (conn) {
-      const joinCode = `join_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-      
-      conn.reducers.onJoinGame((ctx) => {
-        if (ctx.event.status.tag === "Committed") {
-          const myProgress = Array.from(conn.db.playerprogress.iter())
-            .filter(row => row.playerId.isEqual(conn.identity!) && row.joinCode === joinCode);
+      const newJoinCode = `join_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      setJoinCode(newJoinCode);
 
-          console.log(myProgress);
-
-          if (myProgress.length > 0) {
-            navigate(`/game/${myProgress[0].gameId.toString()}`);
-          }
-        }
-      });
-      
       const gameTypeEnum = { tag: gameType };
-      conn.reducers.joinGame(selectedMode, joinCode, gameTypeEnum);
+      conn.reducers.joinGame(selectedMode, newJoinCode, gameTypeEnum);
     }
-  }, [conn, selectedMode, gameType, navigate]);
-
-  const player_progress = useTable("player");
-  console.log(player_progress);
+  }, [conn, selectedMode, gameType]);
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -47,7 +56,12 @@ export const LobbyPage = () => {
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="content-container">
           <div className="text-xl mb-[400px]">
-            <TypeBox ref={typeBoxRef} phrase="asdf" onComplete={handlePhraseComplete} resetOnComplete={true} />
+            <TypeBox
+              ref={typeBoxRef}
+              phrase="asdf"
+              onComplete={handlePhraseComplete}
+              resetOnComplete={true}
+            />
           </div>
         </div>
       </div>
