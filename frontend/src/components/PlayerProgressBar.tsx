@@ -1,5 +1,4 @@
 import Avatar from "boring-avatars";
-import { ChatBox } from "./ChatBox";
 
 type PlayerProgressBarProps = {
     name: string;
