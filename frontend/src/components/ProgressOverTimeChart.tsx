@@ -39,7 +39,6 @@ const getProgressBySecond = (
         return [{ x: 0, y: 0 }];
     }
 
-    const progressionStack: number[] = [];
     const timeStack: number[] = [];
 
     for (const evt of events) {
@@ -51,17 +50,15 @@ const getProgressBySecond = (
         }
 
         if (evt.eventType.tag === "Backspace") {
-            if (progressionStack.length > 0) {
-                progressionStack.pop();
+            if (timeStack.length > 0) {
                 timeStack.pop();
             }
         } else {
-            progressionStack.push(progressionStack.length);
             timeStack.push(seconds);
         }
     }
 
-    if (progressionStack.length === 0) {
+    if (timeStack.length === 0) {
         return [{ x: 0, y: 0 }];
     }
 
@@ -70,23 +67,23 @@ const getProgressBySecond = (
     const maxSeconds = Math.ceil(timeStack[timeStack.length - 1]);
     
     for (let second = 1; second <= maxSeconds; second++) {
-        let progressAtSecond = 0;
+        let charCount = 0;
         
         for (let i = timeStack.length - 1; i >= 0; i--) {
             if (timeStack[i] <= second) {
-                progressAtSecond = progressionStack[i];
+                charCount = i + 1;
                 break;
             }
         }
 
-        const percentComplete = (progressAtSecond / phraseLength) * 100;
+        const percentComplete = (charCount / phraseLength) * 100;
         progressData.push({ 
             x: second, 
             y: Math.min(100, percentComplete) 
         });
     }
 
-    const finalProgress = (progressionStack[progressionStack.length - 1] / phraseLength) * 100;
+    const finalProgress = (timeStack.length / phraseLength) * 100;
     if (progressData[progressData.length - 1].y < 99.9 && finalProgress >= 99.9) {
         progressData.push({ 
             x: timeStack[timeStack.length - 1], 
