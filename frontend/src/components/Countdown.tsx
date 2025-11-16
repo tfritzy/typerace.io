@@ -3,12 +3,6 @@ import { useParams } from "react-router-dom";
 import { useTable, where, eq } from "spacetimedb/react";
 import type { DbConnection, Game } from "../../module_bindings";
 
-const COUNTDOWN_DURATIONS_MS = {
-    Public: 3000,
-    Private: 5000,
-    Practice: 5000,
-};
-
 export const Countdown = () => {
     const { gameId } = useParams<{ gameId: string }>();
     const [count, setCount] = useState(3);
@@ -28,7 +22,7 @@ export const Countdown = () => {
         const currentState = game.state.tag;
 
         if (previousGameState === "Lobby" && currentState === "Countdown") {
-            const countdownDurationMs = COUNTDOWN_DURATIONS_MS[game.gameType.tag as keyof typeof COUNTDOWN_DURATIONS_MS] || 3000;
+            const countdownDurationMs = Number(game.countdownDurationMs);
             const initialCount = Math.ceil(countdownDurationMs / 1000);
             setIsVisible(true);
             setCount(initialCount);

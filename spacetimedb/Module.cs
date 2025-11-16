@@ -90,6 +90,7 @@ public static partial class Module
         public string Phrase;
         public long CreatedAt;
         public long RacingStartedAt;
+        public long CountdownDurationMs;
 
         [SpacetimeDB.Index.BTree]
         public GameState State;
@@ -445,12 +446,16 @@ public static partial class Module
 
     private static Game InsertGame(ReducerContext ctx, GameMode gameMode, GameType gameType)
     {
+        long countdownDurationMicros = GetCountdownDuration(gameType);
+        long countdownDurationMs = countdownDurationMicros / 1000;
+        
         return ctx.Db.game.Insert(new Game
         {
             Id = IdGenerator.Generate("game_", ctx.Rng),
             Phrase = PhraseGenerator.GeneratePhraseForMode(gameMode, ctx.Rng),
             CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
             RacingStartedAt = 0,
+            CountdownDurationMs = countdownDurationMs,
             State = GameState.Lobby,
             GameMode = gameMode,
             GameType = gameType,
