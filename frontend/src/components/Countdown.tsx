@@ -3,6 +3,12 @@ import { useParams } from "react-router-dom";
 import { useTable, where, eq } from "spacetimedb/react";
 import type { DbConnection, Game } from "../../module_bindings";
 
+const COUNTDOWN_DURATIONS_MS = {
+    Public: 3000,
+    Private: 5000,
+    Practice: 5000,
+};
+
 export const Countdown = () => {
     const { gameId } = useParams<{ gameId: string }>();
     const [count, setCount] = useState(3);
@@ -22,11 +28,22 @@ export const Countdown = () => {
         const currentState = game.state.tag;
 
         if (previousGameState === "Lobby" && currentState === "Countdown") {
+            const countdownDurationMs = COUNTDOWN_DURATIONS_MS[game.gameType.tag as keyof typeof COUNTDOWN_DURATIONS_MS] || 3000;
+            const initialCount = Math.ceil(countdownDurationMs / 1000);
             setIsVisible(true);
-            setCount(3);
+            setCount(initialCount);
         } else if (previousGameState === null && currentState === "Countdown") {
-            setIsVisible(true);
-            setCount(3);
+            const countdownDurationMs = COUNTDOWN_DURATIONS_MS[game.gameType.tag as keyof typeof COUNTDOWN_DURATIONS_MS] || 3000;
+            const currentTimeMicros = BigInt(Date.now()) * 1000n;
+            const elapsedMicros = currentTimeMicros - BigInt(game.countdownStartedAt);
+            const elapsedMs = Number(elapsedMicros / 1000n);
+            const remainingMs = Math.max(0, countdownDurationMs - elapsedMs);
+            const remainingCount = Math.ceil(remainingMs / 1000);
+            
+            if (remainingCount > 0) {
+                setIsVisible(true);
+                setCount(remainingCount);
+            }
         }
 
         setPreviousGameState(currentState);

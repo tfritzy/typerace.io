@@ -88,6 +88,7 @@ public static partial class Module
         public string Id;
         public string Phrase;
         public long CreatedAt;
+        public long CountdownStartedAt;
         public long RacingStartedAt;
 
         [SpacetimeDB.Index.BTree]
@@ -314,6 +315,7 @@ public static partial class Module
 
                 var updatedGame = foundGame.Value;
                 updatedGame.State = GameState.Countdown;
+                updatedGame.CountdownStartedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
                 ctx.Db.game.Id.Update(updatedGame);
 
                 Log.Info($"Game {foundGame.Value.Id} reached {requiredPlayers} players, transitioning to Countdown state");
@@ -344,6 +346,7 @@ public static partial class Module
             {
                 var updatedGame = newGame;
                 updatedGame.State = GameState.Countdown;
+                updatedGame.CountdownStartedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
                 ctx.Db.game.Id.Update(updatedGame);
 
                 Log.Info($"Game {newGame.Id} reached {requiredPlayers} players, transitioning to Countdown state");
@@ -422,6 +425,7 @@ public static partial class Module
             Id = IdGenerator.Generate("game_", ctx.Rng),
             Phrase = PhraseGenerator.GeneratePhraseForMode(gameMode, ctx.Rng),
             CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+            CountdownStartedAt = 0,
             RacingStartedAt = 0,
             State = GameState.Lobby,
             GameMode = gameMode,
@@ -517,6 +521,7 @@ public static partial class Module
 
             var updatedGame = game.Value;
             updatedGame.State = GameState.Countdown;
+            updatedGame.CountdownStartedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
             ctx.Db.game.Id.Update(updatedGame);
 
             Log.Info($"Game {args.GameId} filled with {botsToAdd} bots and transitioned to Countdown state");
@@ -701,6 +706,7 @@ public static partial class Module
 
         var updatedGame = game.Value;
         updatedGame.State = GameState.Countdown;
+        updatedGame.CountdownStartedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
         ctx.Db.game.Id.Update(updatedGame);
 
         Log.Info($"Private/practice game {gameId} transitioned to Countdown state");
