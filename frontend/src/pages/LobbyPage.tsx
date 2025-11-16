@@ -6,12 +6,12 @@ import type { DbConnection, GameMode } from "../../module_bindings";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
 import { ModeSelector } from "../components/ModeSelector";
-import { MatchTypeSelector } from "../components/MatchTypeSelector";
+import { MatchTypeSelector, type GameTypeValue } from "../components/MatchTypeSelector";
 import { Header } from "../components/Header";
 
 export const LobbyPage = () => {
   const [selectedMode, setSelectedMode] = useState<GameMode>({ tag: "English500" });
-  const [isPrivate, setIsPrivate] = useState(false);
+  const [gameType, setGameType] = useState<GameTypeValue>("Public");
   const conn = useSpacetimeDB<DbConnection>();
   const navigate = useNavigate();
   const typeBoxRef = useRef<TypeBoxRef>(null);
@@ -32,9 +32,11 @@ export const LobbyPage = () => {
           }
         }
       });
-      conn.reducers.joinGame(selectedMode, joinCode);
+      
+      const gameTypeEnum = { tag: gameType };
+      conn.reducers.joinGame(selectedMode, joinCode, gameTypeEnum);
     }
-  }, [conn, selectedMode, navigate]);
+  }, [conn, selectedMode, gameType, navigate]);
 
   const player_progress = useTable("player");
   console.log(player_progress);
@@ -51,7 +53,7 @@ export const LobbyPage = () => {
       </div>
       <div className="fixed bottom-0 left-0 right-0 p-4">
         <div className="content-container">
-          <MatchTypeSelector isPrivate={isPrivate} setIsPrivate={setIsPrivate} />
+          <MatchTypeSelector gameType={gameType} setGameType={setGameType} />
           <ModeSelector
             selectedMode={selectedMode}
             onModeSelect={setSelectedMode}
