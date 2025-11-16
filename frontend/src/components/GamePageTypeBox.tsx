@@ -6,7 +6,7 @@ import type { DbConnection } from "../../module_bindings";
 type GamePageTypeBoxProps = {
   phrase: string;
   gameId: string;
-  shouldShowStartPrompt: boolean;
+  isLobby: boolean;
   conn: DbConnection | null;
   onFinish: () => void;
 };
@@ -14,11 +14,37 @@ type GamePageTypeBoxProps = {
 export const GamePageTypeBox = ({ 
   phrase, 
   gameId, 
-  shouldShowStartPrompt, 
+  isLobby, 
   conn,
   onFinish 
 }: GamePageTypeBoxProps) => {
   const typeBoxRef = useRef<TypeBoxRef>(null);
+
+  const handleStartGame = useCallback(() => {
+    if (!conn || !gameId) return;
+    conn.reducers.startPrivateGame(gameId);
+  }, [conn, gameId]);
+
+  const gameUrl = `${window.location.origin}/game/${gameId}`;
+
+  if (isLobby) {
+    return (
+      <>
+        <div
+          className="text-2xl font-mono" style={{ lineHeight: 1.6 }}
+        >
+          <TypeBox
+            ref={typeBoxRef}
+            phrase="start game"
+            onComplete={handleStartGame}
+            style={{ height: '430px', display: 'flex', alignItems: 'flex-start' }}
+          />
+        </div>
+        
+        <CopyableLink url={gameUrl} />
+      </>
+    );
+  }
 
   const handleProgress = useCallback((correctCharCount: number, eventType: "Correct" | "Incorrect" | "Backspace") => {
     if (!conn || !gameId) return;
@@ -31,31 +57,18 @@ export const GamePageTypeBox = ({
     onFinish();
   }, [onFinish]);
 
-  const handleStartGame = useCallback(() => {
-    if (!conn || !gameId) return;
-    conn.reducers.startPrivateGame(gameId);
-  }, [conn, gameId]);
-
-  const gameUrl = `${window.location.origin}/game/${gameId}`;
-
   return (
-    <>
-      <div
-        className="text-2xl font-mono" style={{ lineHeight: 1.6 }}
-      >
-        <TypeBox
-          ref={typeBoxRef}
-          phrase={shouldShowStartPrompt ? "start game" : phrase}
-          onProgress={shouldShowStartPrompt ? undefined : handleProgress}
-          onComplete={shouldShowStartPrompt ? handleStartGame : handleComplete}
-          style={{ height: '430px', display: 'flex', alignItems: 'flex-start' }}
-        />
-      </div>
-      
-      {shouldShowStartPrompt && (
-        <CopyableLink url={gameUrl} />
-      )}
-    </>
+    <div
+      className="text-2xl font-mono" style={{ lineHeight: 1.6 }}
+    >
+      <TypeBox
+        ref={typeBoxRef}
+        phrase={phrase}
+        onProgress={handleProgress}
+        onComplete={handleComplete}
+        style={{ height: '430px', display: 'flex', alignItems: 'flex-start' }}
+      />
+    </div>
   );
 };
 

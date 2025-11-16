@@ -71,7 +71,7 @@ export const GamePage = () => {
   const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
   const isPrivateOrPractice = game.gameType?.tag === "Private" || game.gameType?.tag === "Practice";
   const isInLobby = game.state?.tag === "Lobby";
-  const shouldShowStartPrompt = isPrivateOrPractice && isInLobby;
+  const isLobby = isPrivateOrPractice && isInLobby;
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -137,7 +137,7 @@ export const GamePage = () => {
             <GamePageTypeBox
               phrase={game.phrase}
               gameId={gameId!}
-              shouldShowStartPrompt={shouldShowStartPrompt}
+              isLobby={isLobby}
               conn={conn}
               onFinish={handleFinish}
             />
