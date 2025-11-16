@@ -1,18 +1,22 @@
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import type { DbConnection, Player, GameRecord } from "../../module_bindings";
 import { WpmChart } from "../components/WpmChart";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
 import Avatar from "boring-avatars";
 import { useParams } from "react-router-dom";
 import { Identity } from "spacetimedb";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 
+type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
+
 export const ProfilePage = () => {
     const { playerId } = useParams<{ playerId: string }>();
     const conn = useSpacetimeDB<DbConnection>();
     const { rows: players } = useTable<DbConnection, Player>("player");
     const { rows: gameRecords } = useTable<DbConnection, GameRecord>("gamerecord");
+    const [selectedMode, setSelectedMode] = useState<string>('all');
+    const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('all');
 
     useEffect(() => {
         if (!conn || !playerId) return;
@@ -40,12 +44,39 @@ export const ProfilePage = () => {
     const playerIdentity = playerId ? Identity.fromString(playerId) : null;
     const viewedPlayer = playerIdentity ? players.find(p => p.id.isEqual(playerIdentity)) : null;
 
+    const getTimeFrameFilter = (timeFrame: TimeFrame): number => {
+        const now = Date.now() * 1000;
+        switch (timeFrame) {
+            case 'today':
+                const startOfDay = new Date();
+                startOfDay.setHours(0, 0, 0, 0);
+                return startOfDay.getTime() * 1000;
+            case 'week':
+                return now - (7 * 24 * 60 * 60 * 1000 * 1000);
+            case 'month':
+                return now - (30 * 24 * 60 * 60 * 1000 * 1000);
+            case '3months':
+                return now - (90 * 24 * 60 * 60 * 1000 * 1000);
+            default:
+                return 0;
+        }
+    };
+
     const realGameData = useMemo(() => {
         if (!playerIdentity) return [];
 
-        const playerStats = gameRecords.filter(stat =>
+        let playerStats = gameRecords.filter(stat =>
             stat.playerId.isEqual(playerIdentity)
         );
+
+        if (selectedMode !== 'all') {
+            playerStats = playerStats.filter(stat => stat.gameMode.tag === selectedMode);
+        }
+
+        if (selectedTimeFrame !== 'all') {
+            const cutoffTime = getTimeFrameFilter(selectedTimeFrame);
+            playerStats = playerStats.filter(stat => stat.date >= cutoffTime);
+        }
 
         return playerStats.sort((a, b) => {
             if (a.timeMs < b.timeMs) {
@@ -56,6 +87,17 @@ export const ProfilePage = () => {
             }
             return 0;
         });
+    }, [gameRecords, playerIdentity, selectedMode, selectedTimeFrame]);
+
+    const availableModes = useMemo(() => {
+        if (!playerIdentity) return [];
+        
+        const modesSet = new Set<string>();
+        gameRecords
+            .filter(stat => stat.playerId.isEqual(playerIdentity))
+            .forEach(stat => modesSet.add(stat.gameMode.tag));
+        
+        return Array.from(modesSet).sort();
     }, [gameRecords, playerIdentity]);
 
     return (
@@ -267,14 +309,90 @@ export const ProfilePage = () => {
                     </div>
 
                     <div>
-                        <h2 style={{
-                            color: '#ffffff',
-                            fontSize: '1.5rem',
-                            fontWeight: 700,
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
                             marginBottom: '24px'
                         }}>
-                            Performance History
-                        </h2>
+                            <h2 style={{
+                                color: '#ffffff',
+                                fontSize: '1.5rem',
+                                fontWeight: 700,
+                                margin: 0
+                            }}>
+                                Performance History
+                            </h2>
+
+                            <div style={{
+                                display: 'flex',
+                                gap: '12px',
+                                alignItems: 'center'
+                            }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <label style={{
+                                        color: 'rgba(255, 255, 255, 0.6)',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 500
+                                    }}>
+                                        Mode
+                                    </label>
+                                    <select
+                                        value={selectedMode}
+                                        onChange={(e) => setSelectedMode(e.target.value)}
+                                        style={{
+                                            backgroundColor: '#1a1a1a',
+                                            color: '#ffffff',
+                                            border: '1px solid rgba(255, 255, 255, 0.15)',
+                                            borderRadius: '6px',
+                                            padding: '8px 12px',
+                                            fontSize: '0.875rem',
+                                            cursor: 'pointer',
+                                            outline: 'none',
+                                            minWidth: '150px'
+                                        }}
+                                    >
+                                        <option value="all">All Modes</option>
+                                        {availableModes.map(mode => (
+                                            <option key={mode} value={mode}>
+                                                {mode.replace(/(\d+)/, ' $1')}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <label style={{
+                                        color: 'rgba(255, 255, 255, 0.6)',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 500
+                                    }}>
+                                        Time Frame
+                                    </label>
+                                    <select
+                                        value={selectedTimeFrame}
+                                        onChange={(e) => setSelectedTimeFrame(e.target.value as TimeFrame)}
+                                        style={{
+                                            backgroundColor: '#1a1a1a',
+                                            color: '#ffffff',
+                                            border: '1px solid rgba(255, 255, 255, 0.15)',
+                                            borderRadius: '6px',
+                                            padding: '8px 12px',
+                                            fontSize: '0.875rem',
+                                            cursor: 'pointer',
+                                            outline: 'none',
+                                            minWidth: '150px'
+                                        }}
+                                    >
+                                        <option value="all">All Time</option>
+                                        <option value="today">Today</option>
+                                        <option value="week">Last Week</option>
+                                        <option value="month">Last Month</option>
+                                        <option value="3months">Last 3 Months</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
 
                         <WpmChart
                             data={realGameData}
