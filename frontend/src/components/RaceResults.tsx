@@ -1,16 +1,21 @@
 import type { PlayerProgress } from "../../module_bindings/player_progress_type";
 import { RaceResultsChart } from "./RaceResultsChart";
+import { ProgressOverTimeChart } from "./ProgressOverTimeChart";
 import { getFinalWpm, getRaceTime, getAccuracy } from "../utils/wpmCalculator";
 import { formatStopwatchTime, getOrdinalPlacement } from "../utils/formatters";
 
 interface RaceResultsProps {
     playerProgress: PlayerProgress;
+    allPlayerProgress: PlayerProgress[];
+    phraseLength: number;
     raceStartTimestamp: bigint;
     placement: number;
 }
 
 export const RaceResults = ({
     playerProgress,
+    allPlayerProgress,
+    phraseLength,
     raceStartTimestamp,
     placement
 }: RaceResultsProps) => {
@@ -170,6 +175,30 @@ export const RaceResults = ({
             }}>
                 <RaceResultsChart
                     playerProgress={playerProgress}
+                    raceStartTimestamp={raceStartTimestamp}
+                />
+            </div>
+
+            <div style={{
+                backgroundColor: 'var(--color-chat-box-bg)',
+                border: '1px solid var(--color-chat-box-border)',
+                borderRadius: '8px',
+                padding: '24px',
+                marginTop: '16px'
+            }}>
+                <div style={{
+                    fontSize: '11px',
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.2px',
+                    marginBottom: '16px',
+                    fontWeight: '600'
+                }}>
+                    Race Progress
+                </div>
+                <ProgressOverTimeChart
+                    allPlayerProgress={allPlayerProgress}
+                    phraseLength={phraseLength}
                     raceStartTimestamp={raceStartTimestamp}
                 />
             </div>

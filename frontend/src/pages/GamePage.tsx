@@ -127,6 +127,8 @@ export const GamePage = () => {
               return (
                 <RaceResults
                   playerProgress={currentPP}
+                  allPlayerProgress={gamePlayerProgress}
+                  phraseLength={game.phrase.length}
                   raceStartTimestamp={game.racingStartedAt}
                   placement={currentPP.placement}
                 />
