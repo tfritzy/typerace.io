@@ -1,7 +1,7 @@
 .selection-button {
   padding: 0.875rem 1rem;
-  background-color: var(--color-chat-box-bg);
-  border: 1px solid var(--color-chat-box-border);
+  background-color: var(--color-box-bg);
+  border: 1px solid var(--color-box-border);
   border-radius: 6px;
   color: var(--color-white);
   font-size: 0.9375rem;

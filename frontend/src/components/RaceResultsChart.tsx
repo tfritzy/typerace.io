@@ -33,7 +33,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp }: RaceRes
     const secondaryColor = getComputedStyle(document.documentElement)
         .getPropertyValue('--color-white-25').trim();
     const borderColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-chat-box-border').trim();
+        .getPropertyValue('--color-box-border').trim();
 
     const chartData = {
         datasets: [
