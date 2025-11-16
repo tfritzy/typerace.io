@@ -14,22 +14,12 @@ export function xpRequiredForLevel(level: number): number {
     return Math.round(baseXp * Math.exp(growthRate * (level - 2)));
 }
 
-export function totalXpForLevel(level: number): number {
-    let total = 0;
-    for (let i = 2; i <= level; i++) {
-        total += xpRequiredForLevel(i);
-    }
-    return total;
-}
-
 export function xpProgressToNextLevel(currentXp: number, currentLevel: number): number {
-    const totalXpForCurrentLevel = totalXpForLevel(currentLevel);
-    const xpIntoCurrentLevel = currentXp - totalXpForCurrentLevel;
     const xpNeededForNextLevel = xpRequiredForLevel(currentLevel + 1);
     
     if (xpNeededForNextLevel === 0) {
         return 0;
     }
     
-    return Math.min(100, Math.max(0, (xpIntoCurrentLevel / xpNeededForNextLevel) * 100));
+    return Math.min(100, Math.max(0, (currentXp / xpNeededForNextLevel) * 100));
 }

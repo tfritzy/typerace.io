@@ -793,6 +793,7 @@ public static partial class Module
 
         while (updatedPlayer.Xp >= XpRequiredForLevel(updatedPlayer.Level + 1))
         {
+            updatedPlayer.Xp -= XpRequiredForLevel(updatedPlayer.Level + 1);
             updatedPlayer.Level += 1;
         }
 
