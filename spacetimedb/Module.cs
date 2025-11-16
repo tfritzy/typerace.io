@@ -306,8 +306,7 @@ public static partial class Module
             InsertPlayerProgress(ctx, foundGame.Value.Id, joinCode);
 
             int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
-            
-            int requiredPlayers = foundGame.Value.GameType == GameType.Practice ? 1 : 3;
+            int requiredPlayers = GetMaxPlayerCount(foundGame.Value.GameType);
             
             if (playerCount >= requiredPlayers)
             {
@@ -319,16 +318,7 @@ public static partial class Module
 
                 Log.Info($"Game {foundGame.Value.Id} reached {requiredPlayers} players, transitioning to Countdown state");
 
-                long countdownDuration;
-                if (foundGame.Value.GameType == GameType.Private || foundGame.Value.GameType == GameType.Practice)
-                {
-                    countdownDuration = PRIVATE_GAME_COUNTDOWN_MICROSECONDS;
-                }
-                else
-                {
-                    countdownDuration = PUBLIC_GAME_COUNTDOWN_MICROSECONDS;
-                }
-                
+                long countdownDuration = GetCountdownDuration(foundGame.Value.GameType);
                 var countdownTime = new TimeDuration { Microseconds = countdownDuration };
                 var scheduledTime = ctx.Timestamp + countdownTime;
 
@@ -342,23 +332,13 @@ public static partial class Module
         }
         else
         {
-            var newGame = ctx.Db.game.Insert(new Game
-            {
-                Id = IdGenerator.Generate("game_", ctx.Rng),
-                Phrase = PhraseGenerator.GeneratePhraseForMode(gameMode, ctx.Rng),
-                CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
-                RacingStartedAt = 0,
-                State = GameState.Lobby,
-                GameMode = gameMode,
-                GameType = gameType,
-                Placements = new List<Identity>()
-            });
+            var newGame = InsertGame(ctx, gameMode, gameType);
 
             Log.Info($"Player {ctx.Sender} created and joined game {newGame.Id}");
             InsertPlayerProgress(ctx, newGame.Id, joinCode);
 
             int playerCount = CountPlayersInGame(ctx, newGame.Id);
-            int requiredPlayers = gameType == GameType.Practice ? 1 : 3;
+            int requiredPlayers = GetMaxPlayerCount(gameType);
 
             if (playerCount >= requiredPlayers)
             {
@@ -368,16 +348,7 @@ public static partial class Module
 
                 Log.Info($"Game {newGame.Id} reached {requiredPlayers} players, transitioning to Countdown state");
 
-                long countdownDuration;
-                if (gameType == GameType.Private || gameType == GameType.Practice)
-                {
-                    countdownDuration = PRIVATE_GAME_COUNTDOWN_MICROSECONDS;
-                }
-                else
-                {
-                    countdownDuration = PUBLIC_GAME_COUNTDOWN_MICROSECONDS;
-                }
-
+                long countdownDuration = GetCountdownDuration(gameType);
                 var countdownTime = new TimeDuration { Microseconds = countdownDuration };
                 var scheduledTime = ctx.Timestamp + countdownTime;
 
@@ -409,8 +380,7 @@ public static partial class Module
         {
             if (game.GameMode == gameMode && game.GameType == gameType)
             {
-                int maxPlayers = gameType == GameType.Practice ? 1 : 3;
-                if (CountPlayersInGame(ctx, game.Id) < maxPlayers)
+                if (CountPlayersInGame(ctx, game.Id) < GetMaxPlayerCount(gameType))
                 {
                     return game;
                 }
@@ -427,6 +397,37 @@ public static partial class Module
             count++;
         }
         return count;
+    }
+
+    private static int GetMaxPlayerCount(GameType gameType)
+    {
+        return gameType == GameType.Practice ? 1 : 3;
+    }
+
+    private static long GetCountdownDuration(GameType gameType)
+    {
+        return gameType switch
+        {
+            GameType.Public => PUBLIC_GAME_COUNTDOWN_MICROSECONDS,
+            GameType.Private => PRIVATE_GAME_COUNTDOWN_MICROSECONDS,
+            GameType.Practice => PRACTICE_GAME_COUNTDOWN_MICROSECONDS,
+            _ => PRIVATE_GAME_COUNTDOWN_MICROSECONDS
+        };
+    }
+
+    private static Game InsertGame(ReducerContext ctx, GameMode gameMode, GameType gameType)
+    {
+        return ctx.Db.game.Insert(new Game
+        {
+            Id = IdGenerator.Generate("game_", ctx.Rng),
+            Phrase = PhraseGenerator.GeneratePhraseForMode(gameMode, ctx.Rng),
+            CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+            RacingStartedAt = 0,
+            State = GameState.Lobby,
+            GameMode = gameMode,
+            GameType = gameType,
+            Placements = new List<Identity>()
+        });
     }
 
     private static void CancelBotFillTrigger(ReducerContext ctx, string gameId)
@@ -520,7 +521,8 @@ public static partial class Module
 
             Log.Info($"Game {args.GameId} filled with {botsToAdd} bots and transitioned to Countdown state");
 
-            var countdownTime = new TimeDuration { Microseconds = PUBLIC_GAME_COUNTDOWN_MICROSECONDS };
+            long countdownDuration = GetCountdownDuration(game.Value.GameType);
+            var countdownTime = new TimeDuration { Microseconds = countdownDuration };
             var scheduledTime = ctx.Timestamp + countdownTime;
 
             ctx.Db.GameStart.Insert(new GameStart
@@ -703,7 +705,8 @@ public static partial class Module
 
         Log.Info($"Private/practice game {gameId} transitioned to Countdown state");
 
-        var countdownTime = new TimeDuration { Microseconds = PRIVATE_GAME_COUNTDOWN_MICROSECONDS };
+        long countdownDuration = GetCountdownDuration(game.Value.GameType);
+        var countdownTime = new TimeDuration { Microseconds = countdownDuration };
         var scheduledTime = ctx.Timestamp + countdownTime;
 
         ctx.Db.GameStart.Insert(new GameStart
@@ -727,14 +730,18 @@ public static partial class Module
                 updatedGame.State = GameState.Archived;
                 ctx.Db.game.Id.Update(updatedGame);
 
+                var progressToDelete = new List<string>();
                 foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
                 {
-                    var updatedProgress = progress;
-                    updatedProgress.CharacterHistory.Clear();
-                    ctx.Db.playerprogress.Id.Update(updatedProgress);
+                    progressToDelete.Add(progress.Id);
                 }
 
-                Log.Info($"Game {game.Id} transitioned to Archived state");
+                foreach (var progressId in progressToDelete)
+                {
+                    ctx.Db.playerprogress.Id.Delete(progressId);
+                }
+
+                Log.Info($"Game {game.Id} transitioned to Archived state and deleted {progressToDelete.Count} player progress records");
             }
         }
     }
