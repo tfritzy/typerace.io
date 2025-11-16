@@ -25,6 +25,17 @@ export const GamePageTypeBox = ({
     conn.reducers.startPrivateGame(gameId);
   }, [conn, gameId]);
 
+  const handleProgress = useCallback((correctCharCount: number, eventType: "Correct" | "Incorrect" | "Backspace") => {
+    if (!conn || !gameId) return;
+
+    const eventTypeEnum = { tag: eventType };
+    conn.reducers.updateProgress(gameId, correctCharCount, eventTypeEnum);
+  }, [conn, gameId]);
+
+  const handleComplete = useCallback(() => {
+    onFinish();
+  }, [onFinish]);
+
   const gameUrl = `${window.location.origin}/game/${gameId}`;
 
   if (isLobby) {
@@ -45,17 +56,6 @@ export const GamePageTypeBox = ({
       </>
     );
   }
-
-  const handleProgress = useCallback((correctCharCount: number, eventType: "Correct" | "Incorrect" | "Backspace") => {
-    if (!conn || !gameId) return;
-
-    const eventTypeEnum = { tag: eventType };
-    conn.reducers.updateProgress(gameId, correctCharCount, eventTypeEnum);
-  }, [conn, gameId]);
-
-  const handleComplete = useCallback(() => {
-    onFinish();
-  }, [onFinish]);
 
   return (
     <div
