@@ -357,7 +357,38 @@ public static partial class Module
             Log.Info($"Player {ctx.Sender} created and joined game {newGame.Id}");
             InsertPlayerProgress(ctx, newGame.Id, joinCode);
 
-            if (gameType == GameType.Public)
+            int playerCount = CountPlayersInGame(ctx, newGame.Id);
+            int requiredPlayers = gameType == GameType.Practice ? 1 : 3;
+
+            if (playerCount >= requiredPlayers)
+            {
+                var updatedGame = newGame;
+                updatedGame.State = GameState.Countdown;
+                ctx.Db.game.Id.Update(updatedGame);
+
+                Log.Info($"Game {newGame.Id} reached {requiredPlayers} players, transitioning to Countdown state");
+
+                long countdownDuration;
+                if (gameType == GameType.Private || gameType == GameType.Practice)
+                {
+                    countdownDuration = PRIVATE_GAME_COUNTDOWN_MICROSECONDS;
+                }
+                else
+                {
+                    countdownDuration = PUBLIC_GAME_COUNTDOWN_MICROSECONDS;
+                }
+
+                var countdownTime = new TimeDuration { Microseconds = countdownDuration };
+                var scheduledTime = ctx.Timestamp + countdownTime;
+
+                ctx.Db.GameStart.Insert(new GameStart
+                {
+                    ScheduledId = 0,
+                    GameId = newGame.Id,
+                    ScheduledAt = new ScheduleAt.Time(scheduledTime)
+                });
+            }
+            else if (gameType == GameType.Public)
             {
                 var botFillDelay = new TimeDuration { Microseconds = BOT_FILL_DELAY_MICROSECONDS };
                 var futureTimestamp = ctx.Timestamp + botFillDelay;
