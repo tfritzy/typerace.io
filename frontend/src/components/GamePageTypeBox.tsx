@@ -90,20 +90,12 @@ export const GamePageTypeBox = ({
 
         <button
           onClick={handleStartGame}
-          className="rounded-lg px-6 py-4 font-semibold text-lg transition-all"
+          className="rounded-lg px-6 py-4 text-lg transition-all"
           style={{
-            backgroundColor: 'var(--color-accent)',
-            color: '#000000',
-            border: 'none',
+            backgroundColor: 'transparent',
+            color: 'var(--color-white)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
             cursor: 'pointer'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(251, 191, 36, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = 'none';
           }}
         >
           Start Game
