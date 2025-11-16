@@ -14,6 +14,7 @@ export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const conn = useSpacetimeDB<DbConnection>();
   const [hasFinished, setHasFinished] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const typeBoxRef = useRef<TypeBoxRef>(null);
 
   useEffect(() => {
@@ -69,12 +70,28 @@ export const GamePage = () => {
     setHasFinished(true);
   }, []);
 
+  const handleStartGame = useCallback(() => {
+    if (!conn || !gameId) return;
+    conn.reducers.startPrivateGame(gameId);
+  }, [conn, gameId]);
+
+  const handleCopyLink = useCallback(() => {
+    const gameUrl = `${window.location.origin}/game/${gameId}`;
+    navigator.clipboard.writeText(gameUrl).then(() => {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    });
+  }, [gameId]);
+
   if (!game) {
     return <div>Game not found</div>;
   }
 
   const currentPlayerId = conn?.identity;
   const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
+  const isPrivateOrPractice = game.gameType?.tag === "Private" || game.gameType?.tag === "Practice";
+  const isInLobby = game.state?.tag === "Lobby";
+  const shouldShowStartPrompt = isPrivateOrPractice && isInLobby;
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -137,17 +154,43 @@ export const GamePage = () => {
               );
             })()
           ) : (
-            <div
-              className="text-2xl font-mono" style={{ lineHeight: 1.6 }}
-            >
-              <TypeBox
-                ref={typeBoxRef}
-                phrase={game.phrase}
-                onProgress={handleProgress}
-                onComplete={handleComplete}
-                style={{ height: '430px', display: 'flex', alignItems: 'flex-start' }}
-              />
-            </div>
+            <>
+              <div
+                className="text-2xl font-mono" style={{ lineHeight: 1.6 }}
+              >
+                <TypeBox
+                  ref={typeBoxRef}
+                  phrase={shouldShowStartPrompt ? "start game" : game.phrase}
+                  onProgress={shouldShowStartPrompt ? undefined : handleProgress}
+                  onComplete={shouldShowStartPrompt ? handleStartGame : handleComplete}
+                  style={{ height: '430px', display: 'flex', alignItems: 'flex-start' }}
+                />
+              </div>
+              
+              {shouldShowStartPrompt && (
+                <div className="mt-4">
+                  <div 
+                    className="chat-box rounded-lg px-6 py-4 cursor-pointer hover:bg-opacity-80 transition-all"
+                    onClick={handleCopyLink}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="text-white/60 text-sm mb-1">Share this link with friends:</div>
+                        <div className="text-white font-mono text-sm break-all">
+                          {window.location.origin}/game/{gameId}
+                        </div>
+                      </div>
+                      <div className="ml-4 text-2xl">
+                        {linkCopied ? "✓" : "📋"}
+                      </div>
+                    </div>
+                    {linkCopied && (
+                      <div className="text-green-400 text-sm mt-2">Link copied to clipboard!</div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
         </div>
