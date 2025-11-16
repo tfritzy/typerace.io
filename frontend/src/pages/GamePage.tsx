@@ -6,7 +6,6 @@ import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { type TypeBoxRef } from "../components/TypeBox";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
-import { ChatBox } from "../components/ChatBox";
 import { Countdown } from "../components/Countdown";
 import { RaceResults } from "../components/RaceResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
@@ -87,7 +86,10 @@ export const GamePage = () => {
 
               if (!pp) {
                 return (
-                  <ChatBox onFocus={() => typeBoxRef.current?.focus()}>
+                  <div
+                    className="app-container w-full rounded-lg px-8 py-6 cursor-pointer"
+                    onClick={() => typeBoxRef.current?.focus()}
+                  >
                     <PlayerProgressBar
                       key={`loading-${index}`}
                       name="Waiting for player..."
@@ -98,12 +100,15 @@ export const GamePage = () => {
                       isCurrentPlayer={false}
                       isLoading={true}
                     />
-                  </ChatBox>
+                  </div>
                 );
               }
 
               return (
-                <ChatBox onFocus={() => typeBoxRef.current?.focus()}>
+                <div
+                  className="app-container w-full rounded-lg px-8 py-6 cursor-pointer"
+                  onClick={() => typeBoxRef.current?.focus()}
+                >
                   <PlayerProgressBar
                     key={pp.id.toString()}
                     name={getPlayerName(pp)}
@@ -113,7 +118,7 @@ export const GamePage = () => {
                     identityHash={getIdentityHash(pp.playerId)}
                     isCurrentPlayer={isCurrentPlayer}
                   />
-                </ChatBox>
+                </div>
               );
             })}
           </div>

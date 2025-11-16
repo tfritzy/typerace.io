@@ -1,6 +1,5 @@
 import React, { useCallback, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import { Cursor } from "./Cursor";
-import "./ChatBox.css";
 
 type TypeBoxProps = {
   phrase: string;
@@ -151,7 +150,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
 
   return (
     <div
-      className={`chat-box w-full rounded-lg px-8 py-6 cursor-pointer ${hasError ? 'border-red-500' : ''} ${className || ''}`}
+      className={`app-container w-full rounded-lg px-8 py-6 cursor-pointer ${hasError ? 'border-red-500' : ''} ${className || ''}`}
       style={style}
       onClick={() => inputRef.current?.focus()}
     >
