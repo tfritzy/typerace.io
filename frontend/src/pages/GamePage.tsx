@@ -74,6 +74,7 @@ export const GamePage = () => {
   }
 
   const currentPlayerId = conn?.identity;
+  const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -84,7 +85,7 @@ export const GamePage = () => {
       <div className="flex-1 flex flex-col items-center justify-center px-4">
         <div className="content-container w-full">
           <div className="mb-4 space-y-3">
-            {Array.from({ length: 3 }).map((_, index) => {
+            {Array.from({ length: maxPlayers }).map((_, index) => {
               const pp = gamePlayerProgress[index];
               const isCurrentPlayer = pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
 
