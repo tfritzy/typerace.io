@@ -11,6 +11,7 @@ type PlayerProgressBarProps = {
     isCurrentPlayer?: boolean;
     isLoading?: boolean;
     playerColor?: PlayerColor;
+    wpm?: number;
 };
 
 export const PlayerProgressBar = ({
@@ -22,6 +23,7 @@ export const PlayerProgressBar = ({
     isCurrentPlayer = false,
     isLoading = false,
     playerColor = PlayerColor.Amber,
+    wpm,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progress / phraseLength) * 100;
     const colorConfig = getColorConfig(playerColor);
@@ -53,18 +55,25 @@ export const PlayerProgressBar = ({
             </div>
 
             <div className="flex-1 flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                    {isLoading ? (
-                        <span className="text-sm font-semibold text-white/30">Waiting...</span>
-                    ) : (
-                        <>
-                            <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-white' : 'text-white/70'}`}>
-                                {name}
-                            </span>
-                            <span className="text-xs font-medium text-white/50">
-                                Lvl {level}
-                            </span>
-                        </>
+                <div className="flex items-center gap-2 justify-between">
+                    <div className="flex items-center gap-2">
+                        {isLoading ? (
+                            <span className="text-sm font-semibold text-white/30">Waiting...</span>
+                        ) : (
+                            <>
+                                <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-white' : 'text-white/70'}`}>
+                                    {name}
+                                </span>
+                                <span className="text-xs font-medium text-white/50">
+                                    Lvl {level}
+                                </span>
+                            </>
+                        )}
+                    </div>
+                    {!isLoading && wpm !== undefined && wpm > 0 && (
+                        <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-white' : 'text-white/70'}`}>
+                            {Math.round(wpm)} WPM
+                        </span>
                     )}
                 </div>
                 <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">

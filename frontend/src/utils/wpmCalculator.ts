@@ -172,3 +172,19 @@ export function getAccuracy(events: CharacterEvent[]): number {
 
   return (correctChars / totalKeystrokes) * 100;
 }
+
+export function getCurrentWpm(progressIndex: number, raceStartTimestamp: bigint): number {
+  if (progressIndex === 0 || raceStartTimestamp === 0n) {
+    return 0;
+  }
+
+  const currentTimeMicros = BigInt(Date.now()) * 1000n;
+  const elapsedMicros = currentTimeMicros - raceStartTimestamp;
+  const elapsedSeconds = Number(elapsedMicros) / 1_000_000.0;
+
+  if (elapsedSeconds <= 0) {
+    return 0;
+  }
+
+  return getWpm(progressIndex, elapsedSeconds);
+}

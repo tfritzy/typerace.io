@@ -10,11 +10,13 @@ import { Countdown } from "../components/Countdown";
 import { RaceResults } from "../components/RaceResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
+import { getCurrentWpm } from "../utils/wpmCalculator";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const conn = useSpacetimeDB<DbConnection>();
   const [hasFinished, setHasFinished] = useState(false);
+  const [, setCurrentTime] = useState(Date.now());
   const typeBoxRef = useRef<TypeBoxRef>(null);
 
   useEffect(() => {
@@ -44,6 +46,18 @@ export const GamePage = () => {
 
   const game = games.find(g => g.id.toString() === gameId);
   const gamePlayerProgress = playerProgress.filter(pp => pp.gameId.toString() === gameId);
+
+  useEffect(() => {
+    if (!game || game.state?.tag !== "Racing") {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [game]);
 
   const getPlayerName = (pp: PlayerProgress) => {
     return pp.playerName;
@@ -93,6 +107,9 @@ export const GamePage = () => {
             {Array.from({ length: maxPlayers }).map((_, index) => {
               const pp = gamePlayerProgress[index];
               const isCurrentPlayer = pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
+              const wpm = pp && game.state?.tag === "Racing" && game.racingStartedAt > 0 
+                ? getCurrentWpm(pp.progressIndex, game.racingStartedAt)
+                : undefined;
 
               if (!pp) {
                 return (
@@ -128,6 +145,7 @@ export const GamePage = () => {
                     identityHash={getIdentityHash(pp.playerId)}
                     isCurrentPlayer={isCurrentPlayer}
                     playerColor={getPlayerColor(pp.playerId)}
+                    wpm={wpm}
                   />
                 </div>
               );
