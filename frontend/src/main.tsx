@@ -15,7 +15,7 @@ const ColorInitializer = () => {
   useEffect(() => {
     if (!conn?.identity) return;
     
-    const myPlayer = players.find(p => p.id.isEqual(conn.identity!));
+    const myPlayer = players.filter(p => p.id.isEqual(conn.identity!))[0];
     if (myPlayer?.color !== undefined) {
       setAccentColor(myPlayer.color as PlayerColor);
     }

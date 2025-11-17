@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useCallback, useState, useRef } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import { type DbConnection, type Game, PlayerProgress } from "../../module_bindings";
+import { type DbConnection, type Game, PlayerProgress, Player, PlayerColor } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { type TypeBoxRef } from "../components/TypeBox";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
@@ -39,6 +39,7 @@ export const GamePage = () => {
 
   const { rows: games } = useTable<DbConnection, Game>("game");
   const { rows: playerProgress } = useTable<DbConnection, PlayerProgress>("playerprogress");
+  const { rows: players } = useTable<DbConnection, Player>("player");
 
   const game = games.find(g => g.id.toString() === gameId);
   const gamePlayerProgress = playerProgress.filter(pp => pp.gameId.toString() === gameId);
@@ -56,6 +57,14 @@ export const GamePage = () => {
       return "bot";
     }
     return playerId.toHexString();
+  };
+  
+  const getPlayerColor = (playerId: any): PlayerColor => {
+    if (!playerId) {
+      return PlayerColor.Amber;
+    }
+    const player = players.filter(p => p.id.isEqual(playerId))[0];
+    return player?.color ?? PlayerColor.Amber;
   };
 
   const handleFinish = useCallback(() => {
@@ -117,6 +126,7 @@ export const GamePage = () => {
                     phraseLength={game.phrase.length}
                     identityHash={getIdentityHash(pp.playerId)}
                     isCurrentPlayer={isCurrentPlayer}
+                    playerColor={getPlayerColor(pp.playerId)}
                   />
                 </div>
               );

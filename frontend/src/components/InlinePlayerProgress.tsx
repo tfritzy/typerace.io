@@ -1,4 +1,6 @@
 import Avatar from "boring-avatars";
+import { PlayerColor } from '../../module_bindings/player_color';
+import { getColorConfig } from '../utils/colorMapping';
 
 type InlinePlayerProgressProps = {
     name: string;
@@ -6,6 +8,7 @@ type InlinePlayerProgressProps = {
     progress: number;
     phraseLength: number;
     identityHash: string;
+    playerColor?: PlayerColor;
 };
 
 export const InlinePlayerProgress = ({
@@ -14,16 +17,22 @@ export const InlinePlayerProgress = ({
     progress,
     phraseLength,
     identityHash,
+    playerColor = PlayerColor.Amber,
 }: InlinePlayerProgressProps) => {
+    const colorConfig = getColorConfig(playerColor);
+    
     return (
         <div className="mb-6">
             <div className="flex items-center gap-3 mb-3">
-                <div className="relative shrink-0 border-2 border-amber-400/60 rounded-full">
+                <div 
+                    className="relative shrink-0 border-2 rounded-full"
+                    style={{ borderColor: `${colorConfig.primary}99` }}
+                >
                     <Avatar
                         size={36}
                         name={identityHash}
                         variant="pixel"
-                        colors={["#fbbf24", "#f59e0b", "#d97706", "#b45309", "#92400e"]}
+                        colors={colorConfig.avatarColors}
                     />
                 </div>
 
