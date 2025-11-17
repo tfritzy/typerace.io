@@ -854,8 +854,7 @@ public static partial class Module
         var player = ctx.Db.player.Id.Find(progress.PlayerId);
         if (player == null) return;
 
-        var timeSeconds = timeElapsed / 1_000_000.0;
-        var wpm = CalculateWpm(game.Phrase.Length, timeSeconds);
+        var wpm = CalculateWpm(game.Phrase.Length, timeElapsed);
 
         var statsId = IdGenerator.Generate("gr_", ctx.Rng);
 
@@ -929,14 +928,15 @@ public static partial class Module
         return (int)Math.Round(baseXp * Math.Exp(growthRate * (level - 2)));
     }
 
-    private static double CalculateWpm(int characterCount, double timeSeconds)
+    private static double CalculateWpm(int characterCount, long timeMicroseconds)
     {
-        if (timeSeconds <= 0 || characterCount <= 0)
+        if (timeMicroseconds <= 0 || characterCount <= 0)
         {
             return 0;
         }
         
         var charsPerWord = 5.0;
+        var timeSeconds = timeMicroseconds / 1_000_000.0;
         var timeMinutes = timeSeconds / 60.0;
         return characterCount / charsPerWord / timeMinutes;
     }
@@ -972,9 +972,8 @@ public static partial class Module
         updatedProgress.CharacterHistory.Add(characterEvent);
 
         var elapsedMicros = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.Value.RacingStartedAt;
-        var elapsedSeconds = elapsedMicros / 1_000_000.0;
         
-        updatedProgress.Wpm = CalculateWpm(newIndex, elapsedSeconds);
+        updatedProgress.Wpm = CalculateWpm(newIndex, elapsedMicros);
 
         ctx.Db.playerprogress.Id.Update(updatedProgress);
 
