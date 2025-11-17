@@ -10,7 +10,7 @@ import { RaceResults } from "../components/RaceResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
-import { PlayerProgressItem } from "../components/PlayerProgressItem";
+import { PlayerProgressList } from "../components/PlayerProgressList";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -58,7 +58,6 @@ export const GamePage = () => {
   const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
   const isInLobby = game.state?.tag === "Lobby";
   const isLobby = game.gameType?.tag === "Private" && isInLobby;
-  const isPrivateGame = game.gameType?.tag === "Private";
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -68,32 +67,15 @@ export const GamePage = () => {
 
       <div className="flex-1 flex flex-col items-center justify-center px-4">
         <div className="content-container w-full">
-          <div className="mb-4 space-y-3">
-            {isPrivateGame ? (
-              gamePlayerProgress.map((pp) => (
-                <PlayerProgressItem
-                  key={pp.id.toString()}
-                  playerProgress={pp}
-                  phraseLength={game.phrase.length}
-                  currentPlayerId={currentPlayerId}
-                  players={players}
-                  typeBoxRef={typeBoxRef}
-                />
-              ))
-            ) : (
-              Array.from({ length: maxPlayers }).map((_, index) => (
-                <PlayerProgressItem
-                  key={gamePlayerProgress[index]?.id.toString() ?? `loading-${index}`}
-                  playerProgress={gamePlayerProgress[index]}
-                  index={index}
-                  phraseLength={game.phrase.length}
-                  currentPlayerId={currentPlayerId}
-                  players={players}
-                  typeBoxRef={typeBoxRef}
-                />
-              ))
-            )}
-          </div>
+          <PlayerProgressList
+            gameType={game.gameType}
+            gamePlayerProgress={gamePlayerProgress}
+            maxPlayers={maxPlayers}
+            phraseLength={game.phrase.length}
+            currentPlayerId={currentPlayerId}
+            players={players}
+            typeBoxRef={typeBoxRef}
+          />
 
 
           {hasFinished ? (
