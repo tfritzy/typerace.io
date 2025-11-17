@@ -38,7 +38,7 @@ export const FindGamePage = () => {
     );
 
     if (myProgress) {
-      navigate(`/game/${myProgress.gameId.toString()}`);
+      navigate(`/game/${myProgress.gameId.toString()}`, { replace: true });
     }
   }, [playerProgress, joinCode, conn.identity, navigate]);
 

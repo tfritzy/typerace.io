@@ -22,7 +22,7 @@ export const LobbyPage = () => {
   const typeBoxRef = useRef<TypeBoxRef>(null);
 
   const handlePhraseComplete = useCallback(() => {
-    navigate(`/game?mode=${selectedMode.tag}&gameType=${gameType}`);
+    navigate(`/game?mode=${selectedMode.tag}&gameType=${gameType}`, { replace: true });
   }, [navigate, selectedMode, gameType]);
 
   return (

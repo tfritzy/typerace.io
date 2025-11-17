@@ -22,7 +22,7 @@ export const ActionBar = ({ mode, gameType }: ActionBarProps) => {
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === "p" || event.key === "P") {
-        navigate(`/game?mode=${getModeTag()}&gameType=${getGameType()}`);
+        navigate(`/game?mode=${getModeTag()}&gameType=${getGameType()}`, { replace: true });
       } else if (event.key === "m" || event.key === "M") {
         navigate("/");
       }
@@ -42,7 +42,7 @@ export const ActionBar = ({ mode, gameType }: ActionBarProps) => {
           Main Menu (M)
         </button>
         <button
-          onClick={() => navigate(`/game?mode=${getModeTag()}&gameType=${getGameType()}`)}
+          onClick={() => navigate(`/game?mode=${getModeTag()}&gameType=${getGameType()}`, { replace: true })}
           className="bg-transparent text-white border border-[var(--color-box-border)] rounded-lg px-6 py-3 text-base font-semibold cursor-pointer opacity-80"
         >
           Play Again (P)
