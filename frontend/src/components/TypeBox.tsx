@@ -60,6 +60,20 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       }
 
       const oldValue = input;
+
+      if (newValue.length < oldValue.length) {
+        let lastCompletedWordEnd = 0;
+        for (let i = 0; i < oldValue.length; i++) {
+          if (oldValue[i] === phrase[i] && phrase[i] === ' ') {
+            lastCompletedWordEnd = i + 1;
+          }
+        }
+
+        if (newValue.length < lastCompletedWordEnd) {
+          return;
+        }
+      }
+
       setInput(newValue);
 
       let correctCharCount = 0;
