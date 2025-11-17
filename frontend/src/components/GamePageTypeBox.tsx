@@ -1,6 +1,5 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { TypeBox, type TypeBoxRef } from "./TypeBox";
-import { CopyableLink } from "./CopyableLink";
 import type { DbConnection } from "../../module_bindings";
 
 type GamePageTypeBoxProps = {
@@ -19,6 +18,7 @@ export const GamePageTypeBox = ({
   onFinish 
 }: GamePageTypeBoxProps) => {
   const typeBoxRef = useRef<TypeBoxRef>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const handleStartGame = useCallback(() => {
     if (!conn || !gameId) return;
@@ -38,22 +38,69 @@ export const GamePageTypeBox = ({
 
   const gameUrl = `${window.location.origin}/game/${gameId}`;
 
+  const handleCopyLink = useCallback(() => {
+    navigator.clipboard.writeText(gameUrl).then(() => {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    });
+  }, [gameUrl]);
+
   if (isLobby) {
     return (
-      <>
-        <div
-          className="text-2xl font-mono" style={{ lineHeight: 1.6 }}
-        >
-          <TypeBox
-            ref={typeBoxRef}
-            phrase="start game"
-            onComplete={handleStartGame}
-            style={{ height: '430px', display: 'flex', alignItems: 'flex-start' }}
-          />
+      <div
+        className="box w-full rounded-lg px-8 py-6"
+        style={{ minHeight: '430px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '1.5rem' }}
+      >
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--color-white)' }}>
+            Waiting for players...
+          </h2>
+          <p className="text-base" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+            Share the link below with friends. Click start when everyone's here!
+          </p>
         </div>
-        
-        <CopyableLink url={gameUrl} />
-      </>
+
+        <div 
+          className="rounded-lg px-6 py-4 cursor-pointer transition-all"
+          onClick={handleCopyLink}
+          style={{ 
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="text-sm mb-1" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                Share this link:
+              </div>
+              <div className="font-mono text-sm break-all" style={{ color: 'var(--color-white)' }}>
+                {gameUrl}
+              </div>
+            </div>
+            <div className="ml-4 text-2xl">
+              {linkCopied ? "✓" : "📋"}
+            </div>
+          </div>
+          {linkCopied && (
+            <div className="text-sm mt-2" style={{ color: '#10b981' }}>
+              Link copied to clipboard!
+            </div>
+          )}
+        </div>
+
+        <button
+          onClick={handleStartGame}
+          className="rounded-lg px-6 py-4 text-lg transition-all"
+          style={{
+            backgroundColor: 'transparent',
+            color: 'var(--color-white)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            cursor: 'pointer'
+          }}
+        >
+          Start Game
+        </button>
+      </div>
     );
   }
 
