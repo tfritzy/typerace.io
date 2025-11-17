@@ -136,6 +136,7 @@ export const WpmChart = ({ data, title }: WpmChartProps) => {
     const options: ChartOptions<'line'> = {
         responsive: true,
         maintainAspectRatio: false,
+        animation: false,
         plugins: {
             legend: {
                 display: false,
