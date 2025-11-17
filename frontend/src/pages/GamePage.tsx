@@ -80,6 +80,7 @@ export const GamePage = () => {
   const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
   const isInLobby = game.state?.tag === "Lobby";
   const isLobby = game.gameType?.tag === "Private" && isInLobby;
+  const isPrivateGame = game.gameType?.tag === "Private";
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -90,27 +91,72 @@ export const GamePage = () => {
       <div className="flex-1 flex flex-col items-center justify-center px-4">
         <div className="content-container w-full">
           <div className="mb-4 space-y-3">
-            {gamePlayerProgress.map((pp) => {
-              const isCurrentPlayer = pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
+            {isPrivateGame ? (
+              gamePlayerProgress.map((pp) => {
+                const isCurrentPlayer = pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
 
-              return (
-                <div
-                  className="box w-full rounded-lg px-8 py-6 cursor-pointer"
-                  onClick={() => typeBoxRef.current?.focus()}
-                >
-                  <PlayerProgressBar
-                    key={pp.id.toString()}
-                    name={getPlayerName(pp)}
-                    level={getPlayerLevel(pp)}
-                    progress={pp.progressIndex}
-                    phraseLength={game.phrase.length}
-                    identityHash={getIdentityHash(pp.playerId)}
-                    isCurrentPlayer={isCurrentPlayer}
-                    playerColor={getPlayerColor(pp.playerId)}
-                  />
-                </div>
-              );
-            })}
+                return (
+                  <div
+                    className="box w-full rounded-lg px-8 py-6 cursor-pointer"
+                    onClick={() => typeBoxRef.current?.focus()}
+                  >
+                    <PlayerProgressBar
+                      key={pp.id.toString()}
+                      name={getPlayerName(pp)}
+                      level={getPlayerLevel(pp)}
+                      progress={pp.progressIndex}
+                      phraseLength={game.phrase.length}
+                      identityHash={getIdentityHash(pp.playerId)}
+                      isCurrentPlayer={isCurrentPlayer}
+                      playerColor={getPlayerColor(pp.playerId)}
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              Array.from({ length: maxPlayers }).map((_, index) => {
+                const pp = gamePlayerProgress[index];
+                const isCurrentPlayer = pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
+
+                if (!pp) {
+                  return (
+                    <div
+                      className="box w-full rounded-lg px-8 py-6 cursor-pointer"
+                      onClick={() => typeBoxRef.current?.focus()}
+                    >
+                      <PlayerProgressBar
+                        key={`loading-${index}`}
+                        name="Waiting for player..."
+                        level={1}
+                        progress={0}
+                        phraseLength={game.phrase.length}
+                        identityHash={`loading-${index}`}
+                        isCurrentPlayer={false}
+                        isLoading={true}
+                      />
+                    </div>
+                  );
+                }
+
+                return (
+                  <div
+                    className="box w-full rounded-lg px-8 py-6 cursor-pointer"
+                    onClick={() => typeBoxRef.current?.focus()}
+                  >
+                    <PlayerProgressBar
+                      key={pp.id.toString()}
+                      name={getPlayerName(pp)}
+                      level={getPlayerLevel(pp)}
+                      progress={pp.progressIndex}
+                      phraseLength={game.phrase.length}
+                      identityHash={getIdentityHash(pp.playerId)}
+                      isCurrentPlayer={isCurrentPlayer}
+                      playerColor={getPlayerColor(pp.playerId)}
+                    />
+                  </div>
+                );
+              })
+            )}
           </div>
 
 
