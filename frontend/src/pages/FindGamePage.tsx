@@ -17,7 +17,6 @@ import { Header } from "../components/Header";
 
 export const FindGamePage = () => {
   const [searchParams] = useSearchParams();
-  const initialMode = searchParams.get("mode");
   const initialGameType = searchParams.get("gameType");
 
   const [selectedMode, setSelectedMode] = useState<GameMode>({
