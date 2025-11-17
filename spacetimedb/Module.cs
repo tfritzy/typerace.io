@@ -197,6 +197,7 @@ public static partial class Module
         public long Time;
         public int Placement;
         public string JoinCode;
+        public double Wpm;
     }
 
     [Table(Scheduled = nameof(UpdateBotProgress))]
@@ -959,6 +960,19 @@ public static partial class Module
             EventType = eventType
         };
         updatedProgress.CharacterHistory.Add(characterEvent);
+
+        var elapsedMicros = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.Value.RacingStartedAt;
+        var elapsedSeconds = elapsedMicros / 1_000_000.0;
+        
+        if (elapsedSeconds > 0 && newIndex > 0)
+        {
+            var charsPerWord = 5.0;
+            updatedProgress.Wpm = (newIndex / charsPerWord) / (elapsedSeconds / 60.0);
+        }
+        else
+        {
+            updatedProgress.Wpm = 0;
+        }
 
         ctx.Db.playerprogress.Id.Update(updatedProgress);
 

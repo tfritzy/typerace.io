@@ -1,7 +1,6 @@
 import { PlayerAvatar } from './PlayerAvatar';
 import { getColorConfig } from '../utils/colorMapping';
 import { PlayerColor } from "../../module_bindings";
-import { getCurrentWpm } from '../utils/wpmCalculator';
 
 type PlayerProgressBarProps = {
     name: string;
@@ -12,7 +11,7 @@ type PlayerProgressBarProps = {
     isCurrentPlayer?: boolean;
     isLoading?: boolean;
     playerColor?: PlayerColor;
-    raceStartTime?: bigint;
+    wpm?: number;
 };
 
 export const PlayerProgressBar = ({
@@ -24,14 +23,10 @@ export const PlayerProgressBar = ({
     isCurrentPlayer = false,
     isLoading = false,
     playerColor = PlayerColor.Amber,
-    raceStartTime,
+    wpm,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
     const colorConfig = getColorConfig(playerColor);
-
-    const wpm = raceStartTime && raceStartTime > 0 
-        ? getCurrentWpm(progressIndex, raceStartTime)
-        : undefined;
 
     const gradient = isCurrentPlayer
         ? colorConfig.gradient
