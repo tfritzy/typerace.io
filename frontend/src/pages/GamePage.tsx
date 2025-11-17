@@ -10,6 +10,7 @@ import { Countdown } from "../components/Countdown";
 import { RaceResults } from "../components/RaceResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
+import { ActionBar } from "../components/ActionBar";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -141,13 +142,18 @@ export const GamePage = () => {
               if (!currentPP) return null;
 
               return (
-                <RaceResults
-                  playerProgress={currentPP}
-                  allPlayerProgress={gamePlayerProgress}
-                  phraseLength={game.phrase.length}
-                  raceStartTimestamp={game.racingStartedAt}
-                  placement={currentPP.placement}
-                />
+                <>
+                  <RaceResults
+                    playerProgress={currentPP}
+                    allPlayerProgress={gamePlayerProgress}
+                    phraseLength={game.phrase.length}
+                    raceStartTimestamp={game.racingStartedAt}
+                    placement={currentPP.placement}
+                  />
+                  <ActionBar 
+                    gameType={game.gameType?.tag as any}
+                  />
+                </>
               );
             })()
           ) : isLobby ? (
