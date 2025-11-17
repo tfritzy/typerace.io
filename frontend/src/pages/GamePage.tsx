@@ -80,6 +80,7 @@ export const GamePage = () => {
   const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
   const isInLobby = game.state?.tag === "Lobby";
   const isLobby = game.gameType?.tag === "Private" && isInLobby;
+  const isPrivateGame = game.gameType?.tag === "Private";
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -95,6 +96,9 @@ export const GamePage = () => {
               const isCurrentPlayer = pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
 
               if (!pp) {
+                if (isPrivateGame) {
+                  return null;
+                }
                 return (
                   <div
                     className="box w-full rounded-lg px-8 py-6 cursor-pointer"
