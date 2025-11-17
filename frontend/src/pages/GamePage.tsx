@@ -1,16 +1,16 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useCallback, useState, useRef } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import { type DbConnection, type Game, PlayerProgress, Player, PlayerColor } from "../../module_bindings";
+import { type DbConnection, type Game, PlayerProgress, Player } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { type TypeBoxRef } from "../components/TypeBox";
-import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { Countdown } from "../components/Countdown";
 import { RaceResults } from "../components/RaceResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
+import { PlayerProgressItem } from "../components/PlayerProgressItem";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -46,29 +46,6 @@ export const GamePage = () => {
   const game = games.find(g => g.id.toString() === gameId);
   const gamePlayerProgress = playerProgress.filter(pp => pp.gameId.toString() === gameId);
 
-  const getPlayerName = (pp: PlayerProgress) => {
-    return pp.playerName;
-  };
-
-  const getPlayerLevel = (pp: PlayerProgress) => {
-    return pp.playerLevel;
-  };
-
-  const getIdentityHash = (playerId: any) => {
-    if (!playerId) {
-      return "bot";
-    }
-    return playerId.toHexString();
-  };
-  
-  const getPlayerColor = (playerId: any): PlayerColor => {
-    if (!playerId) {
-      return PlayerColor.Amber;
-    }
-    const player = players.filter(p => p.id.isEqual(playerId))[0];
-    return player?.color ?? PlayerColor.Amber;
-  };
-
   const handleFinish = useCallback(() => {
     setHasFinished(true);
   }, []);
@@ -93,72 +70,28 @@ export const GamePage = () => {
         <div className="content-container w-full">
           <div className="mb-4 space-y-3">
             {isPrivateGame ? (
-              gamePlayerProgress.map((pp) => {
-                const isCurrentPlayer = pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
-
-                return (
-                  <div
-                    className="box w-full rounded-lg px-8 py-6 cursor-pointer"
-                    onClick={() => typeBoxRef.current?.focus()}
-                  >
-                    <PlayerProgressBar
-                      key={pp.id.toString()}
-                      name={getPlayerName(pp)}
-                      level={getPlayerLevel(pp)}
-                      progressIndex={pp.progressIndex}
-                      phraseLength={game.phrase.length}
-                      identityHash={getIdentityHash(pp.playerId)}
-                      isCurrentPlayer={isCurrentPlayer}
-                      playerColor={getPlayerColor(pp.playerId)}
-                      wpm={pp.wpm}
-                    />
-                  </div>
-                );
-              })
+              gamePlayerProgress.map((pp) => (
+                <PlayerProgressItem
+                  key={pp.id.toString()}
+                  playerProgress={pp}
+                  phraseLength={game.phrase.length}
+                  currentPlayerId={currentPlayerId}
+                  players={players}
+                  typeBoxRef={typeBoxRef}
+                />
+              ))
             ) : (
-              Array.from({ length: maxPlayers }).map((_, index) => {
-                const pp = gamePlayerProgress[index];
-                const isCurrentPlayer = pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
-
-                if (!pp) {
-                  return (
-                    <div
-                      className="box w-full rounded-lg px-8 py-6 cursor-pointer"
-                      onClick={() => typeBoxRef.current?.focus()}
-                    >
-                      <PlayerProgressBar
-                        key={`loading-${index}`}
-                        name="Waiting for player..."
-                        level={1}
-                        progressIndex={0}
-                        phraseLength={game.phrase.length}
-                        identityHash={`loading-${index}`}
-                        isCurrentPlayer={false}
-                        isLoading={true}
-                      />
-                    </div>
-                  );
-                }
-
-                return (
-                  <div
-                    className="box w-full rounded-lg px-8 py-6 cursor-pointer"
-                    onClick={() => typeBoxRef.current?.focus()}
-                  >
-                    <PlayerProgressBar
-                      key={pp.id.toString()}
-                      name={getPlayerName(pp)}
-                      level={getPlayerLevel(pp)}
-                      progressIndex={pp.progressIndex}
-                      phraseLength={game.phrase.length}
-                      identityHash={getIdentityHash(pp.playerId)}
-                      isCurrentPlayer={isCurrentPlayer}
-                      playerColor={getPlayerColor(pp.playerId)}
-                      wpm={pp.wpm}
-                    />
-                  </div>
-                );
-              })
+              Array.from({ length: maxPlayers }).map((_, index) => (
+                <PlayerProgressItem
+                  key={gamePlayerProgress[index]?.id.toString() ?? `loading-${index}`}
+                  playerProgress={gamePlayerProgress[index]}
+                  index={index}
+                  phraseLength={game.phrase.length}
+                  currentPlayerId={currentPlayerId}
+                  players={players}
+                  typeBoxRef={typeBoxRef}
+                />
+              ))
             )}
           </div>
 
