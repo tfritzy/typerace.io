@@ -1,87 +1,49 @@
-import { useEffect, useCallback } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import type { GameMode } from "../../module_bindings";
+import type { GameTypeValue } from "../components/MatchTypeSelector";
 
 type ActionBarProps = {
-  onPlayAgain: () => void;
-  onMainMenu: () => void;
+  mode?: GameMode;
+  gameType?: GameTypeValue;
 };
 
-export const ActionBar = ({ onPlayAgain, onMainMenu }: ActionBarProps) => {
+export const ActionBar = ({ mode, gameType }: ActionBarProps) => {
+  const navigate = useNavigate();
 
-  const handlePlayAgain = useCallback(() => {
-    onPlayAgain();
-  }, [onPlayAgain]);
+  const getModeTag = () => {
+    return mode?.tag || "English500";
+  };
 
-  const handleMainMenu = useCallback(() => {
-    onMainMenu();
-  }, [onMainMenu]);
+  const getGameType = () => {
+    return gameType || "Public";
+  };
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === "p" || event.key === "P") {
-        handlePlayAgain();
+        navigate(`/game?mode=${getModeTag()}&gameType=${getGameType()}`);
       } else if (event.key === "m" || event.key === "M") {
-        handleMainMenu();
+        navigate("/");
       }
     };
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [handlePlayAgain, handleMainMenu]);
+  }, [navigate, mode, gameType]);
 
   return (
     <div className="box rounded-lg px-8 py-6 mt-4">
-      <div style={{ display: "flex", gap: "16px", justifyContent: "center" }}>
+      <div className="flex gap-4 justify-center">
         <button
-          onClick={handleMainMenu}
-          style={{
-            backgroundColor: "transparent",
-            color: "var(--color-white)",
-            border: "1px solid var(--color-box-border)",
-            borderRadius: "8px",
-            padding: "12px 24px",
-            fontSize: "16px",
-            fontWeight: "600",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-            opacity: "0.8",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.3)";
-            e.currentTarget.style.transform = "translateY(-1px)";
-            e.currentTarget.style.opacity = "1";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "var(--color-box-border)";
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.opacity = "0.8";
-          }}
+          onClick={() => navigate("/")}
+          className="bg-transparent text-white border border-[var(--color-box-border)] rounded-lg px-6 py-3 text-base font-semibold cursor-pointer opacity-80"
         >
           Main Menu (M)
         </button>
         <button
-          onClick={handlePlayAgain}
-          style={{
-            backgroundColor: "transparent",
-            color: "var(--color-white)",
-            border: "1px solid var(--color-box-border)",
-            borderRadius: "8px",
-            padding: "12px 24px",
-            fontSize: "16px",
-            fontWeight: "600",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-            opacity: "0.8",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.3)";
-            e.currentTarget.style.transform = "translateY(-1px)";
-            e.currentTarget.style.opacity = "1";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "var(--color-box-border)";
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.opacity = "0.8";
-          }}
+          onClick={() => navigate(`/game?mode=${getModeTag()}&gameType=${getGameType()}`)}
+          className="bg-transparent text-white border border-[var(--color-box-border)] rounded-lg px-6 py-3 text-base font-semibold cursor-pointer opacity-80"
         >
           Play Again (P)
         </button>
@@ -89,5 +51,3 @@ export const ActionBar = ({ onPlayAgain, onMainMenu }: ActionBarProps) => {
     </div>
   );
 };
-
-export type { ActionBarProps };
