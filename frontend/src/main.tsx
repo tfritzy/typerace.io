@@ -3,23 +3,23 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
 import { Identity, type ErrorContextInterface } from "spacetimedb";
-import { SpacetimeDBProvider, useTable, useSpacetimeDB } from "spacetimedb/react";
+import { SpacetimeDBProvider, useTable, useSpacetimeDB, where, eq } from "spacetimedb/react";
 import { DbConnection, PlayerColor } from "../module_bindings";
 import { setAccentColor } from "./utils/colorMapping";
 import type { Player } from "../module_bindings";
 
 const ColorInitializer = () => {
   const conn = useSpacetimeDB<DbConnection>();
-  const { rows: players } = useTable<DbConnection, Player>("player");
+  const { rows: players } = useTable<DbConnection, Player>(
+    "player",
+    conn?.identity ? where(eq("id", conn.identity)) : undefined
+  );
   
   useEffect(() => {
-    if (!conn?.identity) return;
-    
-    const myPlayer = players.filter(p => p.id.isEqual(conn.identity!))[0];
-    if (myPlayer?.color !== undefined) {
-      setAccentColor(myPlayer.color as PlayerColor);
+    if (players.length > 0 && players[0].color !== undefined) {
+      setAccentColor(players[0].color as PlayerColor);
     }
-  }, [conn, players]);
+  }, [players]);
   
   return null;
 };
