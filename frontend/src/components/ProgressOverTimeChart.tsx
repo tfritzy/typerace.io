@@ -135,6 +135,14 @@ export const ProgressOverTimeChart = ({
     const options: ChartOptions<'line'> = {
         responsive: true,
         maintainAspectRatio: false,
+        animations: {
+            x: {
+                duration: 0
+            },
+            y: {
+                duration: 0
+            }
+        },
         plugins: {
             legend: {
                 display: true,
