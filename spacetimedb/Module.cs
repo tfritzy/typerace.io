@@ -283,18 +283,7 @@ public static partial class Module
 
     private static PlayerColor GenerateRandomColor(Random rng)
     {
-        var colors = new[] { 
-            PlayerColor.Amber, 
-            PlayerColor.Blue, 
-            PlayerColor.Green, 
-            PlayerColor.Purple, 
-            PlayerColor.Red, 
-            PlayerColor.Pink, 
-            PlayerColor.Cyan, 
-            PlayerColor.Orange, 
-            PlayerColor.Lime, 
-            PlayerColor.Indigo 
-        };
+        var colors = Enum.GetValues<PlayerColor>();
         return colors[rng.Next(colors.Length)];
     }
 
