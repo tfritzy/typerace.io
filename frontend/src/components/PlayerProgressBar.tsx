@@ -1,4 +1,6 @@
 import Avatar from "boring-avatars";
+import { PlayerColor } from '../../module_bindings/player_color';
+import { getColorConfig } from '../utils/colorMapping';
 
 type PlayerProgressBarProps = {
     name: string;
@@ -8,6 +10,7 @@ type PlayerProgressBarProps = {
     identityHash: string;
     isCurrentPlayer?: boolean;
     isLoading?: boolean;
+    playerColor?: PlayerColor;
 };
 
 export const PlayerProgressBar = ({
@@ -18,8 +21,14 @@ export const PlayerProgressBar = ({
     identityHash,
     isCurrentPlayer = false,
     isLoading = false,
+    playerColor = PlayerColor.Amber,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progress / phraseLength) * 100;
+    const colorConfig = getColorConfig(playerColor);
+    
+    const gradient = isCurrentPlayer 
+        ? colorConfig.gradient 
+        : `linear-gradient(to right, ${colorConfig.darker}, ${colorConfig.dark})`;
 
     return (
         <div
@@ -28,7 +37,10 @@ export const PlayerProgressBar = ({
                 : 'opacity-100 animate-[slideInFromLeft_0.5s_ease-out]'
                 }`}
         >
-            <div className={`relative shrink-0 border-2 rounded-full ${isCurrentPlayer ? 'border-amber-400' : 'border-white/30'} ${isLoading ? 'border-dashed' : ''}`}>
+            <div 
+                className={`relative shrink-0 border-2 rounded-full ${isLoading ? 'border-dashed' : ''}`}
+                style={{ borderColor: isCurrentPlayer ? colorConfig.primary : 'rgba(255, 255, 255, 0.3)' }}
+            >
                 {isLoading ? (
                     <div className="w-10 h-10 bg-white/5 rounded-full" />
                 ) : (
@@ -36,7 +48,7 @@ export const PlayerProgressBar = ({
                         size={40}
                         name={identityHash}
                         variant="pixel"
-                        colors={["#fbbf24", "#f59e0b", "#d97706", "#b45309", "#92400e"]}
+                        colors={colorConfig.avatarColors}
                     />
                 )}
             </div>
@@ -58,11 +70,11 @@ export const PlayerProgressBar = ({
                 </div>
                 <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
                     <div
-                        className={`h-full rounded-full transition-all duration-200 ${isCurrentPlayer
-                            ? 'bg-linear-to-r from-amber-500 to-amber-400'
-                            : 'bg-linear-to-r from-stone-500 to-stone-400'
-                            }`}
-                        style={{ width: `${Math.min(100, progressPercentage)}%` }}
+                        className="h-full rounded-full transition-all duration-200"
+                        style={{ 
+                            width: `${Math.min(100, progressPercentage)}%`,
+                            background: gradient
+                        }}
                     />
                 </div>
             </div>

@@ -46,6 +46,21 @@ public enum CharacterEventType
 }
 
 [Type]
+public enum PlayerColor
+{
+    Amber,
+    Blue,
+    Green,
+    Purple,
+    Red,
+    Pink,
+    Cyan,
+    Orange,
+    Lime,
+    Indigo
+}
+
+[Type]
 public partial struct CharacterEvent
 {
     public long Timestamp;
@@ -80,6 +95,7 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         public bool IsBot;
         public BotConfig? BotConfig;
+        public PlayerColor Color;
     }
 
     [Table(Name = "game", Public = true)]
@@ -230,7 +246,8 @@ public static partial class Module
                 {
                     TypingRate = typingRate,
                     ErrorRate = errorRate
-                }
+                },
+                Color = GenerateRandomColor(ctx.Rng)
             });
         }
 
@@ -264,6 +281,12 @@ public static partial class Module
         return mean + stdDev * randStdNormal;
     }
 
+    private static PlayerColor GenerateRandomColor(Random rng)
+    {
+        var colors = Enum.GetValues<PlayerColor>();
+        return colors[rng.Next(colors.Length)];
+    }
+
     [Reducer(ReducerKind.ClientConnected)]
     public static void ClientConnected(ReducerContext ctx)
     {
@@ -281,7 +304,8 @@ public static partial class Module
                 Level = 1,
                 Xp = 0,
                 IsBot = false,
-                BotConfig = null
+                BotConfig = null,
+                Color = PlayerColor.Amber
             });
             Log.Info($"Created player record for new client {ctx.Sender}");
         }
@@ -303,6 +327,20 @@ public static partial class Module
             updatedPlayer.Name = name;
             ctx.Db.player.Id.Update(updatedPlayer);
             Log.Info($"Updated player name for {ctx.Sender} to {name}");
+        }
+    }
+
+    [Reducer]
+    public static void SetPlayerColor(ReducerContext ctx, PlayerColor color)
+    {
+        var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
+
+        if (existingPlayer != null)
+        {
+            var updatedPlayer = existingPlayer.Value;
+            updatedPlayer.Color = color;
+            ctx.Db.player.Id.Update(updatedPlayer);
+            Log.Info($"Updated player color for {ctx.Sender} to {color}");
         }
     }
 
