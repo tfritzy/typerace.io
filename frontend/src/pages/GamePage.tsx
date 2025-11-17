@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useCallback, useState, useRef } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import { type DbConnection, type Game, PlayerProgress, Player, PlayerColor } from "../../module_bindings";
@@ -10,10 +10,12 @@ import { Countdown } from "../components/Countdown";
 import { RaceResults } from "../components/RaceResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
+import { ActionBar } from "../components/ActionBar";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const conn = useSpacetimeDB<DbConnection>();
+  const navigate = useNavigate();
   const [hasFinished, setHasFinished] = useState(false);
   const typeBoxRef = useRef<TypeBoxRef>(null);
 
@@ -71,6 +73,14 @@ export const GamePage = () => {
   const handleFinish = useCallback(() => {
     setHasFinished(true);
   }, []);
+
+  const handlePlayAgain = useCallback(() => {
+    navigate("/game");
+  }, [navigate]);
+
+  const handleMainMenu = useCallback(() => {
+    navigate("/");
+  }, [navigate]);
 
   if (!game) {
     return <div>Game not found</div>;
@@ -141,13 +151,19 @@ export const GamePage = () => {
               if (!currentPP) return null;
 
               return (
-                <RaceResults
-                  playerProgress={currentPP}
-                  allPlayerProgress={gamePlayerProgress}
-                  phraseLength={game.phrase.length}
-                  raceStartTimestamp={game.racingStartedAt}
-                  placement={currentPP.placement}
-                />
+                <>
+                  <RaceResults
+                    playerProgress={currentPP}
+                    allPlayerProgress={gamePlayerProgress}
+                    phraseLength={game.phrase.length}
+                    raceStartTimestamp={game.racingStartedAt}
+                    placement={currentPP.placement}
+                  />
+                  <ActionBar
+                    onPlayAgain={handlePlayAgain}
+                    onMainMenu={handleMainMenu}
+                  />
+                </>
               );
             })()
           ) : isLobby ? (
