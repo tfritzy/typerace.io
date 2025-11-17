@@ -12,6 +12,29 @@ interface PlayerProgressListProps {
   typeBoxRef: React.RefObject<TypeBoxRef>;
 }
 
+const getPlayerName = (pp: PlayerProgress) => {
+  return pp.playerName;
+};
+
+const getPlayerLevel = (pp: PlayerProgress) => {
+  return pp.playerLevel;
+};
+
+const getIdentityHash = (playerId: any) => {
+  if (!playerId) {
+    return "bot";
+  }
+  return playerId.toHexString();
+};
+
+const getPlayerColor = (playerId: any, players: any[]): PlayerColor => {
+  if (!playerId) {
+    return PlayerColor.Amber;
+  }
+  const player = players.filter((p) => p.id.isEqual(playerId))[0];
+  return player?.color ?? PlayerColor.Amber;
+};
+
 export const PlayerProgressList = ({
   gameType,
   gamePlayerProgress,
@@ -22,29 +45,6 @@ export const PlayerProgressList = ({
   typeBoxRef,
 }: PlayerProgressListProps) => {
   const isPrivateGame = gameType?.tag === "Private";
-
-  const getPlayerName = (pp: PlayerProgress) => {
-    return pp.playerName;
-  };
-
-  const getPlayerLevel = (pp: PlayerProgress) => {
-    return pp.playerLevel;
-  };
-
-  const getIdentityHash = (playerId: any) => {
-    if (!playerId) {
-      return "bot";
-    }
-    return playerId.toHexString();
-  };
-
-  const getPlayerColor = (playerId: any): PlayerColor => {
-    if (!playerId) {
-      return PlayerColor.Amber;
-    }
-    const player = players.filter((p) => p.id.isEqual(playerId))[0];
-    return player?.color ?? PlayerColor.Amber;
-  };
 
   const renderPlayerItem = (pp: PlayerProgress | undefined, index?: number) => {
     const isCurrentPlayer =
@@ -85,20 +85,26 @@ export const PlayerProgressList = ({
           phraseLength={phraseLength}
           identityHash={getIdentityHash(pp.playerId)}
           isCurrentPlayer={isCurrentPlayer}
-          playerColor={getPlayerColor(pp.playerId)}
+          playerColor={getPlayerColor(pp.playerId, players)}
           wpm={pp.wpm}
         />
       </div>
     );
   };
 
+  if (isPrivateGame) {
+    return (
+      <div className="mb-4 space-y-3">
+        {gamePlayerProgress.map((pp) => renderPlayerItem(pp))}
+      </div>
+    );
+  }
+
   return (
     <div className="mb-4 space-y-3">
-      {isPrivateGame
-        ? gamePlayerProgress.map((pp) => renderPlayerItem(pp))
-        : Array.from({ length: maxPlayers }).map((_, index) =>
-            renderPlayerItem(gamePlayerProgress[index], index)
-          )}
+      {Array.from({ length: maxPlayers }).map((_, index) =>
+        renderPlayerItem(gamePlayerProgress[index], index)
+      )}
     </div>
   );
 };
