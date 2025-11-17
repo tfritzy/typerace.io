@@ -105,7 +105,7 @@ export const GamePage = () => {
                       key={`loading-${index}`}
                       name="Waiting for player..."
                       level={1}
-                      progress={0}
+                      progressIndex={0}
                       phraseLength={game.phrase.length}
                       identityHash={`loading-${index}`}
                       isCurrentPlayer={false}
@@ -124,11 +124,12 @@ export const GamePage = () => {
                     key={pp.id.toString()}
                     name={getPlayerName(pp)}
                     level={getPlayerLevel(pp)}
-                    progress={pp.progressIndex}
+                    progressIndex={pp.progressIndex}
                     phraseLength={game.phrase.length}
                     identityHash={getIdentityHash(pp.playerId)}
                     isCurrentPlayer={isCurrentPlayer}
                     playerColor={getPlayerColor(pp.playerId)}
+                    wpm={pp.wpm}
                   />
                 </div>
               );

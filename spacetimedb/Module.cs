@@ -197,6 +197,7 @@ public static partial class Module
         public long Time;
         public int Placement;
         public string JoinCode;
+        public double Wpm;
     }
 
     [Table(Scheduled = nameof(UpdateBotProgress))]
@@ -853,10 +854,7 @@ public static partial class Module
         var player = ctx.Db.player.Id.Find(progress.PlayerId);
         if (player == null) return;
 
-        var timeMs = timeElapsed / 1000;
-
-        var timeMinutes = timeMs / 60000.0;
-        var wpm = game.Phrase.Length / 5.0 / timeMinutes;
+        var wpm = CalculateWpm(game.Phrase.Length, timeElapsed);
 
         var statsId = IdGenerator.Generate("gr_", ctx.Rng);
 
@@ -930,6 +928,19 @@ public static partial class Module
         return (int)Math.Round(baseXp * Math.Exp(growthRate * (level - 2)));
     }
 
+    private static double CalculateWpm(int characterCount, long timeMicroseconds)
+    {
+        if (timeMicroseconds <= 0 || characterCount <= 0)
+        {
+            return 0;
+        }
+        
+        var charsPerWord = 5.0;
+        var timeSeconds = timeMicroseconds / 1_000_000.0;
+        var timeMinutes = timeSeconds / 60.0;
+        return characterCount / charsPerWord / timeMinutes;
+    }
+
     [Reducer]
     public static void UpdateProgress(ReducerContext ctx, string gameId, int newIndex, CharacterEventType eventType)
     {
@@ -959,6 +970,10 @@ public static partial class Module
             EventType = eventType
         };
         updatedProgress.CharacterHistory.Add(characterEvent);
+
+        var elapsedMicros = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.Value.RacingStartedAt;
+        
+        updatedProgress.Wpm = CalculateWpm(newIndex, elapsedMicros);
 
         ctx.Db.playerprogress.Id.Update(updatedProgress);
 
