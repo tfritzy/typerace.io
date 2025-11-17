@@ -1,14 +1,15 @@
 import { PlayerProgressBar } from "./PlayerProgressBar";
-import { PlayerProgress, GameType, PlayerColor } from "../../module_bindings";
+import { PlayerProgress, GameType, PlayerColor, Player } from "../../module_bindings";
 import { type TypeBoxRef } from "./TypeBox";
+import { Identity } from "spacetimedb";
 
 interface PlayerProgressListProps {
   gameType?: GameType;
   gamePlayerProgress: PlayerProgress[];
   maxPlayers: number;
   phraseLength: number;
-  currentPlayerId: any;
-  players: any[];
+  currentPlayerId: Identity | undefined;
+  players: Player[];
   typeBoxRef: React.RefObject<TypeBoxRef>;
 }
 
@@ -20,14 +21,14 @@ const getPlayerLevel = (pp: PlayerProgress) => {
   return pp.playerLevel;
 };
 
-const getIdentityHash = (playerId: any) => {
+const getIdentityHash = (playerId: Identity | undefined) => {
   if (!playerId) {
     return "bot";
   }
   return playerId.toHexString();
 };
 
-const getPlayerColor = (playerId: any, players: any[]): PlayerColor => {
+const getPlayerColor = (playerId: Identity | undefined, players: Player[]): PlayerColor => {
   if (!playerId) {
     return PlayerColor.Amber;
   }
