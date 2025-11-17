@@ -1,5 +1,4 @@
 import { useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 
 type ActionBarProps = {
   onPlayAgain: () => void;
@@ -7,7 +6,6 @@ type ActionBarProps = {
 };
 
 export const ActionBar = ({ onPlayAgain, onMainMenu }: ActionBarProps) => {
-  const navigate = useNavigate();
 
   const handlePlayAgain = useCallback(() => {
     onPlayAgain();
