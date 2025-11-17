@@ -10,7 +10,6 @@ import { Countdown } from "../components/Countdown";
 import { RaceResults } from "../components/RaceResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
-import { getCurrentWpm } from "../utils/wpmCalculator";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -107,9 +106,7 @@ export const GamePage = () => {
             {Array.from({ length: maxPlayers }).map((_, index) => {
               const pp = gamePlayerProgress[index];
               const isCurrentPlayer = pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
-              const wpm = pp && game.state?.tag === "Racing" && game.racingStartedAt > 0 
-                ? getCurrentWpm(pp.progressIndex, game.racingStartedAt)
-                : undefined;
+              const raceStartTime = game.state?.tag === "Racing" ? game.racingStartedAt : undefined;
 
               if (!pp) {
                 return (
@@ -121,7 +118,7 @@ export const GamePage = () => {
                       key={`loading-${index}`}
                       name="Waiting for player..."
                       level={1}
-                      progress={0}
+                      progressIndex={0}
                       phraseLength={game.phrase.length}
                       identityHash={`loading-${index}`}
                       isCurrentPlayer={false}
@@ -140,12 +137,12 @@ export const GamePage = () => {
                     key={pp.id.toString()}
                     name={getPlayerName(pp)}
                     level={getPlayerLevel(pp)}
-                    progress={pp.progressIndex}
+                    progressIndex={pp.progressIndex}
                     phraseLength={game.phrase.length}
                     identityHash={getIdentityHash(pp.playerId)}
                     isCurrentPlayer={isCurrentPlayer}
                     playerColor={getPlayerColor(pp.playerId)}
-                    wpm={wpm}
+                    raceStartTime={raceStartTime}
                   />
                 </div>
               );
