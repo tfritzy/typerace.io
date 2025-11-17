@@ -70,6 +70,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
         }
 
         if (newValue.length < lastCompletedWordEnd) {
+          setInput(phrase.substring(0, lastCompletedWordEnd));
           return;
         }
       }
