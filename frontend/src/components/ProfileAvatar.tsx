@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import type { DbConnection, Player } from "../../module_bindings";
-import Avatar from "boring-avatars";
+import { PlayerColor, type DbConnection, type Player } from "../../module_bindings";
+import { PlayerAvatar } from "./PlayerAvatar";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
+import { useEffect } from "react";
+import { setAccentColor } from "../utils/colorMapping";
 
 export const ProfileAvatar = () => {
     const navigate = useNavigate();
@@ -14,6 +16,10 @@ export const ProfileAvatar = () => {
     const myPlayer = conn?.identity
         ? players.find((p) => p.id.isEqual(conn.identity!))
         : null;
+
+    useEffect(() => {
+        setAccentColor(myPlayer?.color || PlayerColor.Amber);
+    }, [myPlayer]);
 
     const name = myPlayer?.name ?? "Guest";
     const level = myPlayer?.level ?? 1;
@@ -27,12 +33,11 @@ export const ProfileAvatar = () => {
             onClick={() => navigate(`/profile/${identityHash}`)}
             className="flex items-center gap-4 py-3 rounded-lg cursor-pointer"
         >
-            <div className="relative shrink-0 border-2 border-amber-400 rounded-full">
-                <Avatar
+            <div className="relative shrink-0 border-2 rounded-full" style={{ borderColor: 'var(--color-accent)' }}>
+                <PlayerAvatar
                     size={40}
-                    name={identityHash}
-                    variant="pixel"
-                    colors={["#fbbf24", "#f59e0b", "#d97706", "#b45309", "#92400e"]}
+                    identity={identityHash}
+                    color={myPlayer?.color}
                 />
             </div>
 
@@ -42,8 +47,11 @@ export const ProfileAvatar = () => {
                     <span className="text-xs font-medium text-white/60">Lvl {level}</span>
                     <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
                         <div
-                            className="h-full bg-linear-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-300"
-                            style={{ width: `${xpProgress}%` }}
+                            className="h-full rounded-full transition-all duration-300"
+                            style={{
+                                width: `${xpProgress}%`,
+                                background: 'linear-gradient(to right, var(--color-accent-dark), var(--color-accent))'
+                            }}
                         />
                     </div>
                     <span className="text-xs font-medium text-white/60">Lvl {level + 1}</span>

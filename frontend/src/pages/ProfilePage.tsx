@@ -1,13 +1,15 @@
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import type { DbConnection, Player, GameRecord } from "../../module_bindings";
+import type { DbConnection, Player, GameRecord, PlayerColor } from "../../module_bindings";
 import { WpmChart } from "../components/WpmChart";
 import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
-import Avatar from "boring-avatars";
+import { PlayerAvatar } from "../components/PlayerAvatar";
 import { useParams } from "react-router-dom";
 import { Identity } from "spacetimedb";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
+import { getColorConfig } from "../utils/colorMapping";
+import { EditProfileModal } from "../components/EditProfileModal";
 
 type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
@@ -18,6 +20,7 @@ export const ProfilePage = () => {
     const { rows: gameRecords } = useTable<DbConnection, GameRecord>("gamerecord");
     const [selectedMode, setSelectedMode] = useState<string>('all');
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('all');
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     useEffect(() => {
         if (!conn || !playerId) return;
@@ -44,6 +47,17 @@ export const ProfilePage = () => {
 
     const playerIdentity = playerId ? Identity.fromString(playerId) : null;
     const viewedPlayer = playerIdentity ? players.find(p => p.id.isEqual(playerIdentity)) : null;
+    const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.id);
+
+    const handleProfileSave = (name: string, color: PlayerColor['tag']) => {
+        if (!conn) return;
+        if (name !== viewedPlayer?.name) {
+            conn.reducers.setPlayerName(name);
+        }
+        if (color !== viewedPlayer?.color.tag) {
+            conn.reducers.setPlayerColor({ tag: color });
+        }
+    };
 
     const getTimeFrameFilter = (timeFrame: TimeFrame): number => {
         const now = Date.now() * 1000;
@@ -92,12 +106,12 @@ export const ProfilePage = () => {
 
     const availableModes = useMemo(() => {
         if (!playerIdentity) return [];
-        
+
         const modesSet = new Set<string>();
         gameRecords
             .filter(stat => stat.playerId.isEqual(playerIdentity))
             .forEach(stat => modesSet.add(stat.gameMode.tag));
-        
+
         return Array.from(modesSet).sort();
     }, [gameRecords, playerIdentity]);
 
@@ -113,22 +127,41 @@ export const ProfilePage = () => {
                         borderRadius: '8px',
                         padding: '32px',
                         marginBottom: '32px',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1)'
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1)',
+                        position: 'relative'
                     }}>
+                        {isOwnProfile && (
+                            <button
+                                onClick={() => setIsEditModalOpen(true)}
+                                style={{
+                                    position: 'absolute',
+                                    top: '20px',
+                                    right: '20px',
+                                    backgroundColor: 'transparent',
+                                    border: 'none',
+                                    color: 'rgba(255, 255, 255, 0.5)',
+                                    cursor: 'pointer',
+                                    fontSize: '1.25rem',
+                                    padding: '8px'
+                                }}
+                                title="Edit Profile"
+                            >
+                                ✏️
+                            </button>
+                        )}
                         {viewedPlayer ? (
                             <div>
                                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px', marginBottom: '32px' }}>
                                     <div style={{
-                                        border: '2px solid #fbbf24',
+                                        border: '2px solid var(--color-accent)',
                                         borderRadius: '50%',
                                         overflow: 'hidden',
                                         flexShrink: 0
                                     }}>
-                                        <Avatar
+                                        <PlayerAvatar
                                             size={80}
-                                            name={viewedPlayer.id.toHexString()}
-                                            variant="pixel"
-                                            colors={["#fbbf24", "#f59e0b", "#d97706", "#b45309", "#92400e"]}
+                                            identity={viewedPlayer.id.toHexString()}
+                                            color={viewedPlayer.color}
                                         />
                                     </div>
 
@@ -163,7 +196,7 @@ export const ProfilePage = () => {
                                             }}>
                                                 <div style={{
                                                     height: '100%',
-                                                    background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+                                                    background: viewedPlayer ? getColorConfig(viewedPlayer.color).gradient : 'var(--color-accent)',
                                                     borderRadius: '5px',
                                                     width: `${viewedPlayer ? xpProgressToNextLevel(viewedPlayer.xp, viewedPlayer.level) : 0}%`,
                                                     transition: 'width 0.3s ease'
@@ -271,7 +304,7 @@ export const ProfilePage = () => {
                                                     Highest WPM
                                                 </div>
                                                 <div style={{
-                                                    color: '#fbbf24',
+                                                    color: 'var(--color-accent)',
                                                     fontSize: '1.5rem',
                                                     fontWeight: 700
                                                 }}>
@@ -402,6 +435,15 @@ export const ProfilePage = () => {
                     </div>
                 </div>
             </div>
+
+            {isEditModalOpen && viewedPlayer && (
+                <EditProfileModal
+                    currentName={viewedPlayer.name}
+                    currentColor={viewedPlayer.color.tag}
+                    onSave={handleProfileSave}
+                    onClose={() => setIsEditModalOpen(false)}
+                />
+            )}
         </div>
     );
 };

@@ -28,7 +28,7 @@
 
 .logo-accent {
   color: var(--color-accent);
-  text-shadow: 0 0 20px var(--color-accent);
+  text-shadow: 0 0 20px color-mix(in srgb, var(--color-accent) 50%, transparent);
   font-style: italic;
   position: relative;
   transition: text-shadow 0.2s ease;

@@ -1,6 +1,6 @@
-import Avatar from "boring-avatars";
-import { PlayerColor } from '../../module_bindings/player_color';
+import { PlayerAvatar } from './PlayerAvatar';
 import { getColorConfig } from '../utils/colorMapping';
+import { PlayerColor } from "../../module_bindings";
 
 type PlayerProgressBarProps = {
     name: string;
@@ -25,9 +25,9 @@ export const PlayerProgressBar = ({
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progress / phraseLength) * 100;
     const colorConfig = getColorConfig(playerColor);
-    
-    const gradient = isCurrentPlayer 
-        ? colorConfig.gradient 
+
+    const gradient = isCurrentPlayer
+        ? colorConfig.gradient
         : `linear-gradient(to right, ${colorConfig.darker}, ${colorConfig.dark})`;
 
     return (
@@ -37,18 +37,17 @@ export const PlayerProgressBar = ({
                 : 'opacity-100 animate-[slideInFromLeft_0.5s_ease-out]'
                 }`}
         >
-            <div 
+            <div
                 className={`relative shrink-0 border-2 rounded-full ${isLoading ? 'border-dashed' : ''}`}
                 style={{ borderColor: isCurrentPlayer ? colorConfig.primary : 'rgba(255, 255, 255, 0.3)' }}
             >
                 {isLoading ? (
                     <div className="w-10 h-10 bg-white/5 rounded-full" />
                 ) : (
-                    <Avatar
+                    <PlayerAvatar
                         size={40}
-                        name={identityHash}
-                        variant="pixel"
-                        colors={colorConfig.avatarColors}
+                        identity={identityHash}
+                        color={playerColor}
                     />
                 )}
             </div>
@@ -71,7 +70,7 @@ export const PlayerProgressBar = ({
                 <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
                     <div
                         className="h-full rounded-full transition-all duration-200"
-                        style={{ 
+                        style={{
                             width: `${Math.min(100, progressPercentage)}%`,
                             background: gradient
                         }}

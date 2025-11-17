@@ -1,4 +1,4 @@
-import { PlayerColor } from '../../module_bindings/player_color';
+import { PlayerColor } from "../../module_bindings";
 
 export interface ColorConfig {
     primary: string;
@@ -10,104 +10,105 @@ export interface ColorConfig {
     gradient: string;
 }
 
-export const COLOR_CONFIGS: Record<PlayerColor, ColorConfig> = {
-    [PlayerColor.Amber]: {
+export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
+    [PlayerColor.Red.tag]: {
+        primary: '#f87171',
+        light: '#fca5a5',
+        dark: '#ef4444',
+        darker: '#dc2626',
+        darkest: '#b91c1c',
+        avatarColors: ['#f87171', '#6b4a4a', '#b38f8f', '#4a2d2d', '#d4a3a3'],
+        gradient: 'linear-gradient(to right, #ef4444, #f87171)'
+    },
+    [PlayerColor.Orange.tag]: {
+        primary: '#fb923c',
+        light: '#fdba74',
+        dark: '#f97316',
+        darker: '#ea580c',
+        darkest: '#c2410c',
+        avatarColors: ['#fb923c', '#8b6a4a', '#d49a74', '#5c4a36', '#a6825d'],
+        gradient: 'linear-gradient(to right, #f97316, #fb923c)'
+    },
+    [PlayerColor.Amber.tag]: {
         primary: '#fbbf24',
         light: '#fcd34d',
         dark: '#f59e0b',
         darker: '#d97706',
         darkest: '#b45309',
-        avatarColors: ['#fbbf24', '#f59e0b', '#d97706', '#b45309', '#92400e'],
+        avatarColors: ['#fbbf24', '#8b7355', '#d4a574', '#5c4a3a', '#a67c52'],
         gradient: 'linear-gradient(to right, #f59e0b, #fbbf24)'
     },
-    [PlayerColor.Blue]: {
-        primary: '#3b82f6',
-        light: '#60a5fa',
-        dark: '#2563eb',
-        darker: '#1d4ed8',
-        darkest: '#1e40af',
-        avatarColors: ['#3b82f6', '#2563eb', '#1d4ed8', '#1e40af', '#1e3a8a'],
-        gradient: 'linear-gradient(to right, #2563eb, #3b82f6)'
+    [PlayerColor.Lime.tag]: {
+        primary: '#a3e635',
+        light: '#bef264',
+        dark: '#84cc16',
+        darker: '#65a30d',
+        darkest: '#4d7c0f',
+        avatarColors: ['#a3e635', '#5d6b4a', '#8fa37d', '#3d4a2d', '#b8c89b'],
+        gradient: 'linear-gradient(to right, #84cc16, #a3e635)'
     },
-    [PlayerColor.Green]: {
-        primary: '#10b981',
-        light: '#34d399',
-        dark: '#059669',
-        darker: '#047857',
-        darkest: '#065f46',
-        avatarColors: ['#10b981', '#059669', '#047857', '#065f46', '#064e3b'],
-        gradient: 'linear-gradient(to right, #059669, #10b981)'
+    [PlayerColor.Green.tag]: {
+        primary: '#34d399',
+        light: '#6ee7b7',
+        dark: '#10b981',
+        darker: '#059669',
+        darkest: '#047857',
+        avatarColors: ['#34d399', '#4a5d52', '#7d9b8f', '#2d3e36', '#9bc4b5'],
+        gradient: 'linear-gradient(to right, #10b981, #34d399)'
     },
-    [PlayerColor.Purple]: {
-        primary: '#a855f7',
-        light: '#c084fc',
-        dark: '#9333ea',
-        darker: '#7e22ce',
-        darkest: '#6b21a8',
-        avatarColors: ['#a855f7', '#9333ea', '#7e22ce', '#6b21a8', '#581c87'],
-        gradient: 'linear-gradient(to right, #9333ea, #a855f7)'
+    [PlayerColor.Cyan.tag]: {
+        primary: '#22d3ee',
+        light: '#67e8f9',
+        dark: '#06b6d4',
+        darker: '#0891b2',
+        darkest: '#0e7490',
+        avatarColors: ['#22d3ee', '#4a5d68', '#7d9ba8', '#2d3e47', '#9bc4d4'],
+        gradient: 'linear-gradient(to right, #06b6d4, #22d3ee)'
     },
-    [PlayerColor.Red]: {
-        primary: '#ef4444',
-        light: '#f87171',
-        dark: '#dc2626',
-        darker: '#b91c1c',
-        darkest: '#991b1b',
-        avatarColors: ['#ef4444', '#dc2626', '#b91c1c', '#991b1b', '#7f1d1d'],
-        gradient: 'linear-gradient(to right, #dc2626, #ef4444)'
+    [PlayerColor.Blue.tag]: {
+        primary: '#60a5fa',
+        light: '#93c5fd',
+        dark: '#3b82f6',
+        darker: '#2563eb',
+        darkest: '#1d4ed8',
+        avatarColors: ['#60a5fa', '#4a5568', '#7d8fa3', '#2d3748', '#9fb3c8'],
+        gradient: 'linear-gradient(to right, #3b82f6, #60a5fa)'
     },
-    [PlayerColor.Pink]: {
-        primary: '#ec4899',
-        light: '#f472b6',
-        dark: '#db2777',
-        darker: '#be185d',
-        darkest: '#9f1239',
-        avatarColors: ['#ec4899', '#db2777', '#be185d', '#9f1239', '#831843'],
-        gradient: 'linear-gradient(to right, #db2777, #ec4899)'
+    [PlayerColor.Indigo.tag]: {
+        primary: '#818cf8',
+        light: '#a5b4fc',
+        dark: '#6366f1',
+        darker: '#4f46e5',
+        darkest: '#4338ca',
+        avatarColors: ['#818cf8', '#4a4d68', '#8f92b3', '#2e3047', '#a3a6c8'],
+        gradient: 'linear-gradient(to right, #6366f1, #818cf8)'
     },
-    [PlayerColor.Cyan]: {
-        primary: '#06b6d4',
-        light: '#22d3ee',
-        dark: '#0891b2',
-        darker: '#0e7490',
-        darkest: '#155e75',
-        avatarColors: ['#06b6d4', '#0891b2', '#0e7490', '#155e75', '#164e63'],
-        gradient: 'linear-gradient(to right, #0891b2, #06b6d4)'
+    [PlayerColor.Purple.tag]: {
+        primary: '#c084fc',
+        light: '#d8b4fe',
+        dark: '#a855f7',
+        darker: '#9333ea',
+        darkest: '#7e22ce',
+        avatarColors: ['#c084fc', '#5d4a68', '#9d8fb3', '#3d2e47', '#b8a3c8'],
+        gradient: 'linear-gradient(to right, #a855f7, #c084fc)'
     },
-    [PlayerColor.Orange]: {
-        primary: '#f97316',
-        light: '#fb923c',
-        dark: '#ea580c',
-        darker: '#c2410c',
-        darkest: '#9a3412',
-        avatarColors: ['#f97316', '#ea580c', '#c2410c', '#9a3412', '#7c2d12'],
-        gradient: 'linear-gradient(to right, #ea580c, #f97316)'
-    },
-    [PlayerColor.Lime]: {
-        primary: '#84cc16',
-        light: '#a3e635',
-        dark: '#65a30d',
-        darker: '#4d7c0f',
-        darkest: '#3f6212',
-        avatarColors: ['#84cc16', '#65a30d', '#4d7c0f', '#3f6212', '#365314'],
-        gradient: 'linear-gradient(to right, #65a30d, #84cc16)'
-    },
-    [PlayerColor.Indigo]: {
-        primary: '#6366f1',
-        light: '#818cf8',
-        dark: '#4f46e5',
-        darker: '#4338ca',
-        darkest: '#3730a3',
-        avatarColors: ['#6366f1', '#4f46e5', '#4338ca', '#3730a3', '#312e81'],
-        gradient: 'linear-gradient(to right, #4f46e5, #6366f1)'
+    [PlayerColor.Pink.tag]: {
+        primary: '#f472b6',
+        light: '#f9a8d4',
+        dark: '#ec4899',
+        darker: '#db2777',
+        darkest: '#be185d',
+        avatarColors: ['#f472b6', '#6b4a5d', '#b38fa3', '#4a2d3d', '#d4a3b8'],
+        gradient: 'linear-gradient(to right, #ec4899, #f472b6)'
     }
 };
 
 export function getColorConfig(color: PlayerColor): ColorConfig {
-    return COLOR_CONFIGS[color] || COLOR_CONFIGS[PlayerColor.Amber];
+    return COLOR_CONFIGS[color.tag] || COLOR_CONFIGS[PlayerColor.Amber.tag];
 }
 
 export function setAccentColor(color: PlayerColor): void {
+    console.log("setting accent color to", color);
     const config = getColorConfig(color);
     const root = document.documentElement;
     root.style.setProperty('--color-accent', config.primary);

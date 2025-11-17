@@ -9,6 +9,7 @@ import { Header } from "../components/Header";
 import { Countdown } from "../components/Countdown";
 import { RaceResults } from "../components/RaceResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
+import { GameLobby } from "../components/GameLobby";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -149,11 +150,12 @@ export const GamePage = () => {
                 />
               );
             })()
+          ) : isLobby ? (
+            <GameLobby gameId={gameId!} conn={conn} />
           ) : (
             <GamePageTypeBox
               phrase={game.phrase}
               gameId={gameId!}
-              isLobby={isLobby}
               conn={conn}
               onFinish={handleFinish}
             />
