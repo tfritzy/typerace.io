@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Color Selector Preview</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background-color: #202020;
+            font-family: system-ui, -apple-system, sans-serif;
+            color: #ffffff;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        
+        .subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 40px;
+        }
+        
+        .section {
+            background-color: #272727;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .color-button {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .color-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .color-button.selected {
+            transform: scale(1.1);
+            border-color: currentColor;
+        }
+        
+        .color-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .color-sample {
+            padding: 20px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        .color-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        .avatar-preview {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .avatar-pixel {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+        }
+        
+        .example-ui {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 70%;
+            border-radius: 5px;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 20px 0;
+        }
+        
+        .logo-accent {
+            font-style: italic;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Player Color Customization Preview</h1>
+        <p class="subtitle">Choose your color theme for the game</p>
+        
+        <div class="section">
+            <div class="section-title">Color Selector</div>
+            <div class="color-grid" id="colorGrid"></div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Selected Color: <span id="selectedColorName">Amber</span></div>
+            
+            <div class="example-ui">
+                <div style="margin-bottom: 20px;">
+                    <strong>Progress Bar Example:</strong>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <strong>Avatar Color Palette:</strong>
+                    <div class="avatar-preview" id="avatarPreview"></div>
+                </div>
+                
+                <div>
+                    <strong>Logo Example:</strong>
+                    <div class="logo">
+                        <span style="color: #ffffff;">Type</span><span class="logo-accent" id="logoAccent">Race</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const colors = {
+            'Amber': {
+                primary: '#fbbf24',
+                gradient: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+                avatarColors: ['#fbbf24', '#f59e0b', '#d97706', '#b45309', '#92400e']
+            },
+            'Blue': {
+                primary: '#3b82f6',
+                gradient: 'linear-gradient(to right, #2563eb, #3b82f6)',
+                avatarColors: ['#3b82f6', '#2563eb', '#1d4ed8', '#1e40af', '#1e3a8a']
+            },
+            'Green': {
+                primary: '#10b981',
+                gradient: 'linear-gradient(to right, #059669, #10b981)',
+                avatarColors: ['#10b981', '#059669', '#047857', '#065f46', '#064e3b']
+            },
+            'Purple': {
+                primary: '#a855f7',
+                gradient: 'linear-gradient(to right, #9333ea, #a855f7)',
+                avatarColors: ['#a855f7', '#9333ea', '#7e22ce', '#6b21a8', '#581c87']
+            },
+            'Red': {
+                primary: '#ef4444',
+                gradient: 'linear-gradient(to right, #dc2626, #ef4444)',
+                avatarColors: ['#ef4444', '#dc2626', '#b91c1c', '#991b1b', '#7f1d1d']
+            },
+            'Pink': {
+                primary: '#ec4899',
+                gradient: 'linear-gradient(to right, #db2777, #ec4899)',
+                avatarColors: ['#ec4899', '#db2777', '#be185d', '#9f1239', '#831843']
+            },
+            'Cyan': {
+                primary: '#06b6d4',
+                gradient: 'linear-gradient(to right, #0891b2, #06b6d4)',
+                avatarColors: ['#06b6d4', '#0891b2', '#0e7490', '#155e75', '#164e63']
+            },
+            'Orange': {
+                primary: '#f97316',
+                gradient: 'linear-gradient(to right, #ea580c, #f97316)',
+                avatarColors: ['#f97316', '#ea580c', '#c2410c', '#9a3412', '#7c2d12']
+            },
+            'Lime': {
+                primary: '#84cc16',
+                gradient: 'linear-gradient(to right, #65a30d, #84cc16)',
+                avatarColors: ['#84cc16', '#65a30d', '#4d7c0f', '#3f6212', '#365314']
+            },
+            'Indigo': {
+                primary: '#6366f1',
+                gradient: 'linear-gradient(to right, #4f46e5, #6366f1)',
+                avatarColors: ['#6366f1', '#4f46e5', '#4338ca', '#3730a3', '#312e81']
+            }
+        };
+        
+        let selectedColor = 'Amber';
+        
+        const colorGrid = document.getElementById('colorGrid');
+        const selectedColorName = document.getElementById('selectedColorName');
+        const progressFill = document.getElementById('progressFill');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const logoAccent = document.getElementById('logoAccent');
+        
+        Object.entries(colors).forEach(([name, config]) => {
+            const button = document.createElement('button');
+            button.className = 'color-button';
+            button.style.background = config.gradient;
+            button.style.color = config.primary;
+            button.title = name;
+            
+            if (name === selectedColor) {
+                button.classList.add('selected');
+            }
+            
+            button.addEventListener('click', () => {
+                selectColor(name);
+            });
+            
+            colorGrid.appendChild(button);
+        });
+        
+        function selectColor(name) {
+            selectedColor = name;
+            const config = colors[name];
+            
+            document.querySelectorAll('.color-button').forEach((btn, i) => {
+                const colorName = Object.keys(colors)[i];
+                btn.classList.toggle('selected', colorName === name);
+            });
+            
+            selectedColorName.textContent = name;
+            progressFill.style.background = config.gradient;
+            
+            avatarPreview.innerHTML = '';
+            config.avatarColors.forEach(color => {
+                const pixel = document.createElement('div');
+                pixel.className = 'avatar-pixel';
+                pixel.style.backgroundColor = color;
+                avatarPreview.appendChild(pixel);
+            });
+            
+            logoAccent.style.color = config.primary;
+            logoAccent.style.textShadow = `0 0 20px ${config.primary}`;
+        }
+        
+        selectColor('Amber');
+    </script>
+</body>
+</html>
