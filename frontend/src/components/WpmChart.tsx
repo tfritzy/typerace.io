@@ -233,24 +233,11 @@ export const WpmChart = ({ data, title }: WpmChartProps) => {
     };
 
     return (
-        <div style={{
-            marginBottom: '32px',
-            backgroundColor: '#272727',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            borderRadius: '8px',
-            padding: '24px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1)',
-            width: '100%'
-        }}>
-            <h3 style={{
-                color: '#ffffff',
-                marginBottom: '20px',
-                fontSize: '1.125rem',
-                fontWeight: 600
-            }}>
+        <div className="mb-8 bg-[#272727] border border-white/15 rounded-lg p-6 shadow-[0_4px_12px_rgba(0,0,0,0.2),0_1px_3px_rgba(0,0,0,0.1)] w-full">
+            <h3 className="text-white mb-5 text-lg font-semibold">
                 {title}
             </h3>
-            <div style={{ height: '280px', position: 'relative', width: '100%' }}>
+            <div className="h-[280px] relative w-full">
                 <Line data={chartData} options={options} />
             </div>
         </div>

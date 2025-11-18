@@ -25,43 +25,23 @@ export const GameLobby = ({ gameId, conn }: GameLobbyProps) => {
 
   return (
     <div
-      className="box w-full rounded-lg px-8 py-6"
-      style={{
-        minHeight: '430px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        gap: '24px'
-      }}
+      className="box w-full rounded-lg px-8 py-6 min-h-[430px] flex flex-col justify-center gap-6"
     >
-      <div style={{ textAlign: 'center' }}>
-        <h2 style={{
-          fontSize: '28px',
-          fontWeight: '700',
-          marginBottom: '12px',
-          color: 'var(--color-white)'
-        }}>
+      <div className="text-center">
+        <h2 className="text-[28px] font-bold mb-3 text-white">
           Waiting for players...
         </h2>
-        <p style={{
-          fontSize: '16px',
-          color: 'rgba(255, 255, 255, 0.6)',
-          lineHeight: '1.5'
-        }}>
+        <p className="text-base text-white/60 leading-relaxed">
           Share this link with friends to invite them to your race
         </p>
       </div>
 
       <div
         onClick={handleCopyLink}
+        className="rounded-lg p-5 cursor-pointer transition-all duration-200 relative"
         style={{
           backgroundColor: 'var(--color-box-bg)',
-          border: linkCopied ? '1px solid var(--color-accent)' : '1px solid var(--color-box-border)',
-          borderRadius: '8px',
-          padding: '20px',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-          position: 'relative'
+          border: linkCopied ? '1px solid var(--color-accent)' : '1px solid var(--color-box-border)'
         }}
         onMouseEnter={(e) => {
           if (!linkCopied) {
@@ -74,36 +54,22 @@ export const GameLobby = ({ gameId, conn }: GameLobbyProps) => {
           }
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ flex: '1', minWidth: 0 }}>
-            <div style={{
-              fontSize: '11px',
-              color: linkCopied ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)',
-              textTransform: 'uppercase',
-              letterSpacing: '1.2px',
-              marginBottom: '8px',
-              fontWeight: '600',
-              transition: 'color 0.2s ease'
-            }}>
+        <div className="flex items-center gap-4">
+          <div className="flex-1 min-w-0">
+            <div
+              className="text-[11px] uppercase tracking-[1.2px] mb-2 font-semibold transition-colors duration-200"
+              style={{ color: linkCopied ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
+            >
               {linkCopied ? 'Copied!' : 'Click to Copy Link'}
             </div>
-            <div style={{
-              fontFamily: 'monospace',
-              fontSize: '14px',
-              color: 'var(--color-white)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
-            }}>
+            <div className="font-mono text-sm text-white overflow-hidden text-ellipsis whitespace-nowrap">
               {gameUrl}
             </div>
           </div>
-          <div style={{
-            fontSize: '24px',
-            flexShrink: 0,
-            transition: 'all 0.2s ease',
-            color: linkCopied ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.6)'
-          }}>
+          <div
+            className="text-2xl flex-shrink-0 transition-all duration-200"
+            style={{ color: linkCopied ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.6)' }}
+          >
             {linkCopied ? "✓" : "📋"}
           </div>
         </div>
@@ -111,17 +77,8 @@ export const GameLobby = ({ gameId, conn }: GameLobbyProps) => {
 
       <button
         onClick={handleStartGame}
-        style={{
-          backgroundColor: 'transparent',
-          color: 'var(--color-white)',
-          border: '1px solid var(--color-box-border)',
-          borderRadius: '8px',
-          padding: '16px',
-          fontSize: '18px',
-          fontWeight: '600',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease'
-        }}
+        className="bg-transparent text-white border rounded-lg p-4 text-lg font-semibold cursor-pointer transition-all duration-200"
+        style={{ borderColor: 'var(--color-box-border)' }}
         onMouseEnter={(e) => {
           e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
           e.currentTarget.style.transform = 'translateY(-1px)';

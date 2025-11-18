@@ -179,19 +179,14 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
 
     if (rawWpmData.length === 0 && aggWpmData.length === 0) {
         return (
-            <div style={{
-                width: '100%',
-                textAlign: 'center',
-                color: 'rgba(255, 255, 255, 0.6)',
-                padding: '24px 0'
-            }}>
+            <div className="w-full text-center text-white/60 py-6">
                 No typing data available
             </div>
         );
     }
 
     return (
-        <div style={{ height: '280px', position: 'relative', width: '100%' }}>
+        <div className="h-[280px] relative w-full">
             <Line data={chartData} options={options} />
         </div>
     );

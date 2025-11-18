@@ -24,94 +24,47 @@ export const EditProfileModal = ({ currentName, currentColor, onSave, onClose }:
 
     return (
         <div
-            style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 2000
-            }}
+            className="fixed inset-0 bg-black/70 flex items-center justify-center z-[2000]"
             onClick={onClose}
         >
             <div
-                style={{
-                    backgroundColor: '#272727',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    borderRadius: '12px',
-                    padding: '32px',
-                    minWidth: '400px',
-                    maxWidth: '500px'
-                }}
+                className="bg-[#272727] border border-white/15 rounded-xl p-8 min-w-[400px] max-w-[500px]"
                 onClick={(e) => e.stopPropagation()}
             >
-                <h2 style={{
-                    color: '#ffffff',
-                    fontSize: '1.5rem',
-                    fontWeight: 700,
-                    marginBottom: '24px',
-                    marginTop: 0
-                }}>
+                <h2 className="text-white text-2xl font-bold mb-6 mt-0">
                     Edit Profile
                 </h2>
 
-                <div style={{ marginBottom: '24px' }}>
-                    <label style={{
-                        color: 'rgba(255, 255, 255, 0.6)',
-                        fontSize: '0.875rem',
-                        marginBottom: '8px',
-                        display: 'block'
-                    }}>
+                <div className="mb-6">
+                    <label className="text-white/60 text-sm mb-2 block">
                         Name
                     </label>
                     <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        style={{
-                            width: '100%',
-                            backgroundColor: '#1a1a1a',
-                            color: '#ffffff',
-                            border: '1px solid rgba(255, 255, 255, 0.15)',
-                            borderRadius: '6px',
-                            padding: '10px 12px',
-                            fontSize: '0.875rem',
-                            outline: 'none',
-                            boxSizing: 'border-box'
-                        }}
+                        className="w-full bg-[#1a1a1a] text-white border border-white/15 rounded-md px-3 py-2.5 text-sm outline-none box-border"
                         maxLength={30}
                     />
                 </div>
 
-                <div style={{ marginBottom: '32px' }}>
-                    <label style={{
-                        color: 'rgba(255, 255, 255, 0.6)',
-                        fontSize: '0.875rem',
-                        marginBottom: '12px',
-                        display: 'block'
-                    }}>
+                <div className="mb-8">
+                    <label className="text-white/60 text-sm mb-3 block">
                         Color
                     </label>
                     <div className='flex flex-row flex-wrap space-x-2 space-y-2'>
                         {availableColors.map((colorTag) => {
                             const colorConfig = getColorConfig({ tag: colorTag } as PlayerColor);
                             const isSelected = color === colorTag;
+                            const borderStyle = isSelected ? { border: '3px solid #ffffff' } : {};
                             return (
                                 <button
                                     key={colorTag}
                                     onClick={() => setColor(colorTag)}
+                                    className={`w-10 h-10 rounded cursor-pointer ${isSelected ? 'opacity-100' : 'opacity-70'}`}
                                     style={{
-                                        width: '40px',
-                                        height: '40px',
-                                        borderRadius: '3px',
                                         background: colorConfig.primary,
-                                        border: isSelected ? '3px solid #ffffff' : 'none',
-                                        cursor: 'pointer',
-                                        opacity: isSelected ? 1 : 0.7
+                                        ...borderStyle
                                     }}
                                     title={colorTag}
                                 />
@@ -120,34 +73,20 @@ export const EditProfileModal = ({ currentName, currentColor, onSave, onClose }:
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                <div className="flex gap-3 justify-end">
                     <button
                         onClick={onClose}
-                        style={{
-                            backgroundColor: 'transparent',
-                            color: 'rgba(255, 255, 255, 0.6)',
-                            border: '1px solid rgba(255, 255, 255, 0.15)',
-                            borderRadius: '6px',
-                            padding: '10px 20px',
-                            fontSize: '0.875rem',
-                            cursor: 'pointer',
-                            fontWeight: 500
-                        }}
+                        className="bg-transparent text-white/60 border border-white/15 rounded-md px-5 py-2.5 text-sm cursor-pointer font-medium"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSave}
                         disabled={!name.trim()}
+                        className="border-0 rounded-md px-5 py-2.5 text-sm font-semibold text-white"
                         style={{
                             backgroundColor: 'var(--color-accent)',
-                            color: '#ffffff',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '10px 20px',
-                            fontSize: '0.875rem',
                             cursor: name.trim() ? 'pointer' : 'not-allowed',
-                            fontWeight: 600,
                             opacity: name.trim() ? 1 : 0.5
                         }}
                     >
