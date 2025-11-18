@@ -451,6 +451,11 @@ public static partial class Module
 
     private static Game? FindLobbyGame(ReducerContext ctx, GameMode gameMode, GameType gameType)
     {
+        if (gameType != GameType.Public)
+        {
+            return null;
+        }
+
         foreach (var game in ctx.Db.game.State.Filter(GameState.Lobby))
         {
             if (game.GameMode == gameMode && game.GameType == gameType)
