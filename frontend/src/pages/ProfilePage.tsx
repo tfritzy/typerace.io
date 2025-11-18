@@ -1,5 +1,5 @@
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import type { DbConnection, Player, GameRecord, PlayerColor } from "../../module_bindings";
+import type { DbConnection, Player, GameRecord, PersonalRecord, PlayerColor } from "../../module_bindings";
 import { WpmChart } from "../components/WpmChart";
 import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
@@ -18,6 +18,7 @@ export const ProfilePage = () => {
     const { playerId } = useParams<{ playerId: string }>();
     const conn = useSpacetimeDB<DbConnection>();
     const { rows: players } = useTable<DbConnection, Player>("player");
+    const { rows: personalRecords } = useTable<DbConnection, PersonalRecord>("personalrecord");
     const { rows: gameRecords } = useTable<DbConnection, GameRecord>("gamerecord");
     const [selectedMode, setSelectedMode] = useState<string>('all');
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('all');
@@ -40,9 +41,16 @@ export const ProfilePage = () => {
             })
             .subscribe(`select * from gamerecord where PlayerId = '${playerIdentity}'`);
 
+        const personalRecordSubscription = conn.subscriptionBuilder()
+            .onError((error: ErrorContextInterface) => {
+                console.error("Error subscribing to personalrecord:", error);
+            })
+            .subscribe(`select * from personalrecord where PlayerId = '${playerIdentity}'`);
+
         return () => {
             playerSubscription.unsubscribe();
             gameRecordSubscription.unsubscribe();
+            personalRecordSubscription.unsubscribe();
         };
     }, [conn, playerId]);
 
@@ -116,40 +124,20 @@ export const ProfilePage = () => {
         return Array.from(modesSet).sort();
     }, [gameRecords, playerIdentity]);
 
-    const totalWordsTyped = useMemo(() => {
-        if (!playerIdentity) return 0;
-
-        const playerRecords = gameRecords.filter(stat => 
-            stat.playerId.isEqual(playerIdentity)
-        );
-
-        let totalWords = 0;
-        for (const record of playerRecords) {
-            const timeMinutes = record.timeMs / 60000;
-            const words = record.wpm * timeMinutes;
-            totalWords += words;
-        }
-
-        return Math.round(totalWords);
-    }, [gameRecords, playerIdentity]);
-
     const bestWpmPerMode = useMemo(() => {
         if (!playerIdentity) return {};
 
-        const playerRecords = gameRecords.filter(stat => 
-            stat.playerId.isEqual(playerIdentity)
+        const playerPersonalRecords = personalRecords.filter(record => 
+            record.playerId.isEqual(playerIdentity)
         );
 
         const modeWpms: Record<string, number> = {};
-        for (const record of playerRecords) {
-            const mode = record.gameMode.tag;
-            if (!modeWpms[mode] || record.wpm > modeWpms[mode]) {
-                modeWpms[mode] = record.wpm;
-            }
+        for (const record of playerPersonalRecords) {
+            modeWpms[record.gameMode.tag] = record.wpm;
         }
 
         return modeWpms;
-    }, [gameRecords, playerIdentity]);
+    }, [personalRecords, playerIdentity]);
 
     return (
         <div className="min-h-screen">
@@ -233,7 +221,7 @@ export const ProfilePage = () => {
                                                 Total Words Typed
                                             </div>
                                             <div className="text-white text-4xl font-bold">
-                                                {formatNumber(totalWordsTyped)}
+                                                {formatNumber(viewedPlayer.totalWordsTyped)}
                                             </div>
                                         </div>
                                     </div>
