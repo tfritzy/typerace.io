@@ -81,6 +81,8 @@ export const GamePage = () => {
   const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
   const isInLobby = game.state?.tag === "Lobby";
   const isLobby = game.gameType?.tag === "Private" && isInLobby;
+  const isCountdown = game.state?.tag === "Countdown";
+  const isDisabled = isInLobby || isCountdown;
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -165,6 +167,7 @@ export const GamePage = () => {
               gameId={gameId!}
               conn={conn}
               onFinish={handleFinish}
+              disabled={isDisabled}
             />
           )}
 

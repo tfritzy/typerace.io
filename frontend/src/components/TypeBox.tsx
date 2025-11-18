@@ -8,13 +8,14 @@ type TypeBoxProps = {
   className?: string;
   style?: React.CSSProperties;
   resetOnComplete?: boolean;
+  disabled?: boolean;
 };
 
 export type TypeBoxRef = {
   focus: () => void;
 };
 
-export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplete, onProgress, className, style, resetOnComplete = false }, ref) => {
+export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplete, onProgress, className, style, resetOnComplete = false, disabled = false }, ref) => {
   const [focused, setFocused] = useState(true);
   const [input, setInput] = useState("");
   const [hasError, setHasError] = useState(false);
@@ -53,6 +54,10 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      if (disabled) {
+        return;
+      }
+
       const newValue = event.target.value;
 
       if (newValue.length > phrase.length) {
@@ -116,7 +121,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
         }
       }
     },
-    [phrase, onComplete, onProgress, input, resetOnComplete]
+    [phrase, onComplete, onProgress, input, resetOnComplete, disabled]
   );
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -165,7 +170,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
 
   return (
     <div
-      className={`box w-full rounded-lg px-8 py-6 cursor-pointer ${hasError ? 'border-red-500' : ''} ${className || ''}`}
+      className={`box w-full rounded-lg px-8 py-6 cursor-pointer ${hasError ? 'border-red-500' : ''} ${disabled ? 'opacity-60' : ''} ${className || ''}`}
       style={style}
       onClick={() => inputRef.current?.focus()}
     >
@@ -199,6 +204,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
             autoComplete="off"
             spellCheck={false}
             autoFocus
+            readOnly={disabled}
             style={{
               cursor: focused ? "auto" : "pointer",
             }}

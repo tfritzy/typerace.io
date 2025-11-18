@@ -7,13 +7,15 @@ type GamePageTypeBoxProps = {
   gameId: string;
   conn: DbConnection | null;
   onFinish: () => void;
+  disabled?: boolean;
 };
 
 export const GamePageTypeBox = ({ 
   phrase, 
   gameId, 
   conn,
-  onFinish 
+  onFinish,
+  disabled = false
 }: GamePageTypeBoxProps) => {
   const typeBoxRef = useRef<TypeBoxRef>(null);
 
@@ -37,6 +39,7 @@ export const GamePageTypeBox = ({
         phrase={phrase}
         onProgress={handleProgress}
         onComplete={handleComplete}
+        disabled={disabled}
         style={{ height: '430px', display: 'flex', alignItems: 'flex-start' }}
       />
     </div>
