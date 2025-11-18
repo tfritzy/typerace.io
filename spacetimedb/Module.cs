@@ -895,8 +895,7 @@ public static partial class Module
             Wpm = wpm
         });
 
-        var timeMinutes = (timeElapsed / 1000.0) / 60000.0;
-        var wordsTyped = (int)Math.Round(wpm * timeMinutes);
+        var wordsTyped = game.Phrase.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
 
         var xpEarned = CalculateXpForPlacement(placement);
 
