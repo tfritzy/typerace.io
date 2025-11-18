@@ -80,7 +80,7 @@ export const Cursor = ({ targetRef, lerp = 0.15, fadeDelay = 2000, visible = tru
     return (
         <div
             ref={followerRef}
-            className={`max-w-0 h-8 -translate-y-px fixed top-0 left-0 ${isBlinking ? 'animate-blink' : ''}`}
+            className={`max-w-0 h-8 -translate-y-px fixed top-0 left-0 ${isBlinking && visible ? 'animate-blink' : ''}`}
             style={{ opacity: visible ? 1 : 0 }}
         >
             <div className="h-full" style={{ borderRight: '1px solid var(--color-white)' }} />
