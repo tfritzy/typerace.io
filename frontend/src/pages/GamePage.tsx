@@ -90,7 +90,7 @@ export const GamePage = () => {
 
       <div className="flex-1 flex flex-col items-center justify-center px-4">
         <div className="content-container w-full">
-          <div className="mb-4 space-y-3">
+          <div className="mb-3 space-y-3">
             {Array.from({ length: maxPlayers }).map((_, index) => {
               const pp = gamePlayerProgress[index];
               const isCurrentPlayer = pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);

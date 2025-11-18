@@ -48,17 +48,17 @@ export const RaceResults = ({
         <div style={{ width: '100%' }}>
             <div style={{
                 display: 'flex',
-                gap: '16px',
-                marginBottom: '16px',
+                gap: '12px',
+                marginBottom: '12px',
                 alignItems: 'stretch',
-                minHeight: '140px'
+                minHeight: '100px'
             }}>
                 <div style={{
                     flex: '1',
                     backgroundColor: 'var(--color-box-bg)',
                     border: `1px solid var(--color-box-border)`,
                     borderRadius: '8px',
-                    padding: '24px',
+                    padding: '12px',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
@@ -66,17 +66,17 @@ export const RaceResults = ({
                     transition: 'all 0.3s ease'
                 }}>
                     <div style={{
-                        fontSize: '11px',
+                        fontSize: '10px',
                         color: isHighWpm ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)',
                         textTransform: 'uppercase',
                         letterSpacing: '1.2px',
-                        marginBottom: '12px',
+                        marginBottom: '8px',
                         fontWeight: '600'
                     }}>
                         WPM
                     </div>
                     <div style={{
-                        fontSize: '48px',
+                        fontSize: '36px',
                         fontWeight: '700',
                         color: isHighWpm ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)',
                         lineHeight: '1'
@@ -90,7 +90,7 @@ export const RaceResults = ({
                     backgroundColor: 'var(--color-box-bg)',
                     border: `1px solid var(--color-box-border)`,
                     borderRadius: '8px',
-                    padding: '24px',
+                    padding: '12px',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
@@ -98,17 +98,17 @@ export const RaceResults = ({
                     transition: 'all 0.3s ease'
                 }}>
                     <div style={{
-                        fontSize: '11px',
+                        fontSize: '10px',
                         color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)',
                         textTransform: 'uppercase',
                         letterSpacing: '1.2px',
-                        marginBottom: '12px',
+                        marginBottom: '8px',
                         fontWeight: '600'
                     }}>
                         Time
                     </div>
                     <div style={{
-                        fontSize: '48px',
+                        fontSize: '36px',
                         fontWeight: '700',
                         color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)',
                         fontFamily: 'monospace',
@@ -124,7 +124,7 @@ export const RaceResults = ({
                     backgroundColor: 'var(--color-box-bg)',
                     border: `1px solid var(--color-box-border)`,
                     borderRadius: '8px',
-                    padding: '24px',
+                    padding: '12px',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
@@ -132,17 +132,17 @@ export const RaceResults = ({
                     transition: 'all 0.3s ease'
                 }}>
                     <div style={{
-                        fontSize: '11px',
+                        fontSize: '10px',
                         color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)',
                         textTransform: 'uppercase',
                         letterSpacing: '1.2px',
-                        marginBottom: '12px',
+                        marginBottom: '8px',
                         fontWeight: '600'
                     }}>
                         Place
                     </div>
                     <div style={{
-                        fontSize: '48px',
+                        fontSize: '36px',
                         fontWeight: '700',
                         color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)',
                         lineHeight: '1'
@@ -156,7 +156,7 @@ export const RaceResults = ({
                     backgroundColor: 'var(--color-box-bg)',
                     border: `1px solid var(--color-box-border)`,
                     borderRadius: '8px',
-                    padding: '24px',
+                    padding: '12px',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
@@ -164,17 +164,17 @@ export const RaceResults = ({
                     transition: 'all 0.3s ease'
                 }}>
                     <div style={{
-                        fontSize: '11px',
+                        fontSize: '10px',
                         color: isPerfectAccuracy ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)',
                         textTransform: 'uppercase',
                         letterSpacing: '1.2px',
-                        marginBottom: '12px',
+                        marginBottom: '8px',
                         fontWeight: '600'
                     }}>
                         Accuracy
                     </div>
                     <div style={{
-                        fontSize: '48px',
+                        fontSize: '36px',
                         fontWeight: '700',
                         color: isPerfectAccuracy ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)',
                         lineHeight: '1'
@@ -188,12 +188,12 @@ export const RaceResults = ({
                 backgroundColor: 'var(--color-box-bg)',
                 border: '1px solid var(--color-box-border)',
                 borderRadius: '8px',
-                padding: '24px'
+                padding: '12px'
             }}>
                 <div style={{
                     display: 'flex',
-                    gap: '8px',
-                    marginBottom: '16px',
+                    gap: '12px',
+                    marginBottom: '12px',
                     flexWrap: 'wrap'
                 }}>
                     {allPlayerProgress.map((pp) => (

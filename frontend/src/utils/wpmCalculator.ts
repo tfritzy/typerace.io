@@ -95,51 +95,25 @@ export function getAggWpmBySecond(
     return [];
   }
 
-  const aggWpmByCharacter: number[] = [];
-  for (let i = 0; i < progressionStack.length; i++) {
-    aggWpmByCharacter.push(getWpm(i + 1, progressionStack[i]));
-  }
-
-  let target = 1;
-  const nearestIndexPriorWpmToSecondBounds: number[] = [];
-  for (let i = 0; i < aggWpmByCharacter.length; i++) {
-    while (progressionStack[i] > target) {
-      target += 1;
-      nearestIndexPriorWpmToSecondBounds.push(Math.max(i - 1, 0));
-    }
-  }
-
+  const finalTime = progressionStack[progressionStack.length - 1];
+  const maxSecond = Math.floor(finalTime);
   const wpmBySecond: number[] = [];
-  for (let i = 0; i < nearestIndexPriorWpmToSecondBounds.length; i++) {
-    const second = i + 1;
-    const priorI = nearestIndexPriorWpmToSecondBounds[i];
-    const prevVal = aggWpmByCharacter[priorI];
 
-    const nextI = priorI + 1;
-    if (nextI >= aggWpmByCharacter.length) {
-      wpmBySecond.push(prevVal);
-      continue;
+  for (let second = 0; second <= maxSecond; second++) {
+    let charCountAtSecond = 0;
+    for (let i = 0; i < progressionStack.length; i++) {
+      if (progressionStack[i] <= second) {
+        charCountAtSecond = i + 1;
+      } else {
+        break;
+      }
     }
 
-    const nextVal = aggWpmByCharacter[nextI];
-    const priorTime = progressionStack[priorI];
-    const nextTime = progressionStack[nextI];
-    const timespan = nextTime - priorTime;
-
-    if (timespan <= 0) {
-      wpmBySecond.push(prevVal);
-      continue;
+    if (charCountAtSecond > 0 && second > 0) {
+      wpmBySecond.push(getWpm(charCountAtSecond, second));
+    } else {
+      wpmBySecond.push(0);
     }
-
-    const percentAlongTimespan = (second - priorTime) / timespan;
-    let lerpedWpm = prevVal + (nextVal - prevVal) * percentAlongTimespan;
-    lerpedWpm = Math.max(lerpedWpm, 0);
-    wpmBySecond.push(lerpedWpm);
-  }
-
-  if (aggWpmByCharacter.length > 0) {
-    const finalWpm = aggWpmByCharacter[aggWpmByCharacter.length - 1];
-    wpmBySecond.push(finalWpm);
   }
 
   return wpmBySecond;

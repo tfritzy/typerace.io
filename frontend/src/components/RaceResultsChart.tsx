@@ -31,6 +31,8 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
     const rawWpmData = getRawWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
     const aggWpmData = getAggWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
 
+    const maxDataIndex = Math.max(rawWpmData.length - 1, aggWpmData.length - 1);
+
     const colorConfig = getColorConfig(playerColor);
     const primaryColor = colorConfig.primary;
     const secondaryColor = getComputedStyle(document.documentElement)
@@ -124,6 +126,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
         scales: {
             x: {
                 type: 'linear',
+                max: maxDataIndex,
                 title: {
                     display: true,
                     text: 'Time (seconds)',
