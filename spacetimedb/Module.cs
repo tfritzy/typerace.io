@@ -264,10 +264,10 @@ public static partial class Module
 
     private static double GenerateTypingRate(Random rng)
     {
-        var meanWpm = 40.0;
-        var stdDev = 15.0;
+        var meanWpm = 70.0;
+        var stdDev = 20.0;
         var wpm = GenerateNormalDistribution(rng, meanWpm, stdDev);
-        wpm = Math.Max(20.0, Math.Min(80.0, wpm));
+        wpm = Math.Max(35.0, Math.Min(120.0, wpm));
         var charactersPerSecond = (wpm * 5.0) / 60.0;
         var microsecondsPerCharacter = 1_000_000.0 / charactersPerSecond;
         return microsecondsPerCharacter;
@@ -965,17 +965,7 @@ public static partial class Module
 
             var timeElapsed = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.RacingStartedAt;
 
-            if (!progress.IsBot)
-            {
-                UpdatePlayerStatsForGame(ctx, updatedProgress, updatedGame, placement, timeElapsed);
-            }
-            else
-            {
-                updatedProgress.Time = timeElapsed;
-                updatedProgress.Placement = placement;
-                updatedProgress.Wpm = CalculateWpm(game.Phrase.Length, timeElapsed);
-                ctx.Db.playerprogress.Id.Update(updatedProgress);
-            }
+            UpdatePlayerStatsForGame(ctx, updatedProgress, updatedGame, placement, timeElapsed);
 
             Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}");
         }
