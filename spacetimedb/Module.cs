@@ -106,6 +106,7 @@ public static partial class Module
     }
 
     [Table(Name = "game", Public = true)]
+    [SpacetimeDB.Index.BTree(Table = nameof(Game), Columns = new[] { nameof(State), nameof(GameType) })]
     public partial struct Game
     {
         [PrimaryKey]
