@@ -31,9 +31,7 @@ export const GamePageTypeBox = ({
   }, [onFinish]);
 
   return (
-    <div
-      className="text-2xl font-mono" style={{ lineHeight: 1.6 }}
-    >
+    <div className="text-2xl font-mono leading-[1.6]">
       <TypeBox
         ref={typeBoxRef}
         phrase={phrase}

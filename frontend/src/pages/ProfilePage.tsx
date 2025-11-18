@@ -121,29 +121,11 @@ export const ProfilePage = () => {
 
             <div className="flex flex-col items-center px-4 pb-12">
                 <div className="content-container">
-                    <div style={{
-                        backgroundColor: '#272727',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        borderRadius: '8px',
-                        padding: '32px',
-                        marginBottom: '32px',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1)',
-                        position: 'relative'
-                    }}>
+                    <div className="bg-[#272727] border border-white/15 rounded-lg p-8 mb-8 shadow-[0_4px_12px_rgba(0,0,0,0.2),0_1px_3px_rgba(0,0,0,0.1)] relative">
                         {isOwnProfile && (
                             <button
                                 onClick={() => setIsEditModalOpen(true)}
-                                style={{
-                                    position: 'absolute',
-                                    top: '20px',
-                                    right: '20px',
-                                    backgroundColor: 'transparent',
-                                    border: 'none',
-                                    color: 'rgba(255, 255, 255, 0.5)',
-                                    cursor: 'pointer',
-                                    fontSize: '1.25rem',
-                                    padding: '8px'
-                                }}
+                                className="absolute top-5 right-5 bg-transparent border-0 text-white/50 cursor-pointer text-xl p-2"
                                 title="Edit Profile"
                             >
                                 ✏️
@@ -151,7 +133,7 @@ export const ProfilePage = () => {
                         )}
                         {viewedPlayer ? (
                             <div>
-                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px', marginBottom: '32px' }}>
+                                <div className="flex items-start gap-6 mb-8">
                                     <PlayerAvatar
                                         size={80}
                                         identity={viewedPlayer.id.toHexString()}
@@ -159,165 +141,74 @@ export const ProfilePage = () => {
                                         isHighlighted={true}
                                     />
 
-                                    <div style={{ flex: 1 }}>
-                                        <h1 style={{
-                                            color: '#ffffff',
-                                            fontSize: '1.875rem',
-                                            fontWeight: 700,
-                                            marginBottom: '12px'
-                                        }}>
+                                    <div className="flex-1">
+                                        <h1 className="text-white text-3xl font-bold mb-3">
                                             {viewedPlayer.name}
                                         </h1>
 
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '12px'
-                                        }}>
-                                            <span style={{
-                                                color: 'rgba(255, 255, 255, 0.6)',
-                                                fontSize: '0.875rem',
-                                                fontWeight: 500
-                                            }}>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-white/60 text-sm font-medium">
                                                 Level {viewedPlayer.level}
                                             </span>
-                                            <div style={{
-                                                flex: 1,
-                                                height: '10px',
-                                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                                borderRadius: '5px',
-                                                overflow: 'hidden'
-                                            }}>
-                                                <div style={{
-                                                    height: '100%',
-                                                    background: viewedPlayer ? getColorConfig(viewedPlayer.color).gradient : 'var(--color-accent)',
-                                                    borderRadius: '5px',
-                                                    width: `${viewedPlayer ? xpProgressToNextLevel(viewedPlayer.xp, viewedPlayer.level) : 0}%`,
-                                                    transition: 'width 0.3s ease'
-                                                }} />
+                                            <div className="flex-1 h-2.5 bg-white/10 rounded-[5px] overflow-hidden">
+                                                <div
+                                                    className="h-full rounded-[5px] transition-[width_0.3s_ease]"
+                                                    style={{
+                                                        background: viewedPlayer ? getColorConfig(viewedPlayer.color).gradient : 'var(--color-accent)',
+                                                        width: `${viewedPlayer ? xpProgressToNextLevel(viewedPlayer.xp, viewedPlayer.level) : 0}%`
+                                                    }}
+                                                />
                                             </div>
-                                            <span style={{
-                                                color: 'rgba(255, 255, 255, 0.6)',
-                                                fontSize: '0.875rem',
-                                                fontWeight: 500
-                                            }}>
+                                            <span className="text-white/60 text-sm font-medium">
                                                 Level {viewedPlayer.level + 1}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(2, 1fr)',
-                                    gap: '16px'
-                                }}>
-                                    <div style={{
-                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                        borderRadius: '8px',
-                                        padding: '20px',
-                                        border: '1px solid rgba(255, 255, 255, 0.06)'
-                                    }}>
-                                        <div style={{
-                                            color: 'rgba(255, 255, 255, 0.5)',
-                                            fontSize: '0.8125rem',
-                                            marginBottom: '12px',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.05em',
-                                            fontWeight: 600
-                                        }}>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-white/[0.03] rounded-lg p-5 border border-white/[0.06]">
+                                        <div className="text-white/50 text-[0.8125rem] mb-3 uppercase tracking-wider font-semibold">
                                             Career Stats
                                         </div>
-                                        <div style={{
-                                            display: 'grid',
-                                            gridTemplateColumns: 'repeat(2, 1fr)',
-                                            gap: '16px'
-                                        }}>
+                                        <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <div style={{
-                                                    color: 'rgba(255, 255, 255, 0.6)',
-                                                    fontSize: '0.8125rem',
-                                                    marginBottom: '6px'
-                                                }}>
+                                                <div className="text-white/60 text-[0.8125rem] mb-1.5">
                                                     Games Played
                                                 </div>
-                                                <div style={{
-                                                    color: '#ffffff',
-                                                    fontSize: '1.5rem',
-                                                    fontWeight: 700
-                                                }}>
+                                                <div className="text-white text-2xl font-bold">
                                                     {viewedPlayer.totalGames}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div style={{
-                                                    color: 'rgba(255, 255, 255, 0.6)',
-                                                    fontSize: '0.8125rem',
-                                                    marginBottom: '6px'
-                                                }}>
+                                                <div className="text-white/60 text-[0.8125rem] mb-1.5">
                                                     Wins
                                                 </div>
-                                                <div style={{
-                                                    color: '#ffffff',
-                                                    fontSize: '1.5rem',
-                                                    fontWeight: 700
-                                                }}>
+                                                <div className="text-white text-2xl font-bold">
                                                     {viewedPlayer.wins}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div style={{
-                                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                                        borderRadius: '8px',
-                                        padding: '20px',
-                                        border: '1px solid rgba(255, 255, 255, 0.06)'
-                                    }}>
-                                        <div style={{
-                                            color: 'rgba(255, 255, 255, 0.5)',
-                                            fontSize: '0.8125rem',
-                                            marginBottom: '12px',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.05em',
-                                            fontWeight: 600
-                                        }}>
+                                    <div className="bg-white/[0.03] rounded-lg p-5 border border-white/[0.06]">
+                                        <div className="text-white/50 text-[0.8125rem] mb-3 uppercase tracking-wider font-semibold">
                                             Performance
                                         </div>
-                                        <div style={{
-                                            display: 'grid',
-                                            gridTemplateColumns: 'repeat(2, 1fr)',
-                                            gap: '16px'
-                                        }}>
+                                        <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <div style={{
-                                                    color: 'rgba(255, 255, 255, 0.6)',
-                                                    fontSize: '0.8125rem',
-                                                    marginBottom: '6px'
-                                                }}>
+                                                <div className="text-white/60 text-[0.8125rem] mb-1.5">
                                                     Highest WPM
                                                 </div>
-                                                <div style={{
-                                                    color: 'var(--color-accent)',
-                                                    fontSize: '1.5rem',
-                                                    fontWeight: 700
-                                                }}>
+                                                <div className="text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>
                                                     127
                                                 </div>
                                             </div>
                                             <div>
-                                                <div style={{
-                                                    color: 'rgba(255, 255, 255, 0.6)',
-                                                    fontSize: '0.8125rem',
-                                                    marginBottom: '6px'
-                                                }}>
+                                                <div className="text-white/60 text-[0.8125rem] mb-1.5">
                                                     Words Typed
                                                 </div>
-                                                <div style={{
-                                                    color: '#ffffff',
-                                                    fontSize: '1.5rem',
-                                                    fontWeight: 700
-                                                }}>
+                                                <div className="text-white text-2xl font-bold">
                                                     8,432
                                                 </div>
                                             </div>
@@ -326,59 +217,27 @@ export const ProfilePage = () => {
                                 </div>
                             </div>
                         ) : (
-                            <div style={{
-                                color: 'rgba(255, 255, 255, 0.6)',
-                                textAlign: 'center',
-                                padding: '24px'
-                            }}>
+                            <div className="text-white/60 text-center p-6">
                                 No player data found
                             </div>
                         )}
                     </div>
 
                     <div>
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            marginBottom: '24px'
-                        }}>
-                            <h2 style={{
-                                color: '#ffffff',
-                                fontSize: '1.5rem',
-                                fontWeight: 700,
-                                margin: 0
-                            }}>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-white text-2xl font-bold m-0">
                                 Performance History
                             </h2>
 
-                            <div style={{
-                                display: 'flex',
-                                gap: '12px',
-                                alignItems: 'center'
-                            }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                    <label style={{
-                                        color: 'rgba(255, 255, 255, 0.6)',
-                                        fontSize: '0.75rem',
-                                        fontWeight: 500
-                                    }}>
+                            <div className="flex gap-3 items-center">
+                                <div className="flex flex-col gap-1">
+                                    <label className="text-white/60 text-xs font-medium">
                                         Mode
                                     </label>
                                     <select
                                         value={selectedMode}
                                         onChange={(e) => setSelectedMode(e.target.value)}
-                                        style={{
-                                            backgroundColor: '#1a1a1a',
-                                            color: '#ffffff',
-                                            border: '1px solid rgba(255, 255, 255, 0.15)',
-                                            borderRadius: '6px',
-                                            padding: '8px 12px',
-                                            fontSize: '0.875rem',
-                                            cursor: 'pointer',
-                                            outline: 'none',
-                                            minWidth: '150px'
-                                        }}
+                                        className="bg-[#1a1a1a] text-white border border-white/15 rounded-md px-3 py-2 text-sm cursor-pointer outline-none min-w-[150px]"
                                     >
                                         <option value="all">All Modes</option>
                                         {availableModes.map(mode => (
@@ -389,28 +248,14 @@ export const ProfilePage = () => {
                                     </select>
                                 </div>
 
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                    <label style={{
-                                        color: 'rgba(255, 255, 255, 0.6)',
-                                        fontSize: '0.75rem',
-                                        fontWeight: 500
-                                    }}>
+                                <div className="flex flex-col gap-1">
+                                    <label className="text-white/60 text-xs font-medium">
                                         Time Frame
                                     </label>
                                     <select
                                         value={selectedTimeFrame}
                                         onChange={(e) => setSelectedTimeFrame(e.target.value as TimeFrame)}
-                                        style={{
-                                            backgroundColor: '#1a1a1a',
-                                            color: '#ffffff',
-                                            border: '1px solid rgba(255, 255, 255, 0.15)',
-                                            borderRadius: '6px',
-                                            padding: '8px 12px',
-                                            fontSize: '0.875rem',
-                                            cursor: 'pointer',
-                                            outline: 'none',
-                                            minWidth: '150px'
-                                        }}
+                                        className="bg-[#1a1a1a] text-white border border-white/15 rounded-md px-3 py-2 text-sm cursor-pointer outline-none min-w-[150px]"
                                     >
                                         <option value="all">All Time</option>
                                         <option value="today">Today</option>
