@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 import "../components/SelectionButton.css";
@@ -12,6 +12,7 @@ import {
   type GameTypeValue,
 } from "../components/MatchTypeSelector";
 import { Header } from "../components/Header";
+import { getRandomStartupPhrase } from "../utils/modes";
 
 export const LobbyPage = () => {
   const [selectedMode, setSelectedMode] = useState<GameMode>({
@@ -20,6 +21,10 @@ export const LobbyPage = () => {
   const [gameType, setGameType] = useState<GameTypeValue>("Public");
   const navigate = useNavigate();
   const typeBoxRef = useRef<TypeBoxRef>(null);
+
+  const startupPhrase = useMemo(() => {
+    return getRandomStartupPhrase(selectedMode.tag);
+  }, [selectedMode.tag]);
 
   const handlePhraseComplete = useCallback(() => {
     navigate(`/game?mode=${selectedMode.tag}&gameType=${gameType}`, { replace: true });
@@ -33,7 +38,7 @@ export const LobbyPage = () => {
           <div className="text-xl mb-[400px]">
             <TypeBox
               ref={typeBoxRef}
-              phrase="asdf"
+              phrase={startupPhrase}
               onComplete={handlePhraseComplete}
               resetOnComplete={true}
             />

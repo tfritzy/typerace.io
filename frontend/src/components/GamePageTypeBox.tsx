@@ -10,9 +10,9 @@ type GamePageTypeBoxProps = {
   disabled?: boolean;
 };
 
-export const GamePageTypeBox = ({ 
-  phrase, 
-  gameId, 
+export const GamePageTypeBox = ({
+  phrase,
+  gameId,
   conn,
   onFinish,
   disabled = false

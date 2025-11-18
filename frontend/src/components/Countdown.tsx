@@ -7,6 +7,7 @@ export const Countdown = () => {
     const { gameId } = useParams<{ gameId: string }>();
     const [count, setCount] = useState(3);
     const [isVisible, setIsVisible] = useState(false);
+    const [showImage, setShowImage] = useState(false);
     const [previousGameState, setPreviousGameState] = useState<string | null>(null);
 
     const { rows: games } = useTable<DbConnection, Game>(
@@ -35,7 +36,11 @@ export const Countdown = () => {
         if (!isVisible) return;
 
         if (count === 0) {
-            setIsVisible(false);
+            setShowImage(true);
+            setTimeout(() => {
+                setIsVisible(false);
+                setShowImage(false);
+            }, 2000);
             return;
         }
 
@@ -51,20 +56,21 @@ export const Countdown = () => {
     }
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
-            <div
-                key={count}
-                className="countdown-number"
-                style={{
-                    fontSize: "20rem",
-                    fontWeight: "bold",
-                    color: "#fff",
-                    animation: "countdownPop 1s ease-out forwards",
-                }}
-            >
-                {count}
-            </div>
-            <style>{`
+        <>
+            <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
+                <div
+                    key={count}
+                    className="countdown-number"
+                    style={{
+                        fontSize: "20rem",
+                        fontWeight: "bold",
+                        color: "#fff",
+                        animation: "countdownPop 1s ease-out forwards",
+                    }}
+                >
+                    {count}
+                </div>
+                <style>{`
         @keyframes countdownPop {
           0% {
             opacity: 1;
@@ -76,6 +82,38 @@ export const Countdown = () => {
           }
         }
       `}</style>
-        </div>
+            </div>
+            {showImage && (
+                <div className="fixed left-12 top-[52%] -translate-y-1/2 pointer-events-none z-50">
+                    <img
+                        src="/bufo-lets-goo.gif"
+                        alt="Let's go"
+                        className="w-14 h-14"
+                        style={{
+                            animation: "fadeInOut 2s ease-out forwards",
+                        }}
+                    />
+                    <style>{`
+        @keyframes fadeInOut {
+          0% {
+            transform: scale(0.9) scaleX(-1);
+          }
+          20% {
+            opacity: 1;
+            transform: scale(1) scaleX(-1);
+          }
+          80% {
+            opacity: 1;
+            transform: scale(1) scaleX(-1);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(0.8) scaleX(-1);
+          }
+        }
+      `}</style>
+                </div>
+            )}
+        </>
     );
 };

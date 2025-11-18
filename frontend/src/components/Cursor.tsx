@@ -13,7 +13,7 @@ export const Cursor = ({ targetRef, lerp = 0.15, fadeDelay = 2000, visible = tru
     const target = useRef({ x: 0, y: 0 });
     const initialized = useRef(false);
     const lastMoveTime = useRef(Date.now());
-    const [opacity, setOpacity] = useState(1);
+    const [isBlinking, setIsBlinking] = useState(false);
 
     useEffect(() => {
         if (!targetRef?.current || !followerRef.current) return;
@@ -30,7 +30,7 @@ export const Cursor = ({ targetRef, lerp = 0.15, fadeDelay = 2000, visible = tru
 
             if (newTarget.x !== target.current.x || newTarget.y !== target.current.y) {
                 lastMoveTime.current = Date.now();
-                setOpacity(1);
+                setIsBlinking(false);
             }
 
             target.current = newTarget;
@@ -61,7 +61,7 @@ export const Cursor = ({ targetRef, lerp = 0.15, fadeDelay = 2000, visible = tru
         const fadeInterval = setInterval(() => {
             const timeSinceMove = Date.now() - lastMoveTime.current;
             if (timeSinceMove >= fadeDelay) {
-                setOpacity(.25);
+                setIsBlinking(true);
             }
         }, 100);
 
@@ -80,8 +80,8 @@ export const Cursor = ({ targetRef, lerp = 0.15, fadeDelay = 2000, visible = tru
     return (
         <div
             ref={followerRef}
-            className="max-w-0 h-6 fixed top-0 left-0 transition-opacity duration-500"
-            style={{ opacity: visible ? opacity : 0 }}
+            className={`max-w-0 h-8 -translate-y-px fixed top-0 left-0 ${isBlinking ? 'animate-blink' : ''}`}
+            style={{ opacity: visible ? 1 : 0 }}
         >
             <div className="h-full" style={{ borderRight: '1px solid var(--color-white)' }} />
         </div>
