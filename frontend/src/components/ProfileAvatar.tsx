@@ -33,13 +33,12 @@ export const ProfileAvatar = () => {
             onClick={() => navigate(`/profile/${identityHash}`)}
             className="flex items-center gap-4 py-3 rounded-lg cursor-pointer"
         >
-            <div className="relative shrink-0 border-2 rounded-full" style={{ borderColor: 'var(--color-accent)' }}>
-                <PlayerAvatar
-                    size={40}
-                    identity={identityHash}
-                    color={myPlayer?.color}
-                />
-            </div>
+            <PlayerAvatar
+                size={40}
+                identity={identityHash}
+                color={myPlayer?.color}
+                isHighlighted={true}
+            />
 
             <div className="flex flex-col items-start gap-1 min-w-50">
                 <div className="text-sm font-semibold text-white">{name}</div>

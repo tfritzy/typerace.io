@@ -152,18 +152,12 @@ export const ProfilePage = () => {
                         {viewedPlayer ? (
                             <div>
                                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px', marginBottom: '32px' }}>
-                                    <div style={{
-                                        border: '2px solid var(--color-accent)',
-                                        borderRadius: '50%',
-                                        overflow: 'hidden',
-                                        flexShrink: 0
-                                    }}>
-                                        <PlayerAvatar
-                                            size={80}
-                                            identity={viewedPlayer.id.toHexString()}
-                                            color={viewedPlayer.color}
-                                        />
-                                    </div>
+                                    <PlayerAvatar
+                                        size={80}
+                                        identity={viewedPlayer.id.toHexString()}
+                                        color={viewedPlayer.color}
+                                        isHighlighted={true}
+                                    />
 
                                     <div style={{ flex: 1 }}>
                                         <h1 style={{

@@ -1,13 +1,16 @@
+import { useState } from "react";
 import type { PlayerProgress } from "../../module_bindings/player_progress_type";
+import type { Player } from "../../module_bindings/player_type";
+import { PlayerColor } from "../../module_bindings/player_color_type";
 import { RaceResultsChart } from "./RaceResultsChart";
-import { ProgressOverTimeChart } from "./ProgressOverTimeChart";
+import { PlayerAvatar } from "./PlayerAvatar";
 import { getFinalWpm, getRaceTime, getAccuracy } from "../utils/wpmCalculator";
 import { formatStopwatchTime, getOrdinalPlacement } from "../utils/formatters";
 
 interface RaceResultsProps {
     playerProgress: PlayerProgress;
     allPlayerProgress: PlayerProgress[];
-    phraseLength: number;
+    allPlayers: readonly Player[];
     raceStartTimestamp: bigint;
     placement: number;
 }
@@ -15,10 +18,24 @@ interface RaceResultsProps {
 export const RaceResults = ({
     playerProgress,
     allPlayerProgress,
-    phraseLength,
+    allPlayers,
     raceStartTimestamp,
     placement
 }: RaceResultsProps) => {
+    const [selectedPlayerId, setSelectedPlayerId] = useState<string>(playerProgress.playerId.toHexString());
+
+    const selectedPlayerProgress = allPlayerProgress.find(
+        pp => pp.playerId.toHexString() === selectedPlayerId
+    ) || playerProgress;
+
+    const getPlayerColor = (playerId: any): PlayerColor => {
+        if (!playerId) {
+            return PlayerColor.Amber;
+        }
+        const player = allPlayers.find(p => p.id.isEqual(playerId));
+        return player?.color ?? PlayerColor.Amber;
+    };
+
     const finalWpm = getFinalWpm(playerProgress);
     const raceTime = getRaceTime(playerProgress);
     const accuracy = getAccuracy(playerProgress.characterHistory);
@@ -39,7 +56,7 @@ export const RaceResults = ({
                 <div style={{
                     flex: '1',
                     backgroundColor: 'var(--color-box-bg)',
-                    border: `1px solid ${isHighWpm ? 'var(--color-accent)' : 'var(--color-box-border)'}`,
+                    border: `1px solid var(--color-box-border)`,
                     borderRadius: '8px',
                     padding: '24px',
                     display: 'flex',
@@ -173,33 +190,50 @@ export const RaceResults = ({
                 borderRadius: '8px',
                 padding: '24px'
             }}>
-                <RaceResultsChart
-                    playerProgress={playerProgress}
-                    raceStartTimestamp={raceStartTimestamp}
-                />
-            </div>
-
-            <div style={{
-                backgroundColor: 'var(--color-box-bg)',
-                border: '1px solid var(--color-box-border)',
-                borderRadius: '8px',
-                padding: '24px',
-                marginTop: '16px'
-            }}>
                 <div style={{
-                    fontSize: '11px',
-                    color: 'rgba(255, 255, 255, 0.5)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '1.2px',
+                    display: 'flex',
+                    gap: '8px',
                     marginBottom: '16px',
-                    fontWeight: '600'
+                    flexWrap: 'wrap'
                 }}>
-                    Race Progress
+                    {allPlayerProgress.map((pp) => (
+                        <button
+                            key={pp.playerId.toHexString()}
+                            onClick={() => setSelectedPlayerId(pp.playerId.toHexString())}
+                            style={{
+                                padding: '8px 12px',
+                                backgroundColor: selectedPlayerId === pp.playerId.toHexString()
+                                    ? 'rgba(255, 255, 255, 0.1)'
+                                    : 'transparent',
+                                color: selectedPlayerId === pp.playerId.toHexString()
+                                    ? 'rgba(255, 255, 255, 0.95)'
+                                    : 'rgba(255, 255, 255, 0.5)',
+                                border: '1px solid var(--color-box-border)',
+                                borderRadius: '6px',
+                                fontSize: '13px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                letterSpacing: '0.5px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}
+                        >
+                            <PlayerAvatar
+                                size={24}
+                                identity={pp.playerId.toHexString()}
+                                color={getPlayerColor(pp.playerId)}
+                            />
+                            {pp.playerName}
+                        </button>
+                    ))}
                 </div>
-                <ProgressOverTimeChart
-                    allPlayerProgress={allPlayerProgress}
-                    phraseLength={phraseLength}
+
+                <RaceResultsChart
+                    playerProgress={selectedPlayerProgress}
                     raceStartTimestamp={raceStartTimestamp}
+                    playerColor={getPlayerColor(selectedPlayerProgress.playerId)}
                 />
             </div>
         </div>

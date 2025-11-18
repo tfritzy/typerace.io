@@ -60,7 +60,7 @@ export const GamePage = () => {
     }
     return playerId.toHexString();
   };
-  
+
   const getPlayerColor = (playerId: any): PlayerColor => {
     if (!playerId) {
       return PlayerColor.Amber;
@@ -147,11 +147,11 @@ export const GamePage = () => {
                   <RaceResults
                     playerProgress={currentPP}
                     allPlayerProgress={gamePlayerProgress}
-                    phraseLength={game.phrase.length}
+                    allPlayers={players}
                     raceStartTimestamp={game.racingStartedAt}
                     placement={currentPP.placement}
                   />
-                  <ActionBar 
+                  <ActionBar
                     gameType={game.gameType?.tag as any}
                   />
                 </>

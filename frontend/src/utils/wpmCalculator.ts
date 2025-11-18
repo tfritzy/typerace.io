@@ -51,7 +51,22 @@ export function getRawWpmBySecond(
     wpmBySecond[i] = getWpm(charCountBySecond[i], 1);
   }
 
-  return wpmBySecond;
+  const smoothedWpm: number[] = [];
+  const windowSize = 3;
+  
+  for (let i = 0; i < wpmBySecond.length; i++) {
+    let sum = 0;
+    let count = 0;
+    
+    for (let j = Math.max(0, i - windowSize + 1); j <= Math.min(wpmBySecond.length - 1, i + windowSize - 1); j++) {
+      sum += wpmBySecond[j];
+      count++;
+    }
+    
+    smoothedWpm.push(sum / count);
+  }
+
+  return smoothedWpm;
 }
 
 export function getAggWpmBySecond(

@@ -48,16 +48,23 @@ public enum CharacterEventType
 [Type]
 public enum PlayerColor
 {
-    Amber,
-    Blue,
-    Green,
-    Purple,
     Red,
-    Pink,
-    Cyan,
     Orange,
+    Amber,
+    Yellow,
     Lime,
-    Indigo
+    Green,
+    Emerald,
+    Teal,
+    Cyan,
+    Sky,
+    Blue,
+    Indigo,
+    Violet,
+    Purple,
+    Fuchsia,
+    Pink,
+    Rose
 }
 
 [Type]
@@ -229,11 +236,11 @@ public static partial class Module
             var botName = RobotNameGenerator.Generate(ctx.Rng);
             var typingRate = GenerateTypingRate(ctx.Rng);
             var errorRate = GenerateErrorRate(ctx.Rng);
-            
+
             var identityBytes = Guid.NewGuid().ToByteArray();
             Array.Resize(ref identityBytes, 32);
             var identity = new Identity(identityBytes);
-            
+
             ctx.Db.player.Insert(new Player
             {
                 Id = identity,
@@ -358,7 +365,7 @@ public static partial class Module
 
             int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
             int requiredPlayers = GetMaxPlayerCount(foundGame.Value.GameType);
-            
+
             if (playerCount >= requiredPlayers)
             {
                 CancelBotFillTrigger(ctx, foundGame.Value.Id);
@@ -450,7 +457,10 @@ public static partial class Module
             {
                 if (CountPlayersInGame(ctx, game.Id) < GetMaxPlayerCount(gameType))
                 {
-                    return game;
+                    if (FindPlayerProgress(ctx, ctx.Sender, game.Id) == null)
+                    {
+                        return game;
+                    }
                 }
             }
         }
@@ -487,7 +497,7 @@ public static partial class Module
     {
         long countdownDurationMicros = GetCountdownDuration(gameType);
         long countdownDurationMs = countdownDurationMicros / 1000;
-        
+
         return ctx.Db.game.Insert(new Game
         {
             Id = IdGenerator.Generate("game_", ctx.Rng),
@@ -627,22 +637,24 @@ public static partial class Module
                 var botConfig = botPlayer.Value.BotConfig.Value;
                 var shouldError = ctx.Rng.NextDouble() < botConfig.ErrorRate;
 
-                var updatedProgress = progress.Value;
-                
                 if (shouldError)
                 {
-                    updatedProgress.CharacterHistory.Add(new CharacterEvent
+                    var incorrectEvent = new CharacterEvent
                     {
                         Timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
                         EventType = CharacterEventType.Incorrect
-                    });
-                    updatedProgress.CharacterHistory.Add(new CharacterEvent
+                    };
+                    var backspaceEvent = new CharacterEvent
                     {
                         Timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
                         EventType = CharacterEventType.Backspace
-                    });
+                    };
+
+                    var updatedProgress = progress.Value;
+                    updatedProgress.CharacterHistory.Add(incorrectEvent);
+                    updatedProgress.CharacterHistory.Add(backspaceEvent);
                     ctx.Db.playerprogress.Id.Update(updatedProgress);
-                    
+
                     var errorDelay = new TimeDuration { Microseconds = (long)(botConfig.TypingRate * 0.5) };
                     ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
                     {
@@ -654,29 +666,16 @@ public static partial class Module
                 }
                 else
                 {
-                    updatedProgress.ProgressIndex += 1;
-                    updatedProgress.CharacterHistory.Add(new CharacterEvent
+                    var correctEvent = new CharacterEvent
                     {
                         Timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
                         EventType = CharacterEventType.Correct
-                    });
-                    ctx.Db.playerprogress.Id.Update(updatedProgress);
+                    };
 
-                    if (updatedProgress.ProgressIndex >= args.PhraseLength)
-                    {
-                        var updatedGame = game.Value;
-                        updatedGame.Placements.Add(progress.Value.PlayerId);
-                        var placement = updatedGame.Placements.Count;
-                        ctx.Db.game.Id.Update(updatedGame);
+                    var newIndex = progress.Value.ProgressIndex + 1;
+                    ProcessProgressUpdate(ctx, progress.Value, game.Value, newIndex, correctEvent);
 
-                        var timeElapsed = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.Value.RacingStartedAt;
-                        updatedProgress.Time = timeElapsed;
-                        updatedProgress.Placement = placement;
-                        ctx.Db.playerprogress.Id.Update(updatedProgress);
-
-                        Log.Info($"Bot {progress.Value.PlayerId} finished game {game.Value.Id} in place {placement}");
-                    }
-                    else
+                    if (newIndex < args.PhraseLength)
                     {
                         var delay = new TimeDuration { Microseconds = GenerateBotDelayWithVariance(ctx.Rng, botConfig.TypingRate) };
                         ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
@@ -750,7 +749,7 @@ public static partial class Module
                 {
                     var botPlayer = ctx.Db.player.Id.Find(progress.PlayerId);
                     long delayMicroseconds;
-                    
+
                     if (botPlayer != null && botPlayer.Value.BotConfig != null)
                     {
                         var botConfig = botPlayer.Value.BotConfig.Value;
@@ -760,7 +759,7 @@ public static partial class Module
                     {
                         delayMicroseconds = GenerateBotDelay(ctx.Rng);
                     }
-                    
+
                     var delay = new TimeDuration { Microseconds = delayMicroseconds };
                     ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
                     {
@@ -871,7 +870,7 @@ public static partial class Module
             Year = year,
             Month = month,
             Date = timestamp,
-            TimeMs = timeMs,
+            TimeMs = timeElapsed / 1000,
             Placement = placement,
             Wpm = wpm
         });
@@ -915,16 +914,16 @@ public static partial class Module
         {
             return 0;
         }
-        
+
         if (level > 100)
         {
             return 5000;
         }
-        
+
         double baseXp = 100.0;
         double maxXp = 5000.0;
         double growthRate = Math.Log(maxXp / baseXp) / (100.0 - 2.0);
-        
+
         return (int)Math.Round(baseXp * Math.Exp(growthRate * (level - 2)));
     }
 
@@ -934,11 +933,52 @@ public static partial class Module
         {
             return 0;
         }
-        
+
         var charsPerWord = 5.0;
         var timeSeconds = timeMicroseconds / 1_000_000.0;
         var timeMinutes = timeSeconds / 60.0;
         return characterCount / charsPerWord / timeMinutes;
+    }
+
+    private static void ProcessProgressUpdate(
+        ReducerContext ctx,
+        PlayerProgress progress,
+        Game game,
+        int newIndex,
+        CharacterEvent characterEvent)
+    {
+        var updatedProgress = progress;
+        updatedProgress.ProgressIndex = newIndex;
+        updatedProgress.CharacterHistory.Add(characterEvent);
+
+        var elapsedMicros = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.RacingStartedAt;
+        updatedProgress.Wpm = CalculateWpm(newIndex, elapsedMicros);
+
+        ctx.Db.playerprogress.Id.Update(updatedProgress);
+
+        if (newIndex >= game.Phrase.Length)
+        {
+            var updatedGame = game;
+            updatedGame.Placements.Add(progress.PlayerId);
+            var placement = updatedGame.Placements.Count;
+            ctx.Db.game.Id.Update(updatedGame);
+
+            var timeElapsed = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.RacingStartedAt;
+
+            if (!progress.IsBot)
+            {
+                UpdatePlayerStatsForGame(ctx, updatedProgress, updatedGame, placement, timeElapsed);
+            }
+            else
+            {
+                updatedProgress.Time = timeElapsed;
+                updatedProgress.Placement = placement;
+                updatedProgress.Wpm = CalculateWpm(game.Phrase.Length, timeElapsed);
+                ctx.Db.playerprogress.Id.Update(updatedProgress);
+            }
+
+            Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}");
+        }
     }
 
     [Reducer]
@@ -961,48 +1001,15 @@ public static partial class Module
             return;
         }
 
-        var updatedProgress = existingProgress.Value;
-        updatedProgress.ProgressIndex = newIndex;
-
         var characterEvent = new CharacterEvent
         {
             Timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
             EventType = eventType
         };
-        updatedProgress.CharacterHistory.Add(characterEvent);
 
-        var elapsedMicros = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.Value.RacingStartedAt;
-        
-        updatedProgress.Wpm = CalculateWpm(newIndex, elapsedMicros);
+        ProcessProgressUpdate(ctx, existingProgress.Value, game.Value, newIndex, characterEvent);
 
-        ctx.Db.playerprogress.Id.Update(updatedProgress);
-
-        if (newIndex >= game.Value.Phrase.Length)
-        {
-            var updatedGame = game.Value;
-            updatedGame.Placements.Add(playerId);
-            var placement = updatedGame.Placements.Count;
-            ctx.Db.game.Id.Update(updatedGame);
-
-            var timeElapsed = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.Value.RacingStartedAt;
-
-            if (!existingProgress.Value.IsBot)
-            {
-                UpdatePlayerStatsForGame(ctx, updatedProgress, updatedGame, placement, timeElapsed);
-            }
-            else
-            {
-                updatedProgress.Time = timeElapsed;
-                updatedProgress.Placement = placement;
-                ctx.Db.playerprogress.Id.Update(updatedProgress);
-            }
-
-            Log.Info($"Player {playerId} finished game {gameId} in place {placement}");
-        }
-        else
-        {
-            Log.Info($"Updated progress for player {playerId} in game {gameId} to {newIndex}");
-        }
+        Log.Info($"Updated progress for player {playerId} in game {gameId} to {newIndex}");
     }
 
     private static PlayerProgress? FindPlayerProgress(ReducerContext ctx, Identity playerId, string gameId)

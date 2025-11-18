@@ -96,11 +96,7 @@ export const EditProfileModal = ({ currentName, currentColor, onSave, onClose }:
                     }}>
                         Color
                     </label>
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(5, 1fr)',
-                        gap: '12px'
-                    }}>
+                    <div className='flex flex-row flex-wrap space-x-2 space-y-2'>
                         {availableColors.map((colorTag) => {
                             const colorConfig = getColorConfig({ tag: colorTag } as PlayerColor);
                             const isSelected = color === colorTag;
@@ -109,10 +105,10 @@ export const EditProfileModal = ({ currentName, currentColor, onSave, onClose }:
                                     key={colorTag}
                                     onClick={() => setColor(colorTag)}
                                     style={{
-                                        width: '56px',
-                                        height: '56px',
-                                        borderRadius: '8px',
-                                        background: colorConfig.gradient,
+                                        width: '40px',
+                                        height: '40px',
+                                        borderRadius: '3px',
+                                        background: colorConfig.primary,
                                         border: isSelected ? '3px solid #ffffff' : 'none',
                                         cursor: 'pointer',
                                         opacity: isSelected ? 1 : 0.7

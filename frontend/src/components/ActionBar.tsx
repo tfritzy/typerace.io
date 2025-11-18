@@ -33,19 +33,20 @@ export const ActionBar = ({ mode, gameType }: ActionBarProps) => {
   }, [navigate, mode, gameType]);
 
   return (
-    <div className="box rounded-lg px-8 py-6 mt-4">
+    <div className="box rounded-lg px-8 py-4 mt-4">
       <div className="flex gap-4 justify-center">
         <button
           onClick={() => navigate("/")}
-          className="bg-transparent text-white border border-[var(--color-box-border)] rounded-lg px-6 py-3 text-base font-semibold cursor-pointer opacity-80"
+          className="bg-transparent text-white px-6 py-3 text-base font-semibold cursor-pointer opacity-80"
         >
-          Main Menu (M)
+          Main Menu <span className="border px-1 rounded-sm font-bold border-(--color-accent) text-(--color-accent)">M</span>
         </button>
+        <div className="border border-r border-(--color-box-border)" />
         <button
           onClick={() => navigate(`/game?mode=${getModeTag()}&gameType=${getGameType()}`, { replace: true })}
-          className="bg-transparent text-white border border-[var(--color-box-border)] rounded-lg px-6 py-3 text-base font-semibold cursor-pointer opacity-80"
+          className="bg-transparent text-white px-6 py-3 text-base font-semibold cursor-pointer opacity-80"
         >
-          Play Again (P)
+          Play Again <span className="border px-1 rounded-sm font-bold border-(--color-accent) text-(--color-accent)">P</span>
         </button>
       </div>
     </div>
