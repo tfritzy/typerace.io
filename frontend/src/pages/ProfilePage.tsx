@@ -123,14 +123,14 @@ export const ProfilePage = () => {
             stat.playerId.isEqual(playerIdentity)
         );
 
-        let totalCharacters = 0;
+        let totalWords = 0;
         for (const record of playerRecords) {
             const timeMinutes = record.timeMs / 60000;
-            const characters = record.wpm * 5.0 * timeMinutes;
-            totalCharacters += characters;
+            const words = record.wpm * timeMinutes;
+            totalWords += words;
         }
 
-        return Math.round(totalCharacters / 5.0);
+        return Math.round(totalWords);
     }, [gameRecords, playerIdentity]);
 
     const bestWpmPerMode = useMemo(() => {
