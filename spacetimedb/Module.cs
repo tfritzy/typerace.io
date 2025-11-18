@@ -456,9 +456,9 @@ public static partial class Module
             return null;
         }
 
-        foreach (var game in ctx.Db.game.GameType.Filter(GameType.Public))
+        foreach (var game in ctx.Db.game.State.Filter(GameState.Lobby))
         {
-            if (game.State == GameState.Lobby && game.GameMode == gameMode)
+            if (game.GameType == GameType.Public && game.GameMode == gameMode)
             {
                 if (CountPlayersInGame(ctx, game.Id) < GetMaxPlayerCount(gameType))
                 {
