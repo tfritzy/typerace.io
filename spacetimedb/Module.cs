@@ -106,6 +106,7 @@ public static partial class Module
     }
 
     [Table(Name = "game", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(State), nameof(GameType) })]
     public partial struct Game
     {
         [PrimaryKey]
@@ -451,16 +452,18 @@ public static partial class Module
 
     private static Game? FindLobbyGame(ReducerContext ctx, GameMode gameMode, GameType gameType)
     {
-        foreach (var game in ctx.Db.game.State.Filter(GameState.Lobby))
+        if (gameType != GameType.Public)
         {
-            if (game.GameMode == gameMode && game.GameType == gameType)
+            return null;
+        }
+
+        foreach (var game in ctx.Db.game.State_GameType.Filter((GameState.Lobby, GameType.Public)))
+        {
+            if (CountPlayersInGame(ctx, game.Id) < GetMaxPlayerCount(gameType))
             {
-                if (CountPlayersInGame(ctx, game.Id) < GetMaxPlayerCount(gameType))
+                if (FindPlayerProgress(ctx, ctx.Sender, game.Id) == null)
                 {
-                    if (FindPlayerProgress(ctx, ctx.Sender, game.Id) == null)
-                    {
-                        return game;
-                    }
+                    return game;
                 }
             }
         }
