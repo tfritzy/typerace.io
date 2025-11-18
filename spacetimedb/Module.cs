@@ -99,6 +99,7 @@ public static partial class Module
         public int Wins;
         public int Level;
         public int Xp;
+        public int TotalWordsTyped;
         [SpacetimeDB.Index.BTree]
         public bool IsBot;
         public BotConfig? BotConfig;
@@ -144,6 +145,20 @@ public static partial class Module
         public long Date;
         public long TimeMs;
         public int Placement;
+        public double Wpm;
+    }
+
+    [Table(Name = "personalrecord", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
+    public partial struct PersonalRecord
+    {
+        [PrimaryKey]
+        public string Id;
+        [SpacetimeDB.Index.BTree]
+        public Identity PlayerId;
+        [SpacetimeDB.Index.BTree]
+        public GameMode GameMode;
+        public string GameRecordId;
         public double Wpm;
     }
 
@@ -250,6 +265,7 @@ public static partial class Module
                 Wins = 0,
                 Level = 1,
                 Xp = 0,
+                TotalWordsTyped = 0,
                 IsBot = true,
                 BotConfig = new BotConfig
                 {
@@ -312,6 +328,7 @@ public static partial class Module
                 Wins = 0,
                 Level = 1,
                 Xp = 0,
+                TotalWordsTyped = 0,
                 IsBot = false,
                 BotConfig = null,
                 Color = PlayerColor.Amber
@@ -878,6 +895,8 @@ public static partial class Module
             Wpm = wpm
         });
 
+        var wordsTyped = game.Phrase.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+
         var xpEarned = CalculateXpForPlacement(placement);
 
         var updatedPlayer = player.Value;
@@ -887,6 +906,7 @@ public static partial class Module
             updatedPlayer.Wins += 1;
         }
         updatedPlayer.Xp += xpEarned;
+        updatedPlayer.TotalWordsTyped += wordsTyped;
 
         while (updatedPlayer.Xp >= XpRequiredForLevel(updatedPlayer.Level + 1))
         {
@@ -896,7 +916,33 @@ public static partial class Module
 
         ctx.Db.player.Id.Update(updatedPlayer);
 
-        Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}, earned {xpEarned} XP");
+        PersonalRecord? existingRecord = null;
+        foreach (var record in ctx.Db.personalrecord.PlayerId_GameMode.Filter((progress.PlayerId, game.GameMode)))
+        {
+            existingRecord = record;
+            break;
+        }
+
+        if (existingRecord == null || wpm > existingRecord.Value.Wpm)
+        {
+            if (existingRecord != null)
+            {
+                ctx.Db.personalrecord.Id.Delete(existingRecord.Value.Id);
+            }
+
+            ctx.Db.personalrecord.Insert(new PersonalRecord
+            {
+                Id = IdGenerator.Generate("pr_", ctx.Rng),
+                PlayerId = progress.PlayerId,
+                GameMode = game.GameMode,
+                GameRecordId = statsId,
+                Wpm = wpm
+            });
+
+            Log.Info($"Updated personal record for player {progress.PlayerId} in mode {game.GameMode}: {wpm} WPM");
+        }
+
+        Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}, earned {xpEarned} XP, typed {wordsTyped} words");
     }
 
     private static int CalculateXpForPlacement(int placement)

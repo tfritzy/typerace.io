@@ -11,3 +11,7 @@ export function getOrdinalPlacement(placement: number): string {
     const value = placement % 100;
     return placement + (suffixes[(value - 20) % 10] || suffixes[value] || suffixes[0]);
 }
+
+export function formatNumber(num: number): string {
+    return num.toLocaleString('en-US');
+}

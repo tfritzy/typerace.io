@@ -1,5 +1,5 @@
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import type { DbConnection, Player, GameRecord, PlayerColor } from "../../module_bindings";
+import type { DbConnection, Player, GameRecord, PersonalRecord, PlayerColor } from "../../module_bindings";
 import { WpmChart } from "../components/WpmChart";
 import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
@@ -10,6 +10,7 @@ import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { getColorConfig } from "../utils/colorMapping";
 import { EditProfileModal } from "../components/EditProfileModal";
+import { formatNumber } from "../utils/formatters";
 
 type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
@@ -17,6 +18,7 @@ export const ProfilePage = () => {
     const { playerId } = useParams<{ playerId: string }>();
     const conn = useSpacetimeDB<DbConnection>();
     const { rows: players } = useTable<DbConnection, Player>("player");
+    const { rows: personalRecords } = useTable<DbConnection, PersonalRecord>("personalrecord");
     const { rows: gameRecords } = useTable<DbConnection, GameRecord>("gamerecord");
     const [selectedMode, setSelectedMode] = useState<string>('all');
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('all');
@@ -39,9 +41,16 @@ export const ProfilePage = () => {
             })
             .subscribe(`select * from gamerecord where PlayerId = '${playerIdentity}'`);
 
+        const personalRecordSubscription = conn.subscriptionBuilder()
+            .onError((error: ErrorContextInterface) => {
+                console.error("Error subscribing to personalrecord:", error);
+            })
+            .subscribe(`select * from personalrecord where PlayerId = '${playerIdentity}'`);
+
         return () => {
             playerSubscription.unsubscribe();
             gameRecordSubscription.unsubscribe();
+            personalRecordSubscription.unsubscribe();
         };
     }, [conn, playerId]);
 
@@ -115,6 +124,21 @@ export const ProfilePage = () => {
         return Array.from(modesSet).sort();
     }, [gameRecords, playerIdentity]);
 
+    const bestWpmPerMode = useMemo(() => {
+        if (!playerIdentity) return {};
+
+        const playerPersonalRecords = personalRecords.filter(record => 
+            record.playerId.isEqual(playerIdentity)
+        );
+
+        const modeWpms: Record<string, number> = {};
+        for (const record of playerPersonalRecords) {
+            modeWpms[record.gameMode.tag] = record.wpm;
+        }
+
+        return modeWpms;
+    }, [personalRecords, playerIdentity]);
+
     return (
         <div className="min-h-screen">
             <Header hideAvatar={true} />
@@ -166,54 +190,64 @@ export const ProfilePage = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-white/[0.03] rounded-lg p-5 border border-white/[0.06]">
-                                        <div className="text-white/50 text-[0.8125rem] mb-3 uppercase tracking-wider font-semibold">
-                                            Career Stats
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <div className="text-white/60 text-[0.8125rem] mb-1.5">
-                                                    Games Played
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-white/[0.03] rounded-lg p-5 border border-white/[0.06]">
+                                            <div className="text-white/50 text-[0.8125rem] mb-3 uppercase tracking-wider font-semibold">
+                                                Career Stats
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <div className="text-white/60 text-[0.8125rem] mb-1.5">
+                                                        Games Played
+                                                    </div>
+                                                    <div className="text-white text-2xl font-bold">
+                                                        {viewedPlayer.totalGames}
+                                                    </div>
                                                 </div>
-                                                <div className="text-white text-2xl font-bold">
-                                                    {viewedPlayer.totalGames}
+                                                <div>
+                                                    <div className="text-white/60 text-[0.8125rem] mb-1.5">
+                                                        Wins
+                                                    </div>
+                                                    <div className="text-white text-2xl font-bold">
+                                                        {viewedPlayer.wins}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <div className="text-white/60 text-[0.8125rem] mb-1.5">
-                                                    Wins
-                                                </div>
-                                                <div className="text-white text-2xl font-bold">
-                                                    {viewedPlayer.wins}
-                                                </div>
+                                        </div>
+
+                                        <div className="bg-white/[0.03] rounded-lg p-5 border border-white/[0.06]">
+                                            <div className="text-white/50 text-[0.8125rem] mb-3 uppercase tracking-wider font-semibold">
+                                                Total Words Typed
+                                            </div>
+                                            <div className="text-white text-4xl font-bold">
+                                                {formatNumber(viewedPlayer.totalWordsTyped)}
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="bg-white/[0.03] rounded-lg p-5 border border-white/[0.06]">
-                                        <div className="text-white/50 text-[0.8125rem] mb-3 uppercase tracking-wider font-semibold">
-                                            Performance
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <div className="text-white/60 text-[0.8125rem] mb-1.5">
-                                                    Highest WPM
-                                                </div>
-                                                <div className="text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>
-                                                    127
-                                                </div>
+                                    {Object.keys(bestWpmPerMode).length > 0 && (
+                                        <div className="bg-white/[0.03] rounded-lg p-5 border border-white/[0.06]">
+                                            <div className="text-white/50 text-[0.8125rem] mb-3 uppercase tracking-wider font-semibold">
+                                                Best WPM by Mode
                                             </div>
-                                            <div>
-                                                <div className="text-white/60 text-[0.8125rem] mb-1.5">
-                                                    Words Typed
-                                                </div>
-                                                <div className="text-white text-2xl font-bold">
-                                                    8,432
-                                                </div>
+                                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                                {Object.entries(bestWpmPerMode)
+                                                    .sort(([modeA], [modeB]) => modeA.localeCompare(modeB))
+                                                    .map(([mode, wpm]) => (
+                                                        <div key={mode} className="bg-white/[0.02] rounded p-3 border border-white/[0.04]">
+                                                            <div className="text-white/60 text-xs mb-1.5 font-medium">
+                                                                {mode.replace(/(\d+)/, ' $1')}
+                                                            </div>
+                                                            <div className="text-xl font-bold" style={{ color: 'var(--color-accent)' }}>
+                                                                {Math.round(wpm)}
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                }
                                             </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
                         ) : (
