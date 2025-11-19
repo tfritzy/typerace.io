@@ -1,45 +1,74 @@
-import { StrictMode } from "react";
+import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
-import { Identity, type ErrorContextInterface } from "spacetimedb";
+import { type ErrorContextInterface } from "spacetimedb";
 import { SpacetimeDBProvider } from "spacetimedb/react";
 import { DbConnection } from "../module_bindings";
+import { auth } from "./firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
+import { AuthProvider } from "./firebase/AuthContext.tsx";
 
+const Root = () => {
+  const [token, setToken] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
 
-const onConnect = (conn: DbConnection, identity: Identity, token: string) => {
-  localStorage.setItem("auth_token", token);
-  conn
-    .subscriptionBuilder()
-    .onError((error: ErrorContextInterface) => {
-      console.error("Error subscribing to player:", error);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const idToken = await user.getIdToken();
+        setToken(idToken);
+      } else {
+        setToken(undefined);
+      }
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
+
+  const connectionBuilder = DbConnection.builder()
+    .withUri("ws://localhost:3000")
+    .withModuleName("typerace")
+    .withToken(token)
+    .onConnect((conn, identity, token) => {
+      console.log("Connected with identity:", identity.toHexString());
+      conn
+        .subscriptionBuilder()
+        .onError((error: ErrorContextInterface) => {
+          console.error("Error subscribing:", error);
+        })
+        .subscribe([
+          `select * from player where Id = '${identity}'`,
+          `select * from playerprogress where PlayerId = '${identity}'`,
+        ]);
     })
-    .subscribe([
-      `select * from player where Id = '${identity}'`,
-      `select * from playerprogress where PlayerId = '${identity}'`,
-    ]);
-};
+    .onDisconnect(() => {
+      console.log("Disconnected from SpacetimeDB");
+    })
+    .onConnectError((err: unknown) => {
+      console.log("Error connecting to SpacetimeDB:", err);
+    });
 
-const onDisconnect = () => {
-  console.log("Disconnected from SpacetimeDB");
+  return (
+    <AuthProvider>
+      <SpacetimeDBProvider connectionBuilder={connectionBuilder}>
+        <App />
+      </SpacetimeDBProvider>
+    </AuthProvider>
+  );
 };
-
-const onConnectError = (err: any) => {
-  console.log("Error connecting to SpacetimeDB:", err);
-};
-
-const connectionBuilder = DbConnection.builder()
-  .withUri("ws://localhost:3000")
-  .withModuleName("typerace")
-  .withToken(localStorage.getItem("auth_token") || undefined)
-  .onConnect(onConnect)
-  .onDisconnect(onDisconnect)
-  .onConnectError(onConnectError);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <SpacetimeDBProvider connectionBuilder={connectionBuilder}>
-      <App />
-    </SpacetimeDBProvider>
+    <Root />
   </StrictMode>
 );
