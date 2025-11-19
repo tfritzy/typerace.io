@@ -1,6 +1,7 @@
 import Avatar from "boring-avatars";
 import { PlayerColor } from "../../module_bindings";
 import { getColorConfig } from "../utils/colorMapping";
+import { Crown, Award } from 'lucide-react';
 
 type PlayerAvatarProps = {
     size: number;
@@ -8,21 +9,73 @@ type PlayerAvatarProps = {
     color?: PlayerColor;
     isHighlighted?: boolean;
     isLoading?: boolean;
+    placement?: number;
 };
 
 export const PlayerAvatar = ({
     size,
     identity,
     color = PlayerColor.Amber,
-    isLoading = false
+    isLoading = false,
+    placement
 }: PlayerAvatarProps) => {
     const colorConfig = getColorConfig(color);
+
+    const getCrownColor = (place: number) => {
+        if (place === 1) return '#FFD700';
+        return null;
+    };
+
+    const getMedalColor = (place: number) => {
+        if (place === 1) return '#FFD700';
+        if (place === 2) return '#C0C0C0';
+        if (place === 3) return '#CD7F32';
+        if (place > 3) return '#9CA3AF';
+        return null;
+    };
+
+    const getMedalStroke = (place: number) => {
+        if (place === 1) return '#8B6914';
+        if (place === 2) return '#5A5A5A';
+        if (place === 3) return '#6B3410';
+        if (place > 3) return '#4B5563';
+        return 'black';
+    };
+
+    const crownColor = placement ? getCrownColor(placement) : null;
+    const medalColor = placement ? getMedalColor(placement) : null;
+    const medalStroke = placement ? getMedalStroke(placement) : 'black';
 
     return (
         <div
             className={`relative shrink-0 border-2 rounded-full ${isLoading ? 'border-dashed' : ''}`}
             style={{ borderColor: colorConfig.avatarColors[2] }}
         >
+            {crownColor && (
+                <div
+                    className="absolute -top-4 left-1/2 -translate-x-1/2 z-10"
+                    style={{ filter: `drop-shadow(0 -1px 6px ${crownColor})` }}
+                >
+                    <Crown
+                        size={size * 0.5}
+                        fill={crownColor}
+                        stroke="none"
+                        strokeWidth={1.5}
+                    />
+                </div>
+            )}
+            {medalColor && (
+                <div
+                    className="absolute bottom-0 right-1 z-10"
+                >
+                    <Award
+                        size={size * 0.35}
+                        fill={medalColor}
+                        stroke={medalStroke}
+                        strokeWidth={2}
+                    />
+                </div>
+            )}
             {isLoading ? (
                 <div
                     className="bg-white/5 rounded-full"
