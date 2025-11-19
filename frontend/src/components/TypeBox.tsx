@@ -69,13 +69,17 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       if (newValue.length < oldValue.length) {
         let lastCompletedWordEnd = 0;
         for (let i = 0; i < oldValue.length; i++) {
-          if (oldValue[i] === phrase[i] && phrase[i] === ' ') {
+          if (oldValue[i] !== phrase[i]) {
+            break;
+          }
+          if (phrase[i] === ' ') {
             lastCompletedWordEnd = i + 1;
           }
         }
 
         if (newValue.length < lastCompletedWordEnd) {
-          setInput(phrase.substring(0, lastCompletedWordEnd));
+          const correctPrefix = phrase.substring(0, lastCompletedWordEnd);
+          setInput(correctPrefix);
           return;
         }
       }

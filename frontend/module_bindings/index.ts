@@ -67,10 +67,14 @@ import { GameArchiverTableHandle } from "./game_archiver_table.ts";
 export { GameArchiverTableHandle };
 import { GameStartTableHandle } from "./game_start_table.ts";
 export { GameStartTableHandle };
+import { EloTableHandle } from "./elo_table.ts";
+export { EloTableHandle };
 import { GameTableHandle } from "./game_table.ts";
 export { GameTableHandle };
 import { GamerecordTableHandle } from "./gamerecord_table.ts";
 export { GamerecordTableHandle };
+import { PersonalrecordTableHandle } from "./personalrecord_table.ts";
+export { PersonalrecordTableHandle };
 import { PlayerTableHandle } from "./player_table.ts";
 export { PlayerTableHandle };
 import { PlayerprogressTableHandle } from "./playerprogress_table.ts";
@@ -89,6 +93,8 @@ import { CharacterEventType } from "./character_event_type_type.ts";
 export { CharacterEventType };
 import { CountdownStart } from "./countdown_start_type.ts";
 export { CountdownStart };
+import { Elo } from "./elo_type.ts";
+export { Elo };
 import { Game } from "./game_type.ts";
 export { Game };
 import { GameArchiver } from "./game_archiver_type.ts";
@@ -103,6 +109,8 @@ import { GameState } from "./game_state_type.ts";
 export { GameState };
 import { GameType } from "./game_type_type.ts";
 export { GameType };
+import { PersonalRecord } from "./personal_record_type.ts";
+export { PersonalRecord };
 import { Player } from "./player_type.ts";
 export { Player };
 import { PlayerColor } from "./player_color_type.ts";
@@ -157,6 +165,15 @@ const REMOTE_MODULE = {
         colType: (GameStart.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
       },
     },
+    elo: {
+      tableName: "elo" as const,
+      rowType: Elo.getTypeScriptAlgebraicType(),
+      primaryKey: "id",
+      primaryKeyInfo: {
+        colName: "id",
+        colType: (Elo.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
+      },
+    },
     game: {
       tableName: "game" as const,
       rowType: Game.getTypeScriptAlgebraicType(),
@@ -173,6 +190,15 @@ const REMOTE_MODULE = {
       primaryKeyInfo: {
         colName: "id",
         colType: (GameRecord.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
+      },
+    },
+    personalrecord: {
+      tableName: "personalrecord" as const,
+      rowType: PersonalRecord.getTypeScriptAlgebraicType(),
+      primaryKey: "id",
+      primaryKeyInfo: {
+        colName: "id",
+        colType: (PersonalRecord.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
       },
     },
     player: {
@@ -549,6 +575,11 @@ export class RemoteTables {
     return new GameStartTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<GameStart>(REMOTE_MODULE.tables.GameStart));
   }
 
+  get elo(): EloTableHandle<'elo'> {
+    // clientCache is a private property
+    return new EloTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<Elo>(REMOTE_MODULE.tables.elo));
+  }
+
   get game(): GameTableHandle<'game'> {
     // clientCache is a private property
     return new GameTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<Game>(REMOTE_MODULE.tables.game));
@@ -557,6 +588,11 @@ export class RemoteTables {
   get gamerecord(): GamerecordTableHandle<'gamerecord'> {
     // clientCache is a private property
     return new GamerecordTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<GameRecord>(REMOTE_MODULE.tables.gamerecord));
+  }
+
+  get personalrecord(): PersonalrecordTableHandle<'personalrecord'> {
+    // clientCache is a private property
+    return new PersonalrecordTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<PersonalRecord>(REMOTE_MODULE.tables.personalrecord));
   }
 
   get player(): PlayerTableHandle<'player'> {
