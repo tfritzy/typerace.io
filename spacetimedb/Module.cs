@@ -236,6 +236,19 @@ public static partial class Module
         public double Wpm;
     }
 
+    [Table(Name = "privategameaccess", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameId) })]
+    public partial struct PrivateGameAccess
+    {
+        [PrimaryKey]
+        public string Id;
+        [SpacetimeDB.Index.BTree]
+        public Identity PlayerId;
+        [SpacetimeDB.Index.BTree]
+        public string GameId;
+        public long GrantedAt;
+    }
+
     [Table(Scheduled = nameof(UpdateBotProgress))]
     public partial struct BotProgressUpdate
     {
@@ -845,6 +858,34 @@ public static partial class Module
             GameId = gameId,
             ScheduledAt = new ScheduleAt.Time(scheduledTime)
         });
+    }
+
+    [Reducer]
+    public static void GrantPrivateGameAccess(ReducerContext ctx, string gameId)
+    {
+        var game = ctx.Db.game.Id.Find(gameId);
+
+        if (game == null)
+        {
+            Log.Info($"Game {gameId} not found");
+            return;
+        }
+
+        foreach (var existingAccess in ctx.Db.privategameaccess.PlayerId_GameId.Filter((ctx.Sender, gameId)))
+        {
+            Log.Info($"Player {ctx.Sender} already has access to game {gameId}");
+            return;
+        }
+
+        ctx.Db.privategameaccess.Insert(new PrivateGameAccess
+        {
+            Id = IdGenerator.Generate("pga_", ctx.Rng),
+            PlayerId = ctx.Sender,
+            GameId = gameId,
+            GrantedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch
+        });
+
+        Log.Info($"Granted private game access to player {ctx.Sender} for game {gameId}");
     }
 
     [Reducer]
