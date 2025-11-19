@@ -20,6 +20,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
   const [input, setInput] = useState("");
   const [hasError, setHasError] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [firstErrorPosition, setFirstErrorPosition] = useState<number | null>(null);
+  const [charactersAfterError, setCharactersAfterError] = useState(0);
 
   const targetRef = useRef<HTMLElement>(null);
 
@@ -84,19 +86,34 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
         }
       }
 
-      setInput(newValue);
-
       let correctCharCount = 0;
       let hasIncorrectChar = false;
+      let currentFirstErrorPos: number | null = null;
       for (let i = 0; i < newValue.length; i++) {
         if (newValue[i] === phrase[i]) {
           correctCharCount++;
         } else {
           hasIncorrectChar = true;
+          currentFirstErrorPos = i;
           break;
         }
       }
 
+      const isAddingChar = newValue.length > oldValue.length;
+      if (isAddingChar && currentFirstErrorPos !== null) {
+        const charsAfterError = newValue.length - currentFirstErrorPos - 1;
+        if (charsAfterError >= 10) {
+          return;
+        }
+        setCharactersAfterError(charsAfterError);
+      } else if (currentFirstErrorPos !== null) {
+        setCharactersAfterError(newValue.length - currentFirstErrorPos - 1);
+      } else {
+        setCharactersAfterError(0);
+      }
+
+      setFirstErrorPosition(currentFirstErrorPos);
+      setInput(newValue);
       setHasError(hasIncorrectChar);
 
       if (onProgress && newValue.length !== oldValue.length) {
@@ -121,6 +138,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
             setInput("");
             setIsComplete(false);
             setHasError(false);
+            setFirstErrorPosition(null);
+            setCharactersAfterError(0);
           }, 0);
         }
       }
@@ -178,6 +197,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       style={style}
       onClick={() => inputRef.current?.focus()}
     >
+      {charactersAfterError >= 10 && (
+        <div className="text-red-500 font-semibold text-center mb-4 animate-pulse">
+          You must fix all errors
+        </div>
+      )}
       <div className="relative select-none">
         <div className="type-box">
           <div
