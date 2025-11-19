@@ -441,14 +441,7 @@ public static partial class Module
 
             if (gameType == GameType.Private)
             {
-                ctx.Db.privategameaccess.Insert(new PrivateGameAccess
-                {
-                    Id = IdGenerator.Generate("pga_", ctx.Rng),
-                    PlayerId = ctx.Sender,
-                    GameId = newGame.Id,
-                    GrantedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch
-                });
-                Log.Info($"Granted private game access to creator {ctx.Sender} for game {newGame.Id}");
+                InsertPrivateGameAccess(ctx, ctx.Sender, newGame.Id);
             }
 
             int playerCount = CountPlayersInGame(ctx, newGame.Id);
@@ -583,6 +576,18 @@ public static partial class Module
             ctx.Db.BotFillTrigger.ScheduledId.Delete(trigger.ScheduledId);
             Log.Info($"Cancelled bot fill trigger for game {gameId}");
         }
+    }
+
+    private static void InsertPrivateGameAccess(ReducerContext ctx, Identity playerId, string gameId)
+    {
+        ctx.Db.privategameaccess.Insert(new PrivateGameAccess
+        {
+            Id = IdGenerator.Generate("pga_", ctx.Rng),
+            PlayerId = playerId,
+            GameId = gameId,
+            GrantedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch
+        });
+        Log.Info($"Granted private game access to player {playerId} for game {gameId}");
     }
 
     private static void InsertPlayerProgress(ReducerContext ctx, string gameId, string joinCode)
@@ -889,15 +894,7 @@ public static partial class Module
             return;
         }
 
-        ctx.Db.privategameaccess.Insert(new PrivateGameAccess
-        {
-            Id = IdGenerator.Generate("pga_", ctx.Rng),
-            PlayerId = ctx.Sender,
-            GameId = gameId,
-            GrantedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch
-        });
-
-        Log.Info($"Granted private game access to player {ctx.Sender} for game {gameId}");
+        InsertPrivateGameAccess(ctx, ctx.Sender, gameId);
     }
 
     [Reducer]
