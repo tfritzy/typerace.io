@@ -20,6 +20,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
   const [input, setInput] = useState("");
   const [hasError, setHasError] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [hasReachedErrorLimit, setHasReachedErrorLimit] = useState(false);
 
   const targetRef = useRef<HTMLElement>(null);
 
@@ -108,6 +109,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
         }
       }
 
+      const reachedLimit = firstErrorPos !== null && (newValue.length - firstErrorPos - 1) >= 10;
+      setHasReachedErrorLimit(reachedLimit);
       setInput(newValue);
       setHasError(hasIncorrectChar);
 
@@ -133,6 +136,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
             setInput("");
             setIsComplete(false);
             setHasError(false);
+            setHasReachedErrorLimit(false);
           }, 0);
         }
       }
@@ -154,20 +158,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       event.preventDefault();
     }
   }, []);
-
-  const getCharactersAfterFirstError = useCallback(() => {
-    let firstErrorPos: number | null = null;
-    for (let i = 0; i < input.length; i++) {
-      if (input[i] !== phrase[i]) {
-        firstErrorPos = i;
-        break;
-      }
-    }
-    if (firstErrorPos === null) {
-      return 0;
-    }
-    return input.length - firstErrorPos - 1;
-  }, [input, phrase]);
 
   const renderText = () => {
     const chars = phrase.split("");
@@ -204,7 +194,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       style={style}
       onClick={() => inputRef.current?.focus()}
     >
-      {getCharactersAfterFirstError() >= 10 && (
+      {hasReachedErrorLimit && (
         <div className="text-red-500 font-semibold text-center mb-4 animate-pulse">
           You must fix all errors
         </div>
