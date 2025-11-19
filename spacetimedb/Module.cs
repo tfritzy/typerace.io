@@ -995,28 +995,23 @@ public static partial class Module
     {
         var currentMmr = GetOrCreatePlayerMmr(ctx, playerId, game.GameMode);
         
-        var opponentMmrs = new List<int>();
-        var totalPlayers = 0;
+        var totalMmrChange = 0;
+        var opponentCount = 0;
         foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
         {
-            totalPlayers++;
             if (progress.PlayerId != playerId)
             {
+                opponentCount++;
                 var opponentMmr = GetOrCreatePlayerMmr(ctx, progress.PlayerId, game.GameMode);
-                opponentMmrs.Add(opponentMmr.Rating);
+                var actualScore = (progress.Placement == -1 || progress.Placement > placement) ? 1.0 : 0.0;
+                var mmrChange = CalculateMmrChange(currentMmr.Rating, opponentMmr.Rating, actualScore);
+                totalMmrChange += mmrChange;
             }
         }
 
-        if (opponentMmrs.Count == 0)
+        if (opponentCount == 0)
         {
             return;
-        }
-
-        var totalMmrChange = 0;
-        foreach (var opponentMmr in opponentMmrs)
-        {
-            var mmrChange = CalculateMmrChange(currentMmr.Rating, opponentMmr, placement, totalPlayers);
-            totalMmrChange += mmrChange;
         }
         
         var updatedMmr = currentMmr;
@@ -1046,13 +1041,11 @@ public static partial class Module
         return newMmr;
     }
 
-    private static int CalculateMmrChange(int playerMmr, int opponentMmr, int placement, int totalPlayers)
+    private static int CalculateMmrChange(int playerMmr, int opponentMmr, double actualScore)
     {
         var kFactor = 32.0;
         
         var expectedScore = 1.0 / (1.0 + Math.Pow(10.0, (opponentMmr - playerMmr) / 400.0));
-        
-        var actualScore = (double)(totalPlayers - placement) / (totalPlayers - 1);
         
         var mmrChange = kFactor * (actualScore - expectedScore);
         
