@@ -2,15 +2,13 @@ import { useState } from 'react';
 import type { PlayerColor } from '../../module_bindings';
 import { COLOR_CONFIGS, getColorConfig } from '../utils/colorMapping';
 
-type EditProfileModalProps = {
-    currentName: string;
+type EditColorModalProps = {
     currentColor: PlayerColor['tag'];
-    onSave: (name: string, color: PlayerColor['tag']) => void;
+    onSave: (color: PlayerColor['tag']) => void;
     onClose: () => void;
 };
 
-export const EditProfileModal = ({ currentName, currentColor, onSave, onClose }: EditProfileModalProps) => {
-    const [name, setName] = useState(currentName);
+export const EditColorModal = ({ currentColor, onSave, onClose }: EditColorModalProps) => {
     const [color, setColor] = useState(currentColor);
     const [isClosing, setIsClosing] = useState(false);
 
@@ -22,10 +20,8 @@ export const EditProfileModal = ({ currentName, currentColor, onSave, onClose }:
     };
 
     const handleSave = () => {
-        if (name.trim()) {
-            onSave(name.trim(), color);
-            handleClose();
-        }
+        onSave(color);
+        handleClose();
     };
 
     return (
@@ -44,25 +40,12 @@ export const EditProfileModal = ({ currentName, currentColor, onSave, onClose }:
                 }}
             >
                 <h2 className="text-white text-2xl font-bold mb-6 mt-0">
-                    Edit Profile
+                    Change Color
                 </h2>
-
-                <div className="mb-6">
-                    <label className="text-white/60 text-sm mb-2 block">
-                        Name
-                    </label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="w-full bg-[#1a1a1a] text-white border border-white/15 rounded-md px-3 py-2.5 text-sm outline-none box-border"
-                        maxLength={30}
-                    />
-                </div>
 
                 <div className="mb-8">
                     <label className="text-white/60 text-sm mb-3 block">
-                        Color
+                        Select Color
                     </label>
                     <div className='flex flex-row flex-wrap space-x-2 space-y-2'>
                         {availableColors.map((colorTag) => {
@@ -94,12 +77,10 @@ export const EditProfileModal = ({ currentName, currentColor, onSave, onClose }:
                     </button>
                     <button
                         onClick={handleSave}
-                        disabled={!name.trim()}
                         className="border-0 rounded-md px-5 py-2.5 text-sm font-semibold text-white"
                         style={{
                             backgroundColor: 'var(--color-accent)',
-                            cursor: name.trim() ? 'pointer' : 'not-allowed',
-                            opacity: name.trim() ? 1 : 0.5
+                            cursor: 'pointer'
                         }}
                     >
                         Save

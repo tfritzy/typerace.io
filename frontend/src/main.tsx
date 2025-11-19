@@ -39,7 +39,7 @@ const Root = () => {
     .withUri("ws://localhost:3000")
     .withModuleName("typerace")
     .withToken(token)
-    .onConnect((conn, identity, token) => {
+    .onConnect((conn, identity) => {
       console.log("Connected with identity:", identity.toHexString());
       conn
         .subscriptionBuilder()

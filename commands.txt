@@ -1,6 +1,6 @@
 spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
 
-spacetime sql typerace "SELECT * from playerprogress"
+spacetime sql typerace "SELECT * from elo"
 
 spacetime publish --project-path spacetimedb typerace
 spacetime publish -c --project-path spacetimedb typerace -y

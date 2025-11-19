@@ -1,4 +1,5 @@
 import React from "react";
+import { Globe, Lock, Target } from "lucide-react";
 import "./SelectionButton.css";
 
 export type GameTypeValue = "Public" | "Private" | "Practice";
@@ -16,21 +17,21 @@ export const MatchTypeSelector: React.FC<MatchTypeSelectorProps> = ({ gameType, 
                 className={`selection-button ${gameType === "Public" ? 'selected' : ''}`}
                 onClick={() => setGameType("Public")}
             >
-                <span className="text-xl">🌍</span>
+                <Globe size={20} />
                 <span>Public Match</span>
             </button>
             <button
                 className={`selection-button ${gameType === "Private" ? 'selected' : ''}`}
                 onClick={() => setGameType("Private")}
             >
-                <span className="text-xl">🔒</span>
+                <Lock size={20} />
                 <span>Private Lobby</span>
             </button>
             <button
                 className={`selection-button ${gameType === "Practice" ? 'selected' : ''}`}
                 onClick={() => setGameType("Practice")}
             >
-                <span className="text-xl">🎯</span>
+                <Target size={20} />
                 <span>Practice Mode</span>
             </button>
         </div>

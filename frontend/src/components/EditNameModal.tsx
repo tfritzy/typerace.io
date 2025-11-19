@@ -1,20 +1,14 @@
 import { useState } from 'react';
-import type { PlayerColor } from '../../module_bindings';
-import { COLOR_CONFIGS, getColorConfig } from '../utils/colorMapping';
 
-type EditProfileModalProps = {
+type EditNameModalProps = {
     currentName: string;
-    currentColor: PlayerColor['tag'];
-    onSave: (name: string, color: PlayerColor['tag']) => void;
+    onSave: (name: string) => void;
     onClose: () => void;
 };
 
-export const EditProfileModal = ({ currentName, currentColor, onSave, onClose }: EditProfileModalProps) => {
+export const EditNameModal = ({ currentName, onSave, onClose }: EditNameModalProps) => {
     const [name, setName] = useState(currentName);
-    const [color, setColor] = useState(currentColor);
     const [isClosing, setIsClosing] = useState(false);
-
-    const availableColors: PlayerColor['tag'][] = Object.keys(COLOR_CONFIGS) as PlayerColor['tag'][];
 
     const handleClose = () => {
         setIsClosing(true);
@@ -23,7 +17,7 @@ export const EditProfileModal = ({ currentName, currentColor, onSave, onClose }:
 
     const handleSave = () => {
         if (name.trim()) {
-            onSave(name.trim(), color);
+            onSave(name.trim());
             handleClose();
         }
     };
@@ -44,10 +38,10 @@ export const EditProfileModal = ({ currentName, currentColor, onSave, onClose }:
                 }}
             >
                 <h2 className="text-white text-2xl font-bold mb-6 mt-0">
-                    Edit Profile
+                    Edit Name
                 </h2>
 
-                <div className="mb-6">
+                <div className="mb-8">
                     <label className="text-white/60 text-sm mb-2 block">
                         Name
                     </label>
@@ -57,32 +51,8 @@ export const EditProfileModal = ({ currentName, currentColor, onSave, onClose }:
                         onChange={(e) => setName(e.target.value)}
                         className="w-full bg-[#1a1a1a] text-white border border-white/15 rounded-md px-3 py-2.5 text-sm outline-none box-border"
                         maxLength={30}
+                        autoFocus
                     />
-                </div>
-
-                <div className="mb-8">
-                    <label className="text-white/60 text-sm mb-3 block">
-                        Color
-                    </label>
-                    <div className='flex flex-row flex-wrap space-x-2 space-y-2'>
-                        {availableColors.map((colorTag) => {
-                            const colorConfig = getColorConfig({ tag: colorTag } as PlayerColor);
-                            const isSelected = color === colorTag;
-                            const borderStyle = isSelected ? { border: '3px solid #ffffff' } : {};
-                            return (
-                                <button
-                                    key={colorTag}
-                                    onClick={() => setColor(colorTag)}
-                                    className={`w-10 h-10 rounded cursor-pointer ${isSelected ? 'opacity-100' : 'opacity-70'}`}
-                                    style={{
-                                        background: colorConfig.primary,
-                                        ...borderStyle
-                                    }}
-                                    title={colorTag}
-                                />
-                            );
-                        })}
-                    </div>
                 </div>
 
                 <div className="flex gap-3 justify-end">

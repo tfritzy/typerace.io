@@ -12,6 +12,7 @@ import { Line } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import type { GameRecord } from '../../module_bindings';
 import { formatStopwatchTime, getOrdinalPlacement } from '../utils/formatters';
+import { useState, useEffect } from 'react';
 
 ChartJS.register(
     LinearScale,
@@ -28,6 +29,20 @@ interface WpmChartProps {
 }
 
 export const WpmChart = ({ data, title }: WpmChartProps) => {
+    const [colorTrigger, setColorTrigger] = useState(0);
+
+    useEffect(() => {
+        const observer = new MutationObserver(() => {
+            setColorTrigger(prev => prev + 1);
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['style']
+        });
+
+        return () => observer.disconnect();
+    }, []);
     const calculateRollingAverage = () => {
         if (data.length === 0) return [];
 
@@ -84,8 +99,8 @@ export const WpmChart = ({ data, title }: WpmChartProps) => {
     const rollingAverage = calculateRollingAverage();
     const maxWpmLine = calculateMaxWpm();
 
-    const accentColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-accent').trim();
+    const accentColor = colorTrigger >= 0 ? getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-accent').trim() : '';
     const secondaryColor = getComputedStyle(document.documentElement)
         .getPropertyValue('--color-white-25').trim();
     const borderColor = getComputedStyle(document.documentElement)

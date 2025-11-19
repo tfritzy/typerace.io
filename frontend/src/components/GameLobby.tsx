@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { Check, Clipboard } from "lucide-react";
 import type { DbConnection } from "../../module_bindings";
 
 type GameLobbyProps = {
@@ -67,10 +68,10 @@ export const GameLobby = ({ gameId, conn }: GameLobbyProps) => {
             </div>
           </div>
           <div
-            className="text-2xl flex-shrink-0 transition-all duration-200"
+            className="shrink-0 transition-all duration-200"
             style={{ color: linkCopied ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.6)' }}
           >
-            {linkCopied ? "✓" : "📋"}
+            {linkCopied ? <Check size={24} /> : <Clipboard size={24} />}
           </div>
         </div>
       </div>

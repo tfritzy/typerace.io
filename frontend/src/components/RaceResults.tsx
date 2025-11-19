@@ -45,7 +45,7 @@ export const RaceResults = ({
     const isHighWpm = finalWpm >= 100;
 
     return (
-        <div className="w-full">
+        <div className="w-full animate-slideUpFadeIn">
             <div className="flex gap-3 mb-3 items-stretch min-h-[100px]">
                 <div className="flex-1 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
                     <div

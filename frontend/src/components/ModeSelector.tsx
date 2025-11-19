@@ -35,7 +35,7 @@ export function ModeSelector({ selectedMode, onModeSelect }: ModeSelectorProps) 
                         className={`selection-button ${selectedMode.tag === modeOption.mode.tag ? "selected" : ""}`}
                         onClick={() => onModeSelect(modeOption.mode)}
                     >
-                        <span className="text-xl leading-none">{modeOption.flag}</span>
+                        <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>{modeOption.flag}</span>
                         <span>{modeOption.label}</span>
                     </button>
                 ))}

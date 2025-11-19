@@ -33,7 +33,7 @@ export const ActionBar = ({ mode, gameType }: ActionBarProps) => {
   }, [navigate, mode, gameType]);
 
   return (
-    <div className="flex gap-3 mt-3">
+    <div className="flex gap-3 mt-3 animate-slideUpFadeIn" style={{ animationDelay: '0.2s' }}>
       <button
         onClick={() => navigate("/")}
         className="box rounded-lg px-8 py-4 bg-transparent text-white text-base font-semibold cursor-pointer opacity-80 flex-1"

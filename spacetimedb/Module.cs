@@ -371,14 +371,31 @@ public static partial class Module
     [Reducer]
     public static void SetPlayerName(ReducerContext ctx, string name)
     {
+        const int MinNameLength = 1;
+        const int MaxNameLength = 30;
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            Log.Info($"Player {ctx.Sender} attempted to set empty name");
+            return;
+        }
+
+        var trimmedName = name.Trim();
+
+        if (trimmedName.Length < MinNameLength || trimmedName.Length > MaxNameLength)
+        {
+            Log.Info($"Player {ctx.Sender} attempted to set name with invalid length: {trimmedName.Length}");
+            return;
+        }
+
         var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
 
         if (existingPlayer != null)
         {
             var updatedPlayer = existingPlayer.Value;
-            updatedPlayer.Name = name;
+            updatedPlayer.Name = trimmedName;
             ctx.Db.player.Id.Update(updatedPlayer);
-            Log.Info($"Updated player name for {ctx.Sender} to {name}");
+            Log.Info($"Updated player name for {ctx.Sender} to {trimmedName}");
         }
     }
 
@@ -1044,7 +1061,7 @@ public static partial class Module
     private static void UpdatePlayerElo(ReducerContext ctx, Identity playerId, Game game, int placement)
     {
         var currentElo = GetOrCreatePlayerElo(ctx, playerId, game.GameMode);
-        
+
         var totalEloChange = 0;
         var opponentCount = 0;
         foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
@@ -1063,7 +1080,7 @@ public static partial class Module
         {
             return;
         }
-        
+
         var updatedElo = currentElo;
         updatedElo.Rating += totalEloChange;
         updatedElo.Rating = Math.Max(0, updatedElo.Rating);
@@ -1094,11 +1111,11 @@ public static partial class Module
     private static int CalculateEloChange(int playerElo, int opponentElo, double actualScore)
     {
         var kFactor = 32.0;
-        
+
         var expectedScore = 1.0 / (1.0 + Math.Pow(10.0, (opponentElo - playerElo) / 400.0));
-        
+
         var eloChange = kFactor * (actualScore - expectedScore);
-        
+
         return (int)Math.Round(eloChange);
     }
 

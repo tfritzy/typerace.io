@@ -112,7 +112,7 @@ export const ProfileAvatar = () => {
                         <div className="px-3 py-2 border-b border-white/10">
                             <div className="text-white/70 text-xs font-semibold">Sign in to save progress</div>
                         </div>
-                        
+
                         <button
                             onClick={() => handleSocialSignIn('google')}
                             disabled={loading}

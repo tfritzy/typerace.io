@@ -35,7 +35,7 @@ export const LobbyPage = () => {
       <Header />
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="content-container">
-          <div className="text-xl mb-[400px]">
+          <div className="text-2xl mb-[400px]">
             <TypeBox
               ref={typeBoxRef}
               phrase={startupPhrase}
