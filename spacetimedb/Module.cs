@@ -439,6 +439,18 @@ public static partial class Module
             Log.Info($"Player {ctx.Sender} created and joined game {newGame.Id}");
             InsertPlayerProgress(ctx, newGame.Id, joinCode);
 
+            if (gameType == GameType.Private)
+            {
+                ctx.Db.privategameaccess.Insert(new PrivateGameAccess
+                {
+                    Id = IdGenerator.Generate("pga_", ctx.Rng),
+                    PlayerId = ctx.Sender,
+                    GameId = newGame.Id,
+                    GrantedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch
+                });
+                Log.Info($"Granted private game access to creator {ctx.Sender} for game {newGame.Id}");
+            }
+
             int playerCount = CountPlayersInGame(ctx, newGame.Id);
             int requiredPlayers = GetMaxPlayerCount(gameType);
 
