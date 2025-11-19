@@ -119,7 +119,7 @@ export const GamePage = () => {
 
               return (
                 <div
-                  className="box w-full rounded-lg px-8 py-6 cursor-pointer"
+                  className="box w-full rounded-lg px-8 py-6 cursor-pointer relative"
                   onClick={() => typeBoxRef.current?.focus()}
                 >
                   <PlayerProgressBar
@@ -132,6 +132,7 @@ export const GamePage = () => {
                     isCurrentPlayer={isCurrentPlayer}
                     playerColor={getPlayerColor(pp.playerId)}
                     wpm={pp.wpm}
+                    placement={pp.placement}
                   />
                 </div>
               );
