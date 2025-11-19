@@ -20,8 +20,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
   const [input, setInput] = useState("");
   const [hasError, setHasError] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  const [firstErrorPosition, setFirstErrorPosition] = useState<number | null>(null);
-  const [charactersAfterError, setCharactersAfterError] = useState(0);
 
   const targetRef = useRef<HTMLElement>(null);
 
@@ -88,31 +86,28 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
 
       let correctCharCount = 0;
       let hasIncorrectChar = false;
-      let currentFirstErrorPos: number | null = null;
+      let firstErrorPos: number | null = null;
       for (let i = 0; i < newValue.length; i++) {
         if (newValue[i] === phrase[i]) {
-          correctCharCount++;
+          if (firstErrorPos === null) {
+            correctCharCount++;
+          }
         } else {
           hasIncorrectChar = true;
-          currentFirstErrorPos = i;
-          break;
+          if (firstErrorPos === null) {
+            firstErrorPos = i;
+          }
         }
       }
 
       const isAddingChar = newValue.length > oldValue.length;
-      if (isAddingChar && currentFirstErrorPos !== null) {
-        const charsAfterError = newValue.length - currentFirstErrorPos - 1;
+      if (isAddingChar && firstErrorPos !== null) {
+        const charsAfterError = newValue.length - firstErrorPos - 1;
         if (charsAfterError >= 10) {
           return;
         }
-        setCharactersAfterError(charsAfterError);
-      } else if (currentFirstErrorPos !== null) {
-        setCharactersAfterError(newValue.length - currentFirstErrorPos - 1);
-      } else {
-        setCharactersAfterError(0);
       }
 
-      setFirstErrorPosition(currentFirstErrorPos);
       setInput(newValue);
       setHasError(hasIncorrectChar);
 
@@ -138,8 +133,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
             setInput("");
             setIsComplete(false);
             setHasError(false);
-            setFirstErrorPosition(null);
-            setCharactersAfterError(0);
           }, 0);
         }
       }
@@ -161,6 +154,20 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       event.preventDefault();
     }
   }, []);
+
+  const getCharactersAfterFirstError = useCallback(() => {
+    let firstErrorPos: number | null = null;
+    for (let i = 0; i < input.length; i++) {
+      if (input[i] !== phrase[i]) {
+        firstErrorPos = i;
+        break;
+      }
+    }
+    if (firstErrorPos === null) {
+      return 0;
+    }
+    return input.length - firstErrorPos - 1;
+  }, [input, phrase]);
 
   const renderText = () => {
     const chars = phrase.split("");
@@ -197,7 +204,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       style={style}
       onClick={() => inputRef.current?.focus()}
     >
-      {charactersAfterError >= 10 && (
+      {getCharactersAfterFirstError() >= 10 && (
         <div className="text-red-500 font-semibold text-center mb-4 animate-pulse">
           You must fix all errors
         </div>
