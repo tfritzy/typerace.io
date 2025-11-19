@@ -132,6 +132,7 @@ export const GamePage = () => {
                     isCurrentPlayer={isCurrentPlayer}
                     playerColor={getPlayerColor(pp.playerId)}
                     wpm={pp.wpm}
+                    placement={pp.placement}
                   />
                 </div>
               );

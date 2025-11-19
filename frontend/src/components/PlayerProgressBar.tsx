@@ -12,6 +12,7 @@ type PlayerProgressBarProps = {
     isLoading?: boolean;
     playerColor?: PlayerColor;
     wpm?: number;
+    placement?: number;
 };
 
 export const PlayerProgressBar = ({
@@ -24,13 +25,23 @@ export const PlayerProgressBar = ({
     isLoading = false,
     playerColor = PlayerColor.Amber,
     wpm,
+    placement,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
     const colorConfig = getColorConfig(playerColor);
 
+    const getPlacementColor = (place: number) => {
+        switch (place) {
+            case 1: return '#FFD700';
+            case 2: return '#C0C0C0';
+            case 3: return '#CD7F32';
+            default: return '#9CA3AF';
+        }
+    };
+
     return (
         <div
-            className={`w-full flex items-center gap-5 transition-all duration-500 ${isLoading
+            className={`w-full flex items-center gap-5 transition-all duration-500 relative ${isLoading
                 ? 'opacity-20'
                 : 'opacity-100 animate-[slideInFromLeft_0.5s_ease-out]'
                 }`}
@@ -75,6 +86,18 @@ export const PlayerProgressBar = ({
                     />
                 </div>
             </div>
+
+            {placement !== undefined && placement > 0 && (
+                <div 
+                    className="absolute top-0 right-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-lg"
+                    style={{
+                        backgroundColor: getPlacementColor(placement),
+                        color: '#000000'
+                    }}
+                >
+                    {placement}
+                </div>
+            )}
         </div>
     );
 };
