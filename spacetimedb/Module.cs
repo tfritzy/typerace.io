@@ -996,9 +996,11 @@ public static partial class Module
         var currentMmr = GetOrCreatePlayerMmr(ctx, playerId, game.GameMode);
         
         var opponentMmrs = new List<int>();
+        var totalPlayers = 0;
         foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
         {
-            if (progress.PlayerId != playerId && progress.Placement > 0)
+            totalPlayers++;
+            if (progress.PlayerId != playerId)
             {
                 var opponentMmr = GetOrCreatePlayerMmr(ctx, progress.PlayerId, game.GameMode);
                 opponentMmrs.Add(opponentMmr.Rating);
@@ -1010,15 +1012,19 @@ public static partial class Module
             return;
         }
 
-        var averageOpponentMmr = opponentMmrs.Sum() / (double)opponentMmrs.Count;
-        var mmrChange = CalculateMmrChange(currentMmr.Rating, averageOpponentMmr, placement, opponentMmrs.Count + 1);
+        var totalMmrChange = 0;
+        foreach (var opponentMmr in opponentMmrs)
+        {
+            var mmrChange = CalculateMmrChange(currentMmr.Rating, opponentMmr, placement, totalPlayers);
+            totalMmrChange += mmrChange;
+        }
         
         var updatedMmr = currentMmr;
-        updatedMmr.Rating += mmrChange;
+        updatedMmr.Rating += totalMmrChange;
         updatedMmr.Rating = Math.Max(0, updatedMmr.Rating);
         ctx.Db.mmr.Id.Update(updatedMmr);
 
-        Log.Info($"Player {playerId} MMR updated: {currentMmr.Rating} -> {updatedMmr.Rating} (change: {mmrChange:+0;-0}) in mode {game.GameMode}");
+        Log.Info($"Player {playerId} MMR updated: {currentMmr.Rating} -> {updatedMmr.Rating} (change: {totalMmrChange:+0;-0}) in mode {game.GameMode}");
     }
 
     private static Mmr GetOrCreatePlayerMmr(ReducerContext ctx, Identity playerId, GameMode gameMode)
@@ -1040,11 +1046,11 @@ public static partial class Module
         return newMmr;
     }
 
-    private static int CalculateMmrChange(int playerMmr, double averageOpponentMmr, int placement, int totalPlayers)
+    private static int CalculateMmrChange(int playerMmr, int opponentMmr, int placement, int totalPlayers)
     {
         var kFactor = 32.0;
         
-        var expectedScore = 1.0 / (1.0 + Math.Pow(10.0, (averageOpponentMmr - playerMmr) / 400.0));
+        var expectedScore = 1.0 / (1.0 + Math.Pow(10.0, (opponentMmr - playerMmr) / 400.0));
         
         var actualScore = (double)(totalPlayers - placement) / (totalPlayers - 1);
         
