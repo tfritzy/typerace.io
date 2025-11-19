@@ -89,7 +89,7 @@ export const PlayerProgressBar = ({
 
             {placement !== undefined && placement > 0 && (
                 <div 
-                    className="absolute top-0 right-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-lg"
+                    className="absolute top-1/2 -translate-y-1/2 -right-2 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-lg"
                     style={{
                         backgroundColor: getPlacementColor(placement),
                         color: '#000000'
