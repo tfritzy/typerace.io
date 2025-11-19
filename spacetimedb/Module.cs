@@ -162,6 +162,19 @@ public static partial class Module
         public double Wpm;
     }
 
+    [Table(Name = "elo", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
+    public partial struct Elo
+    {
+        [PrimaryKey]
+        public string Id;
+        [SpacetimeDB.Index.BTree]
+        public Identity PlayerId;
+        [SpacetimeDB.Index.BTree]
+        public GameMode GameMode;
+        public int Rating;
+    }
+
     [Table(Scheduled = nameof(FillGameWithBots))]
     public partial struct BotFillTrigger
     {
@@ -942,6 +955,8 @@ public static partial class Module
             Log.Info($"Updated personal record for player {progress.PlayerId} in mode {game.GameMode}: {wpm} WPM");
         }
 
+        UpdatePlayerElo(ctx, progress.PlayerId, game, placement);
+
         Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}, earned {xpEarned} XP, typed {wordsTyped} words");
     }
 
@@ -974,6 +989,67 @@ public static partial class Module
         double growthRate = Math.Log(maxXp / baseXp) / (100.0 - 2.0);
 
         return (int)Math.Round(baseXp * Math.Exp(growthRate * (level - 2)));
+    }
+
+    private static void UpdatePlayerElo(ReducerContext ctx, Identity playerId, Game game, int placement)
+    {
+        var currentElo = GetOrCreatePlayerElo(ctx, playerId, game.GameMode);
+        
+        var totalEloChange = 0;
+        var opponentCount = 0;
+        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
+        {
+            if (progress.PlayerId != playerId)
+            {
+                opponentCount++;
+                var opponentElo = GetOrCreatePlayerElo(ctx, progress.PlayerId, game.GameMode);
+                var actualScore = (progress.Placement == -1 || progress.Placement > placement) ? 1.0 : 0.0;
+                var eloChange = CalculateEloChange(currentElo.Rating, opponentElo.Rating, actualScore);
+                totalEloChange += eloChange;
+            }
+        }
+
+        if (opponentCount == 0)
+        {
+            return;
+        }
+        
+        var updatedElo = currentElo;
+        updatedElo.Rating += totalEloChange;
+        updatedElo.Rating = Math.Max(0, updatedElo.Rating);
+        ctx.Db.elo.Id.Update(updatedElo);
+
+        Log.Info($"Player {playerId} ELO updated: {currentElo.Rating} -> {updatedElo.Rating} (change: {totalEloChange:+0;-0}) in mode {game.GameMode}");
+    }
+
+    private static Elo GetOrCreatePlayerElo(ReducerContext ctx, Identity playerId, GameMode gameMode)
+    {
+        foreach (var elo in ctx.Db.elo.PlayerId_GameMode.Filter((playerId, gameMode)))
+        {
+            return elo;
+        }
+
+        var newElo = ctx.Db.elo.Insert(new Elo
+        {
+            Id = IdGenerator.Generate("elo_", ctx.Rng),
+            PlayerId = playerId,
+            GameMode = gameMode,
+            Rating = 1000
+        });
+
+        Log.Info($"Created initial ELO for player {playerId} in mode {gameMode}: 1000");
+        return newElo;
+    }
+
+    private static int CalculateEloChange(int playerElo, int opponentElo, double actualScore)
+    {
+        var kFactor = 32.0;
+        
+        var expectedScore = 1.0 / (1.0 + Math.Pow(10.0, (opponentElo - playerElo) / 400.0));
+        
+        var eloChange = kFactor * (actualScore - expectedScore);
+        
+        return (int)Math.Round(eloChange);
     }
 
     private static double CalculateWpm(int characterCount, long timeMicroseconds)
