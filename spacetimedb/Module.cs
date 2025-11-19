@@ -162,9 +162,9 @@ public static partial class Module
         public double Wpm;
     }
 
-    [Table(Name = "mmr", Public = true)]
+    [Table(Name = "elo", Public = true)]
     [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
-    public partial struct Mmr
+    public partial struct Elo
     {
         [PrimaryKey]
         public string Id;
@@ -955,7 +955,7 @@ public static partial class Module
             Log.Info($"Updated personal record for player {progress.PlayerId} in mode {game.GameMode}: {wpm} WPM");
         }
 
-        UpdatePlayerMmr(ctx, progress.PlayerId, game, placement);
+        UpdatePlayerElo(ctx, progress.PlayerId, game, placement);
 
         Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}, earned {xpEarned} XP, typed {wordsTyped} words");
     }
@@ -991,21 +991,21 @@ public static partial class Module
         return (int)Math.Round(baseXp * Math.Exp(growthRate * (level - 2)));
     }
 
-    private static void UpdatePlayerMmr(ReducerContext ctx, Identity playerId, Game game, int placement)
+    private static void UpdatePlayerElo(ReducerContext ctx, Identity playerId, Game game, int placement)
     {
-        var currentMmr = GetOrCreatePlayerMmr(ctx, playerId, game.GameMode);
+        var currentElo = GetOrCreatePlayerElo(ctx, playerId, game.GameMode);
         
-        var totalMmrChange = 0;
+        var totalEloChange = 0;
         var opponentCount = 0;
         foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
         {
             if (progress.PlayerId != playerId)
             {
                 opponentCount++;
-                var opponentMmr = GetOrCreatePlayerMmr(ctx, progress.PlayerId, game.GameMode);
+                var opponentElo = GetOrCreatePlayerElo(ctx, progress.PlayerId, game.GameMode);
                 var actualScore = (progress.Placement == -1 || progress.Placement > placement) ? 1.0 : 0.0;
-                var mmrChange = CalculateMmrChange(currentMmr.Rating, opponentMmr.Rating, actualScore);
-                totalMmrChange += mmrChange;
+                var eloChange = CalculateEloChange(currentElo.Rating, opponentElo.Rating, actualScore);
+                totalEloChange += eloChange;
             }
         }
 
@@ -1014,42 +1014,42 @@ public static partial class Module
             return;
         }
         
-        var updatedMmr = currentMmr;
-        updatedMmr.Rating += totalMmrChange;
-        updatedMmr.Rating = Math.Max(0, updatedMmr.Rating);
-        ctx.Db.mmr.Id.Update(updatedMmr);
+        var updatedElo = currentElo;
+        updatedElo.Rating += totalEloChange;
+        updatedElo.Rating = Math.Max(0, updatedElo.Rating);
+        ctx.Db.elo.Id.Update(updatedElo);
 
-        Log.Info($"Player {playerId} MMR updated: {currentMmr.Rating} -> {updatedMmr.Rating} (change: {totalMmrChange:+0;-0}) in mode {game.GameMode}");
+        Log.Info($"Player {playerId} ELO updated: {currentElo.Rating} -> {updatedElo.Rating} (change: {totalEloChange:+0;-0}) in mode {game.GameMode}");
     }
 
-    private static Mmr GetOrCreatePlayerMmr(ReducerContext ctx, Identity playerId, GameMode gameMode)
+    private static Elo GetOrCreatePlayerElo(ReducerContext ctx, Identity playerId, GameMode gameMode)
     {
-        foreach (var mmr in ctx.Db.mmr.PlayerId_GameMode.Filter((playerId, gameMode)))
+        foreach (var elo in ctx.Db.elo.PlayerId_GameMode.Filter((playerId, gameMode)))
         {
-            return mmr;
+            return elo;
         }
 
-        var newMmr = ctx.Db.mmr.Insert(new Mmr
+        var newElo = ctx.Db.elo.Insert(new Elo
         {
-            Id = IdGenerator.Generate("mmr_", ctx.Rng),
+            Id = IdGenerator.Generate("elo_", ctx.Rng),
             PlayerId = playerId,
             GameMode = gameMode,
             Rating = 1000
         });
 
-        Log.Info($"Created initial MMR for player {playerId} in mode {gameMode}: 1000");
-        return newMmr;
+        Log.Info($"Created initial ELO for player {playerId} in mode {gameMode}: 1000");
+        return newElo;
     }
 
-    private static int CalculateMmrChange(int playerMmr, int opponentMmr, double actualScore)
+    private static int CalculateEloChange(int playerElo, int opponentElo, double actualScore)
     {
         var kFactor = 32.0;
         
-        var expectedScore = 1.0 / (1.0 + Math.Pow(10.0, (opponentMmr - playerMmr) / 400.0));
+        var expectedScore = 1.0 / (1.0 + Math.Pow(10.0, (opponentElo - playerElo) / 400.0));
         
-        var mmrChange = kFactor * (actualScore - expectedScore);
+        var eloChange = kFactor * (actualScore - expectedScore);
         
-        return (int)Math.Round(mmrChange);
+        return (int)Math.Round(eloChange);
     }
 
     private static double CalculateWpm(int characterCount, long timeMicroseconds)
