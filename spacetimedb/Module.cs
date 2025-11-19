@@ -162,6 +162,19 @@ public static partial class Module
         public double Wpm;
     }
 
+    [Table(Name = "mmr", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
+    public partial struct Mmr
+    {
+        [PrimaryKey]
+        public string Id;
+        [SpacetimeDB.Index.BTree]
+        public Identity PlayerId;
+        [SpacetimeDB.Index.BTree]
+        public GameMode GameMode;
+        public int Rating;
+    }
+
     [Table(Scheduled = nameof(FillGameWithBots))]
     public partial struct BotFillTrigger
     {
@@ -942,6 +955,8 @@ public static partial class Module
             Log.Info($"Updated personal record for player {progress.PlayerId} in mode {game.GameMode}: {wpm} WPM");
         }
 
+        UpdatePlayerMmr(ctx, progress.PlayerId, game, placement);
+
         Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}, earned {xpEarned} XP, typed {wordsTyped} words");
     }
 
@@ -974,6 +989,68 @@ public static partial class Module
         double growthRate = Math.Log(maxXp / baseXp) / (100.0 - 2.0);
 
         return (int)Math.Round(baseXp * Math.Exp(growthRate * (level - 2)));
+    }
+
+    private static void UpdatePlayerMmr(ReducerContext ctx, Identity playerId, Game game, int placement)
+    {
+        var currentMmr = GetOrCreatePlayerMmr(ctx, playerId, game.GameMode);
+        
+        var opponentMmrs = new List<int>();
+        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
+        {
+            if (progress.PlayerId != playerId && progress.Placement > 0)
+            {
+                var opponentMmr = GetOrCreatePlayerMmr(ctx, progress.PlayerId, game.GameMode);
+                opponentMmrs.Add(opponentMmr.Rating);
+            }
+        }
+
+        if (opponentMmrs.Count == 0)
+        {
+            return;
+        }
+
+        var averageOpponentMmr = opponentMmrs.Sum() / (double)opponentMmrs.Count;
+        var mmrChange = CalculateMmrChange(currentMmr.Rating, averageOpponentMmr, placement, opponentMmrs.Count + 1);
+        
+        var updatedMmr = currentMmr;
+        updatedMmr.Rating += mmrChange;
+        updatedMmr.Rating = Math.Max(0, updatedMmr.Rating);
+        ctx.Db.mmr.Id.Update(updatedMmr);
+
+        Log.Info($"Player {playerId} MMR updated: {currentMmr.Rating} -> {updatedMmr.Rating} (change: {mmrChange:+0;-0}) in mode {game.GameMode}");
+    }
+
+    private static Mmr GetOrCreatePlayerMmr(ReducerContext ctx, Identity playerId, GameMode gameMode)
+    {
+        foreach (var mmr in ctx.Db.mmr.PlayerId_GameMode.Filter((playerId, gameMode)))
+        {
+            return mmr;
+        }
+
+        var newMmr = ctx.Db.mmr.Insert(new Mmr
+        {
+            Id = IdGenerator.Generate("mmr_", ctx.Rng),
+            PlayerId = playerId,
+            GameMode = gameMode,
+            Rating = 1000
+        });
+
+        Log.Info($"Created initial MMR for player {playerId} in mode {gameMode}: 1000");
+        return newMmr;
+    }
+
+    private static int CalculateMmrChange(int playerMmr, double averageOpponentMmr, int placement, int totalPlayers)
+    {
+        var kFactor = 32.0;
+        
+        var expectedScore = 1.0 / (1.0 + Math.Pow(10.0, (averageOpponentMmr - playerMmr) / 400.0));
+        
+        var actualScore = (double)(totalPlayers - placement) / (totalPlayers - 1);
+        
+        var mmrChange = kFactor * (actualScore - expectedScore);
+        
+        return (int)Math.Round(mmrChange);
     }
 
     private static double CalculateWpm(int characterCount, long timeMicroseconds)
