@@ -190,63 +190,57 @@ export const ProfilePage = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-white/[0.03] rounded-lg p-5 border border-white/[0.06]">
-                                            <div className="text-white/50 text-[0.8125rem] mb-3 uppercase tracking-wider font-semibold">
-                                                Career Stats
+                                <div className="bg-white/[0.03] rounded-lg p-6 border border-white/[0.06]">
+                                    <div className="grid grid-cols-3 gap-6 mb-6">
+                                        <div>
+                                            <div className="text-white/50 text-xs mb-2 uppercase tracking-wider font-semibold">
+                                                Games Played
                                             </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <div className="text-white/60 text-[0.8125rem] mb-1.5">
-                                                        Games Played
-                                                    </div>
-                                                    <div className="text-white text-2xl font-bold">
-                                                        {viewedPlayer.totalGames}
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div className="text-white/60 text-[0.8125rem] mb-1.5">
-                                                        Wins
-                                                    </div>
-                                                    <div className="text-white text-2xl font-bold">
-                                                        {viewedPlayer.wins}
-                                                    </div>
-                                                </div>
+                                            <div className="text-white text-3xl font-bold">
+                                                {viewedPlayer.totalGames}
                                             </div>
                                         </div>
-
-                                        <div className="bg-white/[0.03] rounded-lg p-5 border border-white/[0.06]">
-                                            <div className="text-white/50 text-[0.8125rem] mb-3 uppercase tracking-wider font-semibold">
-                                                Total Words Typed
+                                        <div>
+                                            <div className="text-white/50 text-xs mb-2 uppercase tracking-wider font-semibold">
+                                                Wins
                                             </div>
-                                            <div className="text-white text-4xl font-bold">
+                                            <div className="text-white text-3xl font-bold">
+                                                {viewedPlayer.wins}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-white/50 text-xs mb-2 uppercase tracking-wider font-semibold">
+                                                Words Typed
+                                            </div>
+                                            <div className="text-white text-3xl font-bold">
                                                 {formatNumber(viewedPlayer.totalWordsTyped)}
                                             </div>
                                         </div>
                                     </div>
 
                                     {Object.keys(bestWpmPerMode).length > 0 && (
-                                        <div className="bg-white/[0.03] rounded-lg p-5 border border-white/[0.06]">
-                                            <div className="text-white/50 text-[0.8125rem] mb-3 uppercase tracking-wider font-semibold">
-                                                Best WPM by Mode
-                                            </div>
-                                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                                                {Object.entries(bestWpmPerMode)
-                                                    .sort(([modeA], [modeB]) => modeA.localeCompare(modeB))
-                                                    .map(([mode, wpm]) => (
-                                                        <div key={mode} className="bg-white/[0.02] rounded p-3 border border-white/[0.04]">
-                                                            <div className="text-white/60 text-xs mb-1.5 font-medium">
-                                                                {mode.replace(/(\d+)/, ' $1')}
+                                        <>
+                                            <div className="border-t border-white/[0.06] pt-6">
+                                                <div className="text-white/50 text-xs mb-4 uppercase tracking-wider font-semibold">
+                                                    Best WPM by Mode
+                                                </div>
+                                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                                    {Object.entries(bestWpmPerMode)
+                                                        .sort(([modeA], [modeB]) => modeA.localeCompare(modeB))
+                                                        .map(([mode, wpm]) => (
+                                                            <div key={mode} className="bg-white/[0.02] rounded p-3 border border-white/[0.04]">
+                                                                <div className="text-white/60 text-xs mb-1.5 font-medium">
+                                                                    {mode.replace(/(\d+)/, ' $1')}
+                                                                </div>
+                                                                <div className="text-xl font-bold" style={{ color: 'var(--color-accent)' }}>
+                                                                    {Math.round(wpm)}
+                                                                </div>
                                                             </div>
-                                                            <div className="text-xl font-bold" style={{ color: 'var(--color-accent)' }}>
-                                                                {Math.round(wpm)}
-                                                            </div>
-                                                        </div>
-                                                    ))
-                                                }
+                                                        ))
+                                                    }
+                                                </div>
                                             </div>
-                                        </div>
+                                        </>
                                     )}
                                 </div>
                             </div>
