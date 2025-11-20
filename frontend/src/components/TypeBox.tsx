@@ -20,6 +20,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
   const [input, setInput] = useState("");
   const [hasError, setHasError] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [hasReachedErrorLimit, setHasReachedErrorLimit] = useState(false);
 
   const targetRef = useRef<HTMLElement>(null);
 
@@ -84,19 +85,33 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
         }
       }
 
-      setInput(newValue);
-
       let correctCharCount = 0;
       let hasIncorrectChar = false;
+      let firstErrorPos: number | null = null;
       for (let i = 0; i < newValue.length; i++) {
         if (newValue[i] === phrase[i]) {
-          correctCharCount++;
+          if (firstErrorPos === null) {
+            correctCharCount++;
+          }
         } else {
           hasIncorrectChar = true;
-          break;
+          if (firstErrorPos === null) {
+            firstErrorPos = i;
+          }
         }
       }
 
+      const isAddingChar = newValue.length > oldValue.length;
+      if (isAddingChar && firstErrorPos !== null) {
+        const charsAfterError = newValue.length - firstErrorPos - 1;
+        if (charsAfterError >= 10) {
+          return;
+        }
+      }
+
+      const reachedLimit = firstErrorPos !== null && (newValue.length - firstErrorPos - 1) >= 10;
+      setHasReachedErrorLimit(reachedLimit);
+      setInput(newValue);
       setHasError(hasIncorrectChar);
 
       if (onProgress && newValue.length !== oldValue.length) {
@@ -121,6 +136,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
             setInput("");
             setIsComplete(false);
             setHasError(false);
+            setHasReachedErrorLimit(false);
           }, 0);
         }
       }
@@ -178,6 +194,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       style={style}
       onClick={() => inputRef.current?.focus()}
     >
+      {hasReachedErrorLimit && (
+        <div className="font-semibold text-center mb-4 text-[var(--color-error)]">
+          You must fix all errors
+        </div>
+      )}
       <div className="relative select-none">
         <div className="type-box">
           <div
