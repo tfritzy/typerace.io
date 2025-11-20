@@ -6,19 +6,19 @@ type TypeBoxProps = {
   onComplete?: () => void;
   onProgress?: (correctCharCount: number, eventType: "Correct" | "Incorrect" | "Backspace") => void;
   className?: string;
-  style?: React.CSSProperties;
+  height?: string;
   resetOnComplete?: boolean;
   disabled?: boolean;
+  initialProgress?: number;
 };
 
 export type TypeBoxRef = {
   focus: () => void;
 };
 
-export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplete, onProgress, className, style, resetOnComplete = false, disabled = false }, ref) => {
+export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplete, onProgress, className, height, resetOnComplete = false, disabled = false, initialProgress = 0 }, ref) => {
   const [focused, setFocused] = useState(true);
-  const [input, setInput] = useState("");
-  const [hasError, setHasError] = useState(false);
+  const [input, setInput] = useState(phrase.substring(0, initialProgress));
   const [isComplete, setIsComplete] = useState(false);
   const [hasReachedErrorLimit, setHasReachedErrorLimit] = useState(false);
 
@@ -86,7 +86,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       }
 
       let correctCharCount = 0;
-      let hasIncorrectChar = false;
       let firstErrorPos: number | null = null;
       for (let i = 0; i < newValue.length; i++) {
         if (newValue[i] === phrase[i]) {
@@ -94,7 +93,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
             correctCharCount++;
           }
         } else {
-          hasIncorrectChar = true;
           if (firstErrorPos === null) {
             firstErrorPos = i;
           }
@@ -105,6 +103,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       if (isAddingChar && firstErrorPos !== null) {
         const charsAfterError = newValue.length - firstErrorPos - 1;
         if (charsAfterError >= 10) {
+          setHasReachedErrorLimit(true);
           return;
         }
       }
@@ -112,7 +111,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       const reachedLimit = firstErrorPos !== null && (newValue.length - firstErrorPos - 1) >= 10;
       setHasReachedErrorLimit(reachedLimit);
       setInput(newValue);
-      setHasError(hasIncorrectChar);
 
       if (onProgress && newValue.length !== oldValue.length) {
         let eventType: "Correct" | "Incorrect" | "Backspace";
@@ -135,7 +133,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
           setTimeout(() => {
             setInput("");
             setIsComplete(false);
-            setHasError(false);
             setHasReachedErrorLimit(false);
           }, 0);
         }
@@ -190,12 +187,12 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
 
   return (
     <div
-      className={`box-with-focus w-full rounded-lg px-8 py-6 cursor-text ${hasError ? 'border-red-500' : ''} ${disabled ? 'opacity-60' : ''} ${className || ''}`}
-      style={style}
+      className={`relative box-with-focus w-full rounded-lg px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? 'border-red-500!' : ''} ${disabled ? 'opacity-60' : ''} ${className || ''}`}
+      style={height ? { height } : undefined}
       onClick={() => inputRef.current?.focus()}
     >
       {hasReachedErrorLimit && (
-        <div className="font-semibold text-center mb-4 text-[var(--color-error)]">
+        <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-(--color-error)">
           You must fix all errors
         </div>
       )}

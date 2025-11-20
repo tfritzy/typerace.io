@@ -335,7 +335,6 @@ export const ProfilePage = () => {
 
                         <WpmChart
                             data={realGameData}
-                            title={`${viewedPlayer?.name || 'Player'}'s Games`}
                         />
                     </div>
                 </div>

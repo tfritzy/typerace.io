@@ -1,9 +1,14 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useCallback, useState, useRef } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import { type DbConnection, type Game, PlayerProgress, Player, PlayerColor } from "../../module_bindings";
+import {
+  type DbConnection,
+  type Game,
+  PlayerProgress,
+  Player,
+  PlayerColor,
+} from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
-import { type TypeBoxRef } from "../components/TypeBox";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { Countdown } from "../components/Countdown";
@@ -16,18 +21,19 @@ export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const conn = useSpacetimeDB<DbConnection>();
   const [hasFinished, setHasFinished] = useState(false);
-  const typeBoxRef = useRef<TypeBoxRef>(null);
 
   useEffect(() => {
     if (!conn || !gameId) return;
 
-    const gameSubscription = conn.subscriptionBuilder()
+    const gameSubscription = conn
+      .subscriptionBuilder()
       .onError((error: ErrorContextInterface) => {
         console.error("Error subscribing to game:", error);
       })
       .subscribe(`select * from game where Id = '${gameId}'`);
 
-    const playerProgressSubscription = conn.subscriptionBuilder()
+    const playerProgressSubscription = conn
+      .subscriptionBuilder()
       .onError((error: ErrorContextInterface) => {
         console.error("Error subscribing to playerprogress:", error);
       })
@@ -40,11 +46,15 @@ export const GamePage = () => {
   }, [conn, gameId]);
 
   const { rows: games } = useTable<DbConnection, Game>("game");
-  const { rows: playerProgress } = useTable<DbConnection, PlayerProgress>("playerprogress");
+  const { rows: playerProgress } = useTable<DbConnection, PlayerProgress>(
+    "playerprogress"
+  );
   const { rows: players } = useTable<DbConnection, Player>("player");
 
-  const game = games.find(g => g.id.toString() === gameId);
-  const gamePlayerProgress = playerProgress.filter(pp => pp.gameId.toString() === gameId);
+  const game = games.find((g) => g.id.toString() === gameId);
+  const gamePlayerProgress = playerProgress.filter(
+    (pp) => pp.gameId.toString() === gameId
+  );
 
   const getPlayerName = (pp: PlayerProgress) => {
     return pp.playerName;
@@ -65,7 +75,7 @@ export const GamePage = () => {
     if (!playerId) {
       return PlayerColor.Amber;
     }
-    const player = players.filter(p => p.id.isEqual(playerId))[0];
+    const player = players.filter((p) => p.id.isEqual(playerId))[0];
     return player?.color ?? PlayerColor.Amber;
   };
 
@@ -84,6 +94,14 @@ export const GamePage = () => {
   const isCountdown = game.state?.tag === "Countdown";
   const isDisabled = isInLobby || isCountdown;
 
+  const currentPlayerProgress = gamePlayerProgress.find(
+    (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
+  );
+  const initialProgress = currentPlayerProgress?.progressIndex ?? 0;
+  const hasCompletedRace = currentPlayerProgress
+    ? currentPlayerProgress.progressIndex >= game.phrase.length
+    : false;
+
   return (
     <div className="relative min-h-screen flex flex-col">
       <Header />
@@ -95,14 +113,12 @@ export const GamePage = () => {
           <div className="mb-3 space-y-3">
             {Array.from({ length: maxPlayers }).map((_, index) => {
               const pp = gamePlayerProgress[index];
-              const isCurrentPlayer = pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
+              const isCurrentPlayer =
+                pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
 
               if (!pp) {
                 return (
-                  <div
-                    className="box w-full rounded-lg px-8 py-6 cursor-pointer"
-                    onClick={() => typeBoxRef.current?.focus()}
-                  >
+                  <div className="box w-full rounded-lg px-8 py-6">
                     <PlayerProgressBar
                       key={`loading-${index}`}
                       name="Waiting for player..."
@@ -118,10 +134,7 @@ export const GamePage = () => {
               }
 
               return (
-                <div
-                  className="box w-full rounded-lg px-8 py-6 cursor-pointer relative"
-                  onClick={() => typeBoxRef.current?.focus()}
-                >
+                <div className="box w-full rounded-lg px-8 py-6 relative">
                   <PlayerProgressBar
                     key={pp.id.toString()}
                     name={getPlayerName(pp)}
@@ -133,16 +146,18 @@ export const GamePage = () => {
                     playerColor={getPlayerColor(pp.playerId)}
                     wpm={pp.wpm}
                     placement={pp.placement}
+                    isBot={pp.isBot}
                   />
                 </div>
               );
             })}
           </div>
 
-
-          {hasFinished ? (
+          {hasFinished || hasCompletedRace ? (
             (() => {
-              const currentPP = gamePlayerProgress.find(pp => currentPlayerId && pp.playerId.isEqual(currentPlayerId));
+              const currentPP = gamePlayerProgress.find(
+                (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
+              );
               if (!currentPP) return null;
 
               return (
@@ -154,9 +169,7 @@ export const GamePage = () => {
                     raceStartTimestamp={game.racingStartedAt}
                     placement={currentPP.placement}
                   />
-                  <ActionBar
-                    gameType={game.gameType?.tag as any}
-                  />
+                  <ActionBar gameType={game.gameType?.tag as any} />
                 </>
               );
             })()
@@ -169,9 +182,9 @@ export const GamePage = () => {
               conn={conn}
               onFinish={handleFinish}
               disabled={isDisabled}
+              initialProgress={initialProgress}
             />
           )}
-
         </div>
       </div>
     </div>

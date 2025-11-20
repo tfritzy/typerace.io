@@ -34,17 +34,8 @@ export const PlayerAvatar = ({
         return null;
     };
 
-    const getMedalStroke = (place: number) => {
-        if (place === 1) return '#8B6914';
-        if (place === 2) return '#5A5A5A';
-        if (place === 3) return '#6B3410';
-        if (place > 3) return '#4B5563';
-        return 'black';
-    };
-
     const crownColor = placement ? getCrownColor(placement) : null;
     const medalColor = placement ? getMedalColor(placement) : null;
-    const medalStroke = placement ? getMedalStroke(placement) : 'black';
 
     return (
         <div
@@ -67,11 +58,12 @@ export const PlayerAvatar = ({
             {medalColor && (
                 <div
                     className="absolute bottom-0 right-1 z-10"
+                    style={{ filter: `drop-shadow(0 0px 3px rgba(0, 0, 0, .4))` }}
                 >
                     <Award
                         size={size * 0.35}
                         fill={medalColor}
-                        stroke={medalStroke}
+                        stroke='none'
                         strokeWidth={2}
                     />
                 </div>

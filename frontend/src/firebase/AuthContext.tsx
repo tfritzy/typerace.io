@@ -8,7 +8,6 @@ import {
     signInWithPopup,
     GoogleAuthProvider,
     GithubAuthProvider,
-    OAuthProvider,
     type User
 } from 'firebase/auth';
 import { auth } from '../firebase/config';
@@ -22,7 +21,6 @@ interface AuthContextType {
     resetPassword: (email: string) => Promise<void>;
     signInWithGoogle: () => Promise<void>;
     signInWithGithub: () => Promise<void>;
-    signInWithDiscord: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -78,11 +76,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         await signInWithPopup(auth, provider);
     };
 
-    const signInWithDiscord = async () => {
-        const provider = new OAuthProvider('oidc.discord');
-        await signInWithPopup(auth, provider);
-    };
-
     const value = {
         user,
         loading,
@@ -92,7 +85,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         resetPassword,
         signInWithGoogle,
         signInWithGithub,
-        signInWithDiscord
     };
 
     return (

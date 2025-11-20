@@ -1,6 +1,8 @@
 import { PlayerAvatar } from './PlayerAvatar';
 import { getColorConfig } from '../utils/colorMapping';
 import { PlayerColor } from "../../module_bindings";
+import { Bot } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 type PlayerProgressBarProps = {
     name: string;
@@ -13,6 +15,7 @@ type PlayerProgressBarProps = {
     playerColor?: PlayerColor;
     wpm?: number;
     placement?: number;
+    isBot?: boolean;
 };
 
 export const PlayerProgressBar = ({
@@ -26,18 +29,10 @@ export const PlayerProgressBar = ({
     playerColor = PlayerColor.Amber,
     wpm,
     placement,
+    isBot = false,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
     const colorConfig = getColorConfig(playerColor);
-
-    const getPlacementColor = (place: number) => {
-        switch (place) {
-            case 1: return '#FFD700';
-            case 2: return '#C0C0C0';
-            case 3: return '#CD7F32';
-            default: return '#9CA3AF';
-        }
-    };
 
     return (
         <div
@@ -46,14 +41,27 @@ export const PlayerProgressBar = ({
                 : 'opacity-100 animate-[slideInFromLeft_0.5s_ease-out]'
                 }`}
         >
-            <PlayerAvatar
-                size={40}
-                identity={identityHash}
-                color={playerColor}
-                isHighlighted={isCurrentPlayer}
-                isLoading={isLoading}
-                placement={placement}
-            />
+            {isLoading ? (
+                <PlayerAvatar
+                    size={40}
+                    identity={identityHash}
+                    color={playerColor}
+                    isHighlighted={isCurrentPlayer}
+                    isLoading={isLoading}
+                    placement={placement}
+                />
+            ) : (
+                <Link to={`/profile/${identityHash}`} className="shrink-0">
+                    <PlayerAvatar
+                        size={40}
+                        identity={identityHash}
+                        color={playerColor}
+                        isHighlighted={isCurrentPlayer}
+                        isLoading={isLoading}
+                        placement={placement}
+                    />
+                </Link>
+            )}
 
             <div className="flex-1 flex flex-col gap-2">
                 <div className="flex items-center gap-2 justify-between">
@@ -62,9 +70,20 @@ export const PlayerProgressBar = ({
                             <span className="text-sm font-semibold text-white/30">Waiting...</span>
                         ) : (
                             <>
-                                <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-white' : 'text-white/70'}`}>
-                                    {name}
-                                </span>
+                                <div className="flex items-center gap-1">
+                                    <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-white' : 'text-white/70'}`}>
+                                        {name}
+                                    </span>
+                                    {isBot && (
+                                        <div className="group relative">
+                                            <Bot className="w-4 h-4 text-white/50" />
+                                            <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-(--color-box-bg) text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-10 shadow-lg w-64">
+                                                This player is a bot. Share this game with your friends to reduce the amount they need to be added to games.
+                                                <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-(--color-box-bg)"></div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                                 <span className="text-xs font-medium text-white/50">
                                     Lvl {level}
                                 </span>

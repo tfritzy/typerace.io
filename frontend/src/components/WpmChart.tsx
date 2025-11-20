@@ -25,11 +25,12 @@ ChartJS.register(
 
 interface WpmChartProps {
     data: GameRecord[];
-    title: string;
 }
 
-export const WpmChart = ({ data, title }: WpmChartProps) => {
+export const WpmChart = ({ data }: WpmChartProps) => {
     const [colorTrigger, setColorTrigger] = useState(0);
+
+    const sortedData = [...data].sort((a, b) => Number(a.date - b.date));
 
     useEffect(() => {
         const observer = new MutationObserver(() => {
@@ -44,42 +45,43 @@ export const WpmChart = ({ data, title }: WpmChartProps) => {
         return () => observer.disconnect();
     }, []);
     const calculateRollingAverage = () => {
-        if (data.length === 0) return [];
+        if (sortedData.length === 0) return [];
 
-        const sortedData = [...data].sort((a, b) => Number(a.date - b.date));
-        const timeSpan = Number(sortedData[sortedData.length - 1].date - sortedData[0].date);
-        const daySpan = timeSpan / (1000 * 1000 * 60 * 60 * 24);
+        const startTime = Number(sortedData[0].date);
+        const endTime = Number(sortedData[sortedData.length - 1].date);
+        const timeSpan = endTime - startTime;
 
-        const numPoints = Math.min(Math.max(Math.floor(daySpan / 15), data.length), 24);
-        const windowSize = Math.max(Math.floor(data.length / numPoints), 3);
+        const numSamples = Math.min(50, sortedData.length);
+        const timeStep = timeSpan / (numSamples - 1);
+        const windowSizeMicros = timeSpan * 0.15;
 
         const rollingAvg: { x: number; y: number }[] = [];
 
-        for (let i = 0; i < sortedData.length; i++) {
-            const start = Math.max(0, i - Math.floor(windowSize / 2));
-            const end = Math.min(sortedData.length, start + windowSize);
+        for (let i = 0; i < numSamples; i++) {
+            const sampleTime = startTime + (i * timeStep);
+            const windowStart = sampleTime - windowSizeMicros / 2;
+            const windowEnd = sampleTime + windowSizeMicros / 2;
 
-            const windowData = sortedData.slice(start, end);
-            const avgWpm = windowData.reduce((sum, p) => sum + p.wpm, 0) / windowData.length;
-
-            rollingAvg.push({
-                x: Number(sortedData[i].date) / 1000,
-                y: avgWpm
+            const pointsInWindow = sortedData.filter(p => {
+                const t = Number(p.date);
+                return t >= windowStart && t <= windowEnd;
             });
-        }
 
-        if (numPoints < rollingAvg.length) {
-            const step = Math.floor(rollingAvg.length / numPoints);
-            return rollingAvg.filter((_, index) => index % step === 0);
+            if (pointsInWindow.length > 0) {
+                const avgWpm = pointsInWindow.reduce((sum, p) => sum + p.wpm, 0) / pointsInWindow.length;
+                rollingAvg.push({
+                    x: sampleTime / 1000,
+                    y: avgWpm
+                });
+            }
         }
 
         return rollingAvg;
     };
 
     const calculateMaxWpm = () => {
-        if (data.length === 0) return [];
+        if (sortedData.length === 0) return [];
 
-        const sortedData = [...data].sort((a, b) => Number(a.date - b.date));
         const maxWpmLine: { x: number; y: number }[] = [];
         let currentMax = 0;
 
@@ -99,6 +101,27 @@ export const WpmChart = ({ data, title }: WpmChartProps) => {
     const rollingAverage = calculateRollingAverage();
     const maxWpmLine = calculateMaxWpm();
 
+    const getTimeConfig = () => {
+        if (sortedData.length === 0) return { unit: 'day' as const, format: 'MMM d' };
+
+        const timeSpanMicros = Number(sortedData[sortedData.length - 1].date - sortedData[0].date);
+        const days = timeSpanMicros / (1000 * 1000 * 60 * 60 * 24);
+
+        if (days < 1) {
+            return { unit: 'hour' as const, format: 'HH:mm' };
+        } else if (days < 7) {
+            return { unit: 'day' as const, format: 'MMM d' };
+        } else if (days < 60) {
+            return { unit: 'week' as const, format: 'MMM d' };
+        } else if (days < 365) {
+            return { unit: 'month' as const, format: 'MMM yyyy' };
+        } else {
+            return { unit: 'year' as const, format: 'yyyy' };
+        }
+    };
+
+    const timeConfig = getTimeConfig();
+
     const accentColor = colorTrigger >= 0 ? getComputedStyle(document.documentElement)
         .getPropertyValue('--color-accent').trim() : '';
     const secondaryColor = getComputedStyle(document.documentElement)
@@ -116,8 +139,8 @@ export const WpmChart = ({ data, title }: WpmChartProps) => {
                 pointRadius: 0,
                 pointHoverRadius: 0,
                 showLine: true,
-                borderWidth: 2,
-                tension: 0.4,
+                borderWidth: 3,
+                tension: 0.5,
             },
             {
                 label: 'WPM',
@@ -203,9 +226,13 @@ export const WpmChart = ({ data, title }: WpmChartProps) => {
             x: {
                 type: 'time',
                 time: {
-                    unit: 'month',
+                    unit: timeConfig.unit,
                     displayFormats: {
-                        month: 'MMM yyyy'
+                        hour: timeConfig.format,
+                        day: timeConfig.format,
+                        week: timeConfig.format,
+                        month: timeConfig.format,
+                        year: timeConfig.format
                     }
                 },
                 title: {
@@ -249,9 +276,6 @@ export const WpmChart = ({ data, title }: WpmChartProps) => {
 
     return (
         <div className="mb-8 bg-[#272727] border border-white/15 rounded-lg p-6 shadow-[0_4px_12px_rgba(0,0,0,0.2),0_1px_3px_rgba(0,0,0,0.1)] w-full">
-            <h3 className="text-white mb-5 text-lg font-semibold">
-                {title}
-            </h3>
             <div className="h-[280px] relative w-full">
                 <Line data={chartData} options={options} />
             </div>
