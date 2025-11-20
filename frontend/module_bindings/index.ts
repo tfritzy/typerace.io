@@ -39,6 +39,8 @@ import { ClientDisconnected } from "./client_disconnected_reducer.ts";
 export { ClientDisconnected };
 import { FillGameWithBots } from "./fill_game_with_bots_reducer.ts";
 export { FillGameWithBots };
+import { GrantPrivateGameAccess } from "./grant_private_game_access_reducer.ts";
+export { GrantPrivateGameAccess };
 import { JoinGame } from "./join_game_reducer.ts";
 export { JoinGame };
 import { SetPlayerColor } from "./set_player_color_reducer.ts";
@@ -51,6 +53,8 @@ import { StartGame } from "./start_game_reducer.ts";
 export { StartGame };
 import { StartPrivateGame } from "./start_private_game_reducer.ts";
 export { StartPrivateGame };
+import { SyncAnonymousStatus } from "./sync_anonymous_status_reducer.ts";
+export { SyncAnonymousStatus };
 import { UpdateBotProgress } from "./update_bot_progress_reducer.ts";
 export { UpdateBotProgress };
 import { UpdateProgress } from "./update_progress_reducer.ts";
@@ -79,6 +83,8 @@ import { PlayerTableHandle } from "./player_table.ts";
 export { PlayerTableHandle };
 import { PlayerprogressTableHandle } from "./playerprogress_table.ts";
 export { PlayerprogressTableHandle };
+import { PrivategameaccessTableHandle } from "./privategameaccess_table.ts";
+export { PrivategameaccessTableHandle };
 
 // Import and reexport all types
 import { BotConfig } from "./bot_config_type.ts";
@@ -117,6 +123,8 @@ import { PlayerColor } from "./player_color_type.ts";
 export { PlayerColor };
 import { PlayerProgress } from "./player_progress_type.ts";
 export { PlayerProgress };
+import { PrivateGameAccess } from "./private_game_access_type.ts";
+export { PrivateGameAccess };
 
 const REMOTE_MODULE = {
   tables: {
@@ -219,6 +227,15 @@ const REMOTE_MODULE = {
         colType: (PlayerProgress.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
       },
     },
+    privategameaccess: {
+      tableName: "privategameaccess" as const,
+      rowType: PrivateGameAccess.getTypeScriptAlgebraicType(),
+      primaryKey: "id",
+      primaryKeyInfo: {
+        colName: "id",
+        colType: (PrivateGameAccess.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
+      },
+    },
   },
   reducers: {
     ArchiveOldGames: {
@@ -236,6 +253,10 @@ const REMOTE_MODULE = {
     FillGameWithBots: {
       reducerName: "FillGameWithBots",
       argsType: FillGameWithBots.getTypeScriptAlgebraicType(),
+    },
+    GrantPrivateGameAccess: {
+      reducerName: "GrantPrivateGameAccess",
+      argsType: GrantPrivateGameAccess.getTypeScriptAlgebraicType(),
     },
     JoinGame: {
       reducerName: "JoinGame",
@@ -260,6 +281,10 @@ const REMOTE_MODULE = {
     StartPrivateGame: {
       reducerName: "StartPrivateGame",
       argsType: StartPrivateGame.getTypeScriptAlgebraicType(),
+    },
+    SyncAnonymousStatus: {
+      reducerName: "SyncAnonymousStatus",
+      argsType: SyncAnonymousStatus.getTypeScriptAlgebraicType(),
     },
     UpdateBotProgress: {
       reducerName: "UpdateBotProgress",
@@ -303,12 +328,14 @@ export type Reducer = never
 | { name: "ClientConnected", args: ClientConnected }
 | { name: "ClientDisconnected", args: ClientDisconnected }
 | { name: "FillGameWithBots", args: FillGameWithBots }
+| { name: "GrantPrivateGameAccess", args: GrantPrivateGameAccess }
 | { name: "JoinGame", args: JoinGame }
 | { name: "SetPlayerColor", args: SetPlayerColor }
 | { name: "SetPlayerName", args: SetPlayerName }
 | { name: "StartCountdown", args: StartCountdown }
 | { name: "StartGame", args: StartGame }
 | { name: "StartPrivateGame", args: StartPrivateGame }
+| { name: "SyncAnonymousStatus", args: SyncAnonymousStatus }
 | { name: "UpdateBotProgress", args: UpdateBotProgress }
 | { name: "UpdateProgress", args: UpdateProgress }
 ;
@@ -362,6 +389,22 @@ export class RemoteReducers {
 
   removeOnFillGameWithBots(callback: (ctx: ReducerEventContext, args: BotFillTrigger) => void) {
     this.connection.offReducer("FillGameWithBots", callback);
+  }
+
+  grantPrivateGameAccess(gameId: string) {
+    const __args = { gameId };
+    let __writer = new __BinaryWriter(1024);
+    GrantPrivateGameAccess.serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("GrantPrivateGameAccess", __argsBuffer, this.setCallReducerFlags.grantPrivateGameAccessFlags);
+  }
+
+  onGrantPrivateGameAccess(callback: (ctx: ReducerEventContext, gameId: string) => void) {
+    this.connection.onReducer("GrantPrivateGameAccess", callback);
+  }
+
+  removeOnGrantPrivateGameAccess(callback: (ctx: ReducerEventContext, gameId: string) => void) {
+    this.connection.offReducer("GrantPrivateGameAccess", callback);
   }
 
   joinGame(gameMode: GameMode, joinCode: string, gameType: GameType) {
@@ -460,6 +503,22 @@ export class RemoteReducers {
     this.connection.offReducer("StartPrivateGame", callback);
   }
 
+  syncAnonymousStatus(isAnonymous: boolean) {
+    const __args = { isAnonymous };
+    let __writer = new __BinaryWriter(1024);
+    SyncAnonymousStatus.serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("SyncAnonymousStatus", __argsBuffer, this.setCallReducerFlags.syncAnonymousStatusFlags);
+  }
+
+  onSyncAnonymousStatus(callback: (ctx: ReducerEventContext, isAnonymous: boolean) => void) {
+    this.connection.onReducer("SyncAnonymousStatus", callback);
+  }
+
+  removeOnSyncAnonymousStatus(callback: (ctx: ReducerEventContext, isAnonymous: boolean) => void) {
+    this.connection.offReducer("SyncAnonymousStatus", callback);
+  }
+
   updateBotProgress(args: BotProgressUpdate) {
     const __args = { args };
     let __writer = new __BinaryWriter(1024);
@@ -505,6 +564,11 @@ export class SetReducerFlags {
     this.fillGameWithBotsFlags = flags;
   }
 
+  grantPrivateGameAccessFlags: __CallReducerFlags = 'FullUpdate';
+  grantPrivateGameAccess(flags: __CallReducerFlags) {
+    this.grantPrivateGameAccessFlags = flags;
+  }
+
   joinGameFlags: __CallReducerFlags = 'FullUpdate';
   joinGame(flags: __CallReducerFlags) {
     this.joinGameFlags = flags;
@@ -533,6 +597,11 @@ export class SetReducerFlags {
   startPrivateGameFlags: __CallReducerFlags = 'FullUpdate';
   startPrivateGame(flags: __CallReducerFlags) {
     this.startPrivateGameFlags = flags;
+  }
+
+  syncAnonymousStatusFlags: __CallReducerFlags = 'FullUpdate';
+  syncAnonymousStatus(flags: __CallReducerFlags) {
+    this.syncAnonymousStatusFlags = flags;
   }
 
   updateBotProgressFlags: __CallReducerFlags = 'FullUpdate';
@@ -603,6 +672,11 @@ export class RemoteTables {
   get playerprogress(): PlayerprogressTableHandle<'playerprogress'> {
     // clientCache is a private property
     return new PlayerprogressTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<PlayerProgress>(REMOTE_MODULE.tables.playerprogress));
+  }
+
+  get privategameaccess(): PrivategameaccessTableHandle<'privategameaccess'> {
+    // clientCache is a private property
+    return new PrivategameaccessTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<PrivateGameAccess>(REMOTE_MODULE.tables.privategameaccess));
   }
 }
 

@@ -16,6 +16,7 @@ type PlayerProgressBarProps = {
     wpm?: number;
     placement?: number;
     isBot?: boolean;
+    isAnonymous?: boolean;
 };
 
 export const PlayerProgressBar = ({
@@ -30,6 +31,7 @@ export const PlayerProgressBar = ({
     wpm,
     placement,
     isBot = false,
+    isAnonymous = false,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
     const colorConfig = getColorConfig(playerColor);
@@ -41,7 +43,7 @@ export const PlayerProgressBar = ({
                 : 'opacity-100 animate-[slideInFromLeft_0.5s_ease-out]'
                 }`}
         >
-            {isLoading ? (
+            {isLoading || isAnonymous ? (
                 <PlayerAvatar
                     size={40}
                     identity={identityHash}

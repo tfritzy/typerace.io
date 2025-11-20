@@ -65,6 +65,12 @@ export const ProfilePage = () => {
     const viewedPlayer = playerIdentity ? players.find(p => p.id.isEqual(playerIdentity)) : null;
     const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.id);
 
+    useEffect(() => {
+        if (viewedPlayer && viewedPlayer.isAnonymous) {
+            navigate('/');
+        }
+    }, [viewedPlayer, navigate]);
+
     const handleNameSave = (name: string) => {
         if (!conn) return;
         conn.reducers.setPlayerName(name);

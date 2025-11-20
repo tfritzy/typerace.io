@@ -147,6 +147,7 @@ export const GamePage = () => {
                     wpm={pp.wpm}
                     placement={pp.placement}
                     isBot={pp.isBot}
+                    isAnonymous={pp.isAnonymous}
                   />
                 </div>
               );

@@ -50,6 +50,9 @@ const Root = () => {
           `select * from player where Id = '${identity}'`,
           `select * from playerprogress where PlayerId = '${identity}'`,
         ]);
+
+      const isAnonymous = auth.currentUser?.isAnonymous ?? true;
+      conn.reducers.syncAnonymousStatus(isAnonymous);
     })
     .onDisconnect(() => {
       console.log("Disconnected from SpacetimeDB");

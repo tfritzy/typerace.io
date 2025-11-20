@@ -104,6 +104,7 @@ public static partial class Module
         public bool IsBot;
         public BotConfig? BotConfig;
         public PlayerColor Color;
+        public bool IsAnonymous;
     }
 
     [Table(Name = "game", Public = true)]
@@ -228,6 +229,7 @@ public static partial class Module
         public int PlayerLevel;
         public int ProgressIndex;
         public bool IsBot;
+        public bool IsAnonymous;
         public long CreatedAt;
         public List<CharacterEvent> CharacterHistory;
         public long Time;
@@ -298,7 +300,8 @@ public static partial class Module
                     TypingRate = typingRate,
                     ErrorRate = errorRate
                 },
-                Color = GenerateRandomColor(ctx.Rng)
+                Color = GenerateRandomColor(ctx.Rng),
+                IsAnonymous = false
             });
         }
 
@@ -357,7 +360,8 @@ public static partial class Module
                 TotalWordsTyped = 0,
                 IsBot = false,
                 BotConfig = null,
-                Color = PlayerColor.Amber
+                Color = PlayerColor.Amber,
+                IsAnonymous = true
             });
             Log.Info($"Created player record for new client {ctx.Sender}");
         }
@@ -366,6 +370,20 @@ public static partial class Module
     [Reducer(ReducerKind.ClientDisconnected)]
     public static void ClientDisconnected(ReducerContext ctx)
     {
+    }
+
+    [Reducer]
+    public static void SyncAnonymousStatus(ReducerContext ctx, bool isAnonymous)
+    {
+        var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
+
+        if (existingPlayer != null)
+        {
+            var updatedPlayer = existingPlayer.Value;
+            updatedPlayer.IsAnonymous = isAnonymous;
+            ctx.Db.player.Id.Update(updatedPlayer);
+            Log.Info($"Updated anonymous status for {ctx.Sender} to {isAnonymous}");
+        }
     }
 
     [Reducer]
@@ -612,6 +630,7 @@ public static partial class Module
         var player = ctx.Db.player.Id.Find(ctx.Sender);
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
+        var isAnonymous = player?.IsAnonymous ?? true;
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
         {
@@ -622,6 +641,7 @@ public static partial class Module
             PlayerLevel = playerLevel,
             ProgressIndex = 0,
             IsBot = false,
+            IsAnonymous = isAnonymous,
             CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
             CharacterHistory = new List<CharacterEvent>(),
             Time = 0,
@@ -681,6 +701,7 @@ public static partial class Module
                     PlayerLevel = selectedBot.Level,
                     ProgressIndex = 0,
                     IsBot = true,
+                    IsAnonymous = false,
                     CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
                     CharacterHistory = new List<CharacterEvent>(),
                     Time = 0,
