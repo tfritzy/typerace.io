@@ -57,7 +57,7 @@ export const PlayerAvatar = ({
             )}
             {medalColor && (
                 <div
-                    className="absolute bottom-0 right-1 z-10"
+                    className="absolute -bottom-1 right-1 z-10"
                     style={{ filter: `drop-shadow(0 0px 3px rgba(0, 0, 0, .4))` }}
                 >
                     <Award

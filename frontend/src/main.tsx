@@ -36,7 +36,7 @@ const Root = () => {
   }
 
   const connectionBuilder = DbConnection.builder()
-    .withUri("ws://localhost:3000")
+    .withUri(import.meta.env.VITE_SPACETIMEDB_URI || "ws://localhost:3000")
     .withModuleName("typerace")
     .withToken(token)
     .onConnect((conn, identity) => {

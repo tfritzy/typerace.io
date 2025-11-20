@@ -4,3 +4,4 @@ spacetime sql typerace "SELECT * from elo"
 
 spacetime publish --project-path spacetimedb typerace
 spacetime publish -c --project-path spacetimedb typerace -y
+spacetime publish --project-path spacetimedb --server maincloud typerace
