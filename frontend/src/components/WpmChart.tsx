@@ -219,7 +219,7 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                             `Mode: ${dataPoint.gameMode.tag}`
                         ];
 
-                        if (dataPoint.xpGained !== undefined) {
+                        if (dataPoint.xpGained !== undefined && dataPoint.xpGained > 0) {
                             labels.push(`XP: +${dataPoint.xpGained}`);
                         }
 
