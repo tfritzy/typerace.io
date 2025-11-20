@@ -195,7 +195,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       onClick={() => inputRef.current?.focus()}
     >
       {hasReachedErrorLimit && (
-        <div className="text-red-500 font-semibold text-center mb-4 animate-pulse">
+        <div className="font-semibold text-center mb-4" style={{ color: 'var(--color-error)' }}>
           You must fix all errors
         </div>
       )}
