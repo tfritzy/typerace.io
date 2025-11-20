@@ -64,6 +64,14 @@ export const ProfilePage = () => {
     const playerIdentity = playerId ? Identity.fromString(playerId) : null;
     const viewedPlayer = playerIdentity ? players.find(p => p.id.isEqual(playerIdentity)) : null;
     const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.id);
+    const [hasWaitedForData, setHasWaitedForData] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setHasWaitedForData(true);
+        }, 1500);
+        return () => clearTimeout(timer);
+    }, []);
 
     const handleNameSave = (name: string) => {
         if (!conn) return;
@@ -264,9 +272,21 @@ export const ProfilePage = () => {
                                     </div>
                                 </div>
                             </div>
-                        ) : (
+                        ) : hasWaitedForData ? (
                             <div className="text-white/60 text-center p-6">
                                 No player data found
+                            </div>
+                        ) : (
+                            <div className="flex items-start gap-6">
+                                <div className="w-20 h-20 rounded-full bg-white/10 animate-pulse" />
+                                <div className="flex-1">
+                                    <div className="h-8 w-48 bg-white/10 rounded mb-3 animate-pulse" />
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-5 w-16 bg-white/10 rounded animate-pulse" />
+                                        <div className="flex-1 h-2.5 bg-white/10 rounded-full" />
+                                        <div className="h-5 w-16 bg-white/10 rounded animate-pulse" />
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -277,7 +297,7 @@ export const ProfilePage = () => {
                                 Games Played
                             </div>
                             <div className="text-white text-3xl font-bold">
-                                {viewedPlayer?.totalGames || 0}
+                                {viewedPlayer ? viewedPlayer.totalGames : hasWaitedForData ? 0 : <div className="h-9 w-16 bg-white/10 rounded animate-pulse" />}
                             </div>
                         </div>
                         <div className="box box-shadow rounded-sm p-6">
@@ -285,7 +305,7 @@ export const ProfilePage = () => {
                                 Wins
                             </div>
                             <div className="text-white text-3xl font-bold">
-                                {viewedPlayer?.wins || 0}
+                                {viewedPlayer ? viewedPlayer.wins : hasWaitedForData ? 0 : <div className="h-9 w-16 bg-white/10 rounded animate-pulse" />}
                             </div>
                         </div>
                         <div className="box box-shadow rounded-br-xl rounded-tl-sm rounded-tr-sm rounded-bl-sm p-6">
@@ -293,7 +313,7 @@ export const ProfilePage = () => {
                                 Words Typed
                             </div>
                             <div className="text-white text-3xl font-bold">
-                                {viewedPlayer ? formatNumber(viewedPlayer.totalWordsTyped) : 0}
+                                {viewedPlayer ? formatNumber(viewedPlayer.totalWordsTyped) : hasWaitedForData ? 0 : <div className="h-9 w-16 bg-white/10 rounded animate-pulse" />}
                             </div>
                         </div>
                     </div>

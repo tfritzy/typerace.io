@@ -10,7 +10,7 @@ import { useAuth } from "../firebase/AuthContext";
 export const ProfileAvatar = () => {
     const navigate = useNavigate();
     const conn = useSpacetimeDB<DbConnection>();
-    const { user, signInWithGoogle, signInWithGithub } = useAuth();
+    const { user, loading: authLoading, signInWithGoogle, signInWithGithub } = useAuth();
     const { rows: players } = useTable<DbConnection, Player>(
         "player"
     );
@@ -22,6 +22,8 @@ export const ProfileAvatar = () => {
     const myPlayer = conn?.identity
         ? players.find((p) => p.id.isEqual(conn.identity!))
         : null;
+    
+    const isLoading = authLoading || (!myPlayer && user);
 
     useEffect(() => {
         setAccentColor(myPlayer?.color || PlayerColor.Amber);
@@ -74,6 +76,22 @@ export const ProfileAvatar = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [showMenu]);
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center gap-4 py-3 rounded-lg">
+                <div className="w-10 h-10 rounded-full bg-white/10 animate-pulse" />
+                <div className="flex flex-col gap-1.5 min-w-50">
+                    <div className="h-3.5 w-20 bg-white/10 rounded animate-pulse" />
+                    <div className="flex items-center gap-2 w-full">
+                        <div className="h-2.5 w-8 bg-white/10 rounded animate-pulse" />
+                        <div className="flex-1 h-2.5 bg-white/10 rounded-full" />
+                        <div className="h-2.5 w-8 bg-white/10 rounded animate-pulse" />
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (isAnonymous) {
         return (

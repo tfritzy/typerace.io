@@ -43,9 +43,12 @@ export const FindGamePage = () => {
   }, [playerProgress, joinCode, conn.identity, navigate]);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center">
-      <div className="text-xl text-white opacity-60">
-        Finding game...
+    <div className="relative min-h-screen flex flex-col">
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block w-12 h-12 border-4 border-white/20 border-t-white/80 rounded-full animate-spin mb-4" />
+          <div className="text-xl text-white/60">Finding game...</div>
+        </div>
       </div>
     </div>
   );

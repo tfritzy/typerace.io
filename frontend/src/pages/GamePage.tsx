@@ -21,6 +21,14 @@ export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const conn = useSpacetimeDB<DbConnection>();
   const [hasFinished, setHasFinished] = useState(false);
+  const [hasWaitedForGame, setHasWaitedForGame] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHasWaitedForGame(true);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -84,7 +92,36 @@ export const GamePage = () => {
   }, []);
 
   if (!game) {
-    return <div>Game not found</div>;
+    if (!hasWaitedForGame) {
+      return (
+        <div className="relative min-h-screen flex flex-col">
+          <Header />
+          <div className="flex-1 flex flex-col items-center justify-center px-4">
+            <div className="content-container w-full">
+              <div className="mb-3 space-y-3">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div key={index} className="box w-full rounded-lg px-8 py-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-white/10 animate-pulse" />
+                      <div className="flex-1">
+                        <div className="h-4 w-32 bg-white/10 rounded mb-2 animate-pulse" />
+                        <div className="h-2 w-full bg-white/10 rounded animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="h-24 w-full bg-white/10 rounded animate-pulse" />
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="relative min-h-screen flex items-center justify-center">
+        <div className="text-white/60">Game not found</div>
+      </div>
+    );
   }
 
   const currentPlayerId = conn?.identity;
