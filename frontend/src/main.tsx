@@ -49,6 +49,7 @@ const Root = () => {
         .subscribe([
           `select * from player where Id = '${identity}'`,
           `select * from playerprogress where PlayerId = '${identity}'`,
+          `select * from xpgain where PlayerId = '${identity}'`,
         ]);
 
       const isAnonymous = auth.currentUser?.isAnonymous ?? true;

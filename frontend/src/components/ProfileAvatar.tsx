@@ -6,6 +6,8 @@ import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { useEffect, useState, useRef } from "react";
 import { setAccentColor } from "../utils/colorMapping";
 import { useAuth } from "../firebase/AuthContext";
+import type { XpGain } from "../../module_bindings/xp_gain_type";
+import { XpGainPopup } from "./XpGainPopup";
 
 export const ProfileAvatar = () => {
     const navigate = useNavigate();
@@ -17,6 +19,7 @@ export const ProfileAvatar = () => {
     const [showMenu, setShowMenu] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [xpGains, setXpGains] = useState<XpGain[]>([]);
     const menuRef = useRef<HTMLDivElement>(null);
 
     const myPlayer = conn?.identity
@@ -26,6 +29,28 @@ export const ProfileAvatar = () => {
     useEffect(() => {
         setAccentColor(myPlayer?.color || PlayerColor.Amber);
     }, [myPlayer]);
+
+    useEffect(() => {
+        if (!conn?.db || !conn?.identity) return;
+
+        const currentIdentity = conn.identity;
+
+        const onInsert = (_: any, xpGain: XpGain) => {
+            if (xpGain.playerId.isEqual(currentIdentity)) {
+                setXpGains(prev => [...prev, xpGain]);
+            }
+        };
+
+        conn.db.xpgain.onInsert(onInsert);
+
+        return () => {
+            conn.db.xpgain.removeOnInsert(onInsert);
+        };
+    }, [conn]);
+
+    const handleXpComplete = (xpGainId: string) => {
+        setXpGains(prev => prev.filter(g => g.id !== xpGainId));
+    };
 
     const handleSocialSignIn = async (provider: 'google' | 'github' | 'discord') => {
         setError("");
@@ -82,12 +107,25 @@ export const ProfileAvatar = () => {
                     onClick={() => setShowMenu(!showMenu)}
                     className="flex items-center gap-4 py-3 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
                 >
-                    <PlayerAvatar
-                        size={40}
-                        identity={identityHash}
-                        color={myPlayer?.color}
-                        isHighlighted={false}
-                    />
+                    <div className="relative">
+                        <PlayerAvatar
+                            size={40}
+                            identity={identityHash}
+                            color={myPlayer?.color}
+                            isHighlighted={false}
+                        />
+                        {xpGains.length > 0 && (
+                            <div className="absolute top-full left-0 mt-2 z-50 pointer-events-none">
+                                {xpGains.map((xpGain) => (
+                                    <XpGainPopup
+                                        key={xpGain.id}
+                                        xpGain={xpGain}
+                                        onComplete={() => handleXpComplete(xpGain.id)}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
                     <div className="flex flex-col items-start gap-1.5 min-w-50">
                         <div className="text-sm font-semibold text-white/70">{name}</div>
@@ -152,12 +190,25 @@ export const ProfileAvatar = () => {
             onClick={() => navigate(`/profile/${identityHash}`)}
             className="flex items-center gap-4 py-3 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
         >
-            <PlayerAvatar
-                size={40}
-                identity={identityHash}
-                color={myPlayer?.color}
-                isHighlighted={true}
-            />
+            <div className="relative">
+                <PlayerAvatar
+                    size={40}
+                    identity={identityHash}
+                    color={myPlayer?.color}
+                    isHighlighted={true}
+                />
+                {xpGains.length > 0 && (
+                    <div className="absolute top-full left-0 mt-2 z-50 pointer-events-none">
+                        {xpGains.map((xpGain) => (
+                            <XpGainPopup
+                                key={xpGain.id}
+                                xpGain={xpGain}
+                                onComplete={() => handleXpComplete(xpGain.id)}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
 
             <div className="flex flex-col items-start gap-1 min-w-50">
                 <div className="text-sm font-semibold text-white">{name}</div>

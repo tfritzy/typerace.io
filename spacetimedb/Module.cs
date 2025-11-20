@@ -75,6 +75,14 @@ public partial struct CharacterEvent
 }
 
 [Type]
+public partial struct XpMultiplier
+{
+    public string Label;
+    public string Value;
+    public string Type;
+}
+
+[Type]
 public partial struct BotConfig
 {
     public double TypingRate;
@@ -105,6 +113,7 @@ public static partial class Module
         public BotConfig? BotConfig;
         public PlayerColor Color;
         public bool IsAnonymous;
+        public long LastGameDate;
     }
 
     [Table(Name = "game", Public = true)]
@@ -161,6 +170,20 @@ public static partial class Module
         public GameMode GameMode;
         public string GameRecordId;
         public double Wpm;
+    }
+
+    [Table(Name = "xpgain", Public = true)]
+    public partial struct XpGain
+    {
+        [PrimaryKey]
+        public string Id;
+        [SpacetimeDB.Index.BTree]
+        public Identity PlayerId;
+        public string GameId;
+        public long Timestamp;
+        public int BaseXp;
+        public List<XpMultiplier> Multipliers;
+        public int TotalXp;
     }
 
     [Table(Name = "elo", Public = true)]
@@ -301,7 +324,8 @@ public static partial class Module
                     ErrorRate = errorRate
                 },
                 Color = GenerateRandomColor(ctx.Rng),
-                IsAnonymous = false
+                IsAnonymous = false,
+                LastGameDate = 0
             });
         }
 
@@ -361,7 +385,8 @@ public static partial class Module
                 IsBot = false,
                 BotConfig = null,
                 Color = PlayerColor.Amber,
-                IsAnonymous = true
+                IsAnonymous = true,
+                LastGameDate = 0
             });
             Log.Info($"Created player record for new client {ctx.Sender}");
         }
@@ -1073,27 +1098,47 @@ public static partial class Module
 
         var wordsTyped = game.Phrase.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
 
-        var xpEarned = CalculateXpForPlacement(placement);
-
         var updatedPlayer = player.Value;
-        updatedPlayer.TotalGames += 1;
-        if (placement == 1)
-        {
-            updatedPlayer.Wins += 1;
-        }
-        updatedPlayer.Xp += xpEarned;
-        updatedPlayer.TotalWordsTyped += wordsTyped;
-
-        while (updatedPlayer.Xp >= XpRequiredForLevel(updatedPlayer.Level + 1))
-        {
-            updatedPlayer.Xp -= XpRequiredForLevel(updatedPlayer.Level + 1);
-            updatedPlayer.Level += 1;
-        }
-
+        AwardXpForGame(ctx, ref updatedPlayer, progress, game, placement, wordsTyped);
+        UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped);
+        LevelUpPlayer(ref updatedPlayer);
         ctx.Db.player.Id.Update(updatedPlayer);
 
+        UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, statsId, wpm);
+
+        UpdatePlayerElo(ctx, progress.PlayerId, game, placement);
+
+        Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}, typed {wordsTyped} words");
+    }
+
+    private static void UpdatePlayerStats(ref Player player, int placement, int wordsTyped)
+    {
+        player.TotalGames += 1;
+        if (placement == 1)
+        {
+            player.Wins += 1;
+        }
+        player.TotalWordsTyped += wordsTyped;
+    }
+
+    private static void LevelUpPlayer(ref Player player)
+    {
+        while (true)
+        {
+            var xpRequired = XpRequiredForLevel(player.Level + 1);
+            if (player.Xp < xpRequired)
+            {
+                break;
+            }
+            player.Xp -= xpRequired;
+            player.Level += 1;
+        }
+    }
+
+    private static void UpdatePersonalRecord(ReducerContext ctx, Identity playerId, GameMode gameMode, string gameRecordId, double wpm)
+    {
         PersonalRecord? existingRecord = null;
-        foreach (var record in ctx.Db.personalrecord.PlayerId_GameMode.Filter((progress.PlayerId, game.GameMode)))
+        foreach (var record in ctx.Db.personalrecord.PlayerId_GameMode.Filter((playerId, gameMode)))
         {
             existingRecord = record;
             break;
@@ -1109,30 +1154,129 @@ public static partial class Module
             ctx.Db.personalrecord.Insert(new PersonalRecord
             {
                 Id = IdGenerator.Generate("pr_", ctx.Rng),
-                PlayerId = progress.PlayerId,
-                GameMode = game.GameMode,
-                GameRecordId = statsId,
+                PlayerId = playerId,
+                GameMode = gameMode,
+                GameRecordId = gameRecordId,
                 Wpm = wpm
             });
 
-            Log.Info($"Updated personal record for player {progress.PlayerId} in mode {game.GameMode}: {wpm} WPM");
+            Log.Info($"Updated personal record for player {playerId} in mode {gameMode}: {wpm} WPM");
         }
-
-        UpdatePlayerElo(ctx, progress.PlayerId, game, placement);
-
-        Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}, earned {xpEarned} XP, typed {wordsTyped} words");
     }
 
-    private static int CalculateXpForPlacement(int placement)
+    private static void AwardXpForGame(ReducerContext ctx, ref Player player, PlayerProgress progress, Game game, int placement, int wordsTyped)
+    {
+        var currentTimestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
+        var isFirstGameToday = IsFirstGameOfDay(player.LastGameDate, currentTimestamp);
+
+        var (baseXp, placementMultiplier, accuracyMultiplier, accuracy, xpBeforeBonus) = CalculateXpBreakdown(wordsTyped, placement, progress);
+        var xpEarned = xpBeforeBonus;
+
+        var multipliers = new List<XpMultiplier>
+        {
+            new XpMultiplier
+            {
+                Label = $"Base ({wordsTyped} words)",
+                Value = $"{baseXp} XP",
+                Type = "base"
+            },
+            new XpMultiplier
+            {
+                Label = $"{GetPlacementLabel(placement)} Place",
+                Value = $"×{placementMultiplier:F1}",
+                Type = "multiplier"
+            },
+            new XpMultiplier
+            {
+                Label = $"{Math.Round(accuracy * 100)}% Accuracy",
+                Value = $"×{accuracyMultiplier:F2}",
+                Type = "multiplier"
+            }
+        };
+
+        if (isFirstGameToday)
+        {
+            xpEarned += 100;
+            multipliers.Add(new XpMultiplier
+            {
+                Label = "First Game Today! 🎉",
+                Value = "+100 XP",
+                Type = "bonus"
+            });
+        }
+
+        ctx.Db.xpgain.Insert(new XpGain
+        {
+            Id = IdGenerator.Generate("xpg_", ctx.Rng),
+            PlayerId = progress.PlayerId,
+            GameId = game.Id,
+            Timestamp = currentTimestamp,
+            BaseXp = baseXp,
+            Multipliers = multipliers,
+            TotalXp = xpEarned
+        });
+
+        player.Xp += xpEarned;
+        player.LastGameDate = currentTimestamp;
+
+        Log.Info($"Player {progress.PlayerId} earned {xpEarned} XP");
+    }
+
+    private static (int baseXp, double placementMultiplier, double accuracyMultiplier, double accuracy, int xpBeforeBonus) CalculateXpBreakdown(int wordsTyped, int placement, PlayerProgress progress)
+    {
+        var baseXp = wordsTyped;
+
+        var placementMultiplier = placement switch
+        {
+            1 => 2.0,
+            2 => 1.5,
+            _ => 1.0
+        };
+
+        var correctEvents = 0;
+        var totalEvents = 0;
+        foreach (var evt in progress.CharacterHistory)
+        {
+            if (evt.EventType == CharacterEventType.Correct)
+            {
+                correctEvents++;
+            }
+            if (evt.EventType != CharacterEventType.Backspace)
+            {
+                totalEvents++;
+            }
+        }
+
+        var accuracy = totalEvents > 0 ? (double)correctEvents / totalEvents : 0.0;
+        var accuracyMultiplier = 0.5 + accuracy;
+
+        var xpBeforeBonus = (int)(baseXp * placementMultiplier * accuracyMultiplier);
+
+        return (baseXp, placementMultiplier, accuracyMultiplier, accuracy, xpBeforeBonus);
+    }
+
+    private static string GetPlacementLabel(int placement)
     {
         return placement switch
         {
-            1 => 50,
-            2 => 25,
-            3 => 13,
-            4 => 5,
-            _ => 3
+            1 => "1st",
+            2 => "2nd",
+            3 => "3rd",
+            _ => $"{placement}th"
         };
+    }
+
+    private static bool IsFirstGameOfDay(long lastGameDate, long currentDate)
+    {
+        if (lastGameDate == 0)
+        {
+            return true;
+        }
+
+        var lastGameDay = DateTimeOffset.FromUnixTimeMilliseconds(lastGameDate / 1000).Date;
+        var currentDay = DateTimeOffset.FromUnixTimeMilliseconds(currentDate / 1000).Date;
+
+        return currentDay > lastGameDay;
     }
 
     private static int XpRequiredForLevel(int level)
