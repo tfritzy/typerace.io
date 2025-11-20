@@ -301,7 +301,6 @@ public static partial class Module
                 Color = GenerateRandomColor(ctx.Rng)
             });
 
-            var estimatedElo = EstimateEloFromTypingRate(typingRate, errorRate);
             foreach (GameMode mode in Enum.GetValues<GameMode>())
             {
                 ctx.Db.elo.Insert(new Elo
@@ -309,7 +308,7 @@ public static partial class Module
                     Id = IdGenerator.Generate("elo_", ctx.Rng),
                     PlayerId = identity,
                     GameMode = mode,
-                    Rating = estimatedElo
+                    Rating = 1000
                 });
             }
         }
@@ -334,15 +333,6 @@ public static partial class Module
         var stdDev = 0.03;
         var errorRate = GenerateNormalDistribution(rng, meanErrorRate, stdDev);
         return Math.Max(0.0, Math.Min(0.15, errorRate));
-    }
-
-    private static int EstimateEloFromTypingRate(double typingRateMicros, double errorRate)
-    {
-        var charactersPerSecond = 1_000_000.0 / typingRateMicros;
-        var wpm = (charactersPerSecond * 60.0) / 5.0;
-        var effectiveWpm = wpm * (1.0 - errorRate);
-        var eloEstimate = 800 + (effectiveWpm - 35) * 5;
-        return (int)Math.Round(Math.Max(600, Math.Min(1400, eloEstimate)));
     }
 
     private static double GenerateNormalDistribution(Random rng, double mean, double stdDev)
@@ -672,16 +662,7 @@ public static partial class Module
                 }
             }
 
-            int targetElo = 1000;
-            if (humanPlayerElos.Count > 0)
-            {
-                int sum = 0;
-                foreach (var elo in humanPlayerElos)
-                {
-                    sum += elo;
-                }
-                targetElo = sum / humanPlayerElos.Count;
-            }
+            int targetElo = humanPlayerElos.Count > 0 ? (int)humanPlayerElos.Average() : 1000;
 
             var eligibleBots = GetEligibleBots(ctx, game.Value.GameMode, targetElo, args.GameId);
 
@@ -742,15 +723,6 @@ public static partial class Module
 
     private static List<Player> GetEligibleBots(ReducerContext ctx, GameMode gameMode, int targetElo, string gameId)
     {
-        var botsInGame = new HashSet<Identity>();
-        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(gameId))
-        {
-            if (progress.IsBot)
-            {
-                botsInGame.Add(progress.PlayerId);
-            }
-        }
-
         var eligibleBots = new List<Player>();
         int eloRange = 200;
         const int maxEloRange = 1000;
@@ -761,11 +733,6 @@ public static partial class Module
 
             foreach (var bot in ctx.Db.player.IsBot.Filter(true))
             {
-                if (botsInGame.Contains(bot.Id))
-                {
-                    continue;
-                }
-
                 int botElo = GetBotElo(ctx, bot.Id, gameMode);
                 int eloDifference = Math.Abs(botElo - targetElo);
 
