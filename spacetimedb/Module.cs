@@ -300,17 +300,6 @@ public static partial class Module
                 },
                 Color = GenerateRandomColor(ctx.Rng)
             });
-
-            foreach (GameMode mode in Enum.GetValues<GameMode>())
-            {
-                ctx.Db.elo.Insert(new Elo
-                {
-                    Id = IdGenerator.Generate("elo_", ctx.Rng),
-                    PlayerId = identity,
-                    GameMode = mode,
-                    Rating = 1000
-                });
-            }
         }
 
         Log.Info("Initialized 100 bot players");
@@ -723,17 +712,22 @@ public static partial class Module
 
     private static List<Player> GetEligibleBots(ReducerContext ctx, GameMode gameMode, int targetElo, string gameId)
     {
+        var botsWithElo = new List<(Player bot, int elo)>();
+        foreach (var bot in ctx.Db.player.IsBot.Filter(true))
+        {
+            int botElo = GetBotElo(ctx, bot.Id, gameMode);
+            botsWithElo.Add((bot, botElo));
+        }
+
         var eligibleBots = new List<Player>();
         int eloRange = 200;
-        const int maxEloRange = 1000;
 
-        while (eligibleBots.Count < 10 && eloRange <= maxEloRange)
+        while (eligibleBots.Count < 10)
         {
             eligibleBots.Clear();
 
-            foreach (var bot in ctx.Db.player.IsBot.Filter(true))
+            foreach (var (bot, botElo) in botsWithElo)
             {
-                int botElo = GetBotElo(ctx, bot.Id, gameMode);
                 int eloDifference = Math.Abs(botElo - targetElo);
 
                 if (eloDifference <= eloRange)
@@ -742,7 +736,7 @@ public static partial class Module
                 }
             }
 
-            if (eligibleBots.Count < 10 && eloRange < maxEloRange)
+            if (eligibleBots.Count < 10)
             {
                 eloRange += 200;
             }
