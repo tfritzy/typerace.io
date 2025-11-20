@@ -719,31 +719,27 @@ public static partial class Module
             botsWithElo.Add((bot, botElo));
         }
 
-        var eligibleBots = new List<Player>();
-        int eloRange = 200;
+        botsWithElo.Sort((a, b) => a.elo.CompareTo(b.elo));
 
-        while (eligibleBots.Count < 10)
+        int closestIndex = 0;
+        int minDifference = int.MaxValue;
+        for (int i = 0; i < botsWithElo.Count; i++)
         {
-            eligibleBots.Clear();
-
-            foreach (var (bot, botElo) in botsWithElo)
+            int difference = Math.Abs(botsWithElo[i].elo - targetElo);
+            if (difference < minDifference)
             {
-                int eloDifference = Math.Abs(botElo - targetElo);
+                minDifference = difference;
+                closestIndex = i;
+            }
+        }
 
-                if (eloDifference <= eloRange)
-                {
-                    eligibleBots.Add(bot);
-                }
-            }
+        int startIndex = Math.Max(0, closestIndex - 10);
+        int endIndex = Math.Min(botsWithElo.Count - 1, closestIndex + 10);
 
-            if (eligibleBots.Count < 10)
-            {
-                eloRange += 200;
-            }
-            else
-            {
-                break;
-            }
+        var eligibleBots = new List<Player>();
+        for (int i = startIndex; i <= endIndex; i++)
+        {
+            eligibleBots.Add(botsWithElo[i].bot);
         }
 
         return eligibleBots;
