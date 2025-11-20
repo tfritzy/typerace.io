@@ -212,12 +212,23 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                         const totalSeconds = Number(dataPoint.timeMs) / 1000;
                         const time = formatStopwatchTime(totalSeconds);
 
-                        return [
+                        const labels = [
                             `${context.parsed.y.toFixed(1)} WPM`,
                             `Time: ${time}`,
                             `Place: ${getOrdinalPlacement(dataPoint.placement)}`,
                             `Mode: ${dataPoint.gameMode.tag}`
                         ];
+
+                        if (dataPoint.xpGained !== undefined) {
+                            labels.push(`XP: +${dataPoint.xpGained}`);
+                        }
+
+                        if (dataPoint.eloChange !== undefined) {
+                            const eloSign = dataPoint.eloChange >= 0 ? '+' : '';
+                            labels.push(`ELO: ${eloSign}${dataPoint.eloChange}`);
+                        }
+
+                        return labels;
                     }
                 }
             }
