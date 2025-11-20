@@ -721,20 +721,18 @@ public static partial class Module
 
         botsWithElo.Sort((a, b) => a.elo.CompareTo(b.elo));
 
-        int closestIndex = 0;
-        int minDifference = int.MaxValue;
+        int targetIndex = botsWithElo.Count / 2;
         for (int i = 0; i < botsWithElo.Count; i++)
         {
-            int difference = Math.Abs(botsWithElo[i].elo - targetElo);
-            if (difference < minDifference)
+            if (botsWithElo[i].elo >= targetElo)
             {
-                minDifference = difference;
-                closestIndex = i;
+                targetIndex = i;
+                break;
             }
         }
 
-        int startIndex = Math.Max(0, closestIndex - 10);
-        int endIndex = Math.Min(botsWithElo.Count - 1, closestIndex + 10);
+        int startIndex = Math.Max(0, targetIndex - 10);
+        int endIndex = Math.Min(botsWithElo.Count - 1, targetIndex + 10);
 
         var eligibleBots = new List<Player>();
         for (int i = startIndex; i <= endIndex; i++)
