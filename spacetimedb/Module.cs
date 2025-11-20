@@ -953,6 +953,13 @@ public static partial class Module
             return;
         }
 
+        var senderProgress = FindPlayerProgress(ctx, ctx.Sender, gameId);
+        if (senderProgress == null)
+        {
+            Log.Info($"Player {ctx.Sender} is not in game {gameId}");
+            return;
+        }
+
         var updatedGame = game.Value;
         updatedGame.State = GameState.Countdown;
         ctx.Db.game.Id.Update(updatedGame);
@@ -979,6 +986,18 @@ public static partial class Module
         if (game == null)
         {
             Log.Info($"Game {gameId} not found");
+            return;
+        }
+
+        if (game.Value.GameType != GameType.Private)
+        {
+            Log.Info($"Game {gameId} is not a private game");
+            return;
+        }
+
+        if (game.Value.State != GameState.Lobby)
+        {
+            Log.Info($"Cannot grant access to game {gameId} - game is not in lobby state");
             return;
         }
 

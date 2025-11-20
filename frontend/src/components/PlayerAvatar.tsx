@@ -22,29 +22,37 @@ export const PlayerAvatar = ({
     const colorConfig = getColorConfig(color);
 
     const getCrownColor = (place: number) => {
-        if (place === 1) return '#FFD700';
+        if (place === 1) return '#FFC900';
         return null;
     };
 
     const getMedalColor = (place: number) => {
-        if (place === 1) return '#FFD700';
+        if (place === 1) return '#FFC900';
         if (place === 2) return '#C0C0C0';
         if (place === 3) return '#CD7F32';
         if (place > 3) return '#9CA3AF';
         return null;
     };
 
+    const getBorderColor = (place: number) => {
+        if (place === 1) return '#FFC900';
+        if (place === 2) return '#C0C0C0';
+        if (place === 3) return '#CD7F32';
+        return null;
+    };
+
     const crownColor = placement ? getCrownColor(placement) : null;
     const medalColor = placement ? getMedalColor(placement) : null;
+    const borderColor = placement ? getBorderColor(placement) : null;
 
     return (
         <div
             className={`relative shrink-0 border-2 rounded-full ${isLoading ? 'border-dashed' : ''}`}
-            style={{ borderColor: colorConfig.avatarColors[2] }}
+            style={{ borderColor: borderColor || colorConfig.avatarColors[2] }}
         >
             {crownColor && (
                 <div
-                    className="absolute -top-4 left-1/2 -translate-x-1/2 z-10"
+                    className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 animate-[crownDescend_0.6s_ease-out]"
                     style={{ filter: `drop-shadow(0 -1px 6px ${crownColor})` }}
                 >
                     <Crown

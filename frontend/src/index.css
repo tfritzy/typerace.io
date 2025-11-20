@@ -158,6 +158,17 @@ body {
   }
 }
 
+@keyframes crownDescend {
+  from {
+    opacity: 0;
+    transform: translateY(-150%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-slideUpFadeIn {
   animation: slideUpFadeIn 0.5s ease-out forwards;
   opacity: 0;
