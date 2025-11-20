@@ -42,11 +42,5 @@ export const FindGamePage = () => {
     }
   }, [playerProgress, joinCode, conn.identity, navigate]);
 
-  return (
-    <div className="relative min-h-screen flex items-center justify-center">
-      <div className="text-xl text-white opacity-60">
-        Finding game...
-      </div>
-    </div>
-  );
+  return null;
 };

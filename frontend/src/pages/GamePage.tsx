@@ -84,7 +84,7 @@ export const GamePage = () => {
   }, []);
 
   if (!game) {
-    return <div>Game not found</div>;
+    return null;
   }
 
   const currentPlayerId = conn?.identity;
