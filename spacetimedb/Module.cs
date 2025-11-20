@@ -641,23 +641,37 @@ public static partial class Module
 
             int botsToAdd = 3 - currentPlayerCount;
 
-            var availableBots = new List<Player>();
-            foreach (var player in ctx.Db.player.IsBot.Filter(true))
+            var humanPlayerElos = new List<int>();
+            foreach (var progress in ctx.Db.playerprogress.GameId.Filter(args.GameId))
             {
-                availableBots.Add(player);
+                if (!progress.IsBot)
+                {
+                    var playerElo = GetOrCreatePlayerElo(ctx, progress.PlayerId, game.Value.GameMode);
+                    humanPlayerElos.Add(playerElo.Rating);
+                }
             }
 
-            if (availableBots.Count == 0)
+            int targetElo = humanPlayerElos.Count > 0 ? (int)humanPlayerElos.Average() : 1000;
+
+            var eligibleBots = GetEligibleBots(ctx, game.Value.GameMode, targetElo, args.GameId);
+
+            if (eligibleBots.Count == 0)
             {
-                Log.Info($"No bot players available to fill game {args.GameId}");
+                Log.Info($"No eligible bot players available to fill game {args.GameId}");
                 return;
             }
 
-            for (int i = 0; i < botsToAdd; i++)
+            var selectedBots = new List<Player>();
+            for (int i = 0; i < botsToAdd && eligibleBots.Count > 0; i++)
             {
-                var botIndex = ctx.Rng.Next(availableBots.Count);
-                var selectedBot = availableBots[botIndex];
+                var botIndex = ctx.Rng.Next(eligibleBots.Count);
+                var selectedBot = eligibleBots[botIndex];
+                selectedBots.Add(selectedBot);
+                eligibleBots.RemoveAt(botIndex);
+            }
 
+            foreach (var selectedBot in selectedBots)
+            {
                 ctx.Db.playerprogress.Insert(new PlayerProgress
                 {
                     Id = IdGenerator.Generate("pp_", ctx.Rng),
@@ -674,14 +688,14 @@ public static partial class Module
                     JoinCode = ""
                 });
 
-                Log.Info($"Added bot {selectedBot.Name} to game {args.GameId}");
+                Log.Info($"Added bot {selectedBot.Name} (ELO: {GetBotElo(ctx, selectedBot.Id, game.Value.GameMode)}) to game {args.GameId} (target ELO: {targetElo})");
             }
 
             var updatedGame = game.Value;
             updatedGame.State = GameState.Countdown;
             ctx.Db.game.Id.Update(updatedGame);
 
-            Log.Info($"Game {args.GameId} filled with {botsToAdd} bots and transitioned to Countdown state");
+            Log.Info($"Game {args.GameId} filled with {selectedBots.Count} bots and transitioned to Countdown state");
 
             long countdownDuration = GetCountdownDuration(game.Value.GameType);
             var countdownTime = new TimeDuration { Microseconds = countdownDuration };
@@ -694,6 +708,48 @@ public static partial class Module
                 ScheduledAt = new ScheduleAt.Time(scheduledTime)
             });
         }
+    }
+
+    private static List<Player> GetEligibleBots(ReducerContext ctx, GameMode gameMode, int targetElo, string gameId)
+    {
+        var botsWithElo = new List<(Player bot, int elo)>();
+        foreach (var bot in ctx.Db.player.IsBot.Filter(true))
+        {
+            int botElo = GetBotElo(ctx, bot.Id, gameMode);
+            botsWithElo.Add((bot, botElo));
+        }
+
+        botsWithElo.Sort((a, b) => a.elo.CompareTo(b.elo));
+
+        int targetIndex = botsWithElo.Count / 2;
+        for (int i = 0; i < botsWithElo.Count; i++)
+        {
+            if (botsWithElo[i].elo >= targetElo)
+            {
+                targetIndex = i;
+                break;
+            }
+        }
+
+        int startIndex = Math.Max(0, targetIndex - 10);
+        int endIndex = Math.Min(botsWithElo.Count - 1, targetIndex + 10);
+
+        var eligibleBots = new List<Player>();
+        for (int i = startIndex; i <= endIndex; i++)
+        {
+            eligibleBots.Add(botsWithElo[i].bot);
+        }
+
+        return eligibleBots;
+    }
+
+    private static int GetBotElo(ReducerContext ctx, Identity botId, GameMode gameMode)
+    {
+        foreach (var elo in ctx.Db.elo.PlayerId_GameMode.Filter((botId, gameMode)))
+        {
+            return elo.Rating;
+        }
+        return 1000;
     }
 
     [Reducer]
