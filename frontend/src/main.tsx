@@ -11,7 +11,6 @@ import { AuthProvider } from "./firebase/AuthContext.tsx";
 
 const Root = () => {
   const [token, setToken] = useState<string | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -21,19 +20,10 @@ const Root = () => {
       } else {
         setToken(undefined);
       }
-      setLoading(false);
     });
 
     return unsubscribe;
   }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
-    );
-  }
 
   const connectionBuilder = DbConnection.builder()
     .withUri(import.meta.env.VITE_SPACETIMEDB_URI || "ws://localhost:3000")

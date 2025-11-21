@@ -52,7 +52,7 @@ export const PlayerAvatar = ({
         >
             {crownColor && (
                 <div
-                    className="absolute -top-4 left-1/2 -translate-x-1/2 z-10 animate-[crownDescend_0.6s_ease-out]"
+                    className="absolute -top-[14px] left-1/2 -translate-x-1/2 z-10 animate-[crownDescend_0.6s_ease-out]"
                     style={{ filter: `drop-shadow(0 -1px 6px ${crownColor})` }}
                 >
                     <Crown

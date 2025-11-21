@@ -184,6 +184,8 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         public GameMode GameMode;
         [SpacetimeDB.Index.BTree]
+        public GameType GameType;
+        [SpacetimeDB.Index.BTree]
         public int Year;
         [SpacetimeDB.Index.BTree]
         public int Month;
@@ -1160,6 +1162,7 @@ public static partial class Module
             PlayerId = progress.PlayerId,
             GameId = game.Id,
             GameMode = game.GameMode,
+            GameType = game.GameType,
             Year = year,
             Month = month,
             Date = timestamp,
@@ -1342,14 +1345,14 @@ public static partial class Module
             return 0;
         }
 
-        if (level > 100)
+        if (level > 1000)
         {
-            return 5000;
+            return 10000;
         }
 
-        double baseXp = 100.0;
-        double maxXp = 5000.0;
-        double growthRate = Math.Log(maxXp / baseXp) / (100.0 - 2.0);
+        double baseXp = 500.0;
+        double maxXp = 10000.0;
+        double growthRate = Math.Log(maxXp / baseXp) / (1000.0 - 2.0);
 
         return (int)Math.Round(baseXp * Math.Exp(growthRate * (level - 2)));
     }

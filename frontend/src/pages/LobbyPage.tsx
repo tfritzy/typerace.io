@@ -31,7 +31,7 @@ export const LobbyPage = () => {
   }, [navigate, selectedMode, gameType]);
 
   return (
-    <div className="relative min-h-screen flex flex-col">
+    <div className="relative h-screen flex flex-col overflow-hidden">
       <Header />
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="content-container">
