@@ -170,6 +170,7 @@ public static partial class Module
         public GameType GameType;
 
         public List<Identity> Placements;
+        public Identity? Owner;
     }
 
     [Table(Name = "gamerecord", Public = true)]
@@ -636,7 +637,8 @@ public static partial class Module
             State = GameState.Lobby,
             GameMode = gameMode,
             GameType = gameType,
-            Placements = new List<Identity>()
+            Placements = new List<Identity>(),
+            Owner = ctx.Sender
         });
     }
 
@@ -966,6 +968,12 @@ public static partial class Module
             return;
         }
 
+        if (game.Value.GameType == GameType.Private && game.Value.Owner != ctx.Sender)
+        {
+            Log.Info($"Player {ctx.Sender} is not the owner of private game {gameId}");
+            return;
+        }
+
         var senderProgress = FindPlayerProgress(ctx, ctx.Sender, gameId);
         if (senderProgress == null)
         {
@@ -1023,6 +1031,65 @@ public static partial class Module
 
         InsertPlayerProgress(ctx, gameId, "");
         Log.Info($"Player {ctx.Sender} joined private game {gameId}");
+    }
+
+    [Reducer]
+    public static void Rematch(ReducerContext ctx, string gameId)
+    {
+        var game = ctx.Db.game.Id.Find(gameId);
+
+        if (game == null)
+        {
+            Log.Info($"Game {gameId} not found");
+            return;
+        }
+
+        if (game.Value.GameType == GameType.Private && game.Value.Owner != ctx.Sender)
+        {
+            Log.Info($"Player {ctx.Sender} is not the owner of private game {gameId}");
+            return;
+        }
+
+        var senderProgress = FindPlayerProgress(ctx, ctx.Sender, gameId);
+        if (senderProgress == null)
+        {
+            Log.Info($"Player {ctx.Sender} is not in game {gameId}");
+            return;
+        }
+
+        var newGame = InsertGame(ctx, game.Value.GameMode, game.Value.GameType);
+
+        Log.Info($"Created rematch game {newGame.Id} for original game {gameId}");
+
+        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(gameId))
+        {
+            if (!progress.IsBot)
+            {
+                var player = ctx.Db.player.Id.Find(progress.PlayerId);
+                var playerName = player?.Name ?? "Unknown";
+                var playerLevel = player?.Level ?? 1;
+                var isAnonymous = player?.IsAnonymous ?? true;
+
+                ctx.Db.playerprogress.Insert(new PlayerProgress
+                {
+                    Id = IdGenerator.Generate("pp_", ctx.Rng),
+                    PlayerId = progress.PlayerId,
+                    GameId = newGame.Id,
+                    PlayerName = playerName,
+                    PlayerLevel = playerLevel,
+                    ProgressIndex = 0,
+                    IsBot = false,
+                    IsAnonymous = isAnonymous,
+                    CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+                    CharacterHistory = new byte[0],
+                    Time = 0,
+                    Placement = -1,
+                    JoinCode = gameId
+                });
+
+                Log.Info($"Added player {progress.PlayerId} to rematch game {newGame.Id} with join code {gameId}");
+            }
+        }
     }
 
     [Reducer]

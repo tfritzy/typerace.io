@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useCallback, useState } from "react";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import {
@@ -19,8 +19,13 @@ import { ActionBar } from "../components/ActionBar";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
+  const navigate = useNavigate();
   const conn = useSpacetimeDB<DbConnection>();
   const [hasFinished, setHasFinished] = useState(false);
+
+  useEffect(() => {
+    setHasFinished(false);
+  }, [gameId]);
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -70,6 +75,24 @@ export const GamePage = () => {
       }
     }
   }, [conn, game, gameId, gamePlayerProgress]);
+
+  useEffect(() => {
+    if (!conn || !gameId) return;
+
+    const currentPlayerId = conn.identity;
+    if (!currentPlayerId) return;
+
+    const rematchProgress = playerProgress.find(
+      (pp) =>
+        pp.playerId.isEqual(currentPlayerId) &&
+        pp.joinCode === gameId &&
+        pp.gameId.toString() !== gameId
+    );
+
+    if (rematchProgress) {
+      navigate(`/game/${rematchProgress.gameId.toString()}`, { replace: true });
+    }
+  }, [conn, gameId, playerProgress, navigate]);
 
   const getPlayerName = (pp: PlayerProgress) => {
     return pp.playerName;
@@ -132,10 +155,12 @@ export const GamePage = () => {
                 pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
 
               if (!pp) {
+                if (game.gameType?.tag === "Private") {
+                  return null;
+                }
                 return (
-                  <div className="box w-full rounded-lg px-8 py-6">
+                  <div key={`loading-${index}`} className="box w-full rounded-lg px-8 py-6">
                     <PlayerProgressBar
-                      key={`loading-${index}`}
                       name="Waiting for player..."
                       level={1}
                       progressIndex={0}
@@ -149,9 +174,8 @@ export const GamePage = () => {
               }
 
               return (
-                <div className="box w-full rounded-lg px-8 py-6 relative">
+                <div key={pp.id.toString()} className="box w-full rounded-lg px-8 py-6 relative">
                   <PlayerProgressBar
-                    key={pp.id.toString()}
                     name={getPlayerName(pp)}
                     level={getPlayerLevel(pp)}
                     progressIndex={pp.progressIndex}
@@ -176,6 +200,9 @@ export const GamePage = () => {
               );
               if (!currentPP) return null;
 
+              const isOwner = currentPlayerId && game.owner && currentPlayerId.isEqual(game.owner);
+              const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;
+
               return (
                 <>
                   <RaceResults
@@ -185,14 +212,25 @@ export const GamePage = () => {
                     raceStartTimestamp={game.racingStartedAt}
                     placement={currentPP.placement}
                   />
-                  <ActionBar gameType={game.gameType?.tag as any} />
+                  <ActionBar
+                    mode={game.gameMode}
+                    gameType={game.gameType?.tag as any}
+                    gameId={gameId}
+                    rematchDisabled={rematchDisabled}
+                    conn={conn}
+                  />
                 </>
               );
             })()
           ) : isLobby ? (
-            <GameLobby gameId={gameId!} conn={conn} />
+            <GameLobby 
+              gameId={gameId!} 
+              conn={conn}
+              isOwner={currentPlayerId ? game.owner?.isEqual(currentPlayerId) ?? false : false}
+            />
           ) : (
             <GamePageTypeBox
+              key={gameId}
               phrase={game.phrase}
               gameId={gameId!}
               conn={conn}

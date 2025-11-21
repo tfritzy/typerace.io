@@ -39,12 +39,12 @@ import { ClientDisconnected } from "./client_disconnected_reducer.ts";
 export { ClientDisconnected };
 import { FillGameWithBots } from "./fill_game_with_bots_reducer.ts";
 export { FillGameWithBots };
-import { GrantPrivateGameAccess } from "./grant_private_game_access_reducer.ts";
-export { GrantPrivateGameAccess };
 import { JoinGame } from "./join_game_reducer.ts";
 export { JoinGame };
 import { JoinPrivateGame } from "./join_private_game_reducer.ts";
 export { JoinPrivateGame };
+import { Rematch } from "./rematch_reducer.ts";
+export { Rematch };
 import { SetPlayerColor } from "./set_player_color_reducer.ts";
 export { SetPlayerColor };
 import { SetPlayerName } from "./set_player_name_reducer.ts";
@@ -85,8 +85,6 @@ import { PlayerTableHandle } from "./player_table.ts";
 export { PlayerTableHandle };
 import { PlayerprogressTableHandle } from "./playerprogress_table.ts";
 export { PlayerprogressTableHandle };
-import { PrivategameaccessTableHandle } from "./privategameaccess_table.ts";
-export { PrivategameaccessTableHandle };
 import { XpgainTableHandle } from "./xpgain_table.ts";
 export { XpgainTableHandle };
 
@@ -97,8 +95,6 @@ import { BotFillTrigger } from "./bot_fill_trigger_type.ts";
 export { BotFillTrigger };
 import { BotProgressUpdate } from "./bot_progress_update_type.ts";
 export { BotProgressUpdate };
-import { CharacterEvent } from "./character_event_type.ts";
-export { CharacterEvent };
 import { CharacterEventType } from "./character_event_type_type.ts";
 export { CharacterEventType };
 import { CountdownStart } from "./countdown_start_type.ts";
@@ -127,8 +123,6 @@ import { PlayerColor } from "./player_color_type.ts";
 export { PlayerColor };
 import { PlayerProgress } from "./player_progress_type.ts";
 export { PlayerProgress };
-import { PrivateGameAccess } from "./private_game_access_type.ts";
-export { PrivateGameAccess };
 import { XpGain } from "./xp_gain_type.ts";
 export { XpGain };
 import { XpMultiplier } from "./xp_multiplier_type.ts";
@@ -235,15 +229,6 @@ const REMOTE_MODULE = {
         colType: (PlayerProgress.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
       },
     },
-    privategameaccess: {
-      tableName: "privategameaccess" as const,
-      rowType: PrivateGameAccess.getTypeScriptAlgebraicType(),
-      primaryKey: "id",
-      primaryKeyInfo: {
-        colName: "id",
-        colType: (PrivateGameAccess.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
-      },
-    },
     xpgain: {
       tableName: "xpgain" as const,
       rowType: XpGain.getTypeScriptAlgebraicType(),
@@ -271,10 +256,6 @@ const REMOTE_MODULE = {
       reducerName: "FillGameWithBots",
       argsType: FillGameWithBots.getTypeScriptAlgebraicType(),
     },
-    GrantPrivateGameAccess: {
-      reducerName: "GrantPrivateGameAccess",
-      argsType: GrantPrivateGameAccess.getTypeScriptAlgebraicType(),
-    },
     JoinGame: {
       reducerName: "JoinGame",
       argsType: JoinGame.getTypeScriptAlgebraicType(),
@@ -282,6 +263,10 @@ const REMOTE_MODULE = {
     JoinPrivateGame: {
       reducerName: "JoinPrivateGame",
       argsType: JoinPrivateGame.getTypeScriptAlgebraicType(),
+    },
+    Rematch: {
+      reducerName: "Rematch",
+      argsType: Rematch.getTypeScriptAlgebraicType(),
     },
     SetPlayerColor: {
       reducerName: "SetPlayerColor",
@@ -349,9 +334,9 @@ export type Reducer = never
 | { name: "ClientConnected", args: ClientConnected }
 | { name: "ClientDisconnected", args: ClientDisconnected }
 | { name: "FillGameWithBots", args: FillGameWithBots }
-| { name: "GrantPrivateGameAccess", args: GrantPrivateGameAccess }
 | { name: "JoinGame", args: JoinGame }
 | { name: "JoinPrivateGame", args: JoinPrivateGame }
+| { name: "Rematch", args: Rematch }
 | { name: "SetPlayerColor", args: SetPlayerColor }
 | { name: "SetPlayerName", args: SetPlayerName }
 | { name: "StartCountdown", args: StartCountdown }
@@ -413,22 +398,6 @@ export class RemoteReducers {
     this.connection.offReducer("FillGameWithBots", callback);
   }
 
-  grantPrivateGameAccess(gameId: string) {
-    const __args = { gameId };
-    let __writer = new __BinaryWriter(1024);
-    GrantPrivateGameAccess.serialize(__writer, __args);
-    let __argsBuffer = __writer.getBuffer();
-    this.connection.callReducer("GrantPrivateGameAccess", __argsBuffer, this.setCallReducerFlags.grantPrivateGameAccessFlags);
-  }
-
-  onGrantPrivateGameAccess(callback: (ctx: ReducerEventContext, gameId: string) => void) {
-    this.connection.onReducer("GrantPrivateGameAccess", callback);
-  }
-
-  removeOnGrantPrivateGameAccess(callback: (ctx: ReducerEventContext, gameId: string) => void) {
-    this.connection.offReducer("GrantPrivateGameAccess", callback);
-  }
-
   joinGame(gameMode: GameMode, joinCode: string, gameType: GameType) {
     const __args = { gameMode, joinCode, gameType };
     let __writer = new __BinaryWriter(1024);
@@ -459,6 +428,22 @@ export class RemoteReducers {
 
   removeOnJoinPrivateGame(callback: (ctx: ReducerEventContext, gameId: string) => void) {
     this.connection.offReducer("JoinPrivateGame", callback);
+  }
+
+  rematch(gameId: string) {
+    const __args = { gameId };
+    let __writer = new __BinaryWriter(1024);
+    Rematch.serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("Rematch", __argsBuffer, this.setCallReducerFlags.rematchFlags);
+  }
+
+  onRematch(callback: (ctx: ReducerEventContext, gameId: string) => void) {
+    this.connection.onReducer("Rematch", callback);
+  }
+
+  removeOnRematch(callback: (ctx: ReducerEventContext, gameId: string) => void) {
+    this.connection.offReducer("Rematch", callback);
   }
 
   setPlayerColor(color: PlayerColor) {
@@ -602,11 +587,6 @@ export class SetReducerFlags {
     this.fillGameWithBotsFlags = flags;
   }
 
-  grantPrivateGameAccessFlags: __CallReducerFlags = 'FullUpdate';
-  grantPrivateGameAccess(flags: __CallReducerFlags) {
-    this.grantPrivateGameAccessFlags = flags;
-  }
-
   joinGameFlags: __CallReducerFlags = 'FullUpdate';
   joinGame(flags: __CallReducerFlags) {
     this.joinGameFlags = flags;
@@ -615,6 +595,11 @@ export class SetReducerFlags {
   joinPrivateGameFlags: __CallReducerFlags = 'FullUpdate';
   joinPrivateGame(flags: __CallReducerFlags) {
     this.joinPrivateGameFlags = flags;
+  }
+
+  rematchFlags: __CallReducerFlags = 'FullUpdate';
+  rematch(flags: __CallReducerFlags) {
+    this.rematchFlags = flags;
   }
 
   setPlayerColorFlags: __CallReducerFlags = 'FullUpdate';
@@ -715,11 +700,6 @@ export class RemoteTables {
   get playerprogress(): PlayerprogressTableHandle<'playerprogress'> {
     // clientCache is a private property
     return new PlayerprogressTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<PlayerProgress>(REMOTE_MODULE.tables.playerprogress));
-  }
-
-  get privategameaccess(): PrivategameaccessTableHandle<'privategameaccess'> {
-    // clientCache is a private property
-    return new PrivategameaccessTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<PrivateGameAccess>(REMOTE_MODULE.tables.privategameaccess));
   }
 
   get xpgain(): XpgainTableHandle<'xpgain'> {
