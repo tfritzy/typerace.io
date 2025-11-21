@@ -1069,29 +1069,6 @@ public static partial class Module
 
         InsertPlayerProgress(ctx, gameId, "");
         Log.Info($"Player {ctx.Sender} joined private game {gameId}");
-
-        int playerCount = CountPlayersInGame(ctx, gameId);
-        int requiredPlayers = GetMaxPlayerCount(game.Value.GameType);
-
-        if (playerCount >= requiredPlayers)
-        {
-            var updatedGame = game.Value;
-            updatedGame.State = GameState.Countdown;
-            ctx.Db.game.Id.Update(updatedGame);
-
-            Log.Info($"Private game {gameId} reached {requiredPlayers} players, transitioning to Countdown state");
-
-            long countdownDuration = GetCountdownDuration(game.Value.GameType);
-            var countdownTime = new TimeDuration { Microseconds = countdownDuration };
-            var scheduledTime = ctx.Timestamp + countdownTime;
-
-            ctx.Db.GameStart.Insert(new GameStart
-            {
-                ScheduledId = 0,
-                GameId = gameId,
-                ScheduledAt = new ScheduleAt.Time(scheduledTime)
-            });
-        }
     }
 
     [Reducer]
