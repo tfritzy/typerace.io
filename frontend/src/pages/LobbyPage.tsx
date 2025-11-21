@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef, useMemo } from "react";
-import "../App.css";
 import "../components/SelectionButton.css";
 import type {
   GameMode,
