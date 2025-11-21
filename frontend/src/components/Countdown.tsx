@@ -95,6 +95,7 @@ export const Countdown = () => {
           <img
             src="/bufo-lets-goo.gif"
             alt=""
+            aria-hidden="true"
             className="w-14 h-14"
             style={{
               animation: "fadeInOut 2s ease-out forwards",
