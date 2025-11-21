@@ -220,6 +220,7 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         public Identity PlayerId;
         public string GameId;
+        [SpacetimeDB.Index.BTree]
         public long Timestamp;
         public int BaseXp;
         public List<XpMultiplier> Multipliers;
@@ -279,6 +280,15 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
+    [Table(Scheduled = nameof(CleanupOldXpGains))]
+    public partial struct XpGainCleaner
+    {
+        [AutoInc]
+        [PrimaryKey]
+        public ulong ScheduledId;
+        public ScheduleAt ScheduledAt;
+    }
+
     [Table(Name = "playerprogress", Public = true)]
     public partial struct PlayerProgress
     {
@@ -325,6 +335,14 @@ public static partial class Module
         });
 
         Log.Info("Initialized game archiver with 5-minute interval");
+
+        ctx.Db.XpGainCleaner.Insert(new XpGainCleaner
+        {
+            ScheduledId = 0,
+            ScheduledAt = new ScheduleAt.Interval(fiveMinutes)
+        });
+
+        Log.Info("Initialized XP gain cleaner with 5-minute interval");
 
         for (int i = 0; i < 100; i++)
         {
@@ -1133,6 +1151,27 @@ public static partial class Module
 
                 Log.Info($"Game {game.Id} transitioned to Archived state");
             }
+        }
+    }
+
+    [Reducer]
+    public static void CleanupOldXpGains(ReducerContext ctx, XpGainCleaner args)
+    {
+        var fiveMinutesAgo = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 300_000_000;
+        var deletedCount = 0;
+
+        foreach (var xpGain in ctx.Db.xpgain.Iter())
+        {
+            if (xpGain.Timestamp < fiveMinutesAgo)
+            {
+                ctx.Db.xpgain.Id.Delete(xpGain.Id);
+                deletedCount++;
+            }
+        }
+
+        if (deletedCount > 0)
+        {
+            Log.Info($"Cleaned up {deletedCount} XP gain records older than 5 minutes");
         }
     }
 
