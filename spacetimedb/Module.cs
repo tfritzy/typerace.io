@@ -1218,7 +1218,14 @@ public static partial class Module
         var isFirstGameToday = IsFirstGameOfDay(player.LastGameDate, currentTimestamp);
 
         var totalPlayers = ctx.Db.playerprogress.GameId.Filter(game.Id).Count();
-        var (baseXp, placementMultiplier, accuracyMultiplier, accuracy, xpBeforeBonus) = CalculateXpBreakdown(wordsTyped, placement, progress, totalPlayers);
+        var (baseXp, placementMultiplier, accuracyMultiplier, accuracy, xpBeforeBonus) = CalculateXpBreakdown(wordsTyped, placement, progress);
+        
+        if (totalPlayers <= 2)
+        {
+            placementMultiplier = 1.0;
+            xpBeforeBonus = (int)(baseXp * placementMultiplier * accuracyMultiplier);
+        }
+        
         var xpEarned = xpBeforeBonus;
 
         var multipliers = new List<XpMultiplier>
@@ -1278,11 +1285,11 @@ public static partial class Module
         return xpEarned;
     }
 
-    private static (int baseXp, double placementMultiplier, double accuracyMultiplier, double accuracy, int xpBeforeBonus) CalculateXpBreakdown(int wordsTyped, int placement, PlayerProgress progress, int totalPlayers)
+    private static (int baseXp, double placementMultiplier, double accuracyMultiplier, double accuracy, int xpBeforeBonus) CalculateXpBreakdown(int wordsTyped, int placement, PlayerProgress progress)
     {
         var baseXp = wordsTyped;
 
-        var placementMultiplier = totalPlayers <= 2 ? 1.0 : placement switch
+        var placementMultiplier = placement switch
         {
             1 => 2.0,
             2 => 1.5,
