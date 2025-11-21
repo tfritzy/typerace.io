@@ -61,12 +61,10 @@ export function getWpm(charCount: number, timeSeconds: number): number {
 }
 
 export function getRawWpmBySecond(
-  eventsOrBytes: CharacterEvent[] | Uint8Array,
+  compressedHistory: Uint8Array,
   raceStartTimestamp: bigint
 ): number[] {
-  const events = eventsOrBytes instanceof Uint8Array 
-    ? decodeCharacterHistory(eventsOrBytes, raceStartTimestamp)
-    : eventsOrBytes;
+  const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
     
   if (!events || events.length === 0) {
     return [];
@@ -123,12 +121,10 @@ export function getRawWpmBySecond(
 }
 
 export function getAggWpmBySecond(
-  eventsOrBytes: CharacterEvent[] | Uint8Array,
+  compressedHistory: Uint8Array,
   raceStartTimestamp: bigint
 ): number[] {
-  const events = eventsOrBytes instanceof Uint8Array 
-    ? decodeCharacterHistory(eventsOrBytes, raceStartTimestamp)
-    : eventsOrBytes;
+  const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
     
   if (!events || events.length === 0) {
     return [];
@@ -195,17 +191,8 @@ export function getRaceTime(playerProgress: PlayerProgress): number {
   return Number(playerProgress.time) / 1_000_000.0;
 }
 
-export function getAccuracy(eventsOrBytes: CharacterEvent[] | Uint8Array, raceStartTimestamp?: bigint): number {
-  let events: CharacterEvent[];
-  
-  if (eventsOrBytes instanceof Uint8Array) {
-    if (!raceStartTimestamp) {
-      return 0;
-    }
-    events = decodeCharacterHistory(eventsOrBytes, raceStartTimestamp);
-  } else {
-    events = eventsOrBytes;
-  }
+export function getAccuracy(compressedHistory: Uint8Array, raceStartTimestamp: bigint): number {
+  const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
   
   if (!events || events.length === 0) {
     return 0;
