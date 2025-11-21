@@ -8,7 +8,7 @@ interface HeaderProps {
 }
 
 export const Header = ({ hideAvatar = false }: HeaderProps) => {
-    const navigate = useRouter();
+    const router = useRouter();
 
     return (
         <div className="w-full px-4 py-4">

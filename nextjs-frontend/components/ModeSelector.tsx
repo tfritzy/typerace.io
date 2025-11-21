@@ -1,6 +1,6 @@
 'use client';
 
-import "@/components/components/SelectionButton.css";
+import "@/components/SelectionButton.css";
 import { GameMode } from "@/module_bindings";
 
 interface ModeSelectorProps {

@@ -80,7 +80,7 @@ export const PlayerProgressBar = ({
                                     </span>
                                     {isBot && (
                                         <div className="group relative">
-                                            <Bot className="w-4 h-4 text-white/50"@/components/>
+                                            <Bot className="w-4 h-4 text-white/50" />
                                             <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-(--color-box-bg) text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-10 shadow-lg w-64">
                                                 This player is a bot. Share this game with your friends to reduce the amount they need to be added to games.
                                                 <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-(--color-box-bg)"></div>
