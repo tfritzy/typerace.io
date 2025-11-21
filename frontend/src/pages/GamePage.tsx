@@ -66,7 +66,7 @@ export const GamePage = () => {
       );
 
       if (!hasProgress) {
-        conn.reducers.grantPrivateGameAccess(gameId);
+        conn.reducers.joinPrivateGame(gameId);
       }
     }
   }, [conn, game, gameId, gamePlayerProgress]);
