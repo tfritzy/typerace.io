@@ -20,7 +20,7 @@ export function decodeCharacterHistory(
 ): CharacterEvent[] {
   const events: CharacterEvent[] = [];
   
-  for (let i = 0; i <= compressedHistory.length - EVENT_SIZE_BYTES; i += EVENT_SIZE_BYTES) {
+  for (let i = 0; i + EVENT_SIZE_BYTES <= compressedHistory.length; i += EVENT_SIZE_BYTES) {
     const deciseconds = compressedHistory[i] | (compressedHistory[i + 1] << 8);
     const eventType = compressedHistory[i + 2];
     
@@ -39,6 +39,7 @@ export function decodeCharacterHistory(
         eventTag = "Backspace";
         break;
       default:
+        console.warn(`Unknown event type ${eventType} at index ${i}, treating as Correct`);
         eventTag = "Correct";
     }
     
