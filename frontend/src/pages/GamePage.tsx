@@ -10,7 +10,8 @@ import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { Countdown } from "../components/Countdown";
-import { RaceResults } from "../components/RaceResults";
+import { PlayerStatsRow } from "../components/PlayerStatsRow";
+import { AllPlayersResults } from "../components/AllPlayersResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
@@ -20,10 +21,6 @@ export const GamePage = () => {
   const navigate = useNavigate();
   const conn = useSpacetimeDB<DbConnection>();
   const [hasFinished, setHasFinished] = useState(false);
-
-  useEffect(() => {
-    setHasFinished(false);
-  }, [gameId]);
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -57,6 +54,26 @@ export const GamePage = () => {
   const gamePlayerProgress = playerProgress.filter(
     (pp) => pp.gameId.toString() === gameId
   );
+
+  useEffect(() => {
+    if (!conn || !game) return;
+
+    const currentPlayerId = conn.identity;
+    if (!currentPlayerId) return;
+
+    const currentPlayerProgress = gamePlayerProgress.find(
+      (pp) => pp.playerId.isEqual(currentPlayerId)
+    );
+
+    if (currentPlayerProgress && game.phrase) {
+      const hasCompletedRace = currentPlayerProgress.progressIndex >= game.phrase.length;
+      setHasFinished(hasCompletedRace);
+    } else if (gamePlayerProgress.length > 0 && !currentPlayerProgress) {
+      setHasFinished(true);
+    } else {
+      setHasFinished(false);
+    }
+  }, [conn, game, gamePlayerProgress]);
 
   useEffect(() => {
     if (!conn || !game || !gameId) return;
@@ -187,27 +204,34 @@ export const GamePage = () => {
               const currentPP = gamePlayerProgress.find(
                 (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
               );
-              if (!currentPP) return null;
 
               const isOwner = currentPlayerId && game.owner && currentPlayerId.isEqual(game.owner);
               const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;
 
               return (
-                <>
-                  <RaceResults
-                    playerProgress={currentPP}
+                <div className="w-full animate-slideUpFadeIn">
+                  {currentPP && (
+                    <PlayerStatsRow
+                      playerProgress={currentPP}
+                      raceStartTimestamp={game.racingStartedAt}
+                      placement={currentPP.placement}
+                    />
+                  )}
+                  <AllPlayersResults
                     allPlayerProgress={gamePlayerProgress}
                     raceStartTimestamp={game.racingStartedAt}
-                    placement={currentPP.placement}
+                    initialSelectedPlayerId={currentPP?.playerId.toHexString()}
                   />
-                  <ActionBar
-                    mode={game.gameMode}
-                    gameType={game.gameType?.tag as any}
-                    gameId={gameId}
-                    rematchDisabled={rematchDisabled}
-                    conn={conn}
-                  />
-                </>
+                  {currentPP && (
+                    <ActionBar
+                      mode={game.gameMode}
+                      gameType={game.gameType?.tag as any}
+                      gameId={gameId}
+                      rematchDisabled={rematchDisabled}
+                      conn={conn}
+                    />
+                  )}
+                </div>
               );
             })()
           ) : isLobby ? (
