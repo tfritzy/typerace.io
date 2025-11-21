@@ -70,7 +70,7 @@ export const GamePage = () => {
     } else {
       setHasFinished(false);
     }
-  }, [conn, game?.id, playerProgress, gameId]);
+  }, [conn, game, gamePlayerProgress]);
 
   useEffect(() => {
     if (!conn || !game || !gameId) return;
