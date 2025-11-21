@@ -43,6 +43,8 @@ import { GrantPrivateGameAccess } from "./grant_private_game_access_reducer.ts";
 export { GrantPrivateGameAccess };
 import { JoinGame } from "./join_game_reducer.ts";
 export { JoinGame };
+import { JoinPrivateGame } from "./join_private_game_reducer.ts";
+export { JoinPrivateGame };
 import { SetPlayerColor } from "./set_player_color_reducer.ts";
 export { SetPlayerColor };
 import { SetPlayerName } from "./set_player_name_reducer.ts";
@@ -277,6 +279,10 @@ const REMOTE_MODULE = {
       reducerName: "JoinGame",
       argsType: JoinGame.getTypeScriptAlgebraicType(),
     },
+    JoinPrivateGame: {
+      reducerName: "JoinPrivateGame",
+      argsType: JoinPrivateGame.getTypeScriptAlgebraicType(),
+    },
     SetPlayerColor: {
       reducerName: "SetPlayerColor",
       argsType: SetPlayerColor.getTypeScriptAlgebraicType(),
@@ -345,6 +351,7 @@ export type Reducer = never
 | { name: "FillGameWithBots", args: FillGameWithBots }
 | { name: "GrantPrivateGameAccess", args: GrantPrivateGameAccess }
 | { name: "JoinGame", args: JoinGame }
+| { name: "JoinPrivateGame", args: JoinPrivateGame }
 | { name: "SetPlayerColor", args: SetPlayerColor }
 | { name: "SetPlayerName", args: SetPlayerName }
 | { name: "StartCountdown", args: StartCountdown }
@@ -436,6 +443,22 @@ export class RemoteReducers {
 
   removeOnJoinGame(callback: (ctx: ReducerEventContext, gameMode: GameMode, joinCode: string, gameType: GameType) => void) {
     this.connection.offReducer("JoinGame", callback);
+  }
+
+  joinPrivateGame(gameId: string) {
+    const __args = { gameId };
+    let __writer = new __BinaryWriter(1024);
+    JoinPrivateGame.serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("JoinPrivateGame", __argsBuffer, this.setCallReducerFlags.joinPrivateGameFlags);
+  }
+
+  onJoinPrivateGame(callback: (ctx: ReducerEventContext, gameId: string) => void) {
+    this.connection.onReducer("JoinPrivateGame", callback);
+  }
+
+  removeOnJoinPrivateGame(callback: (ctx: ReducerEventContext, gameId: string) => void) {
+    this.connection.offReducer("JoinPrivateGame", callback);
   }
 
   setPlayerColor(color: PlayerColor) {
@@ -587,6 +610,11 @@ export class SetReducerFlags {
   joinGameFlags: __CallReducerFlags = 'FullUpdate';
   joinGame(flags: __CallReducerFlags) {
     this.joinGameFlags = flags;
+  }
+
+  joinPrivateGameFlags: __CallReducerFlags = 'FullUpdate';
+  joinPrivateGame(flags: __CallReducerFlags) {
+    this.joinPrivateGameFlags = flags;
   }
 
   setPlayerColorFlags: __CallReducerFlags = 'FullUpdate';
