@@ -299,6 +299,7 @@ public static partial class Module
         public int Placement;
         public string JoinCode;
         public double Wpm;
+        public PlayerColor PlayerColor;
     }
 
     [Table(Scheduled = nameof(UpdateBotProgress))]
@@ -683,6 +684,7 @@ public static partial class Module
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
+        var playerColor = player?.Color ?? PlayerColor.Amber;
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
         {
@@ -698,7 +700,8 @@ public static partial class Module
             CharacterHistory = new byte[0],
             Time = 0,
             Placement = -1,
-            JoinCode = joinCode
+            JoinCode = joinCode,
+            PlayerColor = playerColor
         });
     }
 
@@ -758,7 +761,8 @@ public static partial class Module
                     CharacterHistory = new byte[0],
                     Time = 0,
                     Placement = -1,
-                    JoinCode = ""
+                    JoinCode = "",
+                    PlayerColor = selectedBot.Color
                 });
 
                 Log.Info($"Added bot {selectedBot.Name} (ELO: {GetBotElo(ctx, selectedBot.Id, game.Value.GameMode)}) to game {args.GameId} (target ELO: {targetElo})");
@@ -1089,6 +1093,7 @@ public static partial class Module
                 var playerName = player?.Name ?? "Unknown";
                 var playerLevel = player?.Level ?? 1;
                 var isAnonymous = player?.IsAnonymous ?? true;
+                var playerColor = player?.Color ?? PlayerColor.Amber;
 
                 ctx.Db.playerprogress.Insert(new PlayerProgress
                 {
@@ -1104,7 +1109,8 @@ public static partial class Module
                     CharacterHistory = new byte[0],
                     Time = 0,
                     Placement = -1,
-                    JoinCode = gameId
+                    JoinCode = gameId,
+                    PlayerColor = playerColor
                 });
 
                 Log.Info($"Added player {progress.PlayerId} to rematch game {newGame.Id} with join code {gameId}");
@@ -1494,8 +1500,6 @@ public static partial class Module
         }
 
         ProcessProgressUpdate(ctx, existingProgress.Value, game.Value, newIndex, eventType);
-
-        Log.Info($"Updated progress for player {playerId} in game {gameId} to {newIndex}");
     }
 
     private static PlayerProgress? FindPlayerProgress(ReducerContext ctx, Identity playerId, string gameId)

@@ -1,7 +1,5 @@
 import { useState } from "react";
 import type { PlayerProgress } from "../../module_bindings/player_progress_type";
-import type { Player } from "../../module_bindings/player_type";
-import { PlayerColor } from "../../module_bindings/player_color_type";
 import { RaceResultsChart } from "./RaceResultsChart";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { getFinalWpm, getRaceTime, getAccuracy } from "../utils/wpmCalculator";
@@ -10,7 +8,6 @@ import { formatStopwatchTime, getOrdinalPlacement } from "../utils/formatters";
 interface RaceResultsProps {
     playerProgress: PlayerProgress;
     allPlayerProgress: PlayerProgress[];
-    allPlayers: readonly Player[];
     raceStartTimestamp: bigint;
     placement: number;
 }
@@ -18,7 +15,6 @@ interface RaceResultsProps {
 export const RaceResults = ({
     playerProgress,
     allPlayerProgress,
-    allPlayers,
     raceStartTimestamp,
     placement
 }: RaceResultsProps) => {
@@ -27,14 +23,6 @@ export const RaceResults = ({
     const selectedPlayerProgress = allPlayerProgress.find(
         pp => pp.playerId.toHexString() === selectedPlayerId
     ) || playerProgress;
-
-    const getPlayerColor = (playerId: any): PlayerColor => {
-        if (!playerId) {
-            return PlayerColor.Amber;
-        }
-        const player = allPlayers.find(p => p.id.isEqual(playerId));
-        return player?.color ?? PlayerColor.Amber;
-    };
 
     const finalWpm = getFinalWpm(playerProgress);
     const raceTime = getRaceTime(playerProgress);
@@ -127,7 +115,7 @@ export const RaceResults = ({
                                     <PlayerAvatar
                                         size={24}
                                         identity={pp.playerId.toHexString()}
-                                        color={getPlayerColor(pp.playerId)}
+                                        color={pp.playerColor}
                                     />
                                     {pp.playerName}
                                 </button>
@@ -139,7 +127,7 @@ export const RaceResults = ({
                 <RaceResultsChart
                     playerProgress={selectedPlayerProgress}
                     raceStartTimestamp={raceStartTimestamp}
-                    playerColor={getPlayerColor(selectedPlayerProgress.playerId)}
+                    playerColor={selectedPlayerProgress.playerColor}
                 />
             </div>
         </div>

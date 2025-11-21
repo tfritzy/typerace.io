@@ -5,8 +5,6 @@ import {
   type DbConnection,
   type Game,
   PlayerProgress,
-  Player,
-  PlayerColor,
 } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
@@ -54,7 +52,6 @@ export const GamePage = () => {
   const { rows: playerProgress } = useTable<DbConnection, PlayerProgress>(
     "playerprogress"
   );
-  const { rows: players } = useTable<DbConnection, Player>("player");
 
   const game = games.find((g) => g.id.toString() === gameId);
   const gamePlayerProgress = playerProgress.filter(
@@ -107,14 +104,6 @@ export const GamePage = () => {
       return "bot";
     }
     return playerId.toHexString();
-  };
-
-  const getPlayerColor = (playerId: any): PlayerColor => {
-    if (!playerId) {
-      return PlayerColor.Amber;
-    }
-    const player = players.filter((p) => p.id.isEqual(playerId))[0];
-    return player?.color ?? PlayerColor.Amber;
   };
 
   const handleFinish = useCallback(() => {
@@ -182,7 +171,7 @@ export const GamePage = () => {
                     phraseLength={game.phrase.length}
                     identityHash={getIdentityHash(pp.playerId)}
                     isCurrentPlayer={isCurrentPlayer}
-                    playerColor={getPlayerColor(pp.playerId)}
+                    playerColor={pp.playerColor}
                     wpm={pp.wpm}
                     placement={pp.placement}
                     isBot={pp.isBot}
@@ -208,7 +197,6 @@ export const GamePage = () => {
                   <RaceResults
                     playerProgress={currentPP}
                     allPlayerProgress={gamePlayerProgress}
-                    allPlayers={players}
                     raceStartTimestamp={game.racingStartedAt}
                     placement={currentPP.placement}
                   />
@@ -223,8 +211,8 @@ export const GamePage = () => {
               );
             })()
           ) : isLobby ? (
-            <GameLobby 
-              gameId={gameId!} 
+            <GameLobby
+              gameId={gameId!}
               conn={conn}
               isOwner={currentPlayerId ? game.owner?.isEqual(currentPlayerId) ?? false : false}
             />
