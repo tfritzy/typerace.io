@@ -156,6 +156,8 @@ public static partial class Module
         public long TimeMs;
         public int Placement;
         public double Wpm;
+        public int XpGained;
+        public int EloChange;
     }
 
     [Table(Name = "personalrecord", Public = true)]
@@ -1076,6 +1078,16 @@ public static partial class Module
 
         var wpm = CalculateWpm(game.Phrase.Length, timeElapsed);
 
+        var wordsTyped = game.Phrase.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+
+        var updatedPlayer = player.Value;
+        var xpGained = AwardXpForGame(ctx, ref updatedPlayer, progress, game, placement, wordsTyped);
+        UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped);
+        LevelUpPlayer(ref updatedPlayer);
+        ctx.Db.player.Id.Update(updatedPlayer);
+
+        var eloChange = UpdatePlayerElo(ctx, progress.PlayerId, game, placement);
+
         var statsId = IdGenerator.Generate("gr_", ctx.Rng);
 
         var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
@@ -1093,20 +1105,12 @@ public static partial class Module
             Date = timestamp,
             TimeMs = timeElapsed / 1000,
             Placement = placement,
-            Wpm = wpm
+            Wpm = wpm,
+            XpGained = xpGained,
+            EloChange = eloChange
         });
 
-        var wordsTyped = game.Phrase.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
-
-        var updatedPlayer = player.Value;
-        AwardXpForGame(ctx, ref updatedPlayer, progress, game, placement, wordsTyped);
-        UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped);
-        LevelUpPlayer(ref updatedPlayer);
-        ctx.Db.player.Id.Update(updatedPlayer);
-
         UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, statsId, wpm);
-
-        UpdatePlayerElo(ctx, progress.PlayerId, game, placement);
 
         Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}, typed {wordsTyped} words");
     }
@@ -1164,7 +1168,7 @@ public static partial class Module
         }
     }
 
-    private static void AwardXpForGame(ReducerContext ctx, ref Player player, PlayerProgress progress, Game game, int placement, int wordsTyped)
+    private static int AwardXpForGame(ReducerContext ctx, ref Player player, PlayerProgress progress, Game game, int placement, int wordsTyped)
     {
         var currentTimestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
         var isFirstGameToday = IsFirstGameOfDay(player.LastGameDate, currentTimestamp);
@@ -1220,6 +1224,8 @@ public static partial class Module
         player.LastGameDate = currentTimestamp;
 
         Log.Info($"Player {progress.PlayerId} earned {xpEarned} XP");
+        
+        return xpEarned;
     }
 
     private static (int baseXp, double placementMultiplier, double accuracyMultiplier, double accuracy, int xpBeforeBonus) CalculateXpBreakdown(int wordsTyped, int placement, PlayerProgress progress)
@@ -1298,7 +1304,7 @@ public static partial class Module
         return (int)Math.Round(baseXp * Math.Exp(growthRate * (level - 2)));
     }
 
-    private static void UpdatePlayerElo(ReducerContext ctx, Identity playerId, Game game, int placement)
+    private static int UpdatePlayerElo(ReducerContext ctx, Identity playerId, Game game, int placement)
     {
         var currentElo = GetOrCreatePlayerElo(ctx, playerId, game.GameMode);
 
@@ -1318,7 +1324,7 @@ public static partial class Module
 
         if (opponentCount == 0)
         {
-            return;
+            return 0;
         }
 
         var updatedElo = currentElo;
@@ -1327,6 +1333,8 @@ public static partial class Module
         ctx.Db.elo.Id.Update(updatedElo);
 
         Log.Info($"Player {playerId} ELO updated: {currentElo.Rating} -> {updatedElo.Rating} (change: {totalEloChange:+0;-0}) in mode {game.GameMode}");
+        
+        return totalEloChange;
     }
 
     private static Elo GetOrCreatePlayerElo(ReducerContext ctx, Identity playerId, GameMode gameMode)
