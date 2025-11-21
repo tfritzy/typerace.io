@@ -56,6 +56,21 @@ export const GamePage = () => {
     (pp) => pp.gameId.toString() === gameId
   );
 
+  useEffect(() => {
+    if (!conn || !game || !gameId) return;
+
+    if (game.gameType?.tag === "Private" && game.state?.tag === "Lobby") {
+      const currentPlayerId = conn.identity;
+      const hasProgress = gamePlayerProgress.some(
+        (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
+      );
+
+      if (!hasProgress) {
+        conn.reducers.grantPrivateGameAccess(gameId);
+      }
+    }
+  }, [conn, game, gameId, gamePlayerProgress]);
+
   const getPlayerName = (pp: PlayerProgress) => {
     return pp.playerName;
   };

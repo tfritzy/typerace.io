@@ -1028,13 +1028,48 @@ public static partial class Module
             return;
         }
 
+        bool alreadyHasAccess = false;
         foreach (var existingAccess in ctx.Db.privategameaccess.PlayerId_GameId.Filter((ctx.Sender, gameId)))
         {
+            alreadyHasAccess = true;
             Log.Info($"Player {ctx.Sender} already has access to game {gameId}");
-            return;
+            break;
         }
 
-        InsertPrivateGameAccess(ctx, ctx.Sender, gameId);
+        if (!alreadyHasAccess)
+        {
+            InsertPrivateGameAccess(ctx, ctx.Sender, gameId);
+        }
+
+        var existingProgress = FindPlayerProgress(ctx, ctx.Sender, gameId);
+        if (existingProgress == null)
+        {
+            InsertPlayerProgress(ctx, gameId, "");
+            Log.Info($"Player {ctx.Sender} joined private game {gameId}");
+        }
+
+        int playerCount = CountPlayersInGame(ctx, gameId);
+        int requiredPlayers = GetMaxPlayerCount(game.Value.GameType);
+
+        if (playerCount >= requiredPlayers)
+        {
+            var updatedGame = game.Value;
+            updatedGame.State = GameState.Countdown;
+            ctx.Db.game.Id.Update(updatedGame);
+
+            Log.Info($"Private game {gameId} reached {requiredPlayers} players, transitioning to Countdown state");
+
+            long countdownDuration = GetCountdownDuration(game.Value.GameType);
+            var countdownTime = new TimeDuration { Microseconds = countdownDuration };
+            var scheduledTime = ctx.Timestamp + countdownTime;
+
+            ctx.Db.GameStart.Insert(new GameStart
+            {
+                ScheduledId = 0,
+                GameId = gameId,
+                ScheduledAt = new ScheduleAt.Time(scheduledTime)
+            });
+        }
     }
 
     [Reducer]
