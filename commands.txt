@@ -7,3 +7,8 @@ spacetime publish -c --project-path spacetimedb typerace -y
 spacetime publish --project-path spacetimedb --server maincloud typerace
 
 firebase deploy --only hosting
+
+
+
+DANGER!!!!
+spacetime publish -c --project-path spacetimedb --server maincloud typerace

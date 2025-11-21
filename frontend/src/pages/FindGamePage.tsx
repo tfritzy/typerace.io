@@ -6,6 +6,7 @@ import type {
 } from "../../module_bindings";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
+import { Header } from "../components/Header";
 
 export const FindGamePage = () => {
   const [searchParams] = useSearchParams();
@@ -42,5 +43,7 @@ export const FindGamePage = () => {
     }
   }, [playerProgress, joinCode, conn.identity, navigate]);
 
-  return null;
+  return <div>
+    <Header />
+  </div>
 };
