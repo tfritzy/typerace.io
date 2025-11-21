@@ -1,7 +1,56 @@
-import { CharacterEvent } from "../../module_bindings/character_event_type";
 import type { PlayerProgress } from "../../module_bindings/player_progress_type";
 
 const CHARS_PER_WORD = 5;
+const EVENT_SIZE_BYTES = 3;
+
+export enum CharacterEventType {
+  Correct = 0,
+  Incorrect = 1,
+  Backspace = 2
+}
+
+export interface CharacterEvent {
+  timestamp: bigint;
+  eventType: { tag: "Correct" | "Incorrect" | "Backspace" };
+}
+
+export function decodeCharacterHistory(
+  compressedHistory: Uint8Array,
+  raceStartTimestamp: bigint
+): CharacterEvent[] {
+  const events: CharacterEvent[] = [];
+  
+  for (let i = 0; i + EVENT_SIZE_BYTES <= compressedHistory.length; i += EVENT_SIZE_BYTES) {
+    const deciseconds = compressedHistory[i] | (compressedHistory[i + 1] << 8);
+    const eventType = compressedHistory[i + 2];
+    
+    const elapsedMicros = BigInt(deciseconds) * 100_000n;
+    const timestamp = raceStartTimestamp + elapsedMicros;
+    
+    let eventTag: "Correct" | "Incorrect" | "Backspace";
+    switch (eventType) {
+      case CharacterEventType.Correct:
+        eventTag = "Correct";
+        break;
+      case CharacterEventType.Incorrect:
+        eventTag = "Incorrect";
+        break;
+      case CharacterEventType.Backspace:
+        eventTag = "Backspace";
+        break;
+      default:
+        console.warn(`Unknown event type ${eventType} at index ${i}, treating as Correct`);
+        eventTag = "Correct";
+    }
+    
+    events.push({
+      timestamp,
+      eventType: { tag: eventTag }
+    });
+  }
+  
+  return events;
+}
 
 export function getWpm(charCount: number, timeSeconds: number): number {
   if (timeSeconds <= 0) {
@@ -12,9 +61,11 @@ export function getWpm(charCount: number, timeSeconds: number): number {
 }
 
 export function getRawWpmBySecond(
-  events: CharacterEvent[],
+  compressedHistory: Uint8Array,
   raceStartTimestamp: bigint
 ): number[] {
+  const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
+    
   if (!events || events.length === 0) {
     return [];
   }
@@ -70,9 +121,11 @@ export function getRawWpmBySecond(
 }
 
 export function getAggWpmBySecond(
-  events: CharacterEvent[],
+  compressedHistory: Uint8Array,
   raceStartTimestamp: bigint
 ): number[] {
+  const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
+    
   if (!events || events.length === 0) {
     return [];
   }
@@ -138,7 +191,9 @@ export function getRaceTime(playerProgress: PlayerProgress): number {
   return Number(playerProgress.time) / 1_000_000.0;
 }
 
-export function getAccuracy(events: CharacterEvent[]): number {
+export function getAccuracy(compressedHistory: Uint8Array, raceStartTimestamp: bigint): number {
+  const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
+  
   if (!events || events.length === 0) {
     return 0;
   }

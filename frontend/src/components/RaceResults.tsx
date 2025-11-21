@@ -38,7 +38,7 @@ export const RaceResults = ({
 
     const finalWpm = getFinalWpm(playerProgress);
     const raceTime = getRaceTime(playerProgress);
-    const accuracy = getAccuracy(playerProgress.characterHistory);
+    const accuracy = getAccuracy(playerProgress.characterHistory, raceStartTimestamp);
 
     const isFirstPlace = placement === 1;
     const isPerfectAccuracy = accuracy === 100;

@@ -67,12 +67,7 @@ public enum PlayerColor
     Rose
 }
 
-[Type]
-public partial struct CharacterEvent
-{
-    public long Timestamp;
-    public CharacterEventType EventType;
-}
+
 
 [Type]
 public partial struct XpMultiplier
@@ -96,6 +91,44 @@ public static partial class Module
     private const long PRACTICE_GAME_COUNTDOWN_MICROSECONDS = 5_000_000;
     private const long BOT_FILL_DELAY_MICROSECONDS = 5_000_000;
     private const long PRACTICE_GAME_COUNTDOWN_START_DELAY_MICROSECONDS = 1_000_000;
+    private const int EVENT_SIZE_BYTES = 3;
+    private const ushort MAX_DECISECONDS = ushort.MaxValue;
+
+    private static byte[] EncodeCharacterEvent(long gameStartMicros, long eventMicros, CharacterEventType eventType)
+    {
+        var elapsedMicros = eventMicros - gameStartMicros;
+        var deciseconds = (ushort)Math.Min(elapsedMicros / 100_000, MAX_DECISECONDS);
+        
+        return new byte[]
+        {
+            (byte)(deciseconds & 0xFF),
+            (byte)((deciseconds >> 8) & 0xFF),
+            (byte)eventType
+        };
+    }
+
+    private static void AppendCharacterEvent(ref byte[] history, long gameStartMicros, long eventMicros, CharacterEventType eventType)
+    {
+        var eventBytes = EncodeCharacterEvent(gameStartMicros, eventMicros, eventType);
+        var newHistory = new byte[history.Length + EVENT_SIZE_BYTES];
+        Array.Copy(history, newHistory, history.Length);
+        Array.Copy(eventBytes, 0, newHistory, history.Length, EVENT_SIZE_BYTES);
+        history = newHistory;
+    }
+
+    private static int CountEventsByType(byte[] history, CharacterEventType eventType)
+    {
+        int count = 0;
+        for (int i = 0; i <= history.Length - EVENT_SIZE_BYTES; i += EVENT_SIZE_BYTES)
+        {
+            var type = (CharacterEventType)history[i + 2];
+            if (type == eventType)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
 
     [Table(Name = "player", Public = true)]
     public partial struct Player
@@ -256,7 +289,7 @@ public static partial class Module
         public bool IsBot;
         public bool IsAnonymous;
         public long CreatedAt;
-        public List<CharacterEvent> CharacterHistory;
+        public byte[] CharacterHistory;
         public long Time;
         public int Placement;
         public string JoinCode;
@@ -670,7 +703,7 @@ public static partial class Module
             IsBot = false,
             IsAnonymous = isAnonymous,
             CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
-            CharacterHistory = new List<CharacterEvent>(),
+            CharacterHistory = new byte[0],
             Time = 0,
             Placement = -1,
             JoinCode = joinCode
@@ -730,7 +763,7 @@ public static partial class Module
                     IsBot = true,
                     IsAnonymous = false,
                     CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
-                    CharacterHistory = new List<CharacterEvent>(),
+                    CharacterHistory = new byte[0],
                     Time = 0,
                     Placement = -1,
                     JoinCode = ""
@@ -823,20 +856,9 @@ public static partial class Module
 
                 if (shouldError)
                 {
-                    var incorrectEvent = new CharacterEvent
-                    {
-                        Timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
-                        EventType = CharacterEventType.Incorrect
-                    };
-                    var backspaceEvent = new CharacterEvent
-                    {
-                        Timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
-                        EventType = CharacterEventType.Backspace
-                    };
-
                     var updatedProgress = progress.Value;
-                    updatedProgress.CharacterHistory.Add(incorrectEvent);
-                    updatedProgress.CharacterHistory.Add(backspaceEvent);
+                    AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, CharacterEventType.Incorrect);
+                    AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, CharacterEventType.Backspace);
                     ctx.Db.playerprogress.Id.Update(updatedProgress);
 
                     var errorDelay = new TimeDuration { Microseconds = (long)(botConfig.TypingRate * 0.5) };
@@ -850,14 +872,8 @@ public static partial class Module
                 }
                 else
                 {
-                    var correctEvent = new CharacterEvent
-                    {
-                        Timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
-                        EventType = CharacterEventType.Correct
-                    };
-
                     var newIndex = progress.Value.ProgressIndex + 1;
-                    ProcessProgressUpdate(ctx, progress.Value, game.Value, newIndex, correctEvent);
+                    ProcessProgressUpdate(ctx, progress.Value, game.Value, newIndex, CharacterEventType.Correct);
 
                     if (newIndex < args.PhraseLength)
                     {
@@ -1084,18 +1100,7 @@ public static partial class Module
                 updatedGame.State = GameState.Archived;
                 ctx.Db.game.Id.Update(updatedGame);
 
-                var progressToDelete = new List<string>();
-                foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
-                {
-                    progressToDelete.Add(progress.Id);
-                }
-
-                foreach (var progressId in progressToDelete)
-                {
-                    ctx.Db.playerprogress.Id.Delete(progressId);
-                }
-
-                Log.Info($"Game {game.Id} transitioned to Archived state and deleted {progressToDelete.Count} player progress records");
+                Log.Info($"Game {game.Id} transitioned to Archived state");
             }
         }
     }
@@ -1273,19 +1278,9 @@ public static partial class Module
             _ => 1.0
         };
 
-        var correctEvents = 0;
-        var totalEvents = 0;
-        foreach (var evt in progress.CharacterHistory)
-        {
-            if (evt.EventType == CharacterEventType.Correct)
-            {
-                correctEvents++;
-            }
-            if (evt.EventType != CharacterEventType.Backspace)
-            {
-                totalEvents++;
-            }
-        }
+        var correctEvents = CountEventsByType(progress.CharacterHistory, CharacterEventType.Correct);
+        var incorrectEvents = CountEventsByType(progress.CharacterHistory, CharacterEventType.Incorrect);
+        var totalEvents = correctEvents + incorrectEvents;
 
         var accuracy = totalEvents > 0 ? (double)correctEvents / totalEvents : 0.0;
         var accuracyMultiplier = 0.5 + accuracy;
@@ -1419,11 +1414,11 @@ public static partial class Module
         PlayerProgress progress,
         Game game,
         int newIndex,
-        CharacterEvent characterEvent)
+        CharacterEventType eventType)
     {
         var updatedProgress = progress;
         updatedProgress.ProgressIndex = newIndex;
-        updatedProgress.CharacterHistory.Add(characterEvent);
+        AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, eventType);
 
         var elapsedMicros = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.RacingStartedAt;
         updatedProgress.Wpm = CalculateWpm(newIndex, elapsedMicros);
@@ -1465,13 +1460,7 @@ public static partial class Module
             return;
         }
 
-        var characterEvent = new CharacterEvent
-        {
-            Timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
-            EventType = eventType
-        };
-
-        ProcessProgressUpdate(ctx, existingProgress.Value, game.Value, newIndex, characterEvent);
+        ProcessProgressUpdate(ctx, existingProgress.Value, game.Value, newIndex, eventType);
 
         Log.Info($"Updated progress for player {playerId} in game {gameId} to {newIndex}");
     }
