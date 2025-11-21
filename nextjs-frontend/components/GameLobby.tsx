@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { Check, Clipboard } from "lucide-react";
 import type { DbConnection } from "@/module_bindings";
 
@@ -12,19 +12,28 @@ type GameLobbyProps = {
 
 export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
   const [linkCopied, setLinkCopied] = useState(false);
+  const [gameUrl, setGameUrl] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setGameUrl(`${window.location.origin}/game/${gameId}`);
+    }
+  }, [gameId]);
 
   const handleStartGame = useCallback(() => {
     if (!conn || !gameId || !isOwner) return;
     conn.reducers.startPrivateGame(gameId);
   }, [conn, gameId, isOwner]);
 
-  const gameUrl = `${window.location.origin}/game/${gameId}`;
-
   const handleCopyLink = useCallback(() => {
-    navigator.clipboard.writeText(gameUrl).then(() => {
-      setLinkCopied(true);
-      setTimeout(() => setLinkCopied(false), 2000);
-    });
+    navigator.clipboard.writeText(gameUrl)
+      .then(() => {
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 2000);
+      })
+      .catch((err) => {
+        console.error('Failed to copy link:', err);
+      });
   }, [gameUrl]);
 
   return (
