@@ -18,13 +18,16 @@ export const RaceResults = ({
     raceStartTimestamp,
     placement
 }: RaceResultsProps) => {
-    const [selectedPlayerId, setSelectedPlayerId] = useState<string>(
-        playerProgress?.playerId.toHexString() || allPlayerProgress[0]?.playerId.toHexString()
-    );
+    const defaultPlayerId = playerProgress?.playerId.toHexString() || allPlayerProgress[0]?.playerId.toHexString() || '';
+    const [selectedPlayerId, setSelectedPlayerId] = useState<string>(defaultPlayerId);
 
     const selectedPlayerProgress = allPlayerProgress.find(
         pp => pp.playerId.toHexString() === selectedPlayerId
     ) || allPlayerProgress[0];
+
+    if (!selectedPlayerProgress || allPlayerProgress.length === 0) {
+        return null;
+    }
 
     const finalWpm = playerProgress ? getFinalWpm(playerProgress) : 0;
     const raceTime = playerProgress ? getRaceTime(playerProgress) : 0;

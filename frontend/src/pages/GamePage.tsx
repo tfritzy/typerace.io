@@ -64,7 +64,7 @@ export const GamePage = () => {
       (pp) => pp.playerId.isEqual(currentPlayerId)
     );
 
-    if (currentPlayerProgress) {
+    if (currentPlayerProgress && game.phrase) {
       const hasCompletedRace = currentPlayerProgress.progressIndex >= game.phrase.length;
       setHasFinished(hasCompletedRace);
     } else {
