@@ -140,6 +140,7 @@ public static partial class Module
         public int Wins;
         public int Level;
         public int Xp;
+        public int XpRequiredForNextLevel;
         public int TotalWordsTyped;
         [SpacetimeDB.Index.BTree]
         public bool IsBot;
@@ -342,6 +343,7 @@ public static partial class Module
                 Wins = 0,
                 Level = 1,
                 Xp = 0,
+                XpRequiredForNextLevel = XpRequiredForLevel(2),
                 TotalWordsTyped = 0,
                 IsBot = true,
                 BotConfig = new BotConfig
@@ -407,6 +409,7 @@ public static partial class Module
                 Wins = 0,
                 Level = 1,
                 Xp = 0,
+                XpRequiredForNextLevel = XpRequiredForLevel(2),
                 TotalWordsTyped = 0,
                 IsBot = false,
                 BotConfig = null,
@@ -1195,6 +1198,7 @@ public static partial class Module
             var xpRequired = XpRequiredForLevel(player.Level + 1);
             if (player.Xp < xpRequired)
             {
+                player.XpRequiredForNextLevel = xpRequired;
                 break;
             }
             player.Xp -= xpRequired;

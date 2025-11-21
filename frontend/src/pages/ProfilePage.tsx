@@ -261,7 +261,7 @@ export const ProfilePage = () => {
                                                 className="h-full rounded-[5px] transition-[width_0.3s_ease]"
                                                 style={{
                                                     background: viewedPlayer ? getColorConfig(viewedPlayer.color).gradient : 'var(--color-accent)',
-                                                    width: `${viewedPlayer ? xpProgressToNextLevel(viewedPlayer.xp, viewedPlayer.level) : 0}%`
+                                                    width: `${viewedPlayer ? xpProgressToNextLevel(viewedPlayer.xp, viewedPlayer.xpRequiredForNextLevel) : 0}%`
                                                 }}
                                             />
                                         </div>

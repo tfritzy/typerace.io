@@ -1,19 +1,27 @@
-import { GameRecord } from "../../module_bindings";
+import { GameRecord, GamerecordTableHandle } from "../../module_bindings";
 import { useNavigate } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Star } from "lucide-react";
 
 interface RecentGamesProps {
     gameRecords: GameRecord[];
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
     const navigate = useNavigate();
+    const [currentPage, setCurrentPage] = useState(1);
 
     const sortedGames = useMemo(() => {
         return [...gameRecords]
-            .sort((a, b) => Number(b.date - a.date))
-            .slice(0, 10);
+            .sort((a, b) => Number(b.date - a.date));
     }, [gameRecords]);
+
+    const totalPages = Math.ceil(sortedGames.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const currentGames = sortedGames.slice(startIndex, endIndex);
 
     const formatGameMode = (mode: string) => {
         return mode.replace(/(\d+)/, ' $1');
@@ -26,20 +34,6 @@ export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
             case 'Practice': return 'Practice';
             default: return 'Public';
         }
-    };
-
-    const getGameTypeColor = (type: string) => {
-        switch (type) {
-            case 'Public': return 'text-green-400';
-            case 'Private': return 'text-purple-400';
-            case 'Practice': return 'text-blue-400';
-            default: return 'text-green-400';
-        }
-    };
-
-    const getPlacementColor = (placement: number) => {
-        if (placement === 1) return 'text-yellow-400';
-        return 'text-white';
     };
 
     const getPlacementSuffix = (placement: number) => {
@@ -61,16 +55,17 @@ export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
 
     const formatDate = (timestamp: bigint) => {
         const date = new Date(Number(timestamp) / 1000);
-        const now = new Date();
-        const diffMs = now.getTime() - date.getTime();
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-        if (diffDays === 0) return 'Today';
-        if (diffDays === 1) return 'Yesterday';
-        if (diffDays < 7) return `${diffDays} days ago`;
-        if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-        if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-        return date.toLocaleDateString();
+        const dateStr = date.toLocaleDateString('en-US', {
+            month: '2-digit',
+            day: '2-digit',
+            year: 'numeric'
+        });
+        const timeStr = date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+        return `${dateStr} ${timeStr}`;
     };
 
     if (sortedGames.length === 0) {
@@ -85,29 +80,30 @@ export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
 
     return (
         <div className="box box-shadow rounded-xl overflow-hidden">
-            <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-4 p-4 border-b border-white/10 text-white text-xs uppercase tracking-wider font-bold">
+            <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-white/10 text-white text-xs uppercase tracking-wider font-bold">
                 <div>Game Mode</div>
                 <div className="text-center">Type</div>
                 <div className="text-center">Placement</div>
                 <div className="text-center">Time</div>
                 <div className="text-center">WPM</div>
-                <div className="text-center">XP Gained</div>
+                <div className="text-center">Experience</div>
                 <div className="text-right">Date</div>
             </div>
-            {sortedGames.map((gameRecord) => (
+            {currentGames.map((gameRecord) => (
                 <button
                     key={gameRecord.id}
                     onClick={() => navigate(`/game/${gameRecord.gameId}`)}
-                    className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-4 p-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors cursor-pointer w-full text-left bg-transparent border-0"
+                    className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors cursor-pointer w-full text-left bg-transparent border-0"
                 >
                     <div className="text-white/70">
                         {formatGameMode(gameRecord.gameMode.tag)}
                     </div>
-                    <div className={`text-center text-xs ${getGameTypeColor(gameRecord.gameType.tag)}`}>
+                    <div className="text-center text-white/70">
                         {formatGameType(gameRecord.gameType.tag)}
                     </div>
-                    <div className={`text-center ${getPlacementColor(gameRecord.placement)}`}>
-                        {gameRecord.placement}{getPlacementSuffix(gameRecord.placement)}
+                    <div className="text-center text-white/70 flex items-center justify-center gap-1">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" style={{ opacity: gameRecord.placement === 1 ? 1 : 0 }} />
+                        <span>{gameRecord.placement}{getPlacementSuffix(gameRecord.placement)}</span>
                     </div>
                     <div className="text-white/70 text-center">
                         {formatTime(gameRecord.timeMs)}
@@ -115,14 +111,35 @@ export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
                     <div className="text-white/70 text-center">
                         {Math.round(gameRecord.wpm)}
                     </div>
-                    <div className="text-white/70 text-center">
-                        {gameRecord.xpGained > 0 ? '+' : ''}{gameRecord.xpGained}
+                    <div className="text-white/70 text-center flex items-center justify-center gap-1">
+                        <span>{gameRecord.xpGained > 0 ? '+' : ''}{gameRecord.xpGained} xp</span>
                     </div>
                     <div className="text-white/60 text-right text-sm">
                         {formatDate(gameRecord.date)}
                     </div>
                 </button>
             ))}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 p-4 border-t border-white/10">
+                    <button
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        disabled={currentPage === 1}
+                        className="px-3 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white transition-colors"
+                    >
+                        Previous
+                    </button>
+                    <span className="text-white/70 text-sm">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                        disabled={currentPage === totalPages}
+                        className="px-3 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white transition-colors"
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

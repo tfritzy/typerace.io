@@ -79,7 +79,8 @@ export const ProfileAvatar = () => {
     const name = myPlayer?.name ?? "Guest";
     const level = myPlayer?.level ?? 1;
     const currentXP = myPlayer?.xp ?? 0;
-    const xpProgress = xpProgressToNextLevel(currentXP, level);
+    const xpRequired = myPlayer?.xpRequiredForNextLevel ?? 100;
+    const xpProgress = xpProgressToNextLevel(currentXP, xpRequired);
 
     const identityHash = conn?.identity?.toHexString() ?? "default";
     const isAnonymous = !user;
@@ -214,7 +215,7 @@ export const ProfileAvatar = () => {
                 <div className="text-sm font-semibold text-white">{name}</div>
                 <div className="flex items-center gap-2 w-full">
                     <span className="text-xs font-medium text-white/60">Lvl {level}</span>
-                    <div className="flex-1 h-2.5 bg-white/10 rounded-full overflow-hidden">
+                    <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
                         <div
                             className="h-full rounded-full transition-all duration-300"
                             style={{
@@ -223,7 +224,7 @@ export const ProfileAvatar = () => {
                             }}
                         />
                     </div>
-                    <span className="text-xs font-medium text-white/60">Lvl {level + 1}</span>
+                    <span className="text-xs font-mono text-white/60">{currentXP}/{xpRequired}</span>
                 </div>
             </div>
         </button>
