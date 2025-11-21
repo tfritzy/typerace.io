@@ -4,7 +4,7 @@ import { PlayerAvatar } from './PlayerAvatar';
 import { getColorConfig } from '@/lib/utils/colorMapping';
 import { PlayerColor } from "@/module_bindings";
 import { Bot } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 type PlayerProgressBarProps = {
     name: string;
@@ -55,7 +55,7 @@ export const PlayerProgressBar = ({
                     placement={placement}
                 />
             ) : (
-                <Link to={`/profile/${identityHash}`} className="shrink-0">
+                <Link href={`/profile/${identityHash}`} className="shrink-0">
                     <PlayerAvatar
                         size={40}
                         identity={identityHash}
