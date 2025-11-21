@@ -2,7 +2,7 @@
 
 import { PlayerAvatar } from './PlayerAvatar';
 import { getColorConfig } from '@/lib/utils/colorMapping';
-import { PlayerColor } from "@/components/module_bindings";
+import { PlayerColor } from "@/module_bindings";
 import { Bot } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

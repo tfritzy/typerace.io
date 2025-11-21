@@ -1,8 +1,8 @@
 'use client';
 
-import type { PlayerProgress } from "@/components/module_bindings/player_progress_type";
-import { getFinalWpm, getRaceTime, getAccuracy } from "@/components/lib/utils/wpmCalculator";
-import { formatStopwatchTime, getOrdinalPlacement } from "@/components/lib/utils/formatters";
+import type { PlayerProgress } from "@/module_bindings/player_progress_type";
+import { getFinalWpm, getRaceTime, getAccuracy } from "@/lib/utils/wpmCalculator";
+import { formatStopwatchTime, getOrdinalPlacement } from "@/lib/utils/formatters";
 
 interface PlayerStatsRowProps {
     playerProgress: PlayerProgress;

@@ -1,7 +1,7 @@
 'use client';
 
 import "@/components/components/SelectionButton.css";
-import { GameMode } from "@/components/module_bindings";
+import { GameMode } from "@/module_bindings";
 
 interface ModeSelectorProps {
     selectedMode: GameMode;

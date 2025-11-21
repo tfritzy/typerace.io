@@ -1,8 +1,8 @@
 'use client';
 
 import Avatar from "boring-avatars";
-import { PlayerColor } from "@/components/module_bindings";
-import { getColorConfig } from "@/components/lib/utils/colorMapping";
+import { PlayerColor } from "@/module_bindings";
+import { getColorConfig } from "@/lib/utils/colorMapping";
 import { Crown, Award } from 'lucide-react';
 
 type PlayerAvatarProps = {

@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { Check, Clipboard } from "lucide-react";
-import type { DbConnection } from "@/components/module_bindings";
+import type { DbConnection } from "@/module_bindings";
 
 type GameLobbyProps = {
   gameId: string;

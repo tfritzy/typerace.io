@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback } from "react";
 import { useNavigate } from "next/navigation";
-import type { GameMode, DbConnection } from "@/components/module_bindings";
+import type { GameMode, DbConnection } from "@/module_bindings";
 import type { GameTypeValue } from "@/components/components/MatchTypeSelector";
 import { useFindGame } from "../hooks/useFindGame";
 

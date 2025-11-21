@@ -1,6 +1,6 @@
 'use client';
 
-import { GameRecord } from "@/components/module_bindings";
+import { GameRecord } from "@/module_bindings";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Star } from "lucide-react";

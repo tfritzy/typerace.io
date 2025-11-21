@@ -2,7 +2,7 @@
 
 import { useCallback, useRef } from "react";
 import { TypeBox, type TypeBoxRef } from "@/components/TypeBox";
-import type { DbConnection } from "@/components/module_bindings";
+import type { DbConnection } from "@/module_bindings";
 
 type GamePageTypeBoxProps = {
   phrase: string;

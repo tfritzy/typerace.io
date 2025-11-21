@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "next/navigation";
 import { useTable, where, eq } from "spacetimedb/react";
-import type { DbConnection, Game } from "@/components/module_bindings";
+import type { DbConnection, Game } from "@/module_bindings";
 
 export const Countdown = () => {
   const { gameId } = useParams<{ gameId: string }>();

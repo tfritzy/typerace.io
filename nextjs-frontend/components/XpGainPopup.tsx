@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from "react";
-import type { XpGain } from "@/components/module_bindings/xp_gain_type";
+import type { XpGain } from "@/module_bindings/xp_gain_type";
 
 interface XpGainPopupProps {
     xpGain: XpGain;

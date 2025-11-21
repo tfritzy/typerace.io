@@ -2,13 +2,13 @@
 
 import { useNavigate } from "next/navigation";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import { PlayerColor, type DbConnection, type Player } from "@/components/module_bindings";
+import { PlayerColor, type DbConnection, type Player } from "@/module_bindings";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { useEffect, useState, useRef } from "react";
 import { setAccentColor } from "../utils/colorMapping";
 import { useAuth } from "@/components/lib/firebase/AuthContext";
-import type { XpGain } from "@/components/module_bindings/xp_gain_type";
+import type { XpGain } from "@/module_bindings/xp_gain_type";
 import { XpGainPopup } from "@/components/XpGainPopup";
 
 export const ProfileAvatar = () => {

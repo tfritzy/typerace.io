@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react";
-import type { PlayerProgress } from "@/components/module_bindings/player_progress_type";
+import type { PlayerProgress } from "@/module_bindings/player_progress_type";
 import { RaceResultsChart } from "@/components/RaceResultsChart";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
 

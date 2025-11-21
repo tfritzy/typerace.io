@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate-bindings": "spacetime generate --lang typescript --out-dir module_bindings --project-path ../spacetimedb"
   },
   "dependencies": {
     "boring-avatars": "^2.0.4",
