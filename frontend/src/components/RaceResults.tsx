@@ -6,10 +6,10 @@ import { getFinalWpm, getRaceTime, getAccuracy } from "../utils/wpmCalculator";
 import { formatStopwatchTime, getOrdinalPlacement } from "../utils/formatters";
 
 interface RaceResultsProps {
-    playerProgress: PlayerProgress;
+    playerProgress?: PlayerProgress;
     allPlayerProgress: PlayerProgress[];
     raceStartTimestamp: bigint;
-    placement: number;
+    placement?: number;
 }
 
 export const RaceResults = ({
@@ -18,15 +18,17 @@ export const RaceResults = ({
     raceStartTimestamp,
     placement
 }: RaceResultsProps) => {
-    const [selectedPlayerId, setSelectedPlayerId] = useState<string>(playerProgress.playerId.toHexString());
+    const [selectedPlayerId, setSelectedPlayerId] = useState<string>(
+        playerProgress?.playerId.toHexString() || allPlayerProgress[0]?.playerId.toHexString()
+    );
 
     const selectedPlayerProgress = allPlayerProgress.find(
         pp => pp.playerId.toHexString() === selectedPlayerId
-    ) || playerProgress;
+    ) || allPlayerProgress[0];
 
-    const finalWpm = getFinalWpm(playerProgress);
-    const raceTime = getRaceTime(playerProgress);
-    const accuracy = getAccuracy(playerProgress.characterHistory, raceStartTimestamp);
+    const finalWpm = playerProgress ? getFinalWpm(playerProgress) : 0;
+    const raceTime = playerProgress ? getRaceTime(playerProgress) : 0;
+    const accuracy = playerProgress ? getAccuracy(playerProgress.characterHistory, raceStartTimestamp) : 0;
 
     const isFirstPlace = placement === 1;
     const isPerfectAccuracy = accuracy === 100;
@@ -34,6 +36,7 @@ export const RaceResults = ({
 
     return (
         <div className="w-full animate-slideUpFadeIn">
+            {playerProgress && (
             <div className="flex gap-3 mb-3 items-stretch min-h-[100px]">
                 <div className="flex-1 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
                     <div
@@ -95,6 +98,7 @@ export const RaceResults = ({
                     </div>
                 </div>
             </div>
+            )}
 
             <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--color-box-bg)', border: '1px solid var(--color-box-border)' }}>
                 {allPlayerProgress.length > 1 && (

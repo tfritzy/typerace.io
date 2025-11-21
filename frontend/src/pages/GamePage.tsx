@@ -22,10 +22,6 @@ export const GamePage = () => {
   const [hasFinished, setHasFinished] = useState(false);
 
   useEffect(() => {
-    setHasFinished(false);
-  }, [gameId]);
-
-  useEffect(() => {
     if (!conn || !gameId) return;
 
     const gameSubscription = conn
@@ -57,6 +53,24 @@ export const GamePage = () => {
   const gamePlayerProgress = playerProgress.filter(
     (pp) => pp.gameId.toString() === gameId
   );
+
+  useEffect(() => {
+    if (!conn || !game) return;
+
+    const currentPlayerId = conn.identity;
+    if (!currentPlayerId) return;
+
+    const currentPlayerProgress = gamePlayerProgress.find(
+      (pp) => pp.playerId.isEqual(currentPlayerId)
+    );
+
+    if (currentPlayerProgress) {
+      const hasCompletedRace = currentPlayerProgress.progressIndex >= game.phrase.length;
+      setHasFinished(hasCompletedRace);
+    } else {
+      setHasFinished(false);
+    }
+  }, [conn, game?.id, playerProgress, gameId]);
 
   useEffect(() => {
     if (!conn || !game || !gameId) return;
@@ -187,7 +201,6 @@ export const GamePage = () => {
               const currentPP = gamePlayerProgress.find(
                 (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
               );
-              if (!currentPP) return null;
 
               const isOwner = currentPlayerId && game.owner && currentPlayerId.isEqual(game.owner);
               const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;
@@ -198,15 +211,17 @@ export const GamePage = () => {
                     playerProgress={currentPP}
                     allPlayerProgress={gamePlayerProgress}
                     raceStartTimestamp={game.racingStartedAt}
-                    placement={currentPP.placement}
+                    placement={currentPP?.placement}
                   />
-                  <ActionBar
-                    mode={game.gameMode}
-                    gameType={game.gameType?.tag as any}
-                    gameId={gameId}
-                    rematchDisabled={rematchDisabled}
-                    conn={conn}
-                  />
+                  {currentPP && (
+                    <ActionBar
+                      mode={game.gameMode}
+                      gameType={game.gameType?.tag as any}
+                      gameId={gameId}
+                      rematchDisabled={rematchDisabled}
+                      conn={conn}
+                    />
+                  )}
                 </>
               );
             })()
