@@ -22,11 +22,11 @@ export const useFindGame = () => {
     );
 
     if (myProgress) {
-      router.push(`/game/${myProgress.gameId.toString()}`, { replace: true });
+      router.push(`/game/${myProgress.gameId.toString()}`);
       setIsSearching(false);
       setJoinCode(null);
     }
-  }, [playerProgress, joinCode, conn.identity, navigate]);
+  }, [playerProgress, joinCode, conn.identity, router]);
 
   const findGame = useCallback((mode: GameMode, gameType: GameTypeValue) => {
     if (!conn || isSearching) return;

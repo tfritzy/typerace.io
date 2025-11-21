@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useCallback } from "react";
-import { useNavigate } from "next/navigation";
+import { useRouter } from "next/navigation";
 import type { GameMode, DbConnection } from "@/module_bindings";
-import type { GameTypeValue } from "@/components/components/MatchTypeSelector";
+import type { GameTypeValue } from "@/components/MatchTypeSelector";
 import { useFindGame } from "../hooks/useFindGame";
 
 type ActionBarProps = {
@@ -15,7 +15,7 @@ type ActionBarProps = {
 };
 
 export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: ActionBarProps) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { findGame } = useFindGame();
 
   const canRematch = !rematchDisabled;
@@ -45,7 +45,7 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [navigate, gameType, canRematch, handlePlayAgain, handleRematch]);
+  }, [router, gameType, canRematch, handlePlayAgain, handleRematch]);
 
   return (
     <div className="flex gap-3 mt-3 animate-slideUpFadeIn" style={{ animationDelay: '0.2s' }}>
