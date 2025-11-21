@@ -91,11 +91,13 @@ public static partial class Module
     private const long PRACTICE_GAME_COUNTDOWN_MICROSECONDS = 5_000_000;
     private const long BOT_FILL_DELAY_MICROSECONDS = 5_000_000;
     private const long PRACTICE_GAME_COUNTDOWN_START_DELAY_MICROSECONDS = 1_000_000;
+    private const int EVENT_SIZE_BYTES = 3;
+    private const ushort MAX_DECISECONDS = ushort.MaxValue;
 
     private static byte[] EncodeCharacterEvent(long gameStartMicros, long eventMicros, CharacterEventType eventType)
     {
         var elapsedMicros = eventMicros - gameStartMicros;
-        var deciseconds = (ushort)(elapsedMicros / 100_000);
+        var deciseconds = (ushort)Math.Min(elapsedMicros / 100_000, MAX_DECISECONDS);
         
         return new byte[]
         {
@@ -108,24 +110,21 @@ public static partial class Module
     private static void AppendCharacterEvent(ref byte[] history, long gameStartMicros, long eventMicros, CharacterEventType eventType)
     {
         var eventBytes = EncodeCharacterEvent(gameStartMicros, eventMicros, eventType);
-        var newHistory = new byte[history.Length + 3];
+        var newHistory = new byte[history.Length + EVENT_SIZE_BYTES];
         Array.Copy(history, newHistory, history.Length);
-        Array.Copy(eventBytes, 0, newHistory, history.Length, 3);
+        Array.Copy(eventBytes, 0, newHistory, history.Length, EVENT_SIZE_BYTES);
         history = newHistory;
     }
 
     private static int CountEventsByType(byte[] history, CharacterEventType eventType)
     {
         int count = 0;
-        for (int i = 0; i < history.Length; i += 3)
+        for (int i = 0; i <= history.Length - EVENT_SIZE_BYTES; i += EVENT_SIZE_BYTES)
         {
-            if (i + 2 < history.Length)
+            var type = (CharacterEventType)history[i + 2];
+            if (type == eventType)
             {
-                var type = (CharacterEventType)history[i + 2];
-                if (type == eventType)
-                {
-                    count++;
-                }
+                count++;
             }
         }
         return count;
