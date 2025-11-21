@@ -10,7 +10,8 @@ import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { Countdown } from "../components/Countdown";
-import { RaceResults } from "../components/RaceResults";
+import { PlayerStatsRow } from "../components/PlayerStatsRow";
+import { AllPlayersResults } from "../components/AllPlayersResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
@@ -67,6 +68,8 @@ export const GamePage = () => {
     if (currentPlayerProgress && game.phrase) {
       const hasCompletedRace = currentPlayerProgress.progressIndex >= game.phrase.length;
       setHasFinished(hasCompletedRace);
+    } else if (gamePlayerProgress.length > 0 && !currentPlayerProgress) {
+      setHasFinished(true);
     } else {
       setHasFinished(false);
     }
@@ -206,12 +209,18 @@ export const GamePage = () => {
               const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;
 
               return (
-                <>
-                  <RaceResults
-                    playerProgress={currentPP}
+                <div className="w-full animate-slideUpFadeIn">
+                  {currentPP && (
+                    <PlayerStatsRow
+                      playerProgress={currentPP}
+                      raceStartTimestamp={game.racingStartedAt}
+                      placement={currentPP.placement}
+                    />
+                  )}
+                  <AllPlayersResults
                     allPlayerProgress={gamePlayerProgress}
                     raceStartTimestamp={game.racingStartedAt}
-                    placement={currentPP?.placement}
+                    initialSelectedPlayerId={currentPP?.playerId.toHexString()}
                   />
                   {currentPP && (
                     <ActionBar
@@ -222,7 +231,7 @@ export const GamePage = () => {
                       conn={conn}
                     />
                   )}
-                </>
+                </div>
               );
             })()
           ) : isLobby ? (
