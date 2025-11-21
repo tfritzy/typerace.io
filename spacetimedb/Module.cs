@@ -1228,20 +1228,25 @@ public static partial class Module
                 Label = $"Base ({wordsTyped} words)",
                 Value = $"{baseXp} XP",
                 Type = "base"
-            },
-            new XpMultiplier
+            }
+        };
+
+        if (totalPlayers > 2)
+        {
+            multipliers.Add(new XpMultiplier
             {
                 Label = $"{GetPlacementLabel(placement)} Place",
                 Value = $"×{placementMultiplier:F1}",
                 Type = "multiplier"
-            },
-            new XpMultiplier
-            {
-                Label = $"{Math.Round(accuracy * 100)}% Accuracy",
-                Value = $"×{accuracyMultiplier:F2}",
-                Type = "multiplier"
-            }
-        };
+            });
+        }
+
+        multipliers.Add(new XpMultiplier
+        {
+            Label = $"{Math.Round(accuracy * 100)}% Accuracy",
+            Value = $"×{accuracyMultiplier:F2}",
+            Type = "multiplier"
+        });
 
         if (isFirstGameToday)
         {
