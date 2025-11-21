@@ -14,12 +14,12 @@ export const AllPlayersResults = ({
     raceStartTimestamp,
     initialSelectedPlayerId
 }: AllPlayersResultsProps) => {
-    const defaultPlayerId = initialSelectedPlayerId || allPlayerProgress[0]?.playerId.toHexString() || '';
-    const [selectedPlayerId, setSelectedPlayerId] = useState<string>(defaultPlayerId);
-
     if (!allPlayerProgress || allPlayerProgress.length === 0) {
         return null;
     }
+
+    const defaultPlayerId = initialSelectedPlayerId || allPlayerProgress[0].playerId.toHexString();
+    const [selectedPlayerId, setSelectedPlayerId] = useState<string>(defaultPlayerId);
 
     const selectedPlayerProgress = allPlayerProgress.find(
         pp => pp.playerId.toHexString() === selectedPlayerId
