@@ -1,6 +1,5 @@
 'use client';
 
-import React from "react";
 import { Globe, Lock, Target } from "lucide-react";
 import "@/components/SelectionButton.css";
 
@@ -11,7 +10,7 @@ interface MatchTypeSelectorProps {
     setGameType: (value: GameTypeValue) => void;
 }
 
-export const MatchTypeSelector: React.FC<MatchTypeSelectorProps> = ({ gameType, setGameType }) => (
+export const MatchTypeSelector = ({ gameType, setGameType }: MatchTypeSelectorProps) => (
     <div className="mb-6">
         <h2 className="text-white/80 text-lg font-medium mb-3">Match Type</h2>
         <div className="flex gap-3">

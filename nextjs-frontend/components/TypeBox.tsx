@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useRef, useState, useImperativeHandle, forwardRef } from "react";
+import { useCallback, useRef, useState, useImperativeHandle, forwardRef, type ClipboardEvent, type ChangeEvent, type KeyboardEvent, type CSSProperties } from "react";
 import { Cursor } from "@/components/Cursor";
 
 type TypeBoxProps = {
@@ -51,12 +51,12 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
     setFocused(false);
   }, []);
 
-  const handlePaste = useCallback((event: React.ClipboardEvent) => {
+  const handlePaste = useCallback((event: ClipboardEvent) => {
     event.preventDefault();
   }, []);
 
   const handleChange = useCallback(
-    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    (event: ChangeEvent<HTMLTextAreaElement>) => {
       if (disabled) {
         return;
       }
@@ -143,7 +143,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
     [phrase, onComplete, onProgress, input, resetOnComplete, disabled]
   );
 
-  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
     const cursorKeys = [
       "ArrowLeft",
       "ArrowRight",
@@ -165,7 +165,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       const isCorrect = input[i] === char;
       const isCursor = i === input.length;
 
-      const style: React.CSSProperties = {};
+      const style: CSSProperties = {};
       if (isTyped && isCorrect) {
         style.color = "var(--color-white)";
       } else if (isTyped && !isCorrect) {

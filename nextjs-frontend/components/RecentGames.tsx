@@ -12,7 +12,7 @@ interface RecentGamesProps {
 const ITEMS_PER_PAGE = 10;
 
 export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
-    const navigate = useRouter();
+    const router = useRouter();
     const [currentPage, setCurrentPage] = useState(1);
 
     const sortedGames = useMemo(() => {
