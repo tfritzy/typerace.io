@@ -14,6 +14,7 @@ import { EditColorModal } from "../components/EditColorModal";
 import { formatNumber } from "../utils/formatters";
 import { useAuth } from "../firebase/AuthContext";
 import { Select } from "../components/Select";
+import { RecentGames } from "../components/RecentGames";
 
 type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
@@ -342,6 +343,13 @@ export const ProfilePage = () => {
                         <WpmChart
                             data={realGameData}
                         />
+                    </div>
+
+                    <div className="mt-8">
+                        <h2 className="text-white text-2xl font-bold mb-6">
+                            Recent Games
+                        </h2>
+                        <RecentGames gameRecords={realGameData} />
                     </div>
                 </div>
             </div>

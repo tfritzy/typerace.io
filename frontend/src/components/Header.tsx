@@ -1,6 +1,6 @@
-import { ProfileAvatar } from "./ProfileAvatar";
 import "../App.css";
 import { useNavigate } from "react-router-dom";
+import { ProfileAvatar } from "./ProfileAvatar";
 
 interface HeaderProps {
     hideAvatar?: boolean;

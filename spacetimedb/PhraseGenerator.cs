@@ -11,8 +11,16 @@ public static class PhraseGenerator
 
         for (int i = 0; i < wordCount; i++)
         {
-            int index = rng.Next(wordList.Length);
-            words.Add(wordList[index]);
+            string selectedWord;
+            int attempts = 0;
+            do
+            {
+                int index = rng.Next(wordList.Length);
+                selectedWord = wordList[index];
+                attempts++;
+            } while (i > 0 && selectedWord == words[i - 1] && attempts < 100);
+
+            words.Add(selectedWord);
         }
 
         return string.Join(" ", words);

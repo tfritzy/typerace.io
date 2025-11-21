@@ -180,6 +180,7 @@ public static partial class Module
         public string Id;
         [SpacetimeDB.Index.BTree]
         public Identity PlayerId;
+        public string GameId;
         [SpacetimeDB.Index.BTree]
         public GameMode GameMode;
         [SpacetimeDB.Index.BTree]
@@ -429,9 +430,23 @@ public static partial class Module
         {
             var updatedPlayer = existingPlayer.Value;
             updatedPlayer.IsAnonymous = isAnonymous;
+
+            if (!isAnonymous && updatedPlayer.Name.StartsWith("Anonymous "))
+            {
+                var newAdjective = GenerateNonAnonymousAdjective(ctx.Rng);
+                updatedPlayer.Name = updatedPlayer.Name.Replace("Anonymous", newAdjective);
+                Log.Info($"Updated player name from Anonymous to {newAdjective} for {ctx.Sender}");
+            }
+
             ctx.Db.player.Id.Update(updatedPlayer);
             Log.Info($"Updated anonymous status for {ctx.Sender} to {isAnonymous}");
         }
+    }
+
+    private static string GenerateNonAnonymousAdjective(Random rng)
+    {
+        string[] adjectives = { "Shiny", "Sparkly", "Exothermic", "Exuberant" };
+        return adjectives[rng.Next(adjectives.Length)];
     }
 
     [Reducer]
@@ -1143,6 +1158,7 @@ public static partial class Module
         {
             Id = statsId,
             PlayerId = progress.PlayerId,
+            GameId = game.Id,
             GameMode = game.GameMode,
             Year = year,
             Month = month,
@@ -1340,6 +1356,11 @@ public static partial class Module
 
     private static int UpdatePlayerElo(ReducerContext ctx, Identity playerId, Game game, int placement)
     {
+        if (game.GameType == GameType.Private || game.GameType == GameType.Practice)
+        {
+            return 0;
+        }
+
         var currentElo = GetOrCreatePlayerElo(ctx, playerId, game.GameMode);
 
         var totalEloChange = 0;
