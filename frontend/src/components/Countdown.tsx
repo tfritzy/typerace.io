@@ -94,7 +94,7 @@ export const Countdown = () => {
         <div className="fixed left-12 top-[52%] -translate-y-1/2 pointer-events-none z-50">
           <img
             src="/bufo-lets-goo.gif"
-            alt="Let's go"
+            alt=""
             className="w-14 h-14"
             style={{
               animation: "fadeInOut 2s ease-out forwards",
