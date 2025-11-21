@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
   DbConnection,
@@ -13,7 +13,6 @@ export const useFindGame = () => {
   const conn = useSpacetimeDB<DbConnection>();
   const navigate = useNavigate();
   const playerProgress = useTable("playerprogress").rows;
-  const hasCalled = useRef(false);
 
   useEffect(() => {
     if (!joinCode || !conn.identity) return;
@@ -26,14 +25,12 @@ export const useFindGame = () => {
       navigate(`/game/${myProgress.gameId.toString()}`, { replace: true });
       setIsSearching(false);
       setJoinCode(null);
-      hasCalled.current = false;
     }
   }, [playerProgress, joinCode, conn.identity, navigate]);
 
-  const findGame = (mode: GameMode, gameType: GameTypeValue) => {
-    if (!conn || hasCalled.current) return;
+  const findGame = useCallback((mode: GameMode, gameType: GameTypeValue) => {
+    if (!conn || isSearching) return;
 
-    hasCalled.current = true;
     setIsSearching(true);
 
     const newJoinCode = `join_${Date.now()}_${Math.random().toString(36).substring(7)}`;
@@ -41,7 +38,7 @@ export const useFindGame = () => {
 
     const gameTypeEnum = { tag: gameType };
     conn.reducers.joinGame(mode, newJoinCode, gameTypeEnum);
-  };
+  }, [conn, isSearching]);
 
   return { findGame, isSearching };
 };
