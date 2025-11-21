@@ -12,7 +12,7 @@ type GameLobbyProps = {
 
 export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
   const [linkCopied, setLinkCopied] = useState(false);
-  const [gameUrl, setGameUrl] = useState<string>("");
+  const [gameUrl, setGameUrl] = useState("");
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -26,10 +26,14 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
   }, [conn, gameId, isOwner]);
 
   const handleCopyLink = useCallback(() => {
-    navigator.clipboard.writeText(gameUrl).then(() => {
-      setLinkCopied(true);
-      setTimeout(() => setLinkCopied(false), 2000);
-    });
+    navigator.clipboard.writeText(gameUrl)
+      .then(() => {
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 2000);
+      })
+      .catch((err) => {
+        console.error('Failed to copy link:', err);
+      });
   }, [gameUrl]);
 
   return (
