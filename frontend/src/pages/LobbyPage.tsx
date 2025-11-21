@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import "../App.css";
 import "../components/SelectionButton.css";
 import type {
@@ -13,22 +12,23 @@ import {
 } from "../components/MatchTypeSelector";
 import { Header } from "../components/Header";
 import { getRandomStartupPhrase } from "../utils/modes";
+import { useFindGame } from "../hooks/useFindGame";
 
 export const LobbyPage = () => {
   const [selectedMode, setSelectedMode] = useState<GameMode>({
     tag: "English500",
   });
   const [gameType, setGameType] = useState<GameTypeValue>("Public");
-  const navigate = useNavigate();
   const typeBoxRef = useRef<TypeBoxRef>(null);
+  const { findGame } = useFindGame();
 
   const startupPhrase = useMemo(() => {
     return getRandomStartupPhrase(selectedMode.tag);
   }, [selectedMode.tag]);
 
   const handlePhraseComplete = useCallback(() => {
-    navigate(`/game?mode=${selectedMode.tag}&gameType=${gameType}`, { replace: true });
-  }, [navigate, selectedMode, gameType]);
+    findGame(selectedMode, gameType);
+  }, [findGame, selectedMode, gameType]);
 
   return (
     <div className="relative h-screen flex flex-col overflow-hidden">
