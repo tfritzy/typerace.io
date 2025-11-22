@@ -3,6 +3,7 @@ import type { DbConnection, Player, GameRecord, PlayerColor } from "../../module
 import { WpmChart } from "../components/WpmChart";
 import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
 import { PlayerAvatar } from "../components/PlayerAvatar";
 import { useParams, useNavigate } from "react-router-dom";
 import { Identity } from "spacetimedb";
@@ -369,6 +370,7 @@ export const ProfilePage = () => {
                     onClose={() => setIsEditColorModalOpen(false)}
                 />
             )}
+            <Footer />
         </div>
     );
 };

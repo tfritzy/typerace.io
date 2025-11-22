@@ -10,6 +10,7 @@ import {
   type GameTypeValue,
 } from "../components/MatchTypeSelector";
 import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
 import { getRandomStartupPhrase } from "../utils/modes";
 import { useFindGame } from "../hooks/useFindGame";
 
@@ -44,14 +45,17 @@ export const LobbyPage = () => {
           </div>
         </div>
       </div>
-      <div className="fixed bottom-0 left-0 right-0 p-4">
-        <div className="content-container">
-          <MatchTypeSelector gameType={gameType} setGameType={setGameType} />
-          <ModeSelector
-            selectedMode={selectedMode}
-            onModeSelect={setSelectedMode}
-          />
+      <div className="fixed bottom-0 left-0 right-0">
+        <div className="p-4">
+          <div className="content-container">
+            <MatchTypeSelector gameType={gameType} setGameType={setGameType} />
+            <ModeSelector
+              selectedMode={selectedMode}
+              onModeSelect={setSelectedMode}
+            />
+          </div>
         </div>
+        <Footer />
       </div>
     </div>
   );
