@@ -15,7 +15,7 @@ export const useFindGame = () => {
   const playerProgress = useTable("playerprogress").rows;
 
   useEffect(() => {
-    if (!joinCode || !conn.identity) return;
+    if (!joinCode || !conn?.identity) return;
 
     const myProgress = playerProgress.find(
       (row) => row.playerId.isEqual(conn.identity!) && row.joinCode === joinCode
@@ -26,7 +26,7 @@ export const useFindGame = () => {
       setIsSearching(false);
       setJoinCode(null);
     }
-  }, [playerProgress, joinCode, conn.identity, router]);
+  }, [playerProgress, joinCode, conn, router]);
 
   const findGame = useCallback((mode: GameMode, gameType: GameTypeValue) => {
     if (!conn || isSearching) return;

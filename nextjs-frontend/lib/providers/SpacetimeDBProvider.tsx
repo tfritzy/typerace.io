@@ -30,7 +30,7 @@ export const SpacetimeDBClientProvider = ({ children }: SpacetimeDBClientProvide
   }, []);
 
   if (!authLoaded) {
-    return null;
+    return <>{children}</>;
   }
 
   const connectionBuilder = DbConnection.builder()

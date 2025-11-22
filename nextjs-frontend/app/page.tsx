@@ -1,58 +1,62 @@
-'use client';
+import type { Metadata } from "next";
+import ClientWrapper from "@/components/ClientWrapper";
 
-import { useState, useCallback, useRef, useMemo } from "react";
-import "@/components/SelectionButton.css";
-import type { GameMode } from "@/module_bindings";
-import { TypeBox, type TypeBoxRef } from "@/components/TypeBox";
-import { ModeSelector } from "@/components/ModeSelector";
-import {
-  MatchTypeSelector,
-  type GameTypeValue,
-} from "@/components/MatchTypeSelector";
-import { Header } from "@/components/Header";
-import { getRandomStartupPhrase } from "@/lib/utils/modes";
-import { useFindGame } from "@/hooks/useFindGame";
+export const metadata: Metadata = {
+  title: "TypeRace.io - Competitive Multiplayer Typing Game",
+  description: "Race against players worldwide in real-time typing competitions. Improve your typing speed and accuracy with TypeRace.io's multiplayer typing game. Practice in multiple languages including English, Spanish, French, German, Japanese, and more.",
+  keywords: ["typing game", "typing speed test", "multiplayer typing", "typing race", "improve typing speed", "typing practice", "competitive typing", "online typing game"],
+  openGraph: {
+    title: "TypeRace.io - Competitive Multiplayer Typing Game",
+    description: "Race against players worldwide in real-time typing competitions. Test and improve your typing speed.",
+    type: "website",
+    url: "https://typerace.io",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TypeRace.io - Competitive Multiplayer Typing Game",
+    description: "Race against players worldwide in real-time typing competitions. Test and improve your typing speed.",
+  },
+};
 
 export default function Home() {
-  const [selectedMode, setSelectedMode] = useState<GameMode>({
-    tag: "English500",
-  });
-  const [gameType, setGameType] = useState<GameTypeValue>("Public");
-  const typeBoxRef = useRef<TypeBoxRef>(null);
-  const { findGame } = useFindGame();
-
-  const startupPhrase = useMemo(() => {
-    return getRandomStartupPhrase(selectedMode.tag);
-  }, [selectedMode.tag]);
-
-  const handlePhraseComplete = useCallback(() => {
-    findGame(selectedMode, gameType);
-  }, [findGame, selectedMode, gameType]);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "TypeRace.io",
+    "applicationCategory": "Game",
+    "description": "Multiplayer competitive typing game where players race against each other in real-time typing competitions",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Real-time multiplayer typing races",
+      "Multiple language support",
+      "Public and private game modes",
+      "Practice mode",
+      "Player statistics and progress tracking"
+    ],
+    "browserRequirements": "Requires JavaScript. Requires HTML5.",
+    "url": "https://typerace.io"
+  };
 
   return (
-    <div className="relative h-screen flex flex-col overflow-hidden">
-      <Header />
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="content-container">
-          <div className="text-2xl mb-[400px]">
-            <TypeBox
-              ref={typeBoxRef}
-              phrase={startupPhrase}
-              onComplete={handlePhraseComplete}
-              resetOnComplete={true}
-            />
-          </div>
-        </div>
-      </div>
-      <div className="fixed bottom-0 left-0 right-0 p-4">
-        <div className="content-container">
-          <MatchTypeSelector gameType={gameType} setGameType={setGameType} />
-          <ModeSelector
-            selectedMode={selectedMode}
-            onModeSelect={setSelectedMode}
-          />
-        </div>
-      </div>
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <main>
+        <h1 className="sr-only">TypeRace.io - Multiplayer Typing Speed Competition</h1>
+        <p className="sr-only">
+          Compete in real-time multiplayer typing races. Choose from multiple languages including 
+          English, Spanish, French, German, Italian, Portuguese, Japanese, Korean, Chinese, Ukrainian, 
+          Arabic, Hindi, Dutch, Swedish, and Turkish. Practice your typing speed in public matches, 
+          private lobbies, or solo practice mode.
+        </p>
+        <ClientWrapper />
+      </main>
+    </>
   );
 }
