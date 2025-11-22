@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /$
+Allow: /favicons/
+Disallow: /game/
+Disallow: /profile/
+
+Sitemap: https://typerace.io/sitemap.xml
