@@ -37,6 +37,22 @@ npm run build
 npm start
 ```
 
+## Deployment to Firebase Hosting
+
+1. Build the Next.js app for static export:
+   ```bash
+   cd nextjs-frontend
+   npm run build
+   ```
+
+2. Deploy to Firebase Hosting:
+   ```bash
+   cd ..
+   firebase deploy --only hosting
+   ```
+
+The static export will be generated in `nextjs-frontend/out/` directory.
+
 ## Environment Variables
 
 - `.env.development` - Development environment configuration
