@@ -46,7 +46,6 @@ export const LobbyPage = () => {
         </div>
       </div>
       <div className="fixed bottom-0 left-0 right-0">
-        <Footer />
         <div className="p-4">
           <div className="content-container">
             <MatchTypeSelector gameType={gameType} setGameType={setGameType} />
@@ -56,6 +55,7 @@ export const LobbyPage = () => {
             />
           </div>
         </div>
+        <Footer />
       </div>
     </div>
   );
