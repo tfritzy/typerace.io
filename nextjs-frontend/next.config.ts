@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   transpilePackages: ['spacetimedb'],
-  skipTrailingSlashRedirect: true,
 };
 
 export default nextConfig;
