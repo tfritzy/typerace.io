@@ -42,10 +42,29 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 
 ## Deployment
 
-The frontend is built with Next.js and includes server-rendered dynamic routes for games and player profiles. For production deployment, consider:
+The frontend uses Next.js with `output: 'export'` for static generation. The home page is server-side rendered at build time for SEO, while dynamic routes (`/game/*`, `/profile/*`) are handled client-side.
 
-- **Vercel** (recommended for Next.js): Zero-configuration deployment with automatic SSR support
-- **Firebase Hosting + Functions**: Requires Firebase Functions setup for server-side rendering
-- **Custom Node.js hosting**: Use `npm run build && npm run start` to run the Next.js server
+### Firebase Hosting (Recommended, No Functions Needed)
 
-For static-only hosting, the Next.js configuration would need to be modified to use `output: 'export'` with pre-generated static params, which may not be suitable for this real-time multiplayer application with dynamic game IDs.
+The current configuration works with Firebase Hosting alone:
+
+```bash
+cd frontend
+npm run build
+firebase deploy --only hosting
+```
+
+The Firebase rewrite rule serves `index.html` for all routes, and Next.js handles client-side routing. This provides:
+- ✅ Good SEO for the home page (pre-rendered HTML with metadata)
+- ✅ Fast initial load
+- ✅ No serverless functions needed
+- ✅ All dynamic routing handled client-side
+- ✅ Works with CDN caching
+
+### Alternative Deployment Options
+
+- **Netlify/Cloudflare Pages**: Also support static exports with client-side routing
+- **GitHub Pages**: Use the included workflow for automated deployments
+- **Vercel**: Simplified deployment with automatic configuration
+
+No Node.js server or Firebase Functions are required for deployment.

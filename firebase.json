@@ -12,6 +12,5 @@
         "destination": "/index.html"
       }
     ]
-  },
-  "_comment": "Note: Next.js with dynamic routes requires either static export (output: 'export') or Firebase Functions for SSR. Current setup uses server-rendered dynamic routes."
+  }
 }

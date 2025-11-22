@@ -49,12 +49,12 @@ jobs:
         run: npm run build
 
       - name: Add .nojekyll file
-        run: touch frontend/dist/.nojekyll
+        run: touch frontend/out/.nojekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./frontend/dist
+          path: ./frontend/out
 
   deploy:
     environment:
