@@ -10,7 +10,7 @@ import type { ChartOptions } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import type { PlayerProgress } from '../../module_bindings/player_progress_type';
 import { PlayerColor } from '../../module_bindings/player_color_type';
-import { getRawWpmBySecond, getAggWpmBySecond } from '../utils/wpmCalculator';
+import { getRawWpmBySecond, getAggWpmBySecond, getErrorCountsBySecond } from '../utils/wpmCalculator';
 import { getColorConfig } from '../utils/colorMapping';
 
 ChartJS.register(
@@ -30,13 +30,16 @@ interface RaceResultsChartProps {
 export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerColor }: RaceResultsChartProps) => {
     const rawWpmData = getRawWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
     const aggWpmData = getAggWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
+    const errorCountsData = getErrorCountsBySecond(playerProgress.characterHistory, raceStartTimestamp);
 
-    const maxDataIndex = Math.max(rawWpmData.length - 1, aggWpmData.length - 1);
+    const maxDataIndex = Math.max(rawWpmData.length - 1, aggWpmData.length - 1, errorCountsData.length - 1);
 
     const colorConfig = getColorConfig(playerColor);
     const primaryColor = colorConfig.primary;
     const secondaryColor = getComputedStyle(document.documentElement)
         .getPropertyValue('--color-white-25').trim();
+    const errorColor = getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-error').trim();
     const chartData = {
         datasets: [
             {
@@ -52,6 +55,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                 showLine: true,
                 borderWidth: 2,
                 tension: 0.4,
+                yAxisID: 'y',
             },
             {
                 label: 'Raw WPM',
@@ -66,6 +70,22 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                 showLine: true,
                 borderWidth: 2,
                 tension: 0.4,
+                yAxisID: 'y',
+            },
+            {
+                label: 'Errors',
+                data: errorCountsData.map((count, index) => ({
+                    x: index,
+                    y: count
+                })),
+                borderColor: errorColor,
+                pointRadius: 0,
+                pointHoverRadius: 8,
+                pointHitRadius: 20,
+                showLine: true,
+                borderWidth: 2,
+                tension: 0.4,
+                yAxisID: 'y',
             },
         ]
     };
@@ -118,6 +138,9 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                         return '';
                     },
                     label: (context) => {
+                        if (context.dataset.label === 'Errors') {
+                            return ` ${context.parsed.y.toFixed(0)} error${context.parsed.y !== 1 ? 's' : ''}`;
+                        }
                         return ` ${context.parsed.y.toFixed(0)} WPM`;
                     }
                 }
@@ -177,7 +200,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
         }
     };
 
-    if (rawWpmData.length === 0 && aggWpmData.length === 0) {
+    if (rawWpmData.length === 0 && aggWpmData.length === 0 && errorCountsData.length === 0) {
         return (
             <div className="w-full text-center text-white/60 py-6">
                 No typing data available
