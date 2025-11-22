@@ -3,11 +3,13 @@ import {
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
+    CategoryScale,
     Tooltip,
     Legend,
 } from 'chart.js';
 import type { ChartOptions } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Chart } from 'react-chartjs-2';
 import type { PlayerProgress } from '../../module_bindings/player_progress_type';
 import { PlayerColor } from '../../module_bindings/player_color_type';
 import { getRawWpmBySecond, getAggWpmBySecond, getErrorCountsBySecond } from '../utils/wpmCalculator';
@@ -15,8 +17,10 @@ import { getColorConfig } from '../utils/colorMapping';
 
 ChartJS.register(
     LinearScale,
+    CategoryScale,
     PointElement,
     LineElement,
+    BarElement,
     Tooltip,
     Legend
 );
@@ -43,6 +47,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
     const chartData = {
         datasets: [
             {
+                type: 'line' as const,
                 label: 'Aggregate WPM',
                 data: aggWpmData.map((wpm, index) => ({
                     x: index,
@@ -58,6 +63,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                 yAxisID: 'y',
             },
             {
+                type: 'line' as const,
                 label: 'Raw WPM',
                 data: rawWpmData.map((wpm, index) => ({
                     x: index,
@@ -73,24 +79,21 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                 yAxisID: 'y',
             },
             {
+                type: 'bar' as const,
                 label: 'Errors',
                 data: errorCountsData.map((count, index) => ({
                     x: index,
                     y: count
                 })),
+                backgroundColor: errorColor,
                 borderColor: errorColor,
-                pointRadius: 0,
-                pointHoverRadius: 8,
-                pointHitRadius: 20,
-                showLine: true,
-                borderWidth: 2,
-                tension: 0.4,
+                borderWidth: 1,
                 yAxisID: 'y1',
             },
         ]
     };
 
-    const options: ChartOptions<'line'> = {
+    const options: ChartOptions<'bar' | 'line'> = {
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
@@ -236,7 +239,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
 
     return (
         <div className="h-[280px] relative w-full">
-            <Line data={chartData} options={options} />
+            <Chart type='bar' data={chartData} options={options} />
         </div>
     );
 };
