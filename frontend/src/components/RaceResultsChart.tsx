@@ -239,7 +239,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
 
     return (
         <div className="h-[280px] relative w-full">
-            <Chart type='bar' data={chartData} options={options} />
+            <Chart data={chartData} options={options} />
         </div>
     );
 };
