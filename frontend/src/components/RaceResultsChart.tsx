@@ -4,7 +4,6 @@ import {
     PointElement,
     LineElement,
     BarElement,
-    CategoryScale,
     Tooltip,
     Legend,
 } from 'chart.js';
@@ -17,7 +16,6 @@ import { getColorConfig } from '../utils/colorMapping';
 
 ChartJS.register(
     LinearScale,
-    CategoryScale,
     PointElement,
     LineElement,
     BarElement,
@@ -109,7 +107,6 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                     },
                     padding: 12,
                     usePointStyle: true,
-                    pointStyle: 'line',
                 }
             },
             tooltip: {
