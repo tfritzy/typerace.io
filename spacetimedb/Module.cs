@@ -1201,7 +1201,7 @@ public static partial class Module
                 StartedGames = 0,
                 StartedGamesWithMultipleHumans = 0,
                 TotalWpm = 0,
-                MinWpm = double.MaxValue,
+                MinWpm = 0,
                 MaxWpm = 0,
                 GameCount = 0
             };
@@ -1213,25 +1213,15 @@ public static partial class Module
 
         count.StartedGames++;
 
-        var humanPlayers = new List<PlayerProgress>();
-        var allPlayers = new List<PlayerProgress>();
+        var humanPlayerCount = 0;
+        var hasFinishedPlayers = false;
         foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
         {
-            allPlayers.Add(progress);
             if (!progress.IsBot)
             {
-                humanPlayers.Add(progress);
+                humanPlayerCount++;
             }
-        }
 
-        if (humanPlayers.Count > 1)
-        {
-            count.StartedGamesWithMultipleHumans++;
-        }
-
-        var hasFinishedPlayers = false;
-        foreach (var progress in allPlayers)
-        {
             if (progress.Placement > 0)
             {
                 hasFinishedPlayers = true;
@@ -1240,7 +1230,7 @@ public static partial class Module
                 {
                     count.TotalWpm += wpm;
                     count.GameCount++;
-                    if (wpm < count.MinWpm)
+                    if (count.MinWpm == 0 || wpm < count.MinWpm)
                     {
                         count.MinWpm = wpm;
                     }
@@ -1252,10 +1242,15 @@ public static partial class Module
             }
         }
 
+        if (humanPlayerCount > 1)
+        {
+            count.StartedGamesWithMultipleHumans++;
+        }
+
         if (hasFinishedPlayers)
         {
             count.FinishedGames++;
-            if (humanPlayers.Count > 1)
+            if (humanPlayerCount > 1)
             {
                 count.FinishedGamesWithMultipleHumans++;
             }
