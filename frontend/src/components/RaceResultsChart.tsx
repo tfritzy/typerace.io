@@ -85,7 +85,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                 showLine: true,
                 borderWidth: 2,
                 tension: 0.4,
-                yAxisID: 'y',
+                yAxisID: 'y1',
             },
         ]
     };
@@ -174,6 +174,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
             },
             y: {
                 min: 0,
+                position: 'left',
                 title: {
                     display: true,
                     text: 'WPM',
@@ -192,6 +193,31 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                 grid: {
                     color: 'rgba(255, 255, 255, 0.06)',
                     drawTicks: false
+                },
+                border: {
+                    display: false
+                }
+            },
+            y1: {
+                min: 0,
+                position: 'right',
+                title: {
+                    display: true,
+                    text: 'Errors',
+                    color: errorColor,
+                    font: {
+                        size: 12
+                    }
+                },
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    font: {
+                        size: 11
+                    },
+                    padding: 8
+                },
+                grid: {
+                    display: false
                 },
                 border: {
                     display: false
