@@ -7,6 +7,7 @@ A multiplayer typing race game built with a spacetimedb backend
 ### Prerequisites
 
 - SpacetimeDB CLI
+- Node.js 20+
 
 ### Setup
 
@@ -22,7 +23,7 @@ spacetime publish --project-path spacetimedb typerace
 
 3. Generate TypeScript bindings from the SpacetimeDB module:
 ```bash
-spacetime generate --lang typescript --out-dir src/module_bindings --project-path spacetimedb
+spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
 ```
 
 4. Install dependencies:
@@ -36,3 +37,5 @@ npm install
 cd frontend
 npm run dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser.

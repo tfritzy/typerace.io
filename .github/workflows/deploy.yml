@@ -27,9 +27,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install SpacetimeDB CLI
         env:
@@ -40,18 +38,23 @@ jobs:
 
       - name: Generate TypeScript bindings
         run: |
-          spacetime generate --lang typescript --out-dir src/module_bindings --project-path spacetimedb
+          spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
 
-      - name: Build with Vite
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build with Next.js
+        working-directory: frontend
         run: npm run build
 
       - name: Add .nojekyll file
-        run: touch dist/.nojekyll
+        run: touch frontend/dist/.nojekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./frontend/dist
 
   deploy:
     environment:

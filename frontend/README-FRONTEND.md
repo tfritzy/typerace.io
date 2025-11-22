@@ -1,6 +1,6 @@
-# Next.js Frontend for TypeRace.io
+# Frontend for TypeRace.io
 
-This is a Next.js migration of the TypeRace.io frontend, maintaining full functionality of the original Vite-based application.
+This is a Next.js frontend for TypeRace.io, a multiplayer typing race game.
 
 ## Prerequisites
 
@@ -17,7 +17,7 @@ npm install
 2. Generate SpacetimeDB module bindings:
 ```bash
 # From the repository root:
-spacetime generate --lang typescript --out-dir nextjs-frontend/module_bindings --project-path spacetimedb
+spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
 ```
 
 This will generate all the necessary TypeScript bindings from the SpacetimeDB module schema.
@@ -60,20 +60,20 @@ npm start
 - `module_bindings/` - SpacetimeDB generated TypeScript bindings (must be generated)
 - `public/` - Static assets
 
-## Key Differences from Original Vite Frontend
+## Key Features
 
-1. **Routing**: Uses Next.js App Router instead of React Router
-   - `useNavigate()` → `useRouter()` from `next/navigation`
-   - `useParams()` → `useParams()` from `next/navigation`
+1. **Routing**: Uses Next.js App Router with file-based routing
+   - `useRouter()` from `next/navigation` for programmatic navigation
+   - `useParams()` from `next/navigation` for route parameters
    - File-based routing in `app/` directory
 
-2. **Environment Variables**: Uses `NEXT_PUBLIC_` prefix instead of `VITE_`
+2. **Environment Variables**: Uses `NEXT_PUBLIC_` prefix for client-side env vars
 
 3. **Import Paths**: Uses `@/` alias for imports from root
 
 4. **Client Components**: All interactive components use `'use client'` directive
 
-5. **Build System**: Uses Next.js/Turbopack instead of Vite
+5. **Build System**: Uses Next.js with static export for deployment
 
 ## Features
 
@@ -91,4 +91,3 @@ npm start
 
 - The module_bindings directory must be populated by running the SpacetimeDB generate command before building
 - All components that use React hooks or browser APIs are marked as Client Components with 'use client'
-- The application maintains the same functionality as the original Vite frontend
