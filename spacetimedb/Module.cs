@@ -1282,6 +1282,11 @@ public static partial class Module
 
     private static int AwardXpForGame(ReducerContext ctx, ref Player player, PlayerProgress progress, Game game, int placement, int wordsTyped)
     {
+        if (player.IsAnonymous)
+        {
+            return 0;
+        }
+
         var currentTimestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
         var isFirstGameToday = IsFirstGameOfDay(player.LastGameDate, currentTimestamp);
 
