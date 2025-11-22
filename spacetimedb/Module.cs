@@ -84,6 +84,21 @@ public partial struct BotConfig
     public double ErrorRate;
 }
 
+[Type]
+public partial struct GameModeCount
+{
+    public GameType GameType;
+    public GameMode GameMode;
+    public int FinishedGames;
+    public int FinishedGamesWithMultipleHumans;
+    public int StartedGames;
+    public int StartedGamesWithMultipleHumans;
+    public double TotalWpm;
+    public double MinWpm;
+    public double MaxWpm;
+    public int GameCount;
+}
+
 public static partial class Module
 {
     private const long PUBLIC_GAME_COUNTDOWN_MICROSECONDS = 3_000_000;
@@ -287,6 +302,14 @@ public static partial class Module
         [PrimaryKey]
         public ulong ScheduledId;
         public ScheduleAt ScheduledAt;
+    }
+
+    [Table(Name = "globalstats", Public = true)]
+    public partial struct GlobalStats
+    {
+        [PrimaryKey]
+        public string Date;
+        public List<GameModeCount> Stats;
     }
 
     [Table(Name = "playerprogress", Public = true)]
@@ -1136,6 +1159,137 @@ public static partial class Module
         }
     }
 
+    private static void UpdateGlobalStatsForGame(ReducerContext ctx, Game game)
+    {
+        var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
+        var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000);
+        var dateKey = dateTime.ToString("yyyy-MM-dd");
+
+        var existingStats = ctx.Db.globalstats.Date.Find(dateKey);
+        List<GameModeCount> statsList;
+
+        if (existingStats == null)
+        {
+            statsList = new List<GameModeCount>();
+        }
+        else
+        {
+            statsList = existingStats.Value.Stats;
+        }
+
+        GameModeCount? existingCount = null;
+        int existingIndex = -1;
+        for (int i = 0; i < statsList.Count; i++)
+        {
+            if (statsList[i].GameType == game.GameType && statsList[i].GameMode == game.GameMode)
+            {
+                existingCount = statsList[i];
+                existingIndex = i;
+                break;
+            }
+        }
+
+        GameModeCount count;
+        if (existingCount == null)
+        {
+            count = new GameModeCount
+            {
+                GameType = game.GameType,
+                GameMode = game.GameMode,
+                FinishedGames = 0,
+                FinishedGamesWithMultipleHumans = 0,
+                StartedGames = 0,
+                StartedGamesWithMultipleHumans = 0,
+                TotalWpm = 0,
+                MinWpm = double.MaxValue,
+                MaxWpm = 0,
+                GameCount = 0
+            };
+        }
+        else
+        {
+            count = existingCount.Value;
+        }
+
+        count.StartedGames++;
+
+        var humanPlayers = new List<PlayerProgress>();
+        var allPlayers = new List<PlayerProgress>();
+        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
+        {
+            allPlayers.Add(progress);
+            if (!progress.IsBot)
+            {
+                humanPlayers.Add(progress);
+            }
+        }
+
+        if (humanPlayers.Count > 1)
+        {
+            count.StartedGamesWithMultipleHumans++;
+        }
+
+        var hasFinishedPlayers = false;
+        foreach (var progress in allPlayers)
+        {
+            if (progress.Placement > 0)
+            {
+                hasFinishedPlayers = true;
+                var wpm = progress.Wpm;
+                if (wpm > 0)
+                {
+                    count.TotalWpm += wpm;
+                    count.GameCount++;
+                    if (wpm < count.MinWpm)
+                    {
+                        count.MinWpm = wpm;
+                    }
+                    if (wpm > count.MaxWpm)
+                    {
+                        count.MaxWpm = wpm;
+                    }
+                }
+            }
+        }
+
+        if (hasFinishedPlayers)
+        {
+            count.FinishedGames++;
+            if (humanPlayers.Count > 1)
+            {
+                count.FinishedGamesWithMultipleHumans++;
+            }
+        }
+
+        if (existingIndex >= 0)
+        {
+            statsList[existingIndex] = count;
+        }
+        else
+        {
+            statsList.Add(count);
+        }
+
+        if (existingStats == null)
+        {
+            ctx.Db.globalstats.Insert(new GlobalStats
+            {
+                Date = dateKey,
+                Stats = statsList
+            });
+        }
+        else
+        {
+            ctx.Db.globalstats.Date.Update(new GlobalStats
+            {
+                Date = dateKey,
+                Stats = statsList
+            });
+        }
+
+        Log.Info($"Updated global stats for date {dateKey}, GameType {game.GameType}, GameMode {game.GameMode}");
+    }
+
     [Reducer]
     public static void ArchiveOldGames(ReducerContext ctx, GameArchiver args)
     {
@@ -1145,6 +1299,8 @@ public static partial class Module
         {
             if (game.CreatedAt < fiveMinutesAgo)
             {
+                UpdateGlobalStatsForGame(ctx, game);
+
                 var updatedGame = game;
                 updatedGame.State = GameState.Archived;
                 ctx.Db.game.Id.Update(updatedGame);
