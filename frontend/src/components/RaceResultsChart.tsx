@@ -93,7 +93,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
         ]
     };
 
-    const options: ChartOptions<'bar'> = {
+    const options: ChartOptions<'bar' | 'line'> = {
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
