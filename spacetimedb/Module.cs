@@ -1201,7 +1201,7 @@ public static partial class Module
                 StartedGames = 0,
                 StartedGamesWithMultipleHumans = 0,
                 TotalWpm = 0,
-                MinWpm = 0,
+                MinWpm = double.MaxValue,
                 MaxWpm = 0,
                 GameCount = 0
             };
@@ -1230,7 +1230,7 @@ public static partial class Module
                 {
                     count.TotalWpm += wpm;
                     count.GameCount++;
-                    if (count.MinWpm == 0 || wpm < count.MinWpm)
+                    if (wpm < count.MinWpm)
                     {
                         count.MinWpm = wpm;
                     }
@@ -1254,6 +1254,11 @@ public static partial class Module
             {
                 count.FinishedGamesWithMultipleHumans++;
             }
+        }
+
+        if (count.GameCount == 0)
+        {
+            count.MinWpm = 0;
         }
 
         if (existingIndex >= 0)
