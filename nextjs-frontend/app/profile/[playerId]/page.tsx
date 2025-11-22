@@ -1,11 +1,9 @@
-import ProfileClient from './ProfileClient';
-
-export const dynamicParams = false;
+import ProfilePageClient from './ProfilePageClient';
 
 export async function generateStaticParams(): Promise<Array<{ playerId: string }>> {
-  return [];
+  return [{ playerId: '_' }];
 }
 
 export default function ProfilePage(): JSX.Element {
-  return <ProfileClient />;
+  return <ProfilePageClient />;
 }

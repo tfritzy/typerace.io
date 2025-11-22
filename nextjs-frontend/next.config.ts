@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: ['spacetimedb'],
   skipTrailingSlashRedirect: true,
-  distDir: 'out',
 };
 
 export default nextConfig;

@@ -1,11 +1,9 @@
-import GameClient from './GameClient';
-
-export const dynamicParams = false;
+import GamePageClient from './GamePageClient';
 
 export async function generateStaticParams(): Promise<Array<{ gameId: string }>> {
-  return [];
+  return [{ gameId: '_' }];
 }
 
 export default function GamePage(): JSX.Element {
-  return <GameClient />;
+  return <GamePageClient />;
 }
