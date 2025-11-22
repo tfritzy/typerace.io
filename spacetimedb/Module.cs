@@ -90,9 +90,8 @@ public partial struct GameModeCount
     public GameType GameType;
     public GameMode GameMode;
     public int FinishedGames;
-    public int FinishedGamesWithMultipleHumans;
+    public int FinishedHumanCount;
     public int StartedGames;
-    public int StartedGamesWithMultipleHumans;
     public double TotalWpm;
     public double MinWpm;
     public double MaxWpm;
@@ -1197,9 +1196,8 @@ public static partial class Module
                 GameType = game.GameType,
                 GameMode = game.GameMode,
                 FinishedGames = 0,
-                FinishedGamesWithMultipleHumans = 0,
+                FinishedHumanCount = 0,
                 StartedGames = 0,
-                StartedGamesWithMultipleHumans = 0,
                 TotalWpm = 0,
                 MinWpm = double.MaxValue,
                 MaxWpm = 0,
@@ -1213,47 +1211,39 @@ public static partial class Module
 
         count.StartedGames++;
 
-        var humanPlayerCount = 0;
         var hasFinishedPlayers = false;
+        var finishedHumanCount = 0;
         foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
         {
-            if (!progress.IsBot)
-            {
-                humanPlayerCount++;
-            }
-
             if (progress.Placement > 0)
             {
                 hasFinishedPlayers = true;
-                var wpm = progress.Wpm;
-                if (wpm > 0)
+                
+                if (!progress.IsBot)
                 {
-                    count.TotalWpm += wpm;
-                    count.GameCount++;
-                    if (wpm < count.MinWpm)
+                    finishedHumanCount++;
+                    var wpm = progress.Wpm;
+                    if (wpm > 0)
                     {
-                        count.MinWpm = wpm;
-                    }
-                    if (wpm > count.MaxWpm)
-                    {
-                        count.MaxWpm = wpm;
+                        count.TotalWpm += wpm;
+                        count.GameCount++;
+                        if (wpm < count.MinWpm)
+                        {
+                            count.MinWpm = wpm;
+                        }
+                        if (wpm > count.MaxWpm)
+                        {
+                            count.MaxWpm = wpm;
+                        }
                     }
                 }
             }
         }
 
-        if (humanPlayerCount > 1)
-        {
-            count.StartedGamesWithMultipleHumans++;
-        }
-
         if (hasFinishedPlayers)
         {
             count.FinishedGames++;
-            if (humanPlayerCount > 1)
-            {
-                count.FinishedGamesWithMultipleHumans++;
-            }
+            count.FinishedHumanCount += finishedHumanCount;
         }
 
         if (count.GameCount == 0)
