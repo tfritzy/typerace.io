@@ -25,12 +25,21 @@ interface AuthContextType {
     signInWithGithub: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
-        throw new Error('useAuth must be used within AuthProvider');
+        return {
+            user: null,
+            loading: true,
+            signIn: async () => {},
+            signUp: async () => {},
+            signOut: async () => {},
+            resetPassword: async () => {},
+            signInWithGoogle: async () => {},
+            signInWithGithub: async () => {},
+        };
     }
     return context;
 };
@@ -91,7 +100,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };
