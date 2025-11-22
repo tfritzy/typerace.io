@@ -16,12 +16,6 @@ export const Header = ({ hideAvatar = false }: HeaderProps) => {
                     <span className="logo-accent">Race</span>
                     <span className="logo-io">.io</span>
                 </button>
-                <button 
-                    onClick={() => navigate("/privacy")}
-                    className="text-sm text-gray-400 hover:text-gray-300 transition-colors"
-                >
-                    Privacy Policy
-                </button>
                 <div className={hideAvatar ? "invisible" : ""}>
                     <ProfileAvatar />
                 </div>
