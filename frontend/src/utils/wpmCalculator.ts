@@ -216,3 +216,37 @@ export function getAccuracy(compressedHistory: Uint8Array, raceStartTimestamp: b
 
   return (correctChars / totalKeystrokes) * 100;
 }
+
+export function getErrorCountsBySecond(
+  compressedHistory: Uint8Array,
+  raceStartTimestamp: bigint
+): number[] {
+  const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
+  
+  if (!events || events.length === 0) {
+    return [];
+  }
+
+  const errorCountBySecond: number[] = [];
+
+  for (const evt of events) {
+    if (evt.eventType.tag !== "Incorrect") {
+      continue;
+    }
+
+    const elapsedMicros = evt.timestamp - raceStartTimestamp;
+    const second = Number(elapsedMicros / 1_000_000n);
+
+    if (second < 0) {
+      continue;
+    }
+
+    while (errorCountBySecond.length <= second) {
+      errorCountBySecond.push(0);
+    }
+
+    errorCountBySecond[second]++;
+  }
+
+  return errorCountBySecond;
+}

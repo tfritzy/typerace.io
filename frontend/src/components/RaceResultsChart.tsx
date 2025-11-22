@@ -3,20 +3,22 @@ import {
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
     Tooltip,
     Legend,
 } from 'chart.js';
 import type { ChartOptions } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Chart } from 'react-chartjs-2';
 import type { PlayerProgress } from '../../module_bindings/player_progress_type';
 import { PlayerColor } from '../../module_bindings/player_color_type';
-import { getRawWpmBySecond, getAggWpmBySecond } from '../utils/wpmCalculator';
+import { getRawWpmBySecond, getAggWpmBySecond, getErrorCountsBySecond } from '../utils/wpmCalculator';
 import { getColorConfig } from '../utils/colorMapping';
 
 ChartJS.register(
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
     Tooltip,
     Legend
 );
@@ -30,16 +32,20 @@ interface RaceResultsChartProps {
 export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerColor }: RaceResultsChartProps) => {
     const rawWpmData = getRawWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
     const aggWpmData = getAggWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
+    const errorCountsData = getErrorCountsBySecond(playerProgress.characterHistory, raceStartTimestamp);
 
-    const maxDataIndex = Math.max(rawWpmData.length - 1, aggWpmData.length - 1);
+    const maxDataIndex = Math.max(rawWpmData.length - 1, aggWpmData.length - 1, errorCountsData.length - 1);
 
     const colorConfig = getColorConfig(playerColor);
     const primaryColor = colorConfig.primary;
     const secondaryColor = getComputedStyle(document.documentElement)
         .getPropertyValue('--color-white-25').trim();
+    const errorColor = getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-error').trim();
     const chartData = {
         datasets: [
             {
+                type: 'line' as const,
                 label: 'Aggregate WPM',
                 data: aggWpmData.map((wpm, index) => ({
                     x: index,
@@ -52,8 +58,10 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                 showLine: true,
                 borderWidth: 2,
                 tension: 0.4,
+                yAxisID: 'y',
             },
             {
+                type: 'line' as const,
                 label: 'Raw WPM',
                 data: rawWpmData.map((wpm, index) => ({
                     x: index,
@@ -66,11 +74,24 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                 showLine: true,
                 borderWidth: 2,
                 tension: 0.4,
+                yAxisID: 'y',
+            },
+            {
+                type: 'bar' as const,
+                label: 'Errors',
+                data: errorCountsData.map((count, index) => ({
+                    x: index,
+                    y: count
+                })),
+                backgroundColor: errorColor,
+                borderColor: errorColor,
+                borderWidth: 1,
+                yAxisID: 'y1',
             },
         ]
     };
 
-    const options: ChartOptions<'line'> = {
+    const options: ChartOptions<'bar' | 'line'> = {
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
@@ -86,7 +107,6 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                     },
                     padding: 12,
                     usePointStyle: true,
-                    pointStyle: 'line',
                 }
             },
             tooltip: {
@@ -118,6 +138,9 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                         return '';
                     },
                     label: (context) => {
+                        if (context.dataset.label === 'Errors') {
+                            return ` ${context.parsed.y.toFixed(0)} error${context.parsed.y !== 1 ? 's' : ''}`;
+                        }
                         return ` ${context.parsed.y.toFixed(0)} WPM`;
                     }
                 }
@@ -151,6 +174,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
             },
             y: {
                 min: 0,
+                position: 'left',
                 title: {
                     display: true,
                     text: 'WPM',
@@ -173,11 +197,36 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                 border: {
                     display: false
                 }
+            },
+            y1: {
+                min: 0,
+                position: 'right',
+                title: {
+                    display: true,
+                    text: 'Errors',
+                    color: errorColor,
+                    font: {
+                        size: 12
+                    }
+                },
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    font: {
+                        size: 11
+                    },
+                    padding: 8
+                },
+                grid: {
+                    display: false
+                },
+                border: {
+                    display: false
+                }
             }
         }
     };
 
-    if (rawWpmData.length === 0 && aggWpmData.length === 0) {
+    if (rawWpmData.length === 0 && aggWpmData.length === 0 && errorCountsData.length === 0) {
         return (
             <div className="w-full text-center text-white/60 py-6">
                 No typing data available
@@ -187,7 +236,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
 
     return (
         <div className="h-[280px] relative w-full">
-            <Line data={chartData} options={options} />
+            <Chart data={chartData} options={options} />
         </div>
     );
 };
