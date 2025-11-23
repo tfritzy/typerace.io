@@ -236,6 +236,9 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
             onClick={resetCursorToEnd}
             id="type-box"
             className="w-full min-h-full outline-none typebox absolute top-0 left-0 bg-transparent text-transparent resize-none"
+            autoCapitalize="none"
+            autoComplete="off"
+            spellCheck={false}
             autoFocus
             readOnly={disabled}
             style={{
