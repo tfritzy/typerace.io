@@ -91,13 +91,12 @@ export const SiteStatsPage = () => {
         const labels = filteredStats.map(stat => stat.date);
         const gameModes = new Map<string, number[]>();
 
-        filteredStats.forEach(stat => {
+        filteredStats.forEach((stat, index) => {
             stat.stats.forEach(modeCount => {
                 const modeName = modeCount.gameMode.tag;
                 if (!gameModes.has(modeName)) {
                     gameModes.set(modeName, new Array(filteredStats.length).fill(0));
                 }
-                const index = filteredStats.findIndex(s => s.date === stat.date);
                 gameModes.get(modeName)![index] = modeCount.gameCount;
             });
         });
