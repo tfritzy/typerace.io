@@ -67,8 +67,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       console.log("TypeBox onChange:", {
         eventType: event.type,
-        targetValue: event.target.value,
-        eventTargetValue: event.target.value
+        targetValue: event.target.value
       });
 
       if (disabled) {
