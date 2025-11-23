@@ -83,10 +83,16 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
                     x: index,
                     y: count
                 })),
-                backgroundColor: errorColor,
+                backgroundColor: 'transparent',
                 borderColor: errorColor,
+                hoverBackgroundColor: 'transparent',
+                hoverBorderColor: errorColor,
                 borderWidth: 1,
+                borderRadius: 2,
+                borderSkipped: false,
                 yAxisID: 'y1',
+                barPercentage: 0.5,
+                categoryPercentage: 0.6,
             },
         ]
     };
@@ -200,6 +206,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
             },
             y1: {
                 min: 0,
+                max: 10,
                 position: 'right',
                 title: {
                     display: true,
@@ -236,7 +243,7 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
 
     return (
         <div className="h-[280px] relative w-full">
-            <Chart data={chartData} options={options} />
+            <Chart type='bar' data={chartData} options={options} />
         </div>
     );
 };
