@@ -65,6 +65,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      console.log("TypeBox onChange:", {
+        eventType: event.type,
+        targetValue: event.target.value
+      });
+
       if (disabled) {
         return;
       }
@@ -231,7 +236,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
             onClick={resetCursorToEnd}
             id="type-box"
             className="w-full min-h-full outline-none typebox absolute top-0 left-0 bg-transparent text-transparent resize-none"
-            autoCorrect="false"
             autoCapitalize="none"
             autoComplete="off"
             spellCheck={false}
