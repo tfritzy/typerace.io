@@ -11,7 +11,7 @@ export const Header = ({ hideAvatar = false }: HeaderProps) => {
     return (
         <div className="w-full px-4 py-4">
             <div className="content-container flex justify-between items-center gap-2">
-                <button className="logo logo-mobile" onClick={() => navigate("/")}>
+                <button className="logo" onClick={() => navigate("/")}>
                     <span className="logo-text">Type</span>
                     <span className="logo-accent">Race</span>
                     <span className="logo-io">.io</span>
