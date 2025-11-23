@@ -13,6 +13,7 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { getRandomStartupPhrase } from "../utils/modes";
 import { useFindGame } from "../hooks/useFindGame";
+import { useScreenHeight } from "../hooks/useScreenHeight";
 
 export const LobbyPage = () => {
   const [selectedMode, setSelectedMode] = useState<GameMode>({
@@ -21,6 +22,7 @@ export const LobbyPage = () => {
   const [gameType, setGameType] = useState<GameTypeValue>("Public");
   const typeBoxRef = useRef<TypeBoxRef>(null);
   const { findGame } = useFindGame();
+  const { isLimitedHeight } = useScreenHeight();
 
   const startupPhrase = useMemo(() => {
     return getRandomStartupPhrase(selectedMode.tag);
@@ -49,14 +51,22 @@ export const LobbyPage = () => {
         <div className="p-4">
           <div className="content-container">
             <MatchTypeSelector gameType={gameType} setGameType={setGameType} />
-            <ModeSelector
-              selectedMode={selectedMode}
-              onModeSelect={setSelectedMode}
-            />
+            {!isLimitedHeight && (
+              <ModeSelector
+                selectedMode={selectedMode}
+                onModeSelect={setSelectedMode}
+              />
+            )}
           </div>
         </div>
         <Footer />
       </div>
+      {isLimitedHeight && (
+        <ModeSelector
+          selectedMode={selectedMode}
+          onModeSelect={setSelectedMode}
+        />
+      )}
     </div>
   );
 };
