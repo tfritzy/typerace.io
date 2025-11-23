@@ -90,7 +90,7 @@ public partial struct GameModeCount
     public GameType GameType;
     public GameMode GameMode;
     public int FinishedGames;
-    public int FinishedHumanCount;
+    public int NonLonelyGames;
     public int StartedGames;
     public double TotalWpm;
     public double MinWpm;
@@ -309,6 +309,7 @@ public static partial class Module
         [PrimaryKey]
         public string Date;
         public List<GameModeCount> Stats;
+        public GameModeCount Total;
     }
 
     [Table(Name = "playerprogress", Public = true)]
@@ -1166,14 +1167,28 @@ public static partial class Module
 
         var existingStats = ctx.Db.globalstats.Date.Find(dateKey);
         List<GameModeCount> statsList;
+        GameModeCount total;
 
         if (existingStats == null)
         {
             statsList = new List<GameModeCount>();
+            total = new GameModeCount
+            {
+                GameType = GameType.Public,
+                GameMode = GameMode.English500,
+                FinishedGames = 0,
+                NonLonelyGames = 0,
+                StartedGames = 0,
+                TotalWpm = 0,
+                MinWpm = double.MaxValue,
+                MaxWpm = 0,
+                GameCount = 0
+            };
         }
         else
         {
             statsList = existingStats.Value.Stats;
+            total = existingStats.Value.Total;
         }
 
         GameModeCount? existingCount = null;
@@ -1196,7 +1211,7 @@ public static partial class Module
                 GameType = game.GameType,
                 GameMode = game.GameMode,
                 FinishedGames = 0,
-                FinishedHumanCount = 0,
+                NonLonelyGames = 0,
                 StartedGames = 0,
                 TotalWpm = 0,
                 MinWpm = double.MaxValue,
@@ -1210,6 +1225,7 @@ public static partial class Module
         }
 
         count.StartedGames++;
+        total.StartedGames++;
 
         var hasFinishedPlayers = false;
         var finishedHumanCount = 0;
@@ -1227,6 +1243,9 @@ public static partial class Module
                     {
                         count.TotalWpm += wpm;
                         count.GameCount++;
+                        total.TotalWpm += wpm;
+                        total.GameCount++;
+                        
                         if (wpm < count.MinWpm)
                         {
                             count.MinWpm = wpm;
@@ -1234,6 +1253,15 @@ public static partial class Module
                         if (wpm > count.MaxWpm)
                         {
                             count.MaxWpm = wpm;
+                        }
+                        
+                        if (wpm < total.MinWpm)
+                        {
+                            total.MinWpm = wpm;
+                        }
+                        if (wpm > total.MaxWpm)
+                        {
+                            total.MaxWpm = wpm;
                         }
                     }
                 }
@@ -1243,12 +1271,23 @@ public static partial class Module
         if (hasFinishedPlayers)
         {
             count.FinishedGames++;
-            count.FinishedHumanCount += finishedHumanCount;
+            total.FinishedGames++;
+            
+            if (finishedHumanCount > 1)
+            {
+                count.NonLonelyGames++;
+                total.NonLonelyGames++;
+            }
         }
 
         if (count.GameCount == 0)
         {
             count.MinWpm = 0;
+        }
+        
+        if (total.GameCount == 0)
+        {
+            total.MinWpm = 0;
         }
 
         if (existingIndex >= 0)
@@ -1265,7 +1304,8 @@ public static partial class Module
             ctx.Db.globalstats.Insert(new GlobalStats
             {
                 Date = dateKey,
-                Stats = statsList
+                Stats = statsList,
+                Total = total
             });
         }
         else
@@ -1273,7 +1313,8 @@ public static partial class Module
             ctx.Db.globalstats.Date.Update(new GlobalStats
             {
                 Date = dateKey,
-                Stats = statsList
+                Stats = statsList,
+                Total = total
             });
         }
 
