@@ -1,8 +1,9 @@
-import { useTable } from "spacetimedb/react";
-import { useState } from "react";
+import { useSpacetimeDB, useTable } from "spacetimedb/react";
+import { useEffect, useState } from "react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import type { DbConnection } from "../../module_bindings";
+import type { ErrorContextInterface } from "spacetimedb/sdk";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -53,8 +54,23 @@ interface GlobalStats {
 }
 
 export const SiteStatsPage = () => {
+    const conn = useSpacetimeDB<DbConnection>();
     const { rows: globalStatsRows } = useTable<DbConnection, GlobalStats>("globalstats");
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('1month');
+
+    useEffect(() => {
+        if (!conn) return;
+
+        const globalStatsSubscription = conn.subscriptionBuilder()
+            .onError((error: ErrorContextInterface) => {
+                console.error("Error subscribing to globalstats:", error);
+            })
+            .subscribe(`select * from globalstats`);
+
+        return () => {
+            globalStatsSubscription.unsubscribe();
+        };
+    }, [conn]);
 
     const globalStats = globalStatsRows || [];
 
