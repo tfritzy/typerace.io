@@ -3,6 +3,7 @@ import { LobbyPage } from "./pages/LobbyPage";
 import { GamePage } from "./pages/GamePage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
+import { SiteStatsPage } from "./pages/SiteStatsPage";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/game/:gameId" element={<GamePage />} />
         <Route path="/profile/:playerId" element={<ProfilePage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/stats" element={<SiteStatsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
