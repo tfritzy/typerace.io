@@ -55,6 +55,7 @@ export const LobbyPage = () => {
               <ModeSelector
                 selectedMode={selectedMode}
                 onModeSelect={setSelectedMode}
+                isLimitedHeight={isLimitedHeight}
               />
             )}
           </div>
@@ -65,6 +66,7 @@ export const LobbyPage = () => {
         <ModeSelector
           selectedMode={selectedMode}
           onModeSelect={setSelectedMode}
+          isLimitedHeight={isLimitedHeight}
         />
       )}
     </div>

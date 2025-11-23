@@ -1,15 +1,16 @@
 import { useState } from "react";
 import "../components/SelectionButton.css";
 import { GameMode } from "../../module_bindings";
-import { useScreenHeight } from "../hooks/useScreenHeight";
 
 interface ModeSelectorProps {
     selectedMode: GameMode;
     onModeSelect: (mode: GameMode) => void;
+    isLimitedHeight?: boolean;
 }
 
-export function ModeSelector({ selectedMode, onModeSelect }: ModeSelectorProps) {
-    const { isLimitedHeight } = useScreenHeight();
+const DRAWER_HANDLE_HEIGHT = 80;
+
+export function ModeSelector({ selectedMode, onModeSelect, isLimitedHeight = false }: ModeSelectorProps) {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const modes = [
@@ -69,10 +70,11 @@ export function ModeSelector({ selectedMode, onModeSelect }: ModeSelectorProps) 
             )}
             <div
                 className={`fixed left-0 right-0 z-50 transition-transform duration-300 ${
-                    isExpanded ? "bottom-0" : "-bottom-[calc(100%-80px)]"
+                    isExpanded ? "bottom-0" : ""
                 }`}
                 style={{
                     maxHeight: "80vh",
+                    transform: isExpanded ? "translateY(0)" : `translateY(calc(100% - ${DRAWER_HANDLE_HEIGHT}px))`,
                 }}
             >
                 <div
