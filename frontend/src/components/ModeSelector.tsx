@@ -71,9 +71,7 @@ export function ModeSelector({ selectedMode, onModeSelect, isLimitedHeight = fal
                 />
             )}
             <div
-                className={`fixed left-0 right-0 z-50 transition-transform duration-300 ${
-                    isExpanded ? "bottom-0" : ""
-                }`}
+                className="fixed left-0 right-0 bottom-0 z-50 transition-transform duration-300"
                 style={{
                     maxHeight: `${DRAWER_MAX_HEIGHT_VH}vh`,
                     transform: isExpanded ? "translateY(0)" : `translateY(calc(100% - ${DRAWER_HANDLE_HEIGHT}px))`,
