@@ -307,37 +307,39 @@ export const ProfilePage = () => {
                     </div>
 
                     <div>
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-white text-2xl font-bold m-0">
-                                Performance History
-                            </h2>
+                        <div className="overflow-x-auto mb-6">
+                            <div className="flex justify-between items-center min-w-max">
+                                <h2 className="text-white text-2xl font-bold m-0 mr-3">
+                                    Performance History
+                                </h2>
 
-                            <div className="flex gap-3 items-center">
-                                <Select
-                                    label="Mode"
-                                    value={selectedMode}
-                                    onChange={setSelectedMode}
-                                    options={[
-                                        { value: 'all', label: 'All Modes' },
-                                        ...availableModes.map(mode => ({
-                                            value: mode,
-                                            label: mode.replace(/(\d+)/, ' $1')
-                                        }))
-                                    ]}
-                                />
+                                <div className="flex gap-3 items-center">
+                                    <Select
+                                        label="Mode"
+                                        value={selectedMode}
+                                        onChange={setSelectedMode}
+                                        options={[
+                                            { value: 'all', label: 'All Modes' },
+                                            ...availableModes.map(mode => ({
+                                                value: mode,
+                                                label: mode.replace(/(\d+)/, ' $1')
+                                            }))
+                                        ]}
+                                    />
 
-                                <Select
-                                    label="Time Frame"
-                                    value={selectedTimeFrame}
-                                    onChange={(value) => setSelectedTimeFrame(value as TimeFrame)}
-                                    options={[
-                                        { value: 'all', label: 'All Time' },
-                                        { value: 'today', label: 'Today' },
-                                        { value: 'week', label: 'Last Week' },
-                                        { value: 'month', label: 'Last Month' },
-                                        { value: '3months', label: 'Last 3 Months' }
-                                    ]}
-                                />
+                                    <Select
+                                        label="Time Frame"
+                                        value={selectedTimeFrame}
+                                        onChange={(value) => setSelectedTimeFrame(value as TimeFrame)}
+                                        options={[
+                                            { value: 'all', label: 'All Time' },
+                                            { value: 'today', label: 'Today' },
+                                            { value: 'week', label: 'Last Week' },
+                                            { value: 'month', label: 'Last Month' },
+                                            { value: '3months', label: 'Last 3 Months' }
+                                        ]}
+                                    />
+                                </div>
                             </div>
                         </div>
 

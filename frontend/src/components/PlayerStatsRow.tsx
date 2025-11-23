@@ -22,8 +22,9 @@ export const PlayerStatsRow = ({
     const isHighWpm = finalWpm >= 100;
 
     return (
-        <div className="flex gap-3 mb-3 items-stretch min-h-[100px]">
-            <div className="flex-1 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
+        <div className="overflow-x-auto mb-3">
+            <div className="flex gap-3 items-stretch min-h-[100px] min-w-max">
+                <div className="flex-1 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 min-w-[120px]" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
                 <div
                     className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
                     style={{ color: isHighWpm ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
@@ -38,48 +39,49 @@ export const PlayerStatsRow = ({
                 </div>
             </div>
 
-            <div className="flex-1 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
-                <div
-                    className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
-                    style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
-                >
-                    Time
+                <div className="flex-1 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 min-w-[120px]" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
+                    <div
+                        className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
+                        style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
+                    >
+                        Time
+                    </div>
+                    <div
+                        className="text-4xl font-bold font-mono leading-none tracking-[0.02em]"
+                        style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)' }}
+                    >
+                        {formatStopwatchTime(raceTime)}
+                    </div>
                 </div>
-                <div
-                    className="text-4xl font-bold font-mono leading-none tracking-[0.02em]"
-                    style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)' }}
-                >
-                    {formatStopwatchTime(raceTime)}
-                </div>
-            </div>
 
-            <div className="flex-1 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
-                <div
-                    className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
-                    style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
-                >
-                    Place
+                <div className="flex-1 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 min-w-[120px]" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
+                    <div
+                        className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
+                        style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
+                    >
+                        Place
+                    </div>
+                    <div
+                        className="text-4xl font-bold leading-none"
+                        style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)' }}
+                    >
+                        {getOrdinalPlacement(placement)}
+                    </div>
                 </div>
-                <div
-                    className="text-4xl font-bold leading-none"
-                    style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)' }}
-                >
-                    {getOrdinalPlacement(placement)}
-                </div>
-            </div>
 
-            <div className="flex-1 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
-                <div
-                    className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
-                    style={{ color: isPerfectAccuracy ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
-                >
-                    Accuracy
-                </div>
-                <div
-                    className="text-4xl font-bold leading-none"
-                    style={{ color: isPerfectAccuracy ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)' }}
-                >
-                    {Math.round(accuracy)}%
+                <div className="flex-1 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 min-w-[120px]" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
+                    <div
+                        className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
+                        style={{ color: isPerfectAccuracy ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
+                    >
+                        Accuracy
+                    </div>
+                    <div
+                        className="text-4xl font-bold leading-none"
+                        style={{ color: isPerfectAccuracy ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)' }}
+                    >
+                        {Math.round(accuracy)}%
+                    </div>
                 </div>
             </div>
         </div>
