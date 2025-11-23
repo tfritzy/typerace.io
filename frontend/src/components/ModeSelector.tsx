@@ -9,7 +9,7 @@ interface ModeSelectorProps {
 }
 
 const DRAWER_HANDLE_HEIGHT = 80;
-const DRAWER_MAX_HEIGHT_VH = 80;
+const DRAWER_MAX_HEIGHT_PERCENT = 80;
 const DRAWER_SHADOW = "0 -4px 20px rgba(0, 0, 0, 0.5)";
 
 export function ModeSelector({ selectedMode, onModeSelect, isLimitedHeight = false }: ModeSelectorProps) {
@@ -73,7 +73,7 @@ export function ModeSelector({ selectedMode, onModeSelect, isLimitedHeight = fal
             <div
                 className="fixed left-0 right-0 bottom-0 z-50 transition-transform duration-300"
                 style={{
-                    maxHeight: `${DRAWER_MAX_HEIGHT_VH}vh`,
+                    maxHeight: `${DRAWER_MAX_HEIGHT_PERCENT}vh`,
                     transform: isExpanded ? "translateY(0)" : `translateY(calc(100% - ${DRAWER_HANDLE_HEIGHT}px))`,
                 }}
             >
@@ -105,7 +105,7 @@ export function ModeSelector({ selectedMode, onModeSelect, isLimitedHeight = fal
                             </svg>
                         </div>
                     </button>
-                    <div className="overflow-y-auto px-6 pb-6" style={{ maxHeight: `calc(${DRAWER_MAX_HEIGHT_VH}vh - ${DRAWER_HANDLE_HEIGHT}px)` }}>
+                    <div className="overflow-y-auto px-6 pb-6" style={{ maxHeight: `calc(${DRAWER_MAX_HEIGHT_PERCENT}vh - ${DRAWER_HANDLE_HEIGHT}px)` }}>
                         <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
                             {modes.map((modeOption) => (
                                 <button
