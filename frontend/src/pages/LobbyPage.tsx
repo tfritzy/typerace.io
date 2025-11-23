@@ -4,11 +4,7 @@ import type {
   GameMode,
 } from "../../module_bindings";
 import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
-import { ModeSelector } from "../components/ModeSelector";
-import {
-  MatchTypeSelector,
-  type GameTypeValue,
-} from "../components/MatchTypeSelector";
+import { GameOptionsSelector, type GameTypeValue } from "../components/ModeSelector";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { getRandomStartupPhrase } from "../utils/modes";
@@ -46,12 +42,13 @@ export const LobbyPage = () => {
         </div>
       </div>
       <div className="fixed bottom-0 left-0 right-0">
-        <div className="p-4">
+        <div className="px-4">
           <div className="content-container">
-            <MatchTypeSelector gameType={gameType} setGameType={setGameType} />
-            <ModeSelector
+            <GameOptionsSelector
               selectedMode={selectedMode}
               onModeSelect={setSelectedMode}
+              gameType={gameType}
+              setGameType={setGameType}
             />
           </div>
         </div>
