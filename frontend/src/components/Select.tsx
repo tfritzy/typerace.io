@@ -14,7 +14,7 @@ export const Select = ({ value, onChange, options, label, className = '' }: Sele
                     {label}
                 </label>
             )}
-            <div className="relative min-w-[150px]">
+            <div className="relative w-full sm:min-w-[150px]">
                 <select
                     value={value}
                     onChange={(e) => onChange(e.target.value)}

@@ -307,12 +307,12 @@ export const ProfilePage = () => {
                     </div>
 
                     <div>
-                        <div className="flex justify-between items-center mb-6">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
                             <h2 className="text-white text-2xl font-bold m-0">
                                 Performance History
                             </h2>
 
-                            <div className="flex gap-3 items-center">
+                            <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
                                 <Select
                                     label="Mode"
                                     value={selectedMode}
