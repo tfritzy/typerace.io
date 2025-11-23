@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 export const HEIGHT_THRESHOLD = 700;
 
 export function useScreenHeight() {
-  const [isLimitedHeight, setIsLimitedHeight] = useState(() => window.innerHeight < HEIGHT_THRESHOLD);
+  const [isLimitedHeight, setIsLimitedHeight] = useState(false);
 
   useEffect(() => {
     const checkHeight = () => {
