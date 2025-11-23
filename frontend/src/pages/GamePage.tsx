@@ -209,7 +209,7 @@ export const GamePage = () => {
               const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;
 
               return (
-                <div className="w-full animate-slideUpFadeIn">
+                <div className="w-full animate-slideUpFadeIn pb-4">
                   {currentPP && (
                     <PlayerStatsRow
                       playerProgress={currentPP}

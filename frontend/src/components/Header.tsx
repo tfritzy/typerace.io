@@ -9,7 +9,7 @@ export const Header = ({ hideAvatar = false }: HeaderProps) => {
     const navigate = useNavigate();
 
     return (
-        <div className="w-full px-4 py-4">
+        <div className="w-full px-4">
             <div className="content-container flex justify-between items-center">
                 <button className="logo" onClick={() => navigate("/")}>
                     <span className="logo-text">Type</span>

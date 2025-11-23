@@ -27,6 +27,16 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
   const phraseRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  React.useEffect(() => {
+    if (targetRef.current && focused && !isComplete) {
+      targetRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center"
+      });
+    }
+  }, [input.length, focused, isComplete]);
+
   useImperativeHandle(ref, () => ({
     focus: () => {
       inputRef.current?.focus();

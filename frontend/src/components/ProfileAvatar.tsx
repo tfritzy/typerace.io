@@ -144,7 +144,7 @@ export const ProfileAvatar = () => {
                         )}
                     </div>
 
-                    <div className="flex flex-col items-start gap-1.5 min-w-50">
+                    <div className="hidden sm:flex flex-col items-start gap-1.5 min-w-50">
                         <div className="text-sm font-semibold text-white/70">{name}</div>
                         <div className="flex items-center gap-2 w-full">
                             <span className="text-xs font-medium text-white/30">Lvl 1</span>
@@ -227,7 +227,7 @@ export const ProfileAvatar = () => {
                 )}
             </div>
 
-            <div className="flex flex-col items-start gap-1 min-w-50">
+            <div className="hidden sm:flex flex-col items-start gap-1 min-w-50">
                 <div className="text-sm font-semibold text-white">{name}</div>
                 <div className="flex items-center gap-2 w-full">
                     <span className="text-xs font-medium text-white/60">Lvl {level}</span>
