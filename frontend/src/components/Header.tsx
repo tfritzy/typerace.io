@@ -10,13 +10,13 @@ export const Header = ({ hideAvatar = false }: HeaderProps) => {
 
     return (
         <div className="w-full px-4 py-4">
-            <div className="content-container flex justify-between items-center">
-                <button className="logo" onClick={() => navigate("/")}>
+            <div className="content-container flex justify-between items-center gap-2">
+                <button className="logo logo-mobile" onClick={() => navigate("/")}>
                     <span className="logo-text">Type</span>
                     <span className="logo-accent">Race</span>
                     <span className="logo-io">.io</span>
                 </button>
-                <div className={hideAvatar ? "invisible" : ""}>
+                <div className={hideAvatar ? "invisible" : "flex-shrink-0"}>
                     <ProfileAvatar />
                 </div>
             </div>

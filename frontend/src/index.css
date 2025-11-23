@@ -200,6 +200,7 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
+  flex-shrink: 0;
 }
 
 .logo:hover {
@@ -241,4 +242,14 @@ body {
   font-weight: 600;
   font-style: normal;
   margin-left: -0.05rem;
+}
+
+@media (max-width: 640px) {
+  .logo {
+    font-size: 1.35rem;
+  }
+  
+  .logo-io {
+    font-size: 0.95rem;
+  }
 }
