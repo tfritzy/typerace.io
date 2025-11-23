@@ -1234,7 +1234,7 @@ public static partial class Module
             if (progress.Placement > 0)
             {
                 hasFinishedPlayers = true;
-                
+
                 if (!progress.IsBot)
                 {
                     finishedHumanCount++;
@@ -1245,7 +1245,7 @@ public static partial class Module
                         count.GameCount++;
                         total.TotalWpm += wpm;
                         total.GameCount++;
-                        
+
                         if (wpm < count.MinWpm)
                         {
                             count.MinWpm = wpm;
@@ -1254,7 +1254,7 @@ public static partial class Module
                         {
                             count.MaxWpm = wpm;
                         }
-                        
+
                         if (wpm < total.MinWpm)
                         {
                             total.MinWpm = wpm;
@@ -1284,7 +1284,7 @@ public static partial class Module
         {
             count.MinWpm = 0;
         }
-        
+
         if (total.GameCount == 0)
         {
             total.MinWpm = 0;
