@@ -15,9 +15,7 @@ const Root = () => {
   const [authLoaded, setAuthLoaded] = useState(false);
 
   useEffect(() => {
-    if (import.meta.env.DEV) {
-      eruda.init();
-    }
+    eruda.init();
   }, []);
 
   useEffect(() => {
