@@ -266,14 +266,14 @@ export const ProfilePage = () => {
                                                     }}
                                                 />
                                             </div>
-                                            <span className="text-white/60 text-sm font-medium">
-                                                Level {viewedPlayer.level + 1}
+                                            <span className="text-white/60 text-sm font-mono">
+                                                {viewedPlayer.xp}/{viewedPlayer.xpRequiredForNextLevel}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-2 gap-4 mt-8">
                                     <div className="bg-black/5 border border-white/8 rounded-lg p-5">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
