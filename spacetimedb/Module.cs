@@ -156,6 +156,7 @@ public static partial class Module
         public int Xp;
         public int XpRequiredForNextLevel;
         public int TotalWordsTyped;
+        public long TotalTimeMs;
         [SpacetimeDB.Index.BTree]
         public bool IsBot;
         public BotConfig? BotConfig;
@@ -387,6 +388,7 @@ public static partial class Module
                 Xp = 0,
                 XpRequiredForNextLevel = XpRequiredForLevel(2),
                 TotalWordsTyped = 0,
+                TotalTimeMs = 0,
                 IsBot = true,
                 BotConfig = new BotConfig
                 {
@@ -453,6 +455,7 @@ public static partial class Module
                 Xp = 0,
                 XpRequiredForNextLevel = XpRequiredForLevel(2),
                 TotalWordsTyped = 0,
+                TotalTimeMs = 0,
                 IsBot = false,
                 BotConfig = null,
                 Color = PlayerColor.Amber,
@@ -1378,7 +1381,7 @@ public static partial class Module
 
         var updatedPlayer = player.Value;
         var xpGained = AwardXpForGame(ctx, ref updatedPlayer, progress, game, placement, wordsTyped);
-        UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped);
+        UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped, timeElapsed);
         LevelUpPlayer(ref updatedPlayer);
         ctx.Db.player.Id.Update(updatedPlayer);
 
@@ -1413,7 +1416,7 @@ public static partial class Module
         Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}, typed {wordsTyped} words");
     }
 
-    private static void UpdatePlayerStats(ref Player player, int placement, int wordsTyped)
+    private static void UpdatePlayerStats(ref Player player, int placement, int wordsTyped, long timeElapsed)
     {
         player.TotalGames += 1;
         if (placement == 1)
@@ -1421,6 +1424,7 @@ public static partial class Module
             player.Wins += 1;
         }
         player.TotalWordsTyped += wordsTyped;
+        player.TotalTimeMs += timeElapsed / 1000;
     }
 
     private static void LevelUpPlayer(ref Player player)
