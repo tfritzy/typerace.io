@@ -156,6 +156,7 @@ public static partial class Module
         public int Xp;
         public int XpRequiredForNextLevel;
         public int TotalWordsTyped;
+        public long TotalTimeSpentMs;
         [SpacetimeDB.Index.BTree]
         public bool IsBot;
         public BotConfig? BotConfig;
@@ -387,6 +388,7 @@ public static partial class Module
                 Xp = 0,
                 XpRequiredForNextLevel = XpRequiredForLevel(2),
                 TotalWordsTyped = 0,
+                TotalTimeSpentMs = 0,
                 IsBot = true,
                 BotConfig = new BotConfig
                 {
@@ -453,6 +455,7 @@ public static partial class Module
                 Xp = 0,
                 XpRequiredForNextLevel = XpRequiredForLevel(2),
                 TotalWordsTyped = 0,
+                TotalTimeSpentMs = 0,
                 IsBot = false,
                 BotConfig = null,
                 Color = PlayerColor.Amber,
@@ -1272,7 +1275,7 @@ public static partial class Module
         {
             count.FinishedGames++;
             total.FinishedGames++;
-            
+
             if (finishedHumanCount > 1)
             {
                 count.NonLonelyGames++;
@@ -1378,7 +1381,7 @@ public static partial class Module
 
         var updatedPlayer = player.Value;
         var xpGained = AwardXpForGame(ctx, ref updatedPlayer, progress, game, placement, wordsTyped);
-        UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped);
+        UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped, timeElapsed / 1000);
         LevelUpPlayer(ref updatedPlayer);
         ctx.Db.player.Id.Update(updatedPlayer);
 
@@ -1413,7 +1416,7 @@ public static partial class Module
         Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}, typed {wordsTyped} words");
     }
 
-    private static void UpdatePlayerStats(ref Player player, int placement, int wordsTyped)
+    private static void UpdatePlayerStats(ref Player player, int placement, int wordsTyped, long timeElapsedMs)
     {
         player.TotalGames += 1;
         if (placement == 1)
@@ -1421,6 +1424,7 @@ public static partial class Module
             player.Wins += 1;
         }
         player.TotalWordsTyped += wordsTyped;
+        player.TotalTimeSpentMs += timeElapsedMs;
     }
 
     private static void LevelUpPlayer(ref Player player)
@@ -1479,13 +1483,13 @@ public static partial class Module
 
         var totalPlayers = ctx.Db.playerprogress.GameId.Filter(game.Id).Count();
         var (baseXp, placementMultiplier, accuracyMultiplier, accuracy, xpBeforeBonus) = CalculateXpBreakdown(wordsTyped, placement, progress);
-        
+
         if (totalPlayers <= 2)
         {
             placementMultiplier = 1.0;
             xpBeforeBonus = (int)(baseXp * placementMultiplier * accuracyMultiplier);
         }
-        
+
         var xpEarned = xpBeforeBonus;
 
         var multipliers = new List<XpMultiplier>

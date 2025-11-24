@@ -1,7 +1,6 @@
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import { useEffect, useState } from "react";
 import { Header } from "../components/Header";
-import { Footer } from "../components/Footer";
 import type { DbConnection } from "../../module_bindings";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import {
@@ -295,8 +294,8 @@ export const SiteStatsPage = () => {
                                     key={timeFrame}
                                     onClick={() => setSelectedTimeFrame(timeFrame)}
                                     className={`px-4 py-2 rounded-lg transition-all ${selectedTimeFrame === timeFrame
-                                            ? 'bg-amber-400 text-black font-semibold'
-                                            : 'bg-white/5 text-white/80 hover:bg-white/10'
+                                        ? 'bg-amber-400 text-black font-semibold'
+                                        : 'bg-white/5 text-white/80 hover:bg-white/10'
                                         }`}
                                 >
                                     {timeFrame === '1month' ? '1 Month' :
@@ -349,7 +348,6 @@ export const SiteStatsPage = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };
