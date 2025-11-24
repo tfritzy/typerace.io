@@ -167,16 +167,29 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
 
   const renderText = () => {
     const chars = phrase.split("");
+    
+    let currentWordStart = 0;
+    for (let i = input.length - 1; i >= 0; i--) {
+      if (phrase[i] === ' ') {
+        currentWordStart = i + 1;
+        break;
+      }
+    }
+    
     return chars.map((char, i) => {
       const isTyped = i < input.length;
       const isCorrect = input[i] === char;
       const isCursor = i === input.length;
+      const isInCompletedWord = isTyped && isCorrect && i < currentWordStart;
+      const isInCurrentWord = i >= currentWordStart && i < input.length;
 
       const style: React.CSSProperties = {};
-      if (isTyped && isCorrect) {
-        style.color = "var(--color-white)";
-      } else if (isTyped && !isCorrect) {
+      if (isTyped && !isCorrect) {
         style.color = "var(--color-error)";
+      } else if (isInCompletedWord) {
+        style.color = "rgba(255, 255, 255, 0.25)";
+      } else if (isInCurrentWord && isCorrect) {
+        style.color = "var(--color-white)";
       } else {
         style.color = "rgba(255, 255, 255, 0.35)";
       }
