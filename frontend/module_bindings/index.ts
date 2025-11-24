@@ -33,6 +33,8 @@ import {
 // Import and reexport all reducer arg types
 import { ArchiveOldGames } from "./archive_old_games_reducer.ts";
 export { ArchiveOldGames };
+import { CleanupOldXpGains } from "./cleanup_old_xp_gains_reducer.ts";
+export { CleanupOldXpGains };
 import { ClientConnected } from "./client_connected_reducer.ts";
 export { ClientConnected };
 import { ClientDisconnected } from "./client_disconnected_reducer.ts";
@@ -73,12 +75,16 @@ import { GameArchiverTableHandle } from "./game_archiver_table.ts";
 export { GameArchiverTableHandle };
 import { GameStartTableHandle } from "./game_start_table.ts";
 export { GameStartTableHandle };
+import { XpGainCleanerTableHandle } from "./xp_gain_cleaner_table.ts";
+export { XpGainCleanerTableHandle };
 import { EloTableHandle } from "./elo_table.ts";
 export { EloTableHandle };
 import { GameTableHandle } from "./game_table.ts";
 export { GameTableHandle };
 import { GamerecordTableHandle } from "./gamerecord_table.ts";
 export { GamerecordTableHandle };
+import { GlobalstatsTableHandle } from "./globalstats_table.ts";
+export { GlobalstatsTableHandle };
 import { PersonalrecordTableHandle } from "./personalrecord_table.ts";
 export { PersonalrecordTableHandle };
 import { PlayerTableHandle } from "./player_table.ts";
@@ -107,6 +113,8 @@ import { GameArchiver } from "./game_archiver_type.ts";
 export { GameArchiver };
 import { GameMode } from "./game_mode_type.ts";
 export { GameMode };
+import { GameModeCount } from "./game_mode_count_type.ts";
+export { GameModeCount };
 import { GameRecord } from "./game_record_type.ts";
 export { GameRecord };
 import { GameStart } from "./game_start_type.ts";
@@ -115,6 +123,8 @@ import { GameState } from "./game_state_type.ts";
 export { GameState };
 import { GameType } from "./game_type_type.ts";
 export { GameType };
+import { GlobalStats } from "./global_stats_type.ts";
+export { GlobalStats };
 import { PersonalRecord } from "./personal_record_type.ts";
 export { PersonalRecord };
 import { Player } from "./player_type.ts";
@@ -125,6 +135,8 @@ import { PlayerProgress } from "./player_progress_type.ts";
 export { PlayerProgress };
 import { XpGain } from "./xp_gain_type.ts";
 export { XpGain };
+import { XpGainCleaner } from "./xp_gain_cleaner_type.ts";
+export { XpGainCleaner };
 import { XpMultiplier } from "./xp_multiplier_type.ts";
 export { XpMultiplier };
 
@@ -175,6 +187,15 @@ const REMOTE_MODULE = {
         colType: (GameStart.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
       },
     },
+    XpGainCleaner: {
+      tableName: "XpGainCleaner" as const,
+      rowType: XpGainCleaner.getTypeScriptAlgebraicType(),
+      primaryKey: "scheduledId",
+      primaryKeyInfo: {
+        colName: "scheduledId",
+        colType: (XpGainCleaner.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
+      },
+    },
     elo: {
       tableName: "elo" as const,
       rowType: Elo.getTypeScriptAlgebraicType(),
@@ -200,6 +221,15 @@ const REMOTE_MODULE = {
       primaryKeyInfo: {
         colName: "id",
         colType: (GameRecord.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
+      },
+    },
+    globalstats: {
+      tableName: "globalstats" as const,
+      rowType: GlobalStats.getTypeScriptAlgebraicType(),
+      primaryKey: "date",
+      primaryKeyInfo: {
+        colName: "date",
+        colType: (GlobalStats.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
       },
     },
     personalrecord: {
@@ -243,6 +273,10 @@ const REMOTE_MODULE = {
     ArchiveOldGames: {
       reducerName: "ArchiveOldGames",
       argsType: ArchiveOldGames.getTypeScriptAlgebraicType(),
+    },
+    CleanupOldXpGains: {
+      reducerName: "CleanupOldXpGains",
+      argsType: CleanupOldXpGains.getTypeScriptAlgebraicType(),
     },
     ClientConnected: {
       reducerName: "ClientConnected",
@@ -331,6 +365,7 @@ const REMOTE_MODULE = {
 // A type representing all the possible variants of a reducer.
 export type Reducer = never
 | { name: "ArchiveOldGames", args: ArchiveOldGames }
+| { name: "CleanupOldXpGains", args: CleanupOldXpGains }
 | { name: "ClientConnected", args: ClientConnected }
 | { name: "ClientDisconnected", args: ClientDisconnected }
 | { name: "FillGameWithBots", args: FillGameWithBots }
@@ -364,6 +399,22 @@ export class RemoteReducers {
 
   removeOnArchiveOldGames(callback: (ctx: ReducerEventContext, args: GameArchiver) => void) {
     this.connection.offReducer("ArchiveOldGames", callback);
+  }
+
+  cleanupOldXpGains(args: XpGainCleaner) {
+    const __args = { args };
+    let __writer = new __BinaryWriter(1024);
+    CleanupOldXpGains.serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("CleanupOldXpGains", __argsBuffer, this.setCallReducerFlags.cleanupOldXpGainsFlags);
+  }
+
+  onCleanupOldXpGains(callback: (ctx: ReducerEventContext, args: XpGainCleaner) => void) {
+    this.connection.onReducer("CleanupOldXpGains", callback);
+  }
+
+  removeOnCleanupOldXpGains(callback: (ctx: ReducerEventContext, args: XpGainCleaner) => void) {
+    this.connection.offReducer("CleanupOldXpGains", callback);
   }
 
   onClientConnected(callback: (ctx: ReducerEventContext) => void) {
@@ -582,6 +633,11 @@ export class SetReducerFlags {
     this.archiveOldGamesFlags = flags;
   }
 
+  cleanupOldXpGainsFlags: __CallReducerFlags = 'FullUpdate';
+  cleanupOldXpGains(flags: __CallReducerFlags) {
+    this.cleanupOldXpGainsFlags = flags;
+  }
+
   fillGameWithBotsFlags: __CallReducerFlags = 'FullUpdate';
   fillGameWithBots(flags: __CallReducerFlags) {
     this.fillGameWithBotsFlags = flags;
@@ -672,6 +728,11 @@ export class RemoteTables {
     return new GameStartTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<GameStart>(REMOTE_MODULE.tables.GameStart));
   }
 
+  get xpGainCleaner(): XpGainCleanerTableHandle<'XpGainCleaner'> {
+    // clientCache is a private property
+    return new XpGainCleanerTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<XpGainCleaner>(REMOTE_MODULE.tables.XpGainCleaner));
+  }
+
   get elo(): EloTableHandle<'elo'> {
     // clientCache is a private property
     return new EloTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<Elo>(REMOTE_MODULE.tables.elo));
@@ -685,6 +746,11 @@ export class RemoteTables {
   get gamerecord(): GamerecordTableHandle<'gamerecord'> {
     // clientCache is a private property
     return new GamerecordTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<GameRecord>(REMOTE_MODULE.tables.gamerecord));
+  }
+
+  get globalstats(): GlobalstatsTableHandle<'globalstats'> {
+    // clientCache is a private property
+    return new GlobalstatsTableHandle((this.connection as unknown as { clientCache: __ClientCache }).clientCache.getOrCreateTable<GlobalStats>(REMOTE_MODULE.tables.globalstats));
   }
 
   get personalrecord(): PersonalrecordTableHandle<'personalrecord'> {

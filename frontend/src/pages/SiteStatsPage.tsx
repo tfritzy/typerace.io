@@ -294,15 +294,14 @@ export const SiteStatsPage = () => {
                                 <button
                                     key={timeFrame}
                                     onClick={() => setSelectedTimeFrame(timeFrame)}
-                                    className={`px-4 py-2 rounded-lg transition-all ${
-                                        selectedTimeFrame === timeFrame
+                                    className={`px-4 py-2 rounded-lg transition-all ${selectedTimeFrame === timeFrame
                                             ? 'bg-amber-400 text-black font-semibold'
                                             : 'bg-white/5 text-white/80 hover:bg-white/10'
-                                    }`}
+                                        }`}
                                 >
                                     {timeFrame === '1month' ? '1 Month' :
-                                     timeFrame === '6months' ? '6 Months' :
-                                     timeFrame === '1year' ? '1 Year' : 'All Time'}
+                                        timeFrame === '6months' ? '6 Months' :
+                                            timeFrame === '1year' ? '1 Year' : 'All Time'}
                                 </button>
                             ))}
                         </div>
