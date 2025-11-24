@@ -80,45 +80,47 @@ export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
 
     return (
         <div className="box box-shadow rounded-xl overflow-hidden">
-            <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-white/10 text-white text-xs uppercase tracking-wider font-bold">
-                <div>Game Mode</div>
-                <div className="text-center">Type</div>
-                <div className="text-center">Placement</div>
-                <div className="text-center">Time</div>
-                <div className="text-center">WPM</div>
-                <div className="text-center">Experience</div>
-                <div className="text-right">Date</div>
+            <div className="overflow-x-auto">
+                <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-white/10 text-white text-xs uppercase tracking-wider font-bold min-w-[700px]">
+                    <div>Game Mode</div>
+                    <div className="text-center">Type</div>
+                    <div className="text-center">Placement</div>
+                    <div className="text-center">Time</div>
+                    <div className="text-center">WPM</div>
+                    <div className="text-center">Experience</div>
+                    <div className="text-right">Date</div>
+                </div>
+                {currentGames.map((gameRecord) => (
+                    <button
+                        key={gameRecord.id}
+                        onClick={() => navigate(`/game/${gameRecord.gameId}`)}
+                        className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors cursor-pointer w-full text-left bg-transparent border-0 min-w-[700px]"
+                    >
+                        <div className="text-white/70">
+                            {formatGameMode(gameRecord.gameMode.tag)}
+                        </div>
+                        <div className="text-center text-white/70">
+                            {formatGameType(gameRecord.gameType.tag)}
+                        </div>
+                        <div className="text-center text-white/70 flex items-center justify-center gap-1">
+                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" style={{ opacity: gameRecord.placement === 1 ? 1 : 0 }} />
+                            <span>{gameRecord.placement}{getPlacementSuffix(gameRecord.placement)}</span>
+                        </div>
+                        <div className="text-white/70 text-center">
+                            {formatTime(gameRecord.timeMs)}
+                        </div>
+                        <div className="text-white/70 text-center">
+                            {Math.round(gameRecord.wpm)}
+                        </div>
+                        <div className="text-white/70 text-center flex items-center justify-center gap-1">
+                            <span>{gameRecord.xpGained > 0 ? '+' : ''}{gameRecord.xpGained} xp</span>
+                        </div>
+                        <div className="text-white/60 text-right text-sm">
+                            {formatDate(gameRecord.date)}
+                        </div>
+                    </button>
+                ))}
             </div>
-            {currentGames.map((gameRecord) => (
-                <button
-                    key={gameRecord.id}
-                    onClick={() => navigate(`/game/${gameRecord.gameId}`)}
-                    className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors cursor-pointer w-full text-left bg-transparent border-0"
-                >
-                    <div className="text-white/70">
-                        {formatGameMode(gameRecord.gameMode.tag)}
-                    </div>
-                    <div className="text-center text-white/70">
-                        {formatGameType(gameRecord.gameType.tag)}
-                    </div>
-                    <div className="text-center text-white/70 flex items-center justify-center gap-1">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" style={{ opacity: gameRecord.placement === 1 ? 1 : 0 }} />
-                        <span>{gameRecord.placement}{getPlacementSuffix(gameRecord.placement)}</span>
-                    </div>
-                    <div className="text-white/70 text-center">
-                        {formatTime(gameRecord.timeMs)}
-                    </div>
-                    <div className="text-white/70 text-center">
-                        {Math.round(gameRecord.wpm)}
-                    </div>
-                    <div className="text-white/70 text-center flex items-center justify-center gap-1">
-                        <span>{gameRecord.xpGained > 0 ? '+' : ''}{gameRecord.xpGained} xp</span>
-                    </div>
-                    <div className="text-white/60 text-right text-sm">
-                        {formatDate(gameRecord.date)}
-                    </div>
-                </button>
-            ))}
             {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-2 p-4 border-t border-white/10">
                     <button
