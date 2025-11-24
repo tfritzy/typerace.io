@@ -342,40 +342,32 @@ export const SiteStatsPage = () => {
                     ))}
                 </div>
 
-                {filteredStats.length === 0 ? (
-                    <div className="text-center py-12 text-gray-400">
-                        No statistics available yet. Play some games to see stats!
+                <section className="mb-8 box box-shadow rounded-lg p-6">
+                    <h2 className="text-xl font-semibold mb-4 text-white">Players Per Day by Game Mode</h2>
+                    <div className="h-[300px]">
+                        <Line data={playersPerDayData} options={lineChartOptions} />
                     </div>
-                ) : (
-                    <>
-                        <section className="mb-8 bg-[#272727] border border-white/15 rounded-lg p-6 shadow-[0_4px_12px_rgba(0,0,0,0.2),0_1px_3px_rgba(0,0,0,0.1)]">
-                            <h2 className="text-xl font-semibold mb-4 text-white">Players Per Day by Game Mode</h2>
-                            <div className="h-[300px]">
-                                <Line data={playersPerDayData} options={lineChartOptions} />
-                            </div>
-                        </section>
+                </section>
 
-                        <section className="mb-8 bg-[#272727] border border-white/15 rounded-lg p-6 shadow-[0_4px_12px_rgba(0,0,0,0.2),0_1px_3px_rgba(0,0,0,0.1)]">
-                            <h2 className="text-xl font-semibold mb-2 text-white">Non-Lonely Games</h2>
-                            <p className="text-sm text-gray-400 mb-4">
-                                Percentage of games with 2+ human players
-                            </p>
-                            <div className="h-[280px]">
-                                <Line data={nonLonelyGamesData} options={areaChartOptions} />
-                            </div>
-                        </section>
+                <section className="mb-8 box box-shadow rounded-lg p-6">
+                    <h2 className="text-xl font-semibold mb-2 text-white">Non-Lonely Games</h2>
+                    <p className="text-sm text-gray-400 mb-4">
+                        Percentage of games with 2+ human players
+                    </p>
+                    <div className="h-[280px]">
+                        <Line data={nonLonelyGamesData} options={areaChartOptions} />
+                    </div>
+                </section>
 
-                        <section className="mb-8 bg-[#272727] border border-white/15 rounded-lg p-6 shadow-[0_4px_12px_rgba(0,0,0,0.2),0_1px_3px_rgba(0,0,0,0.1)]">
-                            <h2 className="text-xl font-semibold mb-2 text-white">Game Completion Rate</h2>
-                            <p className="text-sm text-gray-400 mb-4">
-                                Percentage of started games that were completed
-                            </p>
-                            <div className="h-[280px]">
-                                <Line data={completionRateData} options={areaChartOptions} />
-                            </div>
-                        </section>
-                    </>
-                )}
+                <section className="mb-8 box box-shadow rounded-lg p-6">
+                    <h2 className="text-xl font-semibold mb-2 text-white">Game Completion Rate</h2>
+                    <p className="text-sm text-gray-400 mb-4">
+                        Percentage of started games that were completed
+                    </p>
+                    <div className="h-[280px]">
+                        <Line data={completionRateData} options={areaChartOptions} />
+                    </div>
+                </section>
             </div>
         </div>
     );
