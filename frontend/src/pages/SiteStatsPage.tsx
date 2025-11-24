@@ -137,13 +137,15 @@ export const SiteStatsPage = () => {
         if (filteredStats.length === 0) return { labels: [], datasets: [] };
 
         const labels = filteredStats.map(stat => stat.date);
-        const nonLonelyPercentages = filteredStats.map(stat => {
+        const nonLonelyPercentages: number[] = [];
+        const lonelyPercentages: number[] = [];
+
+        filteredStats.forEach(stat => {
             const total = stat.total.finishedGames;
             const nonLonely = stat.total.nonLonelyGames;
-            return total > 0 ? (nonLonely / total) * 100 : 0;
-        });
-        const lonelyPercentages = filteredStats.map((_, index) => {
-            return 100 - nonLonelyPercentages[index];
+            const nonLonelyPercent = total > 0 ? (nonLonely / total) * 100 : 0;
+            nonLonelyPercentages.push(nonLonelyPercent);
+            lonelyPercentages.push(100 - nonLonelyPercent);
         });
 
         return {
@@ -173,13 +175,15 @@ export const SiteStatsPage = () => {
         if (filteredStats.length === 0) return { labels: [], datasets: [] };
 
         const labels = filteredStats.map(stat => stat.date);
-        const completionPercentages = filteredStats.map(stat => {
+        const completionPercentages: number[] = [];
+        const incompletePercentages: number[] = [];
+
+        filteredStats.forEach(stat => {
             const started = stat.total.startedGames;
             const finished = stat.total.finishedGames;
-            return started > 0 ? (finished / started) * 100 : 0;
-        });
-        const incompletePercentages = filteredStats.map((_, index) => {
-            return 100 - completionPercentages[index];
+            const completionPercent = started > 0 ? (finished / started) * 100 : 0;
+            completionPercentages.push(completionPercent);
+            incompletePercentages.push(100 - completionPercent);
         });
 
         return {
