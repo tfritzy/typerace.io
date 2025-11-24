@@ -8,15 +8,10 @@ import { DbConnection } from "../module_bindings";
 import { auth } from "./firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { AuthProvider } from "./firebase/AuthContext.tsx";
-import eruda from "eruda";
 
 const Root = () => {
   const [token, setToken] = useState<string | undefined>(undefined);
   const [authLoaded, setAuthLoaded] = useState(false);
-
-  useEffect(() => {
-    eruda.init();
-  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -45,7 +40,7 @@ const Root = () => {
       conn
         .subscriptionBuilder()
         .onError((error: ErrorContextInterface) => {
-          console.error("Error subscribing:", error);
+          console.error("Error subscribing:", error); 
         })
         .subscribe([
           `select * from player where Id = '${identity}'`,

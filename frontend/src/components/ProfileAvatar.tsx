@@ -102,19 +102,7 @@ export const ProfileAvatar = () => {
     }, [showMenu]);
 
     if (!myPlayer) {
-        return (
-            <div className="flex items-center gap-4 py-3 rounded-lg">
-                <div className="w-10 h-10 rounded-full bg-white/5 animate-pulse" />
-                <div className="flex flex-col items-start gap-1 min-w-50">
-                    <div className="w-20 h-4 bg-white/5 rounded animate-pulse" />
-                    <div className="flex items-center gap-2 w-full">
-                        <div className="w-8 h-3 bg-white/5 rounded animate-pulse" />
-                        <div className="flex-1 h-3 bg-white/5 rounded-full" />
-                        <div className="w-12 h-3 bg-white/5 rounded animate-pulse" />
-                    </div>
-                </div>
-            </div>
-        );
+        return null;
     }
 
     if (isAnonymous) {
@@ -122,7 +110,7 @@ export const ProfileAvatar = () => {
             <div className="relative" ref={menuRef}>
                 <button
                     onClick={() => setShowMenu(!showMenu)}
-                    className="flex items-center gap-4 py-3 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
+                    className="flex items-center gap-4 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
                 >
                     <div className="relative">
                         <PlayerAvatar
@@ -205,7 +193,7 @@ export const ProfileAvatar = () => {
     return (
         <button
             onClick={() => navigate(`/profile/${identityHash}`)}
-            className="flex items-center gap-4 py-3 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
+            className="flex items-center gap-4 py-2.5 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
         >
             <div className="relative">
                 <PlayerAvatar

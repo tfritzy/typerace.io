@@ -23,7 +23,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
   const [hasReachedErrorLimit, setHasReachedErrorLimit] = useState(false);
 
   const targetRef = useRef<HTMLElement>(null);
-
   const phraseRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -65,11 +64,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      console.log("TypeBox onChange:", {
-        eventType: event.type,
-        targetValue: event.target.value
-      });
-
       if (disabled) {
         return;
       }
@@ -231,7 +225,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
             onFocus={handleFocus}
             onBlur={handleBlur}
             id="type-box"
-            className="outline-none resize-none absolute top-0 left-0 w-0 h-0 opacity-0 pointer-events-none"
+            className="outline-none resize-none absolute top-0 left-0 opacity-0 pointer-events-none"
             autoCapitalize="none"
             autoComplete="off"
             spellCheck={false}
