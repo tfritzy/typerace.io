@@ -169,10 +169,12 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
     const chars = phrase.split("");
     
     let currentWordStart = 0;
-    for (let i = input.length - 1; i >= 0; i--) {
-      if (phrase[i] === ' ') {
-        currentWordStart = i + 1;
-        break;
+    if (input.length > 0) {
+      for (let i = input.length - 1; i >= 0; i--) {
+        if (phrase[i] === ' ') {
+          currentWordStart = i + 1;
+          break;
+        }
       }
     }
     
@@ -181,14 +183,14 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       const isCorrect = input[i] === char;
       const isCursor = i === input.length;
       const isInCompletedWord = isTyped && isCorrect && i < currentWordStart;
-      const isInCurrentWord = i >= currentWordStart && i < input.length;
+      const isInCurrentWord = i >= currentWordStart && i < input.length && isCorrect;
 
       const style: React.CSSProperties = {};
       if (isTyped && !isCorrect) {
         style.color = "var(--color-error)";
       } else if (isInCompletedWord) {
         style.color = "rgba(255, 255, 255, 0.25)";
-      } else if (isInCurrentWord && isCorrect) {
+      } else if (isInCurrentWord) {
         style.color = "var(--color-white)";
       } else {
         style.color = "rgba(255, 255, 255, 0.35)";
