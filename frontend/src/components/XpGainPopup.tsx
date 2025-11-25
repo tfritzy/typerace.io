@@ -17,7 +17,7 @@ export const XpGainPopup = ({ xpGain, onComplete }: XpGainPopupProps) => {
 
     return (
         <div
-            className="rounded-lg px-3 py-2 shadow-lg min-w-[260px] animate-[modalFadeIn_0.3s_ease-out,modalFadeOut_0.3s_ease-in_5.3s_forwards]"
+            className="rounded-lg px-4 py-3 shadow-lg min-w-[280px] animate-[modalFadeIn_0.3s_ease-out,modalFadeOut_0.3s_ease-in_5.3s_forwards]"
             style={{
                 backgroundColor: 'var(--color-box-bg)',
                 border: '1px solid var(--color-box-border)',
@@ -32,18 +32,23 @@ export const XpGainPopup = ({ xpGain, onComplete }: XpGainPopupProps) => {
                     />
                 ))}
 
-                <div className="my-1.5 border-t" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+                <div className="my-2 border-t" style={{ borderColor: 'rgba(255, 255, 255, 0.15)' }} />
 
                 <div
-                    className="flex items-center justify-between py-1 px-2 rounded font-semibold"
+                    className="flex items-center justify-between py-2 px-3 rounded font-semibold text-sm"
                     style={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                        color: 'rgba(255, 255, 255, 0.9)'
+                        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                        color: 'rgba(255, 255, 255, 0.95)',
                     }}
                 >
-                    <span>Total</span>
-                    <span className="tabular-nums" style={{ color: 'var(--color-accent)' }}>
-                        +{xpGain.totalXp} XP
+                    <span>Total XP</span>
+                    <span
+                        className="tabular-nums text-base"
+                        style={{
+                            color: 'rgba(255, 255, 255, 0.95)',
+                        }}
+                    >
+                        +{xpGain.totalXp}
                     </span>
                 </div>
             </div>
@@ -57,15 +62,24 @@ interface MultiplierRowProps {
 }
 
 const MultiplierRow = ({ label, value }: MultiplierRowProps) => {
+    const isBonus = value.includes('×') && !value.includes('×1.0');
+
     return (
         <div
-            className="flex items-center justify-between py-1 px-2 rounded"
+            className="flex items-center justify-between py-1.5 px-2"
             style={{
-                color: 'rgba(255, 255, 255, 0.7)'
+                color: isBonus ? 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 255, 255, 0.65)',
             }}
         >
-            <span className="font-medium">{label}</span>
-            <span className="font-bold tabular-nums">{value}</span>
+            <span className="font-medium text-sm">{label}</span>
+            <span
+                className="font-bold tabular-nums text-sm tracking-wide"
+                style={{
+                    color: isBonus ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.75)',
+                }}
+            >
+                {value}
+            </span>
         </div>
     );
 };

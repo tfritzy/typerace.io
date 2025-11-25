@@ -125,6 +125,8 @@ export function getAggWpmBySecond(
   raceStartTimestamp: bigint
 ): number[] {
   const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
+
+  console.log(events);
     
   if (!events || events.length === 0) {
     return [];
@@ -168,6 +170,8 @@ export function getAggWpmBySecond(
       wpmBySecond.push(0);
     }
   }
+
+
 
   return wpmBySecond;
 }

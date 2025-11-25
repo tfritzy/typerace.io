@@ -120,7 +120,7 @@ export const ProfileAvatar = () => {
                             isHighlighted={false}
                         />
                         {xpGains.length > 0 && (
-                            <div className="absolute top-full left-0 mt-2 z-50 pointer-events-none">
+                            <div className="absolute top-full left-0 mt-2 z-50 pointer-events-none flex flex-col gap-2">
                                 {xpGains.map((xpGain) => (
                                     <XpGainPopup
                                         key={xpGain.id}
@@ -203,7 +203,7 @@ export const ProfileAvatar = () => {
                     isHighlighted={true}
                 />
                 {xpGains.length > 0 && (
-                    <div className="absolute top-full left-0 mt-2 z-50 pointer-events-none">
+                    <div className="absolute top-full left-0 mt-2 z-50 pointer-events-none flex flex-col gap-2">
                         {xpGains.map((xpGain) => (
                             <XpGainPopup
                                 key={xpGain.id}
