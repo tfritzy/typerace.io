@@ -249,7 +249,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
             autoComplete="off"
             spellCheck={false}
             autoFocus
-            readOnly={disabled}
           />
         </div>
       </div>
