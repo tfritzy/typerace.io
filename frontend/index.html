@@ -73,10 +73,62 @@
       noscript { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
 
       .loading-container {
-        min-height: 100vh;
+        width: 100%;
+        padding: 0 1rem;
+      }
+
+      .loading-content {
+        width: 100%;
+        max-width: 1000px;
+        margin-left: auto;
+        margin-right: auto;
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        justify-content: center;
+        height: 4rem;
+      }
+
+      .loading-logo {
+        display: flex;
+        align-items: baseline;
+        gap: 0.15rem;
+        font-size: 1.65rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        user-select: none;
+        font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+      }
+
+      .loading-logo-text {
+        color: #ffffff;
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+      }
+
+      .loading-logo-accent {
+        color: #fbbf24;
+        text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+        font-style: italic;
+        position: relative;
+      }
+
+      .loading-logo-accent::after {
+        content: '';
+        position: absolute;
+        bottom: 4px;
+        left: -1px;
+        width: 95%;
+        height: 2.5px;
+        background: #fbbf24;
+        transform: skewX(-11deg);
+        transform-origin: bottom left;
+      }
+
+      .loading-logo-io {
+        color: rgba(255, 255, 255, 0.25);
+        font-size: 1.1rem;
+        font-weight: 600;
+        font-style: normal;
+        margin-left: -0.05rem;
       }
 
       .loading-spinner {
@@ -96,7 +148,14 @@
   <body>
     <div id="root">
       <div class="loading-container">
-        <div class="loading-spinner"></div>
+        <div class="loading-content">
+          <div class="loading-logo">
+            <span class="loading-logo-text">Type</span>
+            <span class="loading-logo-accent">Race</span>
+            <span class="loading-logo-io">.io</span>
+          </div>
+          <div class="loading-spinner"></div>
+        </div>
       </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
