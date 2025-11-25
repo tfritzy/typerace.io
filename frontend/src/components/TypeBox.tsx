@@ -71,6 +71,18 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       const newValue = event.target.value;
 
       if (newValue.length > phrase.length) {
+        if (newValue.startsWith(phrase) && onComplete) {
+          setInput(phrase);
+          setIsComplete(true);
+          onComplete();
+          if (resetOnComplete) {
+            setTimeout(() => {
+              setInput("");
+              setIsComplete(false);
+              setHasReachedErrorLimit(false);
+            }, 0);
+          }
+        }
         return;
       }
 
