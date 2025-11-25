@@ -2,6 +2,7 @@ import { GameRecord } from "../../module_bindings";
 import { useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { Star } from "lucide-react";
+import { formatStopwatchTime } from "../utils/formatters";
 
 interface RecentGamesProps {
     gameRecords: GameRecord[];
@@ -47,10 +48,7 @@ export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
     };
 
     const formatTime = (timeMs: bigint) => {
-        const totalSeconds = Number(timeMs) / 1000;
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = Math.floor(totalSeconds % 60);
-        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        return formatStopwatchTime(Number(timeMs) / 1000);
     };
 
     const formatDate = (timestamp: bigint) => {
