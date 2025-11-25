@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { SpacetimeDBProvider, useSpacetimeDB } from 'spacetimedb/react';
 import { DbConnection } from '../../module_bindings';
 import { useAuth } from '../firebase/AuthContext';
@@ -42,21 +42,34 @@ const IdentityGate = ({ children }: { children: React.ReactNode }) => {
 export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     const { user } = useAuth();
     const [token, setToken] = useState<string | undefined>(undefined);
+    const [tokenUserId, setTokenUserId] = useState<string | undefined>(undefined);
+    const previousUserIdRef = useRef<string | undefined>(undefined);
 
     useEffect(() => {
+        if (!user) {
+            setToken(undefined);
+            setTokenUserId(undefined);
+            previousUserIdRef.current = undefined;
+            return;
+        }
+
+        const userChanged = user.uid !== previousUserIdRef.current;
+        if (userChanged) {
+            setToken(undefined);
+            setTokenUserId(undefined);
+        }
+
         const loadToken = async () => {
-            if (user) {
-                const idToken = await user.getIdToken();
-                setToken(idToken);
-            } else {
-                setToken(undefined);
-            }
+            const idToken = await user.getIdToken();
+            setToken(idToken);
+            setTokenUserId(user.uid);
+            previousUserIdRef.current = user.uid;
         };
 
         loadToken();
     }, [user]);
 
-    if (!token) {
+    if (!user || !token || tokenUserId !== user.uid) {
         return <LoadingDots />;
     }
 
@@ -77,7 +90,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
         });
 
     return (
-        <SpacetimeDBProvider connectionBuilder={connectionBuilder}>
+        <SpacetimeDBProvider key={tokenUserId} connectionBuilder={connectionBuilder}>
             <IdentityGate>
                 {children}
             </IdentityGate>
