@@ -102,7 +102,7 @@ export const SiteStatsPage = () => {
         }));
     };
 
-    const getGamesPerDayData = () => {
+    const processGameModeData = (fieldAccessor: (modeCount: GameModeCount) => number) => {
         if (filteredStats.length === 0) return { labels: [], datasets: [] };
 
         const labels = filteredStats.map(stat => stat.date);
@@ -114,7 +114,7 @@ export const SiteStatsPage = () => {
                 if (!gameModes.has(modeName)) {
                     gameModes.set(modeName, new Array(filteredStats.length).fill(0));
                 }
-                gameModes.get(modeName)![index] = modeCount.finishedGames;
+                gameModes.get(modeName)![index] = fieldAccessor(modeCount);
             });
         });
 
@@ -123,25 +123,12 @@ export const SiteStatsPage = () => {
         return { labels, datasets };
     };
 
+    const getGamesPerDayData = () => {
+        return processGameModeData(modeCount => modeCount.finishedGames);
+    };
+
     const getPlayersPerDayData = () => {
-        if (filteredStats.length === 0) return { labels: [], datasets: [] };
-
-        const labels = filteredStats.map(stat => stat.date);
-        const gameModes = new Map<string, number[]>();
-
-        filteredStats.forEach((stat, index) => {
-            stat.stats.forEach(modeCount => {
-                const modeName = modeCount.gameMode.tag;
-                if (!gameModes.has(modeName)) {
-                    gameModes.set(modeName, new Array(filteredStats.length).fill(0));
-                }
-                gameModes.get(modeName)![index] = modeCount.gameCount;
-            });
-        });
-
-        const datasets = createDatasets(gameModes);
-
-        return { labels, datasets };
+        return processGameModeData(modeCount => modeCount.gameCount);
     };
 
     const getNonLonelyGamesData = () => {
