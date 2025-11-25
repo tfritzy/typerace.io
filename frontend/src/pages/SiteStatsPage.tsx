@@ -82,6 +82,24 @@ export const SiteStatsPage = () => {
 
     const filteredStats = getFilteredStats();
 
+    const chartColors = [
+        '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
+        '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
+        '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef'
+    ];
+
+    const createDatasets = (gameModes: Map<string, number[]>) => {
+        return Array.from(gameModes.entries()).map(([mode, data], index) => ({
+            label: mode,
+            data,
+            backgroundColor: `${chartColors[index % chartColors.length]}33`,
+            borderColor: chartColors[index % chartColors.length],
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+        }));
+    };
+
     const getGamesPerDayData = () => {
         if (filteredStats.length === 0) return { labels: [], datasets: [] };
 
@@ -98,21 +116,7 @@ export const SiteStatsPage = () => {
             });
         });
 
-        const colors = [
-            '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
-            '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
-            '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef'
-        ];
-
-        const datasets = Array.from(gameModes.entries()).map(([mode, data], index) => ({
-            label: mode,
-            data,
-            backgroundColor: `${colors[index % colors.length]}33`,
-            borderColor: colors[index % colors.length],
-            borderWidth: 2,
-            fill: false,
-            tension: 0.4,
-        }));
+        const datasets = createDatasets(gameModes);
 
         return { labels, datasets };
     };
@@ -133,21 +137,7 @@ export const SiteStatsPage = () => {
             });
         });
 
-        const colors = [
-            '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
-            '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
-            '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef'
-        ];
-
-        const datasets = Array.from(gameModes.entries()).map(([mode, data], index) => ({
-            label: mode,
-            data,
-            backgroundColor: `${colors[index % colors.length]}33`,
-            borderColor: colors[index % colors.length],
-            borderWidth: 2,
-            fill: false,
-            tension: 0.4,
-        }));
+        const datasets = createDatasets(gameModes);
 
         return { labels, datasets };
     };
