@@ -1230,14 +1230,11 @@ public static partial class Module
         count.StartedGames++;
         total.StartedGames++;
 
-        var hasFinishedPlayers = false;
         var finishedHumanCount = 0;
         foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
         {
             if (progress.Placement > 0)
             {
-                hasFinishedPlayers = true;
-
                 if (!progress.IsBot)
                 {
                     finishedHumanCount++;
@@ -1271,7 +1268,7 @@ public static partial class Module
             }
         }
 
-        if (hasFinishedPlayers)
+        if (finishedHumanCount > 0)
         {
             count.FinishedGames++;
             total.FinishedGames++;

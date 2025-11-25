@@ -9,14 +9,13 @@ import {
     LinearScale,
     PointElement,
     LineElement,
-    BarElement,
     Title,
     Tooltip,
     Legend,
     TimeScale,
     Filler,
 } from 'chart.js';
-import { Line, Bar } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 
 ChartJS.register(
@@ -24,7 +23,6 @@ ChartJS.register(
     LinearScale,
     PointElement,
     LineElement,
-    BarElement,
     Title,
     Tooltip,
     Legend,
@@ -125,9 +123,11 @@ export const SiteStatsPage = () => {
         const datasets = Array.from(gameModes.entries()).map(([mode, data], index) => ({
             label: mode,
             data,
-            backgroundColor: colors[index % colors.length],
+            backgroundColor: `${colors[index % colors.length]}33`,
             borderColor: colors[index % colors.length],
             borderWidth: 2,
+            fill: false,
+            tension: 0.4,
         }));
 
         return { labels, datasets };
@@ -137,22 +137,37 @@ export const SiteStatsPage = () => {
         if (filteredStats.length === 0) return { labels: [], datasets: [] };
 
         const labels = filteredStats.map(stat => stat.date);
-        const nonLonelyPercentages = filteredStats.map(stat => {
+        const nonLonelyPercentages: number[] = [];
+        const lonelyPercentages: number[] = [];
+
+        filteredStats.forEach(stat => {
             const total = stat.total.finishedGames;
             const nonLonely = stat.total.nonLonelyGames;
-            return total > 0 ? (nonLonely / total) * 100 : 0;
+            const nonLonelyPercent = total > 0 ? (nonLonely / total) * 100 : 0;
+            nonLonelyPercentages.push(nonLonelyPercent);
+            lonelyPercentages.push(100 - nonLonelyPercent);
         });
 
         return {
             labels,
-            datasets: [{
-                label: 'Non-Lonely Games %',
-                data: nonLonelyPercentages,
-                borderColor: '#fbbf24',
-                backgroundColor: 'rgba(251, 191, 36, 0.2)',
-                fill: true,
-                tension: 0.4,
-            }]
+            datasets: [
+                {
+                    label: 'Non-Lonely Games %',
+                    data: nonLonelyPercentages,
+                    borderColor: '#fbbf24',
+                    backgroundColor: 'rgba(251, 191, 36, 0.5)',
+                    fill: true,
+                    tension: 0.4,
+                },
+                {
+                    label: 'Lonely Games %',
+                    data: lonelyPercentages,
+                    borderColor: '#6b7280',
+                    backgroundColor: 'rgba(107, 114, 128, 0.3)',
+                    fill: true,
+                    tension: 0.4,
+                }
+            ]
         };
     };
 
@@ -160,22 +175,37 @@ export const SiteStatsPage = () => {
         if (filteredStats.length === 0) return { labels: [], datasets: [] };
 
         const labels = filteredStats.map(stat => stat.date);
-        const completionPercentages = filteredStats.map(stat => {
+        const completionPercentages: number[] = [];
+        const incompletePercentages: number[] = [];
+
+        filteredStats.forEach(stat => {
             const started = stat.total.startedGames;
             const finished = stat.total.finishedGames;
-            return started > 0 ? (finished / started) * 100 : 0;
+            const completionPercent = started > 0 ? (finished / started) * 100 : 0;
+            completionPercentages.push(completionPercent);
+            incompletePercentages.push(100 - completionPercent);
         });
 
         return {
             labels,
-            datasets: [{
-                label: 'Completion Rate %',
-                data: completionPercentages,
-                borderColor: '#22c55e',
-                backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                fill: true,
-                tension: 0.4,
-            }]
+            datasets: [
+                {
+                    label: 'Completed %',
+                    data: completionPercentages,
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34, 197, 94, 0.5)',
+                    fill: true,
+                    tension: 0.4,
+                },
+                {
+                    label: 'Incomplete %',
+                    data: incompletePercentages,
+                    borderColor: '#6b7280',
+                    backgroundColor: 'rgba(107, 114, 128, 0.3)',
+                    fill: true,
+                    tension: 0.4,
+                }
+            ]
         };
     };
 
@@ -183,7 +213,7 @@ export const SiteStatsPage = () => {
     const nonLonelyGamesData = getNonLonelyGamesData();
     const completionRateData = getCompletionRateData();
 
-    const barOptions = {
+    const lineChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -208,7 +238,6 @@ export const SiteStatsPage = () => {
         },
         scales: {
             x: {
-                stacked: true,
                 ticks: {
                     color: 'rgba(255, 255, 255, 0.6)',
                     font: { size: 10 },
@@ -221,7 +250,6 @@ export const SiteStatsPage = () => {
                 border: { display: false }
             },
             y: {
-                stacked: true,
                 ticks: {
                     color: 'rgba(255, 255, 255, 0.6)',
                     font: { size: 10 },
@@ -234,11 +262,20 @@ export const SiteStatsPage = () => {
         }
     };
 
-    const lineOptions = {
+    const areaChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-            legend: { display: false },
+            legend: {
+                display: true,
+                position: 'bottom' as const,
+                labels: {
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    font: { size: 11 },
+                    boxWidth: 12,
+                    padding: 10,
+                }
+            },
             tooltip: {
                 backgroundColor: '#1a1a1a',
                 borderColor: 'rgba(255, 255, 255, 0.12)',
@@ -253,6 +290,7 @@ export const SiteStatsPage = () => {
         },
         scales: {
             x: {
+                stacked: true,
                 ticks: {
                     color: 'rgba(255, 255, 255, 0.6)',
                     font: { size: 10 },
@@ -265,6 +303,7 @@ export const SiteStatsPage = () => {
                 border: { display: false }
             },
             y: {
+                stacked: true,
                 min: 0,
                 max: 100,
                 ticks: {
@@ -284,69 +323,51 @@ export const SiteStatsPage = () => {
         <div className="relative min-h-screen flex flex-col overflow-hidden">
             <Header />
             <div className="flex-1 overflow-y-auto p-4">
-                <div className="content-container">
-                    <div className="box p-8 my-8 text-white">
-                        <h1 className="text-3xl font-bold mb-6">Site Statistics</h1>
+                <h1 className="text-3xl font-bold mb-6 text-white px-4">Site Statistics</h1>
 
-                        <div className="mb-6 flex gap-2">
-                            {(['1month', '6months', '1year', 'all'] as TimeFrame[]).map(timeFrame => (
-                                <button
-                                    key={timeFrame}
-                                    onClick={() => setSelectedTimeFrame(timeFrame)}
-                                    className={`px-4 py-2 rounded-lg transition-all ${selectedTimeFrame === timeFrame
-                                        ? 'bg-amber-400 text-black font-semibold'
-                                        : 'bg-white/5 text-white/80 hover:bg-white/10'
-                                        }`}
-                                >
-                                    {timeFrame === '1month' ? '1 Month' :
-                                        timeFrame === '6months' ? '6 Months' :
-                                            timeFrame === '1year' ? '1 Year' : 'All Time'}
-                                </button>
-                            ))}
-                        </div>
-
-                        {filteredStats.length === 0 ? (
-                            <div className="text-center py-12 text-gray-400">
-                                No statistics available yet. Play some games to see stats!
-                            </div>
-                        ) : (
-                            <>
-                                <section className="mb-8">
-                                    <h2 className="text-xl font-semibold mb-4">Players Per Day by Game Mode</h2>
-                                    <div className="bg-[#272727] border border-white/15 rounded-lg p-6 shadow-[0_4px_12px_rgba(0,0,0,0.2),0_1px_3px_rgba(0,0,0,0.1)]">
-                                        <div className="h-[300px]">
-                                            <Bar data={playersPerDayData} options={barOptions} />
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <section className="mb-8">
-                                    <h2 className="text-xl font-semibold mb-4">Non-Lonely Games</h2>
-                                    <p className="text-sm text-gray-400 mb-4">
-                                        Percentage of games with 2+ human players
-                                    </p>
-                                    <div className="bg-[#272727] border border-white/15 rounded-lg p-6 shadow-[0_4px_12px_rgba(0,0,0,0.2),0_1px_3px_rgba(0,0,0,0.1)]">
-                                        <div className="h-[280px]">
-                                            <Line data={nonLonelyGamesData} options={lineOptions} />
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <section className="mb-8">
-                                    <h2 className="text-xl font-semibold mb-4">Game Completion Rate</h2>
-                                    <p className="text-sm text-gray-400 mb-4">
-                                        Percentage of started games that were completed
-                                    </p>
-                                    <div className="bg-[#272727] border border-white/15 rounded-lg p-6 shadow-[0_4px_12px_rgba(0,0,0,0.2),0_1px_3px_rgba(0,0,0,0.1)]">
-                                        <div className="h-[280px]">
-                                            <Line data={completionRateData} options={lineOptions} />
-                                        </div>
-                                    </div>
-                                </section>
-                            </>
-                        )}
-                    </div>
+                <div className="mb-6 px-4 flex gap-2">
+                    {(['1month', '6months', '1year', 'all'] as TimeFrame[]).map(timeFrame => (
+                        <button
+                            key={timeFrame}
+                            onClick={() => setSelectedTimeFrame(timeFrame)}
+                            className={`px-4 py-2 rounded-lg transition-all ${selectedTimeFrame === timeFrame
+                                ? 'bg-amber-400 text-black font-semibold'
+                                : 'bg-white/5 text-white/80 hover:bg-white/10'
+                                }`}
+                        >
+                            {timeFrame === '1month' ? '1 Month' :
+                                timeFrame === '6months' ? '6 Months' :
+                                    timeFrame === '1year' ? '1 Year' : 'All Time'}
+                        </button>
+                    ))}
                 </div>
+
+                <section className="mb-8 box box-shadow rounded-lg p-6">
+                    <h2 className="text-xl font-semibold mb-4 text-white">Players Per Day by Game Mode</h2>
+                    <div className="h-[300px]">
+                        <Line data={playersPerDayData} options={lineChartOptions} />
+                    </div>
+                </section>
+
+                <section className="mb-8 box box-shadow rounded-lg p-6">
+                    <h2 className="text-xl font-semibold mb-2 text-white">Non-Lonely Games</h2>
+                    <p className="text-sm text-gray-400 mb-4">
+                        Percentage of games with 2+ human players
+                    </p>
+                    <div className="h-[280px]">
+                        <Line data={nonLonelyGamesData} options={areaChartOptions} />
+                    </div>
+                </section>
+
+                <section className="mb-8 box box-shadow rounded-lg p-6">
+                    <h2 className="text-xl font-semibold mb-2 text-white">Game Completion Rate</h2>
+                    <p className="text-sm text-gray-400 mb-4">
+                        Percentage of started games that were completed
+                    </p>
+                    <div className="h-[280px]">
+                        <Line data={completionRateData} options={areaChartOptions} />
+                    </div>
+                </section>
             </div>
         </div>
     );
