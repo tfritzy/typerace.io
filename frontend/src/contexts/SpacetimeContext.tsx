@@ -33,7 +33,7 @@ const IdentityGate = ({ children }: { children: React.ReactNode }) => {
     }, [conn?.identity]);
 
     if (!conn?.identity) {
-        return <LoadingDots />;
+        return <LoadingDots key="app-loading" />;
     }
 
     return <>{children}</>;
@@ -57,7 +57,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     }, [user]);
 
     if (!token) {
-        return <LoadingDots />;
+        return <LoadingDots key="app-loading" />;
     }
 
     const connectionBuilder = DbConnection.builder()

@@ -101,7 +101,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {loading ? <LoadingDots /> : children}
+            {loading ? <LoadingDots key="app-loading" /> : children}
         </AuthContext.Provider>
     );
 };
