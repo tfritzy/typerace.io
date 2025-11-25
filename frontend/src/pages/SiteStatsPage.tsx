@@ -82,7 +82,27 @@ export const SiteStatsPage = () => {
 
     const filteredStats = getFilteredStats();
 
-    const getPlayersPerDayData = () => {
+    const chartColors = [
+        '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
+        '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
+        '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef'
+    ];
+
+    const chartBackgroundAlpha = '33';
+
+    const createDatasets = (gameModes: Map<string, number[]>) => {
+        return Array.from(gameModes.entries()).map(([mode, data], index) => ({
+            label: mode,
+            data,
+            backgroundColor: `${chartColors[index % chartColors.length]}${chartBackgroundAlpha}`,
+            borderColor: chartColors[index % chartColors.length],
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+        }));
+    };
+
+    const processGameModeData = (fieldAccessor: (modeCount: GameModeCount) => number) => {
         if (filteredStats.length === 0) return { labels: [], datasets: [] };
 
         const labels = filteredStats.map(stat => stat.date);
@@ -94,27 +114,21 @@ export const SiteStatsPage = () => {
                 if (!gameModes.has(modeName)) {
                     gameModes.set(modeName, new Array(filteredStats.length).fill(0));
                 }
-                gameModes.get(modeName)![index] = modeCount.gameCount;
+                gameModes.get(modeName)![index] = fieldAccessor(modeCount);
             });
         });
 
-        const colors = [
-            '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
-            '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
-            '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef'
-        ];
-
-        const datasets = Array.from(gameModes.entries()).map(([mode, data], index) => ({
-            label: mode,
-            data,
-            backgroundColor: `${colors[index % colors.length]}33`,
-            borderColor: colors[index % colors.length],
-            borderWidth: 2,
-            fill: false,
-            tension: 0.4,
-        }));
+        const datasets = createDatasets(gameModes);
 
         return { labels, datasets };
+    };
+
+    const getGamesPerDayData = () => {
+        return processGameModeData(modeCount => modeCount.finishedGames);
+    };
+
+    const getPlayersPerDayData = () => {
+        return processGameModeData(modeCount => modeCount.gameCount);
     };
 
     const getNonLonelyGamesData = () => {
@@ -193,6 +207,7 @@ export const SiteStatsPage = () => {
         };
     };
 
+    const gamesPerDayData = getGamesPerDayData();
     const playersPerDayData = getPlayersPerDayData();
     const nonLonelyGamesData = getNonLonelyGamesData();
     const completionRateData = getCompletionRateData();
@@ -325,6 +340,13 @@ export const SiteStatsPage = () => {
                         </button>
                     ))}
                 </div>
+
+                <section className="mb-8 box box-shadow rounded-lg p-6">
+                    <h2 className="text-xl font-semibold mb-4 text-white">Games Played Per Day by Game Mode</h2>
+                    <div className="h-[300px]">
+                        <Line data={gamesPerDayData} options={lineChartOptions} />
+                    </div>
+                </section>
 
                 <section className="mb-8 box box-shadow rounded-lg p-6">
                     <h2 className="text-xl font-semibold mb-4 text-white">Players Per Day by Game Mode</h2>
