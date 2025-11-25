@@ -69,79 +69,12 @@
     
     <style>
       * { box-sizing: border-box; }
-      body { margin: 0; background-color: #202020; }
+      body { margin: 0; background-color: #202020; min-height: 100vh; }
       noscript { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
-
-      .loading-container {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-      }
-
-      .loading-logo {
-        display: flex;
-        align-items: baseline;
-        gap: 0.15rem;
-        font-size: 2rem;
-        font-weight: 800;
-        letter-spacing: -0.025em;
-        user-select: none;
-        margin-bottom: 2rem;
-        animation: fadeIn 0.6s ease-out;
-      }
-
-      .loading-logo-text { color: #ffffff; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
-      .loading-logo-accent { color: #fbbf24; text-shadow: 0 0 20px rgba(251,191,36,0.5); font-style: italic; position: relative; }
-      .loading-logo-accent::after { content: ""; position: absolute; bottom: 4px; left: -1px; width: 95%; height: 2.5px; background: #fbbf24; transform: skewX(-11deg); transform-origin: bottom left; }
-      .loading-logo-io { color: rgba(255,255,255,0.25); font-size: 1.3rem; font-weight: 600; margin-left: -0.05rem; }
-
-      .loading-spinner {
-        display: flex;
-        gap: 6px;
-        animation: fadeIn 0.6s ease-out 0.2s both;
-      }
-
-      .loading-dot {
-        width: 8px;
-        height: 8px;
-        background-color: rgba(251, 191, 36, 0.6);
-        border-radius: 50%;
-        animation: pulse 1.4s ease-in-out infinite;
-      }
-
-      .loading-dot:nth-child(1) { animation-delay: 0s; }
-      .loading-dot:nth-child(2) { animation-delay: 0.2s; }
-      .loading-dot:nth-child(3) { animation-delay: 0.4s; }
-
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-
-      @keyframes pulse {
-        0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
-        40% { opacity: 1; transform: scale(1); }
-      }
     </style>
   </head>
   <body>
-    <div id="root">
-      <div class="loading-container">
-        <div class="loading-logo">
-          <span class="loading-logo-text">Type</span>
-          <span class="loading-logo-accent">Race</span>
-          <span class="loading-logo-io">.io</span>
-        </div>
-        <div class="loading-spinner">
-          <div class="loading-dot"></div>
-          <div class="loading-dot"></div>
-          <div class="loading-dot"></div>
-        </div>
-      </div>
-    </div>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
