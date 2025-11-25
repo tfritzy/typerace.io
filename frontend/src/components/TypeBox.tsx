@@ -62,6 +62,21 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
     event.preventDefault();
   }, []);
 
+  const completeGame = useCallback(() => {
+    setInput(phrase);
+    setIsComplete(true);
+    if (onComplete) {
+      onComplete();
+    }
+    if (resetOnComplete) {
+      setTimeout(() => {
+        setInput("");
+        setIsComplete(false);
+        setHasReachedErrorLimit(false);
+      }, 0);
+    }
+  }, [phrase, onComplete, resetOnComplete]);
+
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       if (disabled) {
@@ -71,17 +86,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       const newValue = event.target.value;
 
       if (newValue.length > phrase.length) {
-        if (newValue.startsWith(phrase) && onComplete) {
-          setInput(phrase);
-          setIsComplete(true);
-          onComplete();
-          if (resetOnComplete) {
-            setTimeout(() => {
-              setInput("");
-              setIsComplete(false);
-              setHasReachedErrorLimit(false);
-            }, 0);
-          }
+        if (newValue.startsWith(phrase)) {
+          completeGame();
         }
         return;
       }
@@ -151,19 +157,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
         }
       }
 
-      if (newValue === phrase && onComplete) {
-        setIsComplete(true);
-        onComplete();
-        if (resetOnComplete) {
-          setTimeout(() => {
-            setInput("");
-            setIsComplete(false);
-            setHasReachedErrorLimit(false);
-          }, 0);
-        }
+      if (newValue === phrase) {
+        completeGame();
       }
     },
-    [phrase, onComplete, onProgress, input, resetOnComplete, disabled]
+    [phrase, onProgress, input, disabled, completeGame]
   );
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
