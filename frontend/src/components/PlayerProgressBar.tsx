@@ -10,7 +10,7 @@ type PlayerProgressBarProps = {
     progressIndex: number;
     phraseLength: number;
     identityHash: string;
-    playerPublicId?: string;
+    playerPublicId: string;
     isCurrentPlayer?: boolean;
     isLoading?: boolean;
     playerColor?: PlayerColor;
@@ -54,7 +54,7 @@ export const PlayerProgressBar = ({
                     isLoading={isLoading}
                     placement={placement}
                 />
-            ) : playerPublicId ? (
+            ) : (
                 <Link to={`/profile/${playerPublicId}`} className="shrink-0">
                     <PlayerAvatar
                         size={40}
@@ -65,15 +65,6 @@ export const PlayerProgressBar = ({
                         placement={placement}
                     />
                 </Link>
-            ) : (
-                <PlayerAvatar
-                    size={40}
-                    identity={identityHash}
-                    color={playerColor}
-                    isHighlighted={isCurrentPlayer}
-                    isLoading={isLoading}
-                    placement={placement}
-                />
             )}
 
             <div className="flex-1 flex flex-col gap-2">

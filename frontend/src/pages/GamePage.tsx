@@ -172,6 +172,7 @@ export const GamePage = () => {
                       progressIndex={0}
                       phraseLength={game.phrase.length}
                       identityHash={`loading-${index}`}
+                      playerPublicId=""
                       isCurrentPlayer={false}
                       isLoading={true}
                     />
