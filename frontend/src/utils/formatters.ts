@@ -3,7 +3,10 @@ export function formatStopwatchTime(seconds: number): string {
     const secs = Math.floor(seconds % 60);
     const deciseconds = Math.floor((seconds % 1) * 10);
     
-    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(deciseconds)}`;
+    if (minutes > 0) {
+        return `${minutes}m ${secs}.${deciseconds}s`;
+    }
+    return `${secs}.${deciseconds}s`;
 }
 
 export function getOrdinalPlacement(placement: number): string {
