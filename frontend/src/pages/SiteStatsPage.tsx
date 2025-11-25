@@ -94,7 +94,7 @@ export const SiteStatsPage = () => {
                 if (!gameModes.has(modeName)) {
                     gameModes.set(modeName, new Array(filteredStats.length).fill(0));
                 }
-                gameModes.get(modeName)![index] = modeCount.gameCount;
+                gameModes.get(modeName)![index] = modeCount.finishedGames;
             });
         });
 
@@ -327,7 +327,7 @@ export const SiteStatsPage = () => {
                 </div>
 
                 <section className="mb-8 box box-shadow rounded-lg p-6">
-                    <h2 className="text-xl font-semibold mb-4 text-white">Players Per Day by Game Mode</h2>
+                    <h2 className="text-xl font-semibold mb-4 text-white">Games Played Per Day by Game Mode</h2>
                     <div className="h-[300px]">
                         <Line data={playersPerDayData} options={lineChartOptions} />
                     </div>
