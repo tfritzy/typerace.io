@@ -10,6 +10,7 @@ type PlayerProgressBarProps = {
     progressIndex: number;
     phraseLength: number;
     identityHash: string;
+    playerPublicId?: string;
     isCurrentPlayer?: boolean;
     isLoading?: boolean;
     playerColor?: PlayerColor;
@@ -25,6 +26,7 @@ export const PlayerProgressBar = ({
     progressIndex,
     phraseLength,
     identityHash,
+    playerPublicId,
     isCurrentPlayer = false,
     isLoading = false,
     playerColor = PlayerColor.Amber,
@@ -53,7 +55,7 @@ export const PlayerProgressBar = ({
                     placement={placement}
                 />
             ) : (
-                <Link to={`/profile/${identityHash}`} className="shrink-0">
+                <Link to={`/profile/${playerPublicId}`} className="shrink-0">
                     <PlayerAvatar
                         size={40}
                         identity={identityHash}

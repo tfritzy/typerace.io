@@ -148,7 +148,9 @@ public static partial class Module
     public partial struct Player
     {
         [PrimaryKey]
-        public Identity Id;
+        public Identity Identity;
+        [SpacetimeDB.Index.BTree]
+        public string PlayerId;
         public string Name;
         public int TotalGames;
         public int Wins;
@@ -320,6 +322,7 @@ public static partial class Module
         public string Id;
         [SpacetimeDB.Index.BTree]
         public Identity PlayerId;
+        public string PlayerPublicId;
         [SpacetimeDB.Index.BTree]
         public string GameId;
         public string PlayerName;
@@ -380,7 +383,8 @@ public static partial class Module
 
             ctx.Db.player.Insert(new Player
             {
-                Id = identity,
+                Identity = identity,
+                PlayerId = IdGenerator.Generate("plyr_", ctx.Rng),
                 Name = botName,
                 TotalGames = 0,
                 Wins = 0,
@@ -440,14 +444,15 @@ public static partial class Module
     [Reducer(ReducerKind.ClientConnected)]
     public static void ClientConnected(ReducerContext ctx)
     {
-        var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
+        var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
 
         if (existingPlayer == null)
         {
             var animalName = AnimalNameGenerator.Generate(ctx.Rng);
             ctx.Db.player.Insert(new Player
             {
-                Id = ctx.Sender,
+                Identity = ctx.Sender,
+                PlayerId = IdGenerator.Generate("plyr_", ctx.Rng),
                 Name = $"Anonymous {animalName}",
                 TotalGames = 0,
                 Wins = 0,
@@ -474,7 +479,7 @@ public static partial class Module
     [Reducer]
     public static void SyncAnonymousStatus(ReducerContext ctx, bool isAnonymous)
     {
-        var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
+        var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
 
         if (existingPlayer != null)
         {
@@ -488,7 +493,7 @@ public static partial class Module
                 Log.Info($"Updated player name from Anonymous to {newAdjective} for {ctx.Sender}");
             }
 
-            ctx.Db.player.Id.Update(updatedPlayer);
+            ctx.Db.player.Identity.Update(updatedPlayer);
             Log.Info($"Updated anonymous status for {ctx.Sender} to {isAnonymous}");
         }
     }
@@ -519,13 +524,13 @@ public static partial class Module
             return;
         }
 
-        var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
+        var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
 
         if (existingPlayer != null)
         {
             var updatedPlayer = existingPlayer.Value;
             updatedPlayer.Name = trimmedName;
-            ctx.Db.player.Id.Update(updatedPlayer);
+            ctx.Db.player.Identity.Update(updatedPlayer);
             Log.Info($"Updated player name for {ctx.Sender} to {trimmedName}");
         }
     }
@@ -533,13 +538,13 @@ public static partial class Module
     [Reducer]
     public static void SetPlayerColor(ReducerContext ctx, PlayerColor color)
     {
-        var existingPlayer = ctx.Db.player.Id.Find(ctx.Sender);
+        var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
 
         if (existingPlayer != null)
         {
             var updatedPlayer = existingPlayer.Value;
             updatedPlayer.Color = color;
-            ctx.Db.player.Id.Update(updatedPlayer);
+            ctx.Db.player.Identity.Update(updatedPlayer);
             Log.Info($"Updated player color for {ctx.Sender} to {color}");
         }
     }
@@ -724,16 +729,18 @@ public static partial class Module
 
     private static void InsertPlayerProgress(ReducerContext ctx, string gameId, string joinCode)
     {
-        var player = ctx.Db.player.Id.Find(ctx.Sender);
+        var player = ctx.Db.player.Identity.Find(ctx.Sender);
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
         var playerColor = player?.Color ?? PlayerColor.Amber;
+        var playerPublicId = player?.PlayerId ?? "";
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
         {
             Id = IdGenerator.Generate("pp_", ctx.Rng),
             PlayerId = ctx.Sender,
+            PlayerPublicId = playerPublicId,
             GameId = gameId,
             PlayerName = playerName,
             PlayerLevel = playerLevel,
@@ -794,7 +801,8 @@ public static partial class Module
                 ctx.Db.playerprogress.Insert(new PlayerProgress
                 {
                     Id = IdGenerator.Generate("pp_", ctx.Rng),
-                    PlayerId = selectedBot.Id,
+                    PlayerId = selectedBot.Identity,
+                    PlayerPublicId = selectedBot.PlayerId,
                     GameId = args.GameId,
                     PlayerName = selectedBot.Name,
                     PlayerLevel = selectedBot.Level,
@@ -809,7 +817,7 @@ public static partial class Module
                     PlayerColor = selectedBot.Color
                 });
 
-                Log.Info($"Added bot {selectedBot.Name} (ELO: {GetBotElo(ctx, selectedBot.Id, game.Value.GameMode)}) to game {args.GameId} (target ELO: {targetElo})");
+                Log.Info($"Added bot {selectedBot.Name} (ELO: {GetBotElo(ctx, selectedBot.Identity, game.Value.GameMode)}) to game {args.GameId} (target ELO: {targetElo})");
             }
 
             var updatedGame = game.Value;
@@ -836,7 +844,7 @@ public static partial class Module
         var botsWithElo = new List<(Player bot, int elo)>();
         foreach (var bot in ctx.Db.player.IsBot.Filter(true))
         {
-            int botElo = GetBotElo(ctx, bot.Id, gameMode);
+            int botElo = GetBotElo(ctx, bot.Identity, gameMode);
             botsWithElo.Add((bot, botElo));
         }
 
@@ -884,7 +892,7 @@ public static partial class Module
 
             if (game != null && game.Value.State == GameState.Racing)
             {
-                var botPlayer = ctx.Db.player.Id.Find(progress.Value.PlayerId);
+                var botPlayer = ctx.Db.player.Identity.Find(progress.Value.PlayerId);
                 if (botPlayer == null || botPlayer.Value.BotConfig == null)
                 {
                     Log.Info($"Bot player {progress.Value.PlayerId} not found or missing BotConfig");
@@ -987,7 +995,7 @@ public static partial class Module
             {
                 if (progress.IsBot)
                 {
-                    var botPlayer = ctx.Db.player.Id.Find(progress.PlayerId);
+                    var botPlayer = ctx.Db.player.Identity.Find(progress.PlayerId);
                     long delayMicroseconds;
 
                     if (botPlayer != null && botPlayer.Value.BotConfig != null)
@@ -1133,16 +1141,18 @@ public static partial class Module
         {
             if (!progress.IsBot)
             {
-                var player = ctx.Db.player.Id.Find(progress.PlayerId);
+                var player = ctx.Db.player.Identity.Find(progress.PlayerId);
                 var playerName = player?.Name ?? "Unknown";
                 var playerLevel = player?.Level ?? 1;
                 var isAnonymous = player?.IsAnonymous ?? true;
                 var playerColor = player?.Color ?? PlayerColor.Amber;
+                var playerPublicId = player?.PlayerId ?? "";
 
                 ctx.Db.playerprogress.Insert(new PlayerProgress
                 {
                     Id = IdGenerator.Generate("pp_", ctx.Rng),
                     PlayerId = progress.PlayerId,
+                    PlayerPublicId = playerPublicId,
                     GameId = newGame.Id,
                     PlayerName = playerName,
                     PlayerLevel = playerLevel,
@@ -1369,7 +1379,7 @@ public static partial class Module
         updatedProgress.Placement = placement;
         ctx.Db.playerprogress.Id.Update(updatedProgress);
 
-        var player = ctx.Db.player.Id.Find(progress.PlayerId);
+        var player = ctx.Db.player.Identity.Find(progress.PlayerId);
         if (player == null) return;
 
         var wpm = CalculateWpm(game.Phrase.Length, timeElapsed);
@@ -1380,7 +1390,7 @@ public static partial class Module
         var xpGained = AwardXpForGame(ctx, ref updatedPlayer, progress, game, placement, wordsTyped);
         UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped, timeElapsed / 1000);
         LevelUpPlayer(ref updatedPlayer);
-        ctx.Db.player.Id.Update(updatedPlayer);
+        ctx.Db.player.Identity.Update(updatedPlayer);
 
         var eloChange = UpdatePlayerElo(ctx, progress.PlayerId, game, placement);
 

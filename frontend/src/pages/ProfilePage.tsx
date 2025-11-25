@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
 import { PlayerAvatar } from "../components/PlayerAvatar";
 import { useParams, useNavigate } from "react-router-dom";
-import { Identity } from "spacetimedb";
 import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { getColorConfig } from "../utils/colorMapping";
@@ -35,36 +34,40 @@ export const ProfilePage = () => {
     useEffect(() => {
         if (!conn || !playerId) return;
 
-        const playerIdentity = Identity.fromString(playerId);
-
         const playerSubscription = conn.subscriptionBuilder()
             .onError((error: ErrorContextInterface) => {
                 console.error("Error subscribing to player:", error);
             })
-            .subscribe(`select * from player where Id = '${playerIdentity}'`);
+            .subscribe(`select * from player where PlayerId = '${playerId}'`);
+
+        return () => {
+            playerSubscription.unsubscribe();
+        };
+    }, [conn, playerId]);
+
+    const viewedPlayer = playerId ? players.find(p => p.playerId === playerId) : null;
+    const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.identity);
+
+    useEffect(() => {
+        if (!conn || !viewedPlayer) return;
 
         const gameRecordSubscription = conn.subscriptionBuilder()
             .onError((error: ErrorContextInterface) => {
                 console.error("Error subscribing to gamerecord:", error);
             })
-            .subscribe(`select * from gamerecord where PlayerId = '${playerIdentity}'`);
+            .subscribe(`select * from gamerecord where PlayerId = '${viewedPlayer.identity}'`);
 
         const personalRecordSubscription = conn.subscriptionBuilder()
             .onError((error: ErrorContextInterface) => {
                 console.error("Error subscribing to personalrecord:", error);
             })
-            .subscribe(`select * from personalrecord where PlayerId = '${playerIdentity}'`);
+            .subscribe(`select * from personalrecord where PlayerId = '${viewedPlayer.identity}'`);
 
         return () => {
-            playerSubscription.unsubscribe();
             gameRecordSubscription.unsubscribe();
             personalRecordSubscription.unsubscribe();
         };
-    }, [conn, playerId]);
-
-    const playerIdentity = playerId ? Identity.fromString(playerId) : null;
-    const viewedPlayer = playerIdentity ? players.find(p => p.id.isEqual(playerIdentity)) : null;
-    const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.id);
+    }, [conn, viewedPlayer]);
 
     useEffect(() => {
         if (viewedPlayer && viewedPlayer.isAnonymous) {
@@ -130,10 +133,10 @@ export const ProfilePage = () => {
     };
 
     const realGameData = useMemo(() => {
-        if (!playerIdentity) return [];
+        if (!viewedPlayer) return [];
 
         let playerStats = gameRecords.filter(stat =>
-            stat.playerId.isEqual(playerIdentity)
+            stat.playerId.isEqual(viewedPlayer.identity)
         );
 
         if (selectedMode !== 'all') {
@@ -154,18 +157,18 @@ export const ProfilePage = () => {
             }
             return 0;
         });
-    }, [gameRecords, playerIdentity, selectedMode, selectedTimeFrame]);
+    }, [gameRecords, viewedPlayer, selectedMode, selectedTimeFrame]);
 
     const availableModes = useMemo(() => {
-        if (!playerIdentity) return [];
+        if (!viewedPlayer) return [];
 
         const modesSet = new Set<string>();
         gameRecords
-            .filter(stat => stat.playerId.isEqual(playerIdentity))
+            .filter(stat => stat.playerId.isEqual(viewedPlayer.identity))
             .forEach(stat => modesSet.add(stat.gameMode.tag));
 
         return Array.from(modesSet).sort();
-    }, [gameRecords, playerIdentity]);
+    }, [gameRecords, viewedPlayer]);
 
     return (
         <div className="min-h-screen">
@@ -229,7 +232,7 @@ export const ProfilePage = () => {
                                 <div className="flex items-start gap-6 mb-6">
                                     <PlayerAvatar
                                         size={80}
-                                        identity={viewedPlayer.id.toHexString()}
+                                        identity={viewedPlayer.identity.toHexString()}
                                         color={viewedPlayer.color}
                                         isHighlighted={true}
                                     />
