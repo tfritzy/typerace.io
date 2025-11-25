@@ -88,11 +88,13 @@ export const SiteStatsPage = () => {
         '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef'
     ];
 
+    const chartBackgroundAlpha = '33';
+
     const createDatasets = (gameModes: Map<string, number[]>) => {
         return Array.from(gameModes.entries()).map(([mode, data], index) => ({
             label: mode,
             data,
-            backgroundColor: `${chartColors[index % chartColors.length]}33`,
+            backgroundColor: `${chartColors[index % chartColors.length]}${chartBackgroundAlpha}`,
             borderColor: chartColors[index % chartColors.length],
             borderWidth: 2,
             fill: false,
