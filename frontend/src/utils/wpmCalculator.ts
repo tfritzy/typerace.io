@@ -62,7 +62,8 @@ export function getWpm(charCount: number, timeSeconds: number): number {
 
 export function getRawWpmBySecond(
   compressedHistory: Uint8Array,
-  raceStartTimestamp: bigint
+  raceStartTimestamp: bigint,
+  progressIndex?: number
 ): number[] {
   const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
     
@@ -70,14 +71,15 @@ export function getRawWpmBySecond(
     return [];
   }
 
+  const correctEvents = events.filter(evt => evt.eventType.tag === "Correct");
+  const totalEventCount = correctEvents.length;
+  const totalCharCount = progressIndex ?? totalEventCount;
+  const charsPerEvent = totalEventCount > 0 ? totalCharCount / totalEventCount : 1;
+
   const charCountBySecond: number[] = [];
   const wpmBySecond: number[] = [];
 
-  for (const evt of events) {
-    if (evt.eventType.tag === "Backspace") {
-      continue;
-    }
-
+  for (const evt of correctEvents) {
     const elapsedMicros = evt.timestamp - raceStartTimestamp;
     const second = Number(elapsedMicros / 1_000_000n);
 
@@ -90,7 +92,7 @@ export function getRawWpmBySecond(
       wpmBySecond.push(0);
     }
 
-    charCountBySecond[second]++;
+    charCountBySecond[second] += charsPerEvent;
   }
 
   for (let i = 0; i < wpmBySecond.length; i++) {
@@ -122,43 +124,56 @@ export function getRawWpmBySecond(
 
 export function getAggWpmBySecond(
   compressedHistory: Uint8Array,
-  raceStartTimestamp: bigint
+  raceStartTimestamp: bigint,
+  progressIndex?: number
 ): number[] {
   const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
-
-  console.log(events);
     
   if (!events || events.length === 0) {
     return [];
   }
 
-  const progressionStack: number[] = [];
+  const eventTimestamps: number[] = [];
+  let eventBalance = 0;
   for (const evt of events) {
     const elapsedMicros = evt.timestamp - raceStartTimestamp;
     const seconds = Number(elapsedMicros) / 1_000_000.0;
 
     if (evt.eventType.tag === "Backspace") {
-      if (progressionStack.length > 0) {
-        progressionStack.pop();
+      if (eventBalance > 0) {
+        eventTimestamps.pop();
+        eventBalance--;
       }
     } else {
-      progressionStack.push(seconds);
+      eventTimestamps.push(seconds);
+      eventBalance++;
     }
   }
 
-  if (progressionStack.length === 0) {
+  if (eventTimestamps.length === 0) {
     return [];
   }
 
-  const finalTime = progressionStack[progressionStack.length - 1];
+  const totalEventCount = eventTimestamps.length;
+  const totalCharCount = progressIndex ?? totalEventCount;
+  const charsPerEvent = totalEventCount > 0 ? totalCharCount / totalEventCount : 1;
+
+  const progressionStack: { seconds: number; charCount: number }[] = [];
+  let cumulativeChars = 0;
+  for (const seconds of eventTimestamps) {
+    cumulativeChars += charsPerEvent;
+    progressionStack.push({ seconds, charCount: cumulativeChars });
+  }
+
+  const finalTime = progressionStack[progressionStack.length - 1].seconds;
   const maxSecond = Math.floor(finalTime);
   const wpmBySecond: number[] = [];
 
   for (let second = 0; second <= maxSecond; second++) {
     let charCountAtSecond = 0;
-    for (let i = 0; i < progressionStack.length; i++) {
-      if (progressionStack[i] <= second) {
-        charCountAtSecond = i + 1;
+    for (const entry of progressionStack) {
+      if (entry.seconds <= second) {
+        charCountAtSecond = entry.charCount;
       } else {
         break;
       }
@@ -170,8 +185,6 @@ export function getAggWpmBySecond(
       wpmBySecond.push(0);
     }
   }
-
-
 
   return wpmBySecond;
 }

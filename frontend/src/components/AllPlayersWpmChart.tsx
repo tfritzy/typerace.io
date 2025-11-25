@@ -42,7 +42,8 @@ export const AllPlayersWpmChart = ({
     const datasets = allPlayerProgress.map((playerProgress, index) => {
         const wpmData = getAggWpmBySecond(
             playerProgress.characterHistory,
-            raceStartTimestamp
+            raceStartTimestamp,
+            playerProgress.progressIndex
         );
 
         return {

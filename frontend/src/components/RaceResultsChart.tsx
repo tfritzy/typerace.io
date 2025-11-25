@@ -30,8 +30,8 @@ interface RaceResultsChartProps {
 }
 
 export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerColor }: RaceResultsChartProps) => {
-    const rawWpmData = getRawWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
-    const aggWpmData = getAggWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
+    const rawWpmData = getRawWpmBySecond(playerProgress.characterHistory, raceStartTimestamp, playerProgress.progressIndex);
+    const aggWpmData = getAggWpmBySecond(playerProgress.characterHistory, raceStartTimestamp, playerProgress.progressIndex);
     const errorCountsData = getErrorCountsBySecond(playerProgress.characterHistory, raceStartTimestamp);
 
     const maxDataIndex = Math.max(rawWpmData.length - 1, aggWpmData.length - 1, errorCountsData.length - 1);
