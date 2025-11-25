@@ -244,9 +244,9 @@ const REMOTE_MODULE = {
     player: {
       tableName: "player" as const,
       rowType: Player.getTypeScriptAlgebraicType(),
-      primaryKey: "id",
+      primaryKey: "identity",
       primaryKeyInfo: {
-        colName: "id",
+        colName: "identity",
         colType: (Player.getTypeScriptAlgebraicType() as __AlgebraicTypeVariants.Product).value.elements[0].algebraicType,
       },
     },

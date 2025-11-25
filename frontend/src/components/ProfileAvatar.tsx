@@ -23,7 +23,7 @@ export const ProfileAvatar = () => {
     const menuRef = useRef<HTMLDivElement>(null);
 
     const myPlayer = conn?.identity
-        ? players.find((p) => p.id.isEqual(conn.identity!))
+        ? players.find((p) => p.identity.isEqual(conn.identity!))
         : null;
 
     useEffect(() => {
@@ -192,7 +192,7 @@ export const ProfileAvatar = () => {
 
     return (
         <button
-            onClick={() => navigate(`/profile/${identityHash}`)}
+            onClick={() => navigate(`/profile/${myPlayer?.playerId}`)}
             className="flex items-center gap-4 py-2.5 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
         >
             <div className="relative">
