@@ -82,7 +82,7 @@ export const SiteStatsPage = () => {
 
     const filteredStats = getFilteredStats();
 
-    const getPlayersPerDayData = () => {
+    const getGamesPerDayData = () => {
         if (filteredStats.length === 0) return { labels: [], datasets: [] };
 
         const labels = filteredStats.map(stat => stat.date);
@@ -95,6 +95,41 @@ export const SiteStatsPage = () => {
                     gameModes.set(modeName, new Array(filteredStats.length).fill(0));
                 }
                 gameModes.get(modeName)![index] = modeCount.finishedGames;
+            });
+        });
+
+        const colors = [
+            '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
+            '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
+            '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef'
+        ];
+
+        const datasets = Array.from(gameModes.entries()).map(([mode, data], index) => ({
+            label: mode,
+            data,
+            backgroundColor: `${colors[index % colors.length]}33`,
+            borderColor: colors[index % colors.length],
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+        }));
+
+        return { labels, datasets };
+    };
+
+    const getPlayersPerDayData = () => {
+        if (filteredStats.length === 0) return { labels: [], datasets: [] };
+
+        const labels = filteredStats.map(stat => stat.date);
+        const gameModes = new Map<string, number[]>();
+
+        filteredStats.forEach((stat, index) => {
+            stat.stats.forEach(modeCount => {
+                const modeName = modeCount.gameMode.tag;
+                if (!gameModes.has(modeName)) {
+                    gameModes.set(modeName, new Array(filteredStats.length).fill(0));
+                }
+                gameModes.get(modeName)![index] = modeCount.gameCount;
             });
         });
 
@@ -193,6 +228,7 @@ export const SiteStatsPage = () => {
         };
     };
 
+    const gamesPerDayData = getGamesPerDayData();
     const playersPerDayData = getPlayersPerDayData();
     const nonLonelyGamesData = getNonLonelyGamesData();
     const completionRateData = getCompletionRateData();
@@ -328,6 +364,13 @@ export const SiteStatsPage = () => {
 
                 <section className="mb-8 box box-shadow rounded-lg p-6">
                     <h2 className="text-xl font-semibold mb-4 text-white">Games Played Per Day by Game Mode</h2>
+                    <div className="h-[300px]">
+                        <Line data={gamesPerDayData} options={lineChartOptions} />
+                    </div>
+                </section>
+
+                <section className="mb-8 box box-shadow rounded-lg p-6">
+                    <h2 className="text-xl font-semibold mb-4 text-white">Players Per Day by Game Mode</h2>
                     <div className="h-[300px]">
                         <Line data={playersPerDayData} options={lineChartOptions} />
                     </div>
