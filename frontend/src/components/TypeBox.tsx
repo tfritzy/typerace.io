@@ -122,17 +122,21 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
       setInput(newValue);
 
       if (onProgress && newValue.length !== oldValue.length) {
-        let eventType: "Correct" | "Incorrect" | "Backspace";
-
         if (newValue.length < oldValue.length) {
-          eventType = "Backspace";
+          const charsDeleted = oldValue.length - newValue.length;
+          for (let i = 0; i < charsDeleted; i++) {
+            onProgress(correctCharCount, "Backspace");
+          }
         } else {
-          const newChar = newValue[newValue.length - 1];
-          const expectedChar = phrase[newValue.length - 1];
-          eventType = newChar === expectedChar ? "Correct" : "Incorrect";
+          const charsAdded = newValue.length - oldValue.length;
+          for (let i = 0; i < charsAdded; i++) {
+            const charIndex = oldValue.length + i;
+            const newChar = newValue[charIndex];
+            const expectedChar = phrase[charIndex];
+            const eventType = newChar === expectedChar ? "Correct" : "Incorrect";
+            onProgress(correctCharCount, eventType);
+          }
         }
-
-        onProgress(correctCharCount, eventType);
       }
 
       if (newValue === phrase && onComplete) {
