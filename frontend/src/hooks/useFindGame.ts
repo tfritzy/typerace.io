@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import type {
   DbConnection,
   GameMode,
-  ReducerEventContext,
-  GameType,
 } from "../../module_bindings";
 import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
@@ -37,14 +35,11 @@ export const useFindGame = () => {
   useEffect(() => {
     if (!conn) return;
 
-    const handleJoinGameResult = (
-      ctx: ReducerEventContext,
-      _gameMode: GameMode,
-      responseJoinCode: string,
-      _gameType: GameType
+    const handleJoinGameResult: Parameters<typeof conn.reducers.onJoinGame>[0] = (
+      ctx,
+      _gameMode,
+      responseJoinCode
     ) => {
-      void _gameMode;
-      void _gameType;
       if (!ctx.event.callerIdentity.isEqual(conn.identity!)) return;
       if (pendingJoinCodeRef.current !== responseJoinCode) return;
 
