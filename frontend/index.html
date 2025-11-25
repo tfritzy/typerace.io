@@ -68,50 +68,78 @@
     </noscript>
     
     <style>
-      :root { --max-content-width: 1000px; }
       * { box-sizing: border-box; }
       body { margin: 0; background-color: #202020; }
       noscript { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
 
-  .prehyd-page { min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; font-family: system-ui, Avenir, Helvetica, Arial, sans-serif; line-height: 1.5; font-weight: 400; }
+      .loading-container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+      }
 
-      .prehyd-header { width: 100%; padding-left: 1rem; padding-right: 1rem; }
-      .prehyd-container { width: 100%; max-width: var(--max-content-width); margin-left: auto; margin-right: auto; }
-      .prehyd-header-inner { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; padding-bottom: 12px; }
+      .loading-logo {
+        display: flex;
+        align-items: baseline;
+        gap: 0.15rem;
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        user-select: none;
+        margin-bottom: 2rem;
+        animation: fadeIn 0.6s ease-out;
+      }
 
-      .prehyd-logo { display: flex; align-items: baseline; gap: 0.15rem; font-size: 1.65rem; font-weight: 800; letter-spacing: -0.025em; user-select: none; position: relative; }
-      .prehyd-logo-text { color: #ffffff; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
-      .prehyd-logo-accent { color: #fbbf24; text-shadow: 0 0 20px rgba(251,191,36,0.5); font-style: italic; position: relative; }
-      .prehyd-logo-accent::after { content: ""; position: absolute; bottom: 4px; left: -1px; width: 95%; height: 2.5px; background: #fbbf24; transform: skewX(-11deg); transform-origin: bottom left; }
-      .prehyd-logo-io { color: rgba(255,255,255,0.25); font-size: 1.1rem; font-weight: 600; margin-left: -0.05rem; }
+      .loading-logo-text { color: #ffffff; text-shadow: 0 0 15px rgba(255,255,255,0.2); }
+      .loading-logo-accent { color: #fbbf24; text-shadow: 0 0 20px rgba(251,191,36,0.5); font-style: italic; position: relative; }
+      .loading-logo-accent::after { content: ""; position: absolute; bottom: 4px; left: -1px; width: 95%; height: 2.5px; background: #fbbf24; transform: skewX(-11deg); transform-origin: bottom left; }
+      .loading-logo-io { color: rgba(255,255,255,0.25); font-size: 1.3rem; font-weight: 600; margin-left: -0.05rem; }
 
-      .prehyd-main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-  .prehyd-typebox-wrap { width: 100%; max-width: 1000px; margin-bottom: 400px; font-size: 1.5rem; line-height: 2rem; }
-      .prehyd-typebox { position: relative; width: 100%; background-color: #272727; border: 1px solid rgba(255,255,255,0.12); border-radius: 0.5rem; padding: 1.5rem 2rem; cursor: text; display: flex; align-items: flex-start; }
-      .prehyd-typebox-content { white-space: pre-wrap; font-size: 1.5rem; text-align: left; color: rgba(255,255,255,0.05); }
+      .loading-spinner {
+        display: flex;
+        gap: 6px;
+        animation: fadeIn 0.6s ease-out 0.2s both;
+      }
+
+      .loading-dot {
+        width: 8px;
+        height: 8px;
+        background-color: rgba(251, 191, 36, 0.6);
+        border-radius: 50%;
+        animation: pulse 1.4s ease-in-out infinite;
+      }
+
+      .loading-dot:nth-child(1) { animation-delay: 0s; }
+      .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+      .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes pulse {
+        0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+        40% { opacity: 1; transform: scale(1); }
+      }
     </style>
   </head>
   <body>
     <div id="root">
-      <div class="prehyd-page">
-        <div class="prehyd-header">
-          <div class="prehyd-container prehyd-header-inner">
-            <div class="prehyd-logo">
-              <span class="prehyd-logo-text">Type</span>
-              <span class="prehyd-logo-accent">Race</span>
-              <span class="prehyd-logo-io">.io</span>
-            </div>
-          </div>
+      <div class="loading-container">
+        <div class="loading-logo">
+          <span class="loading-logo-text">Type</span>
+          <span class="loading-logo-accent">Race</span>
+          <span class="loading-logo-io">.io</span>
         </div>
-        <main class="prehyd-main">
-          <div class="prehyd-container">
-            <div class="prehyd-typebox-wrap">
-              <div class="prehyd-typebox">
-                <div class="prehyd-typebox-content">Loading..</div>
-              </div>
-            </div>
-          </div>
-        </main>
+        <div class="loading-spinner">
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+        </div>
       </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
