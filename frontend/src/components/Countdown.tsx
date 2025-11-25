@@ -91,7 +91,12 @@ export const Countdown = () => {
       `}</style>
       </div>
       {showImage && (
-        <div className="fixed left-12 top-[52%] -translate-y-1/2 pointer-events-none z-50">
+        <div 
+          className="fixed top-[52%] -translate-y-1/2 pointer-events-none z-50"
+          style={{
+            left: "max(1rem, calc((100vw - var(--max-content-width)) / 2 - 4.5rem))",
+          }}
+        >
           <img
             src="/bufo-lets-goo.gif"
             alt=""
