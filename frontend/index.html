@@ -68,8 +68,16 @@
     </noscript>
     
     <style>
+      :root {
+        --color-bg-primary: #202020;
+        --color-white: #ffffff;
+        --color-white-25: rgba(255, 255, 255, 0.25);
+        --color-accent: #fbbf24;
+        --max-content-width: 1000px;
+      }
+
       * { box-sizing: border-box; }
-      body { margin: 0; background-color: #202020; min-height: 100vh; }
+      body { margin: 0; background-color: var(--color-bg-primary); min-height: 100vh; }
       noscript { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
 
       .loading-container {
@@ -79,7 +87,7 @@
 
       .loading-content {
         width: 100%;
-        max-width: 1000px;
+        max-width: var(--max-content-width);
         margin-left: auto;
         margin-right: auto;
         display: flex;
@@ -100,12 +108,12 @@
       }
 
       .loading-logo-text {
-        color: #ffffff;
+        color: var(--color-white);
         text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
       }
 
       .loading-logo-accent {
-        color: #fbbf24;
+        color: var(--color-accent);
         text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
         font-style: italic;
         position: relative;
@@ -118,13 +126,13 @@
         left: -1px;
         width: 95%;
         height: 2.5px;
-        background: #fbbf24;
+        background: var(--color-accent);
         transform: skewX(-11deg);
         transform-origin: bottom left;
       }
 
       .loading-logo-io {
-        color: rgba(255, 255, 255, 0.25);
+        color: var(--color-white-25);
         font-size: 1.1rem;
         font-weight: 600;
         font-style: normal;
