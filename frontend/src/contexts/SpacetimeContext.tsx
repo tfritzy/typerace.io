@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { SpacetimeDBProvider, useSpacetimeDB } from 'spacetimedb/react';
 import { DbConnection } from '../../module_bindings';
 import { useAuth } from '../firebase/AuthContext';
+import { LoadingDots } from '../components/LoadingDots';
 
 interface SpacetimeProviderProps {
     children: React.ReactNode;
@@ -32,7 +33,7 @@ const IdentityGate = ({ children }: { children: React.ReactNode }) => {
     }, [conn?.identity]);
 
     if (!conn?.identity) {
-        return null;
+        return <LoadingDots />;
     }
 
     return <>{children}</>;
@@ -56,7 +57,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     }, [user]);
 
     if (!token) {
-        return null;
+        return <LoadingDots />;
     }
 
     const connectionBuilder = DbConnection.builder()

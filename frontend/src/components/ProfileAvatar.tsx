@@ -12,7 +12,7 @@ import { XpGainPopup } from "./XpGainPopup";
 export const ProfileAvatar = () => {
     const navigate = useNavigate();
     const conn = useSpacetimeDB<DbConnection>();
-    const { user, signInWithGoogle, signInWithGithub } = useAuth();
+    const { signInWithGoogle, signInWithGithub } = useAuth();
     const { rows: players } = useTable<DbConnection, Player>(
         "player"
     );

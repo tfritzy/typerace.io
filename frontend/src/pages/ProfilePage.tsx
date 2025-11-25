@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
 import { PlayerAvatar } from "../components/PlayerAvatar";
 import { useParams, useNavigate } from "react-router-dom";
-import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { getColorConfig } from "../utils/colorMapping";
 import { EditNameModal } from "../components/EditNameModal";
@@ -31,43 +30,8 @@ export const ProfilePage = () => {
     const { signOut } = useAuth();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (!conn || !playerId) return;
-
-        const playerSubscription = conn.subscriptionBuilder()
-            .onError((error: ErrorContextInterface) => {
-                console.error("Error subscribing to player:", error);
-            })
-            .subscribe(`select * from player where PlayerId = '${playerId}'`);
-
-        return () => {
-            playerSubscription.unsubscribe();
-        };
-    }, [conn, playerId]);
-
     const viewedPlayer = playerId ? players.find(p => p.playerId === playerId) : null;
     const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.identity);
-
-    useEffect(() => {
-        if (!conn || !viewedPlayer) return;
-
-        const gameRecordSubscription = conn.subscriptionBuilder()
-            .onError((error: ErrorContextInterface) => {
-                console.error("Error subscribing to gamerecord:", error);
-            })
-            .subscribe(`select * from gamerecord where PlayerId = '${viewedPlayer.identity}'`);
-
-        const personalRecordSubscription = conn.subscriptionBuilder()
-            .onError((error: ErrorContextInterface) => {
-                console.error("Error subscribing to personalrecord:", error);
-            })
-            .subscribe(`select * from personalrecord where PlayerId = '${viewedPlayer.identity}'`);
-
-        return () => {
-            gameRecordSubscription.unsubscribe();
-            personalRecordSubscription.unsubscribe();
-        };
-    }, [conn, viewedPlayer]);
 
     useEffect(() => {
         if (viewedPlayer && viewedPlayer.isAnonymous) {

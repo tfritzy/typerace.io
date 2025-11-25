@@ -6,7 +6,6 @@ import {
   type Game,
   PlayerProgress,
 } from "../../module_bindings";
-import type { ErrorContextInterface } from "spacetimedb/sdk";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { Countdown } from "../components/Countdown";
@@ -22,28 +21,6 @@ export const GamePage = () => {
   const conn = useSpacetimeDB<DbConnection>();
   const [hasFinished, setHasFinished] = useState(false);
 
-  useEffect(() => {
-    if (!conn || !gameId) return;
-
-    const gameSubscription = conn
-      .subscriptionBuilder()
-      .onError((error: ErrorContextInterface) => {
-        console.error("Error subscribing to game:", error);
-      })
-      .subscribe(`select * from game where Id = '${gameId}'`);
-
-    const playerProgressSubscription = conn
-      .subscriptionBuilder()
-      .onError((error: ErrorContextInterface) => {
-        console.error("Error subscribing to playerprogress:", error);
-      })
-      .subscribe(`select * from playerprogress where GameId = '${gameId}'`);
-
-    return () => {
-      gameSubscription.unsubscribe();
-      playerProgressSubscription.unsubscribe();
-    };
-  }, [conn, gameId]);
 
   const { rows: games } = useTable<DbConnection, Game>("game");
   const { rows: playerProgress } = useTable<DbConnection, PlayerProgress>(

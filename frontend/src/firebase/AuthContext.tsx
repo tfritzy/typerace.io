@@ -12,6 +12,7 @@ import {
     type User
 } from 'firebase/auth';
 import { auth } from '../firebase/config';
+import { LoadingDots } from '../components/LoadingDots';
 
 interface AuthContextType {
     user: User | null;
@@ -100,7 +101,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {loading ? <LoadingDots /> : children}
         </AuthContext.Provider>
     );
 };
