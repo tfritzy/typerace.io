@@ -6,6 +6,7 @@ import {
     onAuthStateChanged,
     sendPasswordResetEmail,
     signInWithPopup,
+    signInAnonymously,
     GoogleAuthProvider,
     GithubAuthProvider,
     type User
@@ -42,9 +43,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-            setUser(firebaseUser);
-            setLoading(false);
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            if (!firebaseUser) {
+                try {
+                    await signInAnonymously(auth);
+                } catch (error) {
+                    console.error('Failed to sign in anonymously:', error);
+                    setUser(null);
+                    setLoading(false);
+                }
+            } else {
+                setUser(firebaseUser);
+                setLoading(false);
+            }
         });
 
         return unsubscribe;

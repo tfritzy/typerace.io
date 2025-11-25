@@ -83,7 +83,7 @@ export const ProfileAvatar = () => {
     const xpProgress = xpProgressToNextLevel(currentXP, xpRequired);
 
     const identityHash = conn?.identity?.toHexString() ?? "default";
-    const isAnonymous = !user;
+    const isAnonymous = myPlayer?.isAnonymous ?? true;
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
