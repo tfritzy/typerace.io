@@ -43,7 +43,7 @@ public static class English500Words
         "argue", "cup", "particularly", "amount", "ability", "staff", "recognize", "indicate", "character", "growth",
         "loss", "degree", "wonder", "attack", "herself", "region", "television", "box", "training", "pretty",
         "trade", "election", "everybody", "physical", "lay", "general", "feeling", "standard", "bill", "message",
-        "fail", "outside", "arrive", "analysis", "benefit", "sex", "forward", "lawyer", "present", "section",
+        "fail", "outside", "arrive", "analysis", "benefit", "forward", "lawyer", "present", "section",
         "environmental", "glass", "skill", "sister", "professor", "operation", "financial", "crime", "stage", "compare",
         "authority", "miss", "design", "sort", "act", "ten", "knowledge", "gun", "station", "blue",
         "strategy", "little", "clearly", "discuss", "indeed", "truth", "song", "example", "democratic", "check",

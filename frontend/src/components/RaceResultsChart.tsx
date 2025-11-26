@@ -159,7 +159,9 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
         scales: {
             x: {
                 type: 'linear',
+                min: 0,
                 max: maxDataIndex,
+                offset: false,
                 title: {
                     display: true,
                     text: 'Time (seconds)',
