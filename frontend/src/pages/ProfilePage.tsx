@@ -191,7 +191,7 @@ export const ProfilePage = () => {
                                 </div>
                             </div>
                         )}
-                        {viewedPlayer ? (
+                        {viewedPlayer && (
                             <>
                                 <div className="flex items-start gap-6 mb-6">
                                     <PlayerAvatar
@@ -283,10 +283,6 @@ export const ProfilePage = () => {
                                     </div>
                                 </div>
                             </>
-                        ) : (
-                            <div className="text-white/60 text-center p-6">
-                                No player data found
-                            </div>
                         )}
                     </div>
 

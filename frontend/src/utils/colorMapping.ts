@@ -171,7 +171,6 @@ export function getColorConfig(color: PlayerColor): ColorConfig {
 }
 
 export function setAccentColor(color: PlayerColor): void {
-    console.log("setting accent color to", color);
     const config = getColorConfig(color);
     const root = document.documentElement;
     root.style.setProperty('--color-accent', config.primary);

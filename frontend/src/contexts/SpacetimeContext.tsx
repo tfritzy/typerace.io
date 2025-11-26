@@ -64,16 +64,9 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
         .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
         .withModuleName('typerace')
         .withToken(token)
-        .onConnect((conn, identity) => {
-            console.log('Connected with identity:', identity.toHexString());
+        .onConnect((conn) => {
             const isAnonymous = user?.isAnonymous ?? true;
             conn.reducers.syncAnonymousStatus(isAnonymous);
-        })
-        .onDisconnect(() => {
-            console.log('Disconnected from SpacetimeDB');
-        })
-        .onConnectError((err: unknown) => {
-            console.log('Error connecting to SpacetimeDB:', err);
         });
 
     return (

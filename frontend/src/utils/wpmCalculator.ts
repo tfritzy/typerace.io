@@ -126,8 +126,6 @@ export function getAggWpmBySecond(
 ): number[] {
   const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
 
-  console.log(events);
-    
   if (!events || events.length === 0) {
     return [];
   }
