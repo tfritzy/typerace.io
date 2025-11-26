@@ -1,7 +1,6 @@
-import { useTable } from "spacetimedb/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "../components/Header";
-import type { DbConnection } from "../../module_bindings";
+import { useDatabase } from "../contexts/SpacetimeContext";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -50,10 +49,43 @@ interface GlobalStats {
 }
 
 export const SiteStatsPage = () => {
-    const { rows: globalStatsRows } = useTable<DbConnection, GlobalStats>("globalstats");
+    const conn = useDatabase();
+    const [globalStats, setGlobalStats] = useState<GlobalStats[]>([]);
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('1month');
 
-    const globalStats = globalStatsRows || [];
+    useEffect(() => {
+        if (!conn) return;
+
+        const handleStatsInsert = (_ctx: any, stats: GlobalStats) => {
+            setGlobalStats(prev => {
+                if (prev.some(s => s.date === stats.date)) {
+                    return prev;
+                }
+                return [...prev, stats];
+            });
+        };
+
+        const handleStatsUpdate = (_ctx: any, _oldStats: GlobalStats, newStats: GlobalStats) => {
+            setGlobalStats(prev =>
+                prev.map(s => s.date === newStats.date ? newStats : s)
+            );
+        };
+
+        conn.db.globalstats.onInsert(handleStatsInsert);
+        conn.db.globalstats.onUpdate(handleStatsUpdate);
+
+        const subscription = conn.subscriptionBuilder()
+            .onApplied(() => {
+                setGlobalStats(Array.from(conn.db.globalstats.iter()));
+            })
+            .subscribe([`SELECT * FROM globalstats`]);
+
+        return () => {
+            conn.db.globalstats.removeOnInsert(handleStatsInsert);
+            conn.db.globalstats.removeOnUpdate(handleStatsUpdate);
+            subscription.unsubscribe();
+        };
+    }, [conn]);
 
     const getFilteredStats = () => {
         if (globalStats.length === 0) return [];
@@ -249,6 +281,7 @@ export const SiteStatsPage = () => {
                 border: { display: false }
             },
             y: {
+                beginAtZero: true,
                 ticks: {
                     color: 'rgba(255, 255, 255, 0.6)',
                     font: { size: 10 },
@@ -319,61 +352,63 @@ export const SiteStatsPage = () => {
     };
 
     return (
-        <div className="relative min-h-screen flex flex-col overflow-hidden">
+        <div className="min-h-screen">
             <Header />
-            <div className="flex-1 overflow-y-auto p-4">
-                <h1 className="text-3xl font-bold mb-6 text-white px-4">Site Statistics</h1>
+            <div className="flex flex-col items-center px-4 pb-12">
+                <div className="content-container">
+                    <h1 className="text-3xl font-bold mb-6 text-white">Site Statistics</h1>
 
-                <div className="mb-6 px-4 flex gap-2">
-                    {(['1month', '6months', '1year', 'all'] as TimeFrame[]).map(timeFrame => (
-                        <button
-                            key={timeFrame}
-                            onClick={() => setSelectedTimeFrame(timeFrame)}
-                            className={`px-4 py-2 rounded-lg transition-all ${selectedTimeFrame === timeFrame
-                                ? 'bg-amber-400 text-black font-semibold'
-                                : 'bg-white/5 text-white/80 hover:bg-white/10'
-                                }`}
-                        >
-                            {timeFrame === '1month' ? '1 Month' :
-                                timeFrame === '6months' ? '6 Months' :
-                                    timeFrame === '1year' ? '1 Year' : 'All Time'}
-                        </button>
-                    ))}
+                    <div className="mb-6 flex gap-2">
+                        {(['1month', '6months', '1year', 'all'] as TimeFrame[]).map(timeFrame => (
+                            <button
+                                key={timeFrame}
+                                onClick={() => setSelectedTimeFrame(timeFrame)}
+                                className={`px-4 py-2 rounded-lg transition-all ${selectedTimeFrame === timeFrame
+                                    ? 'bg-amber-400 text-black font-semibold'
+                                    : 'bg-white/5 text-white/80 hover:bg-white/10'
+                                    }`}
+                            >
+                                {timeFrame === '1month' ? '1 Month' :
+                                    timeFrame === '6months' ? '6 Months' :
+                                        timeFrame === '1year' ? '1 Year' : 'All Time'}
+                            </button>
+                        ))}
+                    </div>
+
+                    <section className="mb-8 box box-shadow rounded-lg p-6">
+                        <h2 className="text-xl font-semibold mb-4 text-white">Games Played Per Day by Game Mode</h2>
+                        <div className="h-[300px]">
+                            <Line data={gamesPerDayData} options={lineChartOptions} />
+                        </div>
+                    </section>
+
+                    <section className="mb-8 box box-shadow rounded-lg p-6">
+                        <h2 className="text-xl font-semibold mb-4 text-white">Players Per Day by Game Mode</h2>
+                        <div className="h-[300px]">
+                            <Line data={playersPerDayData} options={lineChartOptions} />
+                        </div>
+                    </section>
+
+                    <section className="mb-8 box box-shadow rounded-lg p-6">
+                        <h2 className="text-xl font-semibold mb-2 text-white">Non-Lonely Games</h2>
+                        <p className="text-sm text-gray-400 mb-4">
+                            Percentage of games with 2+ human players
+                        </p>
+                        <div className="h-[280px]">
+                            <Line data={nonLonelyGamesData} options={areaChartOptions} />
+                        </div>
+                    </section>
+
+                    <section className="mb-8 box box-shadow rounded-lg p-6">
+                        <h2 className="text-xl font-semibold mb-2 text-white">Game Completion Rate</h2>
+                        <p className="text-sm text-gray-400 mb-4">
+                            Percentage of started games that were completed
+                        </p>
+                        <div className="h-[280px]">
+                            <Line data={completionRateData} options={areaChartOptions} />
+                        </div>
+                    </section>
                 </div>
-
-                <section className="mb-8 box box-shadow rounded-lg p-6">
-                    <h2 className="text-xl font-semibold mb-4 text-white">Games Played Per Day by Game Mode</h2>
-                    <div className="h-[300px]">
-                        <Line data={gamesPerDayData} options={lineChartOptions} />
-                    </div>
-                </section>
-
-                <section className="mb-8 box box-shadow rounded-lg p-6">
-                    <h2 className="text-xl font-semibold mb-4 text-white">Players Per Day by Game Mode</h2>
-                    <div className="h-[300px]">
-                        <Line data={playersPerDayData} options={lineChartOptions} />
-                    </div>
-                </section>
-
-                <section className="mb-8 box box-shadow rounded-lg p-6">
-                    <h2 className="text-xl font-semibold mb-2 text-white">Non-Lonely Games</h2>
-                    <p className="text-sm text-gray-400 mb-4">
-                        Percentage of games with 2+ human players
-                    </p>
-                    <div className="h-[280px]">
-                        <Line data={nonLonelyGamesData} options={areaChartOptions} />
-                    </div>
-                </section>
-
-                <section className="mb-8 box box-shadow rounded-lg p-6">
-                    <h2 className="text-xl font-semibold mb-2 text-white">Game Completion Rate</h2>
-                    <p className="text-sm text-gray-400 mb-4">
-                        Percentage of started games that were completed
-                    </p>
-                    <div className="h-[280px]">
-                        <Line data={completionRateData} options={areaChartOptions} />
-                    </div>
-                </section>
             </div>
         </div>
     );

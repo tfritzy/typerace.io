@@ -253,6 +253,7 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                 }
             },
             y: {
+                beginAtZero: true,
                 title: {
                     display: false
                 },
