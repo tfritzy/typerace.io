@@ -1,57 +1,63 @@
 import { useNavigate } from "react-router-dom";
-import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import { PlayerColor, type DbConnection, type Player } from "../../module_bindings";
+import { PlayerColor, type Player } from "../../module_bindings";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { useEffect, useState, useRef } from "react";
 import { setAccentColor } from "../utils/colorMapping";
 import { useAuth } from "../firebase/AuthContext";
-import type { XpGain } from "../../module_bindings/xp_gain_type";
-import { XpGainPopup } from "./XpGainPopup";
+import { useDatabase } from "../contexts/SpacetimeContext";
 
 export const ProfileAvatar = () => {
     const navigate = useNavigate();
-    const conn = useSpacetimeDB<DbConnection>();
+    const conn = useDatabase();
     const { signInWithGoogle, signInWithGithub } = useAuth();
-    const { rows: players } = useTable<DbConnection, Player>(
-        "player"
-    );
-    useTable<DbConnection, XpGain>("xpgain");
+    const [myPlayer, setMyPlayer] = useState<Player | null>(null);
     const [showMenu, setShowMenu] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [xpGains, setXpGains] = useState<XpGain[]>([]);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    const myPlayer = conn?.identity
-        ? players.find((p) => p.identity.isEqual(conn.identity!))
-        : null;
+    useEffect(() => {
+        if (!conn?.identity) return;
+
+        const currentIdentity = conn.identity;
+
+        const handlePlayerInsert = (_ctx: any, player: Player) => {
+            if (player.identity.isEqual(currentIdentity)) {
+                setMyPlayer(player);
+            }
+        };
+
+        const handlePlayerUpdate = (_ctx: any, _oldPlayer: Player, newPlayer: Player) => {
+            if (newPlayer.identity.isEqual(currentIdentity)) {
+                setMyPlayer(newPlayer);
+            }
+        };
+
+        const handlePlayerDelete = (_ctx: any, player: Player) => {
+            if (player.identity.isEqual(currentIdentity)) {
+                setMyPlayer(null);
+            }
+        };
+
+        conn.db.player.onInsert(handlePlayerInsert);
+        conn.db.player.onUpdate(handlePlayerUpdate);
+        conn.db.player.onDelete(handlePlayerDelete);
+
+        const subscription = conn.subscriptionBuilder()
+            .subscribe([`SELECT * FROM player WHERE Identity = '${currentIdentity}'`]);
+
+        return () => {
+            conn.db.player.removeOnInsert(handlePlayerInsert);
+            conn.db.player.removeOnUpdate(handlePlayerUpdate);
+            conn.db.player.removeOnDelete(handlePlayerDelete);
+            subscription.unsubscribe();
+        };
+    }, [conn]);
 
     useEffect(() => {
         setAccentColor(myPlayer?.color || PlayerColor.Amber);
     }, [myPlayer]);
-
-    useEffect(() => {
-        if (!conn?.db || !conn?.identity) return;
-
-        const currentIdentity = conn.identity;
-
-        const onInsert = (_: any, xpGain: XpGain) => {
-            if (xpGain.playerId.isEqual(currentIdentity)) {
-                setXpGains(prev => [...prev, xpGain]);
-            }
-        };
-
-        conn.db.xpgain.onInsert(onInsert);
-
-        return () => {
-            conn.db.xpgain.removeOnInsert(onInsert);
-        };
-    }, [conn]);
-
-    const handleXpComplete = (xpGainId: string) => {
-        setXpGains(prev => prev.filter(g => g.id !== xpGainId));
-    };
 
     const handleSocialSignIn = async (provider: 'google' | 'github' | 'discord') => {
         setError("");
@@ -120,17 +126,6 @@ export const ProfileAvatar = () => {
                             color={myPlayer?.color}
                             isHighlighted={false}
                         />
-                        {xpGains.length > 0 && (
-                            <div className="absolute top-full left-0 mt-2 z-50 pointer-events-none">
-                                {xpGains.map((xpGain) => (
-                                    <XpGainPopup
-                                        key={xpGain.id}
-                                        xpGain={xpGain}
-                                        onComplete={() => handleXpComplete(xpGain.id)}
-                                    />
-                                ))}
-                            </div>
-                        )}
                     </div>
 
                     <div className="hidden sm:flex flex-col items-start gap-1.5 min-w-50">
@@ -203,17 +198,6 @@ export const ProfileAvatar = () => {
                     color={myPlayer?.color}
                     isHighlighted={true}
                 />
-                {xpGains.length > 0 && (
-                    <div className="absolute top-full left-0 mt-2 z-50 pointer-events-none flex flex-col gap-2">
-                        {xpGains.map((xpGain) => (
-                            <XpGainPopup
-                                key={xpGain.id}
-                                xpGain={xpGain}
-                                onComplete={() => handleXpComplete(xpGain.id)}
-                            />
-                        ))}
-                    </div>
-                )}
             </div>
 
             <div className="hidden sm:flex flex-col items-start gap-1 min-w-50">

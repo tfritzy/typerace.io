@@ -1,36 +1,44 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import type {
-  DbConnection,
   GameMode,
 } from "../../module_bindings";
-import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { useToast } from "./useToast";
+import { useDatabase } from "../contexts/SpacetimeContext";
 
 export const useFindGame = () => {
-  const [joinCode, setJoinCode] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
-  const conn = useSpacetimeDB<DbConnection>();
+  const conn = useDatabase();
   const navigate = useNavigate();
-  const playerProgress = useTable("playerprogress").rows;
   const { showToast } = useToast();
   const pendingJoinCodeRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!joinCode || !conn.identity) return;
+    if (!conn || !pendingJoinCodeRef.current) return;
 
-    const myProgress = playerProgress.find(
-      (row) => row.playerId.isEqual(conn.identity!) && row.joinCode === joinCode
-    );
+    const joinCode = pendingJoinCodeRef.current;
 
-    if (myProgress) {
-      navigate(`/game/${myProgress.gameId.toString()}`, { replace: true });
-      setIsSearching(false);
-      setJoinCode(null);
-      pendingJoinCodeRef.current = null;
-    }
-  }, [playerProgress, joinCode, conn.identity, navigate]);
+    const handleInsert = (_ctx: any, progress: any) => {
+      if (conn?.identity && progress.playerId.isEqual(conn.identity)) {
+        if (progress.joinCode === joinCode) {
+          navigate(`/game/${progress.gameId.toString()}`, { replace: true });
+          setIsSearching(false);
+          pendingJoinCodeRef.current = null;
+        }
+      }
+    };
+
+    conn.db.playerprogress.onInsert(handleInsert);
+
+    const subscription = conn.subscriptionBuilder()
+      .subscribe([`SELECT * FROM playerprogress WHERE JoinCode = '${joinCode}'`]);
+
+    return () => {
+      conn.db.playerprogress.removeOnInsert(handleInsert);
+      subscription.unsubscribe();
+    };
+  }, [conn, navigate, pendingJoinCodeRef.current]);
 
   useEffect(() => {
     if (!conn) return;
@@ -46,12 +54,10 @@ export const useFindGame = () => {
       if (ctx.event.status.tag === "Failed") {
         showToast(ctx.event.status.value);
         setIsSearching(false);
-        setJoinCode(null);
         pendingJoinCodeRef.current = null;
       } else if (ctx.event.status.tag === "OutOfEnergy") {
         showToast("Server out of energy. Please try again later.");
         setIsSearching(false);
-        setJoinCode(null);
         pendingJoinCodeRef.current = null;
       }
     };
@@ -68,7 +74,6 @@ export const useFindGame = () => {
     setIsSearching(true);
 
     const newJoinCode = `join_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-    setJoinCode(newJoinCode);
     pendingJoinCodeRef.current = newJoinCode;
 
     const gameTypeEnum = { tag: gameType };

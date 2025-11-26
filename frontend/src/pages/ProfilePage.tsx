@@ -1,5 +1,4 @@
-import { useSpacetimeDB, useTable } from "spacetimedb/react";
-import type { DbConnection, Player, GameRecord, PlayerColor } from "../../module_bindings";
+import type { Player, GameRecord, PlayerColor } from "../../module_bindings";
 import { WpmChart } from "../components/WpmChart";
 import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
@@ -13,14 +12,15 @@ import { formatNumber, formatTimeSpent } from "../utils/formatters";
 import { useAuth } from "../firebase/AuthContext";
 import { Select } from "../components/Select";
 import { RecentGames } from "../components/RecentGames";
+import { useDatabase } from "../contexts/SpacetimeContext";
 
 type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
 export const ProfilePage = () => {
     const { playerId } = useParams<{ playerId: string }>();
-    const conn = useSpacetimeDB<DbConnection>();
-    const { rows: players } = useTable<DbConnection, Player>("player");
-    const { rows: gameRecords } = useTable<DbConnection, GameRecord>("gamerecord");
+    const conn = useDatabase();
+    const [viewedPlayer, setViewedPlayer] = useState<Player | null>(null);
+    const [gameRecords, setGameRecords] = useState<GameRecord[]>([]);
     const [selectedMode, setSelectedMode] = useState<string>('all');
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('all');
     const [isEditNameModalOpen, setIsEditNameModalOpen] = useState(false);
@@ -30,8 +30,64 @@ export const ProfilePage = () => {
     const { signOut } = useAuth();
     const navigate = useNavigate();
 
-    const viewedPlayer = playerId ? players.find(p => p.playerId === playerId) : null;
     const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.identity);
+
+    useEffect(() => {
+        if (!conn || !playerId) return;
+
+        const handlePlayerInsert = (_ctx: any, player: Player) => {
+            if (player.playerId === playerId) {
+                setViewedPlayer(player);
+            }
+        };
+
+        const handlePlayerUpdate = (_ctx: any, _oldPlayer: Player, newPlayer: Player) => {
+            if (newPlayer.playerId === playerId) {
+                setViewedPlayer(newPlayer);
+            }
+        };
+
+        conn.db.player.onInsert(handlePlayerInsert);
+        conn.db.player.onUpdate(handlePlayerUpdate);
+
+        const subscription = conn.subscriptionBuilder()
+            .onApplied(() => {
+                const allPlayers = Array.from(conn.db.player.iter());
+                const p = allPlayers.find(player => player.playerId === playerId);
+                if (p) setViewedPlayer(p);
+            })
+            .subscribe([`SELECT * FROM player WHERE PlayerId = '${playerId}'`]);
+
+        return () => {
+            conn.db.player.removeOnInsert(handlePlayerInsert);
+            conn.db.player.removeOnUpdate(handlePlayerUpdate);
+            subscription.unsubscribe();
+        };
+    }, [conn, playerId]);
+
+    useEffect(() => {
+        if (!conn || !playerId) return;
+
+        const handleGameRecordInsert = (_ctx: any, record: GameRecord) => {
+            if (record.playerId.toHexString() === playerId) {
+                setGameRecords(prev => [...prev, record]);
+            }
+        };
+
+        conn.db.gamerecord.onInsert(handleGameRecordInsert);
+
+        const subscription = conn.subscriptionBuilder()
+            .onApplied(() => {
+                const records = Array.from(conn.db.gamerecord.iter());
+                setGameRecords(records);
+            })
+            .subscribe([`SELECT * FROM gamerecord WHERE PlayerId = '${viewedPlayer?.identity}'`]);
+
+        return () => {
+            conn.db.gamerecord.removeOnInsert(handleGameRecordInsert);
+            subscription.unsubscribe();
+        };
+    }, [conn, viewedPlayer?.identity]);
 
     useEffect(() => {
         if (viewedPlayer && viewedPlayer.isAnonymous) {

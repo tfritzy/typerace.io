@@ -1,21 +1,48 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useTable, where, eq } from "spacetimedb/react";
-import type { DbConnection, Game } from "../../module_bindings";
+import type { Game } from "../../module_bindings";
+import { useDatabase } from "../contexts/SpacetimeContext";
 
 export const Countdown = () => {
   const { gameId } = useParams<{ gameId: string }>();
+  const conn = useDatabase();
   const [count, setCount] = useState(3);
   const [isVisible, setIsVisible] = useState(false);
   const [showImage, setShowImage] = useState(false);
   const [previousGameState, setPreviousGameState] = useState<string | null>(null);
+  const [game, setGame] = useState<Game | null>(null);
 
-  const { rows: games } = useTable<DbConnection, Game>(
-    "game",
-    where(eq("id", gameId || ""))
-  );
+  useEffect(() => {
+    if (!conn || !gameId) return;
 
-  const game = games[0];
+    const handleGameInsert = (_ctx: any, g: Game) => {
+      if (g.id.toString() === gameId) {
+        setGame(g);
+      }
+    };
+
+    const handleGameUpdate = (_ctx: any, _oldGame: Game, newGame: Game) => {
+      if (newGame.id.toString() === gameId) {
+        setGame(newGame);
+      }
+    };
+
+    conn.db.game.onInsert(handleGameInsert);
+    conn.db.game.onUpdate(handleGameUpdate);
+
+    const subscription = conn.subscriptionBuilder()
+      .onApplied(() => {
+        const g = conn.db.game.id.find(gameId);
+        if (g) setGame(g);
+      })
+      .subscribe([`SELECT * FROM game WHERE Id = '${gameId}'`]);
+
+    return () => {
+      conn.db.game.removeOnInsert(handleGameInsert);
+      conn.db.game.removeOnUpdate(handleGameUpdate);
+      subscription.unsubscribe();
+    };
+  }, [conn, gameId]);
 
   useEffect(() => {
     if (!game) return;
@@ -91,7 +118,7 @@ export const Countdown = () => {
       `}</style>
       </div>
       {showImage && (
-        <div 
+        <div
           className="fixed top-[52%] -translate-y-1/2 pointer-events-none z-50"
           style={{
             left: "max(1rem, calc((100vw - var(--max-content-width)) / 2 - 4.5rem))",

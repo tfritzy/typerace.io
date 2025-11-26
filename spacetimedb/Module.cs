@@ -150,8 +150,6 @@ public static partial class Module
         [PrimaryKey]
         public Identity Identity;
         [SpacetimeDB.Index.BTree]
-        public string IdentityString;
-        [SpacetimeDB.Index.BTree]
         public string PlayerId;
         public string Name;
         public int TotalGames;
@@ -386,7 +384,6 @@ public static partial class Module
             ctx.Db.player.Insert(new Player
             {
                 Identity = identity,
-                IdentityString = identity.ToString(),
                 PlayerId = IdGenerator.Generate("plyr_", ctx.Rng),
                 Name = botName,
                 TotalGames = 0,
@@ -455,7 +452,6 @@ public static partial class Module
             ctx.Db.player.Insert(new Player
             {
                 Identity = ctx.Sender,
-                IdentityString = ctx.Sender.ToString(),
                 PlayerId = IdGenerator.Generate("plyr_", ctx.Rng),
                 Name = $"Anonymous {animalName}",
                 TotalGames = 0,

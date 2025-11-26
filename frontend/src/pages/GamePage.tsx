@@ -1,8 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useCallback, useState } from "react";
-import { useSpacetimeDB, useTable } from "spacetimedb/react";
 import {
-  type DbConnection,
   type Game,
   PlayerProgress,
 } from "../../module_bindings";
@@ -14,23 +12,91 @@ import { AllPlayersResults } from "../components/AllPlayersResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
+import { useDatabase } from "../contexts/SpacetimeContext";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
-  const conn = useSpacetimeDB<DbConnection>();
+  const conn = useDatabase();
   const [hasFinished, setHasFinished] = useState(false);
+  const [game, setGame] = useState<Game | null>(null);
+  const [gamePlayerProgress, setGamePlayerProgress] = useState<PlayerProgress[]>([]);
 
+  useEffect(() => {
+    if (!conn || !gameId) return;
 
-  const { rows: games } = useTable<DbConnection, Game>("game");
-  const { rows: playerProgress } = useTable<DbConnection, PlayerProgress>(
-    "playerprogress"
-  );
+    const handleGameInsert = (_ctx: any, g: Game) => {
+      if (g.id.toString() === gameId) {
+        setGame(g);
+      }
+    };
 
-  const game = games.find((g) => g.id.toString() === gameId);
-  const gamePlayerProgress = playerProgress.filter(
-    (pp) => pp.gameId.toString() === gameId
-  );
+    const handleGameUpdate = (_ctx: any, _oldGame: Game, newGame: Game) => {
+      if (newGame.id.toString() === gameId) {
+        setGame(newGame);
+      }
+    };
+
+    conn.db.game.onInsert(handleGameInsert);
+    conn.db.game.onUpdate(handleGameUpdate);
+
+    const gameSubscription = conn.subscriptionBuilder()
+      .onApplied(() => {
+        const g = conn.db.game.id.find(gameId);
+        if (g) setGame(g);
+      })
+      .subscribe([`SELECT * FROM game WHERE Id = '${gameId}'`]);
+
+    return () => {
+      conn.db.game.removeOnInsert(handleGameInsert);
+      conn.db.game.removeOnUpdate(handleGameUpdate);
+      gameSubscription.unsubscribe();
+    };
+  }, [conn, gameId]);
+
+  useEffect(() => {
+    if (!conn || !gameId) return;
+
+    const handleProgressInsert = (_ctx: any, pp: PlayerProgress) => {
+      if (pp.gameId.toString() === gameId) {
+        setGamePlayerProgress(prev => {
+          if (prev.some(p => p.id === pp.id)) {
+            return prev;
+          }
+          return [...prev, pp];
+        });
+      }
+
+      if (conn?.identity && pp.playerId.isEqual(conn.identity)) {
+        if (pp.joinCode === gameId && pp.gameId.toString() !== gameId) {
+          navigate(`/game/${pp.gameId.toString()}`, { replace: true });
+        }
+      }
+    };
+
+    const handleProgressUpdate = (_ctx: any, _oldPP: PlayerProgress, newPP: PlayerProgress) => {
+      if (newPP.gameId.toString() === gameId) {
+        setGamePlayerProgress(prev =>
+          prev.map(pp => pp.id === newPP.id ? newPP : pp)
+        );
+      }
+    };
+
+    conn.db.playerprogress.onInsert(handleProgressInsert);
+    conn.db.playerprogress.onUpdate(handleProgressUpdate);
+
+    const progressSubscription = conn.subscriptionBuilder()
+      .onApplied(() => {
+        setGamePlayerProgress(Array.from(conn.db.playerprogress.iter()));
+      })
+      .subscribe([`SELECT * FROM playerprogress WHERE GameId = '${gameId}'`]);
+
+    return () => {
+      conn.db.playerprogress.removeOnInsert(handleProgressInsert);
+      conn.db.playerprogress.removeOnUpdate(handleProgressUpdate);
+      progressSubscription.unsubscribe();
+    };
+  }, [conn, gameId, navigate]);
 
   useEffect(() => {
     if (!conn || !game) return;
@@ -67,23 +133,7 @@ export const GamePage = () => {
     }
   }, [conn, game, gameId, gamePlayerProgress]);
 
-  useEffect(() => {
-    if (!conn || !gameId) return;
 
-    const currentPlayerId = conn.identity;
-    if (!currentPlayerId) return;
-
-    const rematchProgress = playerProgress.find(
-      (pp) =>
-        pp.playerId.isEqual(currentPlayerId) &&
-        pp.joinCode === gameId &&
-        pp.gameId.toString() !== gameId
-    );
-
-    if (rematchProgress) {
-      navigate(`/game/${rematchProgress.gameId.toString()}`, { replace: true });
-    }
-  }, [conn, gameId, playerProgress, navigate]);
 
   const getPlayerName = (pp: PlayerProgress) => {
     return pp.playerName;
@@ -207,7 +257,7 @@ export const GamePage = () => {
                       gameType={game.gameType?.tag as any}
                       gameId={gameId}
                       rematchDisabled={rematchDisabled}
-                      conn={conn}
+                      conn={conn || undefined}
                     />
                   )}
                 </div>

@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { SpacetimeDBProvider, useSpacetimeDB } from 'spacetimedb/react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { DbConnection } from '../../module_bindings';
 import { useAuth } from '../firebase/AuthContext';
 import { LoadingDots } from '../components/LoadingDots';
@@ -8,56 +7,67 @@ interface SpacetimeProviderProps {
     children: React.ReactNode;
 }
 
-const IdentityGate = ({ children }: { children: React.ReactNode }) => {
-    const conn = useSpacetimeDB<DbConnection>();
-    const [, setTick] = useState(0);
+interface SpacetimeContextType {
+    conn: DbConnection | null;
+}
 
-    if (!conn?.identity) {
-        requestAnimationFrame(() => {
-            setTick(t => t + 1);
-        });
-        return <LoadingDots />;
+const SpacetimeContext = createContext<SpacetimeContextType | undefined>(undefined);
+
+export const useDatabase = () => {
+    const context = useContext(SpacetimeContext);
+    if (!context) {
+        throw new Error('useDatabase must be used within SpacetimeProvider');
     }
-
-    return <>{children}</>;
+    return context.conn;
 };
 
 export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     const { user } = useAuth();
-    const [token, setToken] = useState<string | undefined>(undefined);
+    const [conn, setConn] = useState<DbConnection | null>(null);
 
     useEffect(() => {
-        const loadToken = async () => {
-            if (user) {
-                const idToken = await user.getIdToken();
-                setToken(idToken);
-            } else {
-                setToken(undefined);
-            }
+        if (!user) {
+            return;
+        }
+
+        const connectToDatabase = async () => {
+            const idToken = await user.getIdToken();
+
+            const connectionBuilder = DbConnection.builder()
+                .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
+                .withModuleName('typerace')
+                .withToken(idToken)
+                .onConnect((connection) => {
+                    const isAnonymous = user?.isAnonymous ?? true;
+                    connection.reducers.syncAnonymousStatus(isAnonymous);
+                    setConn(connection);
+                });
+
+            const connection = connectionBuilder.build();
+
+            return connection;
         };
 
-        loadToken();
+        const connectionPromise = connectToDatabase();
+
+        return () => {
+            connectionPromise.then((connection) => {
+                connection?.disconnect();
+            });
+        };
     }, [user]);
 
-    if (!token) {
-        console.log("no tokens eh?")
+    if (!user) {
         return <LoadingDots />;
     }
 
-    const connectionBuilder = DbConnection.builder()
-        .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
-        .withModuleName('typerace')
-        .withToken(token)
-        .onConnect((conn) => {
-            const isAnonymous = user?.isAnonymous ?? true;
-            conn.reducers.syncAnonymousStatus(isAnonymous);
-        });
+    if (!conn?.identity) {
+        return <LoadingDots />;
+    }
 
     return (
-        <SpacetimeDBProvider connectionBuilder={connectionBuilder}>
-            <IdentityGate>
-                {children}
-            </IdentityGate>
-        </SpacetimeDBProvider>
+        <SpacetimeContext.Provider value={{ conn }}>
+            {children}
+        </SpacetimeContext.Provider>
     );
 };
