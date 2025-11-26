@@ -8,8 +8,8 @@ export const Logo = ({ className, onClick }: LogoProps) => {
 
     return (
         <Component className={`logo ${className || ''}`} onClick={onClick}>
-            <span className="logo-text">type</span>
-            <span className="logo-accent">race</span>
+            <span className="logo-text">Type</span>
+            <span className="logo-accent">Race</span>
             <span className="logo-io">.io</span>
         </Component>
     );

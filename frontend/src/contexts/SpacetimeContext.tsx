@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { DbConnection } from '../../module_bindings';
 import { useAuth } from '../firebase/AuthContext';
 import { LoadingDots } from '../components/LoadingDots';
@@ -21,69 +21,37 @@ export const useDatabase = () => {
     return context.conn;
 };
 
-const MAX_RECONNECT_ATTEMPTS = 5;
-const INITIAL_RECONNECT_DELAY = 1000;
-
 export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     const { user } = useAuth();
     const [conn, setConn] = useState<DbConnection | null>(null);
-    const reconnectAttempts = useRef(0);
-    const reconnectTimeoutRef = useRef<number | null>(null);
-    const isConnecting = useRef(false);
-    const connectionRef = useRef<DbConnection | null>(null);
+    const [showReconnectModal, setShowReconnectModal] = useState(false);
 
-    const connectToDatabase = async () => {
-        if (!user || isConnecting.current) {
-            return;
-        }
-
-        isConnecting.current = true;
+    const connect = async () => {
+        if (!user) return;
 
         try {
             const idToken = await user.getIdToken();
 
-            const connectionBuilder = DbConnection.builder()
+            const connection = DbConnection.builder()
                 .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
                 .withModuleName('typerace')
                 .withToken(idToken)
-                .onConnect((connection) => {
+                .onConnect((conn) => {
                     console.log('Connected to SpacetimeDB');
-                    reconnectAttempts.current = 0;
-                    const isAnonymous = user?.isAnonymous ?? true;
-                    connection.reducers.syncAnonymousStatus(isAnonymous);
-                    connectionRef.current = connection;
-                    setConn(connection);
-                    isConnecting.current = false;
+                    conn.reducers.syncAnonymousStatus(user.isAnonymous);
+                    setConn(conn);
+                    setShowReconnectModal(false);
                 })
                 .onDisconnect(() => {
                     console.warn('Disconnected from SpacetimeDB');
-                    connectionRef.current = null;
                     setConn(null);
-                    isConnecting.current = false;
-
-                    if (reconnectAttempts.current < MAX_RECONNECT_ATTEMPTS) {
-                        const delay = INITIAL_RECONNECT_DELAY * Math.pow(2, reconnectAttempts.current);
-                        console.log(`Attempting to reconnect in ${delay}ms (attempt ${reconnectAttempts.current + 1}/${MAX_RECONNECT_ATTEMPTS})`);
-
-                        reconnectTimeoutRef.current = setTimeout(() => {
-                            reconnectAttempts.current++;
-                            connectToDatabase();
-                        }, delay);
-                    } else {
-                        console.error('Max reconnection attempts reached. Please refresh the page.');
-                    }
+                    setShowReconnectModal(true);
                 })
-                .onConnectError((error) => {
-                    console.error('SpacetimeDB connection error:', error);
-                    isConnecting.current = false;
-                });
+                .build();
 
-            const connection = connectionBuilder.build();
             return connection;
         } catch (error) {
             console.error('Failed to connect to SpacetimeDB:', error);
-            isConnecting.current = false;
-            throw error;
         }
     };
 
@@ -92,39 +60,57 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
             return;
         }
 
-        const connectionPromise = connectToDatabase();
+        const connectionPromise = connect();
 
         return () => {
-            if (reconnectTimeoutRef.current) {
-                clearTimeout(reconnectTimeoutRef.current);
-            }
             connectionPromise.then((connection) => {
                 connection?.disconnect();
+                setConn(null);
             });
         };
-    }, [user]);
-
-    useEffect(() => {
-        if (!user) {
-            return;
-        }
-
-        if (!conn && !isConnecting.current && reconnectAttempts.current < MAX_RECONNECT_ATTEMPTS) {
-            console.log('No active connection detected during render, attempting to reconnect...');
-            connectToDatabase();
-        }
-    }, [conn, user]);
+    }, [user?.uid]);
 
     if (!user) {
         return <LoadingDots />;
     }
 
-    if (!conn?.identity) {
+    if (!conn?.identity && !showReconnectModal) {
         return <LoadingDots />;
     }
 
     return (
         <SpacetimeContext.Provider value={{ conn }}>
+            {showReconnectModal && (
+                <div
+                    className="fixed inset-0 bg-black/20 flex items-center justify-center z-2000"
+                    style={{
+                        animation: 'modalFadeIn 0.2s ease-out'
+                    }}
+                >
+                    <div
+                        className="bg-[#272727] border border-white/15 rounded-xl p-8 min-w-[400px] max-w-[500px]"
+                        style={{
+                            animation: 'modalSlideIn 0.2s ease-out'
+                        }}
+                    >
+                        <h2 className="text-white text-2xl font-bold mb-4 mt-0">
+                            Connection Lost
+                        </h2>
+                        <p className="text-white/60 mb-8">
+                            Your connection to the server has been lost. Please reconnect to continue.
+                        </p>
+                        <button
+                            onClick={connect}
+                            className="w-full border-0 rounded-md px-5 py-2.5 text-sm font-semibold text-white cursor-pointer"
+                            style={{
+                                backgroundColor: 'var(--color-accent)'
+                            }}
+                        >
+                            Reconnect
+                        </button>
+                    </div>
+                </div>
+            )}
             {children}
         </SpacetimeContext.Provider>
     );
