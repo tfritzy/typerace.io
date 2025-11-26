@@ -249,22 +249,10 @@ body {
   transition: text-shadow 0.2s ease;
 }
 
-.logo-accent::after {
-  content: '';
-  position: absolute;
-  bottom: 4px;
-  left: -1px;
-  width: 95%;
-  height: 2.5px;
-  background: var(--color-accent);
-  transform: skewX(-11deg);
-  transform-origin: bottom left;
-}
-
 .logo-io {
   color: var(--color-white-25);
   font-size: 1.1rem;
   font-weight: 600;
-  font-style: normal;
-  margin-left: -0.05rem;
+  font-style: italic;
+  margin-left: -0.2rem;
 }

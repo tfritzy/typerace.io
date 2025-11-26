@@ -16,6 +16,7 @@ export const ProfileAvatar = () => {
     const { rows: players } = useTable<DbConnection, Player>(
         "player"
     );
+    useTable<DbConnection, XpGain>("xpgain");
     const [showMenu, setShowMenu] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -120,7 +121,7 @@ export const ProfileAvatar = () => {
                             isHighlighted={false}
                         />
                         {xpGains.length > 0 && (
-                            <div className="absolute top-full left-0 mt-2 z-50 pointer-events-none flex flex-col gap-2">
+                            <div className="absolute top-full left-0 mt-2 z-50 pointer-events-none">
                                 {xpGains.map((xpGain) => (
                                     <XpGainPopup
                                         key={xpGain.id}

@@ -12,27 +12,10 @@ const IdentityGate = ({ children }: { children: React.ReactNode }) => {
     const conn = useSpacetimeDB<DbConnection>();
     const [, setTick] = useState(0);
 
-    useEffect(() => {
-        let animationFrameId: number;
-        const checkIdentity = () => {
-            if (!conn?.identity) {
-                setTick(t => t + 1);
-                animationFrameId = requestAnimationFrame(checkIdentity);
-            } else {
-                setTick(t => t + 1);
-            }
-        };
-
-        animationFrameId = requestAnimationFrame(checkIdentity);
-
-        return () => {
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-            }
-        };
-    }, [conn?.identity]);
-
     if (!conn?.identity) {
+        requestAnimationFrame(() => {
+            setTick(t => t + 1);
+        });
         return <LoadingDots />;
     }
 
@@ -57,6 +40,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     }, [user]);
 
     if (!token) {
+        console.log("no tokens eh?")
         return <LoadingDots />;
     }
 

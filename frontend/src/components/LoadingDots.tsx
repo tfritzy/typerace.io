@@ -1,4 +1,18 @@
+import { Logo } from "./Logo";
+import { useEffect, useRef } from "react";
+
 export const LoadingDots = () => {
+    const spinnerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (spinnerRef.current) {
+            const startTime = (window as any).__spinnerStartTime || Date.now();
+            const elapsed = Date.now() - startTime;
+            const delay = -(elapsed % 800);
+            spinnerRef.current.style.animationDelay = delay + 'ms';
+        }
+    }, []);
+
     return (
         <div style={{
             width: '100%',
@@ -21,19 +35,23 @@ export const LoadingDots = () => {
                 alignItems: 'center',
                 height: '4rem'
             }}>
-                <div className="logo">
-                    <span className="logo-text">Type</span>
-                    <span className="logo-accent">Race</span>
-                    <span className="logo-io">.io</span>
-                </div>
-                <div style={{
-                    width: '32px',
-                    height: '32px',
-                    border: '3px solid rgba(255, 255, 255, 0.1)',
-                    borderTopColor: 'rgba(255, 255, 255, 0.6)',
-                    borderRadius: '50%',
-                    animation: 'spin 0.8s linear infinite'
-                }} />
+                <Logo />
+                <div
+                    ref={spinnerRef}
+                    style={{
+                        position: 'fixed',
+                        top: '50%',
+                        left: '50%',
+                        marginLeft: '-16px',
+                        marginTop: '-16px',
+                        width: '32px',
+                        height: '32px',
+                        border: '3px solid rgba(255, 255, 255, 0.1)',
+                        borderTopColor: 'rgba(255, 255, 255, 0.6)',
+                        borderRadius: '50%',
+                        animation: 'spin 0.8s linear infinite'
+                    }}
+                />
             </div>
         </div>
     );
