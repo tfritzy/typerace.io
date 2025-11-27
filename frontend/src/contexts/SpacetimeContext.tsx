@@ -28,6 +28,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     const [isReconnecting, setIsReconnecting] = useState(false);
     const [reconnectFailed, setReconnectFailed] = useState(false);
     const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const failureTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const connect = async (isAutoReconnect = false) => {
         if (!user) return;
@@ -62,7 +63,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                     reconnectTimeoutRef.current = setTimeout(async () => {
                         try {
                             await connect(true);
-                            reconnectTimeoutRef.current = setTimeout(() => {
+                            failureTimeoutRef.current = setTimeout(() => {
                                 if (!conn) {
                                     setIsReconnecting(false);
                                     setReconnectFailed(true);
@@ -89,14 +90,19 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     const handleManualReconnect = () => {
         setIsReconnecting(true);
         setReconnectFailed(false);
-        connect(true).then(() => {
-            setTimeout(() => {
-                if (!conn) {
-                    setIsReconnecting(false);
-                    setReconnectFailed(true);
-                }
-            }, 5000);
-        });
+        connect(true)
+            .then(() => {
+                failureTimeoutRef.current = setTimeout(() => {
+                    if (!conn) {
+                        setIsReconnecting(false);
+                        setReconnectFailed(true);
+                    }
+                }, 5000);
+            })
+            .catch(() => {
+                setIsReconnecting(false);
+                setReconnectFailed(true);
+            });
     };
 
     useEffect(() => {
@@ -109,6 +115,9 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
         return () => {
             if (reconnectTimeoutRef.current) {
                 clearTimeout(reconnectTimeoutRef.current);
+            }
+            if (failureTimeoutRef.current) {
+                clearTimeout(failureTimeoutRef.current);
             }
             connectionPromise.then((connection) => {
                 connection?.disconnect();
