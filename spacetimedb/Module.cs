@@ -192,6 +192,7 @@ public static partial class Module
     }
 
     [Table(Name = "gamerecord", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(Date) })]
     public partial struct GameRecord
     {
         [PrimaryKey]
@@ -207,6 +208,7 @@ public static partial class Module
         public int Year;
         [SpacetimeDB.Index.BTree]
         public int Month;
+        [SpacetimeDB.Index.BTree]
         public long Date;
         public long TimeMs;
         public int Placement;
