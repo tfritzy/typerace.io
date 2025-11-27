@@ -7,6 +7,7 @@ import {
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
     Title,
     Tooltip,
     Legend,
@@ -21,6 +22,7 @@ ChartJS.register(
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
     Title,
     Tooltip,
     Legend,
@@ -46,6 +48,7 @@ interface GlobalStats {
     date: string;
     stats: GameModeCount[];
     total: GameModeCount;
+    dailyActivePlayers: number;
 }
 
 export const SiteStatsPage = () => {
@@ -122,7 +125,7 @@ export const SiteStatsPage = () => {
 
     const chartBackgroundAlpha = '33';
 
-    const createDatasets = (gameModes: Map<string, number[]>) => {
+    const createLineDatasets = (gameModes: Map<string, number[]>) => {
         return Array.from(gameModes.entries()).map(([mode, data], index) => ({
             label: mode,
             data,
@@ -134,7 +137,29 @@ export const SiteStatsPage = () => {
         }));
     };
 
-    const processGameModeData = (fieldAccessor: (modeCount: GameModeCount) => number) => {
+    const createAreaDatasets = (gameModes: Map<string, number[]>) => {
+        return Array.from(gameModes.entries()).map(([mode, data], index) => ({
+            label: mode,
+            data,
+            backgroundColor: `${chartColors[index % chartColors.length]}${chartBackgroundAlpha}`,
+            borderColor: chartColors[index % chartColors.length],
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+        }));
+    };
+
+    const createBarDatasets = (gameModes: Map<string, number[]>) => {
+        return Array.from(gameModes.entries()).map(([mode, data], index) => ({
+            label: mode,
+            data,
+            backgroundColor: chartColors[index % chartColors.length],
+            borderColor: chartColors[index % chartColors.length],
+            borderWidth: 0,
+        }));
+    };
+
+    const processGameModeData = (fieldAccessor: (modeCount: GameModeCount) => number, chartType: 'line' | 'area' | 'bar' = 'line') => {
         if (filteredStats.length === 0) return { labels: [], datasets: [] };
 
         const labels = filteredStats.map(stat => stat.date);
@@ -146,21 +171,41 @@ export const SiteStatsPage = () => {
                 if (!gameModes.has(modeName)) {
                     gameModes.set(modeName, new Array(filteredStats.length).fill(0));
                 }
-                gameModes.get(modeName)![index] = fieldAccessor(modeCount);
+                gameModes.get(modeName)![index] += fieldAccessor(modeCount);
             });
         });
 
-        const datasets = createDatasets(gameModes);
+        const datasets = chartType === 'bar' ? createBarDatasets(gameModes)
+            : chartType === 'area' ? createAreaDatasets(gameModes)
+                : createLineDatasets(gameModes);
 
         return { labels, datasets };
     };
 
     const getGamesPerDayData = () => {
-        return processGameModeData(modeCount => modeCount.finishedGames);
+        return processGameModeData(modeCount => modeCount.finishedGames, 'area');
     };
 
     const getPlayersPerDayData = () => {
-        return processGameModeData(modeCount => modeCount.gameCount);
+        if (filteredStats.length === 0) return { labels: [], datasets: [] };
+
+        const labels = filteredStats.map(stat => stat.date);
+        const playerCounts = filteredStats.map(stat => stat.dailyActivePlayers);
+
+        return {
+            labels,
+            datasets: [
+                {
+                    label: 'Unique Daily Players',
+                    data: playerCounts,
+                    backgroundColor: `${chartColors[0]}${chartBackgroundAlpha}`,
+                    borderColor: chartColors[0],
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.4,
+                }
+            ]
+        };
     };
 
     const getNonLonelyGamesData = () => {
@@ -243,6 +288,58 @@ export const SiteStatsPage = () => {
     const playersPerDayData = getPlayersPerDayData();
     const nonLonelyGamesData = getNonLonelyGamesData();
     const completionRateData = getCompletionRateData();
+
+    const stackedAreaChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom' as const,
+                labels: {
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    font: { size: 11 },
+                    boxWidth: 12,
+                    padding: 10,
+                }
+            },
+            tooltip: {
+                backgroundColor: '#1a1a1a',
+                borderColor: 'rgba(255, 255, 255, 0.12)',
+                borderWidth: 1,
+                titleColor: '#ffffff',
+                bodyColor: 'rgba(255, 255, 255, 0.9)',
+                padding: 12,
+            }
+        },
+        scales: {
+            x: {
+                stacked: true,
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    font: { size: 10 },
+                    maxRotation: 45,
+                    minRotation: 45,
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.06)',
+                },
+                border: { display: false }
+            },
+            y: {
+                stacked: true,
+                beginAtZero: true,
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    font: { size: 10 },
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.06)',
+                },
+                border: { display: false }
+            }
+        }
+    };
 
     const lineChartOptions = {
         responsive: true,
@@ -378,12 +475,12 @@ export const SiteStatsPage = () => {
                     <section className="mb-8 box box-shadow rounded-lg p-6">
                         <h2 className="text-xl font-semibold mb-4 text-white">Games Played Per Day by Game Mode</h2>
                         <div className="h-[300px]">
-                            <Line data={gamesPerDayData} options={lineChartOptions} />
+                            <Line data={gamesPerDayData} options={stackedAreaChartOptions} />
                         </div>
                     </section>
 
                     <section className="mb-8 box box-shadow rounded-lg p-6">
-                        <h2 className="text-xl font-semibold mb-4 text-white">Players Per Day by Game Mode</h2>
+                        <h2 className="text-xl font-semibold mb-4 text-white">Unique Daily Active Players</h2>
                         <div className="h-[300px]">
                             <Line data={playersPerDayData} options={lineChartOptions} />
                         </div>

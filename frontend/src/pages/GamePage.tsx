@@ -23,6 +23,13 @@ export const GamePage = () => {
   const [gamePlayerProgress, setGamePlayerProgress] = useState<PlayerProgress[]>([]);
 
   useEffect(() => {
+    // Reset data when game switches to a new one via play again.
+    setGame(null);
+    setGamePlayerProgress([]);
+    setHasFinished(false);
+  }, [gameId]);
+
+  useEffect(() => {
     if (!conn || !gameId) return;
 
     const handleGameInsert = (_ctx: any, g: Game) => {

@@ -215,6 +215,8 @@ public static partial class Module
         public int EloChange;
     }
 
+
+
     [Table(Name = "personalrecord", Public = true)]
     [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
     public partial struct PersonalRecord
@@ -313,6 +315,8 @@ public static partial class Module
         public string Date;
         public List<GameModeCount> Stats;
         public GameModeCount Total;
+        [Default(0)]
+        public int DailyActivePlayers;
     }
 
     [Table(Name = "playerprogress", Public = true)]
@@ -1178,9 +1182,27 @@ public static partial class Module
         var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000);
         var dateKey = dateTime.ToString("yyyy-MM-dd");
 
+        var newPlayersToday = 0;
+        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
+        {
+            if (progress.Placement > 0 && !progress.IsBot)
+            {
+                var player = ctx.Db.player.Identity.Find(progress.PlayerId);
+                if (player != null)
+                {
+                    var isFirstGameToday = IsFirstGameOfDay(player.Value.LastGameDate, timestamp);
+                    if (isFirstGameToday)
+                    {
+                        newPlayersToday++;
+                    }
+                }
+            }
+        }
+
         var existingStats = ctx.Db.globalstats.Date.Find(dateKey);
         List<GameModeCount> statsList;
         GameModeCount total;
+        int dailyActivePlayers;
 
         if (existingStats == null)
         {
@@ -1197,11 +1219,13 @@ public static partial class Module
                 MaxWpm = 0,
                 GameCount = 0
             };
+            dailyActivePlayers = newPlayersToday;
         }
         else
         {
             statsList = existingStats.Value.Stats;
             total = existingStats.Value.Total;
+            dailyActivePlayers = existingStats.Value.DailyActivePlayers + newPlayersToday;
         }
 
         GameModeCount? existingCount = null;
@@ -1315,7 +1339,8 @@ public static partial class Module
             {
                 Date = dateKey,
                 Stats = statsList,
-                Total = total
+                Total = total,
+                DailyActivePlayers = dailyActivePlayers
             });
         }
         else
@@ -1324,7 +1349,8 @@ public static partial class Module
             {
                 Date = dateKey,
                 Stats = statsList,
-                Total = total
+                Total = total,
+                DailyActivePlayers = dailyActivePlayers
             });
         }
 
