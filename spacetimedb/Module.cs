@@ -1181,7 +1181,8 @@ public static partial class Module
         var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
         var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000);
         var dateKey = dateTime.ToString("yyyy-MM-dd");
-        var currentDay = dateTime.Date;
+        var dayStartMicros = new DateTimeOffset(dateTime.Date, TimeSpan.Zero).ToUnixTimeMilliseconds() * 1000;
+        var dayEndMicros = dayStartMicros + 86_400_000_000;
 
         var newPlayersToday = 0;
         foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
@@ -1191,14 +1192,10 @@ public static partial class Module
                 var hasOtherGameToday = false;
                 foreach (var gameRecord in ctx.Db.gamerecord.PlayerId.Filter(progress.PlayerId))
                 {
-                    if (gameRecord.GameId != game.Id)
+                    if (gameRecord.GameId != game.Id && gameRecord.Date >= dayStartMicros && gameRecord.Date < dayEndMicros)
                     {
-                        var recordDay = DateTimeOffset.FromUnixTimeMilliseconds(gameRecord.Date / 1000).Date;
-                        if (recordDay == currentDay)
-                        {
-                            hasOtherGameToday = true;
-                            break;
-                        }
+                        hasOtherGameToday = true;
+                        break;
                     }
                 }
 
