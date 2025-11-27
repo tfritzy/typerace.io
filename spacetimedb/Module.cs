@@ -1181,20 +1181,30 @@ public static partial class Module
         var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
         var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000);
         var dateKey = dateTime.ToString("yyyy-MM-dd");
+        var currentDay = dateTime.Date;
 
         var newPlayersToday = 0;
         foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
         {
             if (progress.Placement > 0 && !progress.IsBot)
             {
-                var player = ctx.Db.player.Identity.Find(progress.PlayerId);
-                if (player != null)
+                var hasOtherGameToday = false;
+                foreach (var gameRecord in ctx.Db.gamerecord.PlayerId.Filter(progress.PlayerId))
                 {
-                    var isFirstGameToday = IsFirstGameOfDay(player.Value.LastGameDate, timestamp);
-                    if (isFirstGameToday)
+                    if (gameRecord.GameId != game.Id)
                     {
-                        newPlayersToday++;
+                        var recordDay = DateTimeOffset.FromUnixTimeMilliseconds(gameRecord.Date / 1000).Date;
+                        if (recordDay == currentDay)
+                        {
+                            hasOtherGameToday = true;
+                            break;
+                        }
                     }
+                }
+
+                if (!hasOtherGameToday)
+                {
+                    newPlayersToday++;
                 }
             }
         }
