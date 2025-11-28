@@ -10,13 +10,12 @@ namespace WikiQuote
 {
     public class WikiQuoteClient : IDisposable
     {
-        private const int MinQuoteLength = 10;
-        private const int MaxQuoteLength = 500;
-        private const int MinQuoteOfTheDayLength = 20;
-
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
         private bool _disposed;
+
+        public int MinQuoteLength { get; set; } = 10;
+        public int MaxQuoteLength { get; set; } = 500;
 
         public WikiQuoteClient(string language = "en")
         {
@@ -112,32 +111,6 @@ namespace WikiQuote
             return null;
         }
 
-        public async Task<QuoteOfTheDay?> GetQuoteOfTheDayAsync()
-        {
-            var url = $"{_baseUrl}?format=json&action=parse&page=Wikiquote:Quote_of_the_day&prop=text";
-            
-            try
-            {
-                var response = await _httpClient.GetStringAsync(url);
-                using var doc = JsonDocument.Parse(response);
-                var html = doc.RootElement
-                    .GetProperty("parse")
-                    .GetProperty("text")
-                    .GetProperty("*")
-                    .GetString() ?? "";
-
-                return ParseQuoteOfTheDay(html);
-            }
-            catch (HttpRequestException)
-            {
-                return null;
-            }
-            catch (JsonException)
-            {
-                return null;
-            }
-        }
-
         private List<string> ParseQuotesFromHtml(string html)
         {
             var quotes = new List<string>();
@@ -164,48 +137,6 @@ namespace WikiQuote
             }
             
             return quotes;
-        }
-
-        private QuoteOfTheDay? ParseQuoteOfTheDay(string html)
-        {
-            var tablePattern = new Regex(@"<table[^>]*>.*?</table>", RegexOptions.Singleline);
-            var tableMatch = tablePattern.Match(html);
-            
-            if (tableMatch.Success)
-            {
-                var tableHtml = tableMatch.Value;
-                
-                var tdPattern = new Regex(@"<td[^>]*>(?<content>.*?)</td>", RegexOptions.Singleline);
-                var tdMatches = tdPattern.Matches(tableHtml);
-                
-                string? quoteText = null;
-                string? author = null;
-                
-                foreach (Match td in tdMatches)
-                {
-                    var content = StripHtmlTags(td.Groups["content"].Value);
-                    content = CleanQuoteText(content);
-                    
-                    if (!string.IsNullOrWhiteSpace(content))
-                    {
-                        if (quoteText == null && content.Length > MinQuoteOfTheDayLength)
-                        {
-                            quoteText = content;
-                        }
-                        else if (quoteText != null && author == null && content.Length < quoteText.Length)
-                        {
-                            author = content;
-                        }
-                    }
-                }
-                
-                if (quoteText != null)
-                {
-                    return new QuoteOfTheDay { Quote = quoteText, Author = author };
-                }
-            }
-            
-            return null;
         }
 
         private string StripHtmlTags(string html)
@@ -246,11 +177,5 @@ namespace WikiQuote
     public class SearchResult
     {
         public string Title { get; set; } = "";
-    }
-
-    public class QuoteOfTheDay
-    {
-        public string Quote { get; set; } = "";
-        public string? Author { get; set; }
     }
 }

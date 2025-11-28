@@ -46,26 +46,4 @@ catch (Exception ex)
     Console.WriteLine($"   Error: {ex.Message}");
 }
 
-Console.WriteLine("\n4. Getting Quote of the Day...");
-try
-{
-    var qotd = await client.GetQuoteOfTheDayAsync();
-    if (qotd != null)
-    {
-        Console.WriteLine($"   \"{qotd.Quote}\"");
-        if (qotd.Author != null)
-        {
-            Console.WriteLine($"   - {qotd.Author}");
-        }
-    }
-    else
-    {
-        Console.WriteLine("   Could not get quote of the day.");
-    }
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"   Error: {ex.Message}");
-}
-
 Console.WriteLine("\nDone!");
