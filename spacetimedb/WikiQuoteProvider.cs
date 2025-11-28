@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 public static class WikiQuoteProvider
 {
@@ -63,15 +64,19 @@ public static class WikiQuoteProvider
 
     public static string GeneratePhrase(Random rng, int minLength = 100, int maxLength = 200)
     {
-        var result = new System.Collections.Generic.List<string>();
-        var currentLength = 0;
+        var result = new List<string>();
         var targetLength = rng.Next(minLength, maxLength + 1);
 
-        while (currentLength < targetLength)
+        while (true)
         {
             var quote = GetRandomQuote(rng);
             result.Add(quote);
-            currentLength += quote.Length + 1;
+
+            var joinedLength = string.Join(" ", result).Length;
+            if (joinedLength >= targetLength)
+            {
+                break;
+            }
         }
 
         return string.Join(" ", result);
