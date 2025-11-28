@@ -176,4 +176,9 @@ export function setAccentColor(color: PlayerColor): void {
     root.style.setProperty('--color-accent', config.primary);
     root.style.setProperty('--color-accent-light', config.light);
     root.style.setProperty('--color-accent-dark', config.dark);
+    
+    try {
+        localStorage.setItem('accentColor', config.primary);
+    } catch (e) {
+    }
 }

@@ -233,7 +233,7 @@ body {
 }
 
 .logo:hover .logo-accent {
-  text-shadow: 0 0 25px var(--color-accent);
+  filter: drop-shadow(0 0 15px var(--color-accent)) brightness(1.1);
 }
 
 .logo-text {
@@ -242,11 +242,14 @@ body {
 }
 
 .logo-accent {
-  color: var(--color-accent);
-  text-shadow: 0 0 20px color-mix(in srgb, var(--color-accent) 50%, transparent);
+  background: linear-gradient(135deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-style: italic;
   position: relative;
-  transition: text-shadow 0.2s ease;
+  transition: filter 0.2s ease;
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-accent) 50%, transparent));
 }
 
 .logo-io {

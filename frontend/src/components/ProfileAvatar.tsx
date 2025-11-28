@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { PlayerColor, type Player } from "../../module_bindings";
+import { type Player } from "../../module_bindings";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { useEffect, useState, useRef } from "react";
@@ -56,7 +56,9 @@ export const ProfileAvatar = () => {
     }, [conn]);
 
     useEffect(() => {
-        setAccentColor(myPlayer?.color || PlayerColor.Amber);
+        if (myPlayer?.color) {
+            setAccentColor(myPlayer.color);
+        }
     }, [myPlayer]);
 
     const handleSocialSignIn = async (provider: 'google' | 'github' | 'discord') => {

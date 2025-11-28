@@ -67,6 +67,16 @@
       </p>
     </noscript>
     
+    <script>
+      (function() {
+        try {
+          const savedColor = localStorage.getItem('accentColor');
+          if (savedColor) {
+            document.documentElement.style.setProperty('--color-accent', savedColor);
+          }
+        } catch (e) {}
+      })();
+    </script>
     <style>
       :root {
         --color-bg-primary: #202020;
@@ -113,10 +123,13 @@
       }
 
       .loading-logo-accent {
-        color: var(--color-accent);
-        text-shadow: 0 0 20px color-mix(in srgb, var(--color-accent) 50%, transparent);
+        background: linear-gradient(135deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 70%, white) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         font-style: italic;
         position: relative;
+        filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-accent) 50%, transparent));
       }
 
       .loading-logo-io {
