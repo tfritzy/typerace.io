@@ -26,7 +26,8 @@ public enum GameMode
     Hindi500,
     Dutch500,
     Swedish500,
-    Turkish500
+    Turkish500,
+    WikiQuote
 }
 
 [Type]
@@ -1799,5 +1800,146 @@ public static partial class Module
             }
         }
         return null;
+    }
+
+    [Procedure]
+    public static string? FetchWikiQuotePhrase(ProcedureContext ctx)
+    {
+        var rng = new Random();
+        for (int attempt = 0; attempt < 5; attempt++)
+        {
+            var quote = WikiQuoteClient.GetRandomQuote(rng);
+            if (quote != null && quote.Length >= 50 && quote.Length <= 300)
+            {
+                Log.Info($"Fetched WikiQuote: {quote.Substring(0, Math.Min(50, quote.Length))}...");
+                return quote;
+            }
+        }
+        Log.Warn("Failed to fetch a suitable WikiQuote after 5 attempts");
+        return null;
+    }
+
+    private static Game InsertGameWithPhrase(ReducerContext ctx, GameMode gameMode, GameType gameType, string phrase)
+    {
+        long countdownDurationMicros = GetCountdownDuration(gameType);
+        long countdownDurationMs = countdownDurationMicros / 1000;
+
+        return ctx.Db.game.Insert(new Game
+        {
+            Id = IdGenerator.Generate("game_", ctx.Rng),
+            Phrase = phrase,
+            CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+            RacingStartedAt = 0,
+            CountdownDurationMs = countdownDurationMs,
+            State = GameState.Lobby,
+            GameMode = gameMode,
+            GameType = gameType,
+            Placements = new List<Identity>(),
+            Owner = ctx.Sender
+        });
+    }
+
+    [Reducer]
+    public static void JoinGameWithPhrase(ReducerContext ctx, GameMode gameMode, string joinCode, GameType gameType, string phrase)
+    {
+        Log.Info($"Player {ctx.Sender} looking for game with custom phrase.");
+
+        if (gameMode == GameMode.WikiQuote && string.IsNullOrEmpty(phrase))
+        {
+            phrase = PhraseGenerator.GeneratePhraseForMode(GameMode.English500, ctx.Rng);
+            Log.Warn("WikiQuote phrase was empty, falling back to English500");
+        }
+
+        var foundGame = FindLobbyGame(ctx, gameMode, gameType);
+
+        if (foundGame != null)
+        {
+            Log.Info($"Player {ctx.Sender} joined game {foundGame.Value.Id}");
+            InsertPlayerProgress(ctx, foundGame.Value.Id, joinCode);
+
+            int playerCount = CountPlayersInGame(ctx, foundGame.Value.Id);
+            int requiredPlayers = GetMaxPlayerCount(foundGame.Value.GameType);
+
+            if (playerCount >= requiredPlayers)
+            {
+                CancelBotFillTrigger(ctx, foundGame.Value.Id);
+
+                var updatedGame = foundGame.Value;
+                updatedGame.State = GameState.Countdown;
+                ctx.Db.game.Id.Update(updatedGame);
+
+                Log.Info($"Game {foundGame.Value.Id} reached {requiredPlayers} players, transitioning to Countdown state");
+
+                long countdownDuration = GetCountdownDuration(foundGame.Value.GameType);
+                var countdownTime = new TimeDuration { Microseconds = countdownDuration };
+                var scheduledTime = ctx.Timestamp + countdownTime;
+
+                ctx.Db.GameStart.Insert(new GameStart
+                {
+                    ScheduledId = 0,
+                    GameId = foundGame.Value.Id,
+                    ScheduledAt = new ScheduleAt.Time(scheduledTime)
+                });
+            }
+        }
+        else
+        {
+            var newGame = InsertGameWithPhrase(ctx, gameMode, gameType, phrase);
+
+            Log.Info($"Player {ctx.Sender} created and joined game {newGame.Id} with custom phrase");
+            InsertPlayerProgress(ctx, newGame.Id, joinCode);
+
+            int playerCount = CountPlayersInGame(ctx, newGame.Id);
+            int requiredPlayers = GetMaxPlayerCount(gameType);
+
+            if (playerCount >= requiredPlayers)
+            {
+                if (gameType == GameType.Practice)
+                {
+                    var startDelay = new TimeDuration { Microseconds = PRACTICE_GAME_COUNTDOWN_START_DELAY_MICROSECONDS };
+                    var scheduledTime = ctx.Timestamp + startDelay;
+
+                    ctx.Db.CountdownStart.Insert(new CountdownStart
+                    {
+                        ScheduledId = 0,
+                        GameId = newGame.Id,
+                        ScheduledAt = new ScheduleAt.Time(scheduledTime)
+                    });
+
+                    Log.Info($"Practice game {newGame.Id} scheduled to start countdown in 1 second");
+                }
+                else
+                {
+                    var updatedGame = newGame;
+                    updatedGame.State = GameState.Countdown;
+                    ctx.Db.game.Id.Update(updatedGame);
+
+                    Log.Info($"Game {newGame.Id} reached {requiredPlayers} players, transitioning to Countdown state");
+
+                    long countdownDuration = GetCountdownDuration(gameType);
+                    var countdownTime = new TimeDuration { Microseconds = countdownDuration };
+                    var scheduledTime = ctx.Timestamp + countdownTime;
+
+                    ctx.Db.GameStart.Insert(new GameStart
+                    {
+                        ScheduledId = 0,
+                        GameId = newGame.Id,
+                        ScheduledAt = new ScheduleAt.Time(scheduledTime)
+                    });
+                }
+            }
+            else if (gameType == GameType.Public)
+            {
+                var botFillDelay = new TimeDuration { Microseconds = BOT_FILL_DELAY_MICROSECONDS };
+                var futureTimestamp = ctx.Timestamp + botFillDelay;
+
+                ctx.Db.BotFillTrigger.Insert(new BotFillTrigger
+                {
+                    ScheduledId = 0,
+                    GameId = newGame.Id,
+                    ScheduledAt = new ScheduleAt.Time(futureTimestamp)
+                });
+            }
+        }
     }
 }
