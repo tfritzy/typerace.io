@@ -207,6 +207,8 @@ public static partial class Module
         public int Year;
         [SpacetimeDB.Index.BTree]
         public int Month;
+        [SpacetimeDB.Index.BTree]
+        public string Day;
         public long Date;
         public long TimeMs;
         public int Placement;
@@ -1426,6 +1428,7 @@ public static partial class Module
         var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000);
         var year = dateTime.Year;
         var month = dateTime.Month;
+        var day = dateTime.ToString("yyyy-MM-dd");
 
         ctx.Db.gamerecord.Insert(new GameRecord
         {
@@ -1436,6 +1439,7 @@ public static partial class Module
             GameType = game.GameType,
             Year = year,
             Month = month,
+            Day = day,
             Date = timestamp,
             TimeMs = timeElapsed / 1000,
             Placement = placement,
