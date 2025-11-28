@@ -1640,16 +1640,18 @@ public static partial class Module
             return 0;
         }
 
-        if (level > 1000)
+        if (level >= 20)
         {
-            return 5000;
+            return 500;
         }
 
-        double baseXp = 50.0;
-        double maxXp = 5000.0;
-        double k = 0.005;
+        int startXp = 200;
+        int endXp = 500;
+        int startLevel = 2;
+        int endLevel = 20;
 
-        return (int)Math.Round(baseXp + (maxXp - baseXp) * (1 - Math.Exp(-k * (level - 2))));
+        double progress = (double)(level - startLevel) / (endLevel - startLevel);
+        return (int)Math.Round(startXp + (endXp - startXp) * progress);
     }
 
     private static int UpdatePlayerElo(ReducerContext ctx, Identity playerId, Game game, int placement)
