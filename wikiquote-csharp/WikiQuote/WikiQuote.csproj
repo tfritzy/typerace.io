@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>WikiQuote</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>typerace.io</Authors>
+    <Description>A C# client for the WikiQuote API. Provides methods to search for quotes, get quotes by person, and get random quotes from WikiQuote.</Description>
+    <PackageTags>wikiquote;quotes;api;wikipedia</PackageTags>
+  </PropertyGroup>
+
+</Project>
