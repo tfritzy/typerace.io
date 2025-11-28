@@ -26,8 +26,7 @@ public enum GameMode
     Hindi500,
     Dutch500,
     Swedish500,
-    Turkish500,
-    WikiQuote
+    Turkish500
 }
 
 [Type]
