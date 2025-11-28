@@ -57,6 +57,9 @@ public partial struct HttpResponse
 
 public static class SpacetimeHttp
 {
+    private const string UserAgent = "WikiQuote-SpacetimeDB/1.0";
+    private const long DefaultTimeoutMicroseconds = 30_000_000;
+
     private const string StdbNamespace10_3 =
 #if EXPERIMENTAL_WASM_AOT
         "spacetime_10.3"
@@ -86,14 +89,34 @@ public static class SpacetimeHttp
 
     private static HttpResponse? DoRequest(HttpMethod method, string uri, byte[]? body)
     {
+        var (response, _) = DoRequestWithBody(method, uri, body);
+        return response;
+    }
+
+    public static byte[] ReadBody(uint bodySourceHandle)
+    {
+        if (bodySourceHandle == 0)
+        {
+            return Array.Empty<byte>();
+        }
+        return ReadBytesSource(new BytesSource(bodySourceHandle));
+    }
+
+    public static (HttpResponse? Response, byte[] Body) HttpGetWithBody(string uri)
+    {
+        return DoRequestWithBody(HttpMethod.Get, uri, null);
+    }
+
+    private static (HttpResponse? Response, byte[] Body) DoRequestWithBody(HttpMethod method, string uri, byte[]? body)
+    {
         var request = new HttpRequest
         {
             Method = method,
             Headers = new List<HttpHeader>
             {
-                new HttpHeader { Name = "User-Agent", Value = Encoding.UTF8.GetBytes("WikiQuote-SpacetimeDB/1.0") }
+                new HttpHeader { Name = "User-Agent", Value = Encoding.UTF8.GetBytes(UserAgent) }
             },
-            TimeoutMicroseconds = 30_000_000,
+            TimeoutMicroseconds = DefaultTimeoutMicroseconds,
             Uri = uri,
             Version = HttpVersion.Http11
         };
@@ -113,63 +136,6 @@ public static class SpacetimeHttp
         if (result != 0)
         {
             Log.Error($"HTTP request failed with error code: {result}");
-            return null;
-        }
-
-        var responseSourceHandle = outPtr[0];
-        var bodySourceHandle = outPtr[1];
-
-        if (responseSourceHandle == 0)
-        {
-            return null;
-        }
-
-        var responseBytes = ReadBytesSource(new BytesSource(responseSourceHandle));
-        using var stream = new MemoryStream(responseBytes);
-        using var reader = new BinaryReader(stream);
-        var response = new HttpResponse.BSATN().Read(reader);
-
-        return response;
-    }
-
-    public static byte[] ReadBody(uint bodySourceHandle)
-    {
-        if (bodySourceHandle == 0)
-        {
-            return Array.Empty<byte>();
-        }
-        return ReadBytesSource(new BytesSource(bodySourceHandle));
-    }
-
-    public static (HttpResponse? Response, byte[] Body) HttpGetWithBody(string uri)
-    {
-        var request = new HttpRequest
-        {
-            Method = HttpMethod.Get,
-            Headers = new List<HttpHeader>
-            {
-                new HttpHeader { Name = "User-Agent", Value = Encoding.UTF8.GetBytes("WikiQuote-SpacetimeDB/1.0") }
-            },
-            TimeoutMicroseconds = 30_000_000,
-            Uri = uri,
-            Version = HttpVersion.Http11
-        };
-
-        var requestBytes = IStructuralReadWrite.ToBytes(new HttpRequest.BSATN(), request);
-        var bodyBytes = Array.Empty<byte>();
-        var outPtr = new uint[2];
-
-        var result = procedure_http_request(
-            requestBytes,
-            (uint)requestBytes.Length,
-            bodyBytes,
-            (uint)bodyBytes.Length,
-            outPtr
-        );
-
-        if (result != 0)
-        {
-            Log.Error($"HTTP request failed with error code: {result}");
             return (null, Array.Empty<byte>());
         }
 
@@ -181,14 +147,18 @@ public static class SpacetimeHttp
             return (null, Array.Empty<byte>());
         }
 
-        var responseBytes = ReadBytesSource(new BytesSource(responseSourceHandle));
-        using var stream = new MemoryStream(responseBytes);
-        using var reader = new BinaryReader(stream);
-        var response = new HttpResponse.BSATN().Read(reader);
-
+        var response = ParseResponse(responseSourceHandle);
         var responseBody = bodySourceHandle != 0 ? ReadBytesSource(new BytesSource(bodySourceHandle)) : Array.Empty<byte>();
 
         return (response, responseBody);
+    }
+
+    private static HttpResponse ParseResponse(uint responseSourceHandle)
+    {
+        var responseBytes = ReadBytesSource(new BytesSource(responseSourceHandle));
+        using var stream = new MemoryStream(responseBytes);
+        using var reader = new BinaryReader(stream);
+        return new HttpResponse.BSATN().Read(reader);
     }
 
     private static byte[] ReadBytesSource(BytesSource source)

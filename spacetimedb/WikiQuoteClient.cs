@@ -167,8 +167,6 @@ public static class WikiQuoteClient
         text = HttpUtility.HtmlDecode(text);
         text = Regex.Replace(text, @"\s+", " ");
         text = text.Trim();
-        text = Regex.Replace(text, @"^\[\d+\]", "");
-        text = Regex.Replace(text, @"\[\d+\]$", "");
         text = Regex.Replace(text, @"\[\d+\]", "");
         return text.Trim();
     }

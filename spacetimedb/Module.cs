@@ -1811,7 +1811,7 @@ public static partial class Module
             var quote = WikiQuoteClient.GetRandomQuote(rng);
             if (quote != null && quote.Length >= 50 && quote.Length <= 300)
             {
-                Log.Info($"Fetched WikiQuote: {quote.Substring(0, Math.Min(50, quote.Length))}...");
+                Log.Info($"Fetched WikiQuote: {quote[..Math.Min(50, quote.Length)]}...");
                 return quote;
             }
         }
