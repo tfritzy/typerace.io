@@ -1642,14 +1642,14 @@ public static partial class Module
 
         if (level > 1000)
         {
-            return 10000;
+            return 5000;
         }
 
-        double baseXp = 500.0;
-        double maxXp = 10000.0;
-        double growthRate = Math.Log(maxXp / baseXp) / (1000.0 - 2.0);
+        double baseXp = 50.0;
+        double maxXp = 5000.0;
+        double k = 0.005;
 
-        return (int)Math.Round(baseXp * Math.Exp(growthRate * (level - 2)));
+        return (int)Math.Round(baseXp + (maxXp - baseXp) * (1 - Math.Exp(-k * (level - 2))));
     }
 
     private static int UpdatePlayerElo(ReducerContext ctx, Identity playerId, Game game, int placement)
