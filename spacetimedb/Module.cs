@@ -192,6 +192,7 @@ public static partial class Module
     }
 
     [Table(Name = "gamerecord", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameRecord.PlayerId), nameof(GameRecord.Day) })]
     public partial struct GameRecord
     {
         [PrimaryKey]
@@ -1189,14 +1190,7 @@ public static partial class Module
         {
             if (progress.Placement > 0 && !progress.IsBot)
             {
-                var gamesPlayedToday = 0;
-                foreach (var record in ctx.Db.gamerecord.PlayerId.Filter(progress.PlayerId))
-                {
-                    if (record.Day == dateKey)
-                    {
-                        gamesPlayedToday++;
-                    }
-                }
+                var gamesPlayedToday = ctx.Db.gamerecord.PlayerId_Day.Filter((progress.PlayerId, dateKey)).Count();
                 if (gamesPlayedToday == 1)
                 {
                     newPlayersToday++;
