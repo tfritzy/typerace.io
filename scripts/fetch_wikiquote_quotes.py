@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
+import urllib.request
 import wikiquote
 import time
 import json
 import os
 from typing import List, Dict, Tuple
+
+opener = urllib.request.build_opener()
+opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')]
+urllib.request.install_opener(opener)
 
 LANGUAGE_CONFIG = {
     'English': {'code': 'en', 'class_name': 'EnglishQuotes'},
