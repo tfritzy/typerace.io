@@ -44,36 +44,58 @@ def is_valid_quote(quote: str) -> bool:
         return False
     return True
 
-def validate_quote_with_gemini(quote: str, author: str) -> bool:
-    if not GEMINI_API_KEY:
-        return True
+def validate_quotes_batch_with_gemini(quotes_batch: list) -> list:
+    if not GEMINI_API_KEY or not quotes_batch:
+        return [True] * len(quotes_batch)
     
-    prompt = f"""Evaluate if this quote is high quality for a typing practice game. 
+    quotes_text = "\n".join([f"{i+1}. Quote: \"{q['quote']}\" - Author: {q['author']}" 
+                             for i, q in enumerate(quotes_batch)])
     
-Quote: "{quote}"
-Author: {author}
+    prompt = f"""Evaluate each quote for quality in a typing practice game.
 
-A high quality quote should:
-1. Be interesting and meaningful
-2. Not contain markup, wiki formatting, or contextual notes like "[speaking to someone]"
-3. Be just the quote itself, not a description or summary
-4. Have a complete thought (not cut off mid-sentence)
-5. Be enjoyable to type (not have excessive punctuation like "..." repeatedly or too many special characters)
-6. Not be a list of items or song lyrics with excessive line breaks
+{quotes_text}
 
-Reply with ONLY "yes" if this is a high quality quote suitable for a typing game, or "no" if it has any quality issues."""
+For EACH quote, respond with ONLY its number followed by "yes" or "no".
+A quote should be marked "no" if it has ANY of these issues:
+- Contains context markers in square brackets like [after doing something], [to someone], [speaking about X], [on topic]
+- Contains markup, wiki formatting, citations, or references
+- Is not a complete thought (cut off mid-sentence)
+- Has excessive punctuation (too many "...", special chars)
+- Is a list of items, song lyrics with line breaks, or a description rather than a quote
+- Is not interesting or meaningful for typing practice
+
+Example response format:
+1. yes
+2. no
+3. yes"""
 
     try:
         response = gemini_model.generate_content(prompt)
-        result = response.text.strip().lower()
-        return result == 'yes'
+        result_text = response.text.strip().lower()
+        
+        results = [True] * len(quotes_batch)
+        for line in result_text.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.replace('.', ' ').split()
+            if len(parts) >= 2:
+                try:
+                    idx = int(parts[0]) - 1
+                    if 0 <= idx < len(results):
+                        results[idx] = parts[-1] == 'yes'
+                except ValueError:
+                    continue
+        return results
     except Exception as e:
-        print(f"    Gemini validation error: {e}")
-        return True
+        print(f"    Gemini batch validation error: {e}")
+        return [True] * len(quotes_batch)
 
 def fetch_quotes_for_language(lang_code: str, target_count: int) -> Dict[str, tuple]:
     quotes: Dict[str, tuple] = {}
     attempts = 0
+    pending_quotes = []
+    BATCH_SIZE = 10
     
     print(f"Fetching quotes for language: {lang_code}")
     
@@ -83,7 +105,22 @@ def fetch_quotes_for_language(lang_code: str, target_count: int) -> Dict[str, tu
         print(f"  Supported languages: {supported_langs}")
         return quotes
     
-    while len(quotes) < target_count and attempts < MAX_FETCH_ATTEMPTS:
+    def process_batch():
+        nonlocal pending_quotes
+        if not pending_quotes:
+            return
+        
+        results = validate_quotes_batch_with_gemini(pending_quotes)
+        for pq, is_valid in zip(pending_quotes, results):
+            if is_valid:
+                quotes[pq['quote']] = (pq['author'], pq['url'])
+            else:
+                print(f"    Rejected by Gemini: {pq['quote'][:50]}...")
+        pending_quotes = []
+        if quotes:
+            print(f"  Progress: {len(quotes)}/{target_count} quotes")
+    
+    while len(quotes) + len(pending_quotes) < target_count + BATCH_SIZE and attempts < MAX_FETCH_ATTEMPTS:
         attempts += 1
         
         try:
@@ -104,18 +141,25 @@ def fetch_quotes_for_language(lang_code: str, target_count: int) -> Dict[str, tu
             page_quotes = wikiquote.quotes(title, lang=lang_code)
             if page_quotes:
                 quote = page_quotes[0]
-                if is_valid_quote(quote) and quote not in quotes:
-                    if validate_quote_with_gemini(quote, title):
-                        url = f"https://{lang_code}.wikiquote.org/wiki/{urllib.parse.quote(title.replace(' ', '_'))}"
-                        quotes[quote] = (title, url)
-                        if len(quotes) % 50 == 0:
-                            print(f"  Progress: {len(quotes)}/{target_count} quotes")
-                    else:
-                        print(f"    Rejected by Gemini: {quote[:50]}...")
+                if is_valid_quote(quote) and quote not in quotes and not any(pq['quote'] == quote for pq in pending_quotes):
+                    url = f"https://{lang_code}.wikiquote.org/wiki/{urllib.parse.quote(title.replace(' ', '_'))}"
+                    pending_quotes.append({'quote': quote, 'author': title, 'url': url})
+                    
+                    if len(pending_quotes) >= BATCH_SIZE:
+                        process_batch()
+                        if len(quotes) >= target_count:
+                            break
         except (wikiquote.DisambiguationPageException, wikiquote.NoSuchPageException):
             pass
         except Exception as e:
             print(f"  Error fetching quotes for '{title}': {e}")
+        
+        time.sleep(0.1)
+    
+    process_batch()
+    
+    while len(quotes) > target_count:
+        quotes.popitem()
         
         time.sleep(0.1)
     
