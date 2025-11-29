@@ -127,6 +127,43 @@ export const startupPhrases: Record<string, string[]> = {
     "ileri",
     "haydi",
   ],
+  EnglishQuotes: [
+    "time for wisdom",
+    "words of the wise",
+    "quote time",
+    "let's get inspired",
+    "wisdom awaits",
+  ],
+  SpanishQuotes: [
+    "hora de sabiduría",
+    "palabras sabias",
+    "citas famosas",
+    "inspiración",
+  ],
+  FrenchQuotes: [
+    "paroles de sagesse",
+    "citations célèbres",
+    "l'heure de la sagesse",
+    "inspiration",
+  ],
+  GermanQuotes: [
+    "zeit für weisheit",
+    "weise worte",
+    "berühmte zitate",
+    "inspiration",
+  ],
+  ItalianQuotes: [
+    "tempo di saggezza",
+    "parole sagge",
+    "citazioni famose",
+    "ispirazione",
+  ],
+  PortugueseQuotes: [
+    "hora da sabedoria",
+    "palavras sábias",
+    "citações famosas",
+    "inspiração",
+  ],
 };
 
 export function getRandomStartupPhrase(gameModeTag: string): string {

@@ -26,6 +26,12 @@ public static class PhraseGenerator
         return string.Join(" ", words);
     }
 
+    public static string SelectRandomQuote(string[] quotes, Random rng)
+    {
+        int index = rng.Next(quotes.Length);
+        return quotes[index];
+    }
+
     public static string GeneratePhraseForMode(GameMode mode, Random rng)
     {
         switch (mode)
@@ -60,6 +66,18 @@ public static class PhraseGenerator
                 return GeneratePhrase(Swedish500Words.Words, rng);
             case GameMode.Turkish500:
                 return GeneratePhrase(Turkish500Words.Words, rng);
+            case GameMode.EnglishQuotes:
+                return SelectRandomQuote(EnglishQuotes.Quotes, rng);
+            case GameMode.SpanishQuotes:
+                return SelectRandomQuote(SpanishQuotes.Quotes, rng);
+            case GameMode.FrenchQuotes:
+                return SelectRandomQuote(FrenchQuotes.Quotes, rng);
+            case GameMode.GermanQuotes:
+                return SelectRandomQuote(GermanQuotes.Quotes, rng);
+            case GameMode.ItalianQuotes:
+                return SelectRandomQuote(ItalianQuotes.Quotes, rng);
+            case GameMode.PortugueseQuotes:
+                return SelectRandomQuote(PortugueseQuotes.Quotes, rng);
             default:
                 return "The quick brown fox jumps over the lazy dog";
         }
