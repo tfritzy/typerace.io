@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import urllib.request
+import urllib.parse
 import wikiquote
 import time
 import os
@@ -37,8 +38,8 @@ def is_valid_quote(quote: str) -> bool:
         return False
     return True
 
-def fetch_quotes_for_language(lang_code: str, target_count: int) -> Dict[str, str]:
-    quotes: Dict[str, str] = {}
+def fetch_quotes_for_language(lang_code: str, target_count: int) -> Dict[str, tuple]:
+    quotes: Dict[str, tuple] = {}
     attempts = 0
     
     print(f"Fetching quotes for language: {lang_code}")
@@ -71,7 +72,8 @@ def fetch_quotes_for_language(lang_code: str, target_count: int) -> Dict[str, st
             if page_quotes:
                 quote = page_quotes[0]
                 if is_valid_quote(quote) and quote not in quotes:
-                    quotes[quote] = title
+                    url = f"https://{lang_code}.wikiquote.org/wiki/{urllib.parse.quote(title.replace(' ', '_'))}"
+                    quotes[quote] = (title, url)
                     if len(quotes) % 50 == 0:
                         print(f"  Progress: {len(quotes)}/{target_count} quotes")
         except (wikiquote.DisambiguationPageException, wikiquote.NoSuchPageException):
@@ -92,11 +94,11 @@ def escape_csharp_string(s: str) -> str:
     s = s.replace('\t', '\\t')
     return s
 
-def generate_csharp_class(class_name: str, quotes: Dict[str, str]) -> str:
+def generate_csharp_class(class_name: str, quotes: Dict[str, tuple]) -> str:
     lines = ['using System;', '']
     lines.append('public struct Quote')
     lines.append('{')
-    lines.append('    public int Id;')
+    lines.append('    public string Id;')
     lines.append('    public string Text;')
     lines.append('    public string Author;')
     lines.append('}')
@@ -107,11 +109,12 @@ def generate_csharp_class(class_name: str, quotes: Dict[str, str]) -> str:
     lines.append('    {')
     
     quote_items = list(quotes.items())
-    for i, (quote, author) in enumerate(quote_items):
+    for i, (quote, (author, url)) in enumerate(quote_items):
         escaped_quote = escape_csharp_string(quote)
         escaped_author = escape_csharp_string(author)
+        escaped_url = escape_csharp_string(url)
         comma = ',' if i < len(quote_items) - 1 else ''
-        lines.append(f'        new Quote {{ Id = {i}, Text = "{escaped_quote}", Author = "{escaped_author}" }}{comma}')
+        lines.append(f'        new Quote {{ Id = "{escaped_url}", Text = "{escaped_quote}", Author = "{escaped_author}" }}{comma}')
     
     lines.append('    };')
     lines.append('}')
