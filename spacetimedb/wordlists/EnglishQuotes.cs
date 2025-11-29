@@ -44,7 +44,7 @@ public static class EnglishQuotes
         "Don't judge each day by the harvest you reap but by the seeds that you plant.",
         "Tell me and I forget. Teach me and I remember. Involve me and I learn.",
         "The best and most beautiful things in the world cannot be seen or even touched.",
-        "It is during our darkest moments that we must focus to see the light.",
+        "The only way to do great work is to love what you do.",
         "Whoever is happy will make others happy too.",
         "Do not let making a living prevent you from making a life.",
         "You will face many defeats in life, but never let yourself be defeated.",

@@ -22,7 +22,7 @@ public static class ItalianQuotes
         "La creatività è l'intelligenza che si diverte.",
         "Le grandi menti hanno sempre incontrato l'opposizione delle menti mediocri.",
         "C'è solo una cosa che rende impossibile un sogno: la paura di fallire.",
-        "La vera scoperta non consiste nel trovare nuovi territori.",
+        "La vera scoperta non consiste nel trovare nuovi territori, ma nel vedere con occhi nuovi.",
         "L'istruzione è l'arma più potente che puoi usare per cambiare il mondo.",
         "Chi non risica non rosica.",
         "La vita è come andare in bicicletta. Per mantenere l'equilibrio devi muoverti.",

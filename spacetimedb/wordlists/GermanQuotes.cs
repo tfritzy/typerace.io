@@ -29,7 +29,7 @@ public static class GermanQuotes
         "Geduld ist bitter, aber ihre Frucht ist süß.",
         "Lebe, als würdest du morgen sterben. Lerne, als würdest du ewig leben.",
         "Der Verstand ist wie ein Fallschirm, er funktioniert nur, wenn er offen ist.",
-        "Die wahre Reise der Entdeckung besteht nicht darin, neue Landschaften zu suchen.",
+        "Die wahre Reise der Entdeckung besteht nicht darin, neue Landschaften zu suchen, sondern mit neuen Augen zu sehen.",
         "Das einzige, was wir zu fürchten haben, ist die Furcht selbst.",
         "Die Zukunft gehört denen, die an die Schönheit ihrer Träume glauben.",
         "Mut ist nicht die Abwesenheit von Angst, sondern die Fähigkeit, sie zu überwinden.",
