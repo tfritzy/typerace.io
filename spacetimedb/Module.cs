@@ -26,13 +26,7 @@ public enum GameMode
     Hindi500,
     Dutch500,
     Swedish500,
-    Turkish500,
-    EnglishQuotes,
-    SpanishQuotes,
-    FrenchQuotes,
-    GermanQuotes,
-    ItalianQuotes,
-    PortugueseQuotes
+    Turkish500
 }
 
 [Type]

@@ -2,49 +2,9 @@ import { useState, useMemo } from "react";
 import "../components/SelectionButton.css";
 import { GameMode } from "../../module_bindings";
 import { ChevronUp, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
+import { randomWordsModes, quotesModes, getContentTypeFromMode, type ContentTypeValue } from "../utils/modes";
 
 export type GameTypeValue = "Public" | "Private" | "Practice";
-export type ContentTypeValue = "RandomWords" | "Quotes";
-
-interface ModeOption {
-    mode: GameMode;
-    label: string;
-    flag: string;
-}
-
-const randomWordsModes: ModeOption[] = [
-    { mode: { tag: "English500" }, label: "English", flag: "🇬🇧" },
-    { mode: { tag: "Spanish500" }, label: "Spanish", flag: "🇪🇸" },
-    { mode: { tag: "French500" }, label: "French", flag: "🇫🇷" },
-    { mode: { tag: "German500" }, label: "German", flag: "🇩🇪" },
-    { mode: { tag: "Italian500" }, label: "Italian", flag: "🇮🇹" },
-    { mode: { tag: "Portuguese500" }, label: "Portuguese", flag: "🇵🇹" },
-    { mode: { tag: "Japanese500" }, label: "Japanese", flag: "🇯🇵" },
-    { mode: { tag: "Korean500" }, label: "Korean", flag: "🇰🇷" },
-    { mode: { tag: "Chinese500" }, label: "Chinese", flag: "🇨🇳" },
-    { mode: { tag: "Ukrainian500" }, label: "Ukrainian", flag: "🇺🇦" },
-    { mode: { tag: "Arabic500" }, label: "Arabic", flag: "🇸🇦" },
-    { mode: { tag: "Hindi500" }, label: "Hindi", flag: "🇮🇳" },
-    { mode: { tag: "Dutch500" }, label: "Dutch", flag: "🇳🇱" },
-    { mode: { tag: "Swedish500" }, label: "Swedish", flag: "🇸🇪" },
-    { mode: { tag: "Turkish500" }, label: "Turkish", flag: "🇹🇷" },
-];
-
-const quotesModes: ModeOption[] = [
-    { mode: { tag: "EnglishQuotes" }, label: "English", flag: "🇬🇧" },
-    { mode: { tag: "SpanishQuotes" }, label: "Spanish", flag: "🇪🇸" },
-    { mode: { tag: "FrenchQuotes" }, label: "French", flag: "🇫🇷" },
-    { mode: { tag: "GermanQuotes" }, label: "German", flag: "🇩🇪" },
-    { mode: { tag: "ItalianQuotes" }, label: "Italian", flag: "🇮🇹" },
-    { mode: { tag: "PortugueseQuotes" }, label: "Portuguese", flag: "🇵🇹" },
-];
-
-function getContentTypeFromMode(mode: GameMode): ContentTypeValue {
-    if (mode.tag.endsWith("Quotes")) {
-        return "Quotes";
-    }
-    return "RandomWords";
-}
 
 interface GameOptionsSelectorProps {
     selectedMode: GameMode;
@@ -55,7 +15,7 @@ interface GameOptionsSelectorProps {
 
 export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setGameType }: GameOptionsSelectorProps) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const [contentType, setContentType] = useState<ContentTypeValue>(() => getContentTypeFromMode(selectedMode));
+    const [contentType, setContentType] = useState<ContentTypeValue>(() => getContentTypeFromMode(selectedMode.tag));
 
     const modes = useMemo(() => {
         return contentType === "Quotes" ? quotesModes : randomWordsModes;
@@ -66,11 +26,11 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
     const handleContentTypeChange = (newContentType: ContentTypeValue) => {
         setContentType(newContentType);
         const newModes = newContentType === "Quotes" ? quotesModes : randomWordsModes;
-        onModeSelect(newModes[0].mode);
+        onModeSelect(newModes[0].mode as GameMode);
     };
 
-    const handleModeSelect = (mode: GameMode) => {
-        onModeSelect(mode);
+    const handleModeSelect = (mode: { tag: string }) => {
+        onModeSelect(mode as GameMode);
         setIsDrawerOpen(false);
     };
 
@@ -129,7 +89,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                             <button
                                 key={modeOption.mode.tag}
                                 className={`selection-button ${selectedMode.tag === modeOption.mode.tag ? "selected" : ""}`}
-                                onClick={() => onModeSelect(modeOption.mode)}
+                                onClick={() => onModeSelect(modeOption.mode as GameMode)}
                             >
                                 <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>{modeOption.flag}</span>
                                 <span>{modeOption.label}</span>
