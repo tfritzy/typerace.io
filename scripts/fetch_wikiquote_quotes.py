@@ -4,11 +4,17 @@ import urllib.parse
 import wikiquote
 import time
 import os
+import google.generativeai as genai
 from typing import Dict
 
 opener = urllib.request.build_opener()
 opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')]
 urllib.request.install_opener(opener)
+
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+    gemini_model = genai.GenerativeModel('gemini-1.5-flash')
 
 LANGUAGE_CONFIG = {
     'English': {'code': 'en', 'class_name': 'EnglishQuotes'},
@@ -29,7 +35,7 @@ LANGUAGE_CONFIG = {
 }
 
 QUOTES_PER_LANGUAGE = 1000
-MAX_FETCH_ATTEMPTS = 2000
+MAX_FETCH_ATTEMPTS = 5000
 
 def is_valid_quote(quote: str) -> bool:
     if not quote or len(quote) < 20 or len(quote) > 300:
@@ -37,6 +43,33 @@ def is_valid_quote(quote: str) -> bool:
     if any(x in quote.lower() for x in ['http', 'www.', '.com', '.org']):
         return False
     return True
+
+def validate_quote_with_gemini(quote: str, author: str) -> bool:
+    if not GEMINI_API_KEY:
+        return True
+    
+    prompt = f"""Evaluate if this quote is high quality for a typing practice game. 
+    
+Quote: "{quote}"
+Author: {author}
+
+A high quality quote should:
+1. Be interesting and meaningful
+2. Not contain markup, wiki formatting, or contextual notes like "[speaking to someone]"
+3. Be just the quote itself, not a description or summary
+4. Have a complete thought (not cut off mid-sentence)
+5. Be enjoyable to type (not have excessive punctuation like "..." repeatedly or too many special characters)
+6. Not be a list of items or song lyrics with excessive line breaks
+
+Reply with ONLY "yes" if this is a high quality quote suitable for a typing game, or "no" if it has any quality issues."""
+
+    try:
+        response = gemini_model.generate_content(prompt)
+        result = response.text.strip().lower()
+        return result == 'yes'
+    except Exception as e:
+        print(f"    Gemini validation error: {e}")
+        return True
 
 def fetch_quotes_for_language(lang_code: str, target_count: int) -> Dict[str, tuple]:
     quotes: Dict[str, tuple] = {}
@@ -72,10 +105,13 @@ def fetch_quotes_for_language(lang_code: str, target_count: int) -> Dict[str, tu
             if page_quotes:
                 quote = page_quotes[0]
                 if is_valid_quote(quote) and quote not in quotes:
-                    url = f"https://{lang_code}.wikiquote.org/wiki/{urllib.parse.quote(title.replace(' ', '_'))}"
-                    quotes[quote] = (title, url)
-                    if len(quotes) % 50 == 0:
-                        print(f"  Progress: {len(quotes)}/{target_count} quotes")
+                    if validate_quote_with_gemini(quote, title):
+                        url = f"https://{lang_code}.wikiquote.org/wiki/{urllib.parse.quote(title.replace(' ', '_'))}"
+                        quotes[quote] = (title, url)
+                        if len(quotes) % 50 == 0:
+                            print(f"  Progress: {len(quotes)}/{target_count} quotes")
+                    else:
+                        print(f"    Rejected by Gemini: {quote[:50]}...")
         except (wikiquote.DisambiguationPageException, wikiquote.NoSuchPageException):
             pass
         except Exception as e:
