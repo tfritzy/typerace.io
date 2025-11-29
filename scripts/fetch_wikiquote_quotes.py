@@ -3,7 +3,7 @@ import wikiquote
 import time
 import json
 import os
-from typing import List, Set
+from typing import List, Dict, Tuple
 
 LANGUAGE_CONFIG = {
     'English': {'code': 'en', 'class_name': 'EnglishQuotes'},
@@ -33,8 +33,8 @@ def is_valid_quote(quote: str) -> bool:
         return False
     return True
 
-def fetch_quotes_for_language(lang_code: str, target_count: int) -> Set[str]:
-    quotes: Set[str] = set()
+def fetch_quotes_for_language(lang_code: str, target_count: int) -> Dict[str, str]:
+    quotes: Dict[str, str] = {}
     attempts = 0
     
     print(f"Fetching quotes for language: {lang_code}")
@@ -68,7 +68,7 @@ def fetch_quotes_for_language(lang_code: str, target_count: int) -> Set[str]:
                 page_quotes = wikiquote.quotes(title, lang=lang_code)
                 for quote in page_quotes:
                     if is_valid_quote(quote) and quote not in quotes:
-                        quotes.add(quote)
+                        quotes[quote] = title
                         if len(quotes) >= target_count:
                             break
             except (wikiquote.DisambiguationPageException, wikiquote.NoSuchPageException):
@@ -92,15 +92,17 @@ def escape_csharp_string(s: str) -> str:
     s = s.replace('\t', '\\t')
     return s
 
-def generate_csharp_class(class_name: str, quotes: List[str]) -> str:
+def generate_csharp_class(class_name: str, quotes: Dict[str, str]) -> str:
     lines = ['using System;', '', f'public static class {class_name}', '{']
-    lines.append('    public static readonly string[] Quotes = new string[]')
+    lines.append('    public static readonly (string Quote, string Author)[] Quotes = new (string, string)[]')
     lines.append('    {')
     
-    for i, quote in enumerate(quotes):
-        escaped = escape_csharp_string(quote)
-        comma = ',' if i < len(quotes) - 1 else ''
-        lines.append(f'        "{escaped}"{comma}')
+    quote_items = list(quotes.items())
+    for i, (quote, author) in enumerate(quote_items):
+        escaped_quote = escape_csharp_string(quote)
+        escaped_author = escape_csharp_string(author)
+        comma = ',' if i < len(quote_items) - 1 else ''
+        lines.append(f'        ("{escaped_quote}", "{escaped_author}"){comma}')
     
     lines.append('    };')
     lines.append('}')
@@ -120,22 +122,21 @@ def main():
         print(f"{'='*50}")
         
         quotes = fetch_quotes_for_language(lang_code, QUOTES_PER_LANGUAGE)
-        quotes_list = list(quotes)
         
-        if len(quotes_list) < QUOTES_PER_LANGUAGE:
-            print(f"Warning: Only fetched {len(quotes_list)} quotes for {lang_name}")
+        if len(quotes) < QUOTES_PER_LANGUAGE:
+            print(f"Warning: Only fetched {len(quotes)} quotes for {lang_name}")
         
-        csharp_code = generate_csharp_class(class_name, quotes_list)
+        csharp_code = generate_csharp_class(class_name, quotes)
         
         output_file = os.path.join(output_dir, f'{class_name}.cs')
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(csharp_code)
         
-        print(f"Generated {output_file} with {len(quotes_list)} quotes")
+        print(f"Generated {output_file} with {len(quotes)} quotes")
         
         cache_file = os.path.join(output_dir, f'{lang_code}_quotes.json')
         with open(cache_file, 'w', encoding='utf-8') as f:
-            json.dump(quotes_list, f, ensure_ascii=False, indent=2)
+            json.dump([{"quote": q, "author": a} for q, a in quotes.items()], f, ensure_ascii=False, indent=2)
     
     print("\n" + "="*50)
     print("Quote fetching complete!")
