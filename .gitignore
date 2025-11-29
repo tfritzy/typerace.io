@@ -20,6 +20,15 @@ obj/
 # SpacetimeDB generated bindings
 frontend/module_bindings/
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
