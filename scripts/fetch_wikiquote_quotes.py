@@ -63,6 +63,9 @@ A quote should be marked "no" if it has ANY of these issues:
 - Has excessive punctuation (too many "...", special chars)
 - Is a list of items, song lyrics with line breaks, or a description rather than a quote
 - Is not interesting or meaningful for typing practice
+- Is a dialog with multiple speakers (contains "Name:" or "Character:" patterns indicating multiple people talking)
+- Cannot be understood in isolation without knowing the context or question being answered
+- Is an answer to an unspoken question (starts with phrases like "On a...", "When I...", "Because..." that imply a preceding question)
 
 Example response format:
 1. yes
