@@ -2,9 +2,8 @@
 import urllib.request
 import wikiquote
 import time
-import json
 import os
-from typing import List, Dict, Tuple
+from typing import Dict
 
 opener = urllib.request.build_opener()
 opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')]
@@ -94,8 +93,17 @@ def escape_csharp_string(s: str) -> str:
     return s
 
 def generate_csharp_class(class_name: str, quotes: Dict[str, str]) -> str:
-    lines = ['using System;', '', f'public static class {class_name}', '{']
-    lines.append('    public static readonly (int Id, string Quote, string Author)[] Quotes = new (int, string, string)[]')
+    lines = ['using System;', '']
+    lines.append('public struct Quote')
+    lines.append('{')
+    lines.append('    public int Id;')
+    lines.append('    public string Text;')
+    lines.append('    public string Author;')
+    lines.append('}')
+    lines.append('')
+    lines.append(f'public static class {class_name}')
+    lines.append('{')
+    lines.append('    public static readonly Quote[] Quotes = new Quote[]')
     lines.append('    {')
     
     quote_items = list(quotes.items())
@@ -103,7 +111,7 @@ def generate_csharp_class(class_name: str, quotes: Dict[str, str]) -> str:
         escaped_quote = escape_csharp_string(quote)
         escaped_author = escape_csharp_string(author)
         comma = ',' if i < len(quote_items) - 1 else ''
-        lines.append(f'        ({i}, "{escaped_quote}", "{escaped_author}"){comma}')
+        lines.append(f'        new Quote {{ Id = {i}, Text = "{escaped_quote}", Author = "{escaped_author}" }}{comma}')
     
     lines.append('    };')
     lines.append('}')
@@ -134,10 +142,6 @@ def main():
             f.write(csharp_code)
         
         print(f"Generated {output_file} with {len(quotes)} quotes")
-        
-        cache_file = os.path.join(output_dir, f'{lang_code}_quotes.json')
-        with open(cache_file, 'w', encoding='utf-8') as f:
-            json.dump([{"quote": q, "author": a} for q, a in quotes.items()], f, ensure_ascii=False, indent=2)
     
     print("\n" + "="*50)
     print("Quote fetching complete!")
