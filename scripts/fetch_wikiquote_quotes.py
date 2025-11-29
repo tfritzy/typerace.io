@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
-import requests
+import wikiquote
 import time
-import re
 import json
 import os
-from typing import List, Set, Optional
-from html import unescape
+from typing import List, Set
 
 LANGUAGE_CONFIG = {
     'English': {'code': 'en', 'class_name': 'EnglishQuotes'},
@@ -28,81 +26,12 @@ LANGUAGE_CONFIG = {
 QUOTES_PER_LANGUAGE = 1000
 MAX_FETCH_ATTEMPTS = 200
 
-def get_random_page_titles(lang_code: str, num_titles: int = 50) -> List[str]:
-    url = f"https://{lang_code}.wikiquote.org/w/api.php"
-    params = {
-        'action': 'query',
-        'list': 'random',
-        'rnnamespace': 0,
-        'rnlimit': num_titles,
-        'format': 'json'
-    }
-    
-    try:
-        response = requests.get(url, params=params, timeout=30)
-        response.raise_for_status()
-        data = response.json()
-        return [page['title'] for page in data.get('query', {}).get('random', [])]
-    except Exception as e:
-        print(f"Error fetching random titles for {lang_code}: {e}")
-        return []
-
-def get_page_content(lang_code: str, title: str) -> Optional[str]:
-    url = f"https://{lang_code}.wikiquote.org/w/api.php"
-    params = {
-        'action': 'query',
-        'titles': title,
-        'prop': 'extracts',
-        'explaintext': True,
-        'format': 'json'
-    }
-    
-    try:
-        response = requests.get(url, params=params, timeout=30)
-        response.raise_for_status()
-        data = response.json()
-        pages = data.get('query', {}).get('pages', {})
-        for page_id, page_data in pages.items():
-            if page_id != '-1':
-                return page_data.get('extract', '')
-        return None
-    except Exception as e:
-        print(f"Error fetching page content for {title}: {e}")
-        return None
-
-def extract_quotes_from_text(text: str) -> List[str]:
-    quotes = []
-    
-    if not text:
-        return quotes
-    
-    lines = text.split('\n')
-    
-    for line in lines:
-        line = line.strip()
-        
-        if not line:
-            continue
-            
-        if line.startswith('==') or line.startswith('*'):
-            line = re.sub(r'^[=*\s]+', '', line)
-            line = re.sub(r'[=]+$', '', line)
-            line = line.strip()
-        
-        line = re.sub(r'\[.*?\]', '', line)
-        line = re.sub(r'\(.*?\)', '', line)
-        line = re.sub(r'—.*$', '', line)
-        line = re.sub(r'-\s*[A-Z].*$', '', line)
-        
-        line = unescape(line)
-        line = line.strip()
-        
-        if 20 <= len(line) <= 300:
-            if not re.match(r'^[\d\s.,-]+$', line):
-                if not any(x in line.lower() for x in ['http', 'www.', '.com', '.org']):
-                    quotes.append(line)
-    
-    return quotes
+def is_valid_quote(quote: str) -> bool:
+    if not quote or len(quote) < 20 or len(quote) > 300:
+        return False
+    if any(x in quote.lower() for x in ['http', 'www.', '.com', '.org']):
+        return False
+    return True
 
 def fetch_quotes_for_language(lang_code: str, target_count: int) -> Set[str]:
     quotes: Set[str] = set()
@@ -110,10 +39,21 @@ def fetch_quotes_for_language(lang_code: str, target_count: int) -> Set[str]:
     
     print(f"Fetching quotes for language: {lang_code}")
     
+    supported_langs = wikiquote.supported_languages()
+    if lang_code not in supported_langs:
+        print(f"  Warning: Language {lang_code} not supported by wikiquote package")
+        print(f"  Supported languages: {supported_langs}")
+        return quotes
+    
     while len(quotes) < target_count and attempts < MAX_FETCH_ATTEMPTS:
         attempts += 1
         
-        titles = get_random_page_titles(lang_code, num_titles=50)
+        try:
+            titles = wikiquote.random_titles(lang=lang_code, max_titles=50)
+        except Exception as e:
+            print(f"  Error fetching random titles: {e}")
+            time.sleep(1)
+            continue
         
         if not titles:
             print(f"  No titles found, attempt {attempts}/{MAX_FETCH_ATTEMPTS}")
@@ -123,15 +63,19 @@ def fetch_quotes_for_language(lang_code: str, target_count: int) -> Set[str]:
         for title in titles:
             if len(quotes) >= target_count:
                 break
-                
-            content = get_page_content(lang_code, title)
-            if content:
-                extracted = extract_quotes_from_text(content)
-                for quote in extracted:
-                    if quote not in quotes:
+            
+            try:
+                page_quotes = wikiquote.quotes(title, lang=lang_code)
+                for quote in page_quotes:
+                    if is_valid_quote(quote) and quote not in quotes:
                         quotes.add(quote)
                         if len(quotes) >= target_count:
                             break
+            except (wikiquote.DisambiguationPageException, wikiquote.NoSuchPageException):
+                continue
+            except Exception as e:
+                print(f"  Error fetching quotes for '{title}': {e}")
+                continue
             
             time.sleep(0.1)
         
