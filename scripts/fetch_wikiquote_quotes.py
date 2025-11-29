@@ -29,7 +29,7 @@ LANGUAGE_CONFIG = {
 }
 
 QUOTES_PER_LANGUAGE = 1000
-MAX_FETCH_ATTEMPTS = 200
+MAX_FETCH_ATTEMPTS = 2000
 
 def is_valid_quote(quote: str) -> bool:
     if not quote or len(quote) < 20 or len(quote) > 300:
@@ -54,39 +54,35 @@ def fetch_quotes_for_language(lang_code: str, target_count: int) -> Dict[str, st
         attempts += 1
         
         try:
-            titles = wikiquote.random_titles(lang=lang_code, max_titles=50)
+            titles = wikiquote.random_titles(lang=lang_code, max_titles=1)
         except Exception as e:
-            print(f"  Error fetching random titles: {e}")
+            print(f"  Error fetching random title: {e}")
             time.sleep(1)
             continue
         
         if not titles:
-            print(f"  No titles found, attempt {attempts}/{MAX_FETCH_ATTEMPTS}")
+            print(f"  No title found, attempt {attempts}/{MAX_FETCH_ATTEMPTS}")
             time.sleep(1)
             continue
         
-        for title in titles:
-            if len(quotes) >= target_count:
-                break
-            
-            try:
-                page_quotes = wikiquote.quotes(title, lang=lang_code)
-                for quote in page_quotes:
-                    if is_valid_quote(quote) and quote not in quotes:
-                        quotes[quote] = title
-                        if len(quotes) >= target_count:
-                            break
-            except (wikiquote.DisambiguationPageException, wikiquote.NoSuchPageException):
-                continue
-            except Exception as e:
-                print(f"  Error fetching quotes for '{title}': {e}")
-                continue
-            
-            time.sleep(0.1)
+        title = titles[0]
         
-        print(f"  Progress: {len(quotes)}/{target_count} quotes (attempt {attempts})")
-        time.sleep(0.5)
+        try:
+            page_quotes = wikiquote.quotes(title, lang=lang_code)
+            if page_quotes:
+                quote = page_quotes[0]
+                if is_valid_quote(quote) and quote not in quotes:
+                    quotes[quote] = title
+                    if len(quotes) % 50 == 0:
+                        print(f"  Progress: {len(quotes)}/{target_count} quotes")
+        except (wikiquote.DisambiguationPageException, wikiquote.NoSuchPageException):
+            pass
+        except Exception as e:
+            print(f"  Error fetching quotes for '{title}': {e}")
+        
+        time.sleep(0.1)
     
+    print(f"  Final: {len(quotes)}/{target_count} quotes (attempts: {attempts})")
     return quotes
 
 def escape_csharp_string(s: str) -> str:
@@ -99,7 +95,7 @@ def escape_csharp_string(s: str) -> str:
 
 def generate_csharp_class(class_name: str, quotes: Dict[str, str]) -> str:
     lines = ['using System;', '', f'public static class {class_name}', '{']
-    lines.append('    public static readonly (string Quote, string Author)[] Quotes = new (string, string)[]')
+    lines.append('    public static readonly (int Id, string Quote, string Author)[] Quotes = new (int, string, string)[]')
     lines.append('    {')
     
     quote_items = list(quotes.items())
@@ -107,7 +103,7 @@ def generate_csharp_class(class_name: str, quotes: Dict[str, str]) -> str:
         escaped_quote = escape_csharp_string(quote)
         escaped_author = escape_csharp_string(author)
         comma = ',' if i < len(quote_items) - 1 else ''
-        lines.append(f'        ("{escaped_quote}", "{escaped_author}"){comma}')
+        lines.append(f'        ({i}, "{escaped_quote}", "{escaped_author}"){comma}')
     
     lines.append('    };')
     lines.append('}')
