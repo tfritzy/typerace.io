@@ -34,7 +34,7 @@ LANGUAGE_CONFIG = {
     'Turkish': {'code': 'tr', 'class_name': 'TurkishQuotes'},
 }
 
-QUOTES_PER_LANGUAGE = 100
+QUOTES_PER_LANGUAGE = 1000
 MAX_FETCH_ATTEMPTS = 500
 
 def is_valid_quote(quote: str) -> bool:
