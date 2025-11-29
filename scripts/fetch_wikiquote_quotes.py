@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 import requests
-import random
 import time
 import re
 import json
 import os
-from typing import List, Dict, Set, Optional
+from typing import List, Set, Optional
 from html import unescape
 
 LANGUAGE_CONFIG = {
@@ -27,6 +26,7 @@ LANGUAGE_CONFIG = {
 }
 
 QUOTES_PER_LANGUAGE = 1000
+MAX_FETCH_ATTEMPTS = 200
 
 def get_random_page_titles(lang_code: str, num_titles: int = 50) -> List[str]:
     url = f"https://{lang_code}.wikiquote.org/w/api.php"
@@ -70,7 +70,7 @@ def get_page_content(lang_code: str, title: str) -> Optional[str]:
         print(f"Error fetching page content for {title}: {e}")
         return None
 
-def extract_quotes_from_text(text: str, lang_code: str) -> List[str]:
+def extract_quotes_from_text(text: str) -> List[str]:
     quotes = []
     
     if not text:
@@ -106,18 +106,17 @@ def extract_quotes_from_text(text: str, lang_code: str) -> List[str]:
 
 def fetch_quotes_for_language(lang_code: str, target_count: int) -> Set[str]:
     quotes: Set[str] = set()
-    max_attempts = 200
     attempts = 0
     
     print(f"Fetching quotes for language: {lang_code}")
     
-    while len(quotes) < target_count and attempts < max_attempts:
+    while len(quotes) < target_count and attempts < MAX_FETCH_ATTEMPTS:
         attempts += 1
         
         titles = get_random_page_titles(lang_code, num_titles=50)
         
         if not titles:
-            print(f"  No titles found, attempt {attempts}/{max_attempts}")
+            print(f"  No titles found, attempt {attempts}/{MAX_FETCH_ATTEMPTS}")
             time.sleep(1)
             continue
         
@@ -127,7 +126,7 @@ def fetch_quotes_for_language(lang_code: str, target_count: int) -> Set[str]:
                 
             content = get_page_content(lang_code, title)
             if content:
-                extracted = extract_quotes_from_text(content, lang_code)
+                extracted = extract_quotes_from_text(content)
                 for quote in extracted:
                     if quote not in quotes:
                         quotes.add(quote)
@@ -177,7 +176,7 @@ def main():
         print(f"{'='*50}")
         
         quotes = fetch_quotes_for_language(lang_code, QUOTES_PER_LANGUAGE)
-        quotes_list = list(quotes)[:QUOTES_PER_LANGUAGE]
+        quotes_list = list(quotes)
         
         if len(quotes_list) < QUOTES_PER_LANGUAGE:
             print(f"Warning: Only fetched {len(quotes_list)} quotes for {lang_name}")
