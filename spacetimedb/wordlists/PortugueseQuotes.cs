@@ -22,7 +22,7 @@ public static class PortugueseQuotes
         "A criatividade é a inteligência se divertindo.",
         "Grandes mentes sempre encontraram oposição de mentes medíocres.",
         "Só há uma coisa que torna um sonho impossível: o medo de fracassar.",
-        "A verdadeira viagem de descoberta não consiste em procurar novas paisagens.",
+        "A verdadeira viagem de descoberta não consiste em procurar novas paisagens, mas em ter novos olhos.",
         "A educação é a arma mais poderosa que você pode usar para mudar o mundo.",
         "Quem não arrisca não petisca.",
         "A vida é como andar de bicicleta. Para manter o equilíbrio você deve continuar se movendo.",
