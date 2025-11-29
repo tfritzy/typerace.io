@@ -2,6 +2,11 @@ name: Fetch WikiQuote Quotes
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/fetch_wikiquote_quotes.py'
 
 permissions:
   contents: write
