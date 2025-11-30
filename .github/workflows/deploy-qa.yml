@@ -59,10 +59,7 @@ jobs:
         working-directory: frontend
 
       - name: Deploy to Firebase Hosting (QA)
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TYPERACE_160D3 }}
-          projectId: typerace-160d3
-          target: qa
-          channelId: pr-${{ github.event.pull_request.number }}
+        run: |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_TYPERACE_160D3 }}' > /tmp/firebase-sa.json
+          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/firebase-sa.json
+          npx firebase-tools deploy --only hosting:qa --project typerace-160d3
