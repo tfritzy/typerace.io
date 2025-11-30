@@ -65,3 +65,4 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TYPERACE_160D3 }}
           projectId: typerace-160d3
           target: qa
+          channelId: pr-${{ github.event.pull_request.number }}
