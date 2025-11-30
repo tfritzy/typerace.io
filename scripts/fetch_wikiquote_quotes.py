@@ -35,7 +35,7 @@ LANGUAGE_CONFIG = {
 }
 
 QUOTES_PER_LANGUAGE = 1000
-MAX_FETCH_ATTEMPTS = 500
+MAX_FETCH_ATTEMPTS = 3000
 
 def is_valid_quote(quote: str) -> bool:
     if not quote or len(quote) < 20 or len(quote) > 300:
