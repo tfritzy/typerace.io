@@ -179,13 +179,6 @@ def escape_csharp_string(s: str) -> str:
 
 def generate_csharp_class(class_name: str, quotes: Dict[str, tuple]) -> str:
     lines = ['using System;', '']
-    lines.append('public struct Quote')
-    lines.append('{')
-    lines.append('    public string Id;')
-    lines.append('    public string Text;')
-    lines.append('    public string Author;')
-    lines.append('}')
-    lines.append('')
     lines.append(f'public static class {class_name}')
     lines.append('{')
     lines.append('    public static readonly Quote[] Quotes = new Quote[]')
