@@ -47,12 +47,11 @@ jobs:
         env:
           SPACETIMEDB_TOKEN: ${{ secrets.SPACETIMEDB_TOKEN }}
         run: |
-          spacetime server add maincloud https://maincloud.spacetimedb.com --default
           spacetime login --token "$SPACETIMEDB_TOKEN"
 
       - name: Publish SpacetimeDB Module (QA)
         run: |
-          spacetime publish -c -y --project-path spacetimedb typerace-qa
+          spacetime publish -c -y -s maincloud --project-path spacetimedb typerace-qa
 
       - name: Generate TypeScript bindings
         run: |
