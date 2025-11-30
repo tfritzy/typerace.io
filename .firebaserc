@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "typerace-160d3"
+  },
+  "targets": {
+    "typerace-160d3": {
+      "hosting": {
+        "production": [
+          "typerace-160d3"
+        ],
+        "qa": [
+          "typerace-qa"
+        ]
+      }
+    }
   }
 }
