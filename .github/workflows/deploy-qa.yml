@@ -47,7 +47,8 @@ jobs:
         env:
           SPACETIMEDB_TOKEN: ${{ secrets.SPACETIMEDB_TOKEN }}
         run: |
-          spacetime login --token "$SPACETIMEDB_TOKEN" --server maincloud
+          spacetime server add maincloud https://maincloud.spacetimedb.com --default
+          spacetime login --token "$SPACETIMEDB_TOKEN"
 
       - name: Publish SpacetimeDB Module (QA)
         run: |
