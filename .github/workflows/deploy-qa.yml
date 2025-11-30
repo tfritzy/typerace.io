@@ -43,9 +43,13 @@ jobs:
           curl --proto '=https' --tlsv1.2 -sSf https://install.spacetimedb.com | sh -s -- -y
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Publish SpacetimeDB Module (QA)
+      - name: Login to SpacetimeDB
         env:
           SPACETIMEDB_TOKEN: ${{ secrets.SPACETIMEDB_TOKEN }}
+        run: |
+          spacetime login --token "$SPACETIMEDB_TOKEN" --server maincloud
+
+      - name: Publish SpacetimeDB Module (QA)
         run: |
           spacetime publish -c -y --project-path spacetimedb typerace-qa
 
