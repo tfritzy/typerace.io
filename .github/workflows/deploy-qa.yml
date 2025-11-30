@@ -1,0 +1,66 @@
+name: Deploy QA Environment
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: "qa-${{ github.event.pull_request.number || github.run_id }}"
+  cancel-in-progress: true
+
+jobs:
+  deploy-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install SpacetimeDB CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://install.spacetimedb.com | sh -s -- -y
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Publish SpacetimeDB Module (QA)
+        env:
+          SPACETIMEDB_TOKEN: ${{ secrets.SPACETIMEDB_TOKEN }}
+        run: |
+          spacetime publish -c -y --project-path spacetimedb typerace-qa
+
+      - name: Generate TypeScript bindings
+        run: |
+          spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
+
+      - name: Build with Vite (QA)
+        run: npm run build -- --mode qa
+        working-directory: frontend
+
+      - name: Deploy to Firebase Hosting (QA)
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TYPERACE_160D3 }}
+          projectId: typerace-160d3
+          target: qa

@@ -43,7 +43,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
 
             const connection = DbConnection.builder()
                 .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
-                .withModuleName('typerace')
+                .withModuleName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace')
                 .withToken(idToken)
                 .onConnect((conn) => {
                     console.log('Connected to SpacetimeDB');
