@@ -39,6 +39,7 @@ jobs:
       - name: Install SpacetimeDB CLI
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SPACETIME_DOWNLOAD_ROOT: https://github.com/clockworklabs/SpacetimeDB/releases/download/v1.8.0
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://install.spacetimedb.com | sh -s -- -y
           echo "$HOME/.local/bin" >> $GITHUB_PATH
