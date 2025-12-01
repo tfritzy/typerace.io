@@ -24,8 +24,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -34,7 +34,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: "8.0.x"
 
       - name: Install SpacetimeDB CLI
         env:
@@ -52,7 +52,7 @@ jobs:
 
       - name: Publish SpacetimeDB Module (QA)
         run: |
-          spacetime publish -c -y -s maincloud --project-path spacetimedb typerace-qa
+          spacetime publish -c -y -s maincloud --project-path spacetimedb qa-typerace
 
       - name: Build with Vite (QA)
         run: npm run build -- --mode qa
