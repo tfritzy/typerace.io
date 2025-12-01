@@ -29,6 +29,9 @@ __pycache__/
 *.egg-info/
 .eggs/
 
+# Script output files
+scripts/model_comparison_*.txt
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
