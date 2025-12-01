@@ -26,40 +26,40 @@ public static class PhraseGenerator
         return string.Join(" ", words);
     }
 
-    public static string GeneratePhraseForMode(GameMode mode, Random rng)
+    public static Phrase GeneratePhraseForMode(GameMode mode, Random rng)
     {
         switch (mode)
         {
             case GameMode.English500:
-                return GeneratePhrase(English500Words.Words, rng);
+                return new Phrase(GeneratePhrase(English500Words.Words, rng));
             case GameMode.Spanish500:
-                return GeneratePhrase(Spanish500Words.Words, rng);
+                return new Phrase(GeneratePhrase(Spanish500Words.Words, rng));
             case GameMode.French500:
-                return GeneratePhrase(French500Words.Words, rng);
+                return new Phrase(GeneratePhrase(French500Words.Words, rng));
             case GameMode.German500:
-                return GeneratePhrase(German500Words.Words, rng);
+                return new Phrase(GeneratePhrase(German500Words.Words, rng));
             case GameMode.Italian500:
-                return GeneratePhrase(Italian500Words.Words, rng);
+                return new Phrase(GeneratePhrase(Italian500Words.Words, rng));
             case GameMode.Portuguese500:
-                return GeneratePhrase(Portuguese500Words.Words, rng);
+                return new Phrase(GeneratePhrase(Portuguese500Words.Words, rng));
             case GameMode.Japanese500:
-                return GeneratePhrase(Japanese500Words.Words, rng);
+                return new Phrase(GeneratePhrase(Japanese500Words.Words, rng));
             case GameMode.Korean500:
-                return GeneratePhrase(Korean500Words.Words, rng);
+                return new Phrase(GeneratePhrase(Korean500Words.Words, rng));
             case GameMode.Chinese500:
-                return GeneratePhrase(Chinese500Words.Words, rng);
+                return new Phrase(GeneratePhrase(Chinese500Words.Words, rng));
             case GameMode.Ukrainian500:
-                return GeneratePhrase(Ukrainian500Words.Words, rng);
+                return new Phrase(GeneratePhrase(Ukrainian500Words.Words, rng));
             case GameMode.Arabic500:
-                return GeneratePhrase(Arabic500Words.Words, rng);
+                return new Phrase(GeneratePhrase(Arabic500Words.Words, rng));
             case GameMode.Hindi500:
-                return GeneratePhrase(Hindi500Words.Words, rng);
+                return new Phrase(GeneratePhrase(Hindi500Words.Words, rng));
             case GameMode.Dutch500:
-                return GeneratePhrase(Dutch500Words.Words, rng);
+                return new Phrase(GeneratePhrase(Dutch500Words.Words, rng));
             case GameMode.Swedish500:
-                return GeneratePhrase(Swedish500Words.Words, rng);
+                return new Phrase(GeneratePhrase(Swedish500Words.Words, rng));
             case GameMode.Turkish500:
-                return GeneratePhrase(Turkish500Words.Words, rng);
+                return new Phrase(GeneratePhrase(Turkish500Words.Words, rng));
             case GameMode.EnglishQuotes:
             case GameMode.SpanishQuotes:
             case GameMode.FrenchQuotes:
@@ -77,7 +77,7 @@ public static class PhraseGenerator
             case GameMode.TurkishQuotes:
                 return QuoteGenerator.GetRandomQuote(mode, rng);
             default:
-                return "The quick brown fox jumps over the lazy dog";
+                return new Phrase("The quick brown fox jumps over the lazy dog");
         }
     }
 }

@@ -280,6 +280,7 @@ export const GamePage = () => {
             <GamePageTypeBox
               key={gameId}
               phrase={game.phrase}
+              attribution={game.attribution}
               gameId={gameId!}
               conn={conn}
               onFinish={handleFinish}

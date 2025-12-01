@@ -4,6 +4,7 @@ import type { DbConnection } from "../../module_bindings";
 
 type GamePageTypeBoxProps = {
   phrase: string;
+  attribution?: string;
   gameId: string;
   conn: DbConnection | null;
   onFinish: () => void;
@@ -13,6 +14,7 @@ type GamePageTypeBoxProps = {
 
 export const GamePageTypeBox = ({
   phrase,
+  attribution,
   gameId,
   conn,
   onFinish,
@@ -43,6 +45,11 @@ export const GamePageTypeBox = ({
         height="430px"
         initialProgress={initialProgress}
       />
+      {attribution && (
+        <div className="mt-4 text-sm text-white/40 font-sans italic text-center select-none">
+          — {attribution}
+        </div>
+      )}
     </div>
   );
 };
