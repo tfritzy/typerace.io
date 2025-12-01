@@ -727,13 +727,13 @@ public static partial class Module
         long countdownDurationMicros = GetCountdownDuration(gameType);
         long countdownDurationMs = countdownDurationMicros / 1000;
 
-        var (phrase, attribution) = PhraseGenerator.GeneratePhraseForMode(gameMode, ctx.Rng);
+        var phrase = PhraseGenerator.GeneratePhraseForMode(gameMode, ctx.Rng);
 
         return ctx.Db.game.Insert(new Game
         {
             Id = IdGenerator.Generate("game_", ctx.Rng),
-            Phrase = phrase,
-            Attribution = attribution,
+            Phrase = phrase.Text,
+            Attribution = phrase.Attribution,
             CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
             RacingStartedAt = 0,
             CountdownDurationMs = countdownDurationMs,

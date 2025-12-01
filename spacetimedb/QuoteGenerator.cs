@@ -2,7 +2,7 @@ using System;
 
 public static class QuoteGenerator
 {
-    public static (string Text, string? Author) GetRandomQuote(GameMode mode, Random rng)
+    public static Phrase GetRandomQuote(GameMode mode, Random rng)
     {
         Quote[] quotes = mode switch
         {
@@ -26,10 +26,10 @@ public static class QuoteGenerator
 
         if (quotes.Length == 0)
         {
-            return ("No quotes available for this language.", null);
+            return new Phrase("No quotes available for this language.");
         }
 
         int index = rng.Next(quotes.Length);
-        return (quotes[index].Text, quotes[index].Author);
+        return new Phrase(quotes[index].Text, quotes[index].Author);
     }
 }
