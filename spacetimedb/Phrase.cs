@@ -1,7 +1,7 @@
 public struct Phrase
 {
-    public string Text;
-    public string? Attribution;
+    public readonly string Text;
+    public readonly string? Attribution;
 
     public Phrase(string text, string? attribution = null)
     {
