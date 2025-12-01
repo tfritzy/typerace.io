@@ -26,7 +26,22 @@ public enum GameMode
     Hindi500,
     Dutch500,
     Swedish500,
-    Turkish500
+    Turkish500,
+    EnglishQuotes,
+    SpanishQuotes,
+    FrenchQuotes,
+    GermanQuotes,
+    ItalianQuotes,
+    PortugueseQuotes,
+    JapaneseQuotes,
+    KoreanQuotes,
+    ChineseQuotes,
+    UkrainianQuotes,
+    ArabicQuotes,
+    HindiQuotes,
+    DutchQuotes,
+    SwedishQuotes,
+    TurkishQuotes
 }
 
 [Type]
@@ -65,6 +80,13 @@ public enum PlayerColor
     Fuchsia,
     Pink,
     Rose
+}
+
+public struct Quote
+{
+    public string Id;
+    public string Text;
+    public string Author;
 }
 
 

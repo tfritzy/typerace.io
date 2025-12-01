@@ -60,6 +60,22 @@ public static class PhraseGenerator
                 return GeneratePhrase(Swedish500Words.Words, rng);
             case GameMode.Turkish500:
                 return GeneratePhrase(Turkish500Words.Words, rng);
+            case GameMode.EnglishQuotes:
+            case GameMode.SpanishQuotes:
+            case GameMode.FrenchQuotes:
+            case GameMode.GermanQuotes:
+            case GameMode.ItalianQuotes:
+            case GameMode.PortugueseQuotes:
+            case GameMode.JapaneseQuotes:
+            case GameMode.KoreanQuotes:
+            case GameMode.ChineseQuotes:
+            case GameMode.UkrainianQuotes:
+            case GameMode.ArabicQuotes:
+            case GameMode.HindiQuotes:
+            case GameMode.DutchQuotes:
+            case GameMode.SwedishQuotes:
+            case GameMode.TurkishQuotes:
+                return QuoteGenerator.GetRandomQuote(mode, rng);
             default:
                 return "The quick brown fox jumps over the lazy dog";
         }
