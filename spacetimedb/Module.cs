@@ -1213,42 +1213,6 @@ public static partial class Module
 
         Log.Info($"[UpdateGlobalStats] Processing game {game.Id} for date {dateKey}");
 
-        var newPlayersToday = 0;
-        var totalPlayersInGame = 0;
-        var finishedPlayersInGame = 0;
-        var botsInGame = 0;
-
-        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
-        {
-            totalPlayersInGame++;
-            
-            if (progress.IsBot)
-            {
-                botsInGame++;
-                Log.Info($"[UpdateGlobalStats] Player {progress.PlayerId} is a bot, skipping");
-                continue;
-            }
-
-            if (progress.Placement > 0)
-            {
-                finishedPlayersInGame++;
-                var gamesPlayedToday = ctx.Db.gamerecord.PlayerId_Day.Filter((progress.PlayerId, dateKey)).Count();
-                Log.Info($"[UpdateGlobalStats] Player {progress.PlayerId}: Placement={progress.Placement}, GamesToday={gamesPlayedToday}, IsBot={progress.IsBot}");
-                
-                if (gamesPlayedToday == 1)
-                {
-                    newPlayersToday++;
-                    Log.Info($"[UpdateGlobalStats] Player {progress.PlayerId} is NEW today (first game), newPlayersToday={newPlayersToday}");
-                }
-            }
-            else
-            {
-                Log.Info($"[UpdateGlobalStats] Player {progress.PlayerId} did not finish (Placement={progress.Placement})");
-            }
-        }
-
-        Log.Info($"[UpdateGlobalStats] Game {game.Id} summary: TotalPlayers={totalPlayersInGame}, Bots={botsInGame}, FinishedHumans={finishedPlayersInGame}, NewPlayersToday={newPlayersToday}");
-
         var existingStats = ctx.Db.globalstats.Date.Find(dateKey);
         List<GameModeCount> statsList;
         GameModeCount total;
@@ -1269,16 +1233,15 @@ public static partial class Module
                 MaxWpm = 0,
                 GameCount = 0
             };
-            dailyActivePlayers = newPlayersToday;
-            Log.Info($"[UpdateGlobalStats] Creating NEW global stats for {dateKey}, DailyActivePlayers={dailyActivePlayers}");
+            dailyActivePlayers = 0;
+            Log.Info($"[UpdateGlobalStats] Creating NEW global stats for {dateKey}");
         }
         else
         {
             statsList = existingStats.Value.Stats;
             total = existingStats.Value.Total;
-            var previousCount = existingStats.Value.DailyActivePlayers;
-            dailyActivePlayers = previousCount + newPlayersToday;
-            Log.Info($"[UpdateGlobalStats] Updating EXISTING global stats for {dateKey}, Previous={previousCount}, Adding={newPlayersToday}, New Total={dailyActivePlayers}");
+            dailyActivePlayers = existingStats.Value.DailyActivePlayers;
+            Log.Info($"[UpdateGlobalStats] Updating EXISTING global stats for {dateKey}, DailyActivePlayers={dailyActivePlayers}");
         }
 
         GameModeCount? existingCount = null;
@@ -1386,6 +1349,8 @@ public static partial class Module
             statsList.Add(count);
         }
 
+        Log.Info($"[UpdateGlobalStats] Game {game.Id} stats: FinishedHumans={finishedHumanCount}, TotalGames={count.StartedGames}, FinishedGames={count.FinishedGames}");
+
         if (existingStats == null)
         {
             ctx.Db.globalstats.Insert(new GlobalStats
@@ -1451,6 +1416,48 @@ public static partial class Module
         }
     }
 
+    private static void UpdateDailyActivePlayerCount(ReducerContext ctx, Identity playerId, string dateKey)
+    {
+        var gamesPlayedToday = ctx.Db.gamerecord.PlayerId_Day.Filter((playerId, dateKey)).Count();
+        
+        Log.Info($"[DailyActivePlayers] Player {playerId} finished game on {dateKey}, GamesToday={gamesPlayedToday}");
+        
+        if (gamesPlayedToday == 1)
+        {
+            var existingStats = ctx.Db.globalstats.Date.Find(dateKey);
+            
+            if (existingStats == null)
+            {
+                ctx.Db.globalstats.Insert(new GlobalStats
+                {
+                    Date = dateKey,
+                    Stats = new List<GameModeCount>(),
+                    Total = new GameModeCount
+                    {
+                        GameType = GameType.Public,
+                        GameMode = GameMode.English500,
+                        FinishedGames = 0,
+                        NonLonelyGames = 0,
+                        StartedGames = 0,
+                        TotalWpm = 0,
+                        MinWpm = 0,
+                        MaxWpm = 0,
+                        GameCount = 0
+                    },
+                    DailyActivePlayers = 1
+                });
+                Log.Info($"[DailyActivePlayers] Created global stats for {dateKey} with player {playerId} as first active player");
+            }
+            else
+            {
+                var updatedStats = existingStats.Value;
+                updatedStats.DailyActivePlayers++;
+                ctx.Db.globalstats.Date.Update(updatedStats);
+                Log.Info($"[DailyActivePlayers] Player {playerId} is NEW today, incremented count to {updatedStats.DailyActivePlayers}");
+            }
+        }
+    }
+
     private static void UpdatePlayerStatsForGame(ReducerContext ctx, PlayerProgress progress, Game game, int placement, long timeElapsed)
     {
         var updatedProgress = progress;
@@ -1500,6 +1507,11 @@ public static partial class Module
         });
 
         UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, statsId, wpm);
+
+        if (!progress.IsBot)
+        {
+            UpdateDailyActivePlayerCount(ctx, progress.PlayerId, day);
+        }
 
         Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}, typed {wordsTyped} words");
     }
