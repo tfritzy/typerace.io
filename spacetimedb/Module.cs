@@ -1237,11 +1237,16 @@ public static partial class Module
             total = existingStats.Value.Total;
         }
 
+        var botPlayerIds = new HashSet<Identity>();
+        foreach (var player in ctx.Db.player.IsBot.Filter(true))
+        {
+            botPlayerIds.Add(player.Identity);
+        }
+
         var uniquePlayerIds = new HashSet<Identity>();
         foreach (var record in ctx.Db.gamerecord.Day.Filter(dateKey))
         {
-            var player = ctx.Db.player.Identity.Find(record.PlayerId);
-            if (player != null && !player.Value.IsBot)
+            if (!botPlayerIds.Contains(record.PlayerId))
             {
                 uniquePlayerIds.Add(record.PlayerId);
             }
