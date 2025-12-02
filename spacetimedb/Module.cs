@@ -1211,23 +1211,9 @@ public static partial class Module
         var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000);
         var dateKey = dateTime.ToString("yyyy-MM-dd");
 
-        var newPlayersToday = 0;
-        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
-        {
-            if (progress.Placement > 0 && !progress.IsBot)
-            {
-                var gamesPlayedToday = ctx.Db.gamerecord.PlayerId_Day.Filter((progress.PlayerId, dateKey)).Count();
-                if (gamesPlayedToday == 1)
-                {
-                    newPlayersToday++;
-                }
-            }
-        }
-
         var existingStats = ctx.Db.globalstats.Date.Find(dateKey);
         List<GameModeCount> statsList;
         GameModeCount total;
-        int dailyActivePlayers;
 
         if (existingStats == null)
         {
@@ -1244,14 +1230,23 @@ public static partial class Module
                 MaxWpm = 0,
                 GameCount = 0
             };
-            dailyActivePlayers = newPlayersToday;
         }
         else
         {
             statsList = existingStats.Value.Stats;
             total = existingStats.Value.Total;
-            dailyActivePlayers = existingStats.Value.DailyActivePlayers + newPlayersToday;
         }
+
+        var uniquePlayerIds = new HashSet<Identity>();
+        foreach (var record in ctx.Db.gamerecord.Day.Filter(dateKey))
+        {
+            var player = ctx.Db.player.Identity.Find(record.PlayerId);
+            if (player != null && !player.Value.IsBot)
+            {
+                uniquePlayerIds.Add(record.PlayerId);
+            }
+        }
+        int dailyActivePlayers = uniquePlayerIds.Count;
 
         GameModeCount? existingCount = null;
         int existingIndex = -1;
