@@ -95,15 +95,17 @@ PREFER quotes that:
 
 For each quote you select (aim for only the TOP 10-20 best quotes from the page):
 1. The quote text (cleaned of wiki markup and citations)
-2. A simplified attribution: just "{page_name.replace('_', ' ')}"
+2. A simplified attribution: just the author name without underscores
 
 Format as JSON:
 [
   {{
     "quote": "The quote text in original language",
-    "attribution": "{page_name.replace('_', ' ')}"
+    "attribution": "Author Name"
   }}
 ]
+
+For this page, the attribution should be: {page_name.replace('_', ' ')}
 
 Only return your TOP selections. Quality over quantity. If the page doesn't have many great quotes, that's fine - return fewer.
 
