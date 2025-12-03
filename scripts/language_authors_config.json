@@ -190,5 +190,112 @@
       "Bruno_Schulz",
       "Juliusz_Słowacki"
     ]
+  },
+  "ja": {
+    "name": "Japanese",
+    "class_name": "JapaneseQuotes",
+    "authors": [
+      "夏目漱石",
+      "三島由紀夫",
+      "川端康成",
+      "村上春樹",
+      "芥川龍之介",
+      "太宰治",
+      "松尾芭蕉",
+      "宮沢賢治"
+    ]
+  },
+  "ko": {
+    "name": "Korean",
+    "class_name": "KoreanQuotes",
+    "authors": [
+      "김소월",
+      "윤동주",
+      "이상",
+      "김수영",
+      "한용운",
+      "박목월"
+    ]
+  },
+  "zh": {
+    "name": "Chinese",
+    "class_name": "ChineseQuotes",
+    "authors": [
+      "鲁迅",
+      "老子",
+      "孔子",
+      "莊子",
+      "李白",
+      "杜甫",
+      "曹雪芹",
+      "余华"
+    ]
+  },
+  "uk": {
+    "name": "Ukrainian",
+    "class_name": "UkrainianQuotes",
+    "authors": [
+      "Тарас_Шевченко",
+      "Леся_Українка",
+      "Іван_Франко",
+      "Михайло_Коцюбинський",
+      "Ліна_Костенко"
+    ]
+  },
+  "ar": {
+    "name": "Arabic",
+    "class_name": "ArabicQuotes",
+    "authors": [
+      "نجيب_محفوظ",
+      "جبران_خليل_جبران",
+      "محمود_درويش",
+      "أحمد_شوقي",
+      "طه_حسين"
+    ]
+  },
+  "hi": {
+    "name": "Hindi",
+    "class_name": "HindiQuotes",
+    "authors": [
+      "प्रेमचंद",
+      "हरिवंश_राय_बच्चन",
+      "सूर्यकांत_त्रिपाठी",
+      "महादेवी_वर्मा",
+      "रामधारी_सिंह_दिनकर"
+    ]
+  },
+  "nl": {
+    "name": "Dutch",
+    "class_name": "DutchQuotes",
+    "authors": [
+      "Anne_Frank",
+      "Harry_Mulisch",
+      "Gerard_Reve",
+      "Louis_Couperus",
+      "Multatuli",
+      "Herman_Gorter"
+    ]
+  },
+  "sv": {
+    "name": "Swedish",
+    "class_name": "SwedishQuotes",
+    "authors": [
+      "Astrid_Lindgren",
+      "August_Strindberg",
+      "Selma_Lagerlöf",
+      "Tomas_Tranströmer",
+      "Henning_Mankell"
+    ]
+  },
+  "tr": {
+    "name": "Turkish",
+    "class_name": "TurkishQuotes",
+    "authors": [
+      "Orhan_Pamuk",
+      "Nazım_Hikmet",
+      "Yaşar_Kemal",
+      "Elif_Şafak",
+      "Ahmet_Hamdi_Tanpınar"
+    ]
   }
 }
