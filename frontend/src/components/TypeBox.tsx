@@ -3,6 +3,7 @@ import { Cursor } from "./Cursor";
 
 type TypeBoxProps = {
   phrase: string;
+  attribution?: string;
   onComplete?: () => void;
   onProgress?: (correctCharCount: number, eventType: "Correct" | "Incorrect" | "Backspace") => void;
   className?: string;
@@ -16,7 +17,7 @@ export type TypeBoxRef = {
   focus: () => void;
 };
 
-export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplete, onProgress, className, height, resetOnComplete = false, disabled = false, initialProgress = 0 }, ref) => {
+export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, attribution, onComplete, onProgress, className, height, resetOnComplete = false, disabled = false, initialProgress = 0 }, ref) => {
   const [focused, setFocused] = useState(true);
   const [input, setInput] = useState(phrase.substring(0, initialProgress));
   const [isComplete, setIsComplete] = useState(false);
@@ -224,10 +225,10 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
           You must fix all errors
         </div>
       )}
-      <div className="relative select-none">
+      <div className="relative select-none flex-1">
         <div className="type-box">
           <div
-            className="whitespace-pre-wrap text-start"
+            className="whitespace-pre-wrap text-start font-mono"
             ref={phraseRef}
           >
             {renderText()}
@@ -251,6 +252,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, onComplet
             autoFocus
           />
         </div>
+        {attribution && (
+          <div className="mt-6 text-lg text-white/40 italic font-light text-right select-none pr-2">
+            - {attribution}
+          </div>
+        )}
       </div>
     </div>
   );

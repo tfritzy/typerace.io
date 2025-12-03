@@ -12,3 +12,5 @@ firebase deploy --only hosting
 
 DANGER!!!!
 spacetime publish -c --project-path spacetimedb --server maincloud typerace
+
+venv/bin/python compare_gemini_models.py

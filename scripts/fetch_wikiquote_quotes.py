@@ -42,6 +42,25 @@ def is_valid_quote(quote: str) -> bool:
         return False
     if any(x in quote.lower() for x in ['http', 'www.', '.com', '.org']):
         return False
+    
+    quote_lower = quote.lower()
+    weak_indicators = [
+        '[', ']',
+        'see also:', 'external links:', 'references:',
+        '...',
+    ]
+    if any(indicator in quote_lower for indicator in weak_indicators):
+        return False
+    
+    dialog_indicators = [
+        '"you ', '"i ', '"we ', '"they ',
+        'he said', 'she said', 'they said',
+        '!" ', '?" ',
+    ]
+    dialog_count = sum(1 for indicator in dialog_indicators if indicator in quote_lower)
+    if dialog_count >= 2:
+        return False
+    
     return True
 
 def validate_quotes_batch_with_gemini(quotes_batch: list) -> list:
@@ -51,21 +70,33 @@ def validate_quotes_batch_with_gemini(quotes_batch: list) -> list:
     quotes_text = "\n".join([f"{i+1}. Quote: \"{q['quote']}\" - Author: {q['author']}" 
                              for i, q in enumerate(quotes_batch)])
     
-    prompt = f"""Evaluate each quote for quality in a typing practice game.
+    prompt = f"""Evaluate each quote for quality in a typing practice game. We want thoughtful, well-written quotes that were carefully crafted by authors, not casual dialog or movie lines.
 
 {quotes_text}
 
 For EACH quote, respond with ONLY its number followed by "yes" or "no".
-A quote should be marked "no" if it has ANY of these issues:
+
+Mark a quote "no" if it has ANY of these critical issues:
+- Contains typos, spelling errors, or grammatical mistakes
+- Is uninteresting movie or book dialog that's just casual conversation (e.g., "Perhaps you know me better as... the Kung Fu Panda!")
+- Is a throwaway line from fiction rather than a thoughtfully written passage (e.g., "I'm sorry, counselor, I'd rather blow the goddamn case.")
 - Contains context markers in square brackets like [after doing something], [to someone], [speaking about X], [on topic]
 - Contains markup, wiki formatting, citations, or references
 - Is not a complete thought (cut off mid-sentence)
-- Has excessive punctuation (too many "...", special chars)
+- Has excessive punctuation (too many "...", special chars, or dramatic emphases like "!!!")
 - Is a list of items, song lyrics with line breaks, or a description rather than a quote
 - Is not interesting or meaningful for typing practice
 - Is a dialog with multiple speakers (contains "Name:" or "Character:" patterns indicating multiple people talking)
 - Cannot be understood in isolation without knowing the context or question being answered
 - Is an answer to an unspoken question (starts with phrases like "On a...", "When I...", "Because..." that imply a preceding question)
+- Sounds like it's from a screenplay, script, or casual spoken dialog rather than thoughtful writing
+
+Mark a quote "yes" if it is:
+- Well-written and thoughtfully crafted by the author
+- A meaningful observation, philosophical insight, or carefully considered statement
+- From essays, speeches, letters, poems, or other intentional literary works
+- Interesting and would make good typing practice
+- Free of errors and complete as written
 
 Example response format:
 1. yes
