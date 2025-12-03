@@ -2,13 +2,29 @@ spacetime generate --lang typescript --out-dir frontend/module_bindings --projec
 
 spacetime sql typerace "SELECT * from player"
 
+# Production deployment
 spacetime publish --project-path spacetimedb typerace
 spacetime publish -c --project-path spacetimedb typerace -y
 spacetime publish --project-path spacetimedb --server maincloud typerace
 
 firebase deploy --only hosting
 
+# QA deployment commands
+# 1. Build frontend for QA
+cd frontend && npm run build -- --mode qa && cd ..
+
+# 2. Deploy SpacetimeDB module to QA (maincloud)
+spacetime publish -c -y -s maincloud --project-path spacetimedb qa-typerace
+
+# 3. Deploy frontend to Firebase QA hosting
+# First, authenticate with Firebase service account or login
+firebase deploy --only hosting:qa --project typerace-160d3
+
+# Query QA database
+spacetime sql qa-typerace "SELECT * from player" -s maincloud
+
 
 
 DANGER!!!!
 spacetime publish -c --project-path spacetimedb --server maincloud typerace
+spacetime publish -c -y -s maincloud --project-path spacetimedb qa-typerace
