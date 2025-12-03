@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+@layer base {
+  .font-mono {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 200;
+  }
+}
+
 :root {
   /* Color Variables */
   --color-bg-primary: #202020;
@@ -242,7 +249,7 @@ body {
 }
 
 .logo-accent {
-  background: linear-gradient(135deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 60%, white) 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 80%, white) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

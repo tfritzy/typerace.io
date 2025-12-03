@@ -35,21 +35,17 @@ export const GamePageTypeBox = ({
   }, [onFinish]);
 
   return (
-    <div className="text-2xl font-mono leading-[1.6]">
+    <div className="text-2xl leading-[1.6]">
       <TypeBox
         ref={typeBoxRef}
         phrase={phrase}
+        attribution={attribution}
         onProgress={handleProgress}
         onComplete={handleComplete}
         disabled={disabled}
         height="430px"
         initialProgress={initialProgress}
       />
-      {attribution && (
-        <div className="mt-4 text-sm text-white/40 font-sans italic text-center select-none">
-          — {attribution}
-        </div>
-      )}
     </div>
   );
 };
