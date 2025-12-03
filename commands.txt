@@ -8,7 +8,17 @@ spacetime publish --project-path spacetimedb --server maincloud typerace
 
 firebase deploy --only hosting
 
+QA ENVIRONMENT DEPLOYMENT:
+spacetime publish -c -y --project-path spacetimedb typerace-qa
+spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
+cd frontend && npm run build -- --mode qa
+firebase deploy --only hosting:qa
 
+PRODUCTION ENVIRONMENT DEPLOYMENT:
+spacetime publish -c -y --project-path spacetimedb --server maincloud typerace
+spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
+cd frontend && npm run build -- --mode production
+firebase deploy --only hosting:production
 
 DANGER!!!!
 spacetime publish -c --project-path spacetimedb --server maincloud typerace
