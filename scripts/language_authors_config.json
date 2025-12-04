@@ -1,0 +1,301 @@
+{
+  "en": {
+    "name": "English",
+    "class_name": "EnglishQuotes",
+    "authors": [
+      "Albert_Einstein",
+      "Maya_Angelou",
+      "Oscar_Wilde",
+      "Mark_Twain",
+      "Winston_Churchill",
+      "Friedrich_Nietzsche",
+      "Ralph_Waldo_Emerson",
+      "Abraham_Lincoln",
+      "Martin_Luther_King_Jr.",
+      "Benjamin_Franklin",
+      "William_Shakespeare",
+      "Eleanor_Roosevelt",
+      "Mahatma_Gandhi",
+      "Nelson_Mandela",
+      "Jane_Austen",
+      "Virginia_Woolf",
+      "James_Baldwin",
+      "Toni_Morrison",
+      "Gabriel_García_Márquez",
+      "Ernest_Hemingway",
+      "Bertrand_Russell",
+      "Søren_Kierkegaard",
+      "Simone_de_Beauvoir",
+      "Michel_de_Montaigne",
+      "Arthur_Schopenhauer",
+      "Jorge_Luis_Borges",
+      "Kurt_Vonnegut",
+      "George_Orwell",
+      "Ray_Bradbury",
+      "Ursula_K._Le_Guin",
+      "W._H._Auden",
+      "Emily_Dickinson",
+      "Langston_Hughes",
+      "George_Bernard_Shaw",
+      "H._L._Mencken",
+      "Dorothy_Parker",
+      "Gore_Vidal",
+      "Christopher_Hitchens",
+      "Leo_Tolstoy",
+      "Fyodor_Dostoevsky",
+      "Franz_Kafka",
+      "Charles_Dickens",
+      "Herman_Melville",
+      "Carl_Sagan",
+      "Richard_Feynman",
+      "Isaac_Asimov"
+    ]
+  },
+  "es": {
+    "name": "Spanish",
+    "class_name": "SpanishQuotes",
+    "authors": [
+      "Gabriel_García_Márquez",
+      "Pablo_Neruda",
+      "Jorge_Luis_Borges",
+      "Miguel_de_Cervantes",
+      "Federico_García_Lorca",
+      "Octavio_Paz",
+      "Isabel_Allende",
+      "Mario_Vargas_Llosa",
+      "Sor_Juana_Inés_de_la_Cruz",
+      "Antonio_Machado",
+      "Miguel_de_Unamuno",
+      "Rubén_Darío",
+      "Gabriela_Mistral",
+      "César_Vallejo",
+      "Juan_Ramón_Jiménez",
+      "Rafael_Alberti",
+      "Vicente_Aleixandre",
+      "Camilo_José_Cela",
+      "Benito_Pérez_Galdós",
+      "Rosalía_de_Castro"
+    ]
+  },
+  "fr": {
+    "name": "French",
+    "class_name": "FrenchQuotes",
+    "authors": [
+      "Victor_Hugo",
+      "Albert_Camus",
+      "Jean-Paul_Sartre",
+      "Simone_de_Beauvoir",
+      "Voltaire",
+      "Marcel_Proust",
+      "Antoine_de_Saint-Exupéry",
+      "Molière",
+      "Jean-Jacques_Rousseau",
+      "Gustave_Flaubert",
+      "Émile_Zola",
+      "Charles_Baudelaire",
+      "André_Gide",
+      "Honoré_de_Balzac",
+      "Michel_de_Montaigne",
+      "Stendhal",
+      "Alexandre_Dumas",
+      "Guy_de_Maupassant",
+      "Blaise_Pascal",
+      "René_Descartes"
+    ]
+  },
+  "de": {
+    "name": "German",
+    "class_name": "GermanQuotes",
+    "authors": [
+      "Johann_Wolfgang_von_Goethe",
+      "Friedrich_Schiller",
+      "Friedrich_Nietzsche",
+      "Hermann_Hesse",
+      "Franz_Kafka",
+      "Thomas_Mann",
+      "Bertolt_Brecht",
+      "Rainer_Maria_Rilke",
+      "Arthur_Schopenhauer",
+      "Immanuel_Kant",
+      "Heinrich_Heine",
+      "Erich_Kästner",
+      "Stefan_Zweig",
+      "Heinrich_Böll",
+      "Günter_Grass"
+    ]
+  },
+  "it": {
+    "name": "Italian",
+    "class_name": "ItalianQuotes",
+    "authors": [
+      "Dante_Alighieri",
+      "Italo_Calvino",
+      "Umberto_Eco",
+      "Leonardo_da_Vinci",
+      "Niccolò_Machiavelli",
+      "Giuseppe_Verdi",
+      "Alessandro_Manzoni",
+      "Giacomo_Leopardi",
+      "Luigi_Pirandello",
+      "Primo_Levi",
+      "Giovanni_Boccaccio",
+      "Francesco_Petrarca",
+      "Eugenio_Montale",
+      "Giuseppe_Ungaretti"
+    ]
+  },
+  "pt": {
+    "name": "Portuguese",
+    "class_name": "PortugueseQuotes",
+    "authors": [
+      "Fernando_Pessoa",
+      "José_Saramago",
+      "Machado_de_Assis",
+      "Paulo_Coelho",
+      "Clarice_Lispector",
+      "Luís_de_Camões",
+      "Carlos_Drummond_de_Andrade",
+      "Jorge_Amado",
+      "Eça_de_Queirós",
+      "Guimarães_Rosa"
+    ]
+  },
+  "ru": {
+    "name": "Russian",
+    "class_name": "RussianQuotes",
+    "authors": [
+      "Лев_Толстой",
+      "Фёдор_Достоевский",
+      "Антон_Чехов",
+      "Александр_Пушкин",
+      "Михаил_Булгаков",
+      "Иван_Тургенев",
+      "Владимир_Набоков",
+      "Анна_Ахматова",
+      "Борис_Пастернак",
+      "Николай_Гоголь",
+      "Максим_Горький"
+    ]
+  },
+  "pl": {
+    "name": "Polish",
+    "class_name": "PolishQuotes",
+    "authors": [
+      "Adam_Mickiewicz",
+      "Wisława_Szymborska",
+      "Czesław_Miłosz",
+      "Stanisław_Lem",
+      "Henryk_Sienkiewicz",
+      "Witold_Gombrowicz",
+      "Bruno_Schulz",
+      "Juliusz_Słowacki"
+    ]
+  },
+  "ja": {
+    "name": "Japanese",
+    "class_name": "JapaneseQuotes",
+    "authors": [
+      "夏目漱石",
+      "三島由紀夫",
+      "川端康成",
+      "村上春樹",
+      "芥川龍之介",
+      "太宰治",
+      "松尾芭蕉",
+      "宮沢賢治"
+    ]
+  },
+  "ko": {
+    "name": "Korean",
+    "class_name": "KoreanQuotes",
+    "authors": [
+      "김소월",
+      "윤동주",
+      "이상",
+      "김수영",
+      "한용운",
+      "박목월"
+    ]
+  },
+  "zh": {
+    "name": "Chinese",
+    "class_name": "ChineseQuotes",
+    "authors": [
+      "鲁迅",
+      "老子",
+      "孔子",
+      "莊子",
+      "李白",
+      "杜甫",
+      "曹雪芹",
+      "余华"
+    ]
+  },
+  "uk": {
+    "name": "Ukrainian",
+    "class_name": "UkrainianQuotes",
+    "authors": [
+      "Тарас_Шевченко",
+      "Леся_Українка",
+      "Іван_Франко",
+      "Михайло_Коцюбинський",
+      "Ліна_Костенко"
+    ]
+  },
+  "ar": {
+    "name": "Arabic",
+    "class_name": "ArabicQuotes",
+    "authors": [
+      "نجيب_محفوظ",
+      "جبران_خليل_جبران",
+      "محمود_درويش",
+      "أحمد_شوقي",
+      "طه_حسين"
+    ]
+  },
+  "hi": {
+    "name": "Hindi",
+    "class_name": "HindiQuotes",
+    "authors": [
+      "प्रेमचंद",
+      "हरिवंश_राय_बच्चन",
+      "सूर्यकांत_त्रिपाठी",
+      "महादेवी_वर्मा",
+      "रामधारी_सिंह_दिनकर"
+    ]
+  },
+  "nl": {
+    "name": "Dutch",
+    "class_name": "DutchQuotes",
+    "authors": [
+      "Anne_Frank",
+      "Harry_Mulisch",
+      "Gerard_Reve",
+      "Louis_Couperus",
+      "Multatuli",
+      "Herman_Gorter"
+    ]
+  },
+  "sv": {
+    "name": "Swedish",
+    "class_name": "SwedishQuotes",
+    "authors": [
+      "Astrid_Lindgren",
+      "August_Strindberg",
+      "Selma_Lagerlöf",
+      "Tomas_Tranströmer",
+      "Henning_Mankell"
+    ]
+  },
+  "tr": {
+    "name": "Turkish",
+    "class_name": "TurkishQuotes",
+    "authors": [
+      "Orhan_Pamuk",
+      "Nazım_Hikmet",
+      "Yaşar_Kemal",
+      "Elif_Şafak",
+      "Ahmet_Hamdi_Tanpınar"
+    ]
+  }
+}

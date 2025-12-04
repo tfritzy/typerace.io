@@ -48,7 +48,7 @@ def fetch_wikiquote_page(page_name: str, lang: str = 'en') -> str:
     
     return ""
 
-def extract_quotes_with_gemini(page_name: str, page_content: str, lang_code: str = 'en', lang_name: str = 'English') -> List[Dict[str, str]]:
+def extract_quotes_with_gemini(page_name: str, page_content: str, lang_code: str, lang_name: str) -> List[Dict[str, str]]:
     language_instruction = ""
     if lang_code != 'en':
         language_instruction = f"""
@@ -145,7 +145,7 @@ def sanitize_class_name(page_name: str) -> str:
 def escape_csharp_string(s: str) -> str:
     return s.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\r', '\\r').replace('\t', '\\t')
 
-def generate_csharp_file(page_name: str, quotes: List[Dict[str, str]], output_dir: str, lang_code: str = 'en', class_name_prefix: str = 'EnglishQuotes') -> str:
+def generate_csharp_file(page_name: str, quotes: List[Dict[str, str]], output_dir: str, lang_code: str, class_name_prefix: str) -> str:
     class_name = sanitize_class_name(page_name)
     
     lines = []
@@ -178,7 +178,7 @@ def generate_csharp_file(page_name: str, quotes: List[Dict[str, str]], output_di
     
     return class_name
 
-def generate_main_csharp_file(class_names: List[str], output_dir: str, class_name_prefix: str = 'EnglishQuotes'):
+def generate_main_csharp_file(class_names: List[str], output_file: str, class_name_prefix: str):
     lines = []
     lines.append("using System;")
     lines.append("using System.Linq;")
@@ -196,71 +196,36 @@ def generate_main_csharp_file(class_names: List[str], output_dir: str, class_nam
     lines.append("        .ToArray();")
     lines.append("}")
     
-    filepath = os.path.join(output_dir, "..", f"{class_name_prefix}.cs")
-    
-    with open(filepath, 'w', encoding='utf-8') as f:
+    with open(output_file, 'w', encoding='utf-8') as f:
         f.write('\n'.join(lines))
 
-def main():
-    parser = argparse.ArgumentParser(
-        description='Fetch quotes from Wikiquote for specific languages and authors',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  # Process English quotes (default)
-  python fetch_quotes_with_gemini.py
-  
-  # Process Spanish quotes
-  python fetch_quotes_with_gemini.py --lang es
-  
-  # Process French quotes with custom output
-  python fetch_quotes_with_gemini.py --lang fr --output-dir /custom/path
-        """
-    )
+def process_language(lang_code: str, config: Dict, output_base_dir: str):
+    lang_name = config['name']
+    class_name_prefix = config['class_name']
+    authors = config['authors']
     
-    parser.add_argument('--lang', default='en', help='Language code (default: en)')
-    parser.add_argument('--output-dir', default='../spacetimedb/quotes', help='Output directory for generated C# files')
-    
-    args = parser.parse_args()
-    
-    config = load_language_config()
-    
-    if args.lang not in config:
-        print(f"Error: Language '{args.lang}' not found in config")
-        print("\nAvailable languages:")
-        for lang_code, lang_config in config.items():
-            print(f"  {lang_code}: {lang_config['name']} ({len(lang_config['authors'])} authors)")
-        exit(1)
-    
-    lang_config = config[args.lang]
-    lang_name = lang_config['name']
-    class_name_prefix = lang_config['class_name']
-    authors = lang_config['authors']
-    
-    print(f"Processing {lang_name} ({args.lang})")
-    print(f"Using model: gemini-2.5-pro")
-    print(f"Output directory: {args.output_dir}")
+    print(f"\n{'='*60}")
+    print(f"Processing {lang_name} ({lang_code})")
+    print(f"{'='*60}")
     print(f"Authors to process: {len(authors)}")
+    
+    output_dir = os.path.join(output_base_dir, 'gemini')
+    os.makedirs(output_dir, exist_ok=True)
     
     all_quotes = []
     quotes_by_author = {}
     
-    output_dir = os.path.join(args.output_dir, 'gemini')
-    os.makedirs(output_dir, exist_ok=True)
-    
-    print(f"\nProcessing {len(authors)} Wikiquote pages...")
-    
     for i, page_name in enumerate(authors):
         print(f"\n[{i+1}/{len(authors)}] Processing {page_name}...")
         
-        page_content = fetch_wikiquote_page(page_name, args.lang)
+        page_content = fetch_wikiquote_page(page_name, lang_code)
         if not page_content:
             print(f"  Failed to fetch page content")
             continue
         
         print(f"  Page content length: {len(page_content)} characters")
         
-        quotes = extract_quotes_with_gemini(page_name, page_content, args.lang, lang_name)
+        quotes = extract_quotes_with_gemini(page_name, page_content, lang_code, lang_name)
         print(f"  Extracted {len(quotes)} quotes")
         
         if quotes:
@@ -277,23 +242,71 @@ Examples:
     print("\nGenerating C# files...")
     class_names = []
     for page_name, quotes in quotes_by_author.items():
-        class_name = generate_csharp_file(page_name, quotes, output_dir, args.lang, class_name_prefix)
+        class_name = generate_csharp_file(page_name, quotes, output_dir, lang_code, class_name_prefix)
         class_names.append(class_name)
         print(f"  Generated gemini/{class_name}.cs with {len(quotes)} quotes")
     
-    generate_main_csharp_file(class_names, output_dir, class_name_prefix)
+    main_file = os.path.join(output_base_dir, f"{class_name_prefix}.cs")
+    generate_main_csharp_file(class_names, main_file, class_name_prefix)
     print(f"\nGenerated {class_name_prefix}.cs (top-level) with {len(class_names)} author classes")
     
     print("\nSample quotes:")
     for quote in all_quotes[:5]:
         print(f"\n\"{quote['quote']}\"")
         print(f"  - {quote['attribution']}")
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Fetch quotes from Wikiquote for specific languages and authors',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Process English quotes
+  python fetch_quotes_multilang.py --lang en
+  
+  # Process Spanish quotes
+  python fetch_quotes_multilang.py --lang es
+  
+  # Process all languages
+  python fetch_quotes_multilang.py --all
+  
+  # Process specific languages
+  python fetch_quotes_multilang.py --lang en --lang es --lang fr
+        """
+    )
     
-    output_file = f'extracted_quotes_{args.lang}.json'
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(all_quotes, f, indent=2, ensure_ascii=False)
+    parser.add_argument('--lang', action='append', help='Language code to process (can be specified multiple times)')
+    parser.add_argument('--all', action='store_true', help='Process all configured languages')
+    parser.add_argument('--output-dir', default='../spacetimedb/quotes', help='Output directory for generated C# files')
     
-    print(f"\n\nQuotes also saved to {output_file}")
+    args = parser.parse_args()
+    
+    config = load_language_config()
+    
+    if args.all:
+        languages_to_process = list(config.keys())
+    elif args.lang:
+        languages_to_process = args.lang
+    else:
+        print("Error: You must specify either --lang or --all")
+        print("\nAvailable languages:")
+        for lang_code, lang_config in config.items():
+            print(f"  {lang_code}: {lang_config['name']} ({len(lang_config['authors'])} authors)")
+        exit(1)
+    
+    for lang_code in languages_to_process:
+        if lang_code not in config:
+            print(f"Error: Language '{lang_code}' not found in config")
+            print("\nAvailable languages:")
+            for lc, lconf in config.items():
+                print(f"  {lc}: {lconf['name']}")
+            continue
+        
+        process_language(lang_code, config[lang_code], args.output_dir)
+    
+    print("\n" + "="*60)
+    print("Quote fetching complete!")
+    print("="*60)
 
 if __name__ == "__main__":
     main()
