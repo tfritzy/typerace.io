@@ -86,7 +86,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                         </button>
                     </div>
                 </div>
-                <div className="pb-2">
+                <div className="pb-6">
                     <h2 className="text-white/50 text-sm font-medium mb-2">Language</h2>
                     <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-3">
                         {languages.map((lang) => {
@@ -149,7 +149,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                     <ChevronUp size={24} className="rotate-180" />
                                 </button>
                             </div>
-                            <div className="p-4">
+                            <div className="p-4 pb-8">
                                 <h3 className="text-white/80 text-base font-medium mb-3">Match Type</h3>
                                 <div className="flex flex-col gap-2 mb-6">
                                     <button
