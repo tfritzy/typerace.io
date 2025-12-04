@@ -1,10 +1,10 @@
 .selection-button {
-  padding: 0.875rem 1rem;
-  background-color: var(--color-box-bg);
-  border: 1px solid var(--color-box-border);
-  border-radius: 6px;
+  padding: 0.625rem 1rem;
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.375rem;
   color: var(--color-white);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -15,18 +15,23 @@
 }
 
 .selection-button:hover {
-  border-color: color-mix(in srgb, var(--color-white) 50%, transparent);
-  background-color: #333333;
-  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.25);
+  background-color: #222222;
   opacity: 0.8;
 }
 
 .selection-button.selected {
-  border-color: var(--color-white-25);
-  background-color: #333333;
+  border-color: rgba(255, 255, 255, 0.25);
+  background-color: #222222;
   opacity: 1;
 }
 
 .selection-button:active {
   transform: translateY(0);
+}
+
+.selection-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
 }

@@ -46,11 +46,6 @@ export const GamePageTypeBox = ({
         height="430px"
         initialProgress={initialProgress}
       />
-      {attribution && (
-        <div className="mt-4 text-sm text-white/40 font-sans italic text-center select-none">
-          — {attribution}
-        </div>
-      )}
     </div>
   );
 };
