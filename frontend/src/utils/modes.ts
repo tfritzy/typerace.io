@@ -32,14 +32,14 @@ export const languages: LanguageInfo[] = [
     { language: Language.German, flag: "🇩🇪", randomWordsMode: "German500", quotesMode: "GermanQuotes" },
     { language: Language.Italian, flag: "🇮🇹", randomWordsMode: "Italian500", quotesMode: "ItalianQuotes" },
     { language: Language.Portuguese, flag: "🇵🇹", randomWordsMode: "Portuguese500", quotesMode: "PortugueseQuotes" },
-    { language: Language.Japanese, flag: "🇯🇵", randomWordsMode: "Japanese500", quotesMode: null },
-    { language: Language.Korean, flag: "🇰🇷", randomWordsMode: "Korean500", quotesMode: null },
-    { language: Language.Chinese, flag: "🇨🇳", randomWordsMode: "Chinese500", quotesMode: null },
-    { language: Language.Ukrainian, flag: "🇺🇦", randomWordsMode: "Ukrainian500", quotesMode: null },
-    { language: Language.Hindi, flag: "🇮🇳", randomWordsMode: "Hindi500", quotesMode: null },
-    { language: Language.Dutch, flag: "🇳🇱", randomWordsMode: "Dutch500", quotesMode: null },
-    { language: Language.Swedish, flag: "🇸🇪", randomWordsMode: "Swedish500", quotesMode: null },
-    { language: Language.Turkish, flag: "🇹🇷", randomWordsMode: "Turkish500", quotesMode: null },
+    { language: Language.Japanese, flag: "🇯🇵", randomWordsMode: "Japanese500", quotesMode: "JapaneseQuotes" },
+    { language: Language.Korean, flag: "🇰🇷", randomWordsMode: "Korean500", quotesMode: "KoreanQuotes" },
+    { language: Language.Chinese, flag: "🇨🇳", randomWordsMode: "Chinese500", quotesMode: "ChineseQuotes" },
+    { language: Language.Ukrainian, flag: "🇺🇦", randomWordsMode: "Ukrainian500", quotesMode: "UkrainianQuotes" },
+    { language: Language.Hindi, flag: "🇮🇳", randomWordsMode: "Hindi500", quotesMode: "HindiQuotes" },
+    { language: Language.Dutch, flag: "🇳🇱", randomWordsMode: "Dutch500", quotesMode: "DutchQuotes" },
+    { language: Language.Swedish, flag: "🇸🇪", randomWordsMode: "Swedish500", quotesMode: "SwedishQuotes" },
+    { language: Language.Turkish, flag: "🇹🇷", randomWordsMode: "Turkish500", quotesMode: "TurkishQuotes" },
 ].sort((a, b) => a.language.localeCompare(b.language));
 
 export interface ModeOption {

@@ -32,6 +32,10 @@ public static class QuoteGenerator
         }
 
         int index = rng.Next(quotes.Length);
-        return new Phrase(quotes[index].Text, quotes[index].Author);
+        var quote = quotes[index];
+        return new Phrase(
+            PhraseGenerator.SanitizeText(quote.Text),
+            quote.Author != null ? PhraseGenerator.SanitizeText(quote.Author) : null
+        );
     }
 }
