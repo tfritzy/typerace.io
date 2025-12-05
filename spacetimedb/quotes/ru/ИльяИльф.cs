@@ -1,0 +1,72 @@
+using System;
+
+namespace StdbModule;
+
+public static partial class RussianQuotes
+{
+    public static class ИльяИльф
+    {
+        public static readonly Quote[] Quotes = new Quote[]
+        {
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Я родился между молотом и наковальней.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Бывший потомственный почётный гражданин.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Над городом послышался скрип колеса фортуны.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Всеми фибрами своего чемодана он стремился за границу.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Надо показать ему какую-нибудь бумагу, иначе он не поверит, что вы существуете.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Все талантливые люди пишут разно, все бездарные люди пишут одинаково и даже одним почерком.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Человек, с которым надо сидеть рядом и указывать ему, что хорошо, а что плохо, иначе он может перепутать.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Лицо, не истощенное умственными упражнениями.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Правда объектива, бинокля, телескопа.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Бог правду видит, да не скоро скажет. Что за волокита?", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Собака так предана, что просто не веришь в то, что человек заслуживает такой любви.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Всегда есть такой человек, который изо всех сил хочет высказаться последним.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Смешную фразу надо лелеять, холить, ласково поглаживая по подлежащему.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Орда взбунтовавшихся чиновников.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "По линии наименьшего сопротивления всё обстоит благополучно.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "В фантастических романах главное это было радио. При нём ожидалось счастье человечества. Вот радио есть, а счастья нет.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Счастливец, бредущий по краю планеты в погоне за счастьем, которого солнечная система не может предложить. Безумец, беспрерывно лопочущий и размахивающий руками.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Входит, уходит, смеётся, застреливается.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Любопытства было больше, чем пищи для него.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Это неприятно, но факт. Великая страна не имеет великой литературы.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "«Наряду с достижениями есть и недочёты». Это вполне безопасно. Это можно сказать даже о Библии. Наряду с блестящими местами есть идеологические срывы, например, автор призывает читателя верить в бога.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "На стол был подан страшный, нашпигованный сплетнями гусь.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Девочка пасла шары.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Говорил с нахальством пророка.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "…Ей четыре года, но она говорит, что ей два. Редкое кокетство.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "«Край непуганых идиотов». Самое время пугнуть.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Открылся новый магазин. Колбаса для малокровных, паштеты для неврастеников. Психопаты, покупайте продукты питания только здесь!", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Решено было не допустить ни одной ошибки. Держали двадцать корректур, и всё равно на титульном листе было напечатано: «Британская энциклопудия».", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Справедливость кретинов. Один раз я, другой раз ты. Равноправие идиотов.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Это были гордые дети маленьких ответственных работников.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Сто раз просыпаюсь за ночь. Каждый сон маленький, как рыбья чешуйка. К утру я весь в этой чешуе.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Мы ехали в поезде по Крыму. Когда моя соседка увидела зелёную траву, она так обрадовалась, как будто она была коровой, всю зиму проведшей в мрачном уединении хлева.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Жить на такой планете — только терять время.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Напился так, что уже мог творить различные мелкие чудеса.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "«На вашем месте я бы сидел на месте».", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "«Отец мой мельник, мать — русалка».", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Путаясь в соплях, вошёл мальчик.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Клуб «Домосед».", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Толстые большие мухи гудели возле уборной так, как будто давали концерт на виолончелях.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "При грудном ребёнке сказали какую-то шутку, и он внезапно захохотал. Тогда решили, что он оборотень, и убили его.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Слёзы, пролитые на спектаклях, надо собирать в графины.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Собирайте кости своих друзей — это утиль.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Полк на параде и впереди командир на извозчике.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Ассоциация парикмахеров «Синяя борода».", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Почему я должен уважать бабушку? Она меня даже не родила.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Меня тошнит от запаха чистой воды.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Давайте ходить по газонам, подвергаясь штрафу.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Оперный певец хороший, но плохо играет. И только роль Германа ему удаётся, потому что он страстный картёжник.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Конкурс лгунов. Первый приз получил человек, говоривший правду.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Крыса бежит с корабля! Неверно, — робко ответила из толпы крыса.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Мне не нужна вечная игла для примуса. Я не собираюсь жить вечно.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Больной моет ногу, чтоб пойти к врачу. Придя, он замечает, что вымыл не ту ногу.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Иванов решил нанести визит королю. Узнав об этом, король отрёкся от престола.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Что вы испытываете, ковыряя в носу? Наслаждение или тоску?", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "«В ночной тиши слышен был только стук лбов».", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Говорил «слушаю» в телефон, всегда не своим голосом. Боялся.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "До революции он был генеральской задницей. Революция его раскрепостила, и он начал самостоятельное существование.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Два певца на сцене пели: «Нас побить, побить хотели», Так они противно ныли, Что и вправду их побили.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Как скучно быть кариатидой, подпирать какой-то некрасивый балкон.", Author = "Илья Ильф" },
+        };
+    }
+}

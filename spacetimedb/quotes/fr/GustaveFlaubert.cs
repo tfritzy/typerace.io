@@ -1,0 +1,34 @@
+using System;
+
+namespace StdbModule;
+
+public static partial class FrenchQuotes
+{
+    public static class GustaveFlaubert
+    {
+        public static readonly Quote[] Quotes = new Quote[]
+        {
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Tout le monde, par excès de terreur, devenait brave.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "La conscience de mieux valoir que ces hommes atténuait la fatigue de les regarder.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Elle était finie, cette existence pleine d’agitations ! Combien n’avait-il pas fait de courses dans les bureaux, aligné de chiffres, tripoté d’affaires, entendu de rapports ! Que de boniments, de sourires, de courbettes ! Car il avait acclamé Napoléon, les Cosaques, Louis XVIII, 1830, les ouvriers, tous les régimes, chérissant le pouvoir d’un amour tel qu’il aurait payé pour se vendre.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Il voyagea. Il connut la mélancolie des paquebots, les froids réveils sous la tente, l'étourdissement des paysages et des ruines, l'amertume des sympathies interrompues. Il revint.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Encore un jour ! un jour de passé !", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Mais es-tu sûr de voir ? es-tu même sûr de vivre ? Peut-être qu’il n’y a rien !", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Il s'appelait Loulou. Son corps était vert, le bout de ses ailes rose, son front bleu, et sa gorge dorée.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "\"Maudit ! maudit ! maudit ! Un jour, cœur féroce, tu assassineras ton père et ta mère !\"", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Et voilà l'histoire de saint Julien l'Hospitalier, telle à peu près qu'on la trouve, sur un vitrail d'église, dans mon pays.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "L’ineptie consiste à vouloir conclure.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Oui, la bêtise consiste à vouloir conclure. Quel est l’esprit un peu fort qui ait conclu, à commencer par Homère ? Contentons-nous du tableau, c’est aussi bon.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "La rage de vouloir conclure est une des manies les plus funestes et les plus stériles qui appartiennent à l’humanité. Chaque religion et chaque philosophie a prétendu avoir Dieu à elle, toiser l’infini et connaître la recette du bonheur. Quel orgueil et quel néant! Je vois, au contraire, que les plus grands génies et les plus grandes œuvres n’ont jamais conclu.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Quelle chienne de chose que la prose ! Ça n’est jamais fini ; il y a toujours à refaire. Je crois pourtant qu'on peut lui donner la consistance du vers. Une bonne phrase de prose doit être comme un bon vers, inchangeable, aussi rythmée, aussi sonore. Voilà du moins une ambition (il y a une chose dont je suis sûr, c’est que personne n’a jamais eu en tête un type de prose plus parfait que moi ; mais quant à l’exécution, que de faiblesses, mon Dieu !).", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Quelle admirable invention du Diable que les rapports sociaux !", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Si Tacite revenait au monde, il ne se vendrait pas aussi bien que M. Thiers. Le public respecte les bustes, mais les adore peu. Le bourgeois (c'est-à-dire l'humanité entière maintenant, y compris le peuple) se conduit envers les classiques comme envers la religion : il sait qu'ils sont, serait fâché qu'ils ne fussent pas, comprend qu'ils ont une certaine utilité très éloignée, mais il n'en use nullement et ça l'embête beaucoup, voilà.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Je ne suis pas plus moderne qu'ancien, pas plus Français que Chinois, et l'idée de la patrie c'est-à-dire l'obligation où l'on est de vivre sur un coin de terre marqué en rouge ou en bleu sur la carte et de détester les autres coins en vert ou en noir m'a paru toujours étroite, bornée et d'une stupidité féroce.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Ce qui me navre, c’est 1° la férocité des hommes ; 2° la conviction que nous allons entrer dans une ère stupide. On sera utilitaire, militaire, américain et catholique.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "À quoi faut-il croire ? À rien ! C’est le commencement de la sagesse. Il serait temps de se défaire « des Principes » et d’entrer dans la Science, dans l’Examen. La seule chose raisonnable (j’en reviens toujours là), c’est un gouvernement de mandarins, pourvu que les mandarins sachent quelque chose, et même qu’ils sachent beaucoup de choses.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Je demande, au nom de l'humanité, à ce qu'on broie la Pierre-Noire, pour en jeter les cendres au vent, à ce qu'on détruise la Mecque, et que l'on souille la tombe de Mahomet. Ce serait le moyen de démoraliser le Fanatisme.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Tous les drapeaux ont été tellement souillés de sang et de merde qu'il est temps de n'en plus avoir, du tout.", Author = "Gustave Flaubert" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Chacun de nous a dans le cœur une chambre royale ; je l'ai murée, mais elle n'est pas détruite.", Author = "Gustave Flaubert" },
+        };
+    }
+}

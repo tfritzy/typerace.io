@@ -1,0 +1,72 @@
+using System;
+
+namespace StdbModule;
+
+public static partial class HindiQuotes
+{
+    public static class यशपल
+    {
+        public static readonly Quote[] Quotes = new Quote[]
+        {
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "अनुराग आदर का क्रियात्मक रूप है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "अनेक विरोधी तत्वों का समुच्चय ही जीवन है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "अमरता का अर्थ है परिवर्तन।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "आपकी प्रतिज्ञा बदल जाने से प्रतिज्ञा का आधार नहीं रखता।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "आपदकाल में भित्तियों के भी कान होते हैं।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "आवेग एक वस्तु है, और जीवन दूसरी।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "आसक्ति और साधना का योग असंभव है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "इस शरीर के सूक्ष्म गुण है: मनुष्य के विचार और अनुभव की शक्ति।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "इस संसार में बल ही प्रधान है, जैसे की धन-बल, जन-बल।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "कंचन की खान से लौह उत्पन्न नहीं हो सकता।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "कर्म और जीवन दुःख की शृंखला है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "कर्मफल का अर्थ है कष्ट और विवशता के कारण अज्ञान।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "कला केवल उपकरण मात्र है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "कला व्यवस्थित चित्त की वस्तु है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "कायरता और निरुत्साह वीर पुरूष को शोभा नहीं देते।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "कुल नारी के लिए स्वतन्त्रता कहाँ ? केवल वेश्या स्वतंत्र होती है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "जल का विशेष उपयोग तृषा अनुभव होने पर होता है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "जागती हुई चींटी की शक्ति सोते हुए हाथी से अधिक होती है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "जिसे कर्म के भोग से सेवा ही करना है, वह सभी की सेवा करता है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "जीवन का कोई अनुभव स्थायी और चिरन्तन नहीं।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "जीवन की सार्थकता अधिकार और सामर्थ्य में ही है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "जीवन के आनन्द से जीवन की रक्षा की चिंता अधिक प्रबल हो जाती है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "जीवन में एक समय प्रयत्न की असफलता मनुष्य का सम्पूर्ण जीवन नहीं है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "जीवित होते हुए भी मृतवत व्यवहार करने का क्या लाभ?", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "जो गतिमान है वह सजीव है और जो स्थिर है वह निर्जीव हैं।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "दुखियों के लिए वैराग्य ही सुख है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "देवता जीवों को प्राणदान देते हैं, सिर्फ वही इसे ग्रहण भी कर सकते हैं।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "निरंतर प्रयत्न ही जीवन का लक्षण है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "न्याय कभी लोगों की इच्छा का अनुसरण नहीं करता।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "परलोक में अधिक भोग का अवसर पाने की कामना से किया गया त्याग, त्याग नहीं रहता।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "पराजित होने वाला कभी पूज्य नहीं हो सकता।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "परिवर्तन ही अमरता का अर्थ हैं।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "पाये बिना किसी वस्तु का त्याग नहीं किया जा सकता।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "प्रतिज्ञा बदल जाने से प्रतिज्ञा का आधार नहीं रहता।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "प्रयत्न और चेष्टा जीवन का स्वभाव एवं गुण है। जब तक जीवन है,प्रयत्न और चेष्टा रहना स्वाभाविक है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "प्रयोजन से हीन कला, मोहक रूप रंग लिए मिट्टी के फल के समान है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "बदलने का, चुनने का अर्थ उस बात को महत्त्व देना है। महत्त्व नहीं है तो उपेक्षा ही उचित है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "भय है जीवित रहकर पीड़ा और पराभव सहने में।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "भाग्य का अर्थ है, मनुष्य की विवशता।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "मनुष्य के विचार और अनुभव की शक्ति इस स्थूल शरीर के ही सूक्ष्म गुण हैं।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "मनुष्य के शत्रु कौन है? कितने हैं? आजतक कोई नहीं जान सका।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "मरना-जीना मनुष्य के जीवन में लगा ही रहता है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "माणिक पर धूल रहने से क्या वह माणिक नहीं रहता?", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "मृत्यु क्या है? अस्तित्व का अंत।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "मृत्यु तो एक दिन आएगी ही।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "लड़े हमारी जूती! हमें कोई मारेगा तो क्या हम नहीं लड़ेंगे, लहू पी लेंगे..? मासी, तुम लहू पियोगी? तुम तो उनके घर का पानी भी नहीं पी सकोगी।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "विद्या चाहे जितनी उत्तम वस्तु हो और पैसा केवल हाथ का मैल, परन्तु विद्या पैसे के बिना अप्राप्य रहती है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "शत्रु के दैव्य स्वीकार कर लेने पर युद्ध का अंत हो जाता है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "शत्रु तो मन की भावना से होता है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "शांति ना तो वैभव में है, न ही प्रभुता में और ना ही तृप्ति में, शांति तो केवल अनासक्ति में है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "संघर्ष से विरक्त होकर व्यक्तिगत आत्मरक्षा में संतोष खो जाना आत्महत्या है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "सजीव गतिमान है, निर्जीव गतिहीन।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "सभी प्रसंगों के लिए काल का अवसर होता है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "संसार केवल शक्तिशाली व्यक्तियों के लिए है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "संसार में केवल एक ही सत्य है, शक्ति केवल एक वस्तु काम्य है, शक्ति सामर्थ्य।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "संसार में बल ही प्रधान है, जैसे धन-बल और जन-बल।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "सामर्थ्य से ही मनुष्य भोग और कामना का अधिकारी होता है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "सुख केवल अस्थायी अनुभूति है।", Author = "यशपाल" },
+            new Quote { Id = "https://hi.wikiquote.org/wiki/यशपाल", Text = "सेवा ग्रहण करना स्वामी का अधिकार है, प्राण को ग्रहण करना नहीं।", Author = "यशपाल" },
+        };
+    }
+}

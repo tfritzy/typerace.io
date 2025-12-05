@@ -1,0 +1,71 @@
+using System;
+
+namespace StdbModule;
+
+public static partial class ItalianQuotes
+{
+    public static class GiuseppeUngaretti
+    {
+        public static readonly Quote[] Quotes = new Quote[]
+        {
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "La parola è impotente, la parola non riuscirà mai a dare il segreto che è in noi, mai. Lo avvicina.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Non sono il poeta dell'abbandono alle delizie del sentimento, sono uno abituato a lottare, e devo confessarlo – gli anni vi hanno portato qualche rimedio – sono un violento: sdegno e coraggio di vivere sono stati la traccia della mia vita. Volontà di vivere nonostante tutto, stringendo i pugni, nonostante il tempo, nonostante la morte.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Questa è una notte diversa da ogni altra notte del mondo.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Ogni uomo è fatto in un modo diverso, dico nella sua struttura fisica. È fatto in un modo diverso anche nella sua combinazione spirituale. Quindi tutti gli uomini sono a loro modo anormali. Tutti gli uomini sono, in un certo senso, in contrasto con la natura.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "L'atto di civiltà è un atto di prepotenza umana sulla natura; è un atto contronatura.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Io personalmente sono un uomo, sono un poeta, quindi incomincio a trasgredire tutte le leggi facendo della poesia.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Ora sono vecchio e non rispetto più che le leggi della vecchiaia, che purtroppo sono le leggi della morte.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Tra un fiore colto e l'altro donato l'inesprimibile nulla", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Ogni colore si espande e si adagia negli altri colori Per essere più solo se lo guardi", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Morire come le allodole assetate sul miraggio O come la quaglia passato il mare nei primi cespugli perché di volare non ha più voglia Ma non vivere di lamento come un cardellino accecato", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Vi arriva il poeta e poi torna alla luce con i suoi canti e li disperde Di questa poesia mi resta quel nulla d'inesauribile segreto", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Un'intera nottata buttato vicino a un compagno massacrato con la sua bocca digrignata volta al plenilunio con la congestione delle sue mani penetrata nel silenzio ho scritto lettere piene d'amore Non sono mai stato tanto attaccato alla vita", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Chiuso fra cose mortali (Anche il cielo stellato finirà) Perché bramo Dio?", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Volti al travaglio come una qualsiasi fibra creata perché ci lamentiamo noi?", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Di che reggimento siete fratelli? Parola tremante nella notte. Foglia appena nata Nell'aria spasimante involontaria rivolta dell'uomo presente alla sua fragilità Fratelli.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "La morte si sconta vivendo.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Col mare mi sono fatto una bara di freschezza", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Di queste case non è rimasto che qualche brandello di muro Di tanti che mi corrispondevano non è rimasto neppure tanto Ma nel cuore nessuna croce manca È il mio cuore il paese più straziato.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Eccovi un uomo uniforme || Eccovi un'anima deserta uno specchio impassibile", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Sono un poeta un grido unanime sono un grumo di sogni || Sono un frutto d'innumerevoli contrasti d'innesti maturato in una sera", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Quando trovo in questo mio silenzio una parola scavata è nella mia vita come un abisso.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "E subito riprende il viaggio come dopo il naufragio un superstite lupo di mare.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Non ho voglia di tuffarmi in un gomitolo di strade", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Lasciatemi così come una cosa posata in un angolo e dimenticata", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "M'illumino d'immenso.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "La vita si vuota in diafana ascesa di nuvole colme trapunte di sole", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Si sta come d'autunno sugli alberi le foglie.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Non mi rimane che rassegnarmi a morire. Alleverò dunque tranquillamente una prole.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Quando mi desterò dal barbaglio della promiscuità in una limpida e attonita sfera || Quando il mio peso mi sarà leggero Il naufragio concedimi Signore di quel giovane giorno al primo grido.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "il vero amore è una quiete accesa", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "D'altri diluvi una colomba ascolto.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Luna, | piuma di cielo, | cosi velina, | arida, | trasporti il murmure d'anime spoglie?", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Uomo che speri senza pace, stanca ombra nella luce polverosa, l'ultimo caldo se ne andrà a momenti e vagherai indistinto...", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "E il cuore quando d'un ultimo battito avrà fatto cadere il muro d'ombra, per condurmi, Madre, sino al Signore, come una volta mi darai la mano.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "L'uomo, monotono universo, crede allargarsi i beni e dalle sue mani febbrili non escono senza fine che limiti.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Figlia indiscreta della noia, memoria, memoria incessante, le nuvole della tua polvere, non c'è vento che se le porti via? || Gli occhi mi tornerebbero innocenti, vedrei la primavera eterna || E, finalmente nuova, o memoria, saresti onesta.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Morte, muta parola, sabbia deposta come un letto dal sangue, ti odo cantare come una cicala nella rosa abbrunata dei riflessi.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Quando ogni luce è spenta e non vedo che i miei pensieri, || un'Eva mi mette sugli occhi la tela dei paradisi perduti.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Non mi lasciare, resta, sofferenza!", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "E gli alberi e la notte non si muovono più se non da nidi.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Disperazione che incessante aumenta la vita non mi è più, arrestata in fondo alla gola, che una roccia di gridi.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "La memoria non svolge che le immagini e a me stesso, io stesso non sono già più che l'annientante nulla del pensiero.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Il tempo è muto fra canneti immoti...", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "I ricordi, un inutile infinito,", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "la carità feroce del ricordo.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Quando un giorno ti lascia, pensi all'altro che spunta. || È sempre pieno di promesse il nascere sebbene sia straziante e l'esperienza d'ogni giorno insegni che nel legarsi, sciogliersi o durare non sono i giorni se non vago fumo.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "È sopravvivere alla morte, vivere?", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Sei comparsa al portone in un vestito rosso per dirmi che sei fuoco che consuma e riaccende.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Scompare a poco a poco, amore, il sole ora che sopraggiunge lunga sera. || Con uguale lentezza dello strazio farsi lontana vidi la tua luce per un non breve nostro separarci.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Migliaia d'uomini prima di me, ed anche più di me carichi d'anni, mortalmente ferì il lampo d'una bocca.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Inverno. Come un seme il mio animo ha bisogno del lavoro nascosto di questa stagione.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Vita. Corruzione che s'adorna di illusioni.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "I giorni e le notti suonano in questi miei nervi di arpa || vivo di questa gioia malata di universo e soffro di non saperla accendere nelle mie parole.", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "La terra tremola di piacere sotto un sole di violenze gentili", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Zampilli di matasse radiose spioventi in masse sinuose di perle", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "La malinconia mi macera || Il corpo dissanguato mi dissangua la poesia", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Mughetto fiore piccino calice di enorme candore sullo stelo esile innocenza di bimbi gracile sull'altalena del cielo", Author = "Giuseppe Ungaretti" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Ungaretti", Text = "Ha un cesto di rugiada il ciarlatano del cielo.", Author = "Giuseppe Ungaretti" },
+        };
+    }
+}

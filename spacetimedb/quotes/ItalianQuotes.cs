@@ -1,124 +1,60 @@
 using System;
+using System.Linq;
 
-public static class ItalianQuotes
+
+namespace StdbModule;
+public static partial class ItalianQuotes
 {
-    public static readonly Quote[] Quotes = new Quote[]
-    {
-        new Quote { Id = "https://it.wikiquote.org/wiki/Polar_%28film%29", Text = "Noi possiamo proteggervi dal cancro, alle malattie cardiache, alle biologiche.... ma a volte il killer è nella testa. Lo stato mentale di chi è in pensione, può essere letale. (Dr. Becker)", Author = "Polar (film)" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Biagio_Antonacci", Text = "Spero che nessuno venga mai a dirmi che l'amore eterno non esiste: non lo voglio sapere. Sarebbe come togliere il gioco ad un bambino, quando c'è ancora luce e tempo prima di andare a nanna. (da Se ami devi amare forte)", Author = "Biagio Antonacci" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/25_aprile", Text = "A San Marco il baco a processione. (toscano)", Author = "25 aprile" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Gian-Carlo_Rota", Text = "La capacità di divulgare la matematica è più rara della scoperta di un nuovo teorema. Sfortunatamente, nell'attuale cervellotica scala di valori, i divulgatori non vengono ricompensati come meriterebbero. (p. 13)", Author = "Gian-Carlo Rota" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Indovinelli_dalle_serie_televisive", Text = "Lei esegue gli ordini del generale, i cui soldati attendono di spirare. Un fiume bianco è per loro mortale e lei non avrà lacrime da versare.", Author = "Indovinelli dalle serie televisive" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Gustav_Fr%C3%B6hlich", Text = "Per un trentennio fu uno degli attori più popolari del cinema tedesco, incarnando il personaggio dell'eroe positivo. Sorriso franco, sguardo diretto, atteggiamento spigliato e mondano, rivelò di avere il physique du rôle ideale per le commedie leggere, sentimentali e romantiche. (Melania Mazzucco)", Author = "Gustav Fröhlich" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Dichiarazioni_d%27amore_dalle_poesie", Text = "Il mio amore ha due vite per amarti. | Per questo t'amo quando non t'amo | e per questo t'amo quando t'amo.", Author = "Dichiarazioni d'amore dalle poesie" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Mario_Pomilio", Text = "L'onestà intellettuale è un esercizio di moralità, una religiosità che si esplica non nei proclami, ma nella giustezza delle opre, non nel parlare in nome di Dio, ma nel fare quanto si fa come se si fosse al cospetto di Dio. (da Scritti cristiani, Rusconi, Milano, 1979, pp. 65-66)", Author = "Mario Pomilio" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/The_Punisher_%28film_2004%29", Text = "Sto bruciando un po' del tuo grasso, Mike! (Frank Castle)", Author = "The Punisher (film 2004)" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/L%27esorcista_-_La_genesi", Text = "Oggi qui Dio non c'è, prete. (Kessel)", Author = "L'esorcista - La genesi" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Tajmuraz_Mamsurov", Text = "Accomodandosi sul trono, Mamsurov si è così pronunciato di fronte ai deputati del parlamento: Cercherò di meritarmi la fiducia del presidente.Di quella del popolo non si preoccupa nessuno.", Author = "Tajmuraz Mamsurov" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Giacomo_Leopardi", Text = "Piangi, che ben hai donde, Italia mia. (v. 18)", Author = "Giacomo Leopardi" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Pierre_Terblanche", Text = "È un errore disegnare moto solo per chi vuole le supersportive.", Author = "Pierre Terblanche" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Anthony_Scaramucci", Text = "Trump è estremamente intelligente. Lo si può odiare perché dice stronzate ed è una persona detestabile, a volte. Ma questo non toglie che rifletta lo spirito culturale dell'epoca. È un avatar di quella rabbia.", Author = "Anthony Scaramucci" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Quarto_potere", Text = "Lei si preoccupa di quello che pensa la gente? Su questo argomento posso illuminarla, io sono un'autorità su come far pensare la gente. Ci sono i giornali per esempio, sono proprietario di molti giornali da New York a San Francisco. (Kane)", Author = "Quarto potere" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Lauren_Royal", Text = "Una volta che avete avuto la lingua di un uomo nella vostra bocca, potete chiamarlo con il suo nome di battesimo.", Author = "Lauren Royal" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Star_Wars%3A_Episodio_III_-_La_vendetta_dei_Sith", Text = "Pilotare è per droidi! (Obi-Wan Kenobi)", Author = "Star Wars: Episodio III - La vendetta dei Sith" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Tot%C3%B2_cerca_moglie", Text = "Non basta essere artista bisogna anche essere podista! (Totò)", Author = "Totò cerca moglie" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Flaiani", Text = "Cotesta malattia denominata Broncocele, e dal volgo distinta col nome di gozzo è quel tumore che nasce, ed a gradi si accresce nell'anterior parte del collo formato ordinariamente da un ristagno di viscidi linfatici umori nella glandola tiroidea, o nella cellulare, che la circonda. (p. 275)", Author = "Giuseppe Flaiani" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Fiorino", Text = "A quattrino a quattrino si fa il fiorino. (toscano)", Author = "Fiorino" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Bel%C3%A9n_Cuesta", Text = "La casa di carta (2017 – 2021)", Author = "Belén Cuesta" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Futurismo_%28film%29", Text = "Ici dominant la ville. (didascalia)", Author = "Futurismo (film)" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/RT_%28rete_televisiva%29", Text = "Ho sempre avuto relazioni esemplari con i giornalisti stranieri, a patto che siano dei giornalisti. Russia Today e Sputnik sono stati organi di propaganda che hanno diffuso controverità infamanti sulla mia persona. Su questo non mollerò di un centimetro. (Emmanuel Macron)", Author = "RT (rete televisiva)" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Svjatoslav_Nikolaevi%C4%8D_F%C3%ABdorov", Text = "[[...] come si sente a due giorni dalle elezioni?] Come un cristiano nel Colosseo. Ho la sensazione che da un momento all'altro apriranno le gabbie e lasceranno liberi i leoni affamati.", Author = "Svjatoslav Nikolaevič Fëdorov" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Paolo_da_Venezia", Text = "Come il sole sotto l'eclittica, così l'intelletto umano non torna mai indietro, non si ferma mai, ma procede sempre sotto il raggio della scienza. (traduzione di Eugenio Garin)", Author = "Paolo da Venezia" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Redbelt", Text = "Chi detta i termini della battaglia detterà i termini della pace. (Mike)", Author = "Redbelt" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Cuore_sacro", Text = "Eleonora ha ragione. Ho sempre fatto tutto quello che voleva lei e sai perché? Perché la mia sorellina non mi è mai piaciuta. Ho sempre avuto paura delle persone che non mi piacciono. (Maria Clara)", Author = "Cuore sacro" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Clark_Gable", Text = "Fu assegnato alla nostra squadriglia... Rimase con noi dal 1942 al 1945 e, ti posso dire, non è che lo assegnavano alle missioni di routine. In coda al suo aereo, scattò un sacco di foto ai colpi della contraerea. (Ralph Cowley[3])", Author = "Clark Gable" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Argo_%28film%29", Text = "Se questa gente sa leggere, o contare, si accorgeranno che mancano sei carte dal mazzo molto presto. (Tony)", Author = "Argo (film)" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Paul_Auster", Text = "Tutti sappiamo che la vita dipende da avvenimenti inaspettati. Può finire da un momento all'altro e non sai cosa succederà tra un attimo. A volte succedono cose bellissime, altre volte terribili: cadi, ti rompi il collo...", Author = "Paul Auster" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Hugh_Jackman", Text = "C'è qualcosa da amare sia nella commedia sia nel dramma. Sarebbe bello riuscire a vederla così anche nella vita: esiste sempre una dolcezza che va oltre la situazione del momento.", Author = "Hugh Jackman" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Qualcuno_vol%C3%B2_sul_nido_del_cuculo", Text = "Ma che cosa vi credete di essere, vacca troia? Pazzi? Davvero? Invece no. E invece no. Voi non siete più pazzi della media dei coglioni che vanno in giro per la strada, ve lo dico io. (Randle Patrick McMurphy)", Author = "Qualcuno volò sul nido del cuculo" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/G%C3%BCnter_Grass", Text = "Credere: significa credere alle nostre stesse bugie. Ed io posso dire di essere grato di aver avuto questa lezione molto presto.", Author = "Günter Grass" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Il_ritorno_di_don_Camillo", Text = "Sono come una corazzata chiusa in uno stagno, appena mi muovo c'è la rivoluzione dei ranocchi. (Don Camillo)", Author = "Il ritorno di don Camillo" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Genma_Saotome", Text = "I nemici del padre sono i nemici del figlio e i nemici del figlio sono solo suoi, è questo che unisce padri e figli!", Author = "Genma Saotome" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Stardust_Memories", Text = "Davvero ritieni che esista la compagna ideale? Voglio dire, non credi che alla base di qualsiasi rapporto maturo ci sia, in realtà, un compromesso? (Il cieco)", Author = "Stardust Memories" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Edward_Gibbon", Text = "Fintanto che l'umanità continuerà ad essere prodiga di elogi più coi suoi distruttori che coi suoi benefattori, la brama di gloria militare sarà sempre il vizio delle personalità più insigni.", Author = "Edward Gibbon" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Accattoli", Text = "I Giubilei sono venuti infittendosi lungo i secoli e in particolare nell'arco degli ultimi ottant'anni.", Author = "Luigi Accattoli" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Miguel_Primo_de_Rivera", Text = "I colpi di Stato di Primo de Rivera e di Pilsudzki appaiono concepiti ed eseguiti secondo le regole di una tattica tradizionale, che non ha nessuna analogia con quella fascista. (Curzio Malaparte)", Author = "Miguel Primo de Rivera" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Jean-Louis_Brugu%C3%A8s", Text = "Cristo non beatifica affatto alcune categorie sociali in quanto tali.", Author = "Jean-Louis Bruguès" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Ghianda", Text = "Anche un maiale cieco ogni tanto trova una ghianda. (Steve Sohmer)", Author = "Ghianda" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Uomo_Tigre_II", Text = "Devo riconoscere che sei bravo, ma c'è sempre una certa differenza tra noi: tu vieni dalla Terra, e io dallo spazio! (L'uomo spaziale all'Uomo tigre)", Author = "Uomo Tigre II" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Davila", Text = "Arrigo Caterino Davila (1576 – 1631), militare, scrittore e storico italiano", Author = "Davila" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Libert%C3%A0_e_schiavit%C3%B9", Text = "La libertà col danno è più preziosa della schiavitù con profitto.", Author = "Libertà e schiavitù" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Scherno", Text = "Chi altrui schernisce, merita scherno.", Author = "Scherno" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Accordi_e_disaccordi", Text = "Non solo sei vanesio ed egocentrico, ma sei anche dotato di una genuina grossolanità. (Blanche)", Author = "Accordi e disaccordi" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Honor%C3%A9_de_Balzac", Text = "La gloria è il sole dei morti.", Author = "Honoré de Balzac" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Mia_Hamm", Text = "There is no me in Mia.", Author = "Mia Hamm" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Jen_Holling", Text = "Lui la amava. Voleva essere l'uomo che lei meritava: un uomo senza menomazioni.", Author = "Jen Holling" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Karl-Otto_Apel", Text = "I problemi di una macroetica planetaria della responsabilità non possono certo venir risolti solo sulla base della tradizionale morale individuale e dell'etica tradizionale delle virtù.", Author = "Karl-Otto Apel" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Pernille_Harder_%28calciatrice%29", Text = "Era difficile trovare il calcio femminile in TV, quindi l'unica cosa che ho fatto è stata andare online e guardare le clip di Marta. Era la più grande giocatrice che conoscevo, il mio idolo.", Author = "Pernille Harder (calciatrice)" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Rosaspina", Text = "Al punto in cui scrivo, egli è additato come uno de' più forti sostenitori, se non il più forte dopo la Duse, della nuova tragedia d'annunziana, Francesca da Rimini, nella quale incarna con molta efficacia e molta sobrietà il carattere di Gianciotto.", Author = "Carlo Rosaspina" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Michelle_Hunziker", Text = "Noi a Zelig non facciamo altro che errori spontanei.", Author = "Michelle Hunziker" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Francesco_Bamonte", Text = "Dove si riscontra una reale possessione diabolica, gli esorcismi infondono nell'animo di chi la subisce, sicurezza, forza e serenità assicurando e sostenendo la sua capacità di lottare e di vincere gli spiriti del male.", Author = "Francesco Bamonte" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Via", Text = "Sbagliare la strada, serve a conoscere la strada. (Capoverdiano)", Author = "Via" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Doubleduck", Text = "Parola di Tond, James Tond! (James Tond)", Author = "Doubleduck" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Loreena_McKennitt", Text = "Essere catalizzatrice è uno degli obiettivi della mia vita. Sono stata ispirata da molte persone che a loro volta sono state catalizzatrici. È molto interessante vedere interesse verso il territorio celtico. Se posso essere catalizzatrice per altre persone, è meraviglioso.", Author = "Loreena McKennitt" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Bubba_Ho-Tep_-_Il_re_%C3%A8_qui", Text = "Era da due elezioni presidenziali che non mi veniva così duro. Che stava succedendo? Dopo lo capii: pensavo a qualcosa che mi interessava, non al cibo o ad andare a cagare. Avevo di nuovo una dose di vita. (Sebastian)", Author = "Bubba Ho-Tep - Il re è qui" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Novecento", Text = "Lo sciopero è una prepotenza intollerabile! (Giovanni Berlinghieri)", Author = "Novecento" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Garri_Kasparov", Text = "L'ultima barzelletta dall'internet russo: con l'invasione di Kursk, l'Ucraina ha raggiunto i confini del '91. Ovvero, del 1691!", Author = "Garri Kasparov" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/La_tenerezza", Text = "Esiste un calcolo scientifico secondo il quale sapendo quanta gente muore a Napoli in un giorno, si può sapere quante ne muoiono al mondo. (Lorenzo)", Author = "La tenerezza" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Gerhard_Ludwig_M%C3%BCller", Text = "L'amore è diventato talmente liquido da sembrare con poca forza per fondare seriamente un progetto famigliare. I giovani fidanzati hanno, di fatto, difficoltà a credere in tale solidità. (p. 11)", Author = "Gerhard Ludwig Müller" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Polpo", Text = "'O purpo se coce cu ll'acqua soia. (Napoletano)", Author = "Polpo" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Bernab%C3%B2_Visconti", Text = "Qui de terra est, de terra loquitur.", Author = "Bernabò Visconti" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Rod_Laver", Text = "[Su Federer] Non c'è proprio niente che tu possa fare contro uno come lui; devi solamente stringergli la mano e dire: Troppo bravo.", Author = "Rod Laver" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Joseph_Fessio", Text = "Come leggere Adrienne von Speyr? La risposta più breve ed esauriente suona: in atteggiamento di preghiera. Non ho mai incontrato una sola parola nei suoi numerosi scritti che non porti l'inconfondibile traccia d'esser frutto di una profonda preghiera contemplativa. (p. 165)", Author = "Joseph Fessio" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Louis_Meylan", Text = "Dire che un umanista è un uomo versato nella conoscenza del mondo antico, è difatti definire per l'accidente; è confondere il mezzo col fine. (p. 3)", Author = "Louis Meylan" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Anthelme_Brillat-Savarin", Text = "Il godimento del mangiare è l'unico che, preso con moderazione, non dia luogo a stanchezza.", Author = "Anthelme Brillat-Savarin" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Papa_Onorio_IV", Text = "Ex rosa leonina. (Malachia di Armagh)", Author = "Papa Onorio IV" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Hendrik_Willem_van_Loon", Text = "Ci rendiamo noi esatto conto di qual cumulo ereditario di istinti sanguinari, scatenati da rapine, arsioni, stupri, eccidi, saccheggi secolari gravi sulle spalle del ragazzetto [balcanico], serbo o bulgaro che sia?", Author = "Hendrik Willem van Loon" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Bram_Stoker", Text = "Credo di poter dire che, nella mia persona, rappresento la sintesi dell'educazione universitaria mens sana in corpore sano. (da Personal Reminiscences of Henry Irving)", Author = "Bram Stoker" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Grendel", Text = "Grendel è il Re! Beowulf ferito Grendel. Eroe deve pagare. Stupidi uomini egoisti, soffriranno. (La leggenda di Beowulf: Il videogioco)", Author = "Grendel" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Signori_si_nasce", Text = "Signore si nasce, e io lo nacqui, modestamente! (Zazà)", Author = "Signori si nasce" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/N%C4%81g%C4%81rjuna", Text = "Di cosa può darsi mutazione, se esiste natura propria? (XIII.4)", Author = "Nāgārjuna" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Antonio_Tentori", Text = "[Su Rutger Hauer] Non è solo un grande attore, ma una persona carismatica e unica. È stato un onore parlare con lui e discutere alcune sfaccettature del personaggio di Van Helsing, che ha compreso e interpretato perfettamente.", Author = "Antonio Tentori" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Monastero_di_Santa_Chiara_%28film%29", Text = "Il mondo non vuole il nostro amore. Noi dobbiamo essere più forti del mondo. (Rudolf)", Author = "Monastero di Santa Chiara (film)" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Giandomenico_Boffi", Text = "È la separazione tra fede e vita che af­fligge anche tanti non matematici. E che pro­babilmente dipende dal fatto di non pensare la propria fede in modo adeguato, ma di viver­la prevalentemente a livello emotivo e senti­mentale", Author = "Giandomenico Boffi" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Pervez_Musharraf", Text = "Per risolvere la crisi indo-pachistana occorre aprire un dialogo con la popolazione e le prospettive storiche vanno messe da parte perché noi siamo pronti ad affrontare qualunque minaccia provenga dall'esterno, a morire per il nostro paese nel caso in cui qualcuno oltrepassi il confine.", Author = "Pervez Musharraf" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/La_vita_%C3%A8_bella_%28film_1943%29", Text = "Ancora sette crocette [...] e poi forse basterà una croce sola. (Alberto)", Author = "La vita è bella (film 1943)" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Michel_Butor", Text = "La letteratura è l'esperimento sulla lingua.", Author = "Michel Butor" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Bonaviri", Text = "– Cosa è il nulla?– A ben riflettere, è tutto il passato dove si è riversata l'essenza delle cose.", Author = "Giuseppe Bonaviri" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Karate_Kid_II_-_La_storia_continua", Text = "Per un uomo che vive senza il perdono nel cuore, vivere è punizione peggiore di morire. (Miyagi)", Author = "Karate Kid II - La storia continua" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Eva_Cantarella", Text = "Della nostra storia [l'Odissea] Ulisse è il deuteragonista: la protagonista è Itaca, la meta del viaggio.Itaca con i suoi abitanti, le sue istituzioni, la sua storia.", Author = "Eva Cantarella" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Johann_Peter_Hebel", Text = "Mentre stava per dire addio a Parigi, il poeta tedesco Hebel scrisse: se tutte le città del mondo dovessero sparire, che Parigi esista per sempre!.", Author = "Johann Peter Hebel" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Constantine_%28film%29", Text = "Sono Costantine... John Constantine, stronzo! (Constantine)", Author = "Constantine (film)" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Si_alza_il_vento", Text = "Di uomini atti a fare i piloti ce ne sono già tanti altri. Io sono un uomo che gli aeroplani li crea! Sono un progettista! (Caproni)", Author = "Si alza il vento" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Detective_Conan%3A_Requiem_per_un_detective", Text = "Ogni errore si trascina dietro delle conseguenze, si può decidere di perseverare rischiando così di perdere tutto, o di tornare indietro e di ricominciare, certo quest'ultima è la strada più difficile da percorrere. Lei ha avuto paura di ricominciare da capo. (Conan)", Author = "Detective Conan: Requiem per un detective" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Vicky_Halls", Text = "Il gatto, insomma, sembra del tutto immune ai nostri goffi tentativi di alterarne la naturale perfezione o acquisirne il controllo. (p. 6)", Author = "Vicky Halls" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Aitareya_Br%C4%81hma%E1%B9%87a", Text = "Agni, among the gods, has the lowest, Vishṇu the highest place; between them stand all the other deities.", Author = "Aitareya Brāhmaṇa" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Elizabeth_Wathuti", Text = "La stragrande maggioranza delle persone nei paesi più ricchi del mondo la pensa come me. Sono preoccupati per lo stato del pianeta e vogliono proteggerlo. Vogliono diventare amministratori planetari. Dovrebbero essere un campanello d'allarme per i leader di tutto il mondo.", Author = "Elizabeth Wathuti" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Modi_di_dire_dai_libri", Text = "Cercare pere sull'olmo. (Miguel de Cervantes)", Author = "Modi di dire dai libri" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Will_Durant", Text = "Un entusiasta, che per intossicarsi non aveva bisogno di stimolanti diversi dalla vita. (Charlie Chaplin)", Author = "Will Durant" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Lianne_La_Havas", Text = "Lauryn Hill rimane ancora una grande ispirazione – ho ancora il suo album MTV Unplugged No. 2.0 con me.", Author = "Lianne La Havas" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/La_guerra_segreta_di_suor_Katryn", Text = "Il timore di un castigo dovrebbe trattenerci dal compiere un atto di misericordia? (Katryn)", Author = "La guerra segreta di suor Katryn" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/La_meteora_infernale", Text = "Sono silicati ordinari, la materia più comune che esista, eppure, dovunque si trovi di questa roba, muore qualcuno... (Dave)", Author = "La meteora infernale" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/L%27ululato", Text = "La solita lotta fra la mente e il corpo per me non è indispensabile. È una lotta che produce rabbia, frustrazione. (George Waggner)", Author = "L'ululato" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Demi_Lovato", Text = "Ciò che vedo quando mi guardo allo specchio è qualcuno che ne ha passate tante. Ne ho passate davvero tante e quello che vedo è una lottatrice. Non vedo una campionessa, ma una lottatrice, qualcuno che continuerà a lottare non importa cosa le verrà gettato addosso.", Author = "Demi Lovato" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Fury_%28fumetto%29", Text = "Mi chiamo Nick Fury. Dal '44 ho un proiettile piantato in testa. A quanto pare non posso morire e invecchio molto lentamente. Combatto e scopo come un indemoniato. Mi abbuffo di guerra come fosse zucchero. (Nick Fury)", Author = "Fury (fumetto)" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Nicolas_Cage", Text = "Come si capisce, quando una storia funziona? Alcuni dicono con l'esperienza... altri, con l'intuito... Io la sottopongo a Nicolas Cage. Se Nicolas Cage accetta di interpretarla, è da scartare. (Rat-Man)", Author = "Nicolas Cage" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Friends", Text = "Ross: Sto come se m'avessero messo una mano in gola, preso l'intestino, l'avessero strappato dalla bocca e me l'avessero stretto intorno al collo.Chandler [offrendo un biscotto]: Dolcetto?", Author = "Friends" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Carolyn_R._Bertozzi", Text = "Al college, all'età di 18 anni, divenni consapevole di essere gay. Sono uscita in un momento in cui le persone si stavano davvero mobilitando per cercare di ottenere un cambiamento politico ma anche in un momento in cui il coming out avrebbe potuto impedirmi di trovare un lavoro.", Author = "Carolyn R. Bertozzi" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Duccio_Patan%C3%A8", Text = "La fotografia fa schifo! E lo sai perché fa schifo? [...] Perché lo vogliono loro! Lo vogliono loro! Nella fiction la fotografia non deve essere più bella di quella della pubblicità, se no la gente cambia canale: hanno pensato a tutto!", Author = "Duccio Patanè" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/The_Untouchables_-_Gli_intoccabili", Text = "1930. Prohibition has transformed Chicago into a City at War. Rival gangs compete for control of the city's billion dollar empire of illegal alcohol, enforcing their will with the hand grenade and tommy gun. It is the time of the Ganglords. It is the time of Al Capone.", Author = "The Untouchables - Gli intoccabili" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Renato_Schifani", Text = "Li abbiamo fregati con l'emendamento Carrara. Siamo cresciuti e siamo diventati più furbi di loro. (sul legittimo sospetto; citato in Legge sposta processi: via libera del Senato, la Repubblica, 1° agosto 2002)", Author = "Renato Schifani" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Antonio_Zappi", Text = "Antonio Zappi ha un'impostazione manageriale ed è quello di cui l'AIA ha bisogno oggi. Per questo auguro buon lavoro a lui e al nuovo Comitato Nazionale. (Roberto Rosetti)", Author = "Antonio Zappi" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Paul_Morand", Text = "La Francia, sostenuta dai capitali belgi e dall'esperienza finanziaria di Leopoldo II, lanciava il 5 giugno 1883, attraverso il continente, il primo treno di lusso internazionale, l'Orient-Express. Paris-Stamboul. (p. 35)", Author = "Paul Morand" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Davide_Oldani", Text = "Bisogna sempre avere ben presente la terra su cui mettere i piedi e non solo il cielo dove mettere i sogni.", Author = "Davide Oldani" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Michelle_Branch", Text = "Tutti mi dicevano dove essere e cosa fare; tutto ciò che volevo era crearmi questo nido di sicurezza, avere una vita normale. Almeno penso sia quello che mi avrebbe detto un terapista.", Author = "Michelle Branch" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Francesca_Archibugi", Text = "Io racconto, racconto ciò che vedo e ciò che sento, non giudico i personaggi.", Author = "Francesca Archibugi" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Johann_Gottfried_Schnabel", Text = "Ah, come sarei contento, quale secondo Adamo, di trascorrere la mia intera esistenza in questo paradiso se solo non si consumasse inutilmente la mia migliore giovinezza senza poter abbracciare una Eva amata. (da Insel Felsenburg; citato in Marino Freschi, L'utopia nel Settecento tedesco, p. 29-30)", Author = "Johann Gottfried Schnabel" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Leonardo_Fioravanti_%28designer%29", Text = "Fin dall'età di sette anni i miei libri di scuola erano stati riempiti di disegni di automobili, aerei, treni, motociclette e barche – tutto ciò che si muoveva era interessante per me.", Author = "Leonardo Fioravanti (designer)" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Caterina_Manzoni", Text = "Giovinetta qual era, avvenente, e graziosa, il Popolo l'applaudiva, e tali applausi meritar ben sapevali, esprimendo le cose che rappresentava con una naturalezza assai vera, e mostrando un ingegno aperto, e dall'ignoranza lontano.", Author = "Caterina Manzoni" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Proverbi_francesi", Text = "Amore scaccia gelosia.", Author = "Proverbi francesi" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Giovinezza", Text = "A me pare che la giovinezza sia come la primavera, stagione troppo vantata – deliziosa quando s'abbia fortuna d'imbroccare bene, ma in realtà difficile ad incontrare e in genere memorabile più per venti maligni che per dolci brezze. (Samuel Butler)", Author = "Giovinezza" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/Farhat_-_Il_principe_del_deserto", Text = "Roventi sabbie! (Alì)", Author = "Farhat - Il principe del deserto" },
-        new Quote { Id = "https://it.wikiquote.org/wiki/San_Giovanni_-_L%27apocalisse", Text = "Dio è amore. E chiunque di noi vive nell'amore, vive in Dio, e Dio in lui. Se passiamo con fede a amore attraverso la sofferenza, troviamo la vera gioia. (Giovanni)", Author = "San Giovanni - L'apocalisse" }
-    };
+    public static readonly Quote[] Quotes = 
+        DanteAlighieri.Quotes
+        .Concat(ItaloCalvino.Quotes)
+        .Concat(UmbertoEco.Quotes)
+        .Concat(LeonardodaVinci.Quotes)
+        .Concat(GiuseppeVerdi.Quotes)
+        .Concat(AlessandroManzoni.Quotes)
+        .Concat(GiacomoLeopardi.Quotes)
+        .Concat(LuigiPirandello.Quotes)
+        .Concat(PrimoLevi.Quotes)
+        .Concat(GiovanniBoccaccio.Quotes)
+        .Concat(FrancescoPetrarca.Quotes)
+        .Concat(EugenioMontale.Quotes)
+        .Concat(GiuseppeUngaretti.Quotes)
+        .Concat(LudovicoAriosto.Quotes)
+        .Concat(TorquatoTasso.Quotes)
+        .Concat(CarloGoldoni.Quotes)
+        .Concat(VittorioAlfieri.Quotes)
+        .Concat(UgoFoscolo.Quotes)
+        .Concat(GiosuèCarducci.Quotes)
+        .Concat(GiovanniPascoli.Quotes)
+        .Concat(GabrieleDAnnunzio.Quotes)
+        .Concat(SalvatoreQuasimodo.Quotes)
+        .Concat(CesarePavese.Quotes)
+        .Concat(ElsaMorante.Quotes)
+        .Concat(AlbertoMoravia.Quotes)
+        .Concat(DinoBuzzati.Quotes)
+        .Concat(CarloEmilioGadda.Quotes)
+        .Concat(LeonardoSciascia.Quotes)
+        .Concat(NataliaGinzburg.Quotes)
+        .Concat(IgnazioSilone.Quotes)
+        .Concat(VitalianoBrancati.Quotes)
+        .Concat(GiuseppeTomasidiLampedusa.Quotes)
+        .Concat(GiorgioBassani.Quotes)
+        .Concat(AntonioTabucchi.Quotes)
+        .Concat(PierPaoloPasolini.Quotes)
+        .Concat(ItaloSvevo.Quotes)
+        .Concat(GraziaDeledda.Quotes)
+        .Concat(LuigiCapuana.Quotes)
+        .Concat(GiovanniVerga.Quotes)
+        .Concat(EdmondoDeAmicis.Quotes)
+        .Concat(CarloCollodi.Quotes)
+        .Concat(GianniRodari.Quotes)
+        .Concat(GiuseppeMazzini.Quotes)
+        .Concat(CamilloBensodiCavour.Quotes)
+        .Concat(GiuseppeGaribaldi.Quotes)
+        .Concat(BenedettoCroce.Quotes)
+        .Concat(AntonioGramsci.Quotes)
+        .Concat(GiordanoBruno.Quotes)
+        .Concat(TommasoCampanella.Quotes)
+        .Concat(GiambattistaVico.Quotes)
+        .ToArray();
 }

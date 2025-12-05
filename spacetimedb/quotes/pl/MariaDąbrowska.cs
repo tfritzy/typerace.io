@@ -1,0 +1,72 @@
+using System;
+
+namespace StdbModule;
+
+public static partial class PolishQuotes
+{
+    public static class MariaDąbrowska
+    {
+        public static readonly Quote[] Quotes = new Quote[]
+        {
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Nic nie chcieć dowodzić. Przed zdumionymi oczyma rozpostrzeć obraz świata. Tak chcę pisać. To niech będzie moja dewiza przed rozpoczęciem drugiego tomu. Już się teraz nie martwię, że nie mam żadnej idei.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Zapędy do fanaberyjnego hrabskiego życia przy środkach prawie żadnych.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Bo gdy nas nie stać na miłość, stać nas zawsze na zazdrość.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Człowiek jest tajemnicą – z tajemnicy przybywa i w tajemnicę odchodzi.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Człowiek może służyć tylko czemuś, nigdy komuś.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Człowiek pragnący czegoś dokonać nie może być krytykiem i historykiem swoich czynów.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Czyżbym się łudził i okłamywał? A może takie okłamywanie się jest również rodzajem prawdy. Prawdy chcianej… I czy taka prawda może mieć jakieś rzeczowe znaczenie?", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Despotyczna młodość łaknie aprobaty nawet od świata, który skazuje na zagładę.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Gdy miłość otwiera świat, otwiera go nawet nieszczęśliwa.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Idea rośnie przede wszystkim krwią swoich ofiar.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Interes, władza, maszyna – te rzeczy nie widzą człowieka, potrzebują tylko masy.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Jak to bywa, że jednemu dolega, co kiedy złego doznał, a drugiemu – co kiedy złego zrobił.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Kompromisy mogą zawierać tylko ci, których dusza nie zna, co to kompromis. Że każde warunki mogą przyjąć jedynie ci, co są niezależni od jakichkolwiek warunków.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Kto odda się cały jednej wielkiej czy małej sprawie, w dodatku sprawie beznadziejnej, ten musi umrzeć w końcu za nią albo też przez nią.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Kto zna prawdę niewątpliwą, ten o nią nie zabiega, nie walczy, bo ta prawda walczy za niego.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Miłość fałszuje obraz świata. Ukazuje go dobrym pomimo wszystko.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Najszczęśliwsze, z czystej miłości małżeństwo zawiera tyle samo niedoli, ile chwil szczęścia bywa w najbardziej chłodnym związku.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Nie wraca się nigdy na dobre tam, skąd się niegdyś wyszło.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Niejeden walczy z przemocą nie dlatego, że jej nienawidzi, ale dlatego, że ją kocha. Tylko że w najcenniejszej skrytce duszy sam jeden czuje się uprawniony do jej wywierania.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Niemożność porozumienia się z drugim człowiekiem jest jedną z najcięższych mąk życia na ziemi.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Pewne zaniedbanie formy jest konieczne, by duch mógł przez nią przezierać.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Rewolucje zaczynają się nie od dołu, jak to się mniema powszechnie, ale od góry.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "To, co wiecznie, zawodzi, wiecznie też jest przedmiotem nadziei.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "To prawda, że dobra tego świata są ograniczone i ludzie zawsze je muszą sobie wydzierać. Niedole tylko zdają się nie mieć granic.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Tracić siebie dla drugich to jest właśnie odnajdywać najprawdziwszego siebie.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Tych rzeczy najlepszych: serca, które nas kocha, słońca, które nam świeci, i tak na własność mieć niepodobna.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Za silna dawka pobożności jest niebezpieczna.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Zwalczyć samemu pokusę może się to wydawać zwycięstwem, lecz świadomość, że ktoś nie uległ pokusie, którą myśmy byli dla niego, boli jak niepowetowana porażka.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "W życiu bywają noce i bywają dnie powszednie, a czasem bywają też niedziele. Rzadziej się to zdarza niż w kalendarzu.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Ani różnica poglądów, ani różnica wieku, nic w ogóle nie może być powodem zerwania wielkiej miłości. Nic, prócz jej braku.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Cierpienie nic nie wyzwala, to my się z niego wyzwalamy.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Dyskrecja może być szacunkiem wobec cudzych tajemnic, ale może być i obojętnością.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "I w ograniczeniu do jednej techniki można coś osiągnąć, choćby próbę stosowania różnych technik w tej jednej.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Inteligencja jest tą przyprawą, która z najpospolitszych rzeczy robi cuda.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Jakby cierpienie uczyło, to Polska byłaby jednym z najmędrszych krajów świata.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Katolicyzm ma zbyt słabe (jak dotąd) powiązania z krytycznym myśleniem, a zbyt silne ze sztuką.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Konsekwencje się przeżywają i zamieniają w konwenans, a ten jest śmiercią sztuki.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Marzenia zwykle się spełniają, ale nie tak i nie wtedy, kiedy tego pragniemy.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Nawet nasze próby laicyzacji myśli (…) są przesiąknięte rozmaitymi tabu i magicznym myśleniem, a z ateizmu robi się dogmat tak samo nietykalny, jak dogmaty wyznaniowe.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Pismo i sztuka to jedyni świadkowie naszych czasów.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Prócz tego, co jest możliwe, jest jeszcze to, co jest konieczne.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Wszelki rewolucjonizm (nawet i w sztuce) jest nim, póki nie chwyci władzy w ręce, wtedy staje się zaraz despotyzmem.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Za każdym Don Kichotem wszczynającym awantury idzie zawsze Sanszo Pansa, który je wykorzystuje.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Czasem stary pisarz, świeżo przez nas poznany, staje się nowym.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Czasem wystarczy przyprowadzić do ładu i lśniącej czystości powszednie rzeczy, aby dźwignąć się z rozterki, pokonać rozpacz i zwątpienie", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Historia rzadko ma coś wspólnego z elegancją.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Jak człowiek przyzwyczaja się do każdej rzeczy, która trwa. Jak trudno oderwać się nawet od złej przeszłości.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Jest na świecie jeden zawód, jedno jedyne powołanie – być dobrym dla drugiego człowieka.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Jesteśmy wobec samych siebie, na własnej ziemi jak w nieprzyjacielskim kraju, gdzie postarano się ze wszystkich sił, by każdemu życie uprzykrzyć i utrudnić.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Mężczyzna zdolny jest do zazdrości nawet wobec kamienia, który jego znudzona partnerka wyróżniła jako szczególnie piękny.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Naród nasz składa się z dwóch narodów, które język ust mają wspólny, ale nie język ducha.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Nie ma innego zaklęcia na szczęście – jak tylko umieć i lubić pracować.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Nie masz innej radości prócz tej, że życie się toczy, lecz ta właśnie wystarczy, by żyć.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Odwaga cywilna jest w Polsce rzadsza jak skłonność do natychmiastowego umierania.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Śmiech, sen i nadzieja – to 3 rzeczy nam dane po to, aby osłodzić przykrości życia.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Trochę sukcesu przydaje się nawet ludziom najmniej dbającym o sławę.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "W normalnej przebudowie społecznej nie powinno się jednych krzywd zastępować innymi.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Wartość Polaka mierzy się stosunkiem do tego, co polskie nie jest.", Author = "Maria Dąbrowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Życie nie byłoby tak szalenie trudne, gdyby nie to, że wszyscy mają trochę racji. Idzie o to, jaka racja jest na poziomie czasów.", Author = "Maria Dąbrowska" },
+        };
+    }
+}

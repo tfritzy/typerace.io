@@ -1,5 +1,7 @@
 using System;
 
+namespace StdbModule;
+
 public static class QuoteGenerator
 {
     public static Phrase GetRandomQuote(GameMode mode, Random rng)

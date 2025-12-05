@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+namespace StdbModule;
+
 public static class PhraseGenerator
 {
     public static string GeneratePhrase(string[] wordList, Random rng, int minWordCount = 20, int maxWordCount = 35)

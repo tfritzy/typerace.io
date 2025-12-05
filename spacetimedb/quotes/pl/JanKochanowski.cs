@@ -1,0 +1,73 @@
+using System;
+
+namespace StdbModule;
+
+public static partial class PolishQuotes
+{
+    public static class JanKochanowski
+    {
+        public static readonly Quote[] Quotes = new Quote[]
+        {
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Biedna starości! wszyscy cię żądamy, A kiedy przyjdziesz, to zaś narzekamy.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Co bez przyjaciół za żywot? Więzienie, W którym niesmaczne żadne dobre mienie. Uchowaj Boże takiego żywota, Daj raczej miłość, a chocia mniej złota!", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Doktor nie puścił, ale drzwi puściły.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Fraszki to wszytko, cokolwiek myślemy, Fraszki to wszytko, cokolwiek czyniemy; Nie masz na świecie żadnej pewnej rzeczy, Próżno tu człowiek ma co mieć na pieczy.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Zacność uroda, moc, pieniądze, sława, Wszytko to minie jako polna trawa;", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Gdzie się myśli nie zgodzą, tam przyjaźń dziurawa.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Gościu, siądź pod mym liściem, a odpoczni sobie!", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Jakoby też rok bez wiosny mieć chcieli, Którzy chcą, żeby młodzi nie szaleli.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Jeśli nie grzeszysz, jako mi powiadasz, Czego się miła! tak często spowiadasz?", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Kto naprzód począł miłość dziecięciem malować, Może mu się zaprawdę każdy podziwować;", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Nie dbają moje papiery O przeważne bohatery;", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Nie rzekł jako żyw żaden więtszej prawdy z wieka, Jako kto nazwał Bożem igrzyskiem człowieka.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Nie uciekaj przedemną dziewko urodziwa!", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Próżno uciec, próżno się przed miłością schronić, Bo jako lotny nie ma pieszego dogonić?", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Szedłem spać trzeźwo, a wstanę pijany.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Szeląg dam od wychodu, nie zjem jeno jaje; Drożej sram, niźli jadam; złe to obyczaje.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Szlachetne zdrowie, Nikt się nie dowie, Jako smakujesz, Aż się zepsujesz.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Świętym cię zwać nie mogę; ojcem się nie wstydzę, Kiedy wielki kapłanie! syny twoje widzę.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Wszystko się dziwnie plecie Na tym tu biednym świecie. A kto by chciał rozumem wszystkiego dochodzić, I zginie, a nie będzie umiał w to ugodzić.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Ziemię pomierzył i głębokie morze, Wie, jako wstają i zachodzą zorze, Wiatrom rozumie, praktykuje komu — A sam nie widzi, że ma kurwę w domu.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Łaziebnicy a kurwy jednym kształtem żyją, W tejże wannie i złego, i dobrego myją.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "A jeśli komu droga otwarta do nieba, Tym co służą Ojczyźnie.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "A szkoda zwać człowiekiem, kto bydlęce żyje.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Bo z nas Fortuna w żywe oczy szydzi, To da, to weźmie, jako się jej widzi.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Cieszy mię ten rym: Polak mądr po szkodzie: lecz jeśli prawda i z tego nas zbodzie, nową przypowieść Polak sobie kupi, że i przed szkodą, i po szkodzie głupi.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Cnota skarb wieczny, cnota klejnot drogi.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Czego chcesz od nas, Panie, za Twe hojne dary? Czego za dobrodziejstwa, którym nie masz miary?", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Kto mi dał skrzydła, kto mię odział pióry I tak wysoko postawił, że z góry Wszystek świat widzę, a sam, jako trzeba, Tykam się nieba?", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Kto tak mądry, że zgadnie, Co nań jutro przypadnie?", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Miło szaleć, kiedy czas po temu, A tak, bracia, przypij każdy swemu, Bo o głodzie nie chce się tańcować, A podpiwszy, łacniej już błaznować.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Nauka skarbem drogim, Tak bogatym jak ubogim I bogactwa często giną Lecz nauki nie przeminą.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Nic wiecznego na świecie: Radość się z troską plecie.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Nie zawżdy, piękna Zofija, Róża kwitnie i lelija; Nie zawżdy człek będzie młody Ani tej, co dziś, urody.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Niezwykłym i nie leda piórem opatrzony Polecę precz, poeta, ze dwojej złożony Natury: ani ja już przebywać na ziemi Więcej będę; a więtszy nad zazdrość, ludnemi Miasty wzgardzę.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Nikomu, albo raczej wszytkim, swoje księgi Daję. By kto nie mniemał (strach to bowiem tęgi), Że za to trzeba co dać, wszyscy darmo miejcie.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Panie, iako barzo błądzą, Którzy cię niedbałym sądzą: A iż prawie żadne rzeczy, Niechcesz mieć na swoiey pieczy.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Przeto chciejmy wziąć przed się myśli godne siebie, Myśli ważne na ziemi, myśli ważne w niebie; Służmy poczciwej sławie, a jako kto może, Niech ku pożytku dobra spólnego pomoże.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Serce roście patrząc na te czasy!", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "To pan zdaniem mojem, Kto przestał na swojem.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Ty nie miej za stracone, co może być wrócone.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Upitym Lepiej leżeć niż zabitym.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Wiatrem nadziane puknęły nadzieje.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Znał kto kiedy poetę trzeźwego? Nie uczyni taki nic dobrego.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Z wina dobra myśl roście.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Żona uczciwa ozdoba mężowi I najpierwsza podpora domowi.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Nieznajomy wróg jakiś miesza ludzkie rzeczy.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Wielkieś mi uczyniła pustki w domu moim, Moja droga Orszulko, tym zniknienim swoim! Pełno nas, a jakoby nikogo nie było: Jedną maluczką duszą tak wiele ubyło.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "By rozum był przy młodości: Nigdy takiej obfitości Pereł morze i ziemia złota nie urodzi, Żeby tego nie mieli tym dostawać młodzi.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "O boże na wielkiem niebie! Drogo to, widzę, u ciebie, Dać młodość i baczenie zaraz; jedno płacić Drugiem trzeba; to dobre, a tego żal stracić.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "O nierządne królewstwo i zginienia bliskie! Gdzie ani prawa ważą, ani sprawiedliwość Ma miejsca, ale wszytko złotem kupić trzeba.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "A tak o sobie, wy królowie, czujcie, Wy, którym władza do rąk jest podana; Oglądajcie się w swych sprawach na Pana, Tego się bójcie i Tego szanujcie!", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Powstań, Panie, a broń mię w mej niewinności; Żaden mój nieprzyjaciel Twojej srogości Nigdy wytrzymać nie mógł; biłeś je w gęby, A oni w krwawym piasku zbierali zęby.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Chyba w serce miłości! proszę nie uderzaj, Ale na każdy członek inszy śmiele zmierzaj.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Dzięki przyjaźni staję się spokojniejszy, dzięki spokojowi bardziej przyjazny.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "I mały domek ma swego ducha opiekuńczego.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Ja jeden niech wam służę, a za cześć poczytam Sobie, że się dróg innych niż pospólstwo chwytam. Wy mię z ziemie wzwodzicie, wy mię wyłączacie Z liczby nieznacznej i nad obłoki wsadzacie.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Łotrem ten, co z grzędy capnie kurę, mistrzem, kto zwędzi złota górę.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Miłość jest miodem, gdy do serca wnijdzie; Miłość jest żółcią, gdy kochać przestaniem.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Niewiasta wszystkiego złego świata jest przyczyną.", Author = "Jan Kochanowski" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Jan_Kochanowski", Text = "Trzeźwość a miara to są najważniejsze stróże zdrowia naszego.", Author = "Jan Kochanowski" },
+        };
+    }
+}

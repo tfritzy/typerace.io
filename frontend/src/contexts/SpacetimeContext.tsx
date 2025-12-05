@@ -52,6 +52,15 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                     setShowReconnectModal(false);
                     setIsReconnecting(false);
                     setReconnectFailed(false);
+
+                    if (reconnectTimeoutRef.current) {
+                        clearTimeout(reconnectTimeoutRef.current);
+                        reconnectTimeoutRef.current = null;
+                    }
+                    if (failureTimeoutRef.current) {
+                        clearTimeout(failureTimeoutRef.current);
+                        failureTimeoutRef.current = null;
+                    }
                 })
                 .onDisconnect(() => {
                     console.warn('Disconnected from SpacetimeDB');

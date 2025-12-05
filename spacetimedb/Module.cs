@@ -1,5 +1,7 @@
 using SpacetimeDB;
 
+namespace StdbModule;
+
 [Type]
 public enum GameState
 {
@@ -1419,13 +1421,13 @@ public static partial class Module
     private static void UpdateDailyActivePlayerCount(ReducerContext ctx, Identity playerId, string dateKey)
     {
         var gamesPlayedToday = ctx.Db.gamerecord.PlayerId_Day.Filter((playerId, dateKey)).Count();
-        
+
         Log.Info($"[DailyActivePlayers] Player {playerId} finished game on {dateKey}, GamesToday={gamesPlayedToday}");
-        
+
         if (gamesPlayedToday == 1)
         {
             var existingStats = ctx.Db.globalstats.Date.Find(dateKey);
-            
+
             if (existingStats == null)
             {
                 ctx.Db.globalstats.Insert(new GlobalStats

@@ -1,0 +1,70 @@
+using System;
+
+namespace StdbModule;
+
+public static partial class JapaneseQuotes
+{
+    public static class 松尾芭蕉
+    {
+        public static readonly Quote[] Quotes = new Quote[]
+        {
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "草の戸も住み替はる代（よ）ぞひなの家", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "象潟や雨に西施がねぶの花", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "今日よりや書付消さん笠の露", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "蛤のふたみにわかれ行秋ぞ", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "あかあかと日はつれなくも秋の風", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "荒海や佐渡によこたふ天の川", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "あらたふと青葉若葉の日光", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "石山の石より白し秋の風", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "一家に遊女も寢たり萩と月", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "雲の峰幾つ崩て月の山", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "五月雨をあつめて早し最上川", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "山中や菊はたおらぬ湯の匂", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "閑さや岩にしみ入蝉の聲", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "啄木も庵はやぶらず夏木立", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "田一枚植て立去る柳かな", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "塚も動け我泣声は秋の風", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "夏草や兵（つはもの）どもが夢のあと", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "蚤しらみ馬の尿する枕元", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "むざんやな甲の下のきりぎりす", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "行く春や鳥啼き（なき）魚の目は泪", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "わせの香や分入右は有磯海", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "秋深き隣は何をする人ぞ", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "菊の香や奈良には古き仏たち", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "旅に病んで夢は枯野をかけ廻る", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "明ぼのや白魚白きこと一寸", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "海暮れて鴨の声ほのかに白し", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "野ざらしを心に風のしむ身かな", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "道のべの木槿は馬に食はれけり", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "春なれや名もなき山の薄霞", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "水取りや氷の僧の沓の音", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "山路来て何やらゆかしすみれ草", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "辛崎の松は花より朧にて", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "手に取らば消えん涙ぞ熱き秋の霜", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "憂き我をさびしがらせよ閑古鳥", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "梅若菜丸子の宿のとろろ汁", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "蛸壺やはかなき夢を夏の月", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "初しぐれ猿も小蓑を欲しげなり", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "行く春を近江の人と惜しみける", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "病雁の夜寒に落ちて旅寝かな", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "花の雲鐘は上野か浅草か", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "旅人と我が名呼ばれん初時雨", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "よく見れば薺花咲く垣根かな", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "父母のしきりに恋し雉の声", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "おもしろうてやがて悲しき鵜舟かな", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "梅が香にのつと日の出る山路かな", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "古人の跡を求めず、古人の求めたるところを求めよ。", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "塩鯛の歯ぐきも寒し魚の店", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "静にみれば物皆自得す", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "鷹一つ見付けてうれし伊良湖崎。", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "奈良七重七道伽藍八重桜", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "芭蕉野分して盥に雨を聞く夜かな", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "古池や蛙飛込む水の音", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "名月や池をめぐりて夜もすがら", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "物いへば唇さむし秋の風", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "數ならぬ身となおもひそ玉祭り", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "予が風雅は夏炉冬扇のごとし。", Author = "松尾芭蕉" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/松尾芭蕉", Text = "みのむしの音をききにこよ草の庵", Author = "松尾芭蕉" },
+        };
+    }
+}
