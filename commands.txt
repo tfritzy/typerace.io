@@ -4,7 +4,6 @@ spacetime sql typerace "SELECT * from player"
 
 spacetime publish --project-path spacetimedb typerace
 spacetime publish -c --project-path spacetimedb typerace -y
-spacetime publish --project-path spacetimedb --server maincloud typerace
 
 firebase deploy --only hosting
 
@@ -14,7 +13,7 @@ spacetime generate --lang typescript --out-dir frontend/module_bindings --projec
 cd frontend && npm run build -- --mode qa
 firebase deploy --only hosting:qa
 
-DANGER!!!!
-spacetime publish -c --project-path spacetimedb --server maincloud typerace
+PROD:
+spacetime publish --project-path spacetimedb --server maincloud typerace
 
 venv/bin/python compare_gemini_models.py

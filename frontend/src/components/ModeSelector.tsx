@@ -43,7 +43,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
             <div className="hidden md:block">
                 <div className="mb-4">
                     <h2 className="text-white/50 text-sm font-medium mb-2">Match Type</h2>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                         <button
                             className={`selection-button ${gameType === "Public" ? 'selected' : ''}`}
                             onClick={() => setGameType("Public")}
@@ -69,7 +69,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                 </div>
                 <div className="mb-4">
                     <h2 className="text-white/50 text-sm font-medium mb-2">Mode</h2>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                         <button
                             className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
                             onClick={() => handleContentTypeChange("RandomWords")}
@@ -88,7 +88,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                 </div>
                 <div className="pb-6">
                     <h2 className="text-white/50 text-sm font-medium mb-2">Language</h2>
-                    <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-3">
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2">
                         {languages.map((lang) => {
                             const mode = contentType === "Quotes" ? lang.quotesMode : lang.randomWordsMode;
                             const isDisabled = contentType === "Quotes" && !lang.quotesMode;
@@ -104,7 +104,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                     }}
                                     disabled={isDisabled}
                                 >
-                                    <span className="text-xl leading-none">{lang.flag}</span>
+                                    <span className="flag leading-none">{lang.flag}</span>
                                     <span>{lang.language}</span>
                                 </button>
                             );
