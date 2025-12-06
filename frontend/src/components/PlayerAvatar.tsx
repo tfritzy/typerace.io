@@ -2,6 +2,7 @@ import Avatar from "boring-avatars";
 import { PlayerColor } from "../../module_bindings";
 import { getColorConfig } from "../utils/colorMapping";
 import { Crown, Award } from 'lucide-react';
+import { memo } from "react";
 
 type PlayerAvatarProps = {
     size: number;
@@ -12,7 +13,7 @@ type PlayerAvatarProps = {
     placement?: number;
 };
 
-export const PlayerAvatar = ({
+export const PlayerAvatar = memo(({
     size,
     identity,
     color = PlayerColor.Amber,
@@ -91,4 +92,4 @@ export const PlayerAvatar = ({
             )}
         </div>
     );
-};
+});

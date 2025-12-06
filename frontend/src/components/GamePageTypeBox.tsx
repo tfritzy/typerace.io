@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { memo, useCallback, useRef } from "react";
 import { TypeBox, type TypeBoxRef } from "./TypeBox";
 import type { DbConnection } from "../../module_bindings";
 
@@ -12,7 +12,7 @@ type GamePageTypeBoxProps = {
   initialProgress?: number;
 };
 
-export const GamePageTypeBox = ({
+export const GamePageTypeBox = memo(({
   phrase,
   attribution,
   gameId,
@@ -48,6 +48,6 @@ export const GamePageTypeBox = ({
       />
     </div>
   );
-};
+});
 
 export type { GamePageTypeBoxProps };

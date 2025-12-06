@@ -140,23 +140,6 @@ export const GamePage = () => {
     }
   }, [conn, game, gameId, gamePlayerProgress]);
 
-
-
-  const getPlayerName = (pp: PlayerProgress) => {
-    return pp.playerName;
-  };
-
-  const getPlayerLevel = (pp: PlayerProgress) => {
-    return pp.playerLevel;
-  };
-
-  const getIdentityHash = (playerId: any) => {
-    if (!playerId) {
-      return "bot";
-    }
-    return playerId.toHexString();
-  };
-
   const handleFinish = useCallback(() => {
     setHasFinished(true);
   }, []);
@@ -217,11 +200,12 @@ export const GamePage = () => {
               return (
                 <div key={pp.id.toString()} className="box w-full rounded-lg px-8 py-6 relative">
                   <PlayerProgressBar
-                    name={getPlayerName(pp)}
-                    level={getPlayerLevel(pp)}
+                    key={pp.id.toString()}
+                    name={pp.playerName}
+                    level={pp.playerLevel}
                     progressIndex={pp.progressIndex}
                     phraseLength={game.phrase.length}
-                    identityHash={getIdentityHash(pp.playerId)}
+                    identityHash={pp.playerId.toHexString()}
                     playerPublicId={pp.playerPublicId}
                     isCurrentPlayer={isCurrentPlayer}
                     playerColor={pp.playerColor}
@@ -245,7 +229,7 @@ export const GamePage = () => {
               const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;
 
               return (
-                <div className="w-full animate-slideUpFadeIn pb-4">
+                <div key="stats-section" className="w-full animate-slideUpFadeIn pb-4">
                   {currentPP && (
                     <PlayerStatsRow
                       playerProgress={currentPP}

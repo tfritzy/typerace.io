@@ -198,7 +198,6 @@ public static partial class Module
         [PrimaryKey]
         public string Id;
         public string Phrase;
-        public string? Attribution;
         public long CreatedAt;
         public long RacingStartedAt;
         public long CountdownDurationMs;
@@ -214,6 +213,8 @@ public static partial class Module
 
         public List<Identity> Placements;
         public Identity? Owner;
+        [Default("")]
+        public string? Attribution;
     }
 
     [Table(Name = "gamerecord", Public = true)]
@@ -233,14 +234,15 @@ public static partial class Module
         public int Year;
         [SpacetimeDB.Index.BTree]
         public int Month;
-        [SpacetimeDB.Index.BTree]
-        public string Day;
         public long Date;
         public long TimeMs;
         public int Placement;
         public double Wpm;
         public int XpGained;
         public int EloChange;
+        [SpacetimeDB.Index.BTree]
+        [Default("")]
+        public string Day;
     }
 
 

@@ -3,6 +3,7 @@ import { getColorConfig } from '../utils/colorMapping';
 import { PlayerColor } from "../../module_bindings";
 import { Bot } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { memo } from 'react';
 
 type PlayerProgressBarProps = {
     name: string;
@@ -20,7 +21,7 @@ type PlayerProgressBarProps = {
     isAnonymous?: boolean;
 };
 
-export const PlayerProgressBar = ({
+export const PlayerProgressBar = memo(({
     name,
     level,
     progressIndex,
@@ -47,6 +48,7 @@ export const PlayerProgressBar = ({
         >
             {isLoading || isAnonymous ? (
                 <PlayerAvatar
+                    key="avatar"
                     size={40}
                     identity={identityHash}
                     color={playerColor}
@@ -55,8 +57,9 @@ export const PlayerProgressBar = ({
                     placement={placement}
                 />
             ) : (
-                <Link to={`/profile/${playerPublicId}`} className="shrink-0">
+                <Link key="avatar-link" to={`/profile/${playerPublicId}`} className="shrink-0">
                     <PlayerAvatar
+                        key="avatar"
                         size={40}
                         identity={identityHash}
                         color={playerColor}
@@ -112,4 +115,5 @@ export const PlayerProgressBar = ({
             </div>
         </div>
     );
-};
+});
+

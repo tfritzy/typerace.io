@@ -21,7 +21,7 @@ const getInitialMode = (): GameMode => {
   } catch (error) {
     console.error("Failed to load selected mode from localStorage:", error);
   }
-  return { tag: "English500" };
+  return { tag: "EnglishQuotes" };
 };
 
 const getInitialGameType = (): GameTypeValue => {

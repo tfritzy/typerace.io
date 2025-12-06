@@ -2,12 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { type Player } from "../../module_bindings";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, memo } from "react";
 import { setAccentColor } from "../utils/colorMapping";
 import { useAuth } from "../firebase/AuthContext";
 import { useDatabase } from "../contexts/SpacetimeContext";
 
-export const ProfileAvatar = () => {
+export const ProfileAvatar = memo(() => {
     const navigate = useNavigate();
     const conn = useDatabase();
     const { signInWithGoogle, signInWithGithub } = useAuth();
@@ -220,4 +220,4 @@ export const ProfileAvatar = () => {
             </div>
         </button>
     );
-};
+});

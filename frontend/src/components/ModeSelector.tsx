@@ -71,18 +71,18 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     <h2 className="text-white/50 text-sm font-medium mb-2">Mode</h2>
                     <div className="flex gap-2">
                         <button
-                            className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
-                            onClick={() => handleContentTypeChange("RandomWords")}
-                        >
-                            <Shuffle size={20} />
-                            <span>Random</span>
-                        </button>
-                        <button
                             className={`selection-button ${contentType === "Quotes" ? 'selected' : ''}`}
                             onClick={() => handleContentTypeChange("Quotes")}
                         >
                             <Quote size={20} />
                             <span>Quotes</span>
+                        </button>
+                        <button
+                            className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
+                            onClick={() => handleContentTypeChange("RandomWords")}
+                        >
+                            <Shuffle size={20} />
+                            <span>Random words</span>
                         </button>
                     </div>
                 </div>

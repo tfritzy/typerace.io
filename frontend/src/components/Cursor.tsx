@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { memo, useEffect, useRef, useState, type RefObject } from "react";
 
 type CursorProps = {
     targetRef: RefObject<HTMLElement | null>;
@@ -7,7 +7,7 @@ type CursorProps = {
     visible?: boolean;
 };
 
-export const Cursor = ({ targetRef, lerp = 0.15, fadeDelay = 2000, visible = true }: CursorProps) => {
+export const Cursor = memo(({ targetRef, lerp = 0.15, fadeDelay = 2000, visible = true }: CursorProps) => {
     const followerRef = useRef<HTMLDivElement>(null);
     const position = useRef({ x: 0, y: 0 });
     const target = useRef({ x: 0, y: 0 });
@@ -86,4 +86,4 @@ export const Cursor = ({ targetRef, lerp = 0.15, fadeDelay = 2000, visible = tru
             <div className="h-full rounded-full" style={{ borderRight: '2px solid var(--color-accent)' }} />
         </div>
     );
-};
+});
