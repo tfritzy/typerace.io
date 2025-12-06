@@ -15,7 +15,7 @@ function App() {
           <Route path="/" element={<LobbyPage />} />
           <Route path="/game/:gameId" element={<GamePage />} />
           <Route path="/profile/:playerId" element={<ProfilePage />} />
-          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/stats" element={<SiteStatsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

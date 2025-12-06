@@ -6,6 +6,7 @@ import type {
 import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
 import { GameOptionsSelector, type GameTypeValue } from "../components/ModeSelector";
 import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
 import { getRandomStartupPhrase } from "../utils/modes";
 import { useFindGame } from "../hooks/useFindGame";
 
@@ -83,7 +84,7 @@ export const LobbyPage = () => {
           </div>
         </div>
       </div>
-      <div className="fixed bottom-0 left-0 right-0">
+      <div className="fixed bottom-10 left-0 right-0">
         <div className="px-4">
           <div className="content-container">
             <GameOptionsSelector
@@ -95,6 +96,7 @@ export const LobbyPage = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
