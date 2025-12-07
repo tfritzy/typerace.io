@@ -70,6 +70,17 @@ body {
   animation: blink 1s step-end infinite;
 }
 
+@keyframes xpDrop {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-120px);
+  }
+}
+
 .box {
   background-color: var(--color-box-bg);
   border: 1px solid var(--color-box-border);

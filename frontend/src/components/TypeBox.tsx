@@ -234,7 +234,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, attributi
             {renderText()}
           </div>
 
-          <Cursor targetRef={targetRef} lerp={0.15} fadeDelay={500} visible={focused && !isComplete} />
+          <Cursor targetRef={targetRef} lerp={0.22} fadeDelay={500} visible={focused && !isComplete} />
 
           <textarea
             ref={inputRef}

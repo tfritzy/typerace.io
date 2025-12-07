@@ -6,6 +6,12 @@ import { useEffect, useState, useRef, memo } from "react";
 import { setAccentColor } from "../utils/colorMapping";
 import { useAuth } from "../firebase/AuthContext";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { XpDrop } from "./XpDrop";
+
+interface XpDropInstance {
+    id: number;
+    amount: number;
+}
 
 export const ProfileAvatar = memo(() => {
     const navigate = useNavigate();
@@ -16,6 +22,9 @@ export const ProfileAvatar = memo(() => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const menuRef = useRef<HTMLDivElement>(null);
+    const avatarRef = useRef<HTMLDivElement>(null);
+    const [xpDrops, setXpDrops] = useState<XpDropInstance[]>([]);
+    const xpDropIdCounter = useRef(0);
 
     useEffect(() => {
         if (!conn?.identity) return;
@@ -28,8 +37,16 @@ export const ProfileAvatar = memo(() => {
             }
         };
 
-        const handlePlayerUpdate = (_ctx: any, _oldPlayer: Player, newPlayer: Player) => {
+        const handlePlayerUpdate = (_ctx: any, oldPlayer: Player, newPlayer: Player) => {
             if (newPlayer.identity.isEqual(currentIdentity)) {
+                const xpGained = newPlayer.xp - oldPlayer.xp;
+                if (xpGained > 0) {
+                    const newDrop: XpDropInstance = {
+                        id: xpDropIdCounter.current++,
+                        amount: xpGained
+                    };
+                    setXpDrops(prev => [...prev, newDrop]);
+                }
                 setMyPlayer(newPlayer);
             }
         };
@@ -94,6 +111,10 @@ export const ProfileAvatar = memo(() => {
     const identityHash = conn?.identity?.toHexString() ?? "default";
     const isAnonymous = myPlayer?.isAnonymous ?? true;
 
+    const handleXpDropComplete = (id: number) => {
+        setXpDrops(prev => prev.filter(drop => drop.id !== id));
+    };
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -121,7 +142,7 @@ export const ProfileAvatar = memo(() => {
                     onClick={() => setShowMenu(!showMenu)}
                     className="flex items-center gap-4 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
                 >
-                    <div className="relative">
+                    <div className="relative" ref={avatarRef}>
                         <PlayerAvatar
                             size={40}
                             identity={identityHash}
@@ -184,40 +205,57 @@ export const ProfileAvatar = memo(() => {
                         )}
                     </div>
                 )}
+                {xpDrops.map(drop => (
+                    <XpDrop
+                        key={drop.id}
+                        amount={drop.amount}
+                        onComplete={() => handleXpDropComplete(drop.id)}
+                    />
+                ))}
             </div>
         );
     }
 
     return (
-        <button
-            onClick={() => navigate(`/profile/${myPlayer?.playerId}`)}
-            className="flex items-center gap-4 py-2.5 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
-        >
-            <div className="relative">
-                <PlayerAvatar
-                    size={40}
-                    identity={identityHash}
-                    color={myPlayer?.color}
-                    isHighlighted={true}
+        <>
+            {xpDrops.map(drop => (
+                <XpDrop
+                    key={drop.id}
+                    amount={drop.amount}
+                    onComplete={() => handleXpDropComplete(drop.id)}
+                    avatarRef={avatarRef.current}
                 />
-            </div>
-
-            <div className="hidden sm:flex flex-col items-start gap-1 min-w-50">
-                <div className="text-sm font-semibold text-white">{name}</div>
-                <div className="flex items-center gap-2 w-full">
-                    <span className="text-xs font-medium text-white/60">Lvl {level}</span>
-                    <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div
-                            className="h-full rounded-full transition-all duration-300"
-                            style={{
-                                width: `${xpProgress}%`,
-                                background: 'linear-gradient(to right, var(--color-accent-dark), var(--color-accent))'
-                            }}
-                        />
-                    </div>
-                    <span className="text-xs font-mono text-white/60">{currentXP}/{xpRequired}</span>
+            ))}
+            <button
+                onClick={() => navigate(`/profile/${myPlayer?.playerId}`)}
+                className="flex items-center gap-4 py-2.5 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
+            >
+                <div className="relative" ref={avatarRef}>
+                    <PlayerAvatar
+                        size={40}
+                        identity={identityHash}
+                        color={myPlayer?.color}
+                        isHighlighted={true}
+                    />
                 </div>
-            </div>
-        </button>
+
+                <div className="hidden sm:flex flex-col items-start gap-1 min-w-50">
+                    <div className="text-sm font-semibold text-white">{name}</div>
+                    <div className="flex items-center gap-2 w-full">
+                        <span className="text-xs font-medium text-white/60">Lvl {level}</span>
+                        <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div
+                                className="h-full rounded-full transition-all duration-300"
+                                style={{
+                                    width: `${xpProgress}%`,
+                                    background: 'linear-gradient(to right, var(--color-accent-dark), var(--color-accent))'
+                                }}
+                            />
+                        </div>
+                        <span className="text-xs font-mono text-white/60">{currentXP}/{xpRequired}</span>
+                    </div>
+                </div>
+            </button>
+        </>
     );
 });

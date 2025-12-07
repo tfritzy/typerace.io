@@ -126,7 +126,7 @@ public static partial class Module
 {
     private const long PUBLIC_GAME_COUNTDOWN_MICROSECONDS = 3_000_000;
     private const long PRIVATE_GAME_COUNTDOWN_MICROSECONDS = 5_000_000;
-    private const long PRACTICE_GAME_COUNTDOWN_MICROSECONDS = 5_000_000;
+    private const long PRACTICE_GAME_COUNTDOWN_MICROSECONDS = 3_000_000;
     private const long BOT_FILL_DELAY_MICROSECONDS = 5_000_000;
     private const long PRACTICE_GAME_COUNTDOWN_START_DELAY_MICROSECONDS = 1_000_000;
     private const int EVENT_SIZE_BYTES = 3;
@@ -244,8 +244,6 @@ public static partial class Module
         [Default("")]
         public string Day;
     }
-
-
 
     [Table(Name = "personalrecord", Public = true)]
     [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
@@ -371,6 +369,8 @@ public static partial class Module
         public string JoinCode;
         public double Wpm;
         public PlayerColor PlayerColor;
+        [Default(0)]
+        public int HighestProgress;
     }
 
     [Table(Scheduled = nameof(UpdateBotProgress))]
@@ -396,14 +396,6 @@ public static partial class Module
         });
 
         Log.Info("Initialized game archiver with 5-minute interval");
-
-        ctx.Db.XpGainCleaner.Insert(new XpGainCleaner
-        {
-            ScheduledId = 0,
-            ScheduledAt = new ScheduleAt.Interval(fiveMinutes)
-        });
-
-        Log.Info("Initialized XP gain cleaner with 5-minute interval");
 
         for (int i = 0; i < 100; i++)
         {
@@ -1402,22 +1394,6 @@ public static partial class Module
     [Reducer]
     public static void CleanupOldXpGains(ReducerContext ctx, XpGainCleaner args)
     {
-        var fiveMinutesAgo = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 300_000_000;
-        var deletedCount = 0;
-
-        foreach (var xpGain in ctx.Db.xpgain.Iter())
-        {
-            if (xpGain.Timestamp < fiveMinutesAgo)
-            {
-                ctx.Db.xpgain.Id.Delete(xpGain.Id);
-                deletedCount++;
-            }
-        }
-
-        if (deletedCount > 0)
-        {
-            Log.Info($"Cleaned up {deletedCount} XP gain records older than 5 minutes");
-        }
     }
 
     private static void UpdateDailyActivePlayerCount(ReducerContext ctx, Identity playerId, string dateKey)
@@ -1477,7 +1453,6 @@ public static partial class Module
         var wordsTyped = game.Phrase.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
 
         var updatedPlayer = player.Value;
-        var xpGained = AwardXpForGame(ctx, ref updatedPlayer, progress, game, placement, wordsTyped);
         UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped, timeElapsed / 1000);
         LevelUpPlayer(ref updatedPlayer);
         ctx.Db.player.Identity.Update(updatedPlayer);
@@ -1506,7 +1481,7 @@ public static partial class Module
             TimeMs = timeElapsed / 1000,
             Placement = placement,
             Wpm = wpm,
-            XpGained = xpGained,
+            XpGained = 0,
             EloChange = eloChange
         });
 
@@ -1573,118 +1548,6 @@ public static partial class Module
 
             Log.Info($"Updated personal record for player {playerId} in mode {gameMode}: {wpm} WPM");
         }
-    }
-
-    private static int AwardXpForGame(ReducerContext ctx, ref Player player, PlayerProgress progress, Game game, int placement, int wordsTyped)
-    {
-        if (player.IsAnonymous)
-        {
-            return 0;
-        }
-
-        var currentTimestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
-        var isFirstGameToday = IsFirstGameOfDay(player.LastGameDate, currentTimestamp);
-
-        var totalPlayers = ctx.Db.playerprogress.GameId.Filter(game.Id).Count();
-        var (baseXp, placementMultiplier, accuracyMultiplier, accuracy, xpBeforeBonus) = CalculateXpBreakdown(wordsTyped, placement, progress);
-
-        if (totalPlayers <= 2)
-        {
-            placementMultiplier = 1.0;
-            xpBeforeBonus = (int)(baseXp * placementMultiplier * accuracyMultiplier);
-        }
-
-        var xpEarned = xpBeforeBonus;
-
-        var multipliers = new List<XpMultiplier>
-        {
-            new XpMultiplier
-            {
-                Label = $"Base ({wordsTyped} words)",
-                Value = $"{baseXp} XP",
-                Type = "base"
-            }
-        };
-
-        if (totalPlayers > 2)
-        {
-            multipliers.Add(new XpMultiplier
-            {
-                Label = $"{GetPlacementLabel(placement)} Place",
-                Value = $"×{placementMultiplier:F1}",
-                Type = "multiplier"
-            });
-        }
-
-        multipliers.Add(new XpMultiplier
-        {
-            Label = $"{Math.Round(accuracy * 100)}% Accuracy",
-            Value = $"×{accuracyMultiplier:F2}",
-            Type = "multiplier"
-        });
-
-        if (isFirstGameToday)
-        {
-            xpEarned += 100;
-            multipliers.Add(new XpMultiplier
-            {
-                Label = "First Game Today! 🎉",
-                Value = "+100 XP",
-                Type = "bonus"
-            });
-        }
-
-        ctx.Db.xpgain.Insert(new XpGain
-        {
-            Id = IdGenerator.Generate("xpg_", ctx.Rng),
-            PlayerId = progress.PlayerId,
-            GameId = game.Id,
-            Timestamp = currentTimestamp,
-            BaseXp = baseXp,
-            Multipliers = multipliers,
-            TotalXp = xpEarned
-        });
-
-        player.Xp += xpEarned;
-        player.LastGameDate = currentTimestamp;
-
-        Log.Info($"Player {progress.PlayerId} earned {xpEarned} XP");
-
-        return xpEarned;
-    }
-
-    private static (int baseXp, double placementMultiplier, double accuracyMultiplier, double accuracy, int xpBeforeBonus) CalculateXpBreakdown(int wordsTyped, int placement, PlayerProgress progress)
-    {
-        var baseXp = wordsTyped;
-
-        var placementMultiplier = placement switch
-        {
-            1 => 2.0,
-            2 => 1.5,
-            _ => 1.0
-        };
-
-        var correctEvents = CountEventsByType(progress.CharacterHistory, CharacterEventType.Correct);
-        var incorrectEvents = CountEventsByType(progress.CharacterHistory, CharacterEventType.Incorrect);
-        var totalEvents = correctEvents + incorrectEvents;
-
-        var accuracy = totalEvents > 0 ? (double)correctEvents / totalEvents : 0.0;
-        var accuracyMultiplier = 0.5 + accuracy;
-
-        var xpBeforeBonus = (int)(baseXp * placementMultiplier * accuracyMultiplier);
-
-        return (baseXp, placementMultiplier, accuracyMultiplier, accuracy, xpBeforeBonus);
-    }
-
-    private static string GetPlacementLabel(int placement)
-    {
-        return placement switch
-        {
-            1 => "1st",
-            2 => "2nd",
-            3 => "3rd",
-            _ => $"{placement}th"
-        };
     }
 
     private static bool IsFirstGameOfDay(long lastGameDate, long currentDate)
@@ -1802,6 +1665,43 @@ public static partial class Module
         return characterCount / charsPerWord / timeMinutes;
     }
 
+    private static void AwardInstantXpForProgress(ReducerContext ctx, PlayerProgress progress, Game game, int newIndex)
+    {
+        var player = ctx.Db.player.Identity.Find(progress.PlayerId);
+        if (player == null || player.Value.IsAnonymous)
+        {
+            return;
+        }
+
+        if (newIndex > 0 && newIndex <= game.Phrase.Length)
+        {
+            var currentChar = game.Phrase[newIndex - 1];
+            if (currentChar == ' ' || newIndex == game.Phrase.Length)
+            {
+                var wordStart = newIndex - 1;
+                while (wordStart > 0 && game.Phrase[wordStart - 1] != ' ')
+                {
+                    wordStart--;
+                }
+
+                var wordLength = newIndex - wordStart;
+                if (currentChar == ' ')
+                {
+                    wordLength--;
+                }
+
+                if (wordLength > 0)
+                {
+                    var xpToAward = wordLength;
+                    var updatedPlayer = player.Value;
+                    updatedPlayer.Xp += xpToAward;
+                    LevelUpPlayer(ref updatedPlayer);
+                    ctx.Db.player.Identity.Update(updatedPlayer);
+                }
+            }
+        }
+    }
+
     private static void ProcessProgressUpdate(
         ReducerContext ctx,
         PlayerProgress progress,
@@ -1815,6 +1715,16 @@ public static partial class Module
 
         var elapsedMicros = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.RacingStartedAt;
         updatedProgress.Wpm = CalculateWpm(newIndex, elapsedMicros);
+
+        if (newIndex > updatedProgress.HighestProgress)
+        {
+            updatedProgress.HighestProgress = newIndex;
+
+            if (eventType == CharacterEventType.Correct)
+            {
+                AwardInstantXpForProgress(ctx, progress, game, newIndex);
+            }
+        }
 
         ctx.Db.playerprogress.Id.Update(updatedProgress);
 

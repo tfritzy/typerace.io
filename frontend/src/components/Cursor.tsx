@@ -7,7 +7,7 @@ type CursorProps = {
     visible?: boolean;
 };
 
-export const Cursor = memo(({ targetRef, lerp = 0.15, fadeDelay = 2000, visible = true }: CursorProps) => {
+export const Cursor = memo(({ targetRef, lerp = .2, fadeDelay = 2000, visible = true }: CursorProps) => {
     const followerRef = useRef<HTMLDivElement>(null);
     const position = useRef({ x: 0, y: 0 });
     const target = useRef({ x: 0, y: 0 });
