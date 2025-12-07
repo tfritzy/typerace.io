@@ -18,6 +18,7 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Annette_von_Droste-Hülshoff", Text = "„was die Schelme nicht stehlen, das verderben die Narren.”", Author = "Annette von Droste-Hülshoff" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Annette_von_Droste-Hülshoff", Text = "„wenn die Kinder klein sind, treten sie uns in den Schooß, und wenn sie groß sind, in's Herz!”", Author = "Annette von Droste-Hülshoff" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Annette_von_Droste-Hülshoff", Text = "Die hebräische Schrift an dem Baume heißt: „Wenn du dich diesem Orte nahest, so wird es dir ergehen, wie du mir gethan hast.“", Author = "Annette von Droste-Hülshoff" },
+            new Quote { Id = "https://de.wikiquote.org/wiki/Annette_von_Droste-Hülshoff", Text = "wer nach seiner Überzeugung handelt, und sey sie noch so mangelhaft, kann nie ganz zu Grunde gehen, wogegen nichts seelentödtender wirkt, als gegen das innere Rechtsgefühl das äußere Recht in Anspruch nehmen.", Author = "Annette von Droste-Hülshoff" },
         };
     }
 }

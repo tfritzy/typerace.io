@@ -8,6 +8,7 @@ public static partial class SpanishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
+            new Quote { Id = "https://es.wikiquote.org/wiki/Federico_García_Lorca", Text = "Cada minuto, cada persona, cada actitud puede ser el germen de una obra dramática. Cada criatura que nos tropezamos va pasando a través de su vida por climas dramáticos diferentes, en combinación infinita hasta su última escena, en que se tiende para morir.", Author = "Federico García Lorca" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Federico_García_Lorca", Text = "Como no me he preocupado de nacer, no me preocupo de morir.", Author = "Federico García Lorca" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Federico_García_Lorca", Text = "El cante jondo canta siempre en la noche.", Author = "Federico García Lorca" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Federico_García_Lorca", Text = "El entusiasmo es una aurora que no se termina nunca.", Author = "Federico García Lorca" },

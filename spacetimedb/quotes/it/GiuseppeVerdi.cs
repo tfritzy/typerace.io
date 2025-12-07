@@ -15,6 +15,7 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Verdi", Text = "Io non posso ammettere, né nei cantanti, né nei direttori la facoltà di creare, che come dissi prima, è un principio che conduce all'abisso.", Author = "Giuseppe Verdi" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Verdi", Text = "La Capitale! Ma è egli possibile Napoli per capitale dell Italia? Poi qual meschina idea?! Ma questo per Dio, non è amor patrio.", Author = "Giuseppe Verdi" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Verdi", Text = "Prima di tutto ti ringrazio dello zelo grandissimo da te dimostrato per l'esecuzione d'Aida, e mi rallegro teco del talento nell'interpretare la medesima.", Author = "Giuseppe Verdi" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Verdi", Text = "Si rinunci per moda, per smania di novità, per affettazione di scienza, si rinneghi l arte nostra, il nostro istinto, quel nostro fare sicuro spontaneo naturale sensibile abbagliante di luce, è assurdo e stupido.", Author = "Giuseppe Verdi" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Verdi", Text = "Tornate all'antico e sarà un progresso.", Author = "Giuseppe Verdi" },
         };
     }

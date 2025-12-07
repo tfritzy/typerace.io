@@ -15,6 +15,7 @@ public static partial class UkrainianQuotes
         .Concat(ВалерянПідмогильний.Quotes)
         .Concat(ВасильСимоненко.Quotes)
         .Concat(ВасильСтус.Quotes)
+        .Concat(ВасильЧепурний.Quotes)
         .Concat(ВолодимирВинниченко.Quotes)
         .Concat(ВолодимирДрозд.Quotes)
         .Concat(ГалинаТурелик.Quotes)

@@ -8,15 +8,18 @@ public static partial class PolishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Czucie i wiara silniej mówi do mnie,\nNiż mędrca szkiełko i oko.\n„Martwe znasz prawdy, nieznane dla ludu,\nWidzisz świat w proszku, w każdej gwiazd iskierce;\nNie znasz prawd żywych, nie obaczysz cudu!\nMiej serce i patrzaj w serce!”", Author = "Adam Mickiewicz" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Ciemno wszędzie, głucho wszędzie,\nco to będzie, co to będzie?", Author = "Adam Mickiewicz" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Gdy na dziewczynę zawołają: żono! Już ją żywcem pogrzebano!", Author = "Adam Mickiewicz" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Kobieto! puchu marny! ty wietrzna istoto!", Author = "Adam Mickiewicz" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Kto miłości nie zna, ten żyje szczęśliwy,\nI noc ma spokojną, i dzień nietęskliwy.", Author = "Adam Mickiewicz" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Bo kto siedzi w Ojczyźnie i cierpi niewolę, aby zachować życie, ten straci Ojczyznę i życie; a kto opuści Ojczyznę, aby bronił Wolności narażeniem życia swego, ten obroni Ojczyznę i będzie żyć wiecznie.", Author = "Adam Mickiewicz" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Litwo! Ojczyzno moja! Ty jesteś jak zdrowie;\nIle cię trzeba cenić, ten tylko się dowie,\nKto cię stracił. Dziś piękność twą w całej ozdobie\nWidzę i opisuję, bo tęsknię po tobie.", Author = "Adam Mickiewicz" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Aby kraj mógł żyć, trzeba, aby żyły prawa.", Author = "Adam Mickiewicz" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Bez serc, bez ducha – to szkieletów ludy.\nMłodości! podaj mi skrzydła!\nNiech nad martwym wzlecę światem\nW rajską dziedzinę ułudy…", Author = "Adam Mickiewicz" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Bo dzieło zniszczenia\nW dobrej sprawie jest święte, jak dzieło tworzenia:\nBóg wyrzekł słowo ''stań się'', Bóg i ''zgiń'' wyrzecze!", Author = "Adam Mickiewicz" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Bóg sam może świat zniszczyć i drugi wystawić,\nA bez naszej pomocy nie może nas zbawić.", Author = "Adam Mickiewicz" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Gdy cię nie widzę, nie wzdycham, nie płaczę;\nNie tracę zmysłów, kiedy cię zobaczę;\nJednakże, gdy cię długo nie oglądam,\nCzegoś mi braknie, kogoś widzieć żądam,\nI tęskniąc sobie zadaję pytanie:\nCzy to jest przyjaźń, czy to jest kochanie?", Author = "Adam Mickiewicz" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Głośniej niźli w rozmowach, Bóg przemawia w ciszy,\nI kto w sercu ucichnie, zaraz go usłyszy.", Author = "Adam Mickiewicz" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "Hej, użyjmy żywota! \nWszak żyjem tylko raz; \nNiechaj ta czara złota\nRóżno wabi nas.", Author = "Adam Mickiewicz" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Adam_Mickiewicz", Text = "I was dostrzegam, o dumni badacze!\nGdy wami burza jak śmieciem pomiata,\nZamknięci w sobie, jak w konchy ślimacze,\nChcieliście mali obejrzeć krąg świata.", Author = "Adam Mickiewicz" },

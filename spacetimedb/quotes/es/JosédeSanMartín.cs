@@ -8,6 +8,7 @@ public static partial class SpanishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
+            new Quote { Id = "https://es.wikiquote.org/wiki/José_de_San_Martín", Text = "Prohíbo que se me haga ningún género de funeral; y desde el lugar en que falleciere se me conducirá directamente al cementerio sin ningún acompañamiento; pero sí desearía que mi corazón fuese depositado en el de Buenos Aires.", Author = "José de San Martín" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_de_San_Martín", Text = "En defensa de la patria todo es lícito menos dejarla perecer.", Author = "José de San Martín" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_de_San_Martín", Text = "El Perú es desde este momento libre e independiente por la voluntad general de los pueblos y por la justicia de su causa que Dios defiende. ¡Viva la patria! ¡Viva la libertad! ¡Viva la independencia!", Author = "José de San Martín" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_de_San_Martín", Text = "Hace más ruido un solo hombre gritando que cien mil que están callados.", Author = "José de San Martín" },

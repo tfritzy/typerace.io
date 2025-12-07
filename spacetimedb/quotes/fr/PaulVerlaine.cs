@@ -24,6 +24,7 @@ public static partial class FrenchQuotes
             new Quote { Id = "https://fr.wikiquote.org/wiki/Paul_Verlaine", Text = "Un pavillon à claires-voies\nAbride doucement nos joies", Author = "Paul Verlaine" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Paul_Verlaine", Text = "Et l’Amour comblant tout, hormis\nLa faim, sorbets et confitures\nNous préservent des courbatures.", Author = "Paul Verlaine" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Paul_Verlaine", Text = "Cependant la lune se lève\nEt l’esquif en sa course brève\nFile gaîment sur l’eau qui rêve.", Author = "Paul Verlaine" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Paul_Verlaine", Text = "Cléopâtre fut moins aimée, oui, sur ma foi !\nPar Marc-Antoine et par César que vous par moi,\nN’en doutez pas, Madame, et je saurai combattre\nComme César pour un sourire, ô Cléopâtre,\nEt comme Antoine fuir au seul prix d’un baiser.", Author = "Paul Verlaine" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Paul_Verlaine", Text = "Ferme tes yeux à demi,\nCroise tes bras sur ton sein,\nEt de ton cœur endormi\nChasse à jamais tout dessein.", Author = "Paul Verlaine" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Paul_Verlaine", Text = "— Ton cœur bat-il toujours à mon seul nom ?\nToujours vois-tu mon âme en rêve ? — Non.", Author = "Paul Verlaine" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Paul_Verlaine", Text = "Il pleure dans mon cœur\nComme il pleut sur la ville,\nQuelle est cette langueur\nQui pénètre mon cœur ?", Author = "Paul Verlaine" },
@@ -36,6 +37,7 @@ public static partial class FrenchQuotes
             new Quote { Id = "https://fr.wikiquote.org/wiki/Paul_Verlaine", Text = "Une inquiétude profonde\nM'agite en douloureux transports\nEntre le sublime et l'immonde :\n– Deux écueils, Seigneur, ou deux ports ?", Author = "Paul Verlaine" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Paul_Verlaine", Text = "Je compare ces vers étranges\nAux étranges vers que ferait\nUn marquis de Sade discret\nQui saurait la langue des anges", Author = "Paul Verlaine" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Paul_Verlaine", Text = "Quand même tu dirais\nQue tu me trahirais\nSi c'était ton caprice,\nQu’est-ce que me ferait\nCe terrible secret\nSi c’était mon caprice !", Author = "Paul Verlaine" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Paul_Verlaine", Text = "Dans ce café bondé d'imbéciles, nous deux\nSeuls, nous représentions le soi-disant hideux\nVice d'être « pour homme » et sans qu'ils s'en doutassent\nNous encagnions ces cons avec leur air bonasse,\nLeurs normales amours et leur morale en toc.", Author = "Paul Verlaine" },
         };
     }
 }

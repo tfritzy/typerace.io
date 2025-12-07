@@ -8,6 +8,7 @@ public static partial class PortugueseQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
+            new Quote { Id = "https://pt.wikiquote.org/wiki/José_Régio", Text = "Em Arte, é vivo tudo o que é original. É original tudo o que provém da parte mais virgem, mais verdadeira e mais íntima duma personalidade artística. A primeira condição duma obra viva é pois ter uma personalidade e obedecer-lhe.", Author = "José Régio" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/José_Régio", Text = "Eis como é falsa toda a originalidade calculada e astuciosa. Eis como também pertence à literatura morta aquela em que um autor pretende ser original sem personalidade própria.", Author = "José Régio" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/José_Régio", Text = "A excentricidade, a extravagância e a bizarria podem ser poderosas - mas só quando naturais a um dado temperamento artístico.", Author = "José Régio" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/José_Régio", Text = "Afectadas, semelhantes qualidades não passarão dum truque literário.", Author = "José Régio" },

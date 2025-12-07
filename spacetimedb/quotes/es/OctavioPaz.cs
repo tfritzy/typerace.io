@@ -25,6 +25,7 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "Los imperios están condenados a la dispersión, como las ortodoxias y las ideologías a los cismas y a las escisiones.", Author = "Octavio Paz" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "Ningún pueblo cree en su gobierno. A lo sumo, los pueblos están resignados.", Author = "Octavio Paz" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "Nombrar es crear, e imaginar, nacer.", Author = "Octavio Paz" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "Nuestra ficticia vida política sería incompleta si no tuviéramos una libertad de prensa igualmente ficticia. Teóricamente nuestros periódicos pueden decir lo que quieren. Prácticamente dicen lo que pueden.", Author = "Octavio Paz" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "Sin democracia, la libertad es una quimera.", Author = "Octavio Paz" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "Sólo la comunicación tiene carácter divino.", Author = "Octavio Paz" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "Somos juguetes del tiempo y sus accidentes: la enfermedad y la vejez, que desfiguran el cuerpo y extravían al alma.", Author = "Octavio Paz" },

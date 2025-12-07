@@ -10,6 +10,7 @@ public static partial class EnglishQuotes
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "No shortcuts, with me as with life.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "I've never met another man I'd rather be.", Author = "Charles Bukowski" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "I walk through rooms of the dead, streets of the dead, cities of the dead: men without eyes, men without voices; men with manufactured feelings and standard reactions; men with newspaper brains, television souls and high school ideals.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "If you want to know who your friends are, get yourself a jail sentence.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "An intellectual is a man who says a simple thing in a difficult way; an artist is a man who says a difficult thing in a simple way.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "Show me a man who lives alone and has a perpetually clean kitchen, and eight times out of nine I'll show you a man with detestable spiritual qualities.", Author = "Charles Bukowski" },
@@ -26,6 +27,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "My ambition is handicapped by my laziness.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "People don't need love. What they need is success in one form or another. It can be love but it needn't be.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "For each Joan of Arc there is a Hitler perched at the other end of the teeter-totter. The old story of good and evil.", Author = "Charles Bukowski" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "Not everybody thought they could be a dentist or an automobile mechanic but everybody knew they could be a writer. But most men, fortunately, aren't writers, or even cab drivers, and some men - many men - unfortunately aren't anything.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "Every man is a poet", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "People with no morals often considered themselves more free, but mostly they lacked the ability to feel hate or love.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "Morals were restrictive, but they were grounded on human experience.", Author = "Charles Bukowski" },
@@ -37,6 +39,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "Sex was a trap, a snare. It was for animals.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "Something was always after a man. It never relented. No rest, ever.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "We're all going to die, all of us, what a circus! That alone should make us love each other but it doesn't. We are terrorized and flattened by trivialities, we are eaten up by nothing.", Author = "Charles Bukowski" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "We are here to unlearn the teachings of the church, state and our educational system. We are here to drink beer. We are here to kill war. We are here to laugh at the odds and live our lives so well that Death will tremble to take us.", Author = "Charles Bukowski" },
         };
     }
 }

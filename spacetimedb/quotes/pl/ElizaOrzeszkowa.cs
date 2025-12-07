@@ -8,6 +8,8 @@ public static partial class PolishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Nad wysoką, ciężką poręczą ławy oskarżonych podniosła się szczupła, jasnowłosa, czarno ubrana dziewczyna. Powieki miała spuszczone, postawę spokojną i głos trochę drżący. Uczyłam dzieci, myślałam, że czynię dobrze… I teraz myślę, że dobrze czyniłam.", Author = "Eliza Orzeszkowa" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Dusza ludzka, tak jak kula ziemska, posiada litosferę, na sposoby rozmaite wyrzeźbianą przez przygodne wiatry i wody, a pod tą zwierzchnią skorupą, jądro z naturą niezbadaną, i to skryte jądro właśnie, nie zaś rzeźba powierzchni, stanowi o wartości ludzi i o wzajemnych pomiędzy nimi podobieństwach.", Author = "Eliza Orzeszkowa" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Dusza ludzka zna dwa tylko stany: jest polem walki lub pobojowiskiem.", Author = "Eliza Orzeszkowa" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Są dusze tak stworzone, że czują spójnię, wiążącą je z wysokościami, bez granic wyższemi nad wysokości ziemskie.", Author = "Eliza Orzeszkowa" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Co tam o śmierci myśleć, kiedy i żyć czasem dobrze... nie zawsze, ale czasem... dobrze!", Author = "Eliza Orzeszkowa" },
@@ -28,9 +30,11 @@ public static partial class PolishQuotes
             new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Bardzo trudno albo i niepodobna pomalować wstęgę życia kolorem różowym na zawsze.", Author = "Eliza Orzeszkowa" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Dusze, tak samo jak ciała, bywają chore od urodzenia, albo od różnych przypadków życia. Utrzymywanie w zdrowiu dusz ludzkich i ich leczenie jest zadaniem trudniejszem niż czynienie tego względem ciał.", Author = "Eliza Orzeszkowa" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Im więcej naród jest oświecony, tym wyżej ceni tych, którzy mu światło przynoszą.", Author = "Eliza Orzeszkowa" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Kobieta z gatunku tych, którym ojcowie nasi dali miano herod-baba. Ruchliwa, krzykliwa, nieustraszona, gotowa zawsze do celów swych ludzi za gardła brać albo im oczy wydzierać. W biały dzień i na ulicy wyłajać bliźniego może ona tak dobrze, jak przełknąć ostrygę.", Author = "Eliza Orzeszkowa" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Ku celom pożądanym wiodą drogi trudne.", Author = "Eliza Orzeszkowa" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Los pożycza, nie daje.", Author = "Eliza Orzeszkowa" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Miłość jak odrę każdy człowiek, choćby raz, przebyć musi.", Author = "Eliza Orzeszkowa" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Nie idzie już tu nawet o serca, bo te, tak pod jedwabnymi, jak pod wełnianymi i perkalowymi stanikami, są u tak zwanej płci pięknej drażliwym i zarazem bezbronnym miejscem; byle co zranić je może, byle co zawojować.", Author = "Eliza Orzeszkowa" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Nie każdy może kochać, kto chce kochać.", Author = "Eliza Orzeszkowa" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Nikt nie zrozumie kobiety… ona sama siebie też nie.", Author = "Eliza Orzeszkowa" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Eliza_Orzeszkowa", Text = "Trzeba być podobnym, aby się zrozumieć i innym, aby się pokochać. Trzeba być silnym, aby wybaczyć.", Author = "Eliza Orzeszkowa" },

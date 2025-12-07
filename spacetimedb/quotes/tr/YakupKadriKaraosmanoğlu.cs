@@ -8,6 +8,7 @@ public static partial class TurkishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
+            new Quote { Id = "https://tr.wikiquote.org/wiki/Yakup_Kadri_Karaosmanoğlu", Text = "Birtakım budalalar varmış, \"Atatürk geride kaldı.\" diyen. Bunların adına aşırı solcular deniyormuş. Atatürk sağ mıydı sol muydu? Herhâlde ileriye koşmakta herhangi bir devrimciden çok daha aşırı idi. Nice yüzyıllık çağ merhalelerini bir atlayışta geçip gitti.", Author = "Yakup Kadri Karaosmanoğlu" },
             new Quote { Id = "https://tr.wikiquote.org/wiki/Yakup_Kadri_Karaosmanoğlu", Text = "Kızmak veya gücenebilmek için mutlaka biraz anlamak lazımdır.", Author = "Yakup Kadri Karaosmanoğlu" },
             new Quote { Id = "https://tr.wikiquote.org/wiki/Yakup_Kadri_Karaosmanoğlu", Text = "Şiirdeki aşkla hayattaki aşk ne kadar birbirine benzemiyormuş.", Author = "Yakup Kadri Karaosmanoğlu" },
             new Quote { Id = "https://tr.wikiquote.org/wiki/Yakup_Kadri_Karaosmanoğlu", Text = "Hayatta hiçbir şey olgun bir erkeğin ağlaması kadar yürek paralayıcı değildir.", Author = "Yakup Kadri Karaosmanoğlu" },

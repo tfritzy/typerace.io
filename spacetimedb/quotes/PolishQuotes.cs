@@ -17,6 +17,7 @@ public static partial class PolishQuotes
         .Concat(HenrykSienkiewicz.Quotes)
         .Concat(IgnacyKrasicki.Quotes)
         .Concat(JanKochanowski.Quotes)
+        .Concat(JanPotocki.Quotes)
         .Concat(JarosławIwaszkiewicz.Quotes)
         .Concat(JerzyAndrzejewski.Quotes)
         .Concat(JulianTuwim.Quotes)

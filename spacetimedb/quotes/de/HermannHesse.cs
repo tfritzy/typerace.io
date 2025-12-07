@@ -21,6 +21,7 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Hermann_Hesse", Text = "Liebe kann man erbetteln, erkaufen, geschenkt bekommen, auf der Gasse finden, aber rauben kann man sie nicht.", Author = "Hermann Hesse" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hermann_Hesse", Text = "Nun, aller höhere Humor fängt damit an, daß man die eigene Person nicht mehr ernst nimmt.", Author = "Hermann Hesse" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hermann_Hesse", Text = "Wohin noch mag mein Weg mich führen? Närrisch ist er, dieser Weg, er geht in Schleifen, er geht vielleicht im Kreise. Mag er gehen, wie er will, ich will ihn gehen.", Author = "Hermann Hesse" },
+            new Quote { Id = "https://de.wikiquote.org/wiki/Hermann_Hesse", Text = "Wenn ich nicht im Grunde ein sehr arbeitsamer Mensch wäre, wie wäre ich je auf die Idee gekommen, Loblieder und Theorien des Müßiggangs auszudenken. Die geborenen, die genialen Müßiggänger tun dergleichen nie.", Author = "Hermann Hesse" },
         };
     }
 }

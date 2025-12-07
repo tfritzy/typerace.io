@@ -9,6 +9,7 @@ public static partial class GermanQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://de.wikiquote.org/wiki/Erich_Maria_Remarque", Text = "Das Wunder, wenn man es erlebt, ist nie vollkommen. Erst die Erinnerung macht es dazu.", Author = "Erich Maria Remarque" },
+            new Quote { Id = "https://de.wikiquote.org/wiki/Erich_Maria_Remarque", Text = "Es gibt da auch zwei Wahrheiten - eine, bei der man sich preisgibt, und eine zweite strategische, bei der man nichts preisgibt. Ich hatte in fünf Jahren gelernt, dass, wenn man sich preisgibt, man sich nicht wundern soll, dass auf einen geschossen wird.", Author = "Erich Maria Remarque" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Erich_Maria_Remarque", Text = "Das Grauen läßt sich ertragen, solange man sich einfach duckt – aber es tötet, wenn man darüber nachdenkt.", Author = "Erich Maria Remarque" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Erich_Maria_Remarque", Text = "Dumm geboren zu werden ist keine Schande. Nur dumm zu sterben.", Author = "Erich Maria Remarque" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Erich_Maria_Remarque", Text = "Erst das Lazarett zeigt, was Krieg ist.", Author = "Erich Maria Remarque" },

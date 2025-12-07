@@ -10,7 +10,9 @@ public static partial class EnglishQuotes
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "I can accept failure. Everyone fails at something. But I can't accept not trying.", Author = "Michael Jordan" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "Talent wins games, but teamwork and intelligence wins championships.", Author = "Michael Jordan" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "I've reached the pinnacle of my career. I just feel that I don't have anything else to prove. When I lose the sense of motivation and the sense of 'to prove something' as a basketball player, it's time for me to move away from the game of basketball.", Author = "Michael Jordan" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "I'm back for the second time.", Author = "Michael Jordan" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "I've missed over 9,000 shots in my career. I've lost almost 300 games. 26 times I've been trusted to take the game-winning shot and missed. I've failed over and over and over again in my life. And that is why I succeed.", Author = "Michael Jordan" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "I'm retired 99.9%. Of course, there always is that .1%.", Author = "Michael Jordan" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "There will be a player greater than me.", Author = "Michael Jordan" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "Enjoy every minute of life. Never second-guess life.", Author = "Michael Jordan" },

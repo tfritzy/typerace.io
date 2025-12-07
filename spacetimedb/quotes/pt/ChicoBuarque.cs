@@ -21,6 +21,7 @@ public static partial class PortugueseQuotes
             new Quote { Id = "https://pt.wikiquote.org/wiki/Chico_Buarque", Text = "Não tomo mais uísque. Cantar bêbado pode ser engraçado, mas não a temporada inteira. Faz mal para o fígado", Author = "Chico Buarque" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Chico_Buarque", Text = "Essa coisa do cariocão não tem muito a ver comigo, da mesma forma que acho paulistice chata, baianice chata, mineirice chata", Author = "Chico Buarque" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Chico_Buarque", Text = "Nós aprendemos, Palavras duras, Como dizer perdi, perdi, Palavras tontas, Essas palavras, Quem falou não está mais aqui.", Author = "Chico Buarque" },
+            new Quote { Id = "https://pt.wikiquote.org/wiki/Chico_Buarque", Text = "Era televisão e futebol. Construíram estádios e essa rede impressionante de telecomunicações por todo o Brasil, e ao mesmo tempo uma degradação crescente em termos de educação e saúde. Tudo isso foi descuidado.", Author = "Chico Buarque" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Chico_Buarque", Text = "Escrevo tanto livros quanto músicas para me entender melhor.", Author = "Chico Buarque" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Chico_Buarque", Text = "Detesto ouvir música.", Author = "Chico Buarque" },
         };

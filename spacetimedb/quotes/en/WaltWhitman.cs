@@ -8,6 +8,7 @@ public static partial class EnglishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
+            new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "It is a beautiful truth that all men contain something of the artist in them. And perhaps it is the case that the greatest artists live and die, the world and themselves alike ignorant what they possess.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I think of few heroic actions, which cannot be traced to the artistical impulse. He who does great deeds, does them from his innate sensitiveness to moral beauty.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I find I'm a good deal more of a socialist than I thought I was: maybe not technically, politically, so, but intrinsically, in my meanings.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "Poetry (like a grand personality) is a growth of many generations — many rare combinations.\nTo have great poets, there must be great audiences too.", Author = "Walt Whitman" },
@@ -43,6 +44,8 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "The paths to the house I seek to make,\nBut leave to those to come the house itself.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "Society waits unformed and is between things ended and things begun.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "Now obey thy cherished secret wish,\nEmbrace thy friends—leave all in order;\nTo port and hawser's tie no more returning,\nDepart upon thy endless cruise, old Sailor!", Author = "Walt Whitman" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I announce the great individual, fluid as Nature, chaste, affectionate, compassionate, fully armed;\nI announce a life that shall be copious, vehement, spiritual, bold,\nAnd I announce an end that shall lightly and joyfully meet its translation.", Author = "Walt Whitman" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "Incompossible, adj. Unable to exist if something else exists. Two things are incompossible when the world of being has scope enough for one of them, but not enough for both—as Walt Whitman's poetry and God's mercy to man.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "Whitman...a man full-blooded and brotherly, unselfconscious in his democracy and genuinely at ease with all kinds and classes.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I give you joy of your free and brave thought. I have great joy in it. I find incomparable things said incomparably well, as they must be.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I always knew in my heart Walt Whitman’s mind to be more like my own than any other man’s living.", Author = "Walt Whitman" },

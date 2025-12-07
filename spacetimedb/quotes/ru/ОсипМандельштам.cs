@@ -38,6 +38,7 @@ public static partial class RussianQuotes
             new Quote { Id = "https://ru.wikiquote.org/wiki/Осип_Мандельштам", Text = "Каждое слово имеет свою судьбу.", Author = "Осип Мандельштам" },
             new Quote { Id = "https://ru.wikiquote.org/wiki/Осип_Мандельштам", Text = "Поэзия – это дыхание жизни.", Author = "Осип Мандельштам" },
             new Quote { Id = "https://ru.wikiquote.org/wiki/Осип_Мандельштам", Text = "Я верю в силу слова.", Author = "Осип Мандельштам" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Осип_Мандельштам", Text = "Подобно Блоку, Хлебников мыслил язык как государство, но отнюдь не в пространстве, не географически, а во времени. Хлебников не знает, что такое современник. Он гражданин всей истории, всей системы языка и поэзии.", Author = "Осип Мандельштам" },
         };
     }
 }

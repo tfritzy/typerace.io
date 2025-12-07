@@ -22,6 +22,7 @@ public static partial class PortugueseQuotes
             new Quote { Id = "https://pt.wikiquote.org/wiki/Monteiro_Lobato", Text = "Progresso amigo, tu és cômodo, és delicioso, mas feio...", Author = "Monteiro Lobato" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Monteiro_Lobato", Text = "O grau de cultura de um país mede-se pelo preço dos seus livros", Author = "Monteiro Lobato" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Monteiro_Lobato", Text = "Se quer viver feliz na América, não se mostre duro com os cães – nem desrespeitoso para com a americana. São dois dogmas muito sérios.", Author = "Monteiro Lobato" },
+            new Quote { Id = "https://pt.wikiquote.org/wiki/Monteiro_Lobato", Text = "Um país se faz com homens e livros. Minha visita aos monumentos de George Washington e Lincoln provou-me que a América tinha homens. Ter homens, para um país, é ter Washingtons e Lincolns, forças tão marcantes que sobre sua obra não pode a morte.", Author = "Monteiro Lobato" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Monteiro_Lobato", Text = "Durante a revisão os erros se escondem, fazem-se positivamente invisíveis, mas assim que o livro sai, tornam-se visibilíssimos, verdadeiros sacis a nos botar a língua em todas as páginas.", Author = "Monteiro Lobato" },
         };
     }

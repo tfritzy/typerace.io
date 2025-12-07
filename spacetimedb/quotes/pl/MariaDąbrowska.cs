@@ -8,6 +8,7 @@ public static partial class PolishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Nic nie chcieć dowodzić. Przed zdumionymi oczyma rozpostrzeć obraz świata. Tak chcę pisać. To niech będzie moja dewiza przed rozpoczęciem drugiego tomu. Już się teraz nie martwię, że nie mam żadnej idei.", Author = "Maria Dąbrowska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Zapędy do fanaberyjnego hrabskiego życia przy środkach prawie żadnych.", Author = "Maria Dąbrowska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Bo gdy nas nie stać na miłość, stać nas zawsze na zazdrość.", Author = "Maria Dąbrowska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Maria_Dąbrowska", Text = "Człowiek jest tajemnicą – z tajemnicy przybywa i w tajemnicę odchodzi.", Author = "Maria Dąbrowska" },

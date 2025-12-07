@@ -45,6 +45,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Sylvia_Plath", Text = "These hills are too green and sweet to have tasted salt. I follow the sheep path between them.", Author = "Sylvia Plath" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Sylvia_Plath", Text = "These poems do not live: it's a sad diagnosis. They grew their toes and fingers well enough.", Author = "Sylvia Plath" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Sylvia_Plath", Text = "I'm a riddle in nine syllables, An elephant, a ponderous house, A melon strolling on two tendrils.", Author = "Sylvia Plath" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Sylvia_Plath", Text = "Don't talk to me about the world needing cheerful stuff! What the person out of Belsen — physical or psychological — wants is nobody saying the birdies still go tweet-tweet, but the full knowledge that somebody else has been there and knows the worst.", Author = "Sylvia Plath" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Sylvia_Plath", Text = "I talk to God but the sky is empty.", Author = "Sylvia Plath" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Sylvia_Plath", Text = "With me, the present is forever, and forever is always shifting, flowing, melting.", Author = "Sylvia Plath" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Sylvia_Plath", Text = "The blood of love welled up in my heart with a slow pain.", Author = "Sylvia Plath" },

@@ -33,6 +33,7 @@ public static partial class FrenchQuotes
             new Quote { Id = "https://fr.wikiquote.org/wiki/Molière", Text = "[Qu']un sot savant est sot plus qu'un sot ignorant.", Author = "Molière" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Molière", Text = "Deux époux ! C'est trop pour la coutume.", Author = "Molière" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Molière", Text = "Presque tous les hommes meurent de leurs remèdes et non pas de leurs maladies.", Author = "Molière" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Molière", Text = "Je suis médecin passager, qui vais de ville en ville, de province en province, de royaume en royaume, pour chercher d'illustres matières à ma capacité, pour trouver des malades dignes de m'occuper, capables d'exercer les grands et beaux secrets que j'ai trouvés dans la médecine.", Author = "Molière" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Molière", Text = "Les anciens, monsieur, sont les anciens ; et nous sommes les gens de maintenant.", Author = "Molière" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Molière", Text = "Il faut bien qu'il ait tué des gens pour s'être fait si riche.", Author = "Molière" },
         };

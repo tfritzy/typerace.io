@@ -75,5 +75,6 @@ public static partial class GermanQuotes
         .Concat(ThomasMann.Quotes)
         .Concat(WalterBenjamin.Quotes)
         .Concat(WilhelmBusch.Quotes)
+        .Concat(WillyBrandt.Quotes)
         .ToArray();
 }

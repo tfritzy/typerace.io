@@ -8,6 +8,8 @@ public static partial class FrenchQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Anouilh", Text = "Va, tu finiras comme moi, sous les traits d’une vielle femme couverte de diamants, qui joue aux intrigues pour tâcher d’oublier qu’elle n’a pas vécu. Et encore… Je voudrais rire un peu. Je joue avec le feu et le feu ne veut même pas me brûler.", Author = "Jean Anouilh" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Anouilh", Text = "Il n’y a que pour ceux qui l’ont jouée avec toute leur jeunesse que la comédie est réussie, et encore c’est parce qu’ils jouaient leur jeunesse, ce qui réussit toujours. Ils ne se sont même pas aperçu de la comédie !", Author = "Jean Anouilh" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Anouilh", Text = "C’est propre, la tragédie. C’est reposant, c’est sûr…", Author = "Jean Anouilh" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Anouilh", Text = "C’est plein de disputes un bonheur.", Author = "Jean Anouilh" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Anouilh", Text = "Il y a des fois où il ne faut pas trop réfléchir.", Author = "Jean Anouilh" },

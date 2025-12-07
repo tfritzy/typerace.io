@@ -20,6 +20,8 @@ public static partial class SwedishQuotes
         .Concat(IvarLoJohansson.Quotes)
         .Concat(JanGuillou.Quotes)
         .Concat(JonasGardell.Quotes)
+        .Concat(KatarinaMazetti.Quotes)
+        .Concat(MoaMartinson.Quotes)
         .Concat(PerOlovEnquist.Quotes)
         .Concat(SaraLidman.Quotes)
         .Concat(SelmaLagerlöf.Quotes)
@@ -28,5 +30,6 @@ public static partial class SwedishQuotes
         .Concat(TorgnyLindgren.Quotes)
         .Concat(VernervonHeidenstam.Quotes)
         .Concat(VilhelmMoberg.Quotes)
+        .Concat(WernerAspenström.Quotes)
         .ToArray();
 }

@@ -9,8 +9,10 @@ public static partial class EnglishQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "The human mind is inspired enough when it comes to inventing horrors; it is when it tries to invent a Heaven that it shows itself cloddish.", Author = "Evelyn Waugh" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "It is one of the facts of history that it is impossible for two peoples of widely different culture to live peaceably side by side. Sooner or later one must absorb the other. It is not necessarily the highest culture which survives. It is the more virile.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "I believe it was a bad Government, rapidly deteriorating. If I were a Spaniard I should be fighting for General Franco.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "It is mischievous to suggest that such a choice is imminent.", Author = "Evelyn Waugh" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "We prefer to harbour a grievance and vent our rage in moral lessons to our neighbours, eagerly accepting any extravagant report which will confirm our belief that foreigners as usual have behaved like cads.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "I believe we are in danger of a...stultifying use of the word \"Fascist\".", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "My father taught me that it was flagitious to leave a letter of any kind unanswered.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "You can only leave God out by making your characters pure abstractions.", Author = "Evelyn Waugh" },

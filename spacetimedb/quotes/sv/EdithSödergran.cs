@@ -9,6 +9,7 @@ public static partial class SwedishQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://sv.wikiquote.org/wiki/Edith_Södergran", Text = "Du sökte en blomma och fann en frukt. Du sökte en källa och fann ett hav. Du sökte en kvinna och fann en själ - du är besviken.", Author = "Edith Södergran" },
+            new Quote { Id = "https://sv.wikiquote.org/wiki/Edith_Södergran", Text = "När natten kommer står jag på trappan och lyssnar, stjärnorna svärma i trädgården och jag står i mörkret. Hör, en stjärna föll med en klang! Gå icke ut i gräset med bara fötter; min trädgård är full av skärvor.", Author = "Edith Södergran" },
             new Quote { Id = "https://sv.wikiquote.org/wiki/Edith_Södergran", Text = "Jag längtar till landet som icke är, ty allting som är, är jag trött att begära.", Author = "Edith Södergran" },
             new Quote { Id = "https://sv.wikiquote.org/wiki/Edith_Södergran", Text = "Månen berättar mig i silverne runor om landet som icke är.", Author = "Edith Södergran" },
             new Quote { Id = "https://sv.wikiquote.org/wiki/Edith_Södergran", Text = "Landet, där all vår önskan blir underbart uppfylld, landet, där alla våra kedjor falla, landet, där vi svalka vår sargade panna i månens dagg.", Author = "Edith Södergran" },

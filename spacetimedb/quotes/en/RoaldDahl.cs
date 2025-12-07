@@ -15,6 +15,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Roald_Dahl", Text = "Ah, but they is not killing their own kind. Human beans is the only animals that is killing their own kind.", Author = "Roald Dahl" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Roald_Dahl", Text = "One right is not making two lefts.", Author = "Roald Dahl" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Roald_Dahl", Text = "It doesn't matter who you are or what you look like so long as somebody loves you.", Author = "Roald Dahl" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Roald_Dahl", Text = "All the things he was allowed to do were boring. All the things he was not allowed to do were exciting. One of the things he NEVER NEVER was allowed to do, the most exciting of them all, was to go out through the garden gate all by himself and explore the world beyond.", Author = "Roald Dahl" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Roald_Dahl", Text = "And above all, watch with glittering eyes the whole world around you because the greatest secrets are always hidden in the most unlikely places. Those who don't believe in magic will never find it.", Author = "Roald Dahl" },
         };
     }

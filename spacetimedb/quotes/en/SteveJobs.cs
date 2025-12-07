@@ -30,6 +30,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "To design something really well you have to get it. You have to really grok what it’s all about.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "Creativity is just connecting things.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "And the reason they were able to do that was that they've had more experiences or they have thought more about their experiences than other people.", Author = "Steve Jobs" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "I was worth about over a million dollars when I was twenty-three and over ten million dollars when I was twenty-four, and over a hundred million dollars when I was twenty-five and it wasn't that important because I never did it for the money.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "The only problem with Microsoft is they just have no taste.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "We have always been shameless about stealing great ideas.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "We hire people to tell us what to do.", Author = "Steve Jobs" },

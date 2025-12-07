@@ -8,6 +8,7 @@ public static partial class SpanishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
+            new Quote { Id = "https://es.wikiquote.org/wiki/Rosario_Castellanos", Text = "El arte tiene, ante todo, el deber de ser arte. Como fenómeno social que es, puede teñirse de propaganda política, religiosa, etc., pero esta propaganda no será de ninguna manera eficaz si no se subordina a las exigencias estéticas.", Author = "Rosario Castellanos" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Rosario_Castellanos", Text = "El hombre es un animal de soledades.", Author = "Rosario Castellanos" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Rosario_Castellanos", Text = "La despedida es lo único que sabemos del cielo. Y no necesitamos nada más del infierno.", Author = "Rosario Castellanos" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Rosario_Castellanos", Text = "No es que el poeta busque la soledad, es que la encuentra.", Author = "Rosario Castellanos" },

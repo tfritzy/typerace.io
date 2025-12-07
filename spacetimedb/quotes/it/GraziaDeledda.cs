@@ -8,6 +8,7 @@ public static partial class ItalianQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
+            new Quote { Id = "https://it.wikiquote.org/wiki/Grazia_Deledda", Text = "Mutiamo tutti, da un giorno all'altro, per lente e inconsapevoli evoluzioni, vinti da quella legge ineluttabile del tempo che oggi finisce di cancellare ciò che ieri aveva scritto nelle misteriose tavole del cuore umano.", Author = "Grazia Deledda" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Grazia_Deledda", Text = "Possibile che non si possa vivere senza far male agli innocenti?", Author = "Grazia Deledda" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Grazia_Deledda", Text = "Tutti siamo impastati di bene e di male, ma quest'ultimo bisogna vincerlo, Antonio. L'acciaio che è l'acciaio viene temprato e ridotto a spada, da chi vuol vincere il nemico.", Author = "Grazia Deledda" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Grazia_Deledda", Text = "Adattarsi bisogna. Guarda tu l'acqua: perché dicono che è saggia? perché prende la forma del vaso ove la si versa.", Author = "Grazia Deledda" },

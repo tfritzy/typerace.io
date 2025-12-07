@@ -17,6 +17,7 @@ public static partial class PortugueseQuotes
             new Quote { Id = "https://pt.wikiquote.org/wiki/Álvares_de_Azevedo", Text = "Sinto no meu coração uma\nnecessidade de amar, de dar a\numa criatura este amor que me bate no\npeito. Mas ainda não encontrei uma\nmulher - uma só - por quem eu pudesse\nbater de amores.", Author = "Álvares de Azevedo" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Álvares_de_Azevedo", Text = "Descansem o meu leito solitário\nNa floresta dos homens esquecida,\nÀ sombra de uma cruz e escrevam nela:\n- Foi poeta, sonhou e amou na vida", Author = "Álvares de Azevedo" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Álvares_de_Azevedo", Text = "Todo o vaporoso da visão abstrata não interessa tanto como a realidade da bela mulher a quem amamos.", Author = "Álvares de Azevedo" },
+            new Quote { Id = "https://pt.wikiquote.org/wiki/Álvares_de_Azevedo", Text = "É difícil marcar o lugar\nonde pára o homem e começa o animal, onde cessa a alma e começa o instinto - onde\na paixão se torna ferocidade. É difícil marcar onde deve parar o galope do\nsangue nas artérias, e a violência da dor no crânio.", Author = "Álvares de Azevedo" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Álvares_de_Azevedo", Text = "As volúpias da noite descoraram-te, a fronte enfebrecida.", Author = "Álvares de Azevedo" },
         };
     }

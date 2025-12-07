@@ -9,6 +9,7 @@ public static partial class PolishQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://pl.wikiquote.org/wiki/Wisława_Szymborska", Text = "Natchnienie, czymkolwiek ono jest, rodzi się z bezustannego ''nie wiem''.", Author = "Wisława Szymborska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Wisława_Szymborska", Text = "W języku poezji, gdzie każde słowo się waży, nic już zwyczajne i normalne nie jest. Żaden kamień i żadna nad nim chmura. Żaden dzień i żadna po nim noc. A nade wszystko żadne niczyje na tym świecie istnienie.", Author = "Wisława Szymborska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Wisława_Szymborska", Text = "Wszelka wiedza, która nie wyłania z siebie nowych pytań, staje się w szybkim czasie martwa.", Author = "Wisława Szymborska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Wisława_Szymborska", Text = "Wygląda na to, że poeci będą mieli zawsze dużo roboty.", Author = "Wisława Szymborska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Wisława_Szymborska", Text = "Sprawiasz wrażenie ducha, który próbuje wywołać żywych.", Author = "Wisława Szymborska" },
@@ -32,6 +33,7 @@ public static partial class PolishQuotes
             new Quote { Id = "https://pl.wikiquote.org/wiki/Wisława_Szymborska", Text = "Musi być do wyboru, Zmieniać się, żeby tylko nic się nie zmieniło.", Author = "Wisława Szymborska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Wisława_Szymborska", Text = "Nie znam roli, która gram, Wiem tylko, że jest moja, niewymienna", Author = "Wisława Szymborska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Wisława_Szymborska", Text = "Samokrytyczny szakal nie istnieje. Szarańcza, aligator, trychina i giez żyją jak żyją i rade są z tego.", Author = "Wisława Szymborska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Wisława_Szymborska", Text = "Czas własną głowę w ręce brać mówiąc jej: Biedny Yorik, gdzież twoja niewiedza, gdzież twoja ślepa ufność, gdzież twoja niewinność twoje jakoś to będzie, równowaga ducha pomiędzy niesprawdzoną a sprawdzoną prawdą?", Author = "Wisława Szymborska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Wisława_Szymborska", Text = "Nic dwa razy się nie zdarza i nie zdarzy. Z tej przyczyny zrodziliśmy się bez wprawy i pomrzemy bez rutyny.", Author = "Wisława Szymborska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Wisława_Szymborska", Text = "Tyle wiemy o sobie, ile nas sprawdzono. Mówię to wam ze swego nieznanego serca.", Author = "Wisława Szymborska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Wisława_Szymborska", Text = "Czytamy listy umarłych jak bezradni bogowie, ale jednak bogowie, bo znamy późniejsze daty.", Author = "Wisława Szymborska" },

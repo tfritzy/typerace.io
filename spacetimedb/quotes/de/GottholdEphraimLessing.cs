@@ -43,6 +43,7 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Kein Mensch muss müssen.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Macht denn nur das Blut den Vater?", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Nicht die Kinder bloß speist man mit Märchen ab.", Author = "Gotthold Ephraim Lessing" },
+            new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Und ist denn nicht das ganze Christentum aufs Judentum gebaut? Es hat mich oft geärgert, hat mich Tränen genug gekostet, wenn Christen gar so sehr vergessen konnten, dass unser Herr ja selbst ein Jude war.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Was hätt' ein Weiberkopf erdacht, das er nicht zu beschönen wüsste.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Der Wille und nicht die Gabe macht den Geber.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Es eifre jeder seiner unbestochnen von Vorurteilen freien Liebe nach!", Author = "Gotthold Ephraim Lessing" },

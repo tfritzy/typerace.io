@@ -10,6 +10,7 @@ public static partial class PortugueseQuotes
         .Concat(AlexandreHerculano.Quotes)
         .Concat(AlmeidaGarrett.Quotes)
         .Concat(AlphonsusdeGuimaraens.Quotes)
+        .Concat(AluísioAzevedo.Quotes)
         .Concat(AnterodeQuental.Quotes)
         .Concat(AntónioLoboAntunes.Quotes)
         .Concat(AquilinoRibeiro.Quotes)

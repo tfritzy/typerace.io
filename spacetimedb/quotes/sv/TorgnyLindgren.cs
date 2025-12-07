@@ -8,6 +8,7 @@ public static partial class SwedishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
+            new Quote { Id = "https://sv.wikiquote.org/wiki/Torgny_Lindgren", Text = "Du ska hedra din moder, annars ska det gå åt helvete för dig! Och godheten är icke en blandning av det ena och det andra, det goda är gott i sig själv och gott till sina verkningar! Om du säger något annat ska jag slå dig med det här cykelstyret så att du lär dig!", Author = "Torgny Lindgren" },
             new Quote { Id = "https://sv.wikiquote.org/wiki/Torgny_Lindgren", Text = "Borde man inte kunna begripa människorna, sade Linda? Jo, sade han. Det vore det allra bästa.", Author = "Torgny Lindgren" },
             new Quote { Id = "https://sv.wikiquote.org/wiki/Torgny_Lindgren", Text = "Om inte framtiden funnes, sade den fortfarande sjuke Lars Högström, då behövde vi inte ängslas så mycket.", Author = "Torgny Lindgren" },
             new Quote { Id = "https://sv.wikiquote.org/wiki/Torgny_Lindgren", Text = "Strängt taget, sade musikhandlaren, är det väl ingen skillnad mellan pölsan och räntan, om man bortser från korngrynen. Korngrynen? Ja. Pölsan innehåller alltid korngryn.", Author = "Torgny Lindgren" },

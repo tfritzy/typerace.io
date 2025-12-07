@@ -9,6 +9,7 @@ public static partial class ItalianQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Amar chi t'odia, ell'è impossibil cosa.", Author = "Vittorio Alfieri" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Io dico, e credo, e facile mi sarebbe il provare; che il libro è e deve essere la quintessenza del suo scrittore e che se non è tale, egli sarà cattivo, debole, volgare, di poca vita e di effetto nessuno.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Non perdo mai occasione d'imparare a morire; il più gran timor ch'io abbia della morte è di temerla.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Ove son leggi | tremar non dee chi leggi non infranse.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Quando parla di sé ciascun mentisce.", Author = "Vittorio Alfieri" },
@@ -24,6 +25,7 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "In me pietà ti offende, | quando la tua mi è vita?", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Alta [[vendetta]], | d'alto silenzio è figlia.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Il voler tutto a un tempo, a un tempo spesso | fea perder tutto.", Author = "Vittorio Alfieri" },
+            new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Gli odj di una [[Nazione]] contro l'altra, essendo stati pur sempre, né altro potendo essere che il necessario frutto dei danni vicendevolmente ricevuti, o temuti; non possono perciò esser mai, né ingiusti, né vili.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Schiavi or siamo, sì; ma schiavi almen frementi.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Ahi fiacca [[Italia]], d'indolenza ostello, | Cui niegan corpo i membri troppi e sparti, | Sorda e muta ti stai ritrosa al bello?", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Spesso è da forte, | più che il [[vita e morte|morire]], il [[vita e morte|vivere]].", Author = "Vittorio Alfieri" },

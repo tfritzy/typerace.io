@@ -17,6 +17,7 @@ public static partial class PolishQuotes
             new Quote { Id = "https://pl.wikiquote.org/wiki/Mikołaj_Rej", Text = "Dobra żona jest dar Boży. Ona szczęście domu mnoży.", Author = "Mikołaj Rej" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Mikołaj_Rej", Text = "Gniew zamyka w sobie wszystkie grzechy śmiertelne.", Author = "Mikołaj Rej" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Mikołaj_Rej", Text = "Jaka robota, taka zapłata.", Author = "Mikołaj Rej" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Mikołaj_Rej", Text = "Jeśli umiesz czytać, azaż to nie roskosz czas sobie upatrzywszy, nad książkami posiedzieć, prawa i powinności się swej dowiedzieć. Nie trzeba będzie wielkiego nakładu: zbiegasz wszystek świat lekkim kosztem, tuż na miejscu siedząc, tak jakobyś tam wszędzie oczewiście był a jakobyś wszystko widział.", Author = "Mikołaj Rej" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Mikołaj_Rej", Text = "Jeśliże swego pięknie nie poszlachcisz gniazda, Tedy pewnie zagaśniesz jak przy słońcu gwiazda.", Author = "Mikołaj Rej" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Mikołaj_Rej", Text = "Już ci kto milczy, toć znać, iż przyzwala.", Author = "Mikołaj Rej" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Mikołaj_Rej", Text = "Kiedy niecnota jaka ruszy ciebie, Nie maszli kogo, zawstydź się sam siebie.", Author = "Mikołaj Rej" },

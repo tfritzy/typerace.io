@@ -13,6 +13,7 @@ public static partial class RussianQuotes
         .Concat(АфанасийФет.Quotes)
         .Concat(БорисАкунин.Quotes)
         .Concat(ВалентинРаспутин.Quotes)
+        .Concat(ВелимирХлебников.Quotes)
         .Concat(ВикторАстафьев.Quotes)
         .Concat(ВикторШкловский.Quotes)
         .Concat(ВладимирМаяковский.Quotes)

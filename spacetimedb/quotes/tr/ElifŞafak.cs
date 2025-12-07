@@ -9,6 +9,7 @@ public static partial class TurkishQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://tr.wikiquote.org/wiki/Elif_Şafak", Text = "Katillerimin yüzlerini seçemiyorum; isimlerindense geride harfler kalacak sadece.", Author = "Elif Şafak" },
+            new Quote { Id = "https://tr.wikiquote.org/wiki/Elif_Şafak", Text = "Binlerce kelime, onlarca hikâye var boğazımda düğümlenmiş. Susuyorum konuşmam gereken yerlerde; dilimi tutamıyorum ne zaman susmam gerekse. Anlatacak çok şeyim olsa da, emin değilim anlaşılmak istediğimden.", Author = "Elif Şafak" },
             new Quote { Id = "https://tr.wikiquote.org/wiki/Elif_Şafak", Text = "Derler ki, aşk da unutulurmuş her şey gibi. Hem de yaşanıp bittikten, soğuyup küllendikten sonra değil, tam da dolu dizgin devam ederken unutulurmuş aşk.", Author = "Elif Şafak" },
             new Quote { Id = "https://tr.wikiquote.org/wiki/Elif_Şafak", Text = "Elmas bir gözdür yürek. Ve çizilmeye görsün bir kere, artık hep sedefsi bir yırtıkla bakacaktır cümle aleme", Author = "Elif Şafak" },
             new Quote { Id = "https://tr.wikiquote.org/wiki/Elif_Şafak", Text = "Yabancı, isminin bir ya da birçok bölümü gölgede kalan insandır.", Author = "Elif Şafak" },

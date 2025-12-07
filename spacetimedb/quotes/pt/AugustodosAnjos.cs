@@ -18,6 +18,7 @@ public static partial class PortugueseQuotes
             new Quote { Id = "https://pt.wikiquote.org/wiki/Augusto_dos_Anjos", Text = "Se a alguém causa inda pena a tua chaga, Apedreja esta mão vil que te afaga, Escarra nesta boca que te beija!", Author = "Augusto dos Anjos" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Augusto_dos_Anjos", Text = "Eu, eu faço filho do carbono e amôniaco, Monstro da Escuridão e rutilância, Sofro, desde a epigênese da infância, a influência má dos signos do zodíaco.", Author = "Augusto dos Anjos" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Augusto_dos_Anjos", Text = "Profundissimamente hipocondríaco, este ambiente me causa repugnância... Sobe-me à boca uma ânsia análoga à ânsia que se escapa da boca de um cardíaco.", Author = "Augusto dos Anjos" },
+            new Quote { Id = "https://pt.wikiquote.org/wiki/Augusto_dos_Anjos", Text = "Já o verme - este Operário das Ruinas - Que o sangue podre das carnificinas Come, e à vida em Geral declara guerra, Anda a espreitar Meus Olhos para ROê-los, há de deixar-me apenas Cabelos, Na frialdade inorgânica da terra!", Author = "Augusto dos Anjos" },
         };
     }
 }

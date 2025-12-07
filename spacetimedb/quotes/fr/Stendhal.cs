@@ -8,6 +8,7 @@ public static partial class FrenchQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Stendhal", Text = "On voit que c'est nous qui fûmes les barbares à l'égard de l'Orient, quand nous allâmes le troubler par nos croisades. Aussi devons-nous ce qu'il y a de noble dans nos mœurs à ces croisades et aux Maures d'Espagne.", Author = "Stendhal" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Stendhal", Text = "Je n'ai jamais eu le talent de séduire qu'envers les femmes que je n'aimais pas du tout. Dès que j'aime, je deviens timide et vous pouvez en juger par le décontenancement dont je suis auprès de vous.", Author = "Stendhal" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Stendhal", Text = "Les vraies passions sont égoïstes.", Author = "Stendhal" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Stendhal", Text = "Qui s’excuse s’accuse.", Author = "Stendhal" },

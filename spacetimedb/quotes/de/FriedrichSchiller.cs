@@ -109,6 +109,7 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Uns aber treibt das verworrene Streben Blind und sinnlos durchs wüste Leben.", Author = "Friedrich Schiller" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Schaamhafte Demuth ist der Reize Krone,", Author = "Friedrich Schiller" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "allzustraff gespannt zerspringt der Bogen.", Author = "Friedrich Schiller" },
+            new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "An’s Vaterland, an’s theure, schließ dich an, Das halte fest mit deinem ganzen Herzen. Hier sind die starken Wurzeln deiner Kraft, Dort in der fremden Welt stehst du allein, Ein schwankes Rohr, das jeder Sturm zerknickt.", Author = "Friedrich Schiller" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Auf dieser Bank von Stein will ich mich setzen", Author = "Friedrich Schiller" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Da Es ras’t der See und will sein Opfer haben.", Author = "Friedrich Schiller" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Das Alte stürzt, es ändert sich die Zeit, Und neues Leben blüht aus den Ruinen.", Author = "Friedrich Schiller" },
@@ -138,6 +139,7 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "in gährend Drachendgift hast du Die Milch der frommen Denkart mir verwandelt,", Author = "Friedrich Schiller" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Mach deine Rechnung mit dem Himmel Vogt, Fort mußt du, deine Uhr ist abgelaufen.", Author = "Friedrich Schiller" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Mir fehlt der Arm, wenn mir die Waffe fehlt.", Author = "Friedrich Schiller" },
+            new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Nein, eine Grenze hat Tyrannenmacht, Wenn der Gedrückte nirgends Recht kann finden, Wenn unerträglich wird die Last – greift er Hinauf getrosten Muthes in den Himmel, Und hohlt herunter seine ewgen Rechte, Die droben hangen unveräuserlich Und unzerbrechlich wie die Sterne selbst –", Author = "Friedrich Schiller" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Rache trägt keine Frucht! Sich selbst ist sie Die fürchterliche Nahrung", Author = "Friedrich Schiller" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Rasch tritt der Tod den Menschen an, Es ist ihm keine Frist gegeben, Es stürzt ihn mitten in der Bahn, Es reißt ihn fort vom vollen Leben,", Author = "Friedrich Schiller" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Redlichkeit gedeiht in jedem Stande.", Author = "Friedrich Schiller" },
@@ -231,6 +233,8 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "»Woran erkenn ich den besten Staat?« Woran du die beste Frau kennst; daran mein Freund, daß man von beiden nicht spricht.", Author = "Friedrich Schiller" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Zwischen Sinnenglück und Seelenfrieden Bleibt dem Menschen nur die bange Wahl.", Author = "Friedrich Schiller" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Anmut ist eine bewegliche Schönheit.", Author = "Friedrich Schiller" },
+            new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Billig erwartest Du, daß ich Dir meine Schiksale unter fremdem Himmel mittheile, denn mein Leben hat ohnehin die Farbe eines Romans, und mein sonderbarer Kopf läßt freilich auf sonderbare Situazionen schließen – aber für Briefe ist dieses Thema zu weitläuftig, und vielleicht auch zu gefärlich.", Author = "Friedrich Schiller" },
+            new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Schiller", Text = "Das erste Gesetz des guten Tones ists: Schone fremde Freiheit. Das zweyte: zeige selbst Freiheit. Die pünktliche Erfüllung beider ist ein unendlich schweres Problem, aber der gute Ton fodert sie unerlaßlich, und sie macht allein den vollendeten Weltmann.", Author = "Friedrich Schiller" },
         };
     }
 }
