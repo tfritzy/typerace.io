@@ -12,7 +12,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "Dios mío, Dios mío. La muerte tampoco es mi tipo y no obstante muchas veces me atrae.", Author = "Ernesto Sabato" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "El arte puede llegar donde no llega la lógica.", Author = "Ernesto Sabato" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "En la bondad se encierran todos los géneros de sabiduría.", Author = "Ernesto Sabato" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "Es curioso, pero vivir consiste en construir futuros recuerdos; ahora mismo, aquí frente al mar, sé que estoy preparando recuerdos minuciosos, que alguna vez me traerán la melancolía y la desesperanza.", Author = "Ernesto Sabato" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "Hay una manera de contribuir a la protección de la humanidad, y es no resignarse.", Author = "Ernesto Sabato" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "La vanidad es tan fantástica que hasta nos induce a preocuparnos de lo que pensarán de nosotros una vez muertos y enterrados.", Author = "Ernesto Sabato" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "La vida es tan corta y el oficio de vivir tan difícil, que cuando uno empieza a aprenderlo ya hay que morirse.", Author = "Ernesto Sabato" },

@@ -10,7 +10,6 @@ public static partial class GermanQuotes
         {
             new Quote { Id = "https://de.wikiquote.org/wiki/Clemens_Brentano", Text = "Ach nur in dem Abgrund des Todes ist Ruh.", Author = "Clemens Brentano" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Clemens_Brentano", Text = "Der Mensch ist auf Erden sich zu bilden und dann wieder die Welt.", Author = "Clemens Brentano" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Clemens_Brentano", Text = "Der Sinn des Menschen strebet immer nach dem Unbegreiflichen, als sei dort das Ziel der Laufbahn und der Schlüssel des Himmels; denn bewundern kann der Mensch allein, und alles Erregende ist ein Bote Gottes, [...]", Author = "Clemens Brentano" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Clemens_Brentano", Text = "Die Töne sind ein wunderbarer lebender Atem der Dunkelheit.", Author = "Clemens Brentano" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Clemens_Brentano", Text = "Die wohlaprobirte Gouvernante hatte die verkindete Hochzeitsgesellschaft von Gockelsruh nach der Eierburg bei Gelnhausen geführt und dort aus ihnen eine Kleinkinderbewahranstalt gebildet.", Author = "Clemens Brentano" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Clemens_Brentano", Text = "O Stern und Blume, Geist und Kleid, Lieb', Leid und Zeit und Ewigkeit!", Author = "Clemens Brentano" },

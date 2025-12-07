@@ -9,7 +9,6 @@ public static partial class ItalianQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Amar chi t'odia, ell'è impossibil cosa.", Author = "Vittorio Alfieri" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Io dico, e credo, e facile mi sarebbe il provare; che il libro è e deve essere la quintessenza del suo scrittore e che se non è tale, egli sarà cattivo, debole, volgare, di poca vita e di effetto nessuno.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Non perdo mai occasione d'imparare a morire; il più gran timor ch'io abbia della morte è di temerla.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Ove son leggi | tremar non dee chi leggi non infranse.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Quando parla di sé ciascun mentisce.", Author = "Vittorio Alfieri" },
@@ -21,12 +20,10 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "La forza governa il mondo, (pur troppo!) e non il sapere: perciò chi lo regge, può e suole essere ignorante.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "[[Lettura|Leggere]], come io l'intendo, vuol dire profondamente pensare.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "La ragione ed il vero sono quei tali conquistatori, che, per vincere e conquistare durevolmente, nessun'altra arme debbono adoperare, che le semplici parole.", Author = "Vittorio Alfieri" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "[[Tirannide]] indistintamente appellare si debbe ogni qualunque governo in cui chi è preposto alla esecuzion delle leggi può farle, distruggerle, infrangerle, interpretarle, impedirle, sospenderle od anche soltanto deluderle, con sicurezza d'impunità.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Dalla [[paura]] di tutti nasce nella tirannide la viltà dei più.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "In me pietà ti offende, | quando la tua mi è vita?", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Alta [[vendetta]], | d'alto silenzio è figlia.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Il voler tutto a un tempo, a un tempo spesso | fea perder tutto.", Author = "Vittorio Alfieri" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Gli odj di una [[Nazione]] contro l'altra, essendo stati pur sempre, né altro potendo essere che il necessario frutto dei danni vicendevolmente ricevuti, o temuti; non possono perciò esser mai, né ingiusti, né vili.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Schiavi or siamo, sì; ma schiavi almen frementi.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Ahi fiacca [[Italia]], d'indolenza ostello, | Cui niegan corpo i membri troppi e sparti, | Sorda e muta ti stai ritrosa al bello?", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Spesso è da forte, | più che il [[vita e morte|morire]], il [[vita e morte|vivere]].", Author = "Vittorio Alfieri" },
@@ -51,7 +48,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Ella ha ben denti, ed ugne, e saette, e feroce brevità, quanto e più ch'altra lingua mai l'abbia, o le avesse.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "L'aver con chi piangere menoma il [[pianto]] d'assai.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Il personaggio [[Romanticismo|romantico]] è l'animo umano mostrato nella complessità, nella sua varietà, nelle sue alternative, nelle sue contradizioni, nella sua dipendenza dal mondo che lo circonda.", Author = "Vittorio Alfieri" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Il rimproverare all'Alfieri quel difetto di realismo riproduttivo nelle sue tragedie, sarebbe proprio come rimproverare a [[Michelangelo Buonarroti|Michelangelo]] di non aver messo la sua Notte a dormire in un letto con le pantofole in terra e la candela accanto.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "L'uomo dell'Alfieri non è l'uomo semiromantico, oscillante e complesso, della tragedia francese, e tanto più dista dall'uomo romantico.", Author = "Vittorio Alfieri" },
         };
     }

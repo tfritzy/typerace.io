@@ -8,7 +8,6 @@ public static partial class FrenchQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Charles_Baudelaire", Text = "Le vin est semblable à l'homme : on ne saura jamais jusqu'à quel point on peut l'estimer et le mépriser, l'aimer et le haïr, ni de combien d'actions sublimes ou de forfaits monstrueux il est capable. Ne soyons donc pas plus cruels envers lui qu'envers nous-mêmes, et traitons-le comme notre égal.", Author = "Charles Baudelaire" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Charles_Baudelaire", Text = "S'il existait un gouvernement qui eût intérêt à corrompre ses gouvernés, il n'aurait qu'à encourager l'usage du hachisch.", Author = "Charles Baudelaire" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Charles_Baudelaire", Text = "Hypocrite lecteur, — mon semblable, — mon frère !", Author = "Charles Baudelaire" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Charles_Baudelaire", Text = "Homme libre, toujours tu chériras la mer.", Author = "Charles Baudelaire" },
@@ -31,7 +30,6 @@ public static partial class FrenchQuotes
             new Quote { Id = "https://fr.wikiquote.org/wiki/Charles_Baudelaire", Text = "Ce qu'il y a d'enivrant dans le mauvais goût, c'est le plaisir aristocratique de déplaire.", Author = "Charles Baudelaire" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Charles_Baudelaire", Text = "La modernité, c'est le transitoire, le fugitif, le contingent, la moitié de l'art, dont l'autre moitié est l'éternel et l'immuable.", Author = "Charles Baudelaire" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Charles_Baudelaire", Text = "La passion frénétique de l'art est un chancre qui dévore le reste.", Author = "Charles Baudelaire" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Charles_Baudelaire", Text = "Parmi l'énumération nombreuse des droits de l'homme que la sagesse du XIXe siècle recommence si souvent et si complaisamment, deux assez importants ont été oubliés, qui sont le droit de se contredire et le droit de s'en aller.", Author = "Charles Baudelaire" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Charles_Baudelaire", Text = "La plus belle des ruses du diable est de vous persuader qu'il n'existe pas.", Author = "Charles Baudelaire" },
         };
     }

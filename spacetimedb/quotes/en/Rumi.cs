@@ -17,7 +17,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "Reason is the shadow cast by God; God is the sun.", Author = "Rumi" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "Everyone sees the unseen in proportion to the clarity of his heart, and that depends upon how much he has polished it.", Author = "Rumi" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "I died as a mineral and became a plant, I died as plant and rose to animal, I died as animal and I was Man. Why should I fear? When was I less by dying?", Author = "Rumi" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "Come, come, whoever you are. Wanderer, worshipper, lover of leaving — it doesn't matter, Ours is not a caravan of despair. Come, even if you have broken your vow a hundred times, Come, come again, come.", Author = "Rumi" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "There is no other world. I only know what I've experienced. You must be hallucinating.", Author = "Rumi" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "Everyone has been made for some particular work, and the desire for that work has been put in every heart.", Author = "Rumi" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "The fault is in the one who blames. Spirit sees nothing to criticize.", Author = "Rumi" },

@@ -27,7 +27,6 @@ public static partial class ChineseQuotes
             new Quote { Id = "https://zh.wikiquote.org/wiki/孟子", Text = "人之患，在好為人師。", Author = "孟子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/孟子", Text = "夫人必自侮，然後人侮之；家必自毀，而後人毀之；國必自伐，而後人伐之。《太甲》曰：『天作孽，猶可違；自作孽，不可活』，此之謂也。", Author = "孟子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/孟子", Text = "三代之得天下也以仁，其失天下也以不仁。國之所以廢興存亡者亦然。天子不仁，不保四海；諸侯不仁，不保社稷；卿大夫不仁，不保宗廟；士庶人不仁，不保四體。今惡死亡而樂不仁，是猶惡醉而強酒。", Author = "孟子" },
-            new Quote { Id = "https://zh.wikiquote.org/wiki/孟子", Text = "孟子曰：「桀紂之失天下也，失其民也；失其民者，失其心也。得天下有道：得其民，斯得天下矣；得其民有道：得其心，斯得民矣；得其心有道：所欲與之聚之，所惡勿施爾也。民之歸仁也，猶水之就下、獸之走壙也。故為淵敺魚者，獺也；為叢敺爵者，鸇也；為湯武敺民者，桀與紂也。今天下之君有好仁者，則諸侯皆為之敺矣。雖欲無王，不可得已。今之欲王者，猶七年之病求三年之艾也。苟為不畜，終身不得。苟不志於仁，終身憂辱，以陷於死亡。《詩》云『其何能淑，載胥及溺』，此之謂也。」", Author = "孟子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/孟子", Text = "居下位而不獲於上，民不可得而治也。獲於上有道：不信於友，弗獲於上矣；信於友有道：事親弗悅，弗信於友矣；悅親有道：反身不誠，不悅於親矣；誠身有道：不明乎善，不誠其身矣。是故誠者，天之道也；思誠者，人之道也。至誠而不動者，未之有也；不誠，未有能動者也。", Author = "孟子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/孟子", Text = "恭者不侮人，儉者不奪人。侮奪人之君，惟恐不順焉，惡得為恭儉？恭儉豈可以聲音笑貌為哉？", Author = "孟子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/孟子", Text = "不孝有三，無後為大。舜不告而娶，為無後也，君子以為猶告也。", Author = "孟子" },

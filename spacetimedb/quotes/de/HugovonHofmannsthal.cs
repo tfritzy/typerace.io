@@ -10,7 +10,6 @@ public static partial class GermanQuotes
         {
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "die abstrakten Worte, deren sich doch die Zunge naturgemäß bedienen muß, um irgendwelches Urtheil an den Tag zu geben, zerfielen mir im Munde wie modrige Pilze.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Es ist mir völlig die Fähigkeit abhanden gekommen, über irgend etwas zusammenhängend zu denken oder zu sprechen.", Author = "Hugo von Hofmannsthal" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Es zerfiel mir alles in Teile, die Teile wieder in Teile, und nichts mehr ließ sich mit einem Begriff umspannen. Die einzelnen Worte schwammen um mich; sie gerannen zu Augen, die mich anstarrten und in die ich wieder hineinstarren muß: Wirbel sind sie, in die hinabzusehen mich schwindelt, die sich unaufhaltsam drehen und durch die hindurch man ins Leere kommt.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Was ist der Mensch, daß er Pläne macht!", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Die Zeit, die ist ein sonderbares Ding.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Leicht muß man sein: // mit leichtem Herz und leichten Händen, // halten und nehmen, halten und lassen...", Author = "Hugo von Hofmannsthal" },
@@ -24,7 +23,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Der Mensch wird in der Welt nur das gewahr, was schon in ihm liegt; aber er braucht die Welt, um gewahr zu werden, was in ihm liegt; dazu aber sind Tätigkeit und Leiden nötig.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Die gefährlichste Sorte von Dummheit ist ein scharfer Verstand.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Die Tiefe muß man verstecken. Wo? An der Oberfläche.", Author = "Hugo von Hofmannsthal" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Ein gewöhnlicher Verstand ist wie ein schlechter Jagdhund, der die Fährte eines Gedankens schnell annimmt und schnell wieder verliert; ein außerordentlicher Verstand ist wie ein Leithund, der unbeirrbar fest auf der Fährte bleibt, bis er das Lebendige ereilt hat.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Es gibt eine Stille des Herbstes bis in die Farben hinein.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Es ist ein entscheidender Unterschied, ob Menschen sich zu anderen als Zuschauer verhalten können, oder ob sie immer Mitleidende, Mitfreudige, Mitschuldige sind: diese sind die eigentlich Lebenden.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Malerei verwandelt den Raum in Zeit, Musik die Zeit in Raum.", Author = "Hugo von Hofmannsthal" },
@@ -40,7 +38,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Ein Augenblick ist wenig - ein Blick ist viel.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Und dennoch sagt der viel, der »Abend« sagt, // Ein Wort, daraus Tiefsinn und Trauer rinnt // Wie schwerer Honig aus den hohlen Waben.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Wer hieß dich mich zerren, mich! in diese Welt hinein? Laß mich erfrieren, verhungern, versteinen in der meinigen!", Author = "Hugo von Hofmannsthal" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Wollen wir uns finden, so dürfen wir nicht in unser Inneres hinabsteigen: draußen sind wir zu finden, draußen. Wie der wesenlose Regenbogen spannt sich unsere Seele über den unaufhaltsamen Sturz des Daseins. Wir besitzen unser Selbst nicht: von außen weht es uns an, es flieht uns für lange und kehrt uns in einem Hauch zurück.", Author = "Hugo von Hofmannsthal" },
         };
     }
 }

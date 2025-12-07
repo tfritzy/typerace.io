@@ -9,7 +9,6 @@ public static partial class EnglishQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/Emily_Dickinson", Text = "My friends are my \"estate.\" Forgive me then the avarice to hoard them.", Author = "Emily Dickinson" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Emily_Dickinson", Text = "If I read a book and it makes my whole body so cold no fire can ever warm me, I know that is poetry. If I feel physically as if the top of my head were taken off, I know that is poetry. These are the only ways I know it. Is there any other way?", Author = "Emily Dickinson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Emily_Dickinson", Text = "To live is so startling, it leaves but little room for other occupations.", Author = "Emily Dickinson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Emily_Dickinson", Text = "We turn not older with years, but newer every day.", Author = "Emily Dickinson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Emily_Dickinson", Text = "Success is counted sweetest By those who ne'er succeed. To comprehend a nectar Requires a sorest need.", Author = "Emily Dickinson" },
@@ -37,7 +36,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Emily_Dickinson", Text = "If Aims impel these Astral Ones The ones allowed to know Know that which makes them as forgot As Dawn forgets them — now", Author = "Emily Dickinson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Emily_Dickinson", Text = "Who has not found the Heaven — below — Will fail of it above —", Author = "Emily Dickinson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Emily_Dickinson", Text = "I took one Draught of Life — I'll tell you what I paid — Precisely an existence — The market price, they said.", Author = "Emily Dickinson" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Emily_Dickinson", Text = "Much madness is divinest sense To a discerning eye; Much sense the starkest madness. ’Tis the majority In this, as all, prevails. Assent, and you are sane; Demur,—you ’re straightway dangerous, And handled with a chain.", Author = "Emily Dickinson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Emily_Dickinson", Text = "Surgeons must be very careful When they take the knife! Underneath their fine incisions Stirs the culprit,—Life!", Author = "Emily Dickinson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Emily_Dickinson", Text = "I took my power in my hand And went against the world; ’Twas not so much as David had, But I was twice as bold.", Author = "Emily Dickinson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Emily_Dickinson", Text = "Mine enemy is growing old,— I have at last revenge. The palate of the hate departs; If any would avenge,—", Author = "Emily Dickinson" },

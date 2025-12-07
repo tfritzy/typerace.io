@@ -34,7 +34,6 @@ public static partial class SwedishQuotes
             new Quote { Id = "https://sv.wikiquote.org/wiki/Astrid_Lindgren", Text = "Hennes näsa hade samma fason som en mycket liten potatis, och den var alldeles prickig av fräknar.", Author = "Astrid Lindgren" },
             new Quote { Id = "https://sv.wikiquote.org/wiki/Astrid_Lindgren", Text = "På hennes långa, smala ben satt ett par långa strumpor, den ena brun och den andra svart.", Author = "Astrid Lindgren" },
             new Quote { Id = "https://sv.wikiquote.org/wiki/Astrid_Lindgren", Text = "Karibiska Havets Fasa, det ska bli du och jag, Tommy.", Author = "Astrid Lindgren" },
-            new Quote { Id = "https://sv.wikiquote.org/wiki/Astrid_Lindgren", Text = "Vi ska röva till oss guld och juveler och ädla stenar och ha ett gömställe för våra skatter långt inne i en grotta på en obebodd ö i Stilla oceanen och tre benrangel som ska vakta grottan, och vi ska ha en flagga med en dödskalle och två korslagda benknotor på, och vi ska sjunga \"Femton gastar\", så att det hörs från ena ändan av Atlanten till den andra, och alla sjöfarande ska bli alldeles bleka, när dom hör oss och fundera på att kasta sej i sjön för att undgå vår blodiga, blodiga hämnd!", Author = "Astrid Lindgren" },
             new Quote { Id = "https://sv.wikiquote.org/wiki/Astrid_Lindgren", Text = "Å, du kan följa med i alla fall", Author = "Astrid Lindgren" },
             new Quote { Id = "https://sv.wikiquote.org/wiki/Astrid_Lindgren", Text = "Och dammtorka på fortepianot!", Author = "Astrid Lindgren" },
         };

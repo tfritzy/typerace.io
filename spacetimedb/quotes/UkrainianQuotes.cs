@@ -1,36 +1,41 @@
 using System;
 using System.Linq;
-using static StdbModule.UkrainianQuotes;
 
 namespace StdbModule;
 
 public static partial class UkrainianQuotes
 {
     public static readonly Quote[] Quotes =
-        ТарасШевченко.Quotes
-        .Concat(ЛесяУкраїнка.Quotes)
-        .Concat(МихайлоКоцюбинський.Quotes)
-        .Concat(ГригорійСковорода.Quotes)
-        .Concat(МаркоВовчок.Quotes)
-        .Concat(ІванНечуйЛевицький.Quotes)
-        .Concat(ПанасМирний.Quotes)
-        .Concat(ВолодимирВинниченко.Quotes)
-        .Concat(ОльгаКобилянська.Quotes)
-        .Concat(ОлександрОлесь.Quotes)
-        .Concat(МиколаБажан.Quotes)
-        .Concat(ОстапВишня.Quotes)
-        .Concat(ЮрійЯновський.Quotes)
-        .Concat(МиколаХвильовий.Quotes)
-        .Concat(ВалерянПідмогильний.Quotes)
+        ЄвгенГуцало.Quotes
         .Concat(ІванБагряний.Quotes)
-        .Concat(УласСамчук.Quotes)
-        .Concat(БогданІгорАнтонич.Quotes)
-        .Concat(ВасильСимоненко.Quotes)
         .Concat(ІванДрач.Quotes)
-        .Concat(ЄвгенГуцало.Quotes)
+        .Concat(ІванНечуйЛевицький.Quotes)
+        .Concat(ІзидораКосач.Quotes)
+        .Concat(БогданІгорАнтонич.Quotes)
+        .Concat(ВалерянПідмогильний.Quotes)
+        .Concat(ВасильСимоненко.Quotes)
+        .Concat(ВасильСтус.Quotes)
+        .Concat(ВолодимирВинниченко.Quotes)
         .Concat(ВолодимирДрозд.Quotes)
+        .Concat(ГалинаТурелик.Quotes)
+        .Concat(ГригорійСковорода.Quotes)
+        .Concat(ЛесяУкраїнка.Quotes)
+        .Concat(МаркоВовчок.Quotes)
+        .Concat(МиколаЄвшан.Quotes)
+        .Concat(МиколаБажан.Quotes)
+        .Concat(МиколаЗеров.Quotes)
+        .Concat(МиколаХвильовий.Quotes)
+        .Concat(МихайлоКоцюбинський.Quotes)
+        .Concat(ОксанаЗабужко.Quotes)
+        .Concat(ОлександрОлесь.Quotes)
         .Concat(ОлесьГончар.Quotes)
-        .Concat(ЮрійАндрухович.Quotes)
+        .Concat(ОльгаКобилянська.Quotes)
+        .Concat(ОстапВишня.Quotes)
+        .Concat(ПанасМирний.Quotes)
         .Concat(ТарасПрохасько.Quotes)
+        .Concat(ТарасШевченко.Quotes)
+        .Concat(УласСамчук.Quotes)
+        .Concat(ЮрійАндрухович.Quotes)
+        .Concat(ЮрійЯновський.Quotes)
         .ToArray();
 }

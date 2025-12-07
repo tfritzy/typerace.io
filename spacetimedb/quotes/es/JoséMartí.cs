@@ -31,8 +31,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Martí", Text = "Trincheras de ideas valen más que trincheras de piedra.", Author = "José Martí" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Martí", Text = "Un grano de poesía basta para perfumar todo un siglo.", Author = "José Martí" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Martí", Text = "Vale más un minuto de pie que una vida de rodillas.", Author = "José Martí" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/José_Martí", Text = "El gobierno ha de nacer del país. El espíritu del gobierno ha de ser el del país. La forma del gobierno ha de avenirse a la constitución propia del país. El gobierno no es más que el equilibrio de los elementos naturales del país.", Author = "José Martí" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/José_Martí", Text = "Raro don, don excelso es la justicia. Todo hombre tiene un poco de león, y quiere para sí en la vida la parte del león. Se queja de la opresión ajena; pero apenas puede oprimir, oprime. Clama contra el monopolio ajeno; pero apenas puede monopolizar, monopoliza: No en balde, cuando el libro de los hebreos quería dar nombre a un varón admirable lo llamaba \"un justo\".", Author = "José Martí" },
         };
     }
 }

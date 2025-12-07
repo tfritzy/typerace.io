@@ -53,7 +53,6 @@ public static partial class PolishQuotes
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Staff", Text = "Śmierć to samotność i wolność ostatnia.", Author = "Leopold Staff" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Staff", Text = "Śmierci tak potrzeba uczyć się jak życia.", Author = "Leopold Staff" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Staff", Text = "To, czego się nie widzi, istnieje przede wszystkim.", Author = "Leopold Staff" },
-            new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Staff", Text = "To jam powrozem biernym, który skuł ci Ramiona; pletnią, którą cię smagano; Cierniem, co skroń ci wieńczyła nim zbrodnia; Podaną tobie z octem gąbką żółci; Tą kością, którą o twą szatę grono; Krzyżem, na którym do dziś konasz co dnia.", Author = "Leopold Staff" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Staff", Text = "Waż każde słowo, jako kamień w ręce, Którym ugodzić masz w piersi słuchacza. Nie daj się porwać, a porywaj innych.", Author = "Leopold Staff" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Staff", Text = "Wolność nie jest ulgą lecz trudem wielkości.", Author = "Leopold Staff" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Staff", Text = "Woń jest konaniem kwiatów.", Author = "Leopold Staff" },

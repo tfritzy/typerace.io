@@ -9,7 +9,6 @@ public static partial class ItalianQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "avere una tradizione è meno che nulla, è soltanto cercandola che si può viverla.", Author = "Cesare Pavese" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Lo sai questo? [...] Per te la morte è una cosa che accade, come il giorno e la notte. Tu sei uno di noi, Issione. Tu sei tutto nel gesto che fai. Ma per loro, gli immortali, i tuoi gesti hanno un senso che si prolunga.", Author = "Cesare Pavese" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Quassù la legge non arriva, Nefele. Qui la legge è il nevaio, la bufera, la tenebra. E quando viene il giorno chiaro e tu ti accosti leggera alla rupe, è troppo bello per pensarci ancora.", Author = "Cesare Pavese" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Nessuno si uccide. La morte è destino. Non si può che augurarsela, Ippòloco.", Author = "Cesare Pavese" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Che degli dèi si parla troppo. Esser cieco non è una disgrazia diversa da esser vivo.", Author = "Cesare Pavese" },
@@ -30,7 +29,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Vuol dire che è dentro di te, cosa tua; più profondo del sangue, di là da ogni ebbrezza.", Author = "Cesare Pavese" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Non conosci la strada del sangue. Gli dèi non ti aggiungono né tolgono nulla. Solamente, d'un tocco leggero, t'inchiodano dove sei giunto.", Author = "Cesare Pavese" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Non c'è dei sopra il campo. C'è soltanto la terra, la Madre, la Grotta, che attende sempre e si riscuote soltanto sotto il fiotto di sangue.", Author = "Cesare Pavese" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Se una volta bastava un falò per far piovere, bruciarci sopra un vagabondo per salvare un raccolto, quante case di padroni bisogna incendiare, quanti ammazzarne per le strade e per le piazze, prima che il mondo torni giusto e noi si possa dir la nostra?", Author = "Cesare Pavese" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Sono ingiusti, gli dèi. Che bisogno hanno che si bruci gente viva?", Author = "Cesare Pavese" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Immortale è chi accetta l'istante. Chi non conosce più un domani.", Author = "Cesare Pavese" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Chi non spera di vivere.", Author = "Cesare Pavese" },
@@ -60,8 +58,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Nessuno si fa casa di una cella, e Stefano si sentiva sempre intorno le pareti invisibili.", Author = "Cesare Pavese" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "l'angoscia vera è fatta di noia, [...].", Author = "Cesare Pavese" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "si resiste a star soli finché qualcuno soffre di non averci con sé, mentre la vera solitudine è una cella intollerabile.", Author = "Cesare Pavese" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Pensavo, invece, rientrando la sera, ai discorsi che avevo fatto con tutti ma a nessuno avevo detto ch'ero solo come un cane, e non mica perché non ci fosse più Amelio – anche lui mi mancava per questo.", Author = "Cesare Pavese" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Quando arrivai a Roma sul camion che Milo mi aveva trovato ero contento di aver fatto tanta strada e che al mondo ci fossero degli altri paesi, delle città, delle montagne, tanti posti che non avevo mai visto.", Author = "Cesare Pavese" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Il suo fianco era il mio. La sua voce era come abbracciarla.", Author = "Cesare Pavese" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "L'acqua correva piano piano sotto il cielo.", Author = "Cesare Pavese" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Cesare_Pavese", Text = "Sei sì o no persuaso che lo stato dell'uomo è la debolezza? Come puoi sollevarti se prima non precipiti?", Author = "Cesare Pavese" },

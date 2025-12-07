@@ -81,7 +81,6 @@ public static partial class ChineseQuotes
             new Quote { Id = "https://zh.wikiquote.org/wiki/孔子", Text = "使民敬、忠以劝，如之何？子曰 ：“临之以庄，则敬。孝慈，则忠。举善而教不能．则劝。”", Author = "孔子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/孔子", Text = "先有司，赦小过、举贤才。", Author = "孔子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/孔子", Text = "居上不宽，为礼不敬，临丧不哀，吾何以观之哉", Author = "孔子" },
-            new Quote { Id = "https://zh.wikiquote.org/wiki/孔子", Text = "孔子布衣，傳十餘世，學者宗之。自天子王侯，中國言六藝者折中於夫子，可謂至聖矣！", Author = "司馬遷" },
         };
     }
 }

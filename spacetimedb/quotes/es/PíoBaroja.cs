@@ -38,9 +38,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Pío_Baroja", Text = "Hemos llegado a querernos de verdad —decía Andrés—, porque no teníamos interés en mentir.", Author = "Pío Baroja" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Pío_Baroja", Text = "La generalidad de los hombres nadamos en el océano de la vulgaridad.", Author = "Pío Baroja" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Pío_Baroja", Text = "La revolución es buena para los histriones. Sirven todos los gritos, todas las necedades tienen valor, todos los pedantes alcanzan un pedestal.", Author = "Pío Baroja" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Pío_Baroja", Text = "La vida era una corriente tumultuosa e inconsciente donde los actores representaban una tragedia que no comprendía, y los hombres, llegados a un estado de intelectualidad, contemplaban la escena con una mirada compasiva y piadosa.", Author = "Pío Baroja" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Pío_Baroja", Text = "Los españoles han resuelto todos esos problemas metafísicos y morales que nos preocupan a nosotros, los del Norte, en el fondo mucho menos civilizados que ustedes. Los han resuelto, negándolos; es la única manera de resolverlos.", Author = "Pío Baroja" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Pío_Baroja", Text = "Yo creo que hay que afirmar el conjunto de mentiras y verdades que son de uno hasta convertirlo en una cosa viva. Creo que hay que vivir con las locuras que uno tenga, cuidándolas y hasta aprovechándose de ellas.", Author = "Pío Baroja" },
         };
     }
 }
