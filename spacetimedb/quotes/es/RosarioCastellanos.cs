@@ -20,7 +20,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Rosario_Castellanos", Text = "palabras que los vientos dispersan como pétalos", Author = "Rosario Castellanos" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Rosario_Castellanos", Text = "Heme aquí, ya al final, y todavía/no sé qué cara le daré a la muerte.", Author = "Rosario Castellanos" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Rosario_Castellanos", Text = "sonríe ante un amanecer sin nadie.", Author = "Rosario Castellanos" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Rosario_Castellanos", Text = "El otro. Con el otro/la humanidad, el diálogo, la poesía, comienzan.", Author = "Rosario Castellanos" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Rosario_Castellanos", Text = "Lo que soñó la tierra/es visible en el árbol.", Author = "Rosario Castellanos" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Rosario_Castellanos", Text = "ternura, la palabra pequeña, familiar/que cabía en mi boca.", Author = "Rosario Castellanos" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Rosario_Castellanos", Text = "Adiós para la tierra que en mi torno bailaba.", Author = "Rosario Castellanos" },

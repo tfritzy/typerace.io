@@ -18,7 +18,6 @@ public static partial class PortugueseQuotes
             new Quote { Id = "https://pt.wikiquote.org/wiki/Paulo_Coelho", Text = "O homem nunca pode parar de sonhar. O sonho é o alimento da alma, como a comida é o alimento do corpo.", Author = "Paulo Coelho" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Paulo_Coelho", Text = "Antes da mão manejar a espada, ela deve localizar o Inimigo e saber como enfrentá-lo. A espada apenas dá o golpe. Mas a mão já está vitoriosa ou perdedora antes desse golpe.", Author = "Paulo Coelho" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Paulo_Coelho", Text = "o maior pecado de todos: o Arrependimento.", Author = "Paulo Coelho" },
-            new Quote { Id = "https://pt.wikiquote.org/wiki/Paulo_Coelho", Text = "Os homens que se julgam sábios são indecisos na hora de mandar e são rebeldes na hora de servir.", Author = "Paulo Coelho" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Paulo_Coelho", Text = "A única maneira de salvarmos nossos sonhos, é sendo generosos conosco mesmos", Author = "Paulo Coelho" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Paulo_Coelho", Text = "Às vezes, a felicidade é uma bênção - mas geralmente é uma conquista.", Author = "Paulo Coelho" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Paulo_Coelho", Text = "O amor se descobre através da prática de amar e não das palavras.", Author = "Paulo Coelho" },

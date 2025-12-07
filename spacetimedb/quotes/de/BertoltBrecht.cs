@@ -20,7 +20,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Bertolt_Brecht", Text = "Wer die Wahrheit nicht weiß, der ist bloß ein Dummkopf. Aber wer sie weiß, und sie eine Lüge nennt, der ist ein Verbrecher!", Author = "Bertolt Brecht" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Bertolt_Brecht", Text = "Wir stehen selbst enttäuscht und sehn betroffen // Den Vorhang zu und alle Fragen offen.", Author = "Bertolt Brecht" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Bertolt_Brecht", Text = "Ja, mach nur einen Plan! Sei nur ein großes Licht! Und mach dann noch’nen zweiten Plan, Gehn tun sie beide nicht..", Author = "Bertolt Brecht" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Bertolt_Brecht", Text = "Pfingsten // Sind die Geschenke am geringsten. // Während Geburtstag, Ostern und Weihnachten // Etwas einbrachten.", Author = "Bertolt Brecht" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Bertolt_Brecht", Text = "Selbst die schmalsten Stirnen / In denen der Friede wohnt / Sind den Künsten willkommener als jener Kunstfreund / Der auch Freund der Kriegskunst ist.", Author = "Bertolt Brecht" },
         };
     }

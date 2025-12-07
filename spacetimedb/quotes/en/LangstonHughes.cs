@@ -8,8 +8,6 @@ public static partial class EnglishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://en.wikiquote.org/wiki/Langston_Hughes", Text = "I, too, sing America. I am the darker brother.", Author = "Langston Hughes" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Langston_Hughes", Text = "They'll see how beautiful I am And be ashamed — I, too, am America.", Author = "Langston Hughes" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Langston_Hughes", Text = "The night is beautiful, So are the faces of my people.", Author = "Langston Hughes" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Langston_Hughes", Text = "My soul has grown deep like the rivers.", Author = "Langston Hughes" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Langston_Hughes", Text = "Hold fast to dreams For if dreams die Life is a broken-winged bird That cannot fly.", Author = "Langston Hughes" },
@@ -29,7 +27,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Langston_Hughes", Text = "Democracy will not come Today, this year Nor ever Through compromise and fear.", Author = "Langston Hughes" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Langston_Hughes", Text = "I do not need my freedom when I’m dead. I cannot live on tomorrow’s bread.", Author = "Langston Hughes" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Langston_Hughes", Text = "Freedom Is a strong seed Planted In a great need. I live here, too.", Author = "Langston Hughes" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Langston_Hughes", Text = "You are white — yet a part of me, as I am a part of you. That’s American.", Author = "Langston Hughes" },
         };
     }
 }

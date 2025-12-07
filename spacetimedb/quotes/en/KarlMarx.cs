@@ -33,7 +33,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Karl_Marx", Text = "Every step of real movement is more important than a dozen programmes.", Author = "Karl Marx" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Karl_Marx", Text = "Neither of us cares a straw for popularity.", Author = "Karl Marx" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Karl_Marx", Text = "When Engels and I first joined the secret Communist Society we made it a condition that everything tending to encourage superstitious belief in authority was to be removed from the statutes.", Author = "Karl Marx" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Karl_Marx", Text = "If anything is certain, it is that I myself am not a Marxist", Author = "Karl Marx" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Karl_Marx", Text = "When we have chosen the vocation in which we can contribute most to humanity, burdens cannot bend us because they are only sacrifices for all.", Author = "Karl Marx" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Karl_Marx", Text = "Only that position can impart dignity in which we do not appear as servile tools but rather create independently within our circle.", Author = "Karl Marx" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Karl_Marx", Text = "Prometheus is the most eminent saint and martyr in the philosophical calendar.", Author = "Karl Marx" },

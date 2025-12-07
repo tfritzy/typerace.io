@@ -17,7 +17,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Giambattista_Vico", Text = "La fantasia tanto è più robusta quanto è più debole il raziocinio.", Author = "Giambattista Vico" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giambattista_Vico", Text = "La fantasia [...] altro non è, che memoria o dilatata, o composta.", Author = "Giambattista Vico" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giambattista_Vico", Text = "Gli uomini sfogano le grandi passioni dando nel canto, come si sperimenta ne' sommamente addolorati e allegri.", Author = "Giambattista Vico" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Giambattista_Vico", Text = "La mente umana è inchinata naturalmente co' sensi a vedersi fuori nel corpo, e con molta difficultà per mezzo della riflessione ad intendere se medesima.", Author = "Giambattista Vico" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giambattista_Vico", Text = "L'ordine delle idee dee procedere secondo l'ordine delle cose.", Author = "Giambattista Vico" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giambattista_Vico", Text = "La natura de' popoli prima è cruda; dipoi severa, quindi benigna, appresso dilicata, finalmente dissoluta.", Author = "Giambattista Vico" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giambattista_Vico", Text = "I governi debbon esser conformi alla natura degli uomini governati.", Author = "Giambattista Vico" },

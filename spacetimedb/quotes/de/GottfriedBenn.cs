@@ -10,7 +10,6 @@ public static partial class GermanQuotes
         {
             new Quote { Id = "https://de.wikiquote.org/wiki/Gottfried_Benn", Text = "Ein Gedicht entsteht überhaupt sehr selten - ein Gedicht wird gemacht.", Author = "Gottfried Benn" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gottfried_Benn", Text = "Es hat sich allmählich herumgesprochen, daß der Gegensatz von Kunst nicht Natur ist, sondern gut gemeint; Stil ist eine bösartige Neubildung, eine letale.", Author = "Gottfried Benn" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Gottfried_Benn", Text = "Am Anfang war das Wort und nicht das Geschwätz, und am Ende wird nicht die Propaganda sein, sondern wieder das Wort.", Author = "Gottfried Benn" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gottfried_Benn", Text = "Dumm sein und Arbeit haben: das ist das Glück.", Author = "Gottfried Benn" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gottfried_Benn", Text = "Es ist also noch alles da, es bleibt auch da, es wird nichts zerstört, unsere Gedanken, Formen und Träume leben weiter, da sie älter u. echter sind als gewisses Gequatsche u. Gelärme.", Author = "Gottfried Benn" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gottfried_Benn", Text = "Ich finde schon Gehen eine unnatürliche Bewegungsart, Tiere laufen, aber der Mensch sollte reiten oder fahren.", Author = "Gottfried Benn" },

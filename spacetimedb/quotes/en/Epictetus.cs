@@ -50,7 +50,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Epictetus", Text = "For freedom is not acquired by satisfying yourself with what you desire, but by destroying your desire.", Author = "Epictetus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Epictetus", Text = "Little is needed to ruin and upset everything, only a slight aberration from reason.", Author = "Epictetus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Epictetus", Text = "Men are disturbed, not by things, but by the principles and notions which they form concerning things.", Author = "Epictetus" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Epictetus", Text = "I am richer than you, therefore my property is greater than yours; I am more eloquent than you, therefore my style is better than yours. But you, after all, are neither property nor style.", Author = "Epictetus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Epictetus", Text = "No man is free who is not master of himself.", Author = "Epictetus" },
         };
     }

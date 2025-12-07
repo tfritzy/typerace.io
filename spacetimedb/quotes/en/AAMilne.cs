@@ -9,7 +9,6 @@ public static partial class EnglishQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/A._A._Milne", Text = "Tell the innocent visitor from another world that two people were killed at Serajevo, and that the best that Europe could do about it was to kill eleven million more.", Author = "A. A. Milne" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/A._A._Milne", Text = "I have been Foolish and Deluded, and I am a Bear of No Brain at All.", Author = "A. A. Milne" },
             new Quote { Id = "https://en.wikiquote.org/wiki/A._A._Milne", Text = "It is hard to be brave, said Piglet, sniffing slightly, when you're only a Very Small Animal.", Author = "A. A. Milne" },
             new Quote { Id = "https://en.wikiquote.org/wiki/A._A._Milne", Text = "It's a little Anxious, he said to himself, to be a Very Small Animal Entirely Surrounded by Water.", Author = "A. A. Milne" },
             new Quote { Id = "https://en.wikiquote.org/wiki/A._A._Milne", Text = "How sweet to be a cloud Floating in the blue.", Author = "A. A. Milne" },

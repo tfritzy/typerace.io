@@ -10,7 +10,6 @@ public static partial class EnglishQuotes
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/Gore_Vidal", Text = "A narcissist is someone better looking than you are.", Author = "Gore Vidal" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Gore_Vidal", Text = "Congress no longer declares war or makes budgets. So that's the end of the constitution as a working machine.", Author = "Gore Vidal" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Gore_Vidal", Text = "I am at heart a propagandist, a tremendous hater, a tiresome nag, complacently positive that there is no human problem which could not be solved if people would simply do as I advise.", Author = "Gore Vidal" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Gore_Vidal", Text = "Well, the Constitution has not yet been pregnant.", Author = "Gore Vidal" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Gore_Vidal", Text = "My dear, you must marry him too. I’m sure the three of you would make a lovely couple.", Author = "Gore Vidal" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Gore_Vidal", Text = "There is something about a bureaucrat that does not like a poem.", Author = "Gore Vidal" },
@@ -69,7 +68,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Gore_Vidal", Text = "American society, literary or lay, tends to be humorless. What other culture could have produced someone like Hemingway and not seen the joke?", Author = "Gore Vidal" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Gore_Vidal", Text = "World events are the work of individuals whose motives are often frivolous, even casual.", Author = "Gore Vidal" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Gore_Vidal", Text = "Nothing that Shakespeare ever invented was to equal Lincoln's invention of himself and, in the process, us.", Author = "Gore Vidal" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Gore_Vidal", Text = "I have begun writing what I have said I'd never write, a memoir (\"I am not my own subject,\" I used to say with icy superiority).", Author = "Gore Vidal" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Gore_Vidal", Text = "I used to be able to summon up scenes at will, but now aging memory is so busy weeding its own garden that, promiscuously, it pulls up roses as well as crabgrass.", Author = "Gore Vidal" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Gore_Vidal", Text = "Celebrities are invariably celebrity-mad, just as liars always believe liars.", Author = "Gore Vidal" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Gore_Vidal", Text = "Apparently, \"conspiracy stuff\" is now shorthand for unspeakable truth.", Author = "Gore Vidal" },

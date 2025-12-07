@@ -16,7 +16,6 @@ public static partial class PolishQuotes
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Tyrmand", Text = "Szczęście jest zawsze gdzie indziej.", Author = "Leopold Tyrmand" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Tyrmand", Text = "Wędrowcy są zawsze wędrowcami wbrew własnej woli, inaczej zaliczają się do kategorii turystów lub wycieczkowiczów.", Author = "Leopold Tyrmand" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Tyrmand", Text = "Syneczku (…) po to, aby pisać, trzeba przede wszystkim wiedzieć, o czym się pisze. Wiedzieć, rozumiesz, zasada numer jeden. Inaczej zaczyna się pisać o wężach morskich.", Author = "Leopold Tyrmand" },
-            new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Tyrmand", Text = "Jak wiesz, życie jest gówno na kole – raz jest w górze, raz jest w dole – i to jest właśnie ze mną.", Author = "Leopold Tyrmand" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Tyrmand", Text = "Nie dlatego nie pływasz na kajaku, bo jesteś stary, lecz dlatego jesteś stary, bo nie pływasz na kajaku…", Author = "Leopold Tyrmand" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Tyrmand", Text = "Z dziewczynami to jak z chodzeniem po bagnie. Skaczesz z kępy na kępę i próbujesz, jak daleko jeszcze możesz dojść. Jak dostaniesz w mordę, to wiesz, że trzeba się cofnąć. I idziesz do następnej.", Author = "Leopold Tyrmand" },
         };

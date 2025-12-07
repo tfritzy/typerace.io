@@ -99,7 +99,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Louis_Stevenson", Text = "Children, you are very little, And your bones are very brittle.", Author = "Robert Louis Stevenson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Louis_Stevenson", Text = "They were a rough lot indeed, as sailors mostly are: being men rooted out of all the kindly parts of life, and condemned to toss together on the rough seas, with masters no less cruel.", Author = "Robert Louis Stevenson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Louis_Stevenson", Text = "Each side, in these sort of civil broils, takes the name of honesty for its own.", Author = "Robert Louis Stevenson" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Louis_Stevenson", Text = "Am I no a bonny fighter?", Author = "Robert Louis Stevenson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Louis_Stevenson", Text = "I have seen wicked men and fools, a great many of both; and I believe they both get paid in the end; but the fools first.", Author = "Robert Louis Stevenson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Louis_Stevenson", Text = "I've a grand memory for forgetting, David.", Author = "Robert Louis Stevenson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Louis_Stevenson", Text = "Of all my verse, like not a single line; But like my title, for it is not mine.", Author = "Robert Louis Stevenson" },

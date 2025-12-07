@@ -44,7 +44,6 @@ public static partial class EnglishQuotes
         .Concat(DarkoMiličić.Quotes)
         .Concat(DavidFosterWallace.Quotes)
         .Concat(DirkNowitzki.Quotes)
-        .Concat(DonaldJohnTrump.Quotes)
         .Concat(DorothyParker.Quotes)
         .Concat(DouglasAdams.Quotes)
         .Concat(EdgarAllanPoe.Quotes)

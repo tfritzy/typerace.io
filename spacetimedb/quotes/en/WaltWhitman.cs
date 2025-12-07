@@ -9,7 +9,6 @@ public static partial class EnglishQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I think of few heroic actions, which cannot be traced to the artistical impulse. He who does great deeds, does them from his innate sensitiveness to moral beauty.", Author = "Walt Whitman" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "Some people are so much sunlight to the square inch. I am still bathing in the cheer he radiated.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I find I'm a good deal more of a socialist than I thought I was: maybe not technically, politically, so, but intrinsically, in my meanings.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "Poetry (like a grand personality) is a growth of many generations — many rare combinations.\nTo have great poets, there must be great audiences too.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I will write the evangel-poem of comrades and of love.", Author = "Walt Whitman" },
@@ -40,20 +39,17 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "What do you suppose will satisfy the soul except to walk free and own no superior?", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "To me every hour of the light and dark is a miracle,\nEvery cubic inch of space is a miracle.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I was thinking the day most splendid, till I saw what the not-day exhibited;\nI was thinking this globe enough, till there sprang out so noiseless around me myriads of other globes.", Author = "Walt Whitman" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I see that I am to wait for what will be exhibited by death.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I swear I think there is nothing but immortality!", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "The paths to the house I seek to make,\nBut leave to those to come the house itself.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "Society waits unformed and is between things ended and things begun.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "Now obey thy cherished secret wish,\nEmbrace thy friends—leave all in order;\nTo port and hawser's tie no more returning,\nDepart upon thy endless cruise, old Sailor!", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "Whitman...a man full-blooded and brotherly, unselfconscious in his democracy and genuinely at ease with all kinds and classes.", Author = "Walt Whitman" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I am not blind to the worth of the wonderful gift of \"Leaves of Grass\". I find it the most extraordinary piece of wit and wisdom that America has yet contributed.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I give you joy of your free and brave thought. I have great joy in it. I find incomparable things said incomparably well, as they must be.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I always knew in my heart Walt Whitman’s mind to be more like my own than any other man’s living.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "One Whitman is miracle enough, and when he comes again it will be the end of the world.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "Whitman to me is the most fascinating of American poets.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "Whitman started to write the great poetry from scratch after he had written all that junk for newspapers, the sentimental lyrical poems. All of a sudden he wrote Leaves of Grass.", Author = "Walt Whitman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "I would think Walt Whitman probably had more influence on my whole poetic thinking than anybody, but I never dreamed of trying to write in the Whitman manner.", Author = "Walt Whitman" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Whitman", Text = "When I read the poetry of Walt Whitman, I could understand why he answered the question, “Do I contradict myself?\" with \"Very well then I contradict myself. I am large, I contain multitudes.\"", Author = "Walt Whitman" },
         };
     }
 }

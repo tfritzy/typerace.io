@@ -40,7 +40,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Es ist Arznei, nicht Gift, was ich dir reiche.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Es sind nicht alle frei, die ihrer Ketten spotten.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Ich fürchte, grad unter Menschen möchtest du, ein Mensch zu sein verlernen.", Author = "Gotthold Ephraim Lessing" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Jeder liebt sich selber nur am meisten.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Kein Mensch muss müssen.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Macht denn nur das Blut den Vater?", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Nicht die Kinder bloß speist man mit Märchen ab.", Author = "Gotthold Ephraim Lessing" },

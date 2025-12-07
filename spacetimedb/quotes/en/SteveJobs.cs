@@ -31,7 +31,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "Creativity is just connecting things.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "And the reason they were able to do that was that they've had more experiences or they have thought more about their experiences than other people.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "The only problem with Microsoft is they just have no taste.", Author = "Steve Jobs" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "I am saddened, not by Microsoft's success — I have no problem with their success. They've earned their success, for the most part.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "We have always been shameless about stealing great ideas.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "We hire people to tell us what to do.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "You’ve got to start with the customer experience and work backwards to the technology.", Author = "Steve Jobs" },

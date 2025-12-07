@@ -28,7 +28,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Pirandello", Text = "Quando uno è contento di se stesso ama l'umanità.", Author = "Luigi Pirandello" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Pirandello", Text = "Un angelo, per una donna, è sempre più irritante d'una bestia!", Author = "Luigi Pirandello" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Pirandello", Text = "Come a voi appajono travestiti loro, così a lui, nei nostri panni, appariremmo travestiti noi.", Author = "Luigi Pirandello" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Pirandello", Text = "Confidarsi con qualcuno, questo sì, è veramente da pazzo!", Author = "Luigi Pirandello" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Pirandello", Text = "Ho paura talvolta anche del mio sangue che pulsa nelle arterie come, nel silenzio della notte, un tonfo cupo di passi in stanze lontane.", Author = "Luigi Pirandello" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Pirandello", Text = "Trovarsi davanti a un pazzo sapete che significa? Trovarsi davanti a uno che vi scrolla dalle fondamenta tutto quanto avete costruito in voi, attorno a voi, la logica di tutte le vostre costruzioni.", Author = "Luigi Pirandello" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Pirandello", Text = "Ora sì... per forza...", Author = "Luigi Pirandello" },

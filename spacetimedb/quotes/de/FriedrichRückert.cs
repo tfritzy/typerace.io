@@ -9,7 +9,6 @@ public static partial class GermanQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Ach, wie ist der Mensch zerbrechlich, Ach, wie flüchtig unaussprechlich Eilt die Zeit, und nimmt ihn mit.", Author = "Friedrich Rückert" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Am Abend wird man klug Für den vergangenen Tag, Doch niemals klug genug Für den, der kommen mag.", Author = "Friedrich Rückert" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Das sind die Weisen, die durch Irrtum zur Wahrheit reisen. Die bei dem Irrtum verharren, das sind die Narren.", Author = "Friedrich Rückert" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Durch Schaden wird man klug Sagen die klugen Leute. Schaden litt ich genug, Doch bin ich ein Tor noch heute.", Author = "Friedrich Rückert" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Erst nach dem Nachbarn schaue, Sodann das Haus dir baue! Wenn der Nachbar ist ein Schuft, So baust du dir deine Totengruft.", Author = "Friedrich Rückert" },
@@ -19,11 +18,9 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Man kann nicht leben, ohne dass die Leute sprechen, Nicht Rosen sammeln, ohne dass die Dornen stechen.", Author = "Friedrich Rückert" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Was schmied'st du Schmied? »Wir schmieden Ketten, Ketten!« »Ach in die Ketten seid ihr selbst geschlagen.«", Author = "Friedrich Rückert" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Wer trinkt soll reinen Herzens sein, mit Wein ist nicht zu scherzen.", Author = "Friedrich Rückert" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Am besten machst du gleich dein Ding im Anfang recht; Nachbesserung macht oft Halbgutes völlig schlecht.", Author = "Friedrich Rückert" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Anmutig werden selbst alltägliche Sentenzen Im Silbenwasserfall melodischer Kadenzien.", Author = "Friedrich Rückert" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Aus Eigennutz entspringt die Dankbarkeit der Meisten Für einen Dienst, den wir geleistet oder leisten.", Author = "Friedrich Rückert" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Das Gute wissen, weit ist noch das Tun davon; Das Böse kennen ist des Bösen Anfang schon.", Author = "Friedrich Rückert" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Denn nur aufs Ziel zu sehn, verdirbt die Lust am Reisen.", Author = "Friedrich Rückert" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Der Adler fliegt allein, der Rabe scharenweise; Gesellschaft braucht der Tor, und Einsamkeit der Weise.", Author = "Friedrich Rückert" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Der Teufel hat die Welt verlassen, weil er weiß, Die Menschen machen selbst die Hölle einander heiß.", Author = "Friedrich Rückert" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Rückert", Text = "Der Übersetzung Kunst, die höchste, dahin geht, Zu übersetzen recht, was man nicht recht versteht.", Author = "Friedrich Rückert" },

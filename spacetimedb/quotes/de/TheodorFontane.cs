@@ -37,7 +37,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Theodor_Fontane", Text = "Was wäre das Leben ohne Liebesverhältnisse? Verstumpft, öde, langweilig.", Author = "Theodor Fontane" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Theodor_Fontane", Text = "Das Herz bleibt ein Kind.", Author = "Theodor Fontane" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Theodor_Fontane", Text = "Die Erfüllung eines Lieblingswunsches, sei der Wunsch selber, was er wolle, berührt uns wie eine Weihnachtsfreude.", Author = "Theodor Fontane" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Theodor_Fontane", Text = "Am Mute hängt der Erfolg.", Author = "Theodor Fontane" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Theodor_Fontane", Text = "Das Poetische hat immer recht, es wächst weit über das Historische hinaus.", Author = "Theodor Fontane" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Theodor_Fontane", Text = "Der ist in tiefster Seele treu, wer die Heimat liebt wie du.", Author = "Theodor Fontane" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Theodor_Fontane", Text = "Erst der Ernst macht den Mann, erst der Fleiß das Genie.", Author = "Theodor Fontane" },

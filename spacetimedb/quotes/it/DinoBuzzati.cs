@@ -8,7 +8,6 @@ public static partial class ItalianQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://it.wikiquote.org/wiki/Dino_Buzzati", Text = "Chi ha dato tanto alla montagna, chi per la montagna ha rischiato con tanto accanimento la vita, a questo amore resterà legato per sempre.", Author = "Dino Buzzati" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Dino_Buzzati", Text = "Ciascuno di noi forse porta scritta in una recondita particella del corpo, la propria finale condanna. Ma perché andare determinatamente a disseppellirla?", Author = "Dino Buzzati" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Dino_Buzzati", Text = "E se l'idea di poter prolungare l'esistenza al nostro cane ci seduce non è solo perché gli vogliamo bene, ma anche per amore di noi stessi.", Author = "Dino Buzzati" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Dino_Buzzati", Text = "Il film ci rivela quanto abietto, crudele e stolto è l'uomo: è quindi una lezione di umiltà.", Author = "Dino Buzzati" },
@@ -27,7 +26,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Dino_Buzzati", Text = "Che peso, la presenza di Dio per chi non la desidera.", Author = "Dino Buzzati" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Dino_Buzzati", Text = "La luna [...] la placida abitatrice delle nostre notti, propizia agli incantesimi d'amore, discreta amica al cui lume favoloso le catapecchie diventavano castelli.", Author = "Dino Buzzati" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Dino_Buzzati", Text = "Le donne sono famose per costruir romanzi inverosimili.", Author = "Dino Buzzati" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Dino_Buzzati", Text = "È la pace di colui che si sente in armonia con la massa che lo attornia. Oppure è l'inquietudine, il disagio, lo smarrimento di chi si allontana dalla norma.", Author = "Dino Buzzati" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Dino_Buzzati", Text = "Anche il più nobile sentimento si atrofizza e si dissolve a poco a poco, se nessuno intorno ne fa più caso. È triste dirlo, ma a desiderare il Paradiso non si può essere soli.", Author = "Dino Buzzati" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Dino_Buzzati", Text = "La consolazione, la felicità era tale che il modo di raggiungerla non aveva più alcuna importanza.", Author = "Dino Buzzati" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Dino_Buzzati", Text = "Lui si ricordò di una Madonna di Antonello da Messina. Il taglio del volto e la bocca erano identici. La madonna aveva più dolcezza, certo. Ma lo stesso stampo netto e genuino.", Author = "Dino Buzzati" },

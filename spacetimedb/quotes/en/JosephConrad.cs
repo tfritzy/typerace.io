@@ -8,7 +8,6 @@ public static partial class EnglishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://en.wikiquote.org/wiki/Joseph_Conrad", Text = "My task which I am trying to achieve is, by the power of the written word, to make you hear, to make you feel — it is, before all, to make you see. That — and no more, and it is everything.", Author = "Joseph Conrad" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Joseph_Conrad", Text = "If I succeed, you shall find there according to your deserts: encouragement, consolation, fear, charm — all you demand; and, perhaps, also that glimpse of truth for which you have forgotten to ask.", Author = "Joseph Conrad" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Joseph_Conrad", Text = "It's only those who do nothing that make no mistakes, I suppose.", Author = "Joseph Conrad" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Joseph_Conrad", Text = "The sea never changes and its works, for all the talk of men, are wrapped in mystery.", Author = "Joseph Conrad" },

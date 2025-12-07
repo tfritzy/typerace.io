@@ -23,7 +23,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "Ricordati che i ragazzi che vogliono fare di loro capriccio e a modo loro, prima o poi se ne pentono.", Author = "Carlo Collodi" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "Io dico che il medico prudente quando non sa quello che dice, la miglior cosa che possa fare, è quella di stare zitto.", Author = "Carlo Collodi" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "Vi sono le bugie che hanno le gambe corte, e le bugie che hanno il naso lungo: la tua per l'appunto è di quelle che hanno il naso lungo.", Author = "Carlo Collodi" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "In questo mondo, quando si può, bisogna mostrarsi cortesi con tutti, se vogliamo esser ricambiati con pari cortesia nei giorni del bisogno.", Author = "Carlo Collodi" },
         };
     }
 }

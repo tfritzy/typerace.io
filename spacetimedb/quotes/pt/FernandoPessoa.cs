@@ -116,7 +116,6 @@ public static partial class PortugueseQuotes
             new Quote { Id = "https://pt.wikiquote.org/wiki/Fernando_Pessoa", Text = "O comboio abranda, é o Cais do Sodré. Cheguei a Lisboa, mas não a uma conclusão.", Author = "Fernando Pessoa" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Fernando_Pessoa", Text = "O coração, se pudesse pensar, pararia.", Author = "Fernando Pessoa" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Fernando_Pessoa", Text = "O olfacto é uma vista estranha. Evoca paisagens sentimentais por um desenhar súbito do subconsciente.", Author = "Fernando Pessoa" },
-            new Quote { Id = "https://pt.wikiquote.org/wiki/Fernando_Pessoa", Text = "O relógio da casa, lugar certo lá ao fundo das coisas, soa a meia hora seca e nula. Tudo é tanto, tudo é tão fundo, tudo é tão negro e frio!", Author = "Fernando Pessoa" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Fernando_Pessoa", Text = "O ter tocado os pés de Cristo não é desculpa para defeitos de pontuação.", Author = "Fernando Pessoa" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Fernando_Pessoa", Text = "Os meus sonhos são um refúgio estúpido, como um guarda-chuva contra um raio.", Author = "Fernando Pessoa" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Fernando_Pessoa", Text = "Para compreender, destruí-me.", Author = "Fernando Pessoa" },

@@ -28,7 +28,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Ahi fiacca [[Italia]], d'indolenza ostello, | Cui niegan corpo i membri troppi e sparti, | Sorda e muta ti stai ritrosa al bello?", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Spesso è da forte, | più che il [[vita e morte|morire]], il [[vita e morte|vivere]].", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "De' ceti tutti i vizj tutti; è questo | il patrimonio eccelso di vostr'arte; | ma non di alcun de' ceti aver l'onesto.", Author = "Vittorio Alfieri" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Tali havvi ingiurie e audaci modi irsuti, | con cui può il Tristo al Buon far grave breccia, | né legge v'ha che incontro a ciò lo aiuti.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Meglio è morir, che trarre | Selvaggia vita in solitudin, dove | A niun sei caro, e di nessun ti cale.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Quanto in rimirar le umane | Cose, diverso ha giovinezza il guardo, | Dalla canuta età!", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Seggio è di sangue e d'empietade il [[trono]].", Author = "Vittorio Alfieri" },
@@ -46,7 +45,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Mai si può veramente ben conoscere il pregio e l'utilità d'un [[amico]] verace, quanto nel dolore.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "L'[[estate]] è la mia stagion favorita; e tanto più mi si confà, quanto più eccessiva riesce.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Ella ha ben denti, ed ugne, e saette, e feroce brevità, quanto e più ch'altra lingua mai l'abbia, o le avesse.", Author = "Vittorio Alfieri" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "L'aver con chi piangere menoma il [[pianto]] d'assai.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "Il personaggio [[Romanticismo|romantico]] è l'animo umano mostrato nella complessità, nella sua varietà, nelle sue alternative, nelle sue contradizioni, nella sua dipendenza dal mondo che lo circonda.", Author = "Vittorio Alfieri" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Vittorio_Alfieri", Text = "L'uomo dell'Alfieri non è l'uomo semiromantico, oscillante e complesso, della tragedia francese, e tanto più dista dall'uomo romantico.", Author = "Vittorio Alfieri" },
         };

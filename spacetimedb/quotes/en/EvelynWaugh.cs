@@ -10,7 +10,6 @@ public static partial class EnglishQuotes
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "The human mind is inspired enough when it comes to inventing horrors; it is when it tries to invent a Heaven that it shows itself cloddish.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "I believe it was a bad Government, rapidly deteriorating. If I were a Spaniard I should be fighting for General Franco.", Author = "Evelyn Waugh" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "I am not a Fascist nor shall I become one unless it were the only alternative to Marxism.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "It is mischievous to suggest that such a choice is imminent.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "I believe we are in danger of a...stultifying use of the word \"Fascist\".", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "My father taught me that it was flagitious to leave a letter of any kind unanswered.", Author = "Evelyn Waugh" },
@@ -50,7 +49,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "The Mass is written of as a \"social meal\" in which the \"people of God\" perform the consecration.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "I can only now go to church as an act of duty and obedience.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "I have become very old in the last two years. Not diseased but enfeebled.", Author = "Evelyn Waugh" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "There is nowhere I want to go and nothing I want to do and I am conscious of being an utter bore.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "The Vatican Council has knocked the guts out of me.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "Easter used to mean so much to me.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "Before Pope John and his Council – they destroyed the beauty of the liturgy.", Author = "Evelyn Waugh" },

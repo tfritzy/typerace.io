@@ -16,7 +16,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Hernández", Text = "No hay tiempo que no se acabe ni tiento que no se corte.", Author = "José Hernández" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Hernández", Text = "Pues el pájaro cantor jamás se para a cantar en árbol que no da flor.", Author = "José Hernández" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Hernández", Text = "Sepan que olvidar lo malo también es tener memoria.", Author = "José Hernández" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/José_Hernández", Text = "Sólo los cobardes son valientes con las mujeres.", Author = "José Hernández" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Hernández", Text = "Algún día hemos de llegar, después sabremos adónde.", Author = "José Hernández" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Hernández", Text = "Ave de pico encorvado le tiene al robo afición.", Author = "José Hernández" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Hernández", Text = "Las armas son necesarias, pero nadie sabe cuándo.", Author = "José Hernández" },

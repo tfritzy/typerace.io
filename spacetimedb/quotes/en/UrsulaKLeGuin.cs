@@ -10,7 +10,6 @@ public static partial class EnglishQuotes
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "We read books to find out who we are.", Author = "Ursula K. Le Guin" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "The artist deals in what cannot be said in words. The artist whose medium is fiction does this in words.", Author = "Ursula K. Le Guin" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "Distrust everything I say. I am telling the truth.", Author = "Ursula K. Le Guin" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "Great artists make the roads; good teachers and good companions can point them out. But there ain't no free rides, baby.", Author = "Ursula K. Le Guin" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "We don’t live in order to die, we live in order to live.", Author = "Ursula K. Le Guin" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "To think that realistic fiction is by definition superior to imaginative fiction is to think imitation is superior to invention.", Author = "Ursula K. Le Guin" },

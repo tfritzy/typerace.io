@@ -13,7 +13,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Ganz begreifen werden wir uns nie, aber wir werden und können uns weit mehr, als begreifen.", Author = "Novalis" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Ihre sogenannte Religion wirkt blos, wie ein Opiat: reizend, betäubend, Schmerzen aus Schwäche stillend.", Author = "Novalis" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Jeder geliebte Gegenstand ist der Mittelpunkt eines Paradieses.", Author = "Novalis" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Jede Stufe der Bildung fängt mit Kindheit an. Daher ist der am meisten gebildete, irdische Mensch dem Kinde so ähnlich.", Author = "Novalis" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Nach Innen geht der geheimnißvolle Weg. In uns, oder nirgends ist die Ewigkeit mit ihren Welten, die Vergangenheit und Zukunft.", Author = "Novalis" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Vieles ist zu zart, um gedacht, noch mehreres, um besprochen zu werden.", Author = "Novalis" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Wir sind auf einer Mißion: zur Bildung der Erde sind wir berufen.", Author = "Novalis" },

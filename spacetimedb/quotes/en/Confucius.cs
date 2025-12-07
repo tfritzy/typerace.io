@@ -8,7 +8,6 @@ public static partial class EnglishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://en.wikiquote.org/wiki/Confucius", Text = "I am not bothered by the fact that I am not understood. I am bothered when I do not know others.", Author = "Confucius" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Confucius", Text = "The Superior Man is all-embracing and not partial. The inferior man is partial and not all-embracing.", Author = "Confucius" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Confucius", Text = "If you see what is right and fail to act on it, you lack courage.", Author = "Confucius" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Confucius", Text = "Men do not stumble over mountains, but over molehills", Author = "Confucius" },
@@ -30,7 +29,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Confucius", Text = "To see what is right, and not to do it, is want of courage or of principle.", Author = "Confucius" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Confucius", Text = "If a man has no humaneness what can his propriety be like? If a man has no humaneness what can his happiness be like?", Author = "Confucius" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Confucius", Text = "Being in humaneness is good. If we select other goodness and thus are far apart from humaneness, how can we be the wise?", Author = "Confucius" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Confucius", Text = "If I hear the Way [of truth] in the morning, I am content even to die in that evening.", Author = "Confucius" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Confucius", Text = "When we see men of worth, we should think of equaling them; when we see men of a contrary character, we should turn inwards and examine ourselves.", Author = "Confucius" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Confucius", Text = "When you meet someone better than yourself, turn your thoughts to becoming his equal. When you meet someone not as good as you are, look within and examine your own self.", Author = "Confucius" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Confucius", Text = "When you see a good person, think of becoming like her/him. When you see someone not so good, reflect on your own weak points.", Author = "Confucius" },

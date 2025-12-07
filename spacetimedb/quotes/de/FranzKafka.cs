@@ -57,7 +57,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Franz_Kafka", Text = "Je länger man vor der Tür zögert, desto fremder wird man.", Author = "Franz Kafka" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Franz_Kafka", Text = "Wie könnten Narren müde werden!", Author = "Franz Kafka" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Franz_Kafka", Text = "Das Geschriebene ist ja nur Schlacke des Erlebnisses.", Author = "Franz Kafka" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Franz_Kafka", Text = "Das Theater wirkt am stärksten, wenn es unwirkliche Dinge wirklich macht. Dann wird die Bühne zum Seelenperiskop, das die Wirklichkeit von innen beleuchtet.", Author = "Franz Kafka" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Franz_Kafka", Text = "Die Jugend ist glücklich, weil sie die Fähigkeit hat, Schönheit zu sehen. Jeder, der die Fähigkeit behält, Schönheit zu sehen, wird niemals alt.", Author = "Franz Kafka" },
         };
     }

@@ -8,7 +8,6 @@ public static partial class GermanQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://de.wikiquote.org/wiki/Karl_Marx", Text = "Es ist die Kritik, die die einzelne Existenz am Wesen, die besondere Wirklichkeit an der Idee mißt.", Author = "Karl Marx" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Karl_Marx", Text = "Der Schuster Jakob Böhme war ein großer Philosoph. Manche Philosophen von Ruf sind nur große Schuster.", Author = "Karl Marx" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Karl_Marx", Text = "Kein Mensch bekämpft die Freiheit; er bekämpft höchstens die Freiheit der anderen.", Author = "Karl Marx" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Karl_Marx", Text = "So gut, wie jeder schreiben und lesen lernt, muss jeder schreiben und lesen dürfen.", Author = "Karl Marx" },

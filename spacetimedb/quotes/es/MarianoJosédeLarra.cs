@@ -18,7 +18,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Mariano_José_de_Larra", Text = "No sé quien ha dicho que el gran talento no consiste precisamente en saber lo que se ha de decir, sino en saber lo que se ha de callar.", Author = "Mariano José de Larra" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Mariano_José_de_Larra", Text = "Por grandes y profundos que sean los conocimientos de un hombre, el día menos pensado encuentra en el libro que menos valga a sus ojos, alguna frase que le enseña algo que ignora.", Author = "Mariano José de Larra" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Mariano_José_de_Larra", Text = "Ser liberal en España es ser emigrado en potencia.", Author = "Mariano José de Larra" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Mariano_José_de_Larra", Text = "Un pueblo no es verdaderamente libre mientras que la libertad no esté arraigada en sus costumbres e identificada con ellas.", Author = "Mariano José de Larra" },
         };
     }
 }

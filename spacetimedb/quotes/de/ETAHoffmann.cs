@@ -12,7 +12,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/E._T._A._Hoffmann", Text = "Beethovens Musik bewegt die Hebel der Furcht, des Schauers, des Entsetzens, des Schmerzes und erweckt eben jene unendliche Sehnsucht, welche das Wesen der Romantik ist.", Author = "E. T. A. Hoffmann" },
             new Quote { Id = "https://de.wikiquote.org/wiki/E._T._A._Hoffmann", Text = "So stark ist der Zauber der Musik, und immer mächtiger werdend mußte er jede Fessel einer andern Kunst zerreißen.", Author = "E. T. A. Hoffmann" },
             new Quote { Id = "https://de.wikiquote.org/wiki/E._T._A._Hoffmann", Text = "aber nur wenige, erweckt aus dem Traume, steigen empor und schreiten durch das Reich der Träume – sie kommen zur Wahrheit – der höchste Moment ist da: die Berührung mit dem Ewigen, Unaussprechlichen!", Author = "E. T. A. Hoffmann" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/E._T._A._Hoffmann", Text = "Im Ernste geredet, die Wochentage bin ich Jurist, und höchstens etwas Musiker, Sonntags am Tage wird gezeichnet, und Abends bin ich ein sehr witziger Autor bis in die späte Nacht.", Author = "E. T. A. Hoffmann" },
         };
     }
 }

@@ -31,7 +31,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Gabriel_García_Márquez", Text = "… my unhealthy timidity might be a great obstacle to me in my life.", Author = "Gabriel García Márquez" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Gabriel_García_Márquez", Text = "Because for you, quitting smoking would be like killing someone you love.", Author = "Gabriel García Márquez" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Gabriel_García_Márquez", Text = "Until I discovered the miracle that all things that sound are music, including dishes and silverware in the dishwasher, as long as they fulfill the illusion of showing us where life is heading.", Author = "Gabriel García Márquez" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Gabriel_García_Márquez", Text = "I couldn't tell you because even I don't know who I am yet.", Author = "Gabriel García Márquez" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Gabriel_García_Márquez", Text = "… for an instant I thought about stopping the cab to say goodbye, but I preferred not to defy again a destiny as uncertain and persistent as mine.", Author = "Gabriel García Márquez" },
         };
     }

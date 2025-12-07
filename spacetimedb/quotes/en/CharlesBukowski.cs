@@ -36,9 +36,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "a woman can drop out of your life and forget you real fast. a woman can't go anywhere but UP after leaving you, honey.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "Sex was a trap, a snare. It was for animals.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "Something was always after a man. It never relented. No rest, ever.", Author = "Charles Bukowski" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "I am waiting to live, waiting to die. I wish I could ring in some bravery. it's a lousy fix", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "We're all going to die, all of us, what a circus! That alone should make us love each other but it doesn't. We are terrorized and flattened by trivialities, we are eaten up by nothing.", Author = "Charles Bukowski" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "I am building a machine gun in my closet now to take out as many of them as I can before they get me.", Author = "Charles Bukowski" },
         };
     }
 }

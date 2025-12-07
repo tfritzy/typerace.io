@@ -23,7 +23,6 @@ public static partial class PortugueseQuotes
             new Quote { Id = "https://pt.wikiquote.org/wiki/Chico_Buarque", Text = "Nós aprendemos, Palavras duras, Como dizer perdi, perdi, Palavras tontas, Essas palavras, Quem falou não está mais aqui.", Author = "Chico Buarque" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Chico_Buarque", Text = "Escrevo tanto livros quanto músicas para me entender melhor.", Author = "Chico Buarque" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Chico_Buarque", Text = "Detesto ouvir música.", Author = "Chico Buarque" },
-            new Quote { Id = "https://pt.wikiquote.org/wiki/Chico_Buarque", Text = "Não é mais motivo de orgulho ser carioca. Então é hora de me afirmar como um.", Author = "Chico Buarque" },
         };
     }
 }

@@ -10,7 +10,6 @@ public static partial class ItalianQuotes
         {
             new Quote { Id = "https://it.wikiquote.org/wiki/Giovanni_Verga", Text = "L'asino va picchiato, perché non può picchiare lui; e s'ei potesse picchiare, ci pesterebbe sotto i piedi e ci strapperebbe la carne a morsi.", Author = "Giovanni Verga" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giovanni_Verga", Text = "Vi siete mai trovata, dopo una pioggia di autunno, a sbaragliare un esercito di formiche, tracciando sbadatamente il nome del vostro ultimo ballerino sulla sabbia del viale?", Author = "Giovanni Verga" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Giovanni_Verga", Text = "Chi pratica con zoppi all'anno zoppica.", Author = "Giovanni Verga" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giovanni_Verga", Text = "Ciascuno deve pensare alla sua barba prima di pensare a quella degli altri.", Author = "Giovanni Verga" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giovanni_Verga", Text = "Così dicendo si fregava le mani e rideva, ma colle labbra e non col cuore.", Author = "Giovanni Verga" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giovanni_Verga", Text = "Fa il mestiere che sai, che se non arricchisci camperai.", Author = "Giovanni Verga" },

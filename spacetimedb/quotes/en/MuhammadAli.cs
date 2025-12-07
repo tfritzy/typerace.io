@@ -22,12 +22,10 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "Allah is the Greatest. I'm just the greatest boxer.", Author = "Muhammad Ali" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "Since I won't let the critics seal my fate, they keep hollering I'm full of hate. But they don't really hurt me none, 'cause I'm doing good and having fun.", Author = "Muhammad Ali" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "I'm the greatest thing that ever lived. I'm so great I don't have a mark on my face. I shook up the world.", Author = "Muhammad Ali" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "When Cassius says a mouse can outrun a horse, Don't ask how; put your money where your mouse is! I AM THE GREATEST!", Author = "Muhammad Ali" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "If you were surprised when Nixon resigned, just watch what happens when I whup Foreman's behind!", Author = "Muhammad Ali" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "Joe Frazier is so ugly that when he cries, the tears turn around and go down the back of his head.", Author = "Muhammad Ali" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "Frazier is so ugly that he should donate his face to the US Bureau of Wildlife.", Author = "Muhammad Ali" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "There live a great man named Joe who was belittled by a loudmouth foe. While his rival would taunt and tease Joe silently bore the stings. And then fought like gladiator in the ring.", Author = "Muhammad Ali" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "You been hearing about how bad I am since you were a little kid with mess in your pants! Tonight, I'm gonna whip you till you cry like a baby.", Author = "Muhammad Ali" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "That's the only way you gonna save this sucker. He's doomed.", Author = "Muhammad Ali" },
         };
     }

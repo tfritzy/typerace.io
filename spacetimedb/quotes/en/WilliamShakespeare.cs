@@ -54,7 +54,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "We have seen better days.", Author = "William Shakespeare" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "Nothing can come of nothing.", Author = "William Shakespeare" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "How sharper than a serpent's tooth it is To have a thankless child!", Author = "William Shakespeare" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "I am a man, More sinn'd against than sinning.", Author = "William Shakespeare" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "The barge she sat in, like a burnish'd throne, Burnt on the water.", Author = "William Shakespeare" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "Come what come may, Time and the hour runs through the roughest day.", Author = "William Shakespeare" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "Is this a dagger which I see before me, The handle toward my hand?", Author = "William Shakespeare" },

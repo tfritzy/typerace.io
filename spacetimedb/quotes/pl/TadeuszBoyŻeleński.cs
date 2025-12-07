@@ -33,7 +33,6 @@ public static partial class PolishQuotes
             new Quote { Id = "https://pl.wikiquote.org/wiki/Tadeusz_Boy-Żeleński", Text = "Skoro wychodzi na plac słowo „masoni”, można być pewnym, że bezmyślność i głupota są za węgłem.", Author = "Tadeusz Boy-Żeleński" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Tadeusz_Boy-Żeleński", Text = "Smutno byłoby, gdyby nikt się nie mylił i wszyscy robili dobrze.", Author = "Tadeusz Boy-Żeleński" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Tadeusz_Boy-Żeleński", Text = "W tym jedynym w swoim rodzaju mieście szaleństwem byłoby tracić czas na opukiwanie płuc i macanie wątrób absolutnie takich samych, jak te w kraju.", Author = "Tadeusz Boy-Żeleński" },
-            new Quote { Id = "https://pl.wikiquote.org/wiki/Tadeusz_Boy-Żeleński", Text = "Może dupa nareszcie Oczyści atmosferę.", Author = "Tadeusz Boy-Żeleński" },
         };
     }
 }

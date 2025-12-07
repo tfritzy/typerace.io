@@ -18,7 +18,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/John_Keats", Text = "To his sight The husk of natural objects opens quite To the core; and every secret essence there Reveals the elements of good and fair; Making him see, where Learning hath no light.", Author = "John Keats" },
             new Quote { Id = "https://en.wikiquote.org/wiki/John_Keats", Text = "Here lies one whose name was writ in water.", Author = "John Keats" },
             new Quote { Id = "https://en.wikiquote.org/wiki/John_Keats", Text = "My chest of books divide amongst my friends.", Author = "John Keats" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/John_Keats", Text = "I am certain of nothing but the holiness of the heart's affections and the truth of imagination — what the imagination seizes as beauty must be truth — whether it existed before or not.", Author = "John Keats" },
             new Quote { Id = "https://en.wikiquote.org/wiki/John_Keats", Text = "The imagination may be compared to Adam's dream — he awoke and found it truth.", Author = "John Keats" },
             new Quote { Id = "https://en.wikiquote.org/wiki/John_Keats", Text = "O for a life of Sensations rather than of Thoughts!", Author = "John Keats" },
             new Quote { Id = "https://en.wikiquote.org/wiki/John_Keats", Text = "The excellency of every art is its intensity, capable of making all disagreeables evaporate, from their being in close relationship with beauty and truth.", Author = "John Keats" },

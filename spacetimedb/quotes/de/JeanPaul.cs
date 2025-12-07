@@ -52,7 +52,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Der Dichter gleicht der Saite: Er selber macht sich unsichtbar, wenn er sich schwingt und Wohllaut gibt.", Author = "Jean Paul" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Die Erinnerung ist das einzige Paradies, aus welchem wir nicht getrieben werden können.", Author = "Jean Paul" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Die Kunst ist zwar nicht das Brot, aber der Wein des Lebens.", Author = "Jean Paul" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Eine neue Rolle des Lebens spielt der Mensch am wärmsten und am besten; über unsern Antrittspredigten schwebt der Heilige Geist brütend mit Taubenflügeln – nur später liegen die Eier kalt.", Author = "Jean Paul" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Es hat mich oft verdrüßlich gemacht, daß ich jeder Vorrede, die ich schreibe, ein Buch anhängen muß", Author = "Jean Paul" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Je älter man wird, desto lieber will man sprechen, und desto weniger schreiben, besonders Briefe.", Author = "Jean Paul" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Mädchen und Gold sind desto weicher, je reiner sie sind.", Author = "Jean Paul" },

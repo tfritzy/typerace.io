@@ -12,7 +12,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Martin_Buber", Text = "Alles wirkliche Leben ist Begegnung.", Author = "Martin Buber" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Martin_Buber", Text = "Alt sein ist ja ein herrliches Ding, wenn man nicht verlernt hat, was anfangen heißt.", Author = "Martin Buber" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Martin_Buber", Text = "Beziehung beruht auf Gegenseitigkeit.", Author = "Martin Buber" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Martin_Buber", Text = "Der Mensch wird am Du zum Ich.", Author = "Martin Buber" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Martin_Buber", Text = "Erfolg ist keiner der Namen Gottes.", Author = "Martin Buber" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Martin_Buber", Text = "Gott wohnt, wo man ihn einläßt.", Author = "Martin Buber" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Martin_Buber", Text = "Liebe ist Verantwortung eines Ich für ein Du.", Author = "Martin Buber" },

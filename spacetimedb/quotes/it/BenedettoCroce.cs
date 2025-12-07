@@ -9,9 +9,7 @@ public static partial class ItalianQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://it.wikiquote.org/wiki/Benedetto_Croce", Text = "Anche nella vendetta, insomma, non si gode del male di altri, ma del nostro bene [...].", Author = "Benedetto Croce" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Benedetto_Croce", Text = "Eliminando le case chiuse non si distruggerebbe il male che rappresentano, ma si distruggerebbe il bene con il quale è contenuto, accerchiato e attenuato quel male.", Author = "Benedetto Croce" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Benedetto_Croce", Text = "Il filosofo, oggi, deve non già fare il puro filosofo, ma esercitare un qualche mestiere, e in primo luogo, il mestiere dell'uomo.", Author = "Benedetto Croce" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Benedetto_Croce", Text = "Io, modestamente, so di vivere in un continuo colloquio con Dio, così serio e intenso che molti cattolici e molti preti non hanno mai sentito nella loro anima.", Author = "Benedetto Croce" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Benedetto_Croce", Text = "L'Italia di Volpe cammina ma non pensa.", Author = "Benedetto Croce" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Benedetto_Croce", Text = "La critica è un fucile molto bello: deve sparare raramente!", Author = "Benedetto Croce" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Benedetto_Croce", Text = "La giustizia vera è fatta di compassione.", Author = "Benedetto Croce" },

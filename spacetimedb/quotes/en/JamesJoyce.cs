@@ -32,7 +32,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "Everything in Paris is gay", Author = "James Joyce" },
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "One by one they were all becoming shades. Better pass boldly into that other world, in the full glory of some passion, than fade and wither dismally with age.", Author = "James Joyce" },
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "His soul swooned slowly as he heard the snow falling faintly through the universe and faintly falling, like the descent of their last end, upon all the living and the dead.", Author = "James Joyce" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "History, Stephen said, is a nightmare from which I am trying to awake.", Author = "James Joyce" },
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "The heaventree of stars hung with humid nightblue fruit.", Author = "James Joyce" },
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "A man of genius makes no mistakes. His errors are volitional and are the portals of discovery", Author = "James Joyce" },
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "Frail the white rose and frail are Her hands that gave ", Author = "James Joyce" },

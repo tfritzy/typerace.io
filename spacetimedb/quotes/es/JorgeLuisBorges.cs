@@ -10,7 +10,6 @@ public static partial class SpanishQuotes
         {
             new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "Conozco las costumbres y las armas y ese dialecto de alusiones que se urde en todo agrupamiento humano.", Author = "Jorge Luis Borges" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "Considero a la democracia como un abuso de la estadística.", Author = "Jorge Luis Borges" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "¿De qué otra forma se puede amenazar que no sea de muerte? Lo interesante, lo original, sería que alguien lo amenazase a uno con la inmortalidad.", Author = "Jorge Luis Borges" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "Duda es uno de los nombres de la inteligencia.", Author = "Jorge Luis Borges" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "El fútbol es popular porque la estupidez es popular.", Author = "Jorge Luis Borges" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "El nacionalismo es el canalla principal de todos los males. Divide a la gente, destruye el lado bueno de la naturaleza humana, conduce a la desigualdad en la distribución de las riquezas.", Author = "Jorge Luis Borges" },
@@ -51,9 +50,7 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "Si viéramos realmente el Universo, tal vez lo entenderíamos.", Author = "Jorge Luis Borges" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "Somos nuestra memoria, somos ese quimérico museo de formas inconstantes, ese montón de espejos rotos.", Author = "Jorge Luis Borges" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "También el jugador es prisionero de otro tablero de negras noches y de blancos días.", Author = "Jorge Luis Borges" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "Un amigo no es otro yo. Si así fuera, sería muy monótono; tiene que ser alguien con sus características propias.", Author = "Jorge Luis Borges" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "Un gran poeta es menos un inventor que un iluminador.", Author = "Jorge Luis Borges" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "Un libro es una cosa entre las cosas, un volumen perdido entre los volúmenes que pueblan el indiferente universo; hasta que da con su lector, con el hombre destinado a sus símbolos.", Author = "Jorge Luis Borges" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "Un verso bueno no permite que se lo lea en voz baja, o en silencio.", Author = "Jorge Luis Borges" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "Yo creo que habría que inventar un juego en el que nadie ganara.", Author = "Jorge Luis Borges" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "Yo he querido hacer lo mismo en muchos cuentos y he sido admirado por ese hallazgo, que es el hallazgo de Dante Alighieri en la Edad Media, el de presentar un momento como cifra de una vida.", Author = "Jorge Luis Borges" },

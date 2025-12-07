@@ -27,11 +27,9 @@ public static partial class FrenchQuotes
             new Quote { Id = "https://fr.wikiquote.org/wiki/Michel_Houellebecq", Text = "Loin d’être un effort d’abstraction, comme on le prétend parfois, le passage au monothéisme n’est qu’un élan vers l’abrutissement.", Author = "Michel Houellebecq" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Michel_Houellebecq", Text = "Quand les gens parlent de « droits de l’homme », j’ai toujours plus ou moins l’impression qu’ils font du ''second degré''.", Author = "Michel Houellebecq" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Michel_Houellebecq", Text = "Les hommes vivent les uns à côté des autres comme des bœufs ; c’est tout juste s’ils parviennent, de temps en temps, à partager une bouteille d’alcool.", Author = "Michel Houellebecq" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Michel_Houellebecq", Text = "Quant aux droits de l'homme, bien évidemment, je n'en avais rien à foutre ; c'est à peine si je parvenais à m'intéresser aux droits de ma queue.", Author = "Michel Houellebecq" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Michel_Houellebecq", Text = "L'enfant est une sorte de nain vicieux, d'une cruauté innée, chez qui se retrouvent immédiatement les pires traits de l'espèce, et dont les animaux domestiques se détournent avec une sage prudence.", Author = "Michel Houellebecq" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Michel_Houellebecq", Text = "Jeunesse, beauté, force : les critères de l'amour physique sont exactement les mêmes que ceux du nazisme.", Author = "Michel Houellebecq" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Michel_Houellebecq", Text = "L'amour non partagé est une hémorragie.", Author = "Michel Houellebecq" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Michel_Houellebecq", Text = "La religion la plus con, c'est quand même l'islam. Quand on lit le Coran, on est effondré... effondré !", Author = "Michel Houellebecq" },
         };
     }
 }

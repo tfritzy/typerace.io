@@ -8,7 +8,6 @@ public static partial class SpanishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://es.wikiquote.org/wiki/Garcilaso_de_la_Vega", Text = "El agua baña el prado con sonido.", Author = "Garcilaso de la Vega" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Garcilaso_de_la_Vega", Text = "En el silencio solo se escuchaba un susurro de abejas que sonaba.", Author = "Garcilaso de la Vega" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Garcilaso_de_la_Vega", Text = "Tus claros ojos ¿a quién los volviste?", Author = "Garcilaso de la Vega" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Garcilaso_de_la_Vega", Text = "Culpa debe ser quereros, según lo que en mi hacéis, más allá lo pagaréis do no sabrán conoceros, por mal que me conocéis.", Author = "Garcilaso de la Vega" },

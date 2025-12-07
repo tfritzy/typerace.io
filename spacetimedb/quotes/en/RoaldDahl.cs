@@ -8,7 +8,6 @@ public static partial class EnglishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://en.wikiquote.org/wiki/Roald_Dahl", Text = "A person is a fool to become a writer. His only compensation is absolute freedom. He has no master except his own soul and that, I am sure, is why he does it.", Author = "Roald Dahl" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Roald_Dahl", Text = "A little nonsense now and then, is cherished by the wisest men.", Author = "Roald Dahl" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Roald_Dahl", Text = "Grown-ups are quirky creatures, full of quirks and secrets.", Author = "Roald Dahl" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Roald_Dahl", Text = "When you grow up and have children of your own, do please remember something important: a stodgy parent is no fun at all. What a child wants and deserves is a parent who is SPARKY.", Author = "Roald Dahl" },

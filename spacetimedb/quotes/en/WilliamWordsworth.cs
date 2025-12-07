@@ -10,7 +10,6 @@ public static partial class EnglishQuotes
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "I travelled among unknown men, In lands beyond the sea; Nor, England! did I know till then What love I bore to thee.", Author = "William Wordsworth" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "Sweet childish days, that were as long As twenty days are now.", Author = "William Wordsworth" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "My heart leaps up when I behold A rainbow in the sky: So was it when my life began; So is it now I am a man; So be it when I shall grow old, Or let me die!", Author = "William Wordsworth" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "The Child is father of the Man; And I could wish my days to be Bound each to each by natural piety.", Author = "William Wordsworth" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "Ne'er saw I, never felt, a calm so deep! The river glideth at his own sweet will: Dear God! the very houses seem asleep; And all that mighty heart is lying still!", Author = "William Wordsworth" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "Pleasures newly found are sweet When they lie about our feet.", Author = "William Wordsworth" },

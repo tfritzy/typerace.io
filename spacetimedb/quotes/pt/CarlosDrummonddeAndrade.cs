@@ -50,7 +50,6 @@ public static partial class PortugueseQuotes
             new Quote { Id = "https://pt.wikiquote.org/wiki/Carlos_Drummond_de_Andrade", Text = "O que se chama povo é tão abstrato que ele não reconhece a sua imagem.", Author = "Carlos Drummond de Andrade" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Carlos_Drummond_de_Andrade", Text = "Nem todas as coisas incompreensíveis são religiosas.", Author = "Carlos Drummond de Andrade" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Carlos_Drummond_de_Andrade", Text = "A rosa não é rosa; é projeto de rosa continuamente renovado.", Author = "Carlos Drummond de Andrade" },
-            new Quote { Id = "https://pt.wikiquote.org/wiki/Carlos_Drummond_de_Andrade", Text = "São mitos de calendário tanto o ontem como o agora, e o teu aniversário é um nascer a toda hora.", Author = "Carlos Drummond de Andrade" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Carlos_Drummond_de_Andrade", Text = "Também temos saudade do que não existiu, e dói bastante.", Author = "Carlos Drummond de Andrade" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Carlos_Drummond_de_Andrade", Text = "A educação para o sofrimento, evitaria senti-lo, em relação a casos que não o merecem.", Author = "Carlos Drummond de Andrade" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Carlos_Drummond_de_Andrade", Text = "Tempo disso, tempo daquilo; falta o tempo de nada.", Author = "Carlos Drummond de Andrade" },

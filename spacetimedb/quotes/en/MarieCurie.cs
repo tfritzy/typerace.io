@@ -12,7 +12,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Marie_Curie", Text = "Be less curious about people and more curious about ideas.", Author = "Marie Curie" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Marie_Curie", Text = "In science, we must be interested in things, not in persons.", Author = "Marie Curie" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Marie_Curie", Text = "All my life through, the new sights of Nature made me rejoice like a child.", Author = "Marie Curie" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Marie_Curie", Text = "I am among those who think that science has great beauty.", Author = "Marie Curie" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Marie_Curie", Text = "I was taught that the way of progress was neither swift nor easy.", Author = "Marie Curie" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Marie_Curie", Text = "There are sadistic scientists who hurry to hunt down errors instead of establishing the truth.", Author = "Marie Curie" },
         };

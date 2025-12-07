@@ -10,7 +10,6 @@ public static partial class GermanQuotes
         {
             new Quote { Id = "https://de.wikiquote.org/wiki/Christian_Morgenstern", Text = "Blödem Volke unverständlich // treiben wir des Lebens Spiel.", Author = "Christian Morgenstern" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Christian_Morgenstern", Text = "Ein Wiesel // saß auf einem Kiesel // Inmitten Bachgeriesel. // Wisst ihr // weshalb? // Das Mondkalb // verriet es mir // Im Stillen: // Das raffinier- // te Tier // tat's um des Reims willen.", Author = "Christian Morgenstern" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Christian_Morgenstern", Text = "Es gibt ein sehr probates Mittel, // die Zeit zu halten am Schlawittel: // Man nimmt die Taschenuhr zur Hand // und folgt dem Zeiger unverwandt.", Author = "Christian Morgenstern" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Christian_Morgenstern", Text = "Es ist Nacht, // und mein Herz kommt zu dir, // hält's nicht aus, // hält's nicht aus mehr bei mir.", Author = "Christian Morgenstern" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Christian_Morgenstern", Text = "Ich liebe dich, du Seele, die da irrt // im Thal des Lebens nach dem rechten Glücke.", Author = "Christian Morgenstern" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Christian_Morgenstern", Text = "In Dank verschlingt sich alles Sein.", Author = "Christian Morgenstern" },
@@ -35,7 +34,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Christian_Morgenstern", Text = "Es gibt nichts, das ich Mir nicht vergeben könnte, und nichts, das ich nicht überwinden möchte.", Author = "Christian Morgenstern" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Christian_Morgenstern", Text = "Es ist schön, zu denken, daß so viele Menschen heilig sind in den Augen derer, die sie lieben.", Author = "Christian Morgenstern" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Christian_Morgenstern", Text = "Gespräch ist gegenseitige distanzierte Berührung.", Author = "Christian Morgenstern" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Christian_Morgenstern", Text = "In dem Maße, wie der Wille und die Fähigkeit zur Selbstkritik steigen, hebt sich auch das Niveau der Kritik am andern.", Author = "Christian Morgenstern" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Christian_Morgenstern", Text = "Leben ist die Suche des Nichts nach dem Etwas.", Author = "Christian Morgenstern" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Christian_Morgenstern", Text = "Neue Dichter seh ich kommen, nach innen den Blick gerichtet.", Author = "Christian Morgenstern" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Christian_Morgenstern", Text = "Spannung ist alles und Entladung. Und höchste Lebensweisheit, seine Spannung immer richtig zu entladen.", Author = "Christian Morgenstern" },

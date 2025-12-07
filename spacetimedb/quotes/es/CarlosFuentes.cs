@@ -14,7 +14,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Carlos_Fuentes", Text = "La memoria es el deseo satisfecho.", Author = "Carlos Fuentes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Carlos_Fuentes", Text = "Las revoluciones las hacen los hombres de carne y hueso y no los santos, y todas acaban por crear una nueva casta privilegiada.", Author = "Carlos Fuentes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Carlos_Fuentes", Text = "Lo que mejor hace los Estados Unidos es comprenderse a sí mismo. Lo que peor hace en comprender a los demás.", Author = "Carlos Fuentes" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Carlos_Fuentes", Text = "México no se explica: se cree en México, con furia, con pasión, con desaliento.", Author = "Carlos Fuentes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Carlos_Fuentes", Text = "Toda obra de arte es una lectura del mundo y, simultáneamente, una lectura de sí misma.", Author = "Carlos Fuentes" },
         };
     }

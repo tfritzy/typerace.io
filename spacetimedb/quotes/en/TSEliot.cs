@@ -26,7 +26,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "I have heard the mermaids singing, each to each.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "We have lingered in the chambers of the sea By sea-girls wreathed with seaweed red and brown Till human voices wake us, and we drown.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "We shall often find that not only the best, but the most individual parts of his work may be those in which the dead poets, his ancestors, assert their immortality most vigorously.", Author = "T. S. Eliot" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "Here I am, an old man in a dry month, Being read to by a boy, waiting for rain.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "Signs are taken for wonders.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "Weave the wind. I have no ghosts, An old man in a draughty house Under a windy knob.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "After such knowledge, what forgiveness? Think now History has many cunning passages, contrived corridors And issues, deceives with whispering ambitions, Guides us by vanities.", Author = "T. S. Eliot" },

@@ -16,15 +16,11 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Gianni_Rodari", Text = "Non si può essere mai sicuri di quello che un bambino impara guardando la televisione. E non si deve mai sottovalutare la sua capacità di reagire creativamente al visibile.", Author = "Gianni Rodari" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Gianni_Rodari", Text = "Non c'è vita dove non c'è lotta.", Author = "Gianni Rodari" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Gianni_Rodari", Text = "Nelle nostre scuole, generalmente parlando, si ride troppo poco. L'idea che l'educazione della mente debba essere una cosa tetra è tra le più difficili da combattere.", Author = "Gianni Rodari" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Gianni_Rodari", Text = "Un «libbro» con due b sarà soltanto un libro più pesante degli altri, o un libro sbagliato, o un libro specialissimo?", Author = "Gianni Rodari" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Gianni_Rodari", Text = "Sbagliando s'impara, è un vecchio proverbio. Il nuovo potrebbe essere che sbagliando s'inventa.", Author = "Gianni Rodari" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Gianni_Rodari", Text = "Burattinaio, il più bel mestiere del mondo.", Author = "Gianni Rodari" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Gianni_Rodari", Text = "Tra il mondo dei giocattoli e il mondo adulto c'è un rapporto meno chiaro di quanto possa sembrare a prima vista: da un lato, i giocattoli vi approdato «per caduta», dall'altro per conquista.", Author = "Gianni Rodari" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Gianni_Rodari", Text = "Certe cose che nel mondo adulto hanno avuto un tempo grande importanza, accettano la riduzione a giocattoli, pur di non sparire, quando quel tempo viene a finire.", Author = "Gianni Rodari" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Gianni_Rodari", Text = "Inventare storie con i giocattoli è quasi naturale, è una cosa che viene da sola se si gioca con i bambini: la storia non è che un prolungamento, uno sviluppo, un'esplosione festosa del giocattolo.", Author = "Gianni Rodari" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Gianni_Rodari", Text = "La mente è una sola. La sua creatività va coltivata in tutte le direzioni.", Author = "Gianni Rodari" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Gianni_Rodari", Text = "Con un po' di esercizio è possibile prendere lezioni di ottimismo anche da Giacomo Leopardi.", Author = "Gianni Rodari" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Gianni_Rodari", Text = "Prima di tutto la fiaba è per il bambino uno strumento ideale per trattenere con sé l'adulto.", Author = "Gianni Rodari" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Gianni_Rodari", Text = "Per colpa di un accento un tale di Santhià credeva d'essere alla meta ed era appena a metà.", Author = "Gianni Rodari" },
         };
     }

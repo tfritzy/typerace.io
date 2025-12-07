@@ -33,7 +33,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "All opinions are not equal. Some are a very great deal more robust, sophisticated and well supported in logic and argument than others.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Anything invented after you're thirty-five is against the natural order of things.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "The future of computer power is pure simplicity.", Author = "Douglas Adams" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "I am fascinated by religion. (That's a completely different thing from believing in it!)", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "I'd take the awe of understanding over the awe of ignorance any day.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "My 'absolute' favourite piece of information is the fact that young sloths are so inept that they frequently grab their own arms and legs instead of tree limbs, and fall out of trees.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "The hotel shop only had two decent books, and I'd written both of them.", Author = "Douglas Adams" },

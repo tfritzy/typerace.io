@@ -8,11 +8,9 @@ public static partial class ItalianQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Ero un ragazzo cui piaceva la solitudine, cui piaceva di più stare con le cose che con le persone.", Author = "Giuseppe Tomasi di Lampedusa" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Io sono una persona che sta molto sola; delle mie sedici ore di veglia quotidiane dieci almeno sono passate in solitudine.", Author = "Giuseppe Tomasi di Lampedusa" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Essa non scrisse che pochi versi, brevi liriche aspre, ferite, alla cui malia non si sfugge.", Author = "Giuseppe Tomasi di Lampedusa" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "E un romanzo. Wuthering Heights, un romanzo come non ne sono mai stati scritti prima, come non saranno mai più scritti dopo.", Author = "Giuseppe Tomasi di Lampedusa" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Si tratta di una fosca vicenda di odi, di sadismo e di represse passioni, narrate con uno stile teso e corrusco spirante, fra i tragici fatti, una selvaggia purezza.", Author = "Giuseppe Tomasi di Lampedusa" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Il romanzo romantico, se mi si consente il bisticcio, ha qui raggiunto il proprio zenith.", Author = "Giuseppe Tomasi di Lampedusa" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Raccontami della nostra isola; è una bella terra benché popolata da somari.", Author = "Giuseppe Tomasi di Lampedusa" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Il suo volto triangolare assunse una inaspettata espressione virile.", Author = "Giuseppe Tomasi di Lampedusa" },
@@ -32,7 +30,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Noi fummo i Gattopardi, i Leoni: chi ci sostituirà saranno gli sciacalletti, le iene; e tutti quanti, gattopardi, sciacalli e pecore, continueremo a crederci il sale della terra.", Author = "Giuseppe Tomasi di Lampedusa" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Come era possibile infierire contro chi, se ne è sicuri, dovrà morire?", Author = "Giuseppe Tomasi di Lampedusa" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Non era lecito odiare altro che l'eternità.", Author = "Giuseppe Tomasi di Lampedusa" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Perché mai Dio voleva che nessuno morisse con la propria faccia?", Author = "Giuseppe Tomasi di Lampedusa" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Macinava \"Tu che a Dio spiegasti l'ale\".", Author = "Giuseppe Tomasi di Lampedusa" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Quel che rimaneva di don Fabrizio pensò a quanto fiele venisse in quel momento mescolato a tante agonie, in Italia, da queste musiche meccaniche.", Author = "Giuseppe Tomasi di Lampedusa" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Giuseppe_Tomasi_di_Lampedusa", Text = "Il mio sicilianissimo amor proprio era umiliato: ero stato fatto fesso; e decisi di abbandonare per qualche tempo il mondo e le sue pompe.", Author = "Giuseppe Tomasi di Lampedusa" },

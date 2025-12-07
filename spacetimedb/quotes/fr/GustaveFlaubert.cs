@@ -20,7 +20,6 @@ public static partial class FrenchQuotes
             new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Oui, la bêtise consiste à vouloir conclure. Quel est l’esprit un peu fort qui ait conclu, à commencer par Homère ? Contentons-nous du tableau, c’est aussi bon.", Author = "Gustave Flaubert" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Quelle admirable invention du Diable que les rapports sociaux !", Author = "Gustave Flaubert" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Ce qui me navre, c’est 1° la férocité des hommes ; 2° la conviction que nous allons entrer dans une ère stupide. On sera utilitaire, militaire, américain et catholique.", Author = "Gustave Flaubert" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Tous les drapeaux ont été tellement souillés de sang et de merde qu'il est temps de n'en plus avoir, du tout.", Author = "Gustave Flaubert" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Gustave_Flaubert", Text = "Chacun de nous a dans le cœur une chambre royale ; je l'ai murée, mais elle n'est pas détruite.", Author = "Gustave Flaubert" },
         };
     }

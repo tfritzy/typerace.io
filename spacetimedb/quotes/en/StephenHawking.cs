@@ -65,7 +65,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Stephen_Hawking", Text = "We are each free to believe what we want and it is my view that the simplest explanation is there is no God.", Author = "Stephen Hawking" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Stephen_Hawking", Text = "No one created the universe and no one directs our fate.", Author = "Stephen Hawking" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Stephen_Hawking", Text = "This leads me to a profound realization. There is probably no heaven, and no afterlife either.", Author = "Stephen Hawking" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Stephen_Hawking", Text = "We have this one life to appreciate the grand design of the universe, and for that, I am extremely grateful.", Author = "Stephen Hawking" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Stephen_Hawking", Text = "We are all different — but we share the same human spirit.", Author = "Stephen Hawking" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Stephen_Hawking", Text = "Perhaps it's human nature that we adapt — and survive.", Author = "Stephen Hawking" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Stephen_Hawking", Text = "If you like, you can call the laws of science 'God', but it wouldn't be a personal God that you would meet and put questions to.", Author = "Stephen Hawking" },

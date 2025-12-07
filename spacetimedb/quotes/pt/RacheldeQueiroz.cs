@@ -10,7 +10,6 @@ public static partial class PortugueseQuotes
         {
             new Quote { Id = "https://pt.wikiquote.org/wiki/Rachel_de_Queiroz", Text = "A piedade supõe uma condição de superioridade e a gente só pode se compadecer de quem sofre mais do que nós.", Author = "Rachel de Queiroz" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Rachel_de_Queiroz", Text = "Fala-se muito na crueldade e na bruteza do homem medievo. Mas o homem moderno será melhor?", Author = "Rachel de Queiroz" },
-            new Quote { Id = "https://pt.wikiquote.org/wiki/Rachel_de_Queiroz", Text = "Cada coisa tem sua hora e cada hora o seu cuidado", Author = "Rachel de Queiroz" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Rachel_de_Queiroz", Text = "Doer, dói sempre. Só não dói depois de morto. Porque a vida toda é um doer.", Author = "Rachel de Queiroz" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Rachel_de_Queiroz", Text = "Morrer,só se morre só. O moribundo se isola numa redoma de vidro,ele e a sua agonia. Nada ajuda nem acompanha.", Author = "Rachel de Queiroz" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Rachel_de_Queiroz", Text = "Acho que a gente tem que dar o testemunho fiel do seu tempo e da sua gente e as conclusões que sejam tiradas.", Author = "Rachel de Queiroz" },

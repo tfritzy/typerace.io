@@ -8,15 +8,12 @@ public static partial class EnglishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "I am. I think. I will.", Author = "Ayn Rand" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "I need no warrant for being, and no word of sanction upon my being. I am the warrant and the sanction.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "There is nothing to take a man's freedom away from him, save other men. To be free, a man must be free of his brothers.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "In the temple of his spirit, each man is alone.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "'Free competition enforced by law' is a grotesque contradiction in terms.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "My views on charity are very simple. I do not consider it a major virtue and, above all, I do not consider it a moral duty.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "I regard compassion as proper only toward those who are innocent victims, but not toward those who are morally guilty.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "Not only the post office, but streets, roads, and above all, schools, should all be privately owned and privately run.", Author = "Ayn Rand" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "I am an advocate of laissez-faire capitalism, of individual rights—there are no others—of individual freedom.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "When I came here from Soviet Russia, I was interested in politics for only one reason—to reach the day when I would not have to be interested in politics.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "And if you ask me, what is greatness? – I will answer, it is the capacity to live by the three fundamental values of John Galt: reason, purpose, self-esteem.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "Is man worth it? What else is worth anything?", Author = "Ayn Rand" },
@@ -70,7 +67,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "Thanksgiving is a typically American holiday... The lavish meal is a symbol of the fact that abundant consumption is the result and reward of production.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "Competition is a by-product of productive work, not its goal. A creative man is motivated by the desire to achieve, not by the desire to beat others.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "Honor is self-esteem made visible in action.", Author = "Ayn Rand" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "As far as the feminist movement is concerned, I am a male chauvinist.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "There are only two means by which men can deal with one another: guns or logic. Force or persuasion.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "The conservatives see man as a body freely roaming the earth, building sand piles or factories—with an electronic computer inside his skull, controlled from Washington.", Author = "Ayn Rand" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ayn_Rand", Text = "A culture is made — or destroyed — by its articulate voices.", Author = "Ayn Rand" },

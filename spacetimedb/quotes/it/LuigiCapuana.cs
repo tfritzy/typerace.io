@@ -15,7 +15,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Capuana", Text = "L'anima è il corpo che funziona; morto il corpo, morta l'anima.", Author = "Luigi Capuana" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Capuana", Text = "«I preti cattolici hanno preso Dio agli ebrei e hanno inventato Gesù Cristo.»", Author = "Luigi Capuana" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Capuana", Text = "Quando un Roccaverdina prende un drizzone, è capace di tutto, nel bene e nel male! ... Anche a costo di far scorazzare il collo a chi non c'entra.", Author = "Luigi Capuana" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Capuana", Text = "Il Michelet è uno dei pochi francesi che abbiano amato l'Italia con affetto profondo. Potremmo anzi dire che ci appartiene.", Author = "Luigi Capuana" },
         };
     }
 }

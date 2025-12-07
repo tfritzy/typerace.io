@@ -24,9 +24,7 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Edmondo_De_Amicis", Text = "L'uomo che pratica una sola classe sociale, è come lo studioso che non legge altro che un libro.", Author = "Edmondo De Amicis" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Edmondo_De_Amicis", Text = "La scuola è una madre.", Author = "Edmondo De Amicis" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Edmondo_De_Amicis", Text = "Immagina pure che ti siano destinati nella vita molti giorni terribili; il più terribile di tutti sarà il giorno in cui perderai tua madre.", Author = "Edmondo De Amicis" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Edmondo_De_Amicis", Text = "E pronuncia sempre con riverenza questo nome – maestro – che dopo quello di padre, è il più nobile, il più dolce nome che possa dare un uomo a un altro uomo.", Author = "Edmondo De Amicis" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Edmondo_De_Amicis", Text = "Pochi uomini stavan rivolti verso il mare; i più passavan a rassegna le passeggiere.", Author = "Edmondo De Amicis" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Edmondo_De_Amicis", Text = "Un monferrino con un muso di cinghiale, era diventato addirittura canuto spettacolo per la contadina di Capracotta.", Author = "Edmondo De Amicis" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Edmondo_De_Amicis", Text = "Non aveva un ingegno di vasta organatura; ma nell'officina della sua mente, piena di minuti strumenti ben temprati e precisi, faceva bene e alla lesta un lavorìo vario e utile.", Author = "Edmondo De Amicis" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Edmondo_De_Amicis", Text = "In letteratura il suo sentimento dominante era l'odio della retorica: non credo che ci sia mai stato al mondo uomo più difficile a prendere all'amo delle belle frasi.", Author = "Edmondo De Amicis" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Edmondo_De_Amicis", Text = "A udirla parlare, pareva di vederla ringiovanire: aveva una grande semplicità, certe uscite ingenue, dei gesti scattanti di bambina.", Author = "Edmondo De Amicis" },
@@ -50,7 +48,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Edmondo_De_Amicis", Text = "Eccomi preso daccapo a quest'immensa rete dorata, in cui ogni tanto bisogna cascare, volere o non volere.", Author = "Edmondo De Amicis" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Edmondo_De_Amicis", Text = "Era una mattina piovosa di febbraio, e mancava un'ora al levar del sole.", Author = "Edmondo De Amicis" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Edmondo_De_Amicis", Text = "Un Piemontese, che deve andare a Roma tra poco, sentì il bisogno, qualche giorno fa, di mandar un saluto alla città di Firenze, e pensò di mandarglielo dalla cima della collina di Fiesole.", Author = "Edmondo De Amicis" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Edmondo_De_Amicis", Text = "Le cose che ho da dire sono tante e tali che mi sarà impossibile di scriverle con ordine e chiaramente.", Author = "Edmondo De Amicis" },
         };
     }
 }
