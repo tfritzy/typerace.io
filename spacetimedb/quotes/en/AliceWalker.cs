@@ -19,7 +19,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Alice_Walker", Text = "We know a roofleaf is not Jesus Christ, but in its own humble way, is it not God?", Author = "Alice Walker" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Alice_Walker", Text = "The world is changing, I said. It is no longer a world just for boys and men.", Author = "Alice Walker" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Alice_Walker", Text = "I think it pisses God off if you walk by the color purple in a field somewhere and don’t notice it.", Author = "Alice Walker" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Alice_Walker", Text = "I think us here to wonder, myself. To wonder. To ast. And that in wondering bout the big things and asting bout the big things, you learn about the little ones, almost by accident. But you never know nothing more about the big things than you start out with. The more I wonder, he say, the more I love.", Author = "Alice Walker" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Alice_Walker", Text = "But please remember, especially in these times of group-think and the right-on chorus, that no person is your friend (or kin) who demands your silence, or denies your right to grow and be perceived as fully blossomed as you were intended.", Author = "Alice Walker" },
         };
     }

@@ -14,7 +14,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Jürgen_Habermas", Text = "Diskurse herrschen nicht. Sie erzeugen eine kommunikative Macht, die die administrative nicht ersetzen kann, sondern nur beeinflussen kann.", Author = "Jürgen Habermas" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Jürgen_Habermas", Text = "Wahrheit nennen wir den Geltungsanspruch, den wir mit konstativen Sprechakten verbinden. Eine Aussage ist wahr, wenn der Geltungsanspruch der Sprechakte, mit denen wir, unter Verwendung von Sätzen, jene Aussage behaupten, berechtigt ist.", Author = "Jürgen Habermas" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Jürgen_Habermas", Text = "Zwischen Kapitalismus und Demokratie besteht ein unauflösliches Spannungsverhältnis; mit beiden konkurrieren nämlich zwei entgegengesetzte Prinzipien der gesellschaftlichen Integration um den Vorrang.", Author = "Jürgen Habermas" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Jürgen_Habermas", Text = "Solidarität ist keine Nächstenliebe, aber erst recht keine Konditionierung zum Vorteil einer Seite. Wer sich solidarisch verhält, ist bereit, sowohl im langfristigen Eigeninteresse wie im Vertrauen darauf, dass sich der andere in ähnlichen Situationen ebenso verhalten wird, kurzfristig Nachteile in Kauf zu nehmen.", Author = "Jürgen Habermas" },
         };
     }
 }

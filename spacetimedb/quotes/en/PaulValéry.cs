@@ -45,7 +45,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Paul_Valéry", Text = "What peace I feel begotten at that source!", Author = "Paul Valéry" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Paul_Valéry", Text = "Beautiful heaven, true heaven, look how I change!", Author = "Paul Valéry" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Paul_Valéry", Text = "Now present here, the future takes its time.", Author = "Paul Valéry" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Paul_Valéry", Text = "All perishes. A thing of flesh and pore Am I. Divine impatience also dies.", Author = "Paul Valéry" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Paul_Valéry", Text = "The \"determinist\" swears that if we knew everything we should also be able to deduce and foretell the conduct of every man in every circumstance, and that is obvious enough.", Author = "Paul Valéry" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Paul_Valéry", Text = "A really free mind is scarcely attached to its opinions.", Author = "Paul Valéry" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Paul_Valéry", Text = "Great things are accomplished by men who are not conscious of the impotence of man. Such insensitiveness is precious.", Author = "Paul Valéry" },

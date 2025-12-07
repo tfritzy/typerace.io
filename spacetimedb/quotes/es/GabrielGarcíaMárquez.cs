@@ -21,7 +21,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Gabriel_García_Márquez", Text = "Simplifiquemos la gramática antes de que la gramática termine por simplificarnos a nosotros.", Author = "Gabriel García Márquez" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Gabriel_García_Márquez", Text = "Un verdadero amigo es quien te toma la mano y te toca el corazón.", Author = "Gabriel García Márquez" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Gabriel_García_Márquez", Text = "Yo creo que todavía no es demasiado tarde para construir una utopía que nos permita compartir la tierra.", Author = "Gabriel García Márquez" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Gabriel_García_Márquez", Text = "El mundo era tan reciente, que muchas cosas carecían de nombre, y para mencionarlas había que señalarlas con el dedo.", Author = "Gabriel García Márquez" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Gabriel_García_Márquez", Text = "Las estirpes condenadas a cien años de soledad no tenían una segunda oportunidad sobre la tierra.", Author = "Gabriel García Márquez" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Gabriel_García_Márquez", Text = "Ningún lugar de la vida es más triste que una cama vacía.", Author = "Gabriel García Márquez" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Gabriel_García_Márquez", Text = "Si los hombres parieran serían menos desconsiderados.", Author = "Gabriel García Márquez" },

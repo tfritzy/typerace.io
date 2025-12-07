@@ -40,7 +40,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Es ist Arznei, nicht Gift, was ich dir reiche.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Es sind nicht alle frei, die ihrer Ketten spotten.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Ich fürchte, grad unter Menschen möchtest du, ein Mensch zu sein verlernen.", Author = "Gotthold Ephraim Lessing" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Jeder liebt sich selber nur am meisten.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Kein Mensch muss müssen.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Macht denn nur das Blut den Vater?", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Nicht die Kinder bloß speist man mit Märchen ab.", Author = "Gotthold Ephraim Lessing" },
@@ -59,12 +58,10 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Die Menge auf etwas aufmerksam machen heißt: dem gesunden Menschenverstand auf die Spur zu helfen.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Es ist ein Beweis für die wahre, für die richtig verstandene wahre Religion, wenn sie uns überall auf das Schöne zurückbringt.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Für wohlgerathene Kinder können Eltern nicht zu viel thun. Aber wenn sich ein blöder Vater für einen ausgearteten Sohn das Blut vom Herzen zapft, dann wird Liebe zur Thorheit.", Author = "Gotthold Ephraim Lessing" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "»Niemand, sagen die Verfasser der Bibliothek, wird leugnen, daß die deutsche Schaubühne einen großen Teil ihrer ersten Verbesserung dem Herrn Professor Gottsched zu danken habe.« Ich bin dieser Niemand; ich leugne es gerade zu. Es wäre zu wünschen, daß sich Herr Gottsched niemals mit dem Theater vermengt hätte.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Reiz ist Schönheit in Bewegung.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Töne, frohe Leier, // Töne Lust und Wein! // Töne, sanfte Leier, // Töne Liebe drein!", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Was ist ein Held ohne Menschenliebe?", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Welche Freude, wenn es heißt: Alter, du bist alt an Haaren, blühend aber ist dein Geist!", Author = "Gotthold Ephraim Lessing" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Wenn Gott in seiner Rechten alle Wahrheit und in seiner Linken den einzigen immer regen Trieb nach Wahrheit, obschon mit dem Zusatze, mich immer und ewig zu irren, verschlossen hielte und spräche zu mir: wähle! Ich fiele ihm mit Demut in seine Linke und sagte: Vater gib! die reine Wahrheit ist ja doch nur für dich allein!", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Was ihn bewegt, bewegt; was ihm gefällt, gefällt. // Sein glücklicher Geschmack ist der Geschmack der Welt.", Author = "Gotthold Ephraim Lessing" },
         };
     }

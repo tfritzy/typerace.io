@@ -10,7 +10,6 @@ public static partial class ItalianQuotes
         {
             new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "Gli smeraldi, le perle, ed i diamanti | Abbaglian gli occhi col vivo splendore; | Ma le dolci parole e i dolci pianti | Hanno spesso più forza e più valore.", Author = "Carlo Collodi" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "La cortesia che le bell'alme accende, | Costa talora acerbi affanni e pene; | Ma presto o tardi la virtù risplende, | E quando men ci pensa il premio ottiene.", Author = "Carlo Collodi" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "La storia di Cappuccetto Rosso fa vedere ai giovinetti e alle giovinette, e segnatamente alle giovinette, che non bisogna mai fermarsi a discorrere per la strada con gente che non si conosce: perché dei lupi ce n'è dappertutto e di diverse specie, e i più pericolosi sono appunto quelli che hanno faccia di persone garbate e piene di complimenti e di belle maniere.", Author = "Carlo Collodi" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "La bellezza, per le donne in ispecie, è un gran tesoro; ma c'è un tesoro che vale anche di più, ed è la grazia, la modestia e le buone maniere.", Author = "Carlo Collodi" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "La curiosità, massime quando è spinta troppo, spesso e volentieri ci porta addosso qualche malanno.", Author = "Carlo Collodi" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "Le follie e i capricci delle mamme spesse volte sono cagione di grandi dispiaceri per i figliuoli.", Author = "Carlo Collodi" },
@@ -24,7 +23,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "Ricordati che i ragazzi che vogliono fare di loro capriccio e a modo loro, prima o poi se ne pentono.", Author = "Carlo Collodi" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "Io dico che il medico prudente quando non sa quello che dice, la miglior cosa che possa fare, è quella di stare zitto.", Author = "Carlo Collodi" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "Vi sono le bugie che hanno le gambe corte, e le bugie che hanno il naso lungo: la tua per l'appunto è di quelle che hanno il naso lungo.", Author = "Carlo Collodi" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Carlo_Collodi", Text = "In questo mondo, quando si può, bisogna mostrarsi cortesi con tutti, se vogliamo esser ricambiati con pari cortesia nei giorni del bisogno.", Author = "Carlo Collodi" },
         };
     }
 }

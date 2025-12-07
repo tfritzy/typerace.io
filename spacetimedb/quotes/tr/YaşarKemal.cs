@@ -10,7 +10,6 @@ public static partial class TurkishQuotes
         {
             new Quote { Id = "https://tr.wikiquote.org/wiki/Yaşar_Kemal", Text = "Gerillanın adını terörist koyduk. Bundan da bir umut bekledik. Sözcükler her zaman, her koşulda değişebilir ve bir gün işe yaramaz olur.", Author = "Yaşar Kemal" },
             new Quote { Id = "https://tr.wikiquote.org/wiki/Yaşar_Kemal", Text = "Bir insana, bir halka ne yaparsanız yapın, ama onuruyla oynamayın.", Author = "Yaşar Kemal" },
-            new Quote { Id = "https://tr.wikiquote.org/wiki/Yaşar_Kemal", Text = "İnsanlar bu kadar korkmasalar, bu kadar zalim olurlar mı, bu kadar biribirlerine düşmanlık eder, biribirlerinin böylesine kuyularını kazarlar mı,insan öldürürler mi, biribirlerine böylesine kıyar, köle eder sömürürler mi, biribirlerinin sırtına binerler mi, aşağılarlar mı, delirirler mi, sevmeyi, sevişmeyi böylesine unuturlar mı?", Author = "Yaşar Kemal" },
             new Quote { Id = "https://tr.wikiquote.org/wiki/Yaşar_Kemal", Text = "Türküler tıpkı kırk bin yıl su altında kalmış, yıkanmış, cilalanmış çakıl taşı gibidir.", Author = "Yaşar Kemal" },
             new Quote { Id = "https://tr.wikiquote.org/wiki/Yaşar_Kemal", Text = "Dünya kurulduğundan bu yana güzel dünya savaştadır, kötü dünyaya karşı, çirkin dünyaya karşı.", Author = "Yaşar Kemal" },
             new Quote { Id = "https://tr.wikiquote.org/wiki/Yaşar_Kemal", Text = "Benim kitaplarımı okuyanlar bilsinler ki, bir kültürü yok edenlerin kendi kültürleri, insanlıkları ellerinden uçmuş gitmiştir.", Author = "Yaşar Kemal" },

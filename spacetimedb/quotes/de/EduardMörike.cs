@@ -8,7 +8,6 @@ public static partial class GermanQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://de.wikiquote.org/wiki/Eduard_Mörike", Text = "Die Liebe, sagt man, steht am Pfahl gebunden, Geht endlich arm, zerrüttet, unbeschuht.", Author = "Eduard Mörike" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Eduard_Mörike", Text = "Es singen die Wasser im Schlafe noch fort Vom Tage, Vom heute gewesenen Tage.", Author = "Eduard Mörike" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Eduard_Mörike", Text = "Frühling läßt sein blaues Band Wieder flattern durch die Lüfte.", Author = "Eduard Mörike" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Eduard_Mörike", Text = "Im Nebel ruhet noch die Welt, Noch träumen Wald und Wiesen.", Author = "Eduard Mörike" },

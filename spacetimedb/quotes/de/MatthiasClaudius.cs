@@ -10,7 +10,6 @@ public static partial class GermanQuotes
         {
             new Quote { Id = "https://de.wikiquote.org/wiki/Matthias_Claudius", Text = "Den leeren Schlauch bläßt der Wind auf; Den leeren Kopf der Dünkel.", Author = "Matthias Claudius" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Matthias_Claudius", Text = "Dein Dichter soll nicht ewig Wein Nicht ewig Amorn necken! Die Barden müssen Männer seyn Und Weise seyn, nicht Gecken!", Author = "Matthias Claudius" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Matthias_Claudius", Text = "Der Mond ist aufgegangen, Die goldnen Sternlein prangen Am Himmel hell und klar. Der Wald steht schwarz und schweiget, Und aus den Wiesen steiget Der weiße Nebel wunderbar.", Author = "Matthias Claudius" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Matthias_Claudius", Text = "Empfangen und genähret Vom Weibe wunderbar, Kömmt er und sieht und höret, Und nimmt des Trugs nicht wahr;", Author = "Matthias Claudius" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Matthias_Claudius", Text = "Es giebt einige Freundschaften, die im Himmel beschlossen sind und auf Erden vollzogen werden.", Author = "Matthias Claudius" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Matthias_Claudius", Text = "Niemand ist frey, der nicht über sich selbst Herr ist.", Author = "Matthias Claudius" },

@@ -10,7 +10,6 @@ public static partial class GermanQuotes
         {
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "die abstrakten Worte, deren sich doch die Zunge naturgemäß bedienen muß, um irgendwelches Urtheil an den Tag zu geben, zerfielen mir im Munde wie modrige Pilze.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Es ist mir völlig die Fähigkeit abhanden gekommen, über irgend etwas zusammenhängend zu denken oder zu sprechen.", Author = "Hugo von Hofmannsthal" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Es zerfiel mir alles in Teile, die Teile wieder in Teile, und nichts mehr ließ sich mit einem Begriff umspannen. Die einzelnen Worte schwammen um mich; sie gerannen zu Augen, die mich anstarrten und in die ich wieder hineinstarren muß: Wirbel sind sie, in die hinabzusehen mich schwindelt, die sich unaufhaltsam drehen und durch die hindurch man ins Leere kommt.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Was ist der Mensch, daß er Pläne macht!", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Die Zeit, die ist ein sonderbares Ding.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Leicht muß man sein: // mit leichtem Herz und leichten Händen, // halten und nehmen, halten und lassen...", Author = "Hugo von Hofmannsthal" },
@@ -40,7 +39,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Ein Augenblick ist wenig - ein Blick ist viel.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Und dennoch sagt der viel, der »Abend« sagt, // Ein Wort, daraus Tiefsinn und Trauer rinnt // Wie schwerer Honig aus den hohlen Waben.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Wer hieß dich mich zerren, mich! in diese Welt hinein? Laß mich erfrieren, verhungern, versteinen in der meinigen!", Author = "Hugo von Hofmannsthal" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Wollen wir uns finden, so dürfen wir nicht in unser Inneres hinabsteigen: draußen sind wir zu finden, draußen. Wie der wesenlose Regenbogen spannt sich unsere Seele über den unaufhaltsamen Sturz des Daseins. Wir besitzen unser Selbst nicht: von außen weht es uns an, es flieht uns für lange und kehrt uns in einem Hauch zurück.", Author = "Hugo von Hofmannsthal" },
         };
     }
 }

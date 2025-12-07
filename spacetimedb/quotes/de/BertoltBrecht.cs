@@ -22,7 +22,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Bertolt_Brecht", Text = "Wir stehen selbst enttäuscht und sehn betroffen // Den Vorhang zu und alle Fragen offen.", Author = "Bertolt Brecht" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Bertolt_Brecht", Text = "Ja, mach nur einen Plan! Sei nur ein großes Licht! Und mach dann noch’nen zweiten Plan, Gehn tun sie beide nicht..", Author = "Bertolt Brecht" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Bertolt_Brecht", Text = "Sie sägten die Äste ab, auf denen sie saßen // Und schrieen sich zu ihre Erfahrungen // Wie man schneller sägen konnte, und fuhren // Mit Krachen in die Tiefe, und die ihnen zusahen // Schüttelten die Köpfe beim Sägen und // Sägten weiter.", Author = "Bertolt Brecht" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Bertolt_Brecht", Text = "Pfingsten // Sind die Geschenke am geringsten. // Während Geburtstag, Ostern und Weihnachten // Etwas einbrachten.", Author = "Bertolt Brecht" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Bertolt_Brecht", Text = "Selbst die schmalsten Stirnen / In denen der Friede wohnt / Sind den Künsten willkommener als jener Kunstfreund / Der auch Freund der Kriegskunst ist.", Author = "Bertolt Brecht" },
         };
     }

@@ -19,7 +19,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Grazia_Deledda", Text = "E come i bambini ed i vecchi si mise a piangere senza sapere il perché, – di dolore ch'era gioia, di gioia ch'era dolore.", Author = "Grazia Deledda" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Grazia_Deledda", Text = "La vita passa e noi la lasciamo passare come l'acqua del fiume, e solo quando manca ci accorgiamo che manca.", Author = "Grazia Deledda" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Grazia_Deledda", Text = "Siamo nati per soffrire come Lui; bisogna piangere e tacere...", Author = "Grazia Deledda" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Grazia_Deledda", Text = "Infanzia!... È forse questa una parola magica e misteriosa, un geroglifico orientale, inteso indistintamente dall'anima, dalla mente, dal cuore, nei quali desta ricordi soavi, dolcissimi, benché sfumati tra le nebbie del passato, e sorrisi vagolanti e dolci come quei ricordi, e sussulti di rimpianto e dimenticanze del presente?", Author = "Grazia Deledda" },
         };
     }
 }

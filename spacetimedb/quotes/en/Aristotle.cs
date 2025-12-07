@@ -9,7 +9,6 @@ public static partial class EnglishQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/Aristotle", Text = "In all things of nature there is something of the marvelous.", Author = "Aristotle" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Aristotle", Text = "Practical life is not necessarily directed toward other people, as some think; and it is not the case that practical thoughts are only those which result from action for the sake of what ensues. On the contrary, much more practical are those mental activities and reflections which have their goal in themselves and take place for their own sake.", Author = "Aristotle" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Aristotle", Text = "That which is desirable on its own account and for the sake of knowing it is more of the nature of wisdom than that which is desirable on account of its results.", Author = "Aristotle" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Aristotle", Text = "The greatest thing by far is to have a command of metaphor. This alone cannot be imparted by another; it is the mark of genius, for to make good metaphors implies an eye for resemblances.", Author = "Aristotle" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Aristotle", Text = "Piety requires us to honor truth above our friends.", Author = "Aristotle" },

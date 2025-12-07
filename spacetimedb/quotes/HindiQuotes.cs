@@ -1,21 +1,25 @@
 using System;
 using System.Linq;
 
-
 namespace StdbModule;
+
 public static partial class HindiQuotes
 {
-    public static readonly Quote[] Quotes = 
-        परमचद.Quotes
-        .Concat(हरवशरयबचचन.Quotes)
-        .Concat(महदववरम.Quotes)
+    public static readonly Quote[] Quotes =
+        आचरयरमचनदरशकल.Quotes
         .Concat(जयशकरपरसद.Quotes)
-        .Concat(मथलशरणगपत.Quotes)
-        .Concat(भरतदहरशचदर.Quotes)
+        .Concat(जरजगरयरसन.Quotes)
         .Concat(धरमवरभरत.Quotes)
+        .Concat(परमचद.Quotes)
+        .Concat(परमचद.Quotes)
+        .Concat(भरतनदहरशचदर.Quotes)
+        .Concat(मथलशरणगपत.Quotes)
+        .Concat(महदववरम.Quotes)
         .Concat(यशपल.Quotes)
-        .Concat(हजरपरसददववद.Quotes)
         .Concat(रमवलसशरम.Quotes)
         .Concat(रहलसकतययन.Quotes)
+        .Concat(वसधडलमय.Quotes)
+        .Concat(हजरपरसददववद.Quotes)
+        .Concat(हरवशरयबचचन.Quotes)
         .ToArray();
 }

@@ -9,7 +9,6 @@ public static partial class SpanishQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://es.wikiquote.org/wiki/Ramón_María_del_Valle-Inclán", Text = "Cuando mires tu imagen en el espejo mágico, evoca tu sombra de niño; quien sabe del pasado, sabe del porvenir.", Author = "Ramón María del Valle-Inclán" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Ramón_María_del_Valle-Inclán", Text = "El fascio no es una partida de la porra, como creen en España los radical-imbeciloides, ni un régimen de extrema-derecha. Es un afán imperial de universalidad en su más vertical y horizontal sentido ecuménico.", Author = "Ramón María del Valle-Inclán" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Ramón_María_del_Valle-Inclán", Text = "¡El mundo es una controversia!", Author = "Ramón María del Valle-Inclán" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Ramón_María_del_Valle-Inclán", Text = "Lo mismo da la victoria que hacer gloriosa la derrota.", Author = "Ramón María del Valle-Inclán" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Ramón_María_del_Valle-Inclán", Text = "Toda expresión suprema de belleza es un divino centro que engendra infinitos círculos.", Author = "Ramón María del Valle-Inclán" },

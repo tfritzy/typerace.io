@@ -9,7 +9,6 @@ public static partial class EnglishQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/Zora_Neale_Hurston", Text = "Gods always behave like the people who make them.", Author = "Zora Neale Hurston" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Zora_Neale_Hurston", Text = "I am not tragically colored. There is no great sorrow dammed up in my soul, nor lurking behind my eyes. I do not mind at all.", Author = "Zora Neale Hurston" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Zora_Neale_Hurston", Text = "Sometimes, I feel discriminated against, but it does not make me angry. It merely astonishes me.", Author = "Zora Neale Hurston" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Zora_Neale_Hurston", Text = "Ships at a distance have every man's wish on board.", Author = "Zora Neale Hurston" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Zora_Neale_Hurston", Text = "Janie saw her life like a great tree in leaf with the things suffered, things enjoyed, things done and undone. Dawn and doom was in the branches.", Author = "Zora Neale Hurston" },

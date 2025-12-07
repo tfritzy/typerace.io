@@ -20,7 +20,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "No se puede vivir sin héroes, santos ni mártires.", Author = "Ernesto Sabato" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "Ser original es en cierto modo estar poniendo de manifiesto la mediocridad de los demás.", Author = "Ernesto Sabato" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "Siempre es levemente siniestro volver a los lugares que han sido testigos de un instante de perfección", Author = "Ernesto Sabato" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "Un buen escritor expresa grandes cosas con pequeñas palabras; a la inversa del mal escritor, que dice cosas insignificantes con palabras grandiosas.", Author = "Ernesto Sabato" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "Ya no se dice que son 'los de abajo' sino 'los de fuera'.", Author = "Ernesto Sabato" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "…Y él había suspirado entonces y ella le había dicho “qué”. Y él le había respondido “nada”, como respondemos cuando estamos pensando “todo”.", Author = "Ernesto Sabato" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Ernesto_Sabato", Text = "El ser humano sabe hacer de los obstáculos nuevos caminos porque a la vida le basta el espacio de una grieta para renacer.", Author = "Ernesto Sabato" },

@@ -18,9 +18,6 @@ public static partial class FrenchQuotes
             new Quote { Id = "https://fr.wikiquote.org/wiki/Stéphane_Mallarmé", Text = "le tout sans nouveauté qu’un espacement de la lecture.", Author = "Stéphane Mallarmé" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Stéphane_Mallarmé", Text = "le monde est fait pour aboutir à un beau livre.", Author = "Stéphane Mallarmé" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Stéphane_Mallarmé", Text = "Sisley saisit les moments fugitifs de la journée ; il regarde un nuage fugitif et semble le peindre en plein vol ; sur sa toile, l'air vivant se meut et les feuilles frissonnent et tremblent encore.", Author = "Stéphane Mallarmé" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Stéphane_Mallarmé", Text = "Mallarmé, invisible ou invu, en tout cas à part, se trouvait dans l’obscurité. Ce qui n’est pas la même chose que d’être obscur. Maintenant que des centaines d’explorateurs sont entrés dans son œuvre avec leur lampe, et que mille mallarméens en sont sortis avec leur luciole, il est clair, trop peut-être.", Author = "Charles Dantzig" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Stéphane_Mallarmé", Text = "[Mallarmé] n'est pas obscur, il est loin.", Author = "Charles Dantzig" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Stéphane_Mallarmé", Text = "Le mallarméisme a consisté à secouer la vieille prosodie pour en faire tomber les fruits morts.", Author = "Charles Dantzig" },
         };
     }
 }

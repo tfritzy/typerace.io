@@ -27,7 +27,6 @@ public static partial class FrenchQuotes
             new Quote { Id = "https://fr.wikiquote.org/wiki/Victor_Hugo", Text = "(...) au dix-neuvième siècle, le blanc a fait du noir un homme ; au vingtième siècle, l’Europe fera de l’Afrique un monde.", Author = "Victor Hugo" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Victor_Hugo", Text = "Ce que Paris conseille, l'Europe le médite ; ce que Paris commence, l'Europe le continue.", Author = "Victor Hugo" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Victor_Hugo", Text = "Le monde naît, Homère chante. C’est l’oiseau de cette aurore.", Author = "Victor Hugo" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Victor_Hugo", Text = "Le travail de l’homme, la fonction divine de sa liberté, le but de sa vie, c’est de construire sur la terre à l’état d’œuvres réelles, les trois notions idéales, c’est de faire chair le vrai, le beau et le juste, c’est en un mot de laisser après sa mort debout derrière lui sa conscience faite action.", Author = "Victor Hugo" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Victor_Hugo", Text = "Le président de la république : en France, l'égal de tous les citoyens ; hors de France, l'égal de tous les souverains.", Author = "Victor Hugo" },
         };
     }

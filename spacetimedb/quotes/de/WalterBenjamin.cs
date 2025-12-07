@@ -9,7 +9,6 @@ public static partial class GermanQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://de.wikiquote.org/wiki/Walter_Benjamin", Text = "Arbeit an einer guten Prosa hat drei Stufen: eine musikalische, auf der sie komponiert, eine architektonische, auf der sie gebaut, endlich eine textile, auf der sie gewoben wird.", Author = "Walter Benjamin" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Walter_Benjamin", Text = "Beim Ekel vor Tieren ist die beherrschende Empfindung die Angst, in der Berührung von ihnen erkannt zu werden. Was sich tief im Menschen entsetzt, ist das dunkle Bewußtsein, in ihm sei etwas am Leben, was dem ekelerregenden Tiere so wenig fremd sei, daß es von ihm erkannt werden könne. – Aller Ekel ist ursprünglich Ekel vor dem Berühren.", Author = "Walter Benjamin" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Walter_Benjamin", Text = "Bücher und Dirnen kann man ins Bett nehmen.", Author = "Walter Benjamin" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Walter_Benjamin", Text = "Das Werk ist die Totenmaske der Konzeption.", Author = "Walter Benjamin" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Walter_Benjamin", Text = "Der Ausdruck der Leute, die sich in Gemäldegalerien bewegen, zeigt eine schlecht verhehlte Enttäuschung darüber, daß dort nur Bilder hängen.", Author = "Walter Benjamin" },

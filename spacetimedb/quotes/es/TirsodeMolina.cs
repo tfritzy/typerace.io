@@ -22,7 +22,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Tirso_de_Molina", Text = "Sí se puede fiar el que es prudente, del sol de enero y de mujer ausente.", Author = "Tirso de Molina" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Tirso_de_Molina", Text = "Y el favor dado a mi competidor tengo de hurtar disfrazado; que todo lo que es hurtado dicen que sabe mejor.", Author = "Tirso de Molina" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Tirso_de_Molina", Text = "Deje palabras quien ama, que sin obras todas vuelan; porque palabras y plumas dicen que el viento las lleva.", Author = "Tirso de Molina" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Tirso_de_Molina", Text = "¿Hay cristal, hay nieve en ellas, leche o manteca de azahar, que se pueda comparar, con aquellas manos bellas?", Author = "Tirso de Molina" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Tirso_de_Molina", Text = "Que el no tener cofres llenos la riqueza en pié mantiene, que no es rico el que más tiene, sino el que ha menester menos.", Author = "Tirso de Molina" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Tirso_de_Molina", Text = "Que en este tiempo no parece justo casar a las hijas contra su propio gusto.", Author = "Tirso de Molina" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Tirso_de_Molina", Text = "Que no es digno de estimar el que no inventa algo nuevo.", Author = "Tirso de Molina" },

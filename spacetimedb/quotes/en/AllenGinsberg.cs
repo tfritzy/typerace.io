@@ -15,7 +15,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Allen_Ginsberg", Text = "I smoke marijuana every chance I get.", Author = "Allen Ginsberg" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Allen_Ginsberg", Text = "The CIA and the Mafia are in cahoots", Author = "Allen Ginsberg" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Allen_Ginsberg", Text = "Nobody knows whether we were catalysts or invented something, or just the froth riding on a wave of its own. We were all three, I suppose.", Author = "Allen Ginsberg" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Allen_Ginsberg", Text = "You assume we are all sexually stable; while on the other hand, as I have become acquainted with people, I find that they are all perverted sinners, one way or another, that the whole society is corrupt and rotten and repressed and unconscious that it exhibits its repression in various forms of social sadism.", Author = "Allen Ginsberg" },
         };
     }
 }

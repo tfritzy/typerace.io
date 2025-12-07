@@ -18,7 +18,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "El presente es un fruto en el que la vida y la muerte se funden.", Author = "Octavio Paz" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "El ritmo no es medida, es visión del mundo.", Author = "Octavio Paz" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "El sexo se ha vuelto predicador público y su discurso es un llamado a la lucha: hace del placer un deber. Un puritanismo al revés.", Author = "Octavio Paz" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "La crítica del otro comienza con la crítica de uno mismo.", Author = "Octavio Paz" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "La imaginación vuelve palpables los fantasmas del deseo.", Author = "Octavio Paz" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "La indiferencia del mexicano ante la muerte se nutre de su indiferencia ante la vida.", Author = "Octavio Paz" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Octavio_Paz", Text = "La obra de arte es una señal de inteligencia que se intercambia el sentido y el sinsentido.", Author = "Octavio Paz" },

@@ -37,7 +37,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Niccolò_Machiavelli", Text = "The reason is easy to understand, for it is the common good and not private gain that makes cities great.", Author = "Niccolò Machiavelli" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Niccolò_Machiavelli", Text = "The end of the republic is to enervate and to weaken all other bodies so as to increase its own body.", Author = "Niccolò Machiavelli" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Niccolò_Machiavelli", Text = "Cunning and deceit will every time serve a man better than force to rise from a base condition to great fortune.", Author = "Niccolò Machiavelli" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Niccolò_Machiavelli", Text = "They may weave its warp, but cannot break it. Yet they should never give up, because there is always hope, though they know not the end and more towards it along roads which cross one another and as yet are unexplored; and since there is hope, they should not despair, no matter what fortune brings or in what travail they find themselves.", Author = "Niccolò Machiavelli" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Niccolò_Machiavelli", Text = "It is not titles that make men illustrious, but men who make titles illustrious.", Author = "Niccolò Machiavelli" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Niccolò_Machiavelli", Text = "No proceeding is better than that which you have concealed from the enemy until the time you have executed it.", Author = "Niccolò Machiavelli" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Niccolò_Machiavelli", Text = "To know how to recognize an opportunity in war, and take it, benefits you more than anything else.", Author = "Niccolò Machiavelli" },
@@ -52,7 +51,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Niccolò_Machiavelli", Text = "from good they gradually decline to evil, and from evil again return to good. The reason is, that valor produces peace; peace, repose; repose, disorder; disorder, ruin; so from disorder order springs; from order virtue, and from this, glory and good fortune.", Author = "Niccolò Machiavelli" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Niccolò_Machiavelli", Text = "God and nature have thrown all human fortunes into the midst of mankind; and they are thus attainable rather by rapine than by industry, by wicked actions rather than by good.", Author = "Niccolò Machiavelli" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Niccolò_Machiavelli", Text = "Wars begin when you will, but they do not end when you please.", Author = "Niccolò Machiavelli" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Niccolò_Machiavelli", Text = "he would much rather be in Hell with those great geniuses, to converse with them about affairs of state, than be condemned to the company of the verminous scoundrels that he had first been shown.", Author = "Niccolò Machiavelli" },
         };
     }
 }

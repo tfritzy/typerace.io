@@ -8,7 +8,6 @@ public static partial class GermanQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Dürrenmatt", Text = "Die Welt machte mich zu einer Hure, nun mache ich sie zu einem Bordell.", Author = "Friedrich Dürrenmatt" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Dürrenmatt", Text = "Ein Widerstand um jeden Preis ist das Sinnloseste, was es geben kann.", Author = "Friedrich Dürrenmatt" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Dürrenmatt", Text = "Ich habe ins Blaue geschossen und ins Schwarze getroffen.", Author = "Friedrich Dürrenmatt" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Dürrenmatt", Text = "Er war berufen zum Sterben, allein der Tod ist ewig. Das Leben ist eine Schindluderei der Natur sondergleichen, eine obszöne Verwirrung des Kohlenstoffs, eine bösartige Wucherung der Erdoberfläche, ein unheilbarer Schorf. Aus Totem zusammengesetzt, zerfallen wir zu Totem.", Author = "Friedrich Dürrenmatt" },

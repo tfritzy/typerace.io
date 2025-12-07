@@ -9,7 +9,6 @@ public static partial class GermanQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://de.wikiquote.org/wiki/Heinrich_Böll", Text = "Der Regen ist hier absolut, großartig und erschreckend. Diesen Regen schlechtes Wetter zu nennen, ist so unangemessen, wie es unangemessen ist, den brennenden Sonnenschein schönes Wetter zu nennen.", Author = "Heinrich Böll" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Heinrich_Böll", Text = "Dort, wo der Staat gewesen sein könnte oder sein sollte, erblicke ich nur einige verfaulende Reste von Macht, und diese offenbar kostbaren Rudimente von Fäulnis werden mit rattenhafter Wut verteidigt. Schweigen wir also vom Staat, bis er sich wieder blicken läßt. In diesem Augenblick von ihm zu sprechen, wäre Leichenfledderei oder Nekrophilie.", Author = "Heinrich Böll" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Heinrich_Böll", Text = "Einmischung ist die einzige Möglichkeit, realistisch zu bleiben.", Author = "Heinrich Böll" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Heinrich_Böll", Text = "»Höflichkeit ist doch die sicherste Form der Verachtung«.", Author = "Heinrich Böll" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Heinrich_Böll", Text = "Nichts darf man, auch keinen Krieg anfangen.", Author = "Heinrich Böll" },
