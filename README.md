@@ -1,6 +1,6 @@
 # typerace.io
 
-deployed at https://typerace.io
+Deployed at https://typerace.io
 
 A multiplayer typing race game built with a spacetimedb backend
 
