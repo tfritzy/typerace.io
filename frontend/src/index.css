@@ -81,6 +81,17 @@ body {
   }
 }
 
+@keyframes wordXpFloat {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+}
+
 .box {
   background-color: var(--color-box-bg);
   border: 1px solid var(--color-box-border);

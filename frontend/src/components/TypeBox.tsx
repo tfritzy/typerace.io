@@ -6,6 +6,7 @@ type TypeBoxProps = {
   attribution?: string;
   onComplete?: () => void;
   onProgress?: (correctCharCount: number, eventType: "Correct" | "Incorrect" | "Backspace") => void;
+  onWordComplete?: (wordXp: number, position: { x: number; y: number }) => void;
   className?: string;
   height?: string;
   resetOnComplete?: boolean;
@@ -17,7 +18,7 @@ export type TypeBoxRef = {
   focus: () => void;
 };
 
-export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, attribution, onComplete, onProgress, className, height, resetOnComplete = false, disabled = false, initialProgress = 0 }, ref) => {
+export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, attribution, onComplete, onProgress, onWordComplete, className, height, resetOnComplete = false, disabled = false, initialProgress = 0 }, ref) => {
   const [focused, setFocused] = useState(true);
   const [input, setInput] = useState(phrase.substring(0, initialProgress));
   const [isComplete, setIsComplete] = useState(false);
@@ -122,6 +123,30 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, attributi
       setHasReachedErrorLimit(reachedLimit);
       setInput(newValue);
 
+      if (onWordComplete && newValue.length > oldValue.length) {
+        const newCharIndex = newValue.length - 1;
+        const newChar = newValue[newCharIndex];
+        const expectedChar = phrase[newCharIndex];
+        
+        if (newChar === expectedChar && newChar === ' ') {
+          let wordStart = newCharIndex - 1;
+          while (wordStart >= 0 && phrase[wordStart] !== ' ') {
+            wordStart--;
+          }
+          wordStart++;
+          
+          const wordLength = newCharIndex - wordStart;
+          
+          if (phraseRef.current) {
+            const spans = phraseRef.current.querySelectorAll('span');
+            if (spans[newCharIndex - 1]) {
+              const rect = spans[newCharIndex - 1].getBoundingClientRect();
+              onWordComplete(wordLength, { x: rect.left, y: rect.top });
+            }
+          }
+        }
+      }
+
       if (onProgress && newValue.length !== oldValue.length) {
         if (newValue.length < oldValue.length) {
           const charsDeleted = oldValue.length - newValue.length;
@@ -152,7 +177,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, attributi
         }
       }
     },
-    [phrase, onComplete, onProgress, input, resetOnComplete, disabled]
+    [phrase, onComplete, onProgress, onWordComplete, input, resetOnComplete, disabled]
   );
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {

@@ -6,12 +6,6 @@ import { useEffect, useState, useRef, memo } from "react";
 import { setAccentColor } from "../utils/colorMapping";
 import { useAuth } from "../firebase/AuthContext";
 import { useDatabase } from "../contexts/SpacetimeContext";
-import { XpDrop } from "./XpDrop";
-
-interface XpDropInstance {
-    id: number;
-    amount: number;
-}
 
 export const ProfileAvatar = memo(() => {
     const navigate = useNavigate();
@@ -23,8 +17,6 @@ export const ProfileAvatar = memo(() => {
     const [error, setError] = useState("");
     const menuRef = useRef<HTMLDivElement>(null);
     const avatarRef = useRef<HTMLDivElement>(null);
-    const [xpDrops, setXpDrops] = useState<XpDropInstance[]>([]);
-    const xpDropIdCounter = useRef(0);
 
     useEffect(() => {
         if (!conn?.identity) return;
@@ -37,16 +29,8 @@ export const ProfileAvatar = memo(() => {
             }
         };
 
-        const handlePlayerUpdate = (_ctx: any, oldPlayer: Player, newPlayer: Player) => {
+        const handlePlayerUpdate = (_ctx: any, _oldPlayer: Player, newPlayer: Player) => {
             if (newPlayer.identity.isEqual(currentIdentity)) {
-                const xpGained = newPlayer.xp - oldPlayer.xp;
-                if (xpGained > 0) {
-                    const newDrop: XpDropInstance = {
-                        id: xpDropIdCounter.current++,
-                        amount: xpGained
-                    };
-                    setXpDrops(prev => [...prev, newDrop]);
-                }
                 setMyPlayer(newPlayer);
             }
         };
@@ -110,10 +94,6 @@ export const ProfileAvatar = memo(() => {
 
     const identityHash = conn?.identity?.toHexString() ?? "default";
     const isAnonymous = myPlayer?.isAnonymous ?? true;
-
-    const handleXpDropComplete = (id: number) => {
-        setXpDrops(prev => prev.filter(drop => drop.id !== id));
-    };
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -205,39 +185,23 @@ export const ProfileAvatar = memo(() => {
                         )}
                     </div>
                 )}
-                {xpDrops.map(drop => (
-                    <XpDrop
-                        key={drop.id}
-                        amount={drop.amount}
-                        onComplete={() => handleXpDropComplete(drop.id)}
-                    />
-                ))}
             </div>
         );
     }
 
     return (
-        <>
-            {xpDrops.map(drop => (
-                <XpDrop
-                    key={drop.id}
-                    amount={drop.amount}
-                    onComplete={() => handleXpDropComplete(drop.id)}
-                    avatarRef={avatarRef.current}
+        <button
+            onClick={() => navigate(`/profile/${myPlayer?.playerId}`)}
+            className="flex items-center gap-4 py-2.5 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
+        >
+            <div className="relative" ref={avatarRef}>
+                <PlayerAvatar
+                    size={40}
+                    identity={identityHash}
+                    color={myPlayer?.color}
+                    isHighlighted={true}
                 />
-            ))}
-            <button
-                onClick={() => navigate(`/profile/${myPlayer?.playerId}`)}
-                className="flex items-center gap-4 py-2.5 rounded-lg cursor-pointer hover:bg-white/5 transition-colors"
-            >
-                <div className="relative" ref={avatarRef}>
-                    <PlayerAvatar
-                        size={40}
-                        identity={identityHash}
-                        color={myPlayer?.color}
-                        isHighlighted={true}
-                    />
-                </div>
+            </div>
 
                 <div className="hidden sm:flex flex-col items-start gap-1 min-w-50">
                     <div className="text-sm font-semibold text-white">{name}</div>
@@ -256,6 +220,5 @@ export const ProfileAvatar = memo(() => {
                     </div>
                 </div>
             </button>
-        </>
     );
 });
