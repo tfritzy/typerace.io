@@ -137,11 +137,29 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(({ phrase, attributi
           
           const wordLength = newCharIndex - wordStart;
           
-          if (phraseRef.current) {
+          if (phraseRef.current && wordLength > 0) {
             const spans = phraseRef.current.querySelectorAll('span');
             if (spans[newCharIndex - 1]) {
               const rect = spans[newCharIndex - 1].getBoundingClientRect();
               onWordComplete(wordLength, { x: rect.left, y: rect.top });
+            }
+          }
+        }
+        
+        if (newValue === phrase && newChar === expectedChar) {
+          let wordStart = phrase.length - 1;
+          while (wordStart >= 0 && phrase[wordStart] !== ' ') {
+            wordStart--;
+          }
+          wordStart++;
+          
+          const lastWordLength = phrase.length - wordStart;
+          
+          if (phraseRef.current && lastWordLength > 0) {
+            const spans = phraseRef.current.querySelectorAll('span');
+            if (spans[phrase.length - 1]) {
+              const rect = spans[phrase.length - 1].getBoundingClientRect();
+              onWordComplete(lastWordLength, { x: rect.left, y: rect.top });
             }
           }
         }
