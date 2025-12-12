@@ -270,6 +270,7 @@ export const GamePage = () => {
               onFinish={handleFinish}
               disabled={isDisabled}
               initialProgress={initialProgress}
+              isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
             />
           )}
         </div>
