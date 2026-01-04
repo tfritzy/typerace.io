@@ -34,7 +34,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "Many a good man has been put under the bridge by a woman.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "Once a woman turns against you, forget it. They can love you, then something turns in them. They can watch you dying in a gutter, run over by a car, and they'll spit on you.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "All a guy needed was a chance. Somebody was always controlling who got a chance and who didn’t.", Author = "Charles Bukowski" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "Money is like sex. It seems much more important when you don't have any...", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "a woman can drop out of your life and forget you real fast. a woman can't go anywhere but UP after leaving you, honey.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "Sex was a trap, a snare. It was for animals.", Author = "Charles Bukowski" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Charles_Bukowski", Text = "Something was always after a man. It never relented. No rest, ever.", Author = "Charles Bukowski" },

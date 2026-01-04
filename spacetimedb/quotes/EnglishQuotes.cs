@@ -82,7 +82,6 @@ public static partial class EnglishQuotes
         .Concat(ImmanuelKant.Quotes)
         .Concat(IsaacAsimov.Quotes)
         .Concat(IsaacNewton.Quotes)
-        .Concat(JKRowling.Quotes)
         .Concat(JListerHill.Quotes)
         .Concat(JRRTolkien.Quotes)
         .Concat(JackKerouac.Quotes)

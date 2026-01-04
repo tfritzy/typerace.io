@@ -49,7 +49,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "God was always invented to explain mystery. God is always invented to explain those things that you do not understand.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "What I cannot create, I do not understand.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "Einstein was a giant. His head was in the clouds, but his feet were on the ground. But those of us who are not that tall have to choose!", Author = "Richard Feynman" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "Physics is to mathematics what sex is to masturbation.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "Scientific knowledge is an enabling power to do either good or bad — but it does not carry instructions on how to use it.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "The imagination of nature is far, far greater than the imagination of man.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "This is not yet a scientific age.", Author = "Richard Feynman" },

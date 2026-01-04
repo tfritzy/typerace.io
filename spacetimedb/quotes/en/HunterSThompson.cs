@@ -62,7 +62,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Hunter_S._Thompson", Text = "The scene I had just witnessed brought back a lot of memories — not of things I have done but of things I have failed to do, wasted hours and frustrated moments and opportunities forever lost because time had eaten so much of my life and I would never get it back.", Author = "Hunter S. Thompson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Hunter_S._Thompson", Text = "What passed for society was a loud, giddy whirl of thieves and pretentious hustlers, a dull sideshow full of quacks and clowns and philistines with gimp mentalities.", Author = "Hunter S. Thompson" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Hunter_S._Thompson", Text = "I looked out at the ships and the sea beyond them, and I felt crazy to be free with a whole day ahead of me.<br> Then I realized I would sleep most of the day, and my excitement disappeared.", Author = "Hunter S. Thompson" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Hunter_S._Thompson", Text = "And Joyce was a poor sick fucker who probably died with his balls somewhere up around his navel. None of that for me, thanks.", Author = "Hunter S. Thompson" },
         };
     }
 }

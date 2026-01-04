@@ -35,7 +35,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "We have always been shameless about stealing great ideas.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "We hire people to tell us what to do.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "You’ve got to start with the customer experience and work backwards to the technology.", Author = "Steve Jobs" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "The products suck! There's no sex in them anymore!", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "Apple has some tremendous assets, but I believe without some attention, the company could, could, could — I'm searching for the right word — could, could die.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "Nobody has tried to swallow us since I've been here. I think they are afraid how we would taste.", Author = "Steve Jobs" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Steve_Jobs", Text = "But in the end, for something this complicated, it's really hard to design products by focus groups. A lot of times, people don't know what they want until you show it to them.", Author = "Steve Jobs" },
