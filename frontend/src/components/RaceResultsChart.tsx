@@ -11,8 +11,7 @@ import {
 } from 'chart.js';
 import type { ChartOptions } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
-import type { PlayerProgress } from '../../module_bindings/player_progress_type';
-import { PlayerColor } from '../../module_bindings/player_color_type';
+import type { PlayerProgress, PlayerColor } from '../types/stdb';
 import { getRawWpmBySecond, getAggWpmBySecond, getErrorCountsBySecond } from '../utils/wpmCalculator';
 import { getColorConfig } from '../utils/colorMapping';
 

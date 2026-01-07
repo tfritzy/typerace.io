@@ -2,8 +2,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useCallback, useState } from "react";
 import {
   type Game,
-  PlayerProgress,
-} from "../../module_bindings";
+  type PlayerProgress,
+} from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { Countdown } from "../components/Countdown";
@@ -135,7 +135,7 @@ export const GamePage = () => {
       );
 
       if (!hasProgress) {
-        conn.reducers.joinPrivateGame(gameId);
+        conn.reducers.joinPrivateGame({ gameId });
       }
     }
   }, [conn, game, gameId, gamePlayerProgress]);

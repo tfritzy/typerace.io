@@ -1,5 +1,5 @@
 import Avatar from "boring-avatars";
-import { PlayerColor } from "../../module_bindings";
+import { type PlayerColor } from "../types/stdb";
 import { getColorConfig } from "../utils/colorMapping";
 import { Crown, Award } from 'lucide-react';
 import { memo } from "react";
@@ -16,7 +16,7 @@ type PlayerAvatarProps = {
 export const PlayerAvatar = memo(({
     size,
     identity,
-    color = PlayerColor.Amber,
+    color = { tag: "Amber" } as PlayerColor,
     isLoading = false,
     placement
 }: PlayerAvatarProps) => {

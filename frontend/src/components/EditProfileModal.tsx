@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { PlayerColor } from '../../module_bindings';
+import type { PlayerColor } from '../types/stdb';
 import { COLOR_CONFIGS, getColorConfig } from '../utils/colorMapping';
 
 type EditProfileModalProps = {

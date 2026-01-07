@@ -10,7 +10,7 @@ import {
 import type { ChartOptions } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
-import type { GameRecord } from '../../module_bindings';
+import type { GameRecord } from '../types/stdb';
 import { formatStopwatchTime, getOrdinalPlacement } from '../utils/formatters';
 import { useState, useEffect } from 'react';
 

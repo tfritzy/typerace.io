@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { type Player } from "../../module_bindings";
+import { type Player } from "../types/stdb";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { useEffect, useState, useRef, memo } from "react";

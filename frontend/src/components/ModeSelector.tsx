@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import "../components/SelectionButton.css";
-import { GameMode } from "../../module_bindings";
+import { type GameMode } from "../types/stdb";
 import { ChevronUp, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
 import { languages, getContentTypeFromMode, type ContentTypeValue } from "../utils/modes";
 

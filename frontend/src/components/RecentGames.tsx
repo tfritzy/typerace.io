@@ -1,4 +1,4 @@
-import { GameRecord } from "../../module_bindings";
+import { type GameRecord } from "../types/stdb";
 import { useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { Star } from "lucide-react";

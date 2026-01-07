@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { Game } from "../../module_bindings";
+import type { Game } from "../types/stdb";
 import { useDatabase } from "../contexts/SpacetimeContext";
 
 export const Countdown = () => {

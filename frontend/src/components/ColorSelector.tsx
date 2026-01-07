@@ -1,4 +1,4 @@
-import { PlayerColor } from '../../module_bindings';
+import { type PlayerColor } from '../types/stdb';
 import { COLOR_CONFIGS } from '../utils/colorMapping';
 
 type ColorSelectorProps = {

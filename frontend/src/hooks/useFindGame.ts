@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import type {
-  GameMode,
-} from "../../module_bindings";
+import { type GameMode } from "../types/stdb";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { useToast } from "./useToast";
 import { useDatabase } from "../contexts/SpacetimeContext";
@@ -45,11 +43,10 @@ export const useFindGame = () => {
 
     const handleJoinGameResult: Parameters<typeof conn.reducers.onJoinGame>[0] = (
       ctx,
-      _gameMode,
-      responseJoinCode
+      args
     ) => {
       if (!ctx.event.callerIdentity.isEqual(conn.identity!)) return;
-      if (pendingJoinCodeRef.current !== responseJoinCode) return;
+      if (pendingJoinCodeRef.current !== args.joinCode) return;
 
       if (ctx.event.status.tag === "Failed") {
         showToast(ctx.event.status.value);
@@ -77,7 +74,11 @@ export const useFindGame = () => {
     pendingJoinCodeRef.current = newJoinCode;
 
     const gameTypeEnum = { tag: gameType };
-    conn.reducers.joinGame(mode, newJoinCode, gameTypeEnum);
+    conn.reducers.joinGame({
+      gameMode: mode,
+      joinCode: newJoinCode,
+      gameType: gameTypeEnum as any
+    });
   }, [conn, isSearching]);
 
   return { findGame, isSearching };

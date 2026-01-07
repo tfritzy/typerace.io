@@ -1,6 +1,6 @@
 import { PlayerAvatar } from './PlayerAvatar';
 import { getColorConfig } from '../utils/colorMapping';
-import { PlayerColor } from "../../module_bindings";
+import { type PlayerColor } from "../types/stdb";
 import { Bot } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { memo } from 'react';
@@ -30,7 +30,7 @@ export const PlayerProgressBar = memo(({
     playerPublicId,
     isCurrentPlayer = false,
     isLoading = false,
-    playerColor = PlayerColor.Amber,
+    playerColor = { tag: "Amber" } as PlayerColor,
     wpm,
     placement,
     isBot = false,

@@ -8,7 +8,7 @@ import {
 } from 'chart.js';
 import type { ChartOptions } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import type { PlayerProgress } from '../../module_bindings/player_progress_type';
+import type { PlayerProgress } from '../types/stdb';
 import { getAggWpmBySecond } from '../utils/wpmCalculator';
 
 ChartJS.register(

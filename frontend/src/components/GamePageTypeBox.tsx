@@ -43,7 +43,11 @@ export const GamePageTypeBox = memo(
         if (!conn || !gameId) return;
 
         const eventTypeEnum = { tag: eventType };
-        conn.reducers.updateProgress(gameId, correctCharCount, eventTypeEnum);
+        conn.reducers.updateProgress({
+            gameId,
+            newIndex: correctCharCount,
+            eventType: eventTypeEnum
+        });
       },
       [conn, gameId]
     );

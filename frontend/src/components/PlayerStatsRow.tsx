@@ -1,4 +1,4 @@
-import type { PlayerProgress } from "../../module_bindings/player_progress_type";
+import { type PlayerProgress } from "../types/stdb";
 import { getFinalWpm, getRaceTime, getAccuracy } from "../utils/wpmCalculator";
 import { formatStopwatchTime, getOrdinalPlacement } from "../utils/formatters";
 

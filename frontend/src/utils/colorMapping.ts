@@ -1,4 +1,4 @@
-import { PlayerColor } from "../../module_bindings";
+import { type PlayerColor } from "../types/stdb";
 
 export interface ColorConfig {
     primary: string;
@@ -11,7 +11,7 @@ export interface ColorConfig {
 }
 
 export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
-    [PlayerColor.Red.tag]: {
+    Red: {
         primary: '#ef4444',
         light: '#f87171',
         dark: '#dc2626',
@@ -20,7 +20,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#ef4444', '#6b4a4a', '#4a2d2d'],
         gradient: 'linear-gradient(to right, #dc2626, #ef4444)'
     },
-    [PlayerColor.Orange.tag]: {
+    Orange: {
         primary: '#f97316',
         light: '#fb923c',
         dark: '#ea580c',
@@ -29,16 +29,16 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#f97316', '#8b6a4a', '#5c4a36'],
         gradient: 'linear-gradient(to right, #ea580c, #f97316)'
     },
-     [PlayerColor.Amber.tag]: {
-        primary: '#fbbf24',
+     Amber: {
+        primary: '#f59e0b',
         light: '#fcd34d',
-        dark: '#f59e0b',
+        dark: '#fbbf24',
         darker: '#d97706',
         darkest: '#b45309',
-        avatarColors: ['#fbbf24', '#8b7355', '#5c4a3a'],
+        avatarColors: ['#f59e0b', '#8b7355', '#5c4a3a'],
         gradient: 'linear-gradient(to right, #f59e0b, #fbbf24)'
     },
-    [PlayerColor.Yellow.tag]: {
+    Yellow: {
         primary: '#eab308',
         light: '#facc15',
         dark: '#ca8a04',
@@ -47,7 +47,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#eab308', '#8b8355', '#5c543a'],
         gradient: 'linear-gradient(to right, #ca8a04, #eab308)'
     },
-    [PlayerColor.Lime.tag]: {
+    Lime: {
         primary: '#84cc16',
         light: '#a3e635',
         dark: '#65a30d',
@@ -56,7 +56,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#84cc16', '#5d6b4a', '#3d4a2d'],
         gradient: 'linear-gradient(to right, #65a30d, #84cc16)'
     },
-    [PlayerColor.Green.tag]: {
+    Green: {
         primary: '#22c55e',
         light: '#4ade80',
         dark: '#16a34a',
@@ -65,7 +65,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#22c55e', '#4a5d52', '#2d3e36'],
         gradient: 'linear-gradient(to right, #16a34a, #22c55e)'
     },
-    [PlayerColor.Emerald.tag]: {
+    Emerald: {
         primary: '#10b981',
         light: '#34d399',
         dark: '#059669',
@@ -74,7 +74,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#10b981', '#4a5d56', '#2d3e38'],
         gradient: 'linear-gradient(to right, #059669, #10b981)'
     },
-    [PlayerColor.Teal.tag]: {
+    Teal: {
         primary: '#14b8a6',
         light: '#2dd4bf',
         dark: '#0d9488',
@@ -83,7 +83,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#14b8a6', '#4a5d5c', '#2d3e3d'],
         gradient: 'linear-gradient(to right, #0d9488, #14b8a6)'
     },
-    [PlayerColor.Cyan.tag]: {
+    Cyan: {
         primary: '#06b6d4',
         light: '#22d3ee',
         dark: '#0891b2',
@@ -92,7 +92,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#06b6d4', '#4a5d68', '#2d3e47'],
         gradient: 'linear-gradient(to right, #0891b2, #06b6d4)'
     },
-    [PlayerColor.Sky.tag]: {
+    Sky: {
         primary: '#0ea5e9',
         light: '#38bdf8',
         dark: '#0284c7',
@@ -101,7 +101,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#0ea5e9', '#4a5a68', '#2d3a47'],
         gradient: 'linear-gradient(to right, #0284c7, #0ea5e9)'
     },
-    [PlayerColor.Blue.tag]: {
+    Blue: {
         primary: '#3b82f6',
         light: '#60a5fa',
         dark: '#2563eb',
@@ -110,7 +110,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#3b82f6', '#4a5568', '#2d3748'],
         gradient: 'linear-gradient(to right, #2563eb, #3b82f6)'
     },
-    [PlayerColor.Indigo.tag]: {
+    Indigo: {
         primary: '#6366f1',
         light: '#818cf8',
         dark: '#4f46e5',
@@ -119,7 +119,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#6366f1', '#4a4d68', '#2e3047'],
         gradient: 'linear-gradient(to right, #4f46e5, #6366f1)'
     },
-    [PlayerColor.Violet.tag]: {
+    Violet: {
         primary: '#8b5cf6',
         light: '#a78bfa',
         dark: '#7c3aed',
@@ -128,7 +128,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#8b5cf6', '#534a68', '#3a2e47'],
         gradient: 'linear-gradient(to right, #7c3aed, #8b5cf6)'
     },
-    [PlayerColor.Purple.tag]: {
+    Purple: {
         primary: '#a855f7',
         light: '#c084fc',
         dark: '#9333ea',
@@ -137,7 +137,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#a855f7', '#5d4a68', '#3d2e47'],
         gradient: 'linear-gradient(to right, #9333ea, #a855f7)'
     },
-    [PlayerColor.Fuchsia.tag]: {
+    Fuchsia: {
         primary: '#d946ef',
         light: '#e879f9',
         dark: '#c026d3',
@@ -146,7 +146,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#d946ef', '#684a68', '#472e47'],
         gradient: 'linear-gradient(to right, #c026d3, #d946ef)'
     },
-    [PlayerColor.Pink.tag]: {
+    Pink: {
         primary: '#ec4899',
         light: '#f472b6',
         dark: '#db2777',
@@ -155,7 +155,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
         avatarColors: ['#ec4899', '#6b4a5d', '#4a2d3d'],
         gradient: 'linear-gradient(to right, #db2777, #ec4899)'
     },
-    [PlayerColor.Rose.tag]: {
+    Rose: {
         primary: '#f43f5e',
         light: '#fb7185',
         dark: '#e11d48',
@@ -167,7 +167,7 @@ export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
 };
 
 export function getColorConfig(color: PlayerColor): ColorConfig {
-    return COLOR_CONFIGS[color.tag] || COLOR_CONFIGS[PlayerColor.Amber.tag];
+    return COLOR_CONFIGS[color.tag] || COLOR_CONFIGS.Amber;
 }
 
 export function setAccentColor(color: PlayerColor): void {

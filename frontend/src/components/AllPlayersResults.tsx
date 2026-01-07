@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { PlayerProgress } from "../../module_bindings/player_progress_type";
+import type { PlayerProgress } from "../types/stdb";
 import { RaceResultsChart } from "./RaceResultsChart";
 import { PlayerAvatar } from "./PlayerAvatar";
 

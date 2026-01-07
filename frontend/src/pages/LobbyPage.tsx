@@ -1,8 +1,6 @@
 import { useState, useCallback, useRef, useMemo } from "react";
 import "../components/SelectionButton.css";
-import type {
-  GameMode,
-} from "../../module_bindings";
+import { type GameMode } from "../types/stdb";
 import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
 import { GameOptionsSelector, type GameTypeValue } from "../components/ModeSelector";
 import { Header } from "../components/Header";

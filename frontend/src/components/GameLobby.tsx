@@ -13,7 +13,7 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
 
   const handleStartGame = useCallback(() => {
     if (!conn || !gameId || !isOwner) return;
-    conn.reducers.startPrivateGame(gameId);
+    conn.reducers.startPrivateGame({ gameId });
   }, [conn, gameId, isOwner]);
 
   const gameUrl = `${window.location.origin}/game/${gameId}`;

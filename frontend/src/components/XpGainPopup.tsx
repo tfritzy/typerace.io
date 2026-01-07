@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { XpGain } from "../../module_bindings/xp_gain_type";
+import type { XpGain } from "../types/stdb";
 
 interface XpGainPopupProps {
     xpGain: XpGain;
