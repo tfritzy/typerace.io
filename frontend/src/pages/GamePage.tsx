@@ -96,7 +96,10 @@ export const GamePage = () => {
       .onApplied(() => {
         setGamePlayerProgress(Array.from(conn.db.playerprogress.iter()));
       })
-      .subscribe([`SELECT * FROM playerprogress WHERE GameId = '${gameId}'`]);
+      .subscribe([
+        `SELECT * FROM playerprogress WHERE GameId = '${gameId}'`,
+        `SELECT * FROM playerprogress WHERE JoinCode = '${gameId}'`
+      ]);
 
     return () => {
       conn.db.playerprogress.removeOnInsert(handleProgressInsert);
