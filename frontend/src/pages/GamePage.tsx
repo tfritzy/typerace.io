@@ -67,10 +67,22 @@ export const GamePage = () => {
     const handleProgressInsert = (_ctx: any, pp: PlayerProgress) => {
       if (pp.gameId.toString() === gameId) {
         setGamePlayerProgress(prev => {
-          if (prev.some(p => p.id === pp.id)) {
+          let found = false;
+          for (let i = 0; i < prev.length; i++) {
+            if (prev[i].id === pp.id) {
+              found = true;
+              break;
+            }
+          }
+          if (found) {
             return prev;
           }
-          return [...prev, pp];
+          const newArr = new Array(prev.length + 1);
+          for (let i = 0; i < prev.length; i++) {
+            newArr[i] = prev[i];
+          }
+          newArr[prev.length] = pp;
+          return newArr;
         });
       }
 
@@ -83,9 +95,13 @@ export const GamePage = () => {
 
     const handleProgressUpdate = (_ctx: any, _oldPP: PlayerProgress, newPP: PlayerProgress) => {
       if (newPP.gameId.toString() === gameId) {
-        setGamePlayerProgress(prev =>
-          prev.map(pp => pp.id === newPP.id ? newPP : pp)
-        );
+        setGamePlayerProgress(prev => {
+          const newArr = new Array(prev.length);
+          for (let i = 0; i < prev.length; i++) {
+            newArr[i] = prev[i].id === newPP.id ? newPP : prev[i];
+          }
+          return newArr;
+        });
       }
     };
 
@@ -94,7 +110,11 @@ export const GamePage = () => {
 
     const progressSubscription = conn.subscriptionBuilder()
       .onApplied(() => {
-        const currentGameProgress = Array.from(conn.db.playerprogress.gameId.filter(gameId));
+        const filtered = conn.db.playerprogress.gameId.filter(gameId);
+        const currentGameProgress: PlayerProgress[] = [];
+        for (const pp of filtered) {
+          currentGameProgress.push(pp);
+        }
         setGamePlayerProgress(currentGameProgress);
       })
       .subscribe([
@@ -114,9 +134,13 @@ export const GamePage = () => {
     const currentPlayerId = conn.identity;
     if (!currentPlayerId) return;
 
-    const currentPlayerProgress = gamePlayerProgress.find(
-      (pp) => pp.playerId.isEqual(currentPlayerId)
-    );
+    let currentPlayerProgress: PlayerProgress | undefined;
+    for (let i = 0; i < gamePlayerProgress.length; i++) {
+      if (gamePlayerProgress[i].playerId.isEqual(currentPlayerId)) {
+        currentPlayerProgress = gamePlayerProgress[i];
+        break;
+      }
+    }
 
     if (currentPlayerProgress && game.phrase) {
       const hasCompletedRace = currentPlayerProgress.progressIndex >= game.phrase.length;
@@ -133,9 +157,13 @@ export const GamePage = () => {
 
     if (game.gameType?.tag === "Private" && game.state?.tag === "Lobby") {
       const currentPlayerId = conn.identity;
-      const hasProgress = gamePlayerProgress.some(
-        (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
-      );
+      let hasProgress = false;
+      for (let i = 0; i < gamePlayerProgress.length; i++) {
+        if (currentPlayerId && gamePlayerProgress[i].playerId.isEqual(currentPlayerId)) {
+          hasProgress = true;
+          break;
+        }
+      }
 
       if (!hasProgress) {
         conn.reducers.joinPrivateGame({ gameId });
@@ -158,9 +186,13 @@ export const GamePage = () => {
   const isCountdown = game.state?.tag === "Countdown";
   const isDisabled = isInLobby || isCountdown;
 
-  const currentPlayerProgress = gamePlayerProgress.find(
-    (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
-  );
+  let currentPlayerProgress: PlayerProgress | undefined;
+  for (let i = 0; i < gamePlayerProgress.length; i++) {
+    if (currentPlayerId && gamePlayerProgress[i].playerId.isEqual(currentPlayerId)) {
+      currentPlayerProgress = gamePlayerProgress[i];
+      break;
+    }
+  }
   const initialProgress = currentPlayerProgress?.progressIndex ?? 0;
   const hasCompletedRace = currentPlayerProgress
     ? currentPlayerProgress.progressIndex >= game.phrase.length
@@ -224,9 +256,13 @@ export const GamePage = () => {
 
           {hasFinished || hasCompletedRace ? (
             (() => {
-              const currentPP = gamePlayerProgress.find(
-                (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
-              );
+              let currentPP: PlayerProgress | undefined;
+              for (let i = 0; i < gamePlayerProgress.length; i++) {
+                if (currentPlayerId && gamePlayerProgress[i].playerId.isEqual(currentPlayerId)) {
+                  currentPP = gamePlayerProgress[i];
+                  break;
+                }
+              }
 
               const isOwner = currentPlayerId && game.owner && currentPlayerId.isEqual(game.owner);
               const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;

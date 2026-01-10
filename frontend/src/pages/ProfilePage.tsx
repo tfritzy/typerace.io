@@ -69,7 +69,14 @@ export const ProfilePage = () => {
 
         const handleGameRecordInsert = (_ctx: any, record: GameRecord) => {
             if (record.playerId.toHexString() === playerId) {
-                setGameRecords(prev => [...prev, record]);
+                setGameRecords(prev => {
+                    const newArr = new Array(prev.length + 1);
+                    for (let i = 0; i < prev.length; i++) {
+                        newArr[i] = prev[i];
+                    }
+                    newArr[prev.length] = record;
+                    return newArr;
+                });
             }
         };
 
@@ -78,7 +85,11 @@ export const ProfilePage = () => {
         const subscription = conn.subscriptionBuilder()
             .onApplied(() => {
                 if (viewedPlayer?.identity) {
-                    const records = Array.from(conn.db.gamerecord.playerId.filter(viewedPlayer.identity));
+                    const filtered = conn.db.gamerecord.playerId.filter(viewedPlayer.identity);
+                    const records: GameRecord[] = [];
+                    for (const record of filtered) {
+                        records.push(record);
+                    }
                     setGameRecords(records);
                 }
             })
@@ -158,20 +169,24 @@ export const ProfilePage = () => {
     const realGameData = useMemo(() => {
         if (!viewedPlayer) return [];
 
-        let playerStats = gameRecords.filter(stat =>
-            stat.playerId.isEqual(viewedPlayer.identity)
-        );
-
-        if (selectedMode !== 'all') {
-            playerStats = playerStats.filter(stat => stat.gameMode.tag === selectedMode);
+        const playerStats: GameRecord[] = [];
+        const cutoffTime = selectedTimeFrame !== 'all' ? getTimeFrameFilter(selectedTimeFrame) : 0;
+        
+        for (let i = 0; i < gameRecords.length; i++) {
+            const stat = gameRecords[i];
+            if (!stat.playerId.isEqual(viewedPlayer.identity)) {
+                continue;
+            }
+            if (selectedMode !== 'all' && stat.gameMode.tag !== selectedMode) {
+                continue;
+            }
+            if (selectedTimeFrame !== 'all' && stat.date < cutoffTime) {
+                continue;
+            }
+            playerStats.push(stat);
         }
 
-        if (selectedTimeFrame !== 'all') {
-            const cutoffTime = getTimeFrameFilter(selectedTimeFrame);
-            playerStats = playerStats.filter(stat => stat.date >= cutoffTime);
-        }
-
-        return playerStats.sort((a, b) => {
+        playerStats.sort((a, b) => {
             if (a.timeMs < b.timeMs) {
                 return -1;
             }
@@ -180,17 +195,24 @@ export const ProfilePage = () => {
             }
             return 0;
         });
+
+        return playerStats;
     }, [gameRecords, viewedPlayer, selectedMode, selectedTimeFrame]);
 
     const availableModes = useMemo(() => {
         if (!viewedPlayer) return [];
 
         const modesSet = new Set<string>();
-        gameRecords
-            .filter(stat => stat.playerId.isEqual(viewedPlayer.identity))
-            .forEach(stat => modesSet.add(stat.gameMode.tag));
+        for (let i = 0; i < gameRecords.length; i++) {
+            const stat = gameRecords[i];
+            if (stat.playerId.isEqual(viewedPlayer.identity)) {
+                modesSet.add(stat.gameMode.tag);
+            }
+        }
 
-        return Array.from(modesSet).sort();
+        const modesArray = Array.from(modesSet);
+        modesArray.sort();
+        return modesArray;
     }, [gameRecords, viewedPlayer]);
 
     return (
