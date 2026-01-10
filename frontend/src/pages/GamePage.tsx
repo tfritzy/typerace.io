@@ -62,7 +62,7 @@ export const GamePage = () => {
   }, [conn, gameId]);
 
   useEffect(() => {
-    if (!conn || !gameId) return;
+    if (!conn || !gameId || !conn.identity) return;
 
     const handleProgressInsert = (_ctx: any, pp: PlayerProgress) => {
       if (pp.gameId.toString() === gameId) {
@@ -99,8 +99,7 @@ export const GamePage = () => {
         setGamePlayerProgress(currentGameProgress);
       })
       .subscribe([
-        `SELECT * FROM playerprogress WHERE GameId = '${gameId}'`,
-        `SELECT * FROM playerprogress WHERE JoinCode = '${gameId}'`
+        `SELECT * FROM playerprogress WHERE GameId = '${gameId}' OR (JoinCode = '${gameId}' AND PlayerId = '${conn.identity.toHexString()}')`
       ]);
 
     return () => {
