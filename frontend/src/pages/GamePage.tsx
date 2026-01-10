@@ -62,7 +62,7 @@ export const GamePage = () => {
   }, [conn, gameId]);
 
   useEffect(() => {
-    if (!conn || !gameId) return;
+    if (!conn || !gameId || !conn.identity) return;
 
     const handleProgressInsert = (_ctx: any, pp: PlayerProgress) => {
       if (pp.gameId.toString() === gameId) {
@@ -94,9 +94,13 @@ export const GamePage = () => {
 
     const progressSubscription = conn.subscriptionBuilder()
       .onApplied(() => {
-        setGamePlayerProgress(Array.from(conn.db.playerprogress.iter()));
+        const allProgress = Array.from(conn.db.playerprogress.iter());
+        const currentGameProgress = allProgress.filter(pp => pp.gameId.toString() === gameId);
+        setGamePlayerProgress(currentGameProgress);
       })
-      .subscribe([`SELECT * FROM playerprogress WHERE GameId = '${gameId}'`]);
+      .subscribe([
+        `SELECT * FROM playerprogress WHERE GameId = '${gameId}' OR PlayerId = '${conn.identity}'`
+      ]);
 
     return () => {
       conn.db.playerprogress.removeOnInsert(handleProgressInsert);
