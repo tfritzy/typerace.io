@@ -94,8 +94,7 @@ export const GamePage = () => {
 
     const progressSubscription = conn.subscriptionBuilder()
       .onApplied(() => {
-        const allProgress = Array.from(conn.db.playerprogress.iter());
-        const currentGameProgress = allProgress.filter(pp => pp.gameId.toString() === gameId);
+        const currentGameProgress = Array.from(conn.db.playerprogress.gameId.filter(gameId));
         setGamePlayerProgress(currentGameProgress);
       })
       .subscribe([

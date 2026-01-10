@@ -52,8 +52,7 @@ export const ProfilePage = () => {
 
         const subscription = conn.subscriptionBuilder()
             .onApplied(() => {
-                const allPlayers = Array.from(conn.db.player.iter());
-                const p = allPlayers.find(player => player.playerId === playerId);
+                const p = conn.db.player.playerId.find(playerId);
                 if (p) setViewedPlayer(p);
             })
             .subscribe([`SELECT * FROM player WHERE PlayerId = '${playerId}'`]);
@@ -78,8 +77,10 @@ export const ProfilePage = () => {
 
         const subscription = conn.subscriptionBuilder()
             .onApplied(() => {
-                const records = Array.from(conn.db.gamerecord.iter());
-                setGameRecords(records);
+                if (viewedPlayer?.identity) {
+                    const records = Array.from(conn.db.gamerecord.playerId.filter(viewedPlayer.identity));
+                    setGameRecords(records);
+                }
             })
             .subscribe([`SELECT * FROM gamerecord WHERE PlayerId = '${viewedPlayer?.identity}'`]);
 
