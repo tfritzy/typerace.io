@@ -79,20 +79,19 @@ export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
     return (
         <div className="box box-shadow rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
-                <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-white/10 text-white text-xs uppercase tracking-wider font-bold min-w-[700px]">
+                <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-white/10 text-white text-xs uppercase tracking-wider font-bold min-w-[700px]">
                     <div>Game Mode</div>
                     <div className="text-center">Type</div>
                     <div className="text-center">Placement</div>
                     <div className="text-center">Time</div>
                     <div className="text-center">WPM</div>
-                    <div className="text-center">Experience</div>
                     <div className="text-right">Date</div>
                 </div>
                 {currentGames.map((gameRecord) => (
                     <button
                         key={gameRecord.id}
                         onClick={() => navigate(`/game/${gameRecord.gameId}`)}
-                        className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors cursor-pointer w-full text-left bg-transparent border-0 min-w-[700px]"
+                        className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors cursor-pointer w-full text-left bg-transparent border-0 min-w-[700px]"
                     >
                         <div className="text-white/70">
                             {formatGameMode(gameRecord.gameMode.tag)}
@@ -109,9 +108,6 @@ export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
                         </div>
                         <div className="text-white/70 text-center">
                             {Math.round(gameRecord.wpm)}
-                        </div>
-                        <div className="text-white/70 text-center flex items-center justify-center gap-1">
-                            <span>{gameRecord.xpGained > 0 ? '+' : ''}{gameRecord.xpGained} xp</span>
                         </div>
                         <div className="text-white/60 text-right text-sm">
                             {formatDate(gameRecord.date)}
