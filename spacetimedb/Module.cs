@@ -366,7 +366,6 @@ public static partial class Module
         public byte[] CharacterHistory;
         public long Time;
         public int Placement;
-        [SpacetimeDB.Index.BTree]
         public string JoinCode;
         public double Wpm;
         public PlayerColor PlayerColor;

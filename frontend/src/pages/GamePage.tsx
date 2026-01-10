@@ -99,7 +99,7 @@ export const GamePage = () => {
         setGamePlayerProgress(currentGameProgress);
       })
       .subscribe([
-        `SELECT * FROM playerprogress WHERE GameId = '${gameId}' OR (JoinCode = '${gameId}' AND PlayerId = '${conn.identity.toHexString()}')`
+        `SELECT * FROM playerprogress WHERE GameId = '${gameId}' OR PlayerId = '${conn.identity}'`
       ]);
 
     return () => {
