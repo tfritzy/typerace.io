@@ -94,7 +94,9 @@ export const GamePage = () => {
 
     const progressSubscription = conn.subscriptionBuilder()
       .onApplied(() => {
-        setGamePlayerProgress(Array.from(conn.db.playerprogress.iter()));
+        const allProgress = Array.from(conn.db.playerprogress.iter());
+        const currentGameProgress = allProgress.filter(pp => pp.gameId.toString() === gameId);
+        setGamePlayerProgress(currentGameProgress);
       })
       .subscribe([
         `SELECT * FROM playerprogress WHERE GameId = '${gameId}'`,
