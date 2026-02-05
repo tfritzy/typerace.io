@@ -21,13 +21,13 @@ def extract_quotes_from_cs(file_path: str) -> List[Dict]:
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
     
-    pattern = r'new Quote \{ Id = "([^"]*)", Text = "([^"]*)", Author = "([^"]*)" \}'
+    pattern = r'new Quote \{ Id = "([^"\\]*(?:\\.[^"\\]*)*)", Text = "([^"\\]*(?:\\.[^"\\]*)*)", Author = "([^"\\]*(?:\\.[^"\\]*)*)" \}'
     matches = re.findall(pattern, content)
     
     quotes = []
     for id_url, text, author in matches:
-        text = text.replace('\\"', '"').replace('\\n', '\n').replace('\\r', '\r').replace('\\t', '\t')
-        author = author.replace('\\"', '"')
+        text = text.replace('\\"', '"').replace('\\n', '\n').replace('\\r', '\r').replace('\\t', '\t').replace('\\\\', '\\')
+        author = author.replace('\\"', '"').replace('\\\\', '\\')
         quotes.append({
             'id': id_url,
             'text': text,
@@ -45,7 +45,7 @@ def scan_language_quotes(lang_code: str) -> tuple[List[Dict], List[Dict]]:
     all_quotes = []
     for root, dirs, files in os.walk(lang_dir):
         for file in files:
-            if file.endswith('.cs') and file != f'{lang_code.capitalize()}Quotes.cs':
+            if file.endswith('.cs'):
                 file_path = os.path.join(root, file)
                 quotes = extract_quotes_from_cs(file_path)
                 all_quotes.extend(quotes)

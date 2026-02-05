@@ -16,12 +16,11 @@ def load_allowlist() -> Dict[str, Set[str]]:
         }
 
 def check_text_validity(text: str, allowed_chars: Set[str]) -> tuple[bool, List[str]]:
-    invalid_chars = []
+    invalid_chars_set = set()
     for char in text:
         if char not in allowed_chars:
-            if char not in invalid_chars:
-                invalid_chars.append(char)
-    return len(invalid_chars) == 0, invalid_chars
+            invalid_chars_set.add(char)
+    return len(invalid_chars_set) == 0, list(invalid_chars_set)
 
 def scrub_quotes(quotes: List[Dict], lang_code: str, allowed_chars: Set[str]) -> tuple[List[Dict], List[Dict]]:
     valid_quotes = []
@@ -38,8 +37,7 @@ def scrub_quotes(quotes: List[Dict], lang_code: str, allowed_chars: Set[str]) ->
             valid_quotes.append(quote)
         else:
             invalid_info = {
-                'quote': quote,
-                'invalid_chars': []
+                'quote': quote
             }
             if not text_valid:
                 invalid_info['text_invalid_chars'] = text_invalid_chars

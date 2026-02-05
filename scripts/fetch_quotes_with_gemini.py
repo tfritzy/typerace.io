@@ -45,20 +45,15 @@ def scrub_quotes_by_allowlist(quotes: List[Dict], lang_code: str, allowed_chars:
         text = quote.get('quote', quote.get('Text', ''))
         attribution = quote.get('attribution', quote.get('Author', ''))
         
-        text_valid = all(char in allowed_chars for char in text)
-        attr_valid = all(char in allowed_chars for char in attribution)
+        text_invalid_chars = set(c for c in text if c not in allowed_chars)
+        attr_invalid_chars = set(c for c in attribution if c not in allowed_chars)
         
-        if text_valid and attr_valid:
+        if not text_invalid_chars and not attr_invalid_chars:
             valid_quotes.append(quote)
         else:
-            invalid_chars = []
-            if not text_valid:
-                invalid_chars.extend([c for c in text if c not in allowed_chars])
-            if not attr_valid:
-                invalid_chars.extend([c for c in attribution if c not in allowed_chars])
             invalid_quotes.append({
                 'quote': quote,
-                'invalid_chars': list(set(invalid_chars))
+                'invalid_chars': list(text_invalid_chars | attr_invalid_chars)
             })
     
     return valid_quotes, invalid_quotes
