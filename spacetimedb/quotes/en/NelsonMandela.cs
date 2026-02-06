@@ -8,8 +8,6 @@ public static partial class EnglishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "There are thousands of people who feel that it is useless and futile for us to continue talking peace and non-violence — against a government whose only reply is savage attacks on an unarmed and defenceless people.", Author = "Nelson Mandela" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "For to be free is not merely to cast off one’s chains, but to live in a way that respects and enhances the freedom of others.", Author = "Nelson Mandela" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "Difficulties break some men but make others. No axe is sharp enough to cut the soul of a sinner who keeps on trying, one armed with the hope that he will rise even in the end.", Author = "Nelson Mandela" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "I like friends who have independent minds because they tend to make you see problems from all angles.", Author = "Nelson Mandela" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "Only free men can negotiate; prisoners cannot enter into contracts. Your freedom and mine cannot be separated.", Author = "Nelson Mandela" },
@@ -17,7 +15,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "Experience is the best legacy men could possess and never desert in life.", Author = "Nelson Mandela" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "I stand here before you not as a prophet but as a humble servant of you, the people. Your tireless and heroic sacrifices have made it possible for me to be here today. I therefore place the remaining years of my life in your hands.", Author = "Nelson Mandela" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "Exercise dissipates tension, and tension is the enemy of serenity. I found that I worked better and thought more clearly when I was in good physical condition, and so training became one of the inflexible disciplines of my life.", Author = "Nelson Mandela" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "I never think of the time I have lost. I just carry out a programme because it’s there. It’s mapped out for me.", Author = "Nelson Mandela" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "Death is something inevitable. When a man has done what he considers to be his duty to his people and his country, he can rest in peace. I believe I have made that effort and that is, therefore, why I will sleep for the eternity.", Author = "Nelson Mandela" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "It is in the character of growth that we should learn from both pleasant and unpleasant experiences.", Author = "Nelson Mandela" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "Real leaders must be ready to sacrifice all for the freedom of their people.", Author = "Nelson Mandela" },
@@ -48,7 +45,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "You may succeed in delaying, but never in preventing the transition of South Africa to a democracy.", Author = "Nelson Mandela" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "Any man that tries to rob me of my dignity will lose.", Author = "Nelson Mandela" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "The victory of democracy in South Africa is the common achievement of all humanity.", Author = "Nelson Mandela" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "The authorities liked to say that we received a balanced diet; it was indeed balanced — between the unpalatable and the inedible.", Author = "Nelson Mandela" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "Prison itself is a tremendous education in the need for patience and perseverance. It is above all a test of one's commitment.", Author = "Nelson Mandela" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "I always knew that someday I would once again feel the grass under my feet and walk in the sunshine as a free man.", Author = "Nelson Mandela" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Nelson_Mandela", Text = "I have always believed that exercise is the key not only to physical health but to peace of mind.", Author = "Nelson Mandela" },

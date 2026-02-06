@@ -8,7 +8,6 @@ public static partial class EnglishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Paine", Text = "I do not choose to be a common man. It is my right to be uncommon—if I can. I seek opportunity—not security.", Author = "Thomas Paine" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Paine", Text = "Eloquence may strike the ear, but the language of poverty strikes the heart; the first may charm like music, but the second alarms like a knell.", Author = "Thomas Paine" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Paine", Text = "When men yield up the privilege of thinking, the last shadow of liberty quits the horizon.", Author = "Thomas Paine" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Paine", Text = "He who dares not offend cannot be honest.", Author = "Thomas Paine" },

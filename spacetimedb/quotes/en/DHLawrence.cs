@@ -9,14 +9,12 @@ public static partial class EnglishQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "I hold that the parentheses are by far the most important parts of a non-business letter.", Author = "D. H. Lawrence" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "My God, these folks don't know how to love — that's why they love so easily.", Author = "D. H. Lawrence" },
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "Tragedy ought really to be a great kick at misery.", Author = "D. H. Lawrence" },
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "We have to hate our immediate predecessors to get free from their authority.", Author = "D. H. Lawrence" },
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "It's the man who dares to take, who is independent, not he who gives.", Author = "D. H. Lawrence" },
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "Not I, not I, but the wind that blows through me!", Author = "D. H. Lawrence" },
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "The nature of the infant is not just a new permutation-and-combination of elements contained in the natures of the parents. There is in the nature of the infant that which is utterly unknown in the natures of the parents.", Author = "D. H. Lawrence" },
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "The dead don't die. They look on and help.", Author = "D. H. Lawrence" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "California is a queer place — in a way, it has turned its back on the world, and looks into the void Pacific. It is absolutely selfish, very empty, but not false, and at least, not full of false effort.", Author = "D. H. Lawrence" },
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "Never trust the artist. Trust the tale. The proper function of a critic is to save the tale from the artist who created it", Author = "D. H. Lawrence" },
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "It was in 1915 the old world ended.", Author = "D. H. Lawrence" },
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "Men! The only animal in the world to fear!", Author = "D. H. Lawrence" },
@@ -42,7 +40,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "Men and women aren't really dogs: they only look like it and behave like it. Somewhere inside there is a great chagrin and a gnawing discontent.", Author = "D. H. Lawrence" },
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "Sex is the balance of male and female in the universe, the attraction, the repulsion, the transit of neutrality, the new attraction, the new repulsion, always different, always new.", Author = "D. H. Lawrence" },
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "The gods are nameless and imageless yet looking in a great full lime-tree of summer I suddenly saw deep into the eyes of gods: it is enough.", Author = "D. H. Lawrence" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "There are no gods, and you can please yourself have a game of tennis, go out in the car, do some shopping, sit and talk, talk, talk with a cigarette browning your fingers. There are no gods, and you can please yourself — go and please yourself — But leave me alone, leave me alone, to myself!", Author = "D. H. Lawrence" },
             new Quote { Id = "https://en.wikiquote.org/wiki/D._H._Lawrence", Text = "I fall asleep with the gods, the gods that are not, or that are like a pool into which we plunge, or do not plunge.", Author = "D. H. Lawrence" },
         };
     }

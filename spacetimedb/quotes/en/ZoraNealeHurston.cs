@@ -16,7 +16,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Zora_Neale_Hurston", Text = "For a while she thought it was gone from her soul.", Author = "Zora Neale Hurston" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Zora_Neale_Hurston", Text = "Mama exhorted her children at every opportunity to \"jump at de sun.\" We might not land on the sun, but at least we would get off the ground.", Author = "Zora Neale Hurston" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Zora_Neale_Hurston", Text = "Research is formalized curiosity. It is poking and prying with a purpose.", Author = "Zora Neale Hurston" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Zora_Neale_Hurston", Text = "If you haven’t got it, you can’t show it. If you have got it, you can’t hide it.", Author = "Zora Neale Hurston" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Zora_Neale_Hurston", Text = "Love, I find is like singing. Everybody can do enough to satisfy themselves, though it may not impress the neighbors as being very much.", Author = "Zora Neale Hurston" },
         };
     }

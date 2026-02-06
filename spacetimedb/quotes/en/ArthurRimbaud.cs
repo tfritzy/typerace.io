@@ -19,7 +19,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Rimbaud", Text = "The green water spurted through my pine-wood hull.", Author = "Arthur Rimbaud" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Rimbaud", Text = "I have bathed in the Poem Of the Sea... Devouring the green azures.", Author = "Arthur Rimbaud" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Rimbaud", Text = "I have seen the sunset, stained with mystic horrors, Illumine the rolling waves with long purple forms, Like actors in ancient plays.", Author = "Arthur Rimbaud" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Rimbaud", Text = "One evening, I sat Beauty in my lap. — And I found her bitter. — And I cursed her.", Author = "Arthur Rimbaud" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Rimbaud", Text = "I found I could extinguish all human hope from my soul.", Author = "Arthur Rimbaud" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Rimbaud", Text = "Life is the farce we are all forced to endure.", Author = "Arthur Rimbaud" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Rimbaud", Text = "Once, I remember well, my life was a feast where all hearts opened and all wines flowed.", Author = "Arthur Rimbaud" },

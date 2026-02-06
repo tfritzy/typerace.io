@@ -59,7 +59,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "It is not, what a lawyer tells me I may do; but what humanity, reason, and justice, tell me I ought to do.", Author = "Edmund Burke" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "The march of the human mind is slow.", Author = "Edmund Burke" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "Freedom and not servitude is the cure of anarchy; as religion, and not atheism, is the true remedy for superstition.", Author = "Edmund Burke" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "All government — indeed, every human benefit and enjoyment, every virtue and every prudent act — is founded on compromise and barter.", Author = "Edmund Burke" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "Slavery they can have anywhere. It is a weed that grows in every soil.", Author = "Edmund Burke" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "Deny them this participation of freedom, and you break that sole bond, which originally made, and must still preserve the unity of the empire.", Author = "Edmund Burke" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "Magnanimity in politics is not seldom the truest wisdom; and a great empire and little minds go ill together.", Author = "Edmund Burke" },
