@@ -133,7 +133,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Michel_de_Montaigne", Text = "I moreover affirm that our wisdom itself, and wisest consultations, for the most part commit themselves to the conduct of chance.", Author = "Michel de Montaigne" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michel_de_Montaigne", Text = "What if he has borrowed the matter and spoiled the form, as it oft falls out?", Author = "Michel de Montaigne" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michel_de_Montaigne", Text = "The oldest and best known evil was ever more supportable than one that was new and untried.", Author = "Michel de Montaigne" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Michel_de_Montaigne", Text = "Not because Socrates said so,… I look upon all men as my compatriots.", Author = "Michel de Montaigne" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Michel_de_Montaigne", Text = "Not because Socrates said so,... I look upon all men as my compatriots.", Author = "Michel de Montaigne" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michel_de_Montaigne", Text = "My appetite comes to me while eating.", Author = "Michel de Montaigne" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michel_de_Montaigne", Text = "There is no man so good, who, were he to submit all his thoughts and actions to the laws, would not deserve hanging ten times in his life.", Author = "Michel de Montaigne" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michel_de_Montaigne", Text = "Saturninus said, 'Comrades, you have lost a good captain to make him an ill general.'", Author = "Michel de Montaigne" },

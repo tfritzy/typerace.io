@@ -94,7 +94,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/John_Steinbeck", Text = "Strength and success- they are above morality, above criticism. It seems then, that it is not what you do, but how you do it and what you call it.", Author = "John Steinbeck" },
             new Quote { Id = "https://en.wikiquote.org/wiki/John_Steinbeck", Text = "Not only the brave get killed, but the brave have a better chance of it.", Author = "John Steinbeck" },
             new Quote { Id = "https://en.wikiquote.org/wiki/John_Steinbeck", Text = "Good God, what a mess of draggle-tail impulses a man is - and a woman too, I guess.", Author = "John Steinbeck" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/John_Steinbeck", Text = "… we've got so many laws you can't breathe without breaking something.", Author = "John Steinbeck" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/John_Steinbeck", Text = "... we've got so many laws you can't breathe without breaking something.", Author = "John Steinbeck" },
             new Quote { Id = "https://en.wikiquote.org/wiki/John_Steinbeck", Text = "The things everyone knows are most likely to be wrong.", Author = "John Steinbeck" },
             new Quote { Id = "https://en.wikiquote.org/wiki/John_Steinbeck", Text = "Like most modern people, I don't believe in prophecy or magic and then spend half my time practicing it.", Author = "John Steinbeck" },
             new Quote { Id = "https://en.wikiquote.org/wiki/John_Steinbeck", Text = "A crime is something someone else commits.", Author = "John Steinbeck" },

@@ -83,7 +83,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "we still find it funny, but we don't laugh any more.", Author = "Samuel Beckett" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "What in God's name could there be on the horizon?", Author = "Samuel Beckett" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "Hamm: Gray! Did I hear you say gray?", Author = "Samuel Beckett" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "Hamm: We're not beginning … to … to … mean something?", Author = "Samuel Beckett" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "Hamm: We're not beginning ... to ... to ... mean something?", Author = "Samuel Beckett" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "Perhaps my best years are gone. When there was a chance of happiness. But I wouldn't want them back. Not with the fire in me now.", Author = "Samuel Beckett" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "Ah finish your booze now and get to your bed. Go on with this drivel in the morning. Or leave it at that.", Author = "Samuel Beckett" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "No way in, go in, measure.", Author = "Samuel Beckett" },

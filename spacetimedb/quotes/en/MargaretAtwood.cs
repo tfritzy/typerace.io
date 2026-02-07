@@ -76,7 +76,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Margaret_Atwood", Text = "Amazing how quickly the past becomes idyllic.", Author = "Margaret Atwood" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Margaret_Atwood", Text = "Gender roles suck, says Swift Fox. Then you should stop playing them, thinks Toby.", Author = "Margaret Atwood" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Margaret_Atwood", Text = "My fundamental position is that women are human beings, with the full range of saintly and demonic behaviours this entails, including criminal ones. They're not angels, incapable of wrongdoing. If they were, we wouldn't need a legal system.", Author = "Margaret Atwood" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Margaret_Atwood", Text = "Furthermore, I believe that in order to have civil and human rights for women there have to be civil and human rights, period …", Author = "Margaret Atwood" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Margaret_Atwood", Text = "Furthermore, I believe that in order to have civil and human rights for women there have to be civil and human rights, period ...", Author = "Margaret Atwood" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Margaret_Atwood", Text = "Anyone who doesn't puppet their views is seen as an apostate, a heretic or a traitor, and moderates in the middle are annihilated. Fiction writers are particularly suspect because they write about human beings, and people are morally ambiguous.", Author = "Margaret Atwood" },
         };
     }

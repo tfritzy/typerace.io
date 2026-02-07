@@ -45,7 +45,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "I love deadlines. I love the whooshing noise they make as they go by.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "He was constantly reminded of how startlingly different a place the world was when viewed from a point only three feet to the left.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Solutions nearly always come from the direction you least expect, which means there's no point trying to look in that direction because it won't be coming from there.", Author = "Douglas Adams" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Five years later, while he was struggling to think of a legitimate reason for an alien to visit Earth, the phrase returned to him. The rest is history…", Author = "Douglas Adams" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Five years later, while he was struggling to think of a legitimate reason for an alien to visit Earth, the phrase returned to him. The rest is history...", Author = "Douglas Adams" },
         };
     }
 }
