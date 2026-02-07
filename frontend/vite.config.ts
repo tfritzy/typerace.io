@@ -11,4 +11,9 @@ export default defineConfig({
       'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
     },
   },
+  server: {
+    fs: {
+      allow: [path.resolve(__dirname, '..')],
+    },
+  },
 })
