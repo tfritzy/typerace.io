@@ -40,6 +40,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Bertrand_Russell", Text = "Organic life, we are told, has developed gradually from the protozoon to the philosopher, and this development, we are assured, is indubitably an advance. Unfortunately it is the philosopher, not the protozoon, who gives us this assurance.", Author = "Bertrand Russell" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bertrand_Russell", Text = "Ethics is in origin the art of recommending to others the sacrifices required for co-operation with oneself.", Author = "Bertrand Russell" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bertrand_Russell", Text = "The law of causality, I believe, like much that passes muster among philosophers, is a relic of a bygone age, surviving, like the monarchy, only because it is erroneously supposed to do no harm.", Author = "Bertrand Russell" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Bertrand_Russell", Text = "My own opinion-which I may as well indicate at the outset-is that pure Anarchism, though it should be the ultimate ideal, to which society should continually approximate, is for the present impossible, and would not survive more than a year or two at most if it were adopted.", Author = "Bertrand Russell" },
         };
     }
 }

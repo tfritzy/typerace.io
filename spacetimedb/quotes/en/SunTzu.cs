@@ -47,6 +47,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Sun_Tzu", Text = "Now the reason the enlightened prince and the wise general conquer the enemy whenever they move and their achievements surpass those of ordinary men is foreknowledge.", Author = "Sun Tzu" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Sun_Tzu", Text = "Secret operations are essential in war; upon them the army relies to make its every move.", Author = "Sun Tzu" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Sun_Tzu", Text = "Build your opponent a golden bridge to retreat across.", Author = "Sun Tzu" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Sun_Tzu", Text = "Engage people with what they expect; it is what they are able to discern and confirms their projections. It settles them into predictable patterns of response, occupying their minds while you wait for the extraordinary moment - that which they cannot anticipate.", Author = "Sun Tzu" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Sun_Tzu", Text = "Victory is reserved for those who are willing to pay its price.", Author = "Sun Tzu" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Sun_Tzu", Text = "To know your Enemy, you must become your Enemy.", Author = "Sun Tzu" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Sun_Tzu", Text = "The true objective of war is peace.", Author = "Sun Tzu" },

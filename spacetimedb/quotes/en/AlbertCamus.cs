@@ -14,6 +14,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "In the depths of winter, I finally learned that within me there lay an invincible summer.", Author = "Albert Camus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "A living man can be enslaved and reduced to the historic condition of an object. But if he dies in refusing to be enslaved, he reaffirms the existence of another kind of human nature which refuses to be classified as an object.", Author = "Albert Camus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "Knowing that certain nights whose sweetness lingers will keep returning to the earth and sea after we are gone, yes, this helps us to die.", Author = "Albert Camus" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "We always deceive ourselves twice about the people we love - first to their advantage, then to their disadvantage.", Author = "Albert Camus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "Without beauty, love, or danger it would be almost easy to live.", Author = "Albert Camus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "We have exiled beauty; the Greeks took up arms for her.", Author = "Albert Camus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "We turn our backs on nature; we are ashamed of beauty. Our wretched tragedies have a smell of the office clinging to them, and the blood that trickles from them is the color of printer's ink.", Author = "Albert Camus" },
@@ -68,12 +69,15 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "Happiness and the absurd are two sons of the same earth. They are inseparable.", Author = "Albert Camus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "The struggle itself toward the heights is enough to fill a man's heart. One must imagine Sisyphus happy.", Author = "Albert Camus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "There is always a philosophy for lack of courage.", Author = "Albert Camus" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "The greatest saving one can make in the order of thought is to accept the unintelligibility of the world - and to pay attention to man.", Author = "Albert Camus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "Poor and free rather than rich and enslaved. Of course, men want to be both rich and free, and this is what leads them at times to be poor and enslaved.", Author = "Albert Camus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "Our technical civilization has just reached its greatest level of savagery. We will have to choose, in the more or less near future, between collective suicide and the intelligent use of our scientific conquests.", Author = "Albert Camus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "Even before the bomb, one did not breathe too easily in this tortured world. Now we are given a new source of anguish; it has all the promise of being our greatest anguish ever.", Author = "Albert Camus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "When a war breaks out, people say: \"It's too stupid; it can't last long.\" But though the war may well be \"too stupid,\" that doesn't prevent its lasting. Stupidity has a knack of getting its way; as we should see if we were not always so much wrapped up in ourselves.", Author = "Albert Camus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "The evil that is in the world always comes of ignorance, and good intentions may do as much harm as malevolence, if they lack understanding.", Author = "Albert Camus" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "There can be no true goodness, nor true love, without the utmost clear-sightedness.", Author = "Albert Camus" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "There always comes a time in history when the person who dares to say that 2+2=4 is punished by death.", Author = "Albert Camus" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Camus", Text = "The issue is simply whether or not 2+2=4.", Author = "Albert Camus" },
         };
     }
 }
