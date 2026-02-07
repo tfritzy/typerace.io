@@ -28,36 +28,6 @@ def load_language_config() -> Dict:
     with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
         return json.load(f)
 
-def load_character_allowlist() -> Dict:
-    allowlist_file = os.path.join(SCRIPT_DIR, 'character_allowlist.json')
-    with open(allowlist_file, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-        return {
-            lang: set(config['characters']) 
-            for lang, config in data.items()
-        }
-
-def scrub_quotes_by_allowlist(quotes: List[Dict], lang_code: str, allowed_chars: set) -> tuple:
-    valid_quotes = []
-    invalid_quotes = []
-    
-    for quote in quotes:
-        text = quote.get('quote', quote.get('Text', ''))
-        attribution = quote.get('attribution', quote.get('Author', ''))
-        
-        text_invalid_chars = set(c for c in text if c not in allowed_chars)
-        attr_invalid_chars = set(c for c in attribution if c not in allowed_chars)
-        
-        if not text_invalid_chars and not attr_invalid_chars:
-            valid_quotes.append(quote)
-        else:
-            invalid_quotes.append({
-                'quote': quote,
-                'invalid_chars': list(text_invalid_chars | attr_invalid_chars)
-            })
-    
-    return valid_quotes, invalid_quotes
-
 def fetch_wikiquote_page(page_name: str, lang: str = 'en') -> str:
     url = f"https://{lang}.wikiquote.org/w/api.php"
     params = {
@@ -405,41 +375,6 @@ Examples:
                     print(f"  - \"{quote['quote'][:60]}...\" - {quote['attribution']}")
 
         print(f"\n\nTotal quotes extracted: {len(all_quotes)}")
-
-        print("\nScrubbing quotes against character allowlist...")
-        allowlist = load_character_allowlist()
-        if lang_code in allowlist:
-            allowed_chars = allowlist[lang_code]
-            all_valid_quotes = []
-            all_invalid_quotes = []
-            scrubbed_quotes_by_author = {}
-            
-            for page_name, quotes in quotes_by_author.items():
-                valid_quotes, invalid_quotes = scrub_quotes_by_allowlist(quotes, lang_code, allowed_chars)
-                if valid_quotes:
-                    scrubbed_quotes_by_author[page_name] = valid_quotes
-                    all_valid_quotes.extend(valid_quotes)
-                all_invalid_quotes.extend(invalid_quotes)
-            
-            print(f"Valid quotes after scrubbing: {len(all_valid_quotes)} ({len(all_valid_quotes)/len(all_quotes)*100:.1f}%)")
-            print(f"Invalid quotes removed: {len(all_invalid_quotes)} ({len(all_invalid_quotes)/len(all_quotes)*100:.1f}%)")
-            
-            if all_invalid_quotes:
-                print(f"\nSample invalid quotes:")
-                for idx, info in enumerate(all_invalid_quotes[:5], 1):
-                    quote = info['quote']
-                    print(f"  {idx}. \"{quote['quote'][:60]}...\"")
-                    print(f"     Invalid chars: {info['invalid_chars']}")
-                
-                invalid_output_file = f'invalid_quotes_{lang_code}.json'
-                with open(invalid_output_file, 'w', encoding='utf-8') as f:
-                    json.dump(all_invalid_quotes, f, indent=2, ensure_ascii=False)
-                print(f"\nAll invalid quotes saved to {invalid_output_file}")
-            
-            quotes_by_author = scrubbed_quotes_by_author
-            all_quotes = all_valid_quotes
-        else:
-            print(f"Warning: No character allowlist found for {lang_code}, skipping scrubbing")
 
         print("\nGenerating C# files...")
         class_names = []

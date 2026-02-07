@@ -31,10 +31,6 @@ __pycache__/
 
 # Script output files
 scripts/model_comparison_*.txt
-scripts/extracted_quotes_*.json
-scripts/scrubbed_quotes_*.json
-scripts/invalid_quotes_*.json
-scripts/invalid_existing_quotes_*.json
 
 # Editor directories and files
 .vscode/*
