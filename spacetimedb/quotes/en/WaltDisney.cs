@@ -10,7 +10,7 @@ public static partial class EnglishQuotes
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Disney", Text = "I believe that this frightfulness we see everywhere today is only temporary. Tomorrow will be better for as long as America keeps alive the ideals of freedom and a better life.", Author = "Walt Disney" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Disney", Text = "It's kind of fun to do the impossible.", Author = "Walt Disney" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Disney", Text = "We don’t look backwards for very long. We keep moving forward, opening up new doors and doing new things... and curiosity keeps leading us down new paths.", Author = "Walt Disney" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Disney", Text = "We don't look backwards for very long. We keep moving forward, opening up new doors and doing new things... and curiosity keeps leading us down new paths.", Author = "Walt Disney" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Disney", Text = "We're not trying to entertain the critics ... I'll take my chances with the public.", Author = "Walt Disney" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Disney", Text = "Courage is the main quality of leadership, in my opinion, no matter where it is exercised. Usually it implies some risk - especially in new undertakings.", Author = "Walt Disney" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Walt_Disney", Text = "When we do fantasy, we must not lose sight of reality.", Author = "Walt Disney" },

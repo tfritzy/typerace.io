@@ -173,7 +173,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "But who would force the soul tilts with a straw Against a champion cased in adamant.", Author = "William Wordsworth" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "Give all thou canst; high Heaven rejects the lore Of nicely calculated less or more.", Author = "William Wordsworth" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "Where music dwells Lingering and wandering on as loth to die, Like thoughts whose very sweetness yieldeth proof That they were born for immortality.", Author = "William Wordsworth" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "Every gift of noble origin Is breathed upon by Hope’s perpetual breath.", Author = "William Wordsworth" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "Every gift of noble origin Is breathed upon by Hope's perpetual breath.", Author = "William Wordsworth" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "Oh for a single hour of that Dundee Who on that day the word of onset gave!", Author = "William Wordsworth" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "In years that bring the philosophic mind.", Author = "William Wordsworth" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Wordsworth", Text = "To me the meanest flower that blows can give Thoughts that do often lie too deep for tears.", Author = "William Wordsworth" },

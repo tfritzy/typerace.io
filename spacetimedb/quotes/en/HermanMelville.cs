@@ -32,7 +32,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Herman_Melville", Text = "Whoever is not in the possession of leisure can hardly be said to possess independence.", Author = "Herman Melville" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Herman_Melville", Text = "The dignity is in leisure.", Author = "Herman Melville" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Herman_Melville", Text = "99 hundreths of all the 'work' done in the world is either foolish and unnecessary, or harmful and wicked.", Author = "Herman Melville" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Herman_Melville", Text = "Instinct and study; love and hate;\nAudacity - reverence. These must mate,\nAnd fuse with Jacob’s mystic heart,\nTo wrestle with the angel - Art.", Author = "Herman Melville" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Herman_Melville", Text = "Instinct and study; love and hate;\nAudacity - reverence. These must mate,\nAnd fuse with Jacob's mystic heart,\nTo wrestle with the angel - Art.", Author = "Herman Melville" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Herman_Melville", Text = "In armies, navies, cities, or families, in nature herself, nothing more relaxes good order than misery.", Author = "Herman Melville" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Herman_Melville", Text = "Many sensible things banished from high life find an asylum among the mob.", Author = "Herman Melville" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Herman_Melville", Text = "Familiarity with danger makes a brave man braver, but less daring.", Author = "Herman Melville" },

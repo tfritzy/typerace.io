@@ -72,7 +72,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "What is the body? That shadow of a shadow of your love, that somehow contains the entire universe.", Author = "Rumi" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "Out beyond ideas of wrongdoing and rightdoing, there is a field. I will meet you there.", Author = "Rumi" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "Spring is Christ, Raising martyred plants from their shrouds.", Author = "Rumi" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "We talk about this and that. There’s no rest except on these branching moments.", Author = "Rumi" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "We talk about this and that. There's no rest except on these branching moments.", Author = "Rumi" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "There is no reality but God, says the completely surrendered sheik, who is an ocean for all beings.", Author = "Rumi" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "Disputational knowing wants customers. It has no soul.", Author = "Rumi" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Rumi", Text = "Let the lover be.", Author = "Rumi" },
