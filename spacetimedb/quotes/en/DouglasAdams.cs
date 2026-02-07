@@ -32,7 +32,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "I may not have gone where I intended to go, but I think I have ended up where I needed to be.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "The impossible often has a kind of integrity to it which the merely improbable lacks.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "they won't be rivers anymore, just currents in the ocean.", Author = "Douglas Adams" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Radio did not kill books and television did not kill radio or movies — what television did kill was cinema newsreel. TV does it much better because it can deliver it instantly. Who wants last week's news?", Author = "Douglas Adams" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Radio did not kill books and television did not kill radio or movies - what television did kill was cinema newsreel. TV does it much better because it can deliver it instantly. Who wants last week's news?", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Generally, old media don't die. They just have to grow old gracefully.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "You will need to know the difference between Friday and a fried egg. It's quite a simple difference, but an important one. [...] It's all rather complicated, but it makes a kind of sense if you think about it for a while.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "All opinions are not equal. Some are a very great deal more robust, sophisticated and well supported in logic and argument than others.", Author = "Douglas Adams" },
@@ -45,7 +45,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "I love deadlines. I love the whooshing noise they make as they go by.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "He was constantly reminded of how startlingly different a place the world was when viewed from a point only three feet to the left.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Solutions nearly always come from the direction you least expect, which means there's no point trying to look in that direction because it won't be coming from there.", Author = "Douglas Adams" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Five years later, while he was struggling to think of a legitimate reason for an alien to visit Earth, the phrase returned to him. The rest is history…", Author = "Douglas Adams" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Five years later, while he was struggling to think of a legitimate reason for an alien to visit Earth, the phrase returned to him. The rest is history...", Author = "Douglas Adams" },
         };
     }
 }
