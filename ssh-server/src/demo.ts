@@ -25,5 +25,5 @@ const server = createSshRaceServer({
 
 server.listen(port, host, () => {
   process.stdout.write(`SSH demo listening on ${host}:${port}\n`);
-  process.stdout.write(`Connect with: ssh -p ${port} demo@localhost\n`);
+  process.stdout.write(`Connect with: ssh -p ${port} localhost\n`);
 });

@@ -9,27 +9,35 @@ import {
 const phrase =
   "The quick brown fox jumps over the lazy dog with steady hands.";
 
+const WPM_PER_CHAR = 2.4;
+
 const buildPlayers = (inputLength: number): RacePlayerProgress[] => {
-  const bot1 = Math.min(phrase.length, Math.floor(inputLength * 0.75) + 6);
-  const bot2 = Math.min(phrase.length, Math.floor(inputLength * 0.55) + 12);
+  const novaProgressIndex = Math.min(
+    phrase.length,
+    Math.floor(inputLength * 0.75) + 6
+  );
+  const atlasProgressIndex = Math.min(
+    phrase.length,
+    Math.floor(inputLength * 0.55) + 12
+  );
 
   return [
     {
       name: "You",
       progressIndex: inputLength,
       phraseLength: phrase.length,
-      wpm: inputLength * 2.4,
+      wpm: inputLength * WPM_PER_CHAR,
       isCurrent: true,
     },
     {
       name: "Nova",
-      progressIndex: bot1,
+      progressIndex: novaProgressIndex,
       phraseLength: phrase.length,
       wpm: 76,
     },
     {
       name: "Atlas",
-      progressIndex: bot2,
+      progressIndex: atlasProgressIndex,
       phraseLength: phrase.length,
       wpm: 68,
     },
