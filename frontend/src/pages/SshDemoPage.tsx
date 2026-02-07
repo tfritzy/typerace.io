@@ -9,9 +9,12 @@ import {
 const phrase =
   "The quick brown fox jumps over the lazy dog with steady hands.";
 
-const CHARS_TO_WPM_FACTOR = 2.4;
+const CHARACTERS_PER_WORD = 5;
 
-const buildPlayers = (inputLength: number): RacePlayerProgress[] => {
+const buildPlayers = (
+  inputLength: number,
+  wpm: number
+): RacePlayerProgress[] => {
   const novaProgressIndex = Math.min(
     phrase.length,
     Math.floor(inputLength * 0.75) + 6
@@ -26,7 +29,7 @@ const buildPlayers = (inputLength: number): RacePlayerProgress[] => {
       name: "You",
       progressIndex: inputLength,
       phraseLength: phrase.length,
-      wpm: inputLength * CHARS_TO_WPM_FACTOR,
+      wpm,
       isCurrent: true,
     },
     {
@@ -46,6 +49,7 @@ const buildPlayers = (inputLength: number): RacePlayerProgress[] => {
 
 export const SshDemoPage = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const startTimeRef = useRef<number>(performance.now());
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -66,10 +70,15 @@ export const SshDemoPage = () => {
     const width = terminal.cols || 80;
 
     const render = () => {
+      const elapsedMinutes = Math.max(
+        1 / 60,
+        (performance.now() - startTimeRef.current) / 60000
+      );
+      const wpm = (input.length / CHARACTERS_PER_WORD) / elapsedMinutes;
       const screen = renderRaceScreenXterm({
         phrase,
         input,
-        players: buildPlayers(input.length),
+        players: buildPlayers(input.length, wpm),
         width,
       });
       terminal.write("\x1b[2J\x1b[H");
