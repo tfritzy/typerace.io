@@ -10,6 +10,8 @@ const phrase =
   "The quick brown fox jumps over the lazy dog with steady hands.";
 
 const CHARACTERS_PER_WORD = 5;
+const MS_PER_MINUTE = 60000;
+const MIN_ELAPSED_MINUTES = 1 / 60;
 
 const buildPlayers = (
   inputLength: number,
@@ -71,10 +73,12 @@ export const SshDemoPage = () => {
 
     const render = () => {
       const elapsedMinutes = Math.max(
-        1 / 60,
-        (performance.now() - startTimeRef.current) / 60000
+        MIN_ELAPSED_MINUTES,
+        (performance.now() - startTimeRef.current) / MS_PER_MINUTE
       );
-      const wpm = (input.length / CHARACTERS_PER_WORD) / elapsedMinutes;
+      const wpm = Math.round(
+        (input.length / CHARACTERS_PER_WORD) / elapsedMinutes
+      );
       const screen = renderRaceScreenXterm({
         phrase,
         input,
