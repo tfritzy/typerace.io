@@ -9,7 +9,7 @@ import {
 const phrase =
   "The quick brown fox jumps over the lazy dog with steady hands.";
 
-const WPM_PER_CHAR = 2.4;
+const CHARS_TO_WPM_FACTOR = 2.4;
 
 const buildPlayers = (inputLength: number): RacePlayerProgress[] => {
   const novaProgressIndex = Math.min(
@@ -26,7 +26,7 @@ const buildPlayers = (inputLength: number): RacePlayerProgress[] => {
       name: "You",
       progressIndex: inputLength,
       phraseLength: phrase.length,
-      wpm: inputLength * WPM_PER_CHAR,
+      wpm: inputLength * CHARS_TO_WPM_FACTOR,
       isCurrent: true,
     },
     {
