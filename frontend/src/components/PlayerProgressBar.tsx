@@ -30,8 +30,9 @@ const PLACEMENT_COLORS = {
 };
 
 const PLACEMENT_BANNER_POSITION = {
-    top: '-0.75rem',
-    right: '-2rem'
+    top: '0',
+    right: '0',
+    transform: 'translate(50%, -50%)'
 };
 
 const getPlacementColor = (place: number) => {
