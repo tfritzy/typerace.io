@@ -86,3 +86,5 @@ export const PlayerStatsRow = memo(({
         </div>
     );
 });
+
+PlayerStatsRow.displayName = 'PlayerStatsRow';

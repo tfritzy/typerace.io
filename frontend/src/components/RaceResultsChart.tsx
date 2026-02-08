@@ -253,3 +253,5 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
         </div>
     );
 });
+
+RaceResultsChart.displayName = 'RaceResultsChart';
