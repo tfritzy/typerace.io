@@ -1,6 +1,7 @@
 import { type PlayerProgress } from "../types/stdb";
 import { getFinalWpm, getRaceTime, getAccuracy } from "../utils/wpmCalculator";
 import { formatStopwatchTime, getOrdinalPlacement } from "../utils/formatters";
+import { memo } from "react";
 
 interface PlayerStatsRowProps {
     playerProgress: PlayerProgress;
@@ -8,7 +9,7 @@ interface PlayerStatsRowProps {
     placement: number;
 }
 
-export const PlayerStatsRow = ({
+export const PlayerStatsRow = memo(({
     playerProgress,
     raceStartTimestamp,
     placement
@@ -84,4 +85,6 @@ export const PlayerStatsRow = ({
             </div>
         </div>
     );
-};
+});
+
+PlayerStatsRow.displayName = 'PlayerStatsRow';

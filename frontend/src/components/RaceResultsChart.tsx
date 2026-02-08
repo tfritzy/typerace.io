@@ -11,6 +11,7 @@ import {
 } from 'chart.js';
 import type { ChartOptions } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
+import { memo } from 'react';
 import type { PlayerProgress, PlayerColor } from '../types/stdb';
 import { getRawWpmBySecond, getAggWpmBySecond, getErrorCountsBySecond } from '../utils/wpmCalculator';
 import { getColorConfig } from '../utils/colorMapping';
@@ -32,7 +33,7 @@ interface RaceResultsChartProps {
     playerColor: PlayerColor;
 }
 
-export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerColor }: RaceResultsChartProps) => {
+export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, playerColor }: RaceResultsChartProps) => {
     const rawWpmData = getRawWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
     const aggWpmData = getAggWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
     const errorCountsData = getErrorCountsBySecond(playerProgress.characterHistory, raceStartTimestamp);
@@ -251,4 +252,6 @@ export const RaceResultsChart = ({ playerProgress, raceStartTimestamp, playerCol
             <Chart type='bar' data={chartData} options={options} />
         </div>
     );
-};
+});
+
+RaceResultsChart.displayName = 'RaceResultsChart';
