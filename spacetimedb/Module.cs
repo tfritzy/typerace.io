@@ -287,7 +287,7 @@ public static partial class Module
         public int Rating;
     }
 
-    [Table(Scheduled = nameof(FillGameWithBots))]
+    [Table(Scheduled = nameof(fillGameWithBots))]
     public partial struct BotFillTrigger
     {
         [AutoInc]
@@ -298,7 +298,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Scheduled = nameof(StartCountdown))]
+    [Table(Scheduled = nameof(startCountdown))]
     public partial struct CountdownStart
     {
         [AutoInc]
@@ -308,7 +308,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Scheduled = nameof(StartGame))]
+    [Table(Scheduled = nameof(startGame))]
     public partial struct GameStart
     {
         [AutoInc]
@@ -318,7 +318,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Scheduled = nameof(ArchiveOldGames))]
+    [Table(Scheduled = nameof(archiveOldGames))]
     public partial struct GameArchiver
     {
         [AutoInc]
@@ -327,7 +327,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Scheduled = nameof(CleanupOldXpGains))]
+    [Table(Scheduled = nameof(cleanupOldXpGains))]
     public partial struct XpGainCleaner
     {
         [AutoInc]
@@ -373,7 +373,7 @@ public static partial class Module
         public int HighestProgress;
     }
 
-    [Table(Scheduled = nameof(UpdateBotProgress))]
+    [Table(Scheduled = nameof(updateBotProgress))]
     public partial struct BotProgressUpdate
     {
         [AutoInc]
@@ -503,7 +503,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void SyncAnonymousStatus(ReducerContext ctx, bool isAnonymous)
+    public static void syncAnonymousStatus(ReducerContext ctx, bool isAnonymous)
     {
         var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
 
@@ -531,7 +531,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void SetPlayerName(ReducerContext ctx, string name)
+    public static void setPlayerName(ReducerContext ctx, string name)
     {
         const int MinNameLength = 1;
         const int MaxNameLength = 30;
@@ -562,7 +562,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void SetPlayerColor(ReducerContext ctx, PlayerColor color)
+    public static void setPlayerColor(ReducerContext ctx, PlayerColor color)
     {
         var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
 
@@ -576,7 +576,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void JoinGame(ReducerContext ctx, GameMode gameMode, string joinCode, GameType gameType)
+    public static void joinGame(ReducerContext ctx, GameMode gameMode, string joinCode, GameType gameType)
     {
         Log.Info($"Player {ctx.Sender} looking for game.");
         var foundGame = FindLobbyGame(ctx, gameMode, gameType);
@@ -786,7 +786,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void FillGameWithBots(ReducerContext ctx, BotFillTrigger args)
+    public static void fillGameWithBots(ReducerContext ctx, BotFillTrigger args)
     {
         var game = ctx.Db.game.Id.Find(args.GameId);
 
@@ -911,7 +911,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void UpdateBotProgress(ReducerContext ctx, BotProgressUpdate args)
+    public static void updateBotProgress(ReducerContext ctx, BotProgressUpdate args)
     {
         var progress = ctx.Db.playerprogress.Id.Find(args.PlayerProgressId);
 
@@ -981,7 +981,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void StartCountdown(ReducerContext ctx, CountdownStart args)
+    public static void startCountdown(ReducerContext ctx, CountdownStart args)
     {
         var game = ctx.Db.game.Id.Find(args.GameId);
 
@@ -1007,7 +1007,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void StartGame(ReducerContext ctx, GameStart args)
+    public static void startGame(ReducerContext ctx, GameStart args)
     {
         var game = ctx.Db.game.Id.Find(args.GameId);
 
@@ -1051,7 +1051,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void StartPrivateGame(ReducerContext ctx, string gameId)
+    public static void startPrivateGame(ReducerContext ctx, string gameId)
     {
         var game = ctx.Db.game.Id.Find(gameId);
 
@@ -1105,7 +1105,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void JoinPrivateGame(ReducerContext ctx, string gameId)
+    public static void joinPrivateGame(ReducerContext ctx, string gameId)
     {
         var game = ctx.Db.game.Id.Find(gameId);
 
@@ -1139,7 +1139,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void Rematch(ReducerContext ctx, string gameId)
+    public static void rematch(ReducerContext ctx, string gameId)
     {
         var game = ctx.Db.game.Id.Find(gameId);
 
@@ -1372,7 +1372,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void ArchiveOldGames(ReducerContext ctx, GameArchiver args)
+    public static void archiveOldGames(ReducerContext ctx, GameArchiver args)
     {
         var fiveMinutesAgo = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 300_000_000;
 
@@ -1392,7 +1392,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void CleanupOldXpGains(ReducerContext ctx, XpGainCleaner args)
+    public static void cleanupOldXpGains(ReducerContext ctx, XpGainCleaner args)
     {
     }
 
@@ -1744,7 +1744,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void UpdateProgress(ReducerContext ctx, string gameId, int newIndex, CharacterEventType eventType)
+    public static void updateProgress(ReducerContext ctx, string gameId, int newIndex, CharacterEventType eventType)
     {
         var playerId = ctx.Sender;
         var game = ctx.Db.game.Id.Find(gameId);
