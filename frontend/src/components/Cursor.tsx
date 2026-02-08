@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState, type RefObject } from "react";
+import { memo, useLayoutEffect, useRef, useState, type RefObject } from "react";
 
 type CursorProps = {
     targetRef: RefObject<HTMLElement | null>;
@@ -15,7 +15,7 @@ export const Cursor = memo(({ targetRef, lerp = .2, fadeDelay = 2000, visible = 
     const lastMoveTime = useRef(Date.now());
     const [isBlinking, setIsBlinking] = useState(false);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!targetRef?.current || !followerRef.current) return;
 
         const updateTarget = () => {
@@ -38,6 +38,7 @@ export const Cursor = memo(({ targetRef, lerp = .2, fadeDelay = 2000, visible = 
             if (!initialized.current) {
                 position.current = { ...target.current };
                 initialized.current = true;
+                followerRef.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`;
             }
         };
 
