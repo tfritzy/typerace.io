@@ -38,7 +38,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "I believe in sleeping.", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "There is no such thing as maturity. There is instead an ever-evolving process of maturing.", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "I have changed from self-image actualization to self-actualization, from blindly following propaganda, organized truths, etc. to searching internally for the cause of my ignorance.", Author = "Bruce Lee" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "With all the training thrown to nowhere, with a mind perfectly unaware of its own working, with the "self" vanishing nowhere, the art of JKD attains its perfection.", Author = "Bruce Lee" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "With all the training thrown to nowhere, with a mind perfectly unaware of its own working, with the \"self\" vanishing nowhere, the art of JKD attains its perfection.", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "You must have complete determination.", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "Walk on.", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "Jeet Kune Do rejects all restrictions imposed by form and formality and emphasizes the clever use of the mind and body to defend and attack.", Author = "Bruce Lee" },
