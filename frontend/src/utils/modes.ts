@@ -236,16 +236,16 @@ const languageStartupPhrases: Record<Language, string[]> = {
   [Language.CSharp]: [
     "using System;",
     "new Game()",
-    "ctrl+shift+b",
-    "console.writeline",
-    "build succeeded",
+    "Ctrl+Shift+B",
+    "Console.WriteLine",
+    "await Task.WhenAll",
   ],
   [Language.TypeScript]: [
     "tsc --watch",
-    "type safe",
-    "no implicit any",
+    "interface Props {",
+    "const fn = () =>",
     "npm run dev",
-    "strict mode on",
+    "await Promise.all",
   ],
 };
 
@@ -257,12 +257,5 @@ export function getRandomStartupPhrase(gameModeTag: string): string {
 }
 
 export function isProgrammingMode(modeTag: string): boolean {
-  return modeTag.endsWith("Snippets");
-}
-
-export function getShikiLanguage(modeTag: string): string {
-  if (modeTag === "PythonSnippets") return "python";
-  if (modeTag === "CSharpSnippets") return "csharp";
-  if (modeTag === "TypeScriptSnippets") return "typescript";
-  return "text";
+  return programmingLanguages.some(l => l.quotesMode === modeTag);
 }

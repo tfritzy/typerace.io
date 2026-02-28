@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import "../components/SelectionButton.css";
 import { type GameMode } from "../types/stdb";
 import { ChevronUp, Globe, Lock, Target, Quote, Shuffle, Code } from "lucide-react";
-import { spokenLanguages, programmingLanguages, getContentTypeFromMode, isProgrammingMode, type ContentTypeValue, SpokenLanguage } from "../utils/modes";
+import { spokenLanguages, programmingLanguages, getContentTypeFromMode, isProgrammingMode, type ContentTypeValue, SpokenLanguage, type SpokenLanguageInfo } from "../utils/modes";
 
 export type GameTypeValue = "Public" | "Private" | "Practice";
 export type LanguageCategoryValue = "Spoken" | "Programming";
@@ -18,43 +18,32 @@ interface GameOptionsSelectorProps {
 
 export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setGameType }: GameOptionsSelectorProps) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const [contentType, setContentType] = useState<ContentTypeValue>(() => getContentTypeFromMode(selectedMode.tag));
-    const [languageCategory, setLanguageCategory] = useState<LanguageCategoryValue>(() =>
-        isProgrammingMode(selectedMode.tag) ? "Programming" : "Spoken"
-    );
 
-    const selectedSpokenLanguage = useMemo(() =>
-        spokenLanguages.find(l => l.randomWordsMode === selectedMode.tag || l.quotesMode === selectedMode.tag),
-        [selectedMode.tag]
-    );
-    const selectedProgrammingLanguage = useMemo(() =>
-        programmingLanguages.find(l => l.quotesMode === selectedMode.tag),
-        [selectedMode.tag]
-    );
+    const languageCategory: LanguageCategoryValue = isProgrammingMode(selectedMode.tag) ? "Programming" : "Spoken";
+    const contentType: ContentTypeValue = getContentTypeFromMode(selectedMode.tag);
+    const selectedSpokenLanguage = spokenLanguages.find(l => l.randomWordsMode === selectedMode.tag || l.quotesMode === selectedMode.tag);
+    const selectedProgrammingLanguage = programmingLanguages.find(l => l.quotesMode === selectedMode.tag);
 
-    const randomWordsDisabled = languageCategory === "Programming" || !selectedSpokenLanguage;
+    const randomWordsDisabled = languageCategory === "Programming";
+
+    const selectMode = (tag: string) => onModeSelect({ tag } as GameMode);
 
     const handleLanguageCategoryChange = (category: LanguageCategoryValue) => {
-        setLanguageCategory(category);
         if (category === "Programming") {
-            setContentType("Quotes");
-            if (programmingLanguages[0]) {
-                onModeSelect({ tag: programmingLanguages[0].quotesMode } as GameMode);
-            }
-        } else if (selectedProgrammingLanguage) {
-            const fallback = defaultSpokenLanguage;
-            const mode = contentType === "Quotes" ? fallback.quotesMode : fallback.randomWordsMode;
-            onModeSelect({ tag: mode } as GameMode);
+            selectMode(programmingLanguages[0].quotesMode);
+        } else {
+            selectMode(defaultSpokenLanguage.quotesMode);
         }
     };
 
     const handleContentTypeChange = (newContentType: ContentTypeValue) => {
         if (newContentType === "RandomWords" && randomWordsDisabled) return;
-        setContentType(newContentType);
-        if (selectedSpokenLanguage) {
-            const newMode = newContentType === "Quotes" ? selectedSpokenLanguage.quotesMode : selectedSpokenLanguage.randomWordsMode;
-            onModeSelect({ tag: newMode } as GameMode);
-        }
+        if (!selectedSpokenLanguage) return;
+        selectMode(newContentType === "Quotes" ? selectedSpokenLanguage.quotesMode : selectedSpokenLanguage.randomWordsMode);
+    };
+
+    const handleSpokenLanguageSelect = (lang: SpokenLanguageInfo) => {
+        selectMode(contentType === "Quotes" ? lang.quotesMode : lang.randomWordsMode);
     };
 
     return (
@@ -134,7 +123,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                     <button
                                         key={lang.language}
                                         className={`selection-button ${selectedMode.tag === mode ? "selected" : ""}`}
-                                        onClick={() => onModeSelect({ tag: mode } as GameMode)}
+                                        onClick={() => handleSpokenLanguageSelect(lang)}
                                     >
                                         <span className="flag leading-none">{lang.flag}</span>
                                         <span>{lang.language}</span>
@@ -145,7 +134,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                 <button
                                     key={lang.language}
                                     className={`selection-button ${selectedMode.tag === lang.quotesMode ? "selected" : ""}`}
-                                    onClick={() => onModeSelect({ tag: lang.quotesMode } as GameMode)}
+                                    onClick={() => selectMode(lang.quotesMode)}
                                 >
                                     <img src={lang.icon} alt={lang.language} className="w-5 h-5 object-contain" />
                                     <span>{lang.language}</span>
@@ -261,7 +250,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                                 <button
                                                     key={lang.language}
                                                     className={`selection-button ${selectedMode.tag === mode ? "selected" : ""}`}
-                                                    onClick={() => onModeSelect({ tag: mode } as GameMode)}
+                                                    onClick={() => handleSpokenLanguageSelect(lang)}
                                                 >
                                                     <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>{lang.flag}</span>
                                                     <span>{lang.language}</span>
@@ -272,7 +261,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                             <button
                                                 key={lang.language}
                                                 className={`selection-button ${selectedMode.tag === lang.quotesMode ? "selected" : ""}`}
-                                                onClick={() => onModeSelect({ tag: lang.quotesMode } as GameMode)}
+                                                onClick={() => selectMode(lang.quotesMode)}
                                             >
                                                 <img src={lang.icon} alt={lang.language} className="w-5 h-5 object-contain" />
                                                 <span>{lang.language}</span>
