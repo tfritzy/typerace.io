@@ -44,7 +44,7 @@ export const useFindGame = () => {
 
     setIsSearching(true);
 
-    const newJoinCode = `join_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    const newJoinCode = `join_${Date.now()}_${crypto.randomUUID().substring(0, 7)}`;
     pendingJoinCodeRef.current = newJoinCode;
 
     const gameTypeEnum = { tag: gameType };
