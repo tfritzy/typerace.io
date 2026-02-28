@@ -1,6 +1,6 @@
 export type ContentTypeValue = "RandomWords" | "Quotes";
 
-export enum Language {
+export enum SpokenLanguage {
     English = "English",
     Spanish = "Spanish",
     French = "French",
@@ -16,39 +16,52 @@ export enum Language {
     Dutch = "Dutch",
     Swedish = "Swedish",
     Turkish = "Turkish",
+}
+
+export enum ProgrammingLanguage {
     Python = "Python",
     CSharp = "C#",
     TypeScript = "TypeScript",
 }
 
-export interface LanguageInfo {
-    language: Language;
+export type Language = SpokenLanguage | ProgrammingLanguage;
+export const Language = { ...SpokenLanguage, ...ProgrammingLanguage };
+
+export interface SpokenLanguageInfo {
+    language: SpokenLanguage;
     flag: string;
-    icon?: string;
-    randomWordsMode: string | null;
-    quotesMode: string | null;
-    isProgramming?: boolean;
+    randomWordsMode: string;
+    quotesMode: string;
 }
 
-export const languages: LanguageInfo[] = [
-    { language: Language.English, flag: "🇬🇧", randomWordsMode: "English500", quotesMode: "EnglishQuotes" },
-    { language: Language.Spanish, flag: "🇪🇸", randomWordsMode: "Spanish500", quotesMode: "SpanishQuotes" },
-    { language: Language.French, flag: "🇫🇷", randomWordsMode: "French500", quotesMode: "FrenchQuotes" },
-    { language: Language.German, flag: "🇩🇪", randomWordsMode: "German500", quotesMode: "GermanQuotes" },
-    { language: Language.Italian, flag: "🇮🇹", randomWordsMode: "Italian500", quotesMode: "ItalianQuotes" },
-    { language: Language.Portuguese, flag: "🇵🇹", randomWordsMode: "Portuguese500", quotesMode: "PortugueseQuotes" },
-    { language: Language.Japanese, flag: "🇯🇵", randomWordsMode: "Japanese500", quotesMode: "JapaneseQuotes" },
-    { language: Language.Korean, flag: "🇰🇷", randomWordsMode: "Korean500", quotesMode: "KoreanQuotes" },
-    { language: Language.Chinese, flag: "🇨🇳", randomWordsMode: "Chinese500", quotesMode: "ChineseQuotes" },
-    { language: Language.Ukrainian, flag: "🇺🇦", randomWordsMode: "Ukrainian500", quotesMode: "UkrainianQuotes" },
-    { language: Language.Arabic, flag: "🇸🇦", randomWordsMode: "Arabic500", quotesMode: "ArabicQuotes" },
-    { language: Language.Hindi, flag: "🇮🇳", randomWordsMode: "Hindi500", quotesMode: "HindiQuotes" },
-    { language: Language.Dutch, flag: "🇳🇱", randomWordsMode: "Dutch500", quotesMode: "DutchQuotes" },
-    { language: Language.Swedish, flag: "🇸🇪", randomWordsMode: "Swedish500", quotesMode: "SwedishQuotes" },
-    { language: Language.Turkish, flag: "🇹🇷", randomWordsMode: "Turkish500", quotesMode: "TurkishQuotes" },
-    { language: Language.Python, flag: "", icon: "/icons/python.svg", randomWordsMode: null, quotesMode: "PythonSnippets", isProgramming: true },
-    { language: Language.CSharp, flag: "", icon: "/icons/csharp.svg", randomWordsMode: null, quotesMode: "CSharpSnippets", isProgramming: true },
-    { language: Language.TypeScript, flag: "", icon: "/icons/typescript.svg", randomWordsMode: null, quotesMode: "TypeScriptSnippets", isProgramming: true },
+export interface ProgrammingLanguageInfo {
+    language: ProgrammingLanguage;
+    icon: string;
+    quotesMode: string;
+}
+
+export const spokenLanguages: SpokenLanguageInfo[] = [
+    { language: SpokenLanguage.English, flag: "🇬🇧", randomWordsMode: "English500", quotesMode: "EnglishQuotes" },
+    { language: SpokenLanguage.Spanish, flag: "🇪🇸", randomWordsMode: "Spanish500", quotesMode: "SpanishQuotes" },
+    { language: SpokenLanguage.French, flag: "🇫🇷", randomWordsMode: "French500", quotesMode: "FrenchQuotes" },
+    { language: SpokenLanguage.German, flag: "🇩🇪", randomWordsMode: "German500", quotesMode: "GermanQuotes" },
+    { language: SpokenLanguage.Italian, flag: "🇮🇹", randomWordsMode: "Italian500", quotesMode: "ItalianQuotes" },
+    { language: SpokenLanguage.Portuguese, flag: "🇵🇹", randomWordsMode: "Portuguese500", quotesMode: "PortugueseQuotes" },
+    { language: SpokenLanguage.Japanese, flag: "🇯🇵", randomWordsMode: "Japanese500", quotesMode: "JapaneseQuotes" },
+    { language: SpokenLanguage.Korean, flag: "🇰🇷", randomWordsMode: "Korean500", quotesMode: "KoreanQuotes" },
+    { language: SpokenLanguage.Chinese, flag: "🇨🇳", randomWordsMode: "Chinese500", quotesMode: "ChineseQuotes" },
+    { language: SpokenLanguage.Ukrainian, flag: "🇺🇦", randomWordsMode: "Ukrainian500", quotesMode: "UkrainianQuotes" },
+    { language: SpokenLanguage.Arabic, flag: "🇸🇦", randomWordsMode: "Arabic500", quotesMode: "ArabicQuotes" },
+    { language: SpokenLanguage.Hindi, flag: "🇮🇳", randomWordsMode: "Hindi500", quotesMode: "HindiQuotes" },
+    { language: SpokenLanguage.Dutch, flag: "🇳🇱", randomWordsMode: "Dutch500", quotesMode: "DutchQuotes" },
+    { language: SpokenLanguage.Swedish, flag: "🇸🇪", randomWordsMode: "Swedish500", quotesMode: "SwedishQuotes" },
+    { language: SpokenLanguage.Turkish, flag: "🇹🇷", randomWordsMode: "Turkish500", quotesMode: "TurkishQuotes" },
+].sort((a, b) => a.language.localeCompare(b.language));
+
+export const programmingLanguages: ProgrammingLanguageInfo[] = [
+    { language: ProgrammingLanguage.Python, icon: "/icons/python.png", quotesMode: "PythonSnippets" },
+    { language: ProgrammingLanguage.CSharp, icon: "/icons/csharp.svg", quotesMode: "CSharpSnippets" },
+    { language: ProgrammingLanguage.TypeScript, icon: "/icons/typescript.svg", quotesMode: "TypeScriptSnippets" },
 ].sort((a, b) => a.language.localeCompare(b.language));
 
 export interface ModeOption {
@@ -57,25 +70,24 @@ export interface ModeOption {
     flag: string;
 }
 
-export const randomWordsModes: ModeOption[] = languages
-    .filter(l => l.randomWordsMode !== null)
-    .map(l => ({
-        mode: { tag: l.randomWordsMode! },
-        label: l.language,
-        flag: l.flag,
-    }));
+export const randomWordsModes: ModeOption[] = spokenLanguages.map(l => ({
+    mode: { tag: l.randomWordsMode },
+    label: l.language,
+    flag: l.flag,
+}));
 
-export const quotesModes: ModeOption[] = languages
-    .filter(l => l.quotesMode !== null)
-    .map(l => ({
-        mode: { tag: l.quotesMode! },
-        label: l.language,
-        flag: l.flag,
-    }));
+export const quotesModes: ModeOption[] = spokenLanguages.map(l => ({
+    mode: { tag: l.quotesMode },
+    label: l.language,
+    flag: l.flag,
+}));
 
 export function getLanguageFromMode(modeTag: string): Language {
-    const langInfo = languages.find(l => l.randomWordsMode === modeTag || l.quotesMode === modeTag);
-    return langInfo?.language || Language.English;
+    const spoken = spokenLanguages.find(l => l.randomWordsMode === modeTag || l.quotesMode === modeTag);
+    if (spoken) return spoken.language;
+    const programming = programmingLanguages.find(l => l.quotesMode === modeTag);
+    if (programming) return programming.language;
+    return SpokenLanguage.English;
 }
 
 export function getContentTypeFromMode(modeTag: string): ContentTypeValue {
