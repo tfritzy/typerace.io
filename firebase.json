@@ -1,4 +1,9 @@
 {
+  "emulators": {
+    "auth": {
+      "port": 9099
+    }
+  },
   "hosting": [
     {
       "target": "production",

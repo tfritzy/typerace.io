@@ -39,12 +39,18 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
         }
 
         try {
+            const uri = import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000';
             const idToken = await user.getIdToken();
 
-            const connection = DbConnection.builder()
-                .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
-                .withModuleName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace')
-                .withToken(idToken)
+            const builder = DbConnection.builder()
+                .withUri(uri)
+                .withModuleName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace');
+
+            if (!uri.includes('localhost') && !uri.includes('127.0.0.1')) {
+                builder.withToken(idToken);
+            }
+
+            const connection = builder
                 .onConnect((conn) => {
                     console.log('Connected to SpacetimeDB');
                     conn.reducers.SyncAnonymousStatus({ isAnonymous: user.isAnonymous });

@@ -121,7 +121,7 @@ export function getLanguageFromMode(modeTag: string): Language {
 }
 
 export function getContentTypeFromMode(modeTag: string): ContentTypeValue {
-    if (modeTag.endsWith("Quotes")) {
+    if (modeTag.endsWith("Quotes") || modeTag.endsWith("Snippets")) {
         return "Quotes";
     }
     return "RandomWords";
