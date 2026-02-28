@@ -2,6 +2,14 @@ namespace StdbModule;
 
 public static class CSharpSnippets
 {
+    public static readonly string[] Sources = new string[]
+    {
+        "tfritzy/bufo.fun (MIT)",
+        "SebLague/Geographical-Adventures (MIT)",
+        "SebLague/Solar-System (MIT)",
+        "tfritzy/BastionWars",
+    };
+
     public static readonly string[] Snippets = new string[]
     {
         "var current = type;\nwhile (current != null)\n{\n    yield return current;\n    current = current.BaseType;\n}",

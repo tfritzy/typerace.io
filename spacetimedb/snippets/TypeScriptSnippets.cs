@@ -2,6 +2,14 @@ namespace StdbModule;
 
 public static class TypeScriptSnippets
 {
+    public static readonly string[] Sources = new string[]
+    {
+        "medusajs/medusa (MIT)",
+        "strapi/strapi (SEE LICENSE)",
+        "mattermost/mattermost (AGPL-3.0/Apache-2.0)",
+        "tfritzy/typeracing.io",
+    };
+
     public static readonly string[] Snippets = new string[]
     {
         "if (await dbExists(client, dbName)) {\n    logger.info(`Database \"${dbName}\" already exists`)\n\n    envEditor.set(\"DB_NAME\", dbName, { withEmptyTemplateValue: true })\n    await envEditor.save()\n    logger.info(`Updated .env file with \"DB_NAME=${dbName}\"`)\n\n    return true\n}",

@@ -2,6 +2,14 @@ namespace StdbModule;
 
 public static class PythonSnippets
 {
+    public static readonly string[] Sources = new string[]
+    {
+        "numpy/numpy (BSD-3-Clause)",
+        "django/django (BSD-3-Clause)",
+        "plone/Products.CMFPlone (GPL-2.0)",
+        "TheAlgorithms/Python (MIT)",
+    };
+
     public static readonly string[] Snippets = new string[]
     {
         "if hasattr(x, '__iter__') and not isinstance(x, (bytes, unicode)):\n    return [asunicode_nested(y) for y in x]\nelse:\n    return asunicode(x)",
