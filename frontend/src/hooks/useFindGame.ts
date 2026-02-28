@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { type GameMode } from "../types/stdb";
+import { type GameMode, type PlayerProgress } from "../types/stdb";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { useToast } from "./useToast";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import type { EventContext } from "../../module_bindings";
 
 export const useFindGame = () => {
   const [isSearching, setIsSearching] = useState(false);
@@ -17,10 +18,10 @@ export const useFindGame = () => {
 
     const joinCode = pendingJoinCodeRef.current;
 
-    const handleInsert = (_ctx: any, progress: any) => {
+    const handleInsert = (_ctx: EventContext, progress: PlayerProgress) => {
       if (conn?.identity && progress.playerId.isEqual(conn.identity)) {
         if (progress.joinCode === joinCode) {
-          navigate(`/game/${progress.gameId.toString()}`, { replace: true });
+          navigate(`/game/${progress.gameId}`, { replace: true });
           setIsSearching(false);
           pendingJoinCodeRef.current = null;
         }
@@ -38,34 +39,7 @@ export const useFindGame = () => {
     };
   }, [conn, navigate, pendingJoinCodeRef.current]);
 
-  useEffect(() => {
-    if (!conn) return;
-
-    const handleJoinGameResult: Parameters<typeof conn.reducers.onJoinGame>[0] = (
-      ctx,
-      args
-    ) => {
-      if (!ctx.event.callerIdentity.isEqual(conn.identity!)) return;
-      if (pendingJoinCodeRef.current !== args.joinCode) return;
-
-      if (ctx.event.status.tag === "Failed") {
-        showToast(ctx.event.status.value);
-        setIsSearching(false);
-        pendingJoinCodeRef.current = null;
-      } else if (ctx.event.status.tag === "OutOfEnergy") {
-        showToast("Server out of energy. Please try again later.");
-        setIsSearching(false);
-        pendingJoinCodeRef.current = null;
-      }
-    };
-
-    conn.reducers.onJoinGame(handleJoinGameResult);
-    return () => {
-      conn.reducers.removeOnJoinGame(handleJoinGameResult);
-    };
-  }, [conn, showToast]);
-
-  const findGame = useCallback((mode: GameMode, gameType: GameTypeValue) => {
+  const findGame = useCallback(async (mode: GameMode, gameType: GameTypeValue) => {
     if (!conn || isSearching) return;
 
     setIsSearching(true);
@@ -74,12 +48,19 @@ export const useFindGame = () => {
     pendingJoinCodeRef.current = newJoinCode;
 
     const gameTypeEnum = { tag: gameType };
-    conn.reducers.joinGame({
-      gameMode: mode,
-      joinCode: newJoinCode,
-      gameType: gameTypeEnum as any
-    });
-  }, [conn, isSearching]);
+    try {
+      await conn.reducers.joinGame({
+        gameMode: mode,
+        joinCode: newJoinCode,
+        gameType: gameTypeEnum as never
+      });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to join game";
+      showToast(message);
+      setIsSearching(false);
+      pendingJoinCodeRef.current = null;
+    }
+  }, [conn, isSearching, showToast]);
 
   return { findGame, isSearching };
 };
