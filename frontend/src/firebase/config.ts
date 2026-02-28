@@ -13,6 +13,6 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
-if (import.meta.env.DEV) {
-  connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
+if (import.meta.env.VITE_FIREBASE_EMULATOR_HOST) {
+  connectAuthEmulator(auth, import.meta.env.VITE_FIREBASE_EMULATOR_HOST, { disableWarnings: true });
 }

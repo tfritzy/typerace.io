@@ -22,7 +22,7 @@ export const useDatabase = () => {
 };
 
 export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [conn, setConn] = useState<DbConnection | null>(null);
     const [showReconnectModal, setShowReconnectModal] = useState(false);
     const [isReconnecting, setIsReconnecting] = useState(false);
@@ -135,11 +135,11 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
         };
     }, [user?.uid]);
 
-    if (!user) {
+    if (!user && authLoading) {
         return <LoadingDots />;
     }
 
-    if (!conn?.identity && !showReconnectModal) {
+    if (user && !conn?.identity && !showReconnectModal) {
         return <LoadingDots />;
     }
 
