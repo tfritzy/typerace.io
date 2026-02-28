@@ -1,5 +1,4 @@
 export type ContentTypeValue = "RandomWords" | "Quotes";
-export type ModeCategory = "language" | "programming";
 
 export enum Language {
     English = "English",
@@ -126,13 +125,6 @@ export function getContentTypeFromMode(modeTag: string): ContentTypeValue {
 
 export function isProgrammingMode(modeTag: string): boolean {
     return programmingLanguages.some(p => p.mode === modeTag);
-}
-
-export function getCategoryFromMode(modeTag: string): ModeCategory {
-    if (isProgrammingMode(modeTag)) {
-        return "programming";
-    }
-    return "language";
 }
 
 export function getProgrammingLanguageFromMode(modeTag: string): ProgrammingLanguageInfo | undefined {

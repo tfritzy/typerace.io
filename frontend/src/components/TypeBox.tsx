@@ -122,6 +122,29 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       event.preventDefault();
     }, []);
 
+    const getLastCompletedWordEnd = useCallback(
+      (typedInput: string) => {
+        let lastCompletedWordEnd = 0;
+        for (let i = 0; i < typedInput.length && i < phrase.length; i++) {
+          if (typedInput[i] !== phrase[i]) {
+            break;
+          }
+          if (phrase[i] === " " || (isCode && phrase[i] === "\n")) {
+            lastCompletedWordEnd = i + 1;
+            if (isCode && phrase[i] === "\n") {
+              let j = i + 1;
+              while (j < phrase.length && phrase[j] === " " && j < typedInput.length && typedInput[j] === phrase[j]) {
+                lastCompletedWordEnd = j + 1;
+                j++;
+              }
+            }
+          }
+        }
+        return lastCompletedWordEnd;
+      },
+      [phrase, isCode]
+    );
+
     const handleChange = useCallback(
       (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         if (disabled) {
@@ -155,15 +178,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         const oldValue = input;
 
         if (newValue.length < oldValue.length) {
-          let lastCompletedWordEnd = 0;
-          for (let i = 0; i < oldValue.length; i++) {
-            if (oldValue[i] !== phrase[i]) {
-              break;
-            }
-            if (phrase[i] === " " || (isCode && phrase[i] === "\n")) {
-              lastCompletedWordEnd = i + 1;
-            }
-          }
+          const lastCompletedWordEnd = getLastCompletedWordEnd(oldValue);
 
           if (newValue.length < lastCompletedWordEnd) {
             const correctPrefix = phrase.substring(0, lastCompletedWordEnd);
@@ -274,6 +289,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         resetOnComplete,
         disabled,
         isCode,
+        getLastCompletedWordEnd,
       ]
     );
 
@@ -294,23 +310,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     const renderText = () => {
       const chars = phrase.split("");
-
-      let lastCompletedWordEnd = 0;
-      for (let i = 0; i < input.length && i < phrase.length; i++) {
-        if (input[i] !== phrase[i]) {
-          break;
-        }
-        if (phrase[i] === " " || (isCode && phrase[i] === "\n")) {
-          lastCompletedWordEnd = i + 1;
-          if (isCode && phrase[i] === "\n") {
-            let j = i + 1;
-            while (j < phrase.length && phrase[j] === " " && j < input.length && input[j] === phrase[j]) {
-              lastCompletedWordEnd = j + 1;
-              j++;
-            }
-          }
-        }
-      }
+      const lastCompletedWordEnd = getLastCompletedWordEnd(input);
 
       return chars.map((char, i) => {
         const isTyped = i < input.length;
