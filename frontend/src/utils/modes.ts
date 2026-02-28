@@ -38,6 +38,7 @@ export interface ProgrammingLanguageInfo {
     language: ProgrammingLanguage;
     icon: string;
     quotesMode: string;
+    shikiLanguage: string;
 }
 
 export const spokenLanguages: SpokenLanguageInfo[] = [
@@ -59,10 +60,14 @@ export const spokenLanguages: SpokenLanguageInfo[] = [
 ].sort((a, b) => a.language.localeCompare(b.language));
 
 export const programmingLanguages: ProgrammingLanguageInfo[] = [
-    { language: ProgrammingLanguage.Python, icon: "/icons/python.png", quotesMode: "PythonSnippets" },
-    { language: ProgrammingLanguage.CSharp, icon: "/icons/csharp.svg", quotesMode: "CSharpSnippets" },
-    { language: ProgrammingLanguage.TypeScript, icon: "/icons/typescript.svg", quotesMode: "TypeScriptSnippets" },
+    { language: ProgrammingLanguage.Python, icon: "/icons/python.png", quotesMode: "PythonSnippets", shikiLanguage: "python" },
+    { language: ProgrammingLanguage.CSharp, icon: "/icons/csharp.svg", quotesMode: "CSharpSnippets", shikiLanguage: "csharp" },
+    { language: ProgrammingLanguage.TypeScript, icon: "/icons/typescript.svg", quotesMode: "TypeScriptSnippets", shikiLanguage: "typescript" },
 ].sort((a, b) => a.language.localeCompare(b.language));
+
+export function getShikiLanguage(modeTag: string): string | undefined {
+    return programmingLanguages.find(l => l.quotesMode === modeTag)?.shikiLanguage;
+}
 
 export interface ModeOption {
     mode: { tag: string };

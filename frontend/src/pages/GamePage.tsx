@@ -14,6 +14,7 @@ import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import type { CSSProperties } from "react";
+import { getShikiLanguage } from "../utils/modes";
 
 const getPlacementBoxStyle = (placement?: number): CSSProperties => {
   if (!placement) return {};
@@ -305,6 +306,7 @@ export const GamePage = () => {
               disabled={isDisabled}
               initialProgress={initialProgress}
               isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
+              programmingLanguage={getShikiLanguage(game.gameMode.tag)}
             />
           )}
         </div>
