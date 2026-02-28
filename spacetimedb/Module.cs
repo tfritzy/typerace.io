@@ -94,6 +94,12 @@ public struct Quote
     public string Author;
 }
 
+public struct Snippet
+{
+    public string Text;
+    public string Source;
+}
+
 
 
 [Type]

@@ -34,7 +34,8 @@ export interface LanguageInfo {
 export interface ProgrammingLanguageInfo {
     language: ProgrammingLanguage;
     icon: string;
-    mode: string;
+    quotesMode: string;
+    randomWordsMode: string | null;
     startupPhrases: string[];
 }
 
@@ -59,7 +60,8 @@ export const programmingLanguages: ProgrammingLanguageInfo[] = [
     {
         language: ProgrammingLanguage.Python,
         icon: "/logos/python.png",
-        mode: "PythonSnippets",
+        quotesMode: "PythonSnippets",
+        randomWordsMode: null,
         startupPhrases: [
             "def main()",
             "print('start race')",
@@ -70,7 +72,8 @@ export const programmingLanguages: ProgrammingLanguageInfo[] = [
     {
         language: ProgrammingLanguage.CSharp,
         icon: "/logos/csharp.svg",
-        mode: "CSharpSnippets",
+        quotesMode: "CSharpSnippets",
+        randomWordsMode: null,
         startupPhrases: [
             "dotnet run",
             "await Race();",
@@ -81,7 +84,8 @@ export const programmingLanguages: ProgrammingLanguageInfo[] = [
     {
         language: ProgrammingLanguage.TypeScript,
         icon: "/logos/typescript.svg",
-        mode: "TypeScriptSnippets",
+        quotesMode: "TypeScriptSnippets",
+        randomWordsMode: null,
         startupPhrases: [
             "console.log('start race')",
             "new Race().start()",
@@ -124,11 +128,11 @@ export function getContentTypeFromMode(modeTag: string): ContentTypeValue {
 }
 
 export function isProgrammingMode(modeTag: string): boolean {
-    return programmingLanguages.some(p => p.mode === modeTag);
+    return programmingLanguages.some(p => p.quotesMode === modeTag || p.randomWordsMode === modeTag);
 }
 
 export function getProgrammingLanguageFromMode(modeTag: string): ProgrammingLanguageInfo | undefined {
-    return programmingLanguages.find(p => p.mode === modeTag);
+    return programmingLanguages.find(p => p.quotesMode === modeTag || p.randomWordsMode === modeTag);
 }
 
 const shikiLanguageMap: Record<string, "python" | "csharp" | "typescript"> = {

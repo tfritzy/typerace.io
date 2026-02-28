@@ -129,7 +129,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           if (typedInput[i] !== phrase[i]) {
             break;
           }
-          if (phrase[i] === " " || (isCode && phrase[i] === "\n")) {
+          if (phrase[i] === " " || phrase[i] === "\n") {
             lastCompletedWordEnd = i + 1;
             if (isCode && phrase[i] === "\n") {
               let j = i + 1;
@@ -345,7 +345,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           }
         }
 
-        if (isCode && char === "\n") {
+        if (char === "\n") {
           return (
             <span key={i}>
               {isCursor && <span id="target" ref={targetRef} />}

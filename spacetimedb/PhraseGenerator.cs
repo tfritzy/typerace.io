@@ -66,10 +66,11 @@ public static class PhraseGenerator
         return string.Join(" ", words);
     }
 
-    private static Phrase GetRandomSnippet(string[] snippets, Random rng)
+    private static Phrase GetRandomSnippet(Snippet[] snippets, Random rng)
     {
         int index = rng.Next(snippets.Length);
-        return new Phrase(snippets[index]);
+        var snippet = snippets[index];
+        return new Phrase(snippet.Text, snippet.Source);
     }
 
     public static Phrase GeneratePhraseForMode(GameMode mode, Random rng)

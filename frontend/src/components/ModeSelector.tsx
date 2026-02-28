@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import "../components/SelectionButton.css";
 import { type GameMode } from "../types/stdb";
 import { ChevronUp, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
-import { languages, programmingLanguages, getContentTypeFromMode, isProgrammingMode, type ContentTypeValue } from "../utils/modes";
+import { languages, programmingLanguages, getContentTypeFromMode, type ContentTypeValue } from "../utils/modes";
 
 export type GameTypeValue = "Public" | "Private" | "Practice";
 
@@ -17,30 +17,39 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [contentType, setContentType] = useState<ContentTypeValue>(() => getContentTypeFromMode(selectedMode.tag));
 
-    const isProgramming = isProgrammingMode(selectedMode.tag);
-
-    const selectedLanguage = useMemo(() => {
+    const selectedNaturalLanguage = useMemo(() => {
         return languages.find(l =>
             l.randomWordsMode === selectedMode.tag || l.quotesMode === selectedMode.tag
-        ) || languages[0];
+        );
     }, [selectedMode.tag]);
 
-    const quotesAvailableForLanguage = selectedLanguage.quotesMode !== null;
+    const selectedProgrammingLanguage = useMemo(() => {
+        return programmingLanguages.find(p =>
+            p.quotesMode === selectedMode.tag || p.randomWordsMode === selectedMode.tag
+        );
+    }, [selectedMode.tag]);
+
+    const getModeForLanguage = (lang: typeof languages[0], ct: ContentTypeValue) => {
+        return ct === "Quotes" ? lang.quotesMode : lang.randomWordsMode;
+    };
+
+    const getModeForProgrammingLanguage = (lang: typeof programmingLanguages[0], ct: ContentTypeValue) => {
+        return ct === "Quotes" ? lang.quotesMode : lang.randomWordsMode;
+    };
 
     const handleContentTypeChange = (newContentType: ContentTypeValue) => {
-        if (newContentType === "Quotes" && !isProgramming && !quotesAvailableForLanguage) {
-            return;
-        }
-
         setContentType(newContentType);
 
-        if (isProgramming) {
-            return;
-        }
-
-        const newMode = newContentType === "Quotes" ? selectedLanguage.quotesMode : selectedLanguage.randomWordsMode;
-        if (newMode) {
-            onModeSelect({ tag: newMode } as GameMode);
+        if (selectedProgrammingLanguage) {
+            const newMode = getModeForProgrammingLanguage(selectedProgrammingLanguage, newContentType);
+            if (newMode) {
+                onModeSelect({ tag: newMode } as GameMode);
+            }
+        } else if (selectedNaturalLanguage) {
+            const newMode = getModeForLanguage(selectedNaturalLanguage, newContentType);
+            if (newMode) {
+                onModeSelect({ tag: newMode } as GameMode);
+            }
         }
     };
 
@@ -49,12 +58,13 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
     };
 
     const mobileLabel = useMemo(() => {
-        if (isProgramming) {
-            const pl = programmingLanguages.find(p => p.mode === selectedMode.tag);
-            return pl?.language || "Python";
+        if (selectedProgrammingLanguage) {
+            return selectedProgrammingLanguage.language;
         }
-        return selectedLanguage.language;
-    }, [isProgramming, selectedMode.tag, selectedLanguage]);
+        return selectedNaturalLanguage?.language || "English";
+    }, [selectedProgrammingLanguage, selectedNaturalLanguage]);
+
+    const randomWordsDisabled = selectedProgrammingLanguage ? !selectedProgrammingLanguage.randomWordsMode : false;
 
     return (
         <>
@@ -89,16 +99,16 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     <h2 className="text-white/50 text-sm font-medium mb-2">Mode</h2>
                     <div className="flex gap-2">
                         <button
-                            className={`selection-button ${contentType === "Quotes" || isProgramming ? 'selected' : ''}`}
+                            className={`selection-button ${contentType === "Quotes" ? 'selected' : ''}`}
                             onClick={() => handleContentTypeChange("Quotes")}
                         >
                             <Quote size={20} />
                             <span>Quotes</span>
                         </button>
                         <button
-                            className={`selection-button ${contentType === "RandomWords" && !isProgramming ? 'selected' : ''}`}
+                            className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
                             onClick={() => handleContentTypeChange("RandomWords")}
-                            disabled={isProgramming}
+                            disabled={randomWordsDisabled}
                         >
                             <Shuffle size={20} />
                             <span>Random words</span>
@@ -108,24 +118,32 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                 <div className="pb-6">
                     <h2 className="text-white/50 text-sm font-medium mb-2">Language</h2>
                     <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2">
-                        {programmingLanguages.map((lang) => (
-                            <button
-                                key={lang.language}
-                                className={`selection-button ${selectedMode.tag === lang.mode ? "selected" : ""}`}
-                                onClick={() => handleLanguageSelect(lang.mode)}
-                            >
-                                <img src={lang.icon} alt={lang.language} className="w-5 h-5 object-contain" />
-                                <span>{lang.language}</span>
-                            </button>
-                        ))}
+                        {programmingLanguages.map((lang) => {
+                            const mode = getModeForProgrammingLanguage(lang, contentType);
+                            return (
+                                <button
+                                    key={lang.language}
+                                    className={`selection-button ${selectedMode.tag === lang.quotesMode || selectedMode.tag === lang.randomWordsMode ? "selected" : ""}`}
+                                    onClick={() => {
+                                        if (mode) {
+                                            handleLanguageSelect(mode);
+                                        }
+                                    }}
+                                    disabled={!mode}
+                                >
+                                    <img src={lang.icon} alt={lang.language} className="w-5 h-5 object-contain" />
+                                    <span>{lang.language}</span>
+                                </button>
+                            );
+                        })}
                         {languages.map((lang) => {
-                            const mode = contentType === "Quotes" ? lang.quotesMode : lang.randomWordsMode;
-                            const isDisabled = contentType === "Quotes" && !lang.quotesMode;
+                            const mode = getModeForLanguage(lang, contentType);
+                            const isDisabled = !mode;
 
                             return (
                                 <button
                                     key={lang.language}
-                                    className={`selection-button ${selectedMode.tag === mode ? "selected" : ""}`}
+                                    className={`selection-button ${selectedMode.tag === lang.quotesMode || selectedMode.tag === lang.randomWordsMode ? "selected" : ""}`}
                                     onClick={() => {
                                         if (mode) {
                                             handleLanguageSelect(mode);
@@ -151,12 +169,12 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                         {gameType === "Public" && <Globe size={18} />}
                         {gameType === "Private" && <Lock size={18} />}
                         {gameType === "Practice" && <Target size={18} />}
-                        {contentType === "Quotes" || isProgramming ? <Quote size={18} /> : <Shuffle size={18} />}
-                        {isProgramming ? (
-                            <img src={programmingLanguages.find(p => p.mode === selectedMode.tag)?.icon} alt={mobileLabel} className="w-5 h-5 object-contain" />
+                        {contentType === "Quotes" ? <Quote size={18} /> : <Shuffle size={18} />}
+                        {selectedProgrammingLanguage ? (
+                            <img src={selectedProgrammingLanguage.icon} alt={mobileLabel} className="w-5 h-5 object-contain" />
                         ) : (
                             <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>
-                                {selectedLanguage.flag}
+                                {selectedNaturalLanguage?.flag || "🇬🇧"}
                             </span>
                         )}
                         <span>{mobileLabel}</span>
@@ -210,15 +228,15 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                 <h3 className="text-white/80 text-base font-medium mb-3">Mode</h3>
                                 <div className="flex flex-col gap-2 mb-6">
                                     <button
-                                        className={`selection-button ${contentType === "RandomWords" && !isProgramming ? 'selected' : ''}`}
+                                        className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
                                         onClick={() => handleContentTypeChange("RandomWords")}
-                                        disabled={isProgramming}
+                                        disabled={randomWordsDisabled}
                                     >
                                         <Shuffle size={20} />
                                         <span>Random Words</span>
                                     </button>
                                     <button
-                                        className={`selection-button ${contentType === "Quotes" || isProgramming ? 'selected' : ''}`}
+                                        className={`selection-button ${contentType === "Quotes" ? 'selected' : ''}`}
                                         onClick={() => handleContentTypeChange("Quotes")}
                                     >
                                         <Quote size={20} />
@@ -227,24 +245,32 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                 </div>
                                 <h3 className="text-white/80 text-base font-medium mb-3">Language</h3>
                                 <div className="grid grid-cols-2 gap-3">
-                                    {programmingLanguages.map((lang) => (
-                                        <button
-                                            key={lang.language}
-                                            className={`selection-button ${selectedMode.tag === lang.mode ? "selected" : ""}`}
-                                            onClick={() => handleLanguageSelect(lang.mode)}
-                                        >
-                                            <img src={lang.icon} alt={lang.language} className="w-5 h-5 object-contain" />
-                                            <span>{lang.language}</span>
-                                        </button>
-                                    ))}
+                                    {programmingLanguages.map((lang) => {
+                                        const mode = getModeForProgrammingLanguage(lang, contentType);
+                                        return (
+                                            <button
+                                                key={lang.language}
+                                                className={`selection-button ${selectedMode.tag === lang.quotesMode || selectedMode.tag === lang.randomWordsMode ? "selected" : ""}`}
+                                                onClick={() => {
+                                                    if (mode) {
+                                                        handleLanguageSelect(mode);
+                                                    }
+                                                }}
+                                                disabled={!mode}
+                                            >
+                                                <img src={lang.icon} alt={lang.language} className="w-5 h-5 object-contain" />
+                                                <span>{lang.language}</span>
+                                            </button>
+                                        );
+                                    })}
                                     {languages.map((lang) => {
-                                        const mode = contentType === "Quotes" ? lang.quotesMode : lang.randomWordsMode;
-                                        const isDisabled = contentType === "Quotes" && !lang.quotesMode;
+                                        const mode = getModeForLanguage(lang, contentType);
+                                        const isDisabled = !mode;
 
                                         return (
                                             <button
                                                 key={lang.language}
-                                                className={`selection-button ${selectedMode.tag === mode ? "selected" : ""}`}
+                                                className={`selection-button ${selectedMode.tag === lang.quotesMode || selectedMode.tag === lang.randomWordsMode ? "selected" : ""}`}
                                                 onClick={() => {
                                                     if (mode) {
                                                         handleLanguageSelect(mode);
