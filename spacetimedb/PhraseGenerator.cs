@@ -66,6 +66,12 @@ public static class PhraseGenerator
         return string.Join(" ", words);
     }
 
+    private static Phrase GetRandomSnippet(string[] snippets, Random rng)
+    {
+        int index = rng.Next(snippets.Length);
+        return new Phrase(snippets[index]);
+    }
+
     public static Phrase GeneratePhraseForMode(GameMode mode, Random rng)
     {
         switch (mode)
@@ -116,6 +122,12 @@ public static class PhraseGenerator
             case GameMode.SwedishQuotes:
             case GameMode.TurkishQuotes:
                 return QuoteGenerator.GetRandomQuote(mode, rng);
+            case GameMode.PythonSnippets:
+                return GetRandomSnippet(PythonSnippets.Snippets, rng);
+            case GameMode.CSharpSnippets:
+                return GetRandomSnippet(CSharpSnippets.Snippets, rng);
+            case GameMode.TypeScriptSnippets:
+                return GetRandomSnippet(TypeScriptSnippets.Snippets, rng);
             default:
                 return new Phrase(SanitizeText("The quick brown fox jumps over the lazy dog"));
         }

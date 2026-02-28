@@ -13,6 +13,7 @@ import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { isProgrammingMode } from "../utils/modes";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -275,6 +276,7 @@ export const GamePage = () => {
               disabled={isDisabled}
               initialProgress={initialProgress}
               isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
+              isCode={game.gameMode ? isProgrammingMode(game.gameMode.tag) : false}
             />
           )}
         </div>

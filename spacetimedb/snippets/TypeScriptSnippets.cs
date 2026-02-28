@@ -1,0 +1,20 @@
+namespace StdbModule;
+
+public static class TypeScriptSnippets
+{
+    public static readonly string[] Snippets = new string[]
+    {
+        "try {\n    const created = await dbCreate({ directory, interactive, db });\n    process.exit(created ? 0 : 1);\n} catch (error) {\n    if (error.name === \"ExitPromptError\") {\n        process.exit();\n    }\n    logger.error(error);\n    process.exit(1);\n}",
+        "const plugins = await getResolvedPlugins(directory, configModule, true)\nmergePluginModules(configModule, plugins)\n\nconst linksSourcePaths = plugins.map((plugin) =>\n    join(plugin.resolve, \"links\")\n)\nawait new LinkLoader(linksSourcePaths).load()",
+        "if (!skipLinks) {\n    console.log(new Array(TERMINAL_SIZE).join(\"-\"));\n    await syncLinks(medusaAppLoader, {\n        executeAll: executeAllLinks,\n        executeSafe: executeSafeLinks,\n    });\n}",
+        "for (const path of modulePaths) {\n    const moduleDirname = dirname(path);\n    const serviceName = await getModuleServiceName(path);\n    const entities = await getEntitiesForModule(moduleDirname);\n\n    moduleDescriptors.push({\n        serviceName,\n        migrationsPath: join(moduleDirname, \"migrations\"),\n        entities,\n    });\n}",
+        "const pageNumber = parseInt(page, 10);\nconst pageSizeNumber = parseInt(pageSize, 10);\n\nif (Number.isNaN(pageNumber) || pageNumber < 1) {\n    throw new PaginationError('invalid pageNumber param');\n}\nif (Number.isNaN(pageSizeNumber) || pageSizeNumber < 1) {\n    throw new PaginationError('invalid pageSize param');\n}",
+        "if (!isNil(actionConfig)) {\n    const [controller, action] = actionConfig.split(\".\");\n\n    if (controller && action) {\n        return controllers[controller.toLowerCase()][action](ctx, next);\n    }\n}",
+        "if (this.connectFailCount > this.config.maxWebSocketFails) {\n    retryTime = retryTime * this.connectFailCount * this.connectFailCount;\n    if (retryTime > this.config.maxWebSocketRetryTime) {\n        retryTime = this.config.maxWebSocketRetryTime;\n    }\n}",
+        "if (msg.seq !== this.serverSequence) {\n    this.connectFailCount = 0;\n    this.responseSequence = 1;\n    this.conn?.close();\n    return;\n}",
+        "if (this.conn && this.conn.readyState === WebSocket.OPEN) {\n    this.conn.send(JSON.stringify(msg));\n}",
+        "const category = this.getCategoryForWpm(wpm);\nconst prefix =\n    this.prefixes[category][\n        Math.floor(Math.random() * this.prefixes[category].length)\n    ];\nconst suffix =\n    this.suffixes[category][\n        Math.floor(Math.random() * this.suffixes[category].length)\n    ];\nreturn `${prefix} Typewriter ${suffix}`;",
+        "const response = await fetch(getFindGameUrl(), {\n    method: \"POST\",\n    headers: {\n        \"Content-Type\": \"application/json\",\n        Authorization: `Bearer ${token}`,\n    },\n    body: JSON.stringify({\n        displayName: name,\n        mode: mode,\n    }),\n});",
+        "const created = await dbCreate({ directory, interactive, db });\nif (!created) {\n    process.exit(1);\n}\n\nconst migrated = await migrate({\n    directory,\n    skipLinks,\n    skipScripts,\n    executeAllLinks,\n    executeSafeLinks,\n});\n\nprocess.exit(migrated ? 0 : 1);",
+    };
+}

@@ -21,6 +21,7 @@ type TypeBoxProps = {
   resetOnComplete?: boolean;
   disabled?: boolean;
   initialProgress?: number;
+  isCode?: boolean;
 };
 
 export type TypeBoxRef = {
@@ -40,6 +41,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       resetOnComplete = false,
       disabled = false,
       initialProgress = 0,
+      isCode = false,
     },
     ref
   ) => {
@@ -94,7 +96,25 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           return;
         }
 
-        const newValue = event.target.value;
+        let newValue = event.target.value;
+
+        if (isCode && newValue.length > input.length) {
+          const lastChar = newValue[newValue.length - 1];
+          if (lastChar === "\n") {
+            const nextIndex = newValue.length;
+            let spacesToAdd = "";
+            for (let i = nextIndex; i < phrase.length; i++) {
+              if (phrase[i] === " ") {
+                spacesToAdd += " ";
+              } else {
+                break;
+              }
+            }
+            if (spacesToAdd.length > 0) {
+              newValue += spacesToAdd;
+            }
+          }
+        }
 
         if (newValue.length > phrase.length) {
           return;
@@ -108,7 +128,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             if (oldValue[i] !== phrase[i]) {
               break;
             }
-            if (phrase[i] === " ") {
+            if (phrase[i] === " " || (isCode && phrase[i] === "\n")) {
               lastCompletedWordEnd = i + 1;
             }
           }
@@ -221,6 +241,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         input,
         resetOnComplete,
         disabled,
+        isCode,
       ]
     );
 
@@ -247,8 +268,15 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         if (input[i] !== phrase[i]) {
           break;
         }
-        if (phrase[i] === " ") {
+        if (phrase[i] === " " || (isCode && phrase[i] === "\n")) {
           lastCompletedWordEnd = i + 1;
+          if (isCode && phrase[i] === "\n") {
+            let j = i + 1;
+            while (j < phrase.length && phrase[j] === " " && j < input.length && input[j] === " ") {
+              lastCompletedWordEnd = j + 1;
+              j++;
+            }
+          }
         }
       }
 
@@ -269,6 +297,19 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           style.color = "var(--color-white)";
         } else {
           style.color = "rgba(255, 255, 255, 0.35)";
+        }
+
+        if (isCode && char === "\n") {
+          return (
+            <span key={i}>
+              {isCursor && <span id="target" ref={targetRef} />}
+              <span
+                className={`transition-all duration-150 ${isTyped && !isCorrect ? "underline decoration-2 decoration-red-500" : ""}`}
+                style={style}
+              >↵</span>
+              <br />
+            </span>
+          );
         }
 
         return (

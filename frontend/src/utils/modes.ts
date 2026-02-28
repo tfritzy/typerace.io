@@ -1,4 +1,5 @@
 export type ContentTypeValue = "RandomWords" | "Quotes";
+export type ModeCategory = "language" | "programming";
 
 export enum Language {
     English = "English",
@@ -18,11 +19,24 @@ export enum Language {
     Turkish = "Turkish",
 }
 
+export enum ProgrammingLanguage {
+    Python = "Python",
+    CSharp = "C#",
+    TypeScript = "TypeScript",
+}
+
 export interface LanguageInfo {
     language: Language;
     flag: string;
     randomWordsMode: string;
     quotesMode: string | null;
+}
+
+export interface ProgrammingLanguageInfo {
+    language: ProgrammingLanguage;
+    icon: string;
+    mode: string;
+    startupPhrases: string[];
 }
 
 export const languages: LanguageInfo[] = [
@@ -41,6 +55,42 @@ export const languages: LanguageInfo[] = [
     { language: Language.Swedish, flag: "🇸🇪", randomWordsMode: "Swedish500", quotesMode: "SwedishQuotes" },
     { language: Language.Turkish, flag: "🇹🇷", randomWordsMode: "Turkish500", quotesMode: "TurkishQuotes" },
 ].sort((a, b) => a.language.localeCompare(b.language));
+
+export const programmingLanguages: ProgrammingLanguageInfo[] = [
+    {
+        language: ProgrammingLanguage.Python,
+        icon: "🐍",
+        mode: "PythonSnippets",
+        startupPhrases: [
+            "def main()",
+            "print('start race')",
+            "Race().start()",
+            "'ecar'[::-1]",
+        ],
+    },
+    {
+        language: ProgrammingLanguage.CSharp,
+        icon: "#",
+        mode: "CSharpSnippets",
+        startupPhrases: [
+            "dotnet run",
+            "await Race();",
+            "Console.ReadLine();",
+            "new Race().Start();",
+        ],
+    },
+    {
+        language: ProgrammingLanguage.TypeScript,
+        icon: "TS",
+        mode: "TypeScriptSnippets",
+        startupPhrases: [
+            "console.log('start race')",
+            "new Race().start()",
+            "await race()",
+            "race().then(race)",
+        ],
+    },
+];
 
 export interface ModeOption {
     mode: { tag: string };
@@ -72,6 +122,21 @@ export function getContentTypeFromMode(modeTag: string): ContentTypeValue {
         return "Quotes";
     }
     return "RandomWords";
+}
+
+export function isProgrammingMode(modeTag: string): boolean {
+    return programmingLanguages.some(p => p.mode === modeTag);
+}
+
+export function getCategoryFromMode(modeTag: string): ModeCategory {
+    if (isProgrammingMode(modeTag)) {
+        return "programming";
+    }
+    return "language";
+}
+
+export function getProgrammingLanguageFromMode(modeTag: string): ProgrammingLanguageInfo | undefined {
+    return programmingLanguages.find(p => p.mode === modeTag);
 }
 
 const languageStartupPhrases: Record<Language, string[]> = {
@@ -206,6 +271,12 @@ const languageStartupPhrases: Record<Language, string[]> = {
 };
 
 export function getRandomStartupPhrase(gameModeTag: string): string {
+  const progLang = getProgrammingLanguageFromMode(gameModeTag);
+  if (progLang) {
+    const phrases = progLang.startupPhrases;
+    return phrases[Math.floor(Math.random() * phrases.length)];
+  }
+
   const language = getLanguageFromMode(gameModeTag);
   const phrases = languageStartupPhrases[language] || languageStartupPhrases[Language.English];
   const randomIndex = Math.floor(Math.random() * phrases.length);
