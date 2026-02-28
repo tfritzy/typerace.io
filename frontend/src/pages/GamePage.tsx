@@ -13,6 +13,34 @@ import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import type { CSSProperties } from "react";
+
+const getPlacementBoxStyle = (placement?: number): CSSProperties => {
+  if (!placement) return {};
+
+  if (placement === 1) {
+    return {
+      backgroundColor: 'rgba(255, 201, 0, 0.06)',
+      borderColor: 'rgba(255, 201, 0, 0.3)',
+      boxShadow: '0 0 20px rgba(255, 201, 0, 0.07), inset 0 1px 0 rgba(255, 201, 0, 0.08)',
+    };
+  }
+  if (placement === 2) {
+    return {
+      backgroundColor: 'rgba(192, 192, 192, 0.04)',
+      borderColor: 'rgba(192, 192, 192, 0.2)',
+      boxShadow: '0 0 15px rgba(192, 192, 192, 0.05)',
+    };
+  }
+  if (placement === 3) {
+    return {
+      backgroundColor: 'rgba(205, 127, 50, 0.05)',
+      borderColor: 'rgba(205, 127, 50, 0.2)',
+      boxShadow: '0 0 15px rgba(205, 127, 50, 0.05)',
+    };
+  }
+  return {};
+};
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -201,8 +229,10 @@ export const GamePage = () => {
                 );
               }
 
+              const placementStyle = getPlacementBoxStyle(pp.placement);
+
               return (
-                <div key={pp.id.toString()} className="box w-full rounded-lg px-8 py-6 relative">
+                <div key={pp.id.toString()} className="box w-full rounded-lg px-8 py-6 relative" style={placementStyle}>
                   <PlayerProgressBar
                     key={pp.id.toString()}
                     name={pp.playerName}
