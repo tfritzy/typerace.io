@@ -271,9 +271,9 @@ const languageStartupPhrases: Record<Language, string[]> = {
 };
 
 export function getRandomStartupPhrase(gameModeTag: string): string {
-  const progLang = getProgrammingLanguageFromMode(gameModeTag);
-  if (progLang) {
-    const phrases = progLang.startupPhrases;
+  const programmingLanguage = getProgrammingLanguageFromMode(gameModeTag);
+  if (programmingLanguage) {
+    const phrases = programmingLanguage.startupPhrases;
     return phrases[Math.floor(Math.random() * phrases.length)];
   }
 

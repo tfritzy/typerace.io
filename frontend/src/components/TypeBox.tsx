@@ -272,7 +272,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           lastCompletedWordEnd = i + 1;
           if (isCode && phrase[i] === "\n") {
             let j = i + 1;
-            while (j < phrase.length && phrase[j] === " " && j < input.length && input[j] === " ") {
+            while (j < phrase.length && phrase[j] === " " && j < input.length && input[j] === phrase[j]) {
               lastCompletedWordEnd = j + 1;
               j++;
             }
