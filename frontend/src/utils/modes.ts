@@ -208,6 +208,6 @@ const languageStartupPhrases: Record<Language, string[]> = {
 export function getRandomStartupPhrase(gameModeTag: string): string {
   const language = getLanguageFromMode(gameModeTag);
   const phrases = languageStartupPhrases[language] || languageStartupPhrases[Language.English];
-  const randomIndex = Math.floor(Math.random() * phrases.length);
+  const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % phrases.length;
   return phrases[randomIndex];
 }
