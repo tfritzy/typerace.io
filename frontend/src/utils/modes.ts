@@ -16,12 +16,16 @@ export enum Language {
     Dutch = "Dutch",
     Swedish = "Swedish",
     Turkish = "Turkish",
+    Python = "Python",
+    CSharp = "C#",
+    TypeScript = "TypeScript",
 }
 
 export interface LanguageInfo {
     language: Language;
     flag: string;
-    randomWordsMode: string;
+    icon?: string;
+    randomWordsMode: string | null;
     quotesMode: string | null;
 }
 
@@ -36,10 +40,14 @@ export const languages: LanguageInfo[] = [
     { language: Language.Korean, flag: "🇰🇷", randomWordsMode: "Korean500", quotesMode: "KoreanQuotes" },
     { language: Language.Chinese, flag: "🇨🇳", randomWordsMode: "Chinese500", quotesMode: "ChineseQuotes" },
     { language: Language.Ukrainian, flag: "🇺🇦", randomWordsMode: "Ukrainian500", quotesMode: "UkrainianQuotes" },
+    { language: Language.Arabic, flag: "🇸🇦", randomWordsMode: "Arabic500", quotesMode: "ArabicQuotes" },
     { language: Language.Hindi, flag: "🇮🇳", randomWordsMode: "Hindi500", quotesMode: "HindiQuotes" },
     { language: Language.Dutch, flag: "🇳🇱", randomWordsMode: "Dutch500", quotesMode: "DutchQuotes" },
     { language: Language.Swedish, flag: "🇸🇪", randomWordsMode: "Swedish500", quotesMode: "SwedishQuotes" },
     { language: Language.Turkish, flag: "🇹🇷", randomWordsMode: "Turkish500", quotesMode: "TurkishQuotes" },
+    { language: Language.Python, flag: "", icon: "/icons/python.svg", randomWordsMode: null, quotesMode: "PythonSnippets" },
+    { language: Language.CSharp, flag: "", icon: "/icons/csharp.svg", randomWordsMode: null, quotesMode: "CSharpSnippets" },
+    { language: Language.TypeScript, flag: "", icon: "/icons/typescript.svg", randomWordsMode: null, quotesMode: "TypeScriptSnippets" },
 ].sort((a, b) => a.language.localeCompare(b.language));
 
 export interface ModeOption {
@@ -48,11 +56,13 @@ export interface ModeOption {
     flag: string;
 }
 
-export const randomWordsModes: ModeOption[] = languages.map(l => ({
-    mode: { tag: l.randomWordsMode },
-    label: l.language,
-    flag: l.flag,
-}));
+export const randomWordsModes: ModeOption[] = languages
+    .filter(l => l.randomWordsMode !== null)
+    .map(l => ({
+        mode: { tag: l.randomWordsMode! },
+        label: l.language,
+        flag: l.flag,
+    }));
 
 export const quotesModes: ModeOption[] = languages
     .filter(l => l.quotesMode !== null)
@@ -68,7 +78,7 @@ export function getLanguageFromMode(modeTag: string): Language {
 }
 
 export function getContentTypeFromMode(modeTag: string): ContentTypeValue {
-    if (modeTag.endsWith("Quotes")) {
+    if (modeTag.endsWith("Quotes") || modeTag.endsWith("Snippets")) {
         return "Quotes";
     }
     return "RandomWords";
@@ -203,6 +213,27 @@ const languageStartupPhrases: Record<Language, string[]> = {
     "ileri",
     "haydi",
   ],
+  [Language.Python]: [
+    "import antigravity",
+    "pip install",
+    "hello, world",
+    "it's snake time",
+    "python -m game",
+  ],
+  [Language.CSharp]: [
+    "using System;",
+    "new Game()",
+    "ctrl+shift+b",
+    "console.writeline",
+    "build succeeded",
+  ],
+  [Language.TypeScript]: [
+    "tsc --watch",
+    "type safe",
+    "no implicit any",
+    "npm run dev",
+    "strict mode on",
+  ],
 };
 
 export function getRandomStartupPhrase(gameModeTag: string): string {
@@ -210,4 +241,15 @@ export function getRandomStartupPhrase(gameModeTag: string): string {
   const phrases = languageStartupPhrases[language] || languageStartupPhrases[Language.English];
   const randomIndex = crypto.getRandomValues(new Uint32Array(1))[0] % phrases.length;
   return phrases[randomIndex];
+}
+
+export function isProgrammingMode(modeTag: string): boolean {
+  return modeTag.endsWith("Snippets");
+}
+
+export function getShikiLanguage(modeTag: string): string {
+  if (modeTag === "PythonSnippets") return "python";
+  if (modeTag === "CSharpSnippets") return "csharp";
+  if (modeTag === "TypeScriptSnippets") return "typescript";
+  return "text";
 }

@@ -9,3 +9,9 @@ public struct Phrase
         Attribution = attribution;
     }
 }
+
+public struct Snippet
+{
+    public string Text;
+    public string Source;
+}

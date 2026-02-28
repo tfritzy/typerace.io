@@ -4,8 +4,10 @@ import React, {
   useState,
   useImperativeHandle,
   forwardRef,
+  useEffect,
 } from "react";
 import { Cursor } from "./Cursor";
+import { codeToTokens } from "shiki";
 
 type TypeBoxProps = {
   phrase: string;
@@ -21,6 +23,8 @@ type TypeBoxProps = {
   resetOnComplete?: boolean;
   disabled?: boolean;
   initialProgress?: number;
+  isCode?: boolean;
+  programmingLanguage?: string;
 };
 
 export type TypeBoxRef = {
@@ -40,6 +44,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       resetOnComplete = false,
       disabled = false,
       initialProgress = 0,
+      isCode = false,
+      programmingLanguage,
     },
     ref
   ) => {
@@ -47,6 +53,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const [input, setInput] = useState(phrase.substring(0, initialProgress));
     const [isComplete, setIsComplete] = useState(false);
     const [hasReachedErrorLimit, setHasReachedErrorLimit] = useState(false);
+    const [tokenColors, setTokenColors] = useState<string[]>([]);
 
     const targetRef = useRef<HTMLElement>(null);
     const phraseRef = useRef<HTMLDivElement>(null);
@@ -67,6 +74,35 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         inputRef.current?.focus();
       },
     }));
+
+    useEffect(() => {
+      if (!programmingLanguage || !phrase) {
+        setTokenColors([]);
+        return;
+      }
+
+      let cancelled = false;
+      codeToTokens(phrase, {
+        lang: programmingLanguage as any,
+        theme: "github-dark-dimmed",
+      }).then((result) => {
+        if (cancelled) return;
+        const colors: string[] = [];
+        for (const line of result.tokens) {
+          for (const token of line) {
+            for (let i = 0; i < token.content.length; i++) {
+              colors.push(token.color ?? "#adbac7");
+            }
+          }
+          colors.push("#adbac7");
+        }
+        setTokenColors(colors);
+      }).catch(() => {
+        if (!cancelled) setTokenColors([]);
+      });
+
+      return () => { cancelled = true; };
+    }, [phrase, programmingLanguage]);
 
     const resetCursorToEnd = useCallback(() => {
       if (inputRef.current) {
@@ -103,19 +139,22 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         const oldValue = input;
 
         if (newValue.length < oldValue.length) {
-          let lastCompletedWordEnd = 0;
+          let lastCompletedLineEnd = 0;
           for (let i = 0; i < oldValue.length; i++) {
             if (oldValue[i] !== phrase[i]) {
               break;
             }
-            if (phrase[i] === " ") {
-              lastCompletedWordEnd = i + 1;
+            if (isCode ? phrase[i] === "\n" : phrase[i] === " ") {
+              lastCompletedLineEnd = i + 1;
             }
           }
 
-          if (newValue.length < lastCompletedWordEnd) {
-            const correctPrefix = phrase.substring(0, lastCompletedWordEnd);
+          if (newValue.length < lastCompletedLineEnd) {
+            const correctPrefix = phrase.substring(0, lastCompletedLineEnd);
             setInput(correctPrefix);
+            if (inputRef.current) {
+              inputRef.current.value = correctPrefix;
+            }
             return;
           }
         }
@@ -151,19 +190,20 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         if (onWordComplete && newValue.length > oldValue.length) {
           const lastCharIndex = newValue.length - 1;
           const lastChar = newValue[lastCharIndex];
-          const justTypedCorrectSpace =
-            lastChar === " " && lastChar === phrase[lastCharIndex];
+          const separator = isCode ? "\n" : " ";
+          const justTypedCorrectSeparator =
+            lastChar === separator && lastChar === phrase[lastCharIndex];
           const justCompletedPhrase = newValue === phrase;
 
           const wordIsFullyCorrect =
-            justTypedCorrectSpace && firstErrorPos === null;
+            justTypedCorrectSeparator && firstErrorPos === null;
 
           if (wordIsFullyCorrect || justCompletedPhrase) {
-            const wordEndIndex = justTypedCorrectSpace
+            const wordEndIndex = justTypedCorrectSeparator
               ? lastCharIndex - 1
               : phrase.length - 1;
             let wordStartIndex = wordEndIndex;
-            while (wordStartIndex > 0 && phrase[wordStartIndex - 1] !== " ") {
+            while (wordStartIndex > 0 && phrase[wordStartIndex - 1] !== separator) {
               wordStartIndex--;
             }
             const wordLength = wordEndIndex - wordStartIndex + 1;
@@ -221,10 +261,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         input,
         resetOnComplete,
         disabled,
+        isCode,
       ]
     );
 
-    const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLTextAreaElement>) => {
       const cursorKeys = [
         "ArrowLeft",
         "ArrowRight",
@@ -237,51 +278,110 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       if (cursorKeys.includes(event.key)) {
         event.preventDefault();
       }
-    }, []);
+
+      if (isCode && event.key === "Enter") {
+        event.preventDefault();
+        const currentInput = inputRef.current?.value ?? input;
+        const expectedChar = phrase[currentInput.length];
+        if (expectedChar !== "\n") return;
+
+        let nextLineStart = currentInput.length + 1;
+        let indent = "";
+        while (nextLineStart + indent.length < phrase.length && phrase[nextLineStart + indent.length] === " ") {
+          indent += " ";
+        }
+
+        const withNewline = currentInput + "\n" + indent;
+        if (withNewline.length > phrase.length) return;
+
+        const syntheticEvent = {
+          target: { value: withNewline },
+        } as React.ChangeEvent<HTMLTextAreaElement>;
+        handleChange(syntheticEvent);
+        if (inputRef.current) {
+          inputRef.current.value = withNewline;
+        }
+      }
+    }, [isCode, phrase, input, handleChange]);
 
     const renderText = () => {
       const chars = phrase.split("");
 
-      let lastCompletedWordEnd = 0;
+      let lastCompletedLineEnd = 0;
       for (let i = 0; i < input.length && i < phrase.length; i++) {
         if (input[i] !== phrase[i]) {
           break;
         }
-        if (phrase[i] === " ") {
-          lastCompletedWordEnd = i + 1;
+        if (isCode ? phrase[i] === "\n" : phrase[i] === " ") {
+          lastCompletedLineEnd = i + 1;
         }
       }
 
-      return chars.map((char, i) => {
+      const elements: React.ReactNode[] = [];
+      chars.forEach((char, i) => {
         const isTyped = i < input.length;
         const isCorrect = input[i] === char;
         const isCursor = i === input.length;
-        const isInCompletedWord = i < lastCompletedWordEnd;
-        const isInCurrentWord =
-          i >= lastCompletedWordEnd && i < input.length && isCorrect;
+        const isInCompletedLine = i < lastCompletedLineEnd;
+        const isInCurrentLine =
+          i >= lastCompletedLineEnd && i < input.length && isCorrect;
 
         const style: React.CSSProperties = {};
         if (isTyped && !isCorrect) {
           style.color = "var(--color-error)";
-        } else if (isInCompletedWord) {
-          style.color = "rgba(255, 255, 255, 0.15)";
-        } else if (isInCurrentWord) {
-          style.color = "var(--color-white)";
+        } else if (tokenColors.length > 0 && tokenColors[i]) {
+          const baseColor = tokenColors[i];
+          if (isInCompletedLine) {
+            style.color = baseColor;
+            style.opacity = 0.15;
+          } else if (isInCurrentLine) {
+            style.color = baseColor;
+            style.opacity = 1;
+          } else {
+            style.color = baseColor;
+            style.opacity = 0.6;
+          }
         } else {
-          style.color = "rgba(255, 255, 255, 0.35)";
+          if (isInCompletedLine) {
+            style.color = "rgba(255, 255, 255, 0.15)";
+          } else if (isInCurrentLine) {
+            style.color = "var(--color-white)";
+          } else {
+            style.color = "rgba(255, 255, 255, 0.35)";
+          }
         }
 
-        return (
-          <span
-            key={i}
-            className={`transition-all duration-150 ${isTyped && !isCorrect ? "underline decoration-2 decoration-red-500" : ""}`}
-            style={style}
-          >
-            {isCursor && <span id="target" ref={targetRef} />}
-            {char}
-          </span>
-        );
+        if (char === "\n") {
+          elements.push(
+            <span
+              key={i}
+              className={`transition-all duration-150 ${isTyped && !isCorrect ? "underline decoration-2 decoration-red-500" : ""}`}
+              style={style}
+            >
+              {isCursor && <span id="target" ref={targetRef} />}
+              {"↵"}
+            </span>
+          );
+          elements.push(<br key={`br-${i}`} />);
+        } else {
+          elements.push(
+            <span
+              key={i}
+              className={`transition-all duration-150 ${isTyped && !isCorrect ? "underline decoration-2 decoration-red-500" : ""}`}
+              style={style}
+            >
+              {isCursor && <span id="target" ref={targetRef} />}
+              {char}
+            </span>
+          );
+        }
       });
+
+      if (input.length >= phrase.length) {
+        elements.push(<span key="cursor-end" ref={targetRef as React.RefObject<HTMLSpanElement>} id="target" />);
+      }
+
+      return elements;
     };
 
     return (

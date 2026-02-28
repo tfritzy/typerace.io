@@ -13,6 +13,7 @@ import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { isProgrammingMode, getShikiLanguage } from "../utils/modes";
 import type { CSSProperties } from "react";
 
 const getPlacementBoxStyle = (placement?: number): CSSProperties => {
@@ -305,6 +306,8 @@ export const GamePage = () => {
               disabled={isDisabled}
               initialProgress={initialProgress}
               isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
+              isCode={isProgrammingMode(game.gameMode?.tag ?? "")}
+              programmingLanguage={getShikiLanguage(game.gameMode?.tag ?? "")}
             />
           )}
         </div>

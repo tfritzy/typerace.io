@@ -24,9 +24,13 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
     }, [selectedMode.tag]);
 
     const quotesAvailableForLanguage = selectedLanguage.quotesMode !== null;
+    const randomWordsAvailableForLanguage = selectedLanguage.randomWordsMode !== null;
 
     const handleContentTypeChange = (newContentType: ContentTypeValue) => {
         if (newContentType === "Quotes" && !quotesAvailableForLanguage) {
+            return;
+        }
+        if (newContentType === "RandomWords" && !randomWordsAvailableForLanguage) {
             return;
         }
 
@@ -80,6 +84,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                         <button
                             className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
                             onClick={() => handleContentTypeChange("RandomWords")}
+                            disabled={!randomWordsAvailableForLanguage}
                         >
                             <Shuffle size={20} />
                             <span>Random words</span>
@@ -98,13 +103,19 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                     key={lang.language}
                                     className={`selection-button ${selectedMode.tag === mode ? "selected" : ""}`}
                                     onClick={() => {
-                                        if (mode) {
+                                        if (lang.randomWordsMode === null && lang.quotesMode) {
+                                            setContentType("Quotes");
+                                            onModeSelect({ tag: lang.quotesMode } as GameMode);
+                                        } else if (mode) {
                                             onModeSelect({ tag: mode } as GameMode);
                                         }
                                     }}
                                     disabled={isDisabled}
                                 >
-                                    <span className="flag leading-none">{lang.flag}</span>
+                                    {lang.icon
+                                        ? <img src={lang.icon} alt={lang.language} className="w-5 h-5 object-contain" />
+                                        : <span className="flag leading-none">{lang.flag}</span>
+                                    }
                                     <span>{lang.language}</span>
                                 </button>
                             );
@@ -118,14 +129,15 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     className="selection-button selected w-full justify-between"
                     onClick={() => setIsDrawerOpen(true)}
                 >
-                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
                         {gameType === "Public" && <Globe size={18} />}
                         {gameType === "Private" && <Lock size={18} />}
                         {gameType === "Practice" && <Target size={18} />}
                         {contentType === "Quotes" ? <Quote size={18} /> : <Shuffle size={18} />}
-                        <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>
-                            {selectedLanguage.flag}
-                        </span>
+                        {selectedLanguage.icon
+                            ? <img src={selectedLanguage.icon} alt={selectedLanguage.language} className="w-5 h-5 object-contain" />
+                            : <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>{selectedLanguage.flag}</span>
+                        }
                         <span>{selectedLanguage.language}</span>
                     </div>
                     <ChevronUp size={20} />
@@ -179,6 +191,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                     <button
                                         className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
                                         onClick={() => handleContentTypeChange("RandomWords")}
+                                        disabled={!randomWordsAvailableForLanguage}
                                     >
                                         <Shuffle size={20} />
                                         <span>Random Words</span>
@@ -203,13 +216,19 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                                 key={lang.language}
                                                 className={`selection-button ${selectedMode.tag === mode ? "selected" : ""}`}
                                                 onClick={() => {
-                                                    if (mode) {
+                                                    if (lang.randomWordsMode === null && lang.quotesMode) {
+                                                        setContentType("Quotes");
+                                                        onModeSelect({ tag: lang.quotesMode } as GameMode);
+                                                    } else if (mode) {
                                                         onModeSelect({ tag: mode } as GameMode);
                                                     }
                                                 }}
                                                 disabled={isDisabled}
                                             >
-                                                <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>{lang.flag}</span>
+                                                {lang.icon
+                                                    ? <img src={lang.icon} alt={lang.language} className="w-5 h-5 object-contain" />
+                                                    : <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>{lang.flag}</span>
+                                                }
                                                 <span>{lang.language}</span>
                                             </button>
                                         );

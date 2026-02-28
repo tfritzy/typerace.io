@@ -115,6 +115,9 @@ export const GameMode = __t.enum("GameMode", {
   DutchQuotes: __t.unit(),
   SwedishQuotes: __t.unit(),
   TurkishQuotes: __t.unit(),
+  PythonSnippets: __t.unit(),
+  CSharpSnippets: __t.unit(),
+  TypeScriptSnippets: __t.unit(),
 });
 export type GameMode = __Infer<typeof GameMode>;
 

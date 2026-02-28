@@ -43,7 +43,10 @@ public enum GameMode
     HindiQuotes,
     DutchQuotes,
     SwedishQuotes,
-    TurkishQuotes
+    TurkishQuotes,
+    PythonSnippets,
+    CSharpSnippets,
+    TypeScriptSnippets
 }
 
 [Type]

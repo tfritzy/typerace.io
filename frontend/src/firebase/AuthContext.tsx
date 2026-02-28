@@ -44,6 +44,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const timeout = setTimeout(() => {
+            setLoading(false);
+        }, 3000);
+
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             if (!firebaseUser) {
                 try {
@@ -56,10 +60,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             } else {
                 setUser(firebaseUser);
                 setLoading(false);
+                clearTimeout(timeout);
             }
         });
 
-        return unsubscribe;
+        return () => {
+            unsubscribe();
+            clearTimeout(timeout);
+        };
     }, []);
 
     const signIn = async (email: string, password: string) => {
