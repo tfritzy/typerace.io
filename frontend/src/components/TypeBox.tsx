@@ -5,7 +5,6 @@ import React, {
   useImperativeHandle,
   forwardRef,
   useEffect,
-  useMemo,
 } from "react";
 import { Cursor } from "./Cursor";
 import { codeToTokens } from "shiki";
