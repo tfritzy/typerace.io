@@ -78,6 +78,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             colorMap.push(tokens.fg || "");
           });
           setCodeColorMap(colorMap);
+        }).catch(() => {
+          setCodeColorMap([]);
         });
       } else {
         setCodeColorMap([]);
