@@ -39,7 +39,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
         }
 
         try {
-            const idToken = await user.getIdToken();
+            const idToken = import.meta.env.VITE_SPACETIMEDB_TOKEN ?? await user.getIdToken();
 
             const connection = DbConnection.builder()
                 .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
