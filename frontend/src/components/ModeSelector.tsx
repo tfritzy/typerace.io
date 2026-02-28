@@ -175,7 +175,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                     className={`selection-button ${selectedMode.tag === lang.mode ? "selected" : ""}`}
                                     onClick={() => onModeSelect({ tag: lang.mode } as GameMode)}
                                 >
-                                    <span className="font-mono text-sm font-bold leading-none">{lang.icon}</span>
+                                    <img src={lang.icon} alt={lang.language} className="w-5 h-5 object-contain" />
                                     <span>{lang.language}</span>
                                 </button>
                             ))}
@@ -194,9 +194,13 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                         {gameType === "Private" && <Lock size={18} />}
                         {gameType === "Practice" && <Target size={18} />}
                         {category === "programming" ? <Code size={18} /> : (contentType === "Quotes" ? <Quote size={18} /> : <Shuffle size={18} />)}
-                        <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>
-                            {mobileIcon}
-                        </span>
+                        {category === "programming" && selectedProgrammingLanguage ? (
+                            <img src={selectedProgrammingLanguage.icon} alt={mobileLabel} className="w-5 h-5 object-contain" />
+                        ) : (
+                            <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>
+                                {mobileIcon}
+                            </span>
+                        )}
                         <span>{mobileLabel}</span>
                     </div>
                     <ChevronUp size={20} />
@@ -317,7 +321,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                                     className={`selection-button ${selectedMode.tag === lang.mode ? "selected" : ""}`}
                                                     onClick={() => onModeSelect({ tag: lang.mode } as GameMode)}
                                                 >
-                                                    <span className="font-mono text-sm font-bold leading-none">{lang.icon}</span>
+                                                    <img src={lang.icon} alt={lang.language} className="w-5 h-5 object-contain" />
                                                     <span>{lang.language}</span>
                                                 </button>
                                             ))}

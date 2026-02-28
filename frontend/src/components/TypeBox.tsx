@@ -4,8 +4,13 @@ import React, {
   useState,
   useImperativeHandle,
   forwardRef,
+  useEffect,
+  useMemo,
 } from "react";
 import { Cursor } from "./Cursor";
+import { codeToTokens } from "shiki";
+
+type ShikiLanguage = "python" | "csharp" | "typescript";
 
 type TypeBoxProps = {
   phrase: string;
@@ -22,6 +27,7 @@ type TypeBoxProps = {
   disabled?: boolean;
   initialProgress?: number;
   isCode?: boolean;
+  programmingLanguage?: ShikiLanguage;
 };
 
 export type TypeBoxRef = {
@@ -42,6 +48,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       disabled = false,
       initialProgress = 0,
       isCode = false,
+      programmingLanguage,
     },
     ref
   ) => {
@@ -49,10 +56,33 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const [input, setInput] = useState(phrase.substring(0, initialProgress));
     const [isComplete, setIsComplete] = useState(false);
     const [hasReachedErrorLimit, setHasReachedErrorLimit] = useState(false);
+    const [codeColorMap, setCodeColorMap] = useState<string[]>([]);
 
     const targetRef = useRef<HTMLElement>(null);
     const phraseRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
+
+    useEffect(() => {
+      if (programmingLanguage) {
+        codeToTokens(phrase, {
+          lang: programmingLanguage,
+          theme: "github-dark-dimmed",
+        }).then((tokens) => {
+          const colorMap: string[] = [];
+          tokens.tokens.forEach((line) => {
+            line.forEach((token) => {
+              for (let i = 0; i < token.content.length; i++) {
+                colorMap.push(token.color || "");
+              }
+            });
+            colorMap.push(tokens.fg || "");
+          });
+          setCodeColorMap(colorMap);
+        });
+      } else {
+        setCodeColorMap([]);
+      }
+    }, [programmingLanguage, phrase]);
 
     React.useEffect(() => {
       if (targetRef.current && focused && !isComplete) {
@@ -292,11 +322,25 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         if (isTyped && !isCorrect) {
           style.color = "var(--color-error)";
         } else if (isInCompletedWord) {
-          style.color = "rgba(255, 255, 255, 0.15)";
+          if (codeColorMap.length > 0 && codeColorMap[i]) {
+            style.color = codeColorMap[i];
+            style.opacity = 0.15;
+          } else {
+            style.color = "rgba(255, 255, 255, 0.15)";
+          }
         } else if (isInCurrentWord) {
-          style.color = "var(--color-white)";
+          if (codeColorMap.length > 0 && codeColorMap[i]) {
+            style.color = codeColorMap[i];
+          } else {
+            style.color = "var(--color-white)";
+          }
         } else {
-          style.color = "rgba(255, 255, 255, 0.35)";
+          if (codeColorMap.length > 0 && codeColorMap[i]) {
+            style.color = codeColorMap[i];
+            style.opacity = 0.6;
+          } else {
+            style.color = "rgba(255, 255, 255, 0.35)";
+          }
         }
 
         if (isCode && char === "\n") {

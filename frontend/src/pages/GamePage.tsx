@@ -13,7 +13,7 @@ import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
-import { isProgrammingMode } from "../utils/modes";
+import { isProgrammingMode, getShikiLanguage } from "../utils/modes";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -277,6 +277,7 @@ export const GamePage = () => {
               initialProgress={initialProgress}
               isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
               isCode={game.gameMode ? isProgrammingMode(game.gameMode.tag) : false}
+              programmingLanguage={game.gameMode ? getShikiLanguage(game.gameMode.tag) : undefined}
             />
           )}
         </div>

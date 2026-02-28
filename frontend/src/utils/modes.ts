@@ -59,7 +59,7 @@ export const languages: LanguageInfo[] = [
 export const programmingLanguages: ProgrammingLanguageInfo[] = [
     {
         language: ProgrammingLanguage.Python,
-        icon: "🐍",
+        icon: "/logos/python.png",
         mode: "PythonSnippets",
         startupPhrases: [
             "def main()",
@@ -70,7 +70,7 @@ export const programmingLanguages: ProgrammingLanguageInfo[] = [
     },
     {
         language: ProgrammingLanguage.CSharp,
-        icon: "#",
+        icon: "/logos/csharp.svg",
         mode: "CSharpSnippets",
         startupPhrases: [
             "dotnet run",
@@ -81,7 +81,7 @@ export const programmingLanguages: ProgrammingLanguageInfo[] = [
     },
     {
         language: ProgrammingLanguage.TypeScript,
-        icon: "TS",
+        icon: "/logos/typescript.svg",
         mode: "TypeScriptSnippets",
         startupPhrases: [
             "console.log('start race')",
@@ -137,6 +137,16 @@ export function getCategoryFromMode(modeTag: string): ModeCategory {
 
 export function getProgrammingLanguageFromMode(modeTag: string): ProgrammingLanguageInfo | undefined {
     return programmingLanguages.find(p => p.mode === modeTag);
+}
+
+const shikiLanguageMap: Record<string, "python" | "csharp" | "typescript"> = {
+    PythonSnippets: "python",
+    CSharpSnippets: "csharp",
+    TypeScriptSnippets: "typescript",
+};
+
+export function getShikiLanguage(modeTag: string): "python" | "csharp" | "typescript" | undefined {
+    return shikiLanguageMap[modeTag];
 }
 
 const languageStartupPhrases: Record<Language, string[]> = {

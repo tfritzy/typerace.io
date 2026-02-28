@@ -19,6 +19,7 @@ type GamePageTypeBoxProps = {
   initialProgress?: number;
   isAnonymous?: boolean;
   isCode?: boolean;
+  programmingLanguage?: "python" | "csharp" | "typescript";
 };
 
 export const GamePageTypeBox = memo(
@@ -32,6 +33,7 @@ export const GamePageTypeBox = memo(
     initialProgress = 0,
     isAnonymous = true,
     isCode = false,
+    programmingLanguage,
   }: GamePageTypeBoxProps) => {
     const typeBoxRef = useRef<TypeBoxRef>(null);
     const [xpIndicators, setXpIndicators] = useState<XpIndicatorInstance[]>([]);
@@ -99,6 +101,7 @@ export const GamePageTypeBox = memo(
           height="430px"
           initialProgress={initialProgress}
           isCode={isCode}
+          programmingLanguage={programmingLanguage}
         />
       </div>
     );
