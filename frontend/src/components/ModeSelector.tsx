@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
 import "../components/SelectionButton.css";
 import { type GameMode } from "../types/stdb";
-import { ChevronUp, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
-import { languages, getContentTypeFromMode, type ContentTypeValue } from "../utils/modes";
+import { ChevronUp, Globe, Lock, Target, Quote, Shuffle, Code } from "lucide-react";
+import { languages, getContentTypeFromMode, isProgrammingMode, type ContentTypeValue, Language } from "../utils/modes";
 
 export type GameTypeValue = "Public" | "Private" | "Practice";
+export type LanguageCategoryValue = "Spoken" | "Programming";
 
 interface GameOptionsSelectorProps {
     selectedMode: GameMode;
@@ -16,6 +17,9 @@ interface GameOptionsSelectorProps {
 export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setGameType }: GameOptionsSelectorProps) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [contentType, setContentType] = useState<ContentTypeValue>(() => getContentTypeFromMode(selectedMode.tag));
+    const [languageCategory, setLanguageCategory] = useState<LanguageCategoryValue>(() =>
+        isProgrammingMode(selectedMode.tag) ? "Programming" : "Spoken"
+    );
 
     const selectedLanguage = useMemo(() => {
         return languages.find(l =>
@@ -23,14 +27,40 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
         ) || languages[0];
     }, [selectedMode.tag]);
 
+    const filteredLanguages = useMemo(() =>
+        languages.filter(l => languageCategory === "Programming" ? l.isProgramming === true : l.isProgramming !== true),
+        [languageCategory]
+    );
+
     const quotesAvailableForLanguage = selectedLanguage.quotesMode !== null;
-    const randomWordsAvailableForLanguage = selectedLanguage.randomWordsMode !== null;
+    const randomWordsDisabled = languageCategory === "Programming" || selectedLanguage.randomWordsMode === null;
+
+    const handleLanguageCategoryChange = (category: LanguageCategoryValue) => {
+        setLanguageCategory(category);
+        if (category === "Programming") {
+            setContentType("Quotes");
+            const firstProg = languages.find(l => l.isProgramming === true);
+            if (firstProg?.quotesMode) {
+                onModeSelect({ tag: firstProg.quotesMode } as GameMode);
+            }
+        } else {
+            if (selectedLanguage.isProgramming === true) {
+                const english = languages.find(l => l.language === Language.English);
+                if (english) {
+                    const mode = contentType === "Quotes" ? english.quotesMode : english.randomWordsMode;
+                    if (mode) {
+                        onModeSelect({ tag: mode } as GameMode);
+                    }
+                }
+            }
+        }
+    };
 
     const handleContentTypeChange = (newContentType: ContentTypeValue) => {
         if (newContentType === "Quotes" && !quotesAvailableForLanguage) {
             return;
         }
-        if (newContentType === "RandomWords" && !randomWordsAvailableForLanguage) {
+        if (newContentType === "RandomWords" && randomWordsDisabled) {
             return;
         }
 
@@ -84,33 +114,46 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                         <button
                             className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
                             onClick={() => handleContentTypeChange("RandomWords")}
-                            disabled={!randomWordsAvailableForLanguage}
+                            disabled={randomWordsDisabled}
                         >
                             <Shuffle size={20} />
                             <span>Random words</span>
                         </button>
                     </div>
                 </div>
-                <div className="pb-6">
+                <div className="mb-4">
                     <h2 className="text-white/50 text-sm font-medium mb-2">Language</h2>
+                    <div className="flex gap-2">
+                        <button
+                            className={`selection-button ${languageCategory === "Spoken" ? 'selected' : ''}`}
+                            onClick={() => handleLanguageCategoryChange("Spoken")}
+                        >
+                            <Globe size={20} />
+                            <span>Spoken</span>
+                        </button>
+                        <button
+                            className={`selection-button ${languageCategory === "Programming" ? 'selected' : ''}`}
+                            onClick={() => handleLanguageCategoryChange("Programming")}
+                        >
+                            <Code size={20} />
+                            <span>Programming</span>
+                        </button>
+                    </div>
+                </div>
+                <div className="pb-6">
                     <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2">
-                        {languages.map((lang) => {
+                        {filteredLanguages.map((lang) => {
                             const mode = contentType === "Quotes" ? lang.quotesMode : lang.randomWordsMode;
-                            const isDisabled = contentType === "Quotes" && !lang.quotesMode;
 
                             return (
                                 <button
                                     key={lang.language}
                                     className={`selection-button ${selectedMode.tag === mode ? "selected" : ""}`}
                                     onClick={() => {
-                                        if (lang.randomWordsMode === null && lang.quotesMode) {
-                                            setContentType("Quotes");
-                                            onModeSelect({ tag: lang.quotesMode } as GameMode);
-                                        } else if (mode) {
+                                        if (mode) {
                                             onModeSelect({ tag: mode } as GameMode);
                                         }
                                     }}
-                                    disabled={isDisabled}
                                 >
                                     {lang.icon
                                         ? <img src={lang.icon} alt={lang.language} className="w-5 h-5 object-contain" />
@@ -129,7 +172,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     className="selection-button selected w-full justify-between"
                     onClick={() => setIsDrawerOpen(true)}
                 >
-                        <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                         {gameType === "Public" && <Globe size={18} />}
                         {gameType === "Private" && <Lock size={18} />}
                         {gameType === "Practice" && <Target size={18} />}
@@ -191,7 +234,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                     <button
                                         className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
                                         onClick={() => handleContentTypeChange("RandomWords")}
-                                        disabled={!randomWordsAvailableForLanguage}
+                                        disabled={randomWordsDisabled}
                                     >
                                         <Shuffle size={20} />
                                         <span>Random Words</span>
@@ -206,24 +249,35 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                     </button>
                                 </div>
                                 <h3 className="text-white/80 text-base font-medium mb-3">Language</h3>
+                                <div className="flex gap-2 mb-4">
+                                    <button
+                                        className={`selection-button ${languageCategory === "Spoken" ? 'selected' : ''}`}
+                                        onClick={() => handleLanguageCategoryChange("Spoken")}
+                                    >
+                                        <Globe size={20} />
+                                        <span>Spoken</span>
+                                    </button>
+                                    <button
+                                        className={`selection-button ${languageCategory === "Programming" ? 'selected' : ''}`}
+                                        onClick={() => handleLanguageCategoryChange("Programming")}
+                                    >
+                                        <Code size={20} />
+                                        <span>Programming</span>
+                                    </button>
+                                </div>
                                 <div className="grid grid-cols-2 gap-3">
-                                    {languages.map((lang) => {
+                                    {filteredLanguages.map((lang) => {
                                         const mode = contentType === "Quotes" ? lang.quotesMode : lang.randomWordsMode;
-                                        const isDisabled = contentType === "Quotes" && !lang.quotesMode;
 
                                         return (
                                             <button
                                                 key={lang.language}
                                                 className={`selection-button ${selectedMode.tag === mode ? "selected" : ""}`}
                                                 onClick={() => {
-                                                    if (lang.randomWordsMode === null && lang.quotesMode) {
-                                                        setContentType("Quotes");
-                                                        onModeSelect({ tag: lang.quotesMode } as GameMode);
-                                                    } else if (mode) {
+                                                    if (mode) {
                                                         onModeSelect({ tag: mode } as GameMode);
                                                     }
                                                 }}
-                                                disabled={isDisabled}
                                             >
                                                 {lang.icon
                                                     ? <img src={lang.icon} alt={lang.language} className="w-5 h-5 object-contain" />

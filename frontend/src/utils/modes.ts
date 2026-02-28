@@ -27,6 +27,7 @@ export interface LanguageInfo {
     icon?: string;
     randomWordsMode: string | null;
     quotesMode: string | null;
+    isProgramming?: boolean;
 }
 
 export const languages: LanguageInfo[] = [
@@ -45,9 +46,9 @@ export const languages: LanguageInfo[] = [
     { language: Language.Dutch, flag: "🇳🇱", randomWordsMode: "Dutch500", quotesMode: "DutchQuotes" },
     { language: Language.Swedish, flag: "🇸🇪", randomWordsMode: "Swedish500", quotesMode: "SwedishQuotes" },
     { language: Language.Turkish, flag: "🇹🇷", randomWordsMode: "Turkish500", quotesMode: "TurkishQuotes" },
-    { language: Language.Python, flag: "", icon: "/icons/python.svg", randomWordsMode: null, quotesMode: "PythonSnippets" },
-    { language: Language.CSharp, flag: "", icon: "/icons/csharp.svg", randomWordsMode: null, quotesMode: "CSharpSnippets" },
-    { language: Language.TypeScript, flag: "", icon: "/icons/typescript.svg", randomWordsMode: null, quotesMode: "TypeScriptSnippets" },
+    { language: Language.Python, flag: "", icon: "/icons/python.svg", randomWordsMode: null, quotesMode: "PythonSnippets", isProgramming: true },
+    { language: Language.CSharp, flag: "", icon: "/icons/csharp.svg", randomWordsMode: null, quotesMode: "CSharpSnippets", isProgramming: true },
+    { language: Language.TypeScript, flag: "", icon: "/icons/typescript.svg", randomWordsMode: null, quotesMode: "TypeScriptSnippets", isProgramming: true },
 ].sort((a, b) => a.language.localeCompare(b.language));
 
 export interface ModeOption {
