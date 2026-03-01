@@ -77,33 +77,23 @@ export const RoadBackground = () => {
             <stop offset="100%" stopColor="transparent" stopOpacity="0" />
           </radialGradient>
 
-          <radialGradient id="vanishGlow" cx="50%" cy="54%" r="8%" fx="50%" fy="54%">
-            <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.25" />
-            <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.08" />
-            <stop offset="100%" stopColor="transparent" stopOpacity="0" />
-          </radialGradient>
+          <linearGradient id="roadHint" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#0a0e17" stopOpacity="0" />
+            <stop offset="40%" stopColor="#0a0e17" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#0a0e17" stopOpacity="0.5" />
+          </linearGradient>
+
+          <linearGradient id="roadEdge" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#fbbf24" stopOpacity="0" />
+            <stop offset="50%" stopColor="#fbbf24" stopOpacity="0.04" />
+            <stop offset="100%" stopColor="#fbbf24" stopOpacity="0.08" />
+          </linearGradient>
 
           <linearGradient id="convergeLine" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#fbbf24" stopOpacity="0" />
             <stop offset="30%" stopColor="#fbbf24" stopOpacity="0.08" />
             <stop offset="100%" stopColor="#fbbf24" stopOpacity="0.25" />
           </linearGradient>
-
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-
-          <filter id="bigGlow">
-            <feGaussianBlur stdDeviation="12" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
 
           <filter id="wideGlow">
             <feGaussianBlur stdDeviation="6" result="blur" />
@@ -125,8 +115,6 @@ export const RoadBackground = () => {
         <rect width="1920" height="1080" fill="url(#skyGrad)" />
 
         <rect width="1920" height="1080" fill="url(#horizonAmbience)" />
-
-        <circle cx="960" cy="580" r="180" fill="#fbbf24" opacity="0.03" filter="url(#bigGlow)" />
 
         {STARS.map((star, i) => (
           <circle
@@ -185,12 +173,13 @@ export const RoadBackground = () => {
           />
         ))}
 
-        <rect x="0" y="480" width="1920" height="600" fill="url(#vanishGlow)" opacity="0.6" />
+        <polygon
+          points="960,580 760,1080 1160,1080"
+          fill="url(#roadHint)"
+        />
 
-        <circle cx="950" cy="572" r="2" fill="#fbbf24" opacity="0.3" filter="url(#glow)" />
-        <circle cx="970" cy="574" r="2" fill="#fbbf24" opacity="0.3" filter="url(#glow)" />
-        <circle cx="940" cy="578" r="1.5" fill="#fbbf24" opacity="0.15" filter="url(#glow)" />
-        <circle cx="980" cy="576" r="1.5" fill="#fbbf24" opacity="0.15" filter="url(#glow)" />
+        <line x1="960" y1="580" x2="760" y2="1080" stroke="url(#roadEdge)" strokeWidth="1" />
+        <line x1="960" y1="580" x2="1160" y2="1080" stroke="url(#roadEdge)" strokeWidth="1" />
       </svg>
     </div>
   );
