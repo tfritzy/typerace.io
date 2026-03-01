@@ -37,6 +37,13 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(251, 191, 36, 0.15) 0%, transparent 100%),
+    radial-gradient(ellipse 50% 50% at 100% 0%, rgba(251, 191, 36, 0.06) 0%, transparent 100%),
+    radial-gradient(ellipse 50% 50% at 0% 100%, rgba(251, 191, 36, 0.04) 0%, transparent 100%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.3) 100%),
+    var(--color-bg-primary);
+  background-attachment: fixed;
 }
 
 .content-container {
