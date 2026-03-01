@@ -79,6 +79,9 @@ export const LobbyPage = () => {
               onComplete={handlePhraseComplete}
               resetOnComplete={true}
             />
+            <p className="text-sm text-white/25 text-center mt-4 tracking-wide">
+              Race real players · improve your WPM · 15+ languages
+            </p>
           </div>
         </div>
       </div>
