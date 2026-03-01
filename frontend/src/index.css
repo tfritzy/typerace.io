@@ -39,6 +39,46 @@ body {
   min-height: 100vh;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 70% at 0% 100%, rgba(251, 191, 36, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 90% at 100% 0%, rgba(251, 191, 36, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 50% at 50% 120%, rgba(251, 191, 36, 0.08) 0%, transparent 50%),
+    radial-gradient(circle 800px at 15% 85%, rgba(251, 191, 36, 0.1) 0%, transparent 70%),
+    radial-gradient(circle 600px at 90% 15%, rgba(168, 85, 247, 0.07) 0%, transparent 70%),
+    radial-gradient(circle 700px at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 70%),
+    var(--color-bg-primary);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle 2px at 15% 25%, rgba(255, 255, 255, 0.3) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 82% 12%, rgba(255, 255, 255, 0.25) 0%, transparent 100%),
+    radial-gradient(circle 2px at 45% 78%, rgba(255, 255, 255, 0.2) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 72% 55%, rgba(255, 255, 255, 0.15) 0%, transparent 100%),
+    radial-gradient(circle 1px at 28% 48%, rgba(255, 255, 255, 0.2) 0%, transparent 100%),
+    radial-gradient(circle 2px at 58% 32%, rgba(255, 255, 255, 0.25) 0%, transparent 100%),
+    radial-gradient(circle 1px at 92% 72%, rgba(255, 255, 255, 0.15) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 38% 88%, rgba(255, 255, 255, 0.2) 0%, transparent 100%),
+    radial-gradient(circle 2.5px at 8% 62%, rgba(251, 191, 36, 0.4) 0%, transparent 100%),
+    radial-gradient(circle 2px at 78% 38%, rgba(251, 191, 36, 0.3) 0%, transparent 100%),
+    radial-gradient(circle 2.5px at 52% 12%, rgba(251, 191, 36, 0.35) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 5% 18%, rgba(255, 255, 255, 0.18) 0%, transparent 100%),
+    radial-gradient(circle 1px at 65% 85%, rgba(255, 255, 255, 0.12) 0%, transparent 100%),
+    radial-gradient(circle 2px at 95% 45%, rgba(251, 191, 36, 0.25) 0%, transparent 100%),
+    radial-gradient(circle 1.5px at 35% 5%, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+}
+
 .content-container {
   width: 100%;
   max-width: var(--max-content-width);
