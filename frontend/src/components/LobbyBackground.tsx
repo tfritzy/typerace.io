@@ -50,9 +50,9 @@ export const LobbyBackground = () => {
         fill="none"
         style={{ color: "var(--color-accent)" }}
       >
-        {KEYS.map((k, i) => (
+        {KEYS.map((k) => (
           <g
-            key={i}
+            key={`${k.x}-${k.y}`}
             transform={`translate(${k.x}, ${k.y}) rotate(${k.r}, ${k.w / 2}, ${k.h / 2})`}
             opacity={k.o}
           >
