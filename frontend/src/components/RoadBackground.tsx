@@ -29,14 +29,15 @@ const STARS = [
   { cx: 820, cy: 320, r: 0.6, o: 0.25 },
 ];
 
-const DASHES = [
-  { y: 640, len: 10, w: 1.5 },
-  { y: 690, len: 16, w: 1.8 },
-  { y: 750, len: 24, w: 2.2 },
-  { y: 820, len: 34, w: 2.6 },
-  { y: 900, len: 46, w: 3.0 },
-  { y: 990, len: 58, w: 3.4 },
-  { y: 1060, len: 50, w: 3.6 },
+const CONVERGING_LINES = [
+  { endX: 300, o: 0.06, w: 1.5 },
+  { endX: 500, o: 0.10, w: 1.2 },
+  { endX: 680, o: 0.14, w: 1.0 },
+  { endX: 820, o: 0.10, w: 0.8 },
+  { endX: 1100, o: 0.10, w: 0.8 },
+  { endX: 1240, o: 0.14, w: 1.0 },
+  { endX: 1420, o: 0.10, w: 1.2 },
+  { endX: 1620, o: 0.06, w: 1.5 },
 ];
 
 const SPEED_LINES = [
@@ -70,37 +71,22 @@ export const RoadBackground = () => {
           </linearGradient>
 
           <radialGradient id="horizonAmbience" cx="50%" cy="58%" r="45%" fx="50%" fy="58%">
-            <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.18" />
-            <stop offset="25%" stopColor="#f59e0b" stopOpacity="0.10" />
-            <stop offset="50%" stopColor="#d97706" stopOpacity="0.04" />
+            <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.14" />
+            <stop offset="25%" stopColor="#f59e0b" stopOpacity="0.07" />
+            <stop offset="50%" stopColor="#d97706" stopOpacity="0.03" />
             <stop offset="100%" stopColor="transparent" stopOpacity="0" />
           </radialGradient>
 
-          <radialGradient id="vanishGlow" cx="50%" cy="56%" r="12%" fx="50%" fy="56%">
-            <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.35" />
-            <stop offset="40%" stopColor="#f59e0b" stopOpacity="0.15" />
+          <radialGradient id="vanishGlow" cx="50%" cy="54%" r="8%" fx="50%" fy="54%">
+            <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.25" />
+            <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.08" />
             <stop offset="100%" stopColor="transparent" stopOpacity="0" />
           </radialGradient>
 
-          <linearGradient id="roadSurface" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1e1e1e" />
-            <stop offset="100%" stopColor="#161616" />
-          </linearGradient>
-
-          <linearGradient id="edgeLine" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
-            <stop offset="30%" stopColor="#ffffff" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.35" />
-          </linearGradient>
-
-          <linearGradient id="shoulderGradL" x1="1" y1="0" x2="0" y2="0">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.04" />
-            <stop offset="100%" stopColor="transparent" stopOpacity="0" />
-          </linearGradient>
-
-          <linearGradient id="shoulderGradR" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.04" />
-            <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+          <linearGradient id="convergeLine" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#fbbf24" stopOpacity="0" />
+            <stop offset="30%" stopColor="#fbbf24" stopOpacity="0.08" />
+            <stop offset="100%" stopColor="#fbbf24" stopOpacity="0.25" />
           </linearGradient>
 
           <filter id="glow">
@@ -113,6 +99,14 @@ export const RoadBackground = () => {
 
           <filter id="bigGlow">
             <feGaussianBlur stdDeviation="12" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+
+          <filter id="wideGlow">
+            <feGaussianBlur stdDeviation="6" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
@@ -132,7 +126,7 @@ export const RoadBackground = () => {
 
         <rect width="1920" height="1080" fill="url(#horizonAmbience)" />
 
-        <circle cx="960" cy="600" r="250" fill="#fbbf24" opacity="0.04" filter="url(#bigGlow)" />
+        <circle cx="960" cy="580" r="180" fill="#fbbf24" opacity="0.03" filter="url(#bigGlow)" />
 
         {STARS.map((star, i) => (
           <circle
@@ -146,38 +140,33 @@ export const RoadBackground = () => {
           />
         ))}
 
-        <polygon
-          points="960,580 340,1080 1580,1080"
-          fill="url(#roadSurface)"
-          opacity="0.9"
-        />
+        {CONVERGING_LINES.map((cl, i) => (
+          <line
+            key={`cl${i}`}
+            x1={960}
+            y1={580}
+            x2={cl.endX}
+            y2={1080}
+            stroke="url(#convergeLine)"
+            strokeWidth={cl.w}
+            opacity={cl.o}
+            filter="url(#wideGlow)"
+          />
+        ))}
 
-        <polygon
-          points="960,580 340,1080 200,1080 960,560"
-          fill="url(#shoulderGradL)"
-        />
-        <polygon
-          points="960,580 1580,1080 1720,1080 960,560"
-          fill="url(#shoulderGradR)"
-        />
-
-        <line x1="960" y1="580" x2="650" y2="1080" stroke="url(#edgeLine)" strokeWidth="2.5" />
-        <line x1="960" y1="580" x2="1270" y2="1080" stroke="url(#edgeLine)" strokeWidth="2.5" />
-
-        {DASHES.map((dash, i) => {
-          const t = (dash.y - 580) / 500;
+        {[0.2, 0.4, 0.6, 0.8].map((t, i) => {
+          const y = 580 + t * 500;
+          const halfW = t * 320;
           return (
             <line
-              key={`d${i}`}
-              x1={960}
-              y1={dash.y}
-              x2={960}
-              y2={dash.y + dash.len}
+              key={`h${i}`}
+              x1={960 - halfW}
+              y1={y}
+              x2={960 + halfW}
+              y2={y}
               stroke="#fbbf24"
-              strokeWidth={dash.w}
-              opacity={0.2 + t * 0.5}
-              strokeLinecap="round"
-              filter="url(#glow)"
+              strokeWidth="0.5"
+              opacity={0.03 + t * 0.04}
             />
           );
         })}
@@ -196,16 +185,12 @@ export const RoadBackground = () => {
           />
         ))}
 
-        <rect x="0" y="580" width="1920" height="500" fill="url(#vanishGlow)" opacity="0.5" />
+        <rect x="0" y="480" width="1920" height="600" fill="url(#vanishGlow)" opacity="0.6" />
 
-        <circle cx="920" cy="558" r="3" fill="#fbbf24" opacity="0.4" filter="url(#glow)" />
-        <circle cx="1000" cy="560" r="3" fill="#fbbf24" opacity="0.4" filter="url(#glow)" />
-        <circle cx="870" cy="565" r="2" fill="#ff6b35" opacity="0.2" filter="url(#glow)" />
-        <circle cx="1050" cy="563" r="2" fill="#ff6b35" opacity="0.2" filter="url(#glow)" />
-        <circle cx="940" cy="555" r="1.5" fill="#ffffff" opacity="0.15" filter="url(#glow)" />
-        <circle cx="980" cy="556" r="1.5" fill="#ffffff" opacity="0.15" filter="url(#glow)" />
-        <circle cx="830" cy="570" r="1.5" fill="#fbbf24" opacity="0.12" filter="url(#glow)" />
-        <circle cx="1090" cy="568" r="1.5" fill="#fbbf24" opacity="0.12" filter="url(#glow)" />
+        <circle cx="950" cy="572" r="2" fill="#fbbf24" opacity="0.3" filter="url(#glow)" />
+        <circle cx="970" cy="574" r="2" fill="#fbbf24" opacity="0.3" filter="url(#glow)" />
+        <circle cx="940" cy="578" r="1.5" fill="#fbbf24" opacity="0.15" filter="url(#glow)" />
+        <circle cx="980" cy="576" r="1.5" fill="#fbbf24" opacity="0.15" filter="url(#glow)" />
       </svg>
     </div>
   );
