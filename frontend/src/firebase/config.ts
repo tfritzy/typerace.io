@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCCgYjvH4LSkEW8IY5boFxKfT1XaKcN6-c",
@@ -12,3 +12,7 @@ const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+
+if (import.meta.env.DEV && typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+  connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+}
