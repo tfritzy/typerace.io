@@ -6,11 +6,13 @@ import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { SiteStatsPage } from "./pages/SiteStatsPage";
 import { ToastProvider } from "./hooks/useToast";
 import { ToastContainer } from "./components/Toast";
+import { RacingBackground } from "./components/RacingBackground";
 
 function App() {
   return (
     <ToastProvider>
       <BrowserRouter>
+        <RacingBackground />
         <Routes>
           <Route path="/" element={<LobbyPage />} />
           <Route path="/:lang" element={<LobbyPage />} />

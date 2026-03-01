@@ -291,3 +291,43 @@ body {
   font-style: italic;
   margin-left: -0.2rem;
 }
+
+.racing-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.racing-glow {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(251, 191, 36, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 30% 60%, rgba(251, 191, 36, 0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 70% 30%, rgba(251, 191, 36, 0.03) 0%, transparent 45%);
+}
+
+.racing-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.3) 100%);
+}
+
+.racing-streak {
+  position: absolute;
+  left: -20%;
+  border-radius: 2px;
+  animation: speedStreak linear infinite;
+  will-change: transform;
+}
+
+@keyframes speedStreak {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(120vw + 100%));
+  }
+}
