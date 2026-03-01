@@ -16,23 +16,23 @@ import {
 
 
 export default __t.row({
-  identity: __t.identity().primaryKey(),
-  playerId: __t.string().name("player_id"),
-  name: __t.string(),
-  totalGames: __t.i32().name("total_games"),
-  wins: __t.i32(),
-  level: __t.i32(),
-  xp: __t.i32(),
-  xpRequiredForNextLevel: __t.i32().name("xp_required_for_next_level"),
-  totalWordsTyped: __t.i32().name("total_words_typed"),
-  totalTimeSpentMs: __t.i64().name("total_time_spent_ms"),
-  isBot: __t.bool().name("is_bot"),
+  identity: __t.identity().primaryKey().name("Identity"),
+  playerId: __t.string().name("PlayerId"),
+  name: __t.string().name("Name"),
+  totalGames: __t.i32().name("TotalGames"),
+  wins: __t.i32().name("Wins"),
+  level: __t.i32().name("Level"),
+  xp: __t.i32().name("Xp"),
+  xpRequiredForNextLevel: __t.i32().name("XpRequiredForNextLevel"),
+  totalWordsTyped: __t.i32().name("TotalWordsTyped"),
+  totalTimeSpentMs: __t.i64().name("TotalTimeSpentMs"),
+  isBot: __t.bool().name("IsBot"),
   get botConfig() {
-    return __t.option(BotConfig).name("bot_config");
+    return __t.option(BotConfig).name("BotConfig");
   },
   get color() {
-    return PlayerColor;
+    return PlayerColor.name("Color");
   },
-  isAnonymous: __t.bool().name("is_anonymous"),
-  lastGameDate: __t.i64().name("last_game_date"),
+  isAnonymous: __t.bool().name("IsAnonymous"),
+  lastGameDate: __t.i64().name("LastGameDate"),
 });

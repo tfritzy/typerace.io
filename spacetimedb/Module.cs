@@ -124,6 +124,9 @@ public partial struct GameModeCount
 
 public static partial class Module
 {
+    [SpacetimeDB.Settings]
+    public const CaseConversionPolicy CASE_CONVERSION_POLICY = CaseConversionPolicy.None;
+
     private const long PUBLIC_GAME_COUNTDOWN_MICROSECONDS = 3_000_000;
     private const long PRIVATE_GAME_COUNTDOWN_MICROSECONDS = 5_000_000;
     private const long PRACTICE_GAME_COUNTDOWN_MICROSECONDS = 3_000_000;

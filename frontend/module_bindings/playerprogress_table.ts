@@ -15,23 +15,23 @@ import {
 
 
 export default __t.row({
-  id: __t.string().primaryKey(),
-  playerId: __t.identity().name("player_id"),
-  playerPublicId: __t.string().name("player_public_id"),
-  gameId: __t.string().name("game_id"),
-  playerName: __t.string().name("player_name"),
-  playerLevel: __t.i32().name("player_level"),
-  progressIndex: __t.i32().name("progress_index"),
-  isBot: __t.bool().name("is_bot"),
-  isAnonymous: __t.bool().name("is_anonymous"),
-  createdAt: __t.i64().name("created_at"),
-  characterHistory: __t.byteArray().name("character_history"),
-  time: __t.i64(),
-  placement: __t.i32(),
-  joinCode: __t.string().name("join_code"),
-  wpm: __t.f64(),
+  id: __t.string().primaryKey().name("Id"),
+  playerId: __t.identity().name("PlayerId"),
+  playerPublicId: __t.string().name("PlayerPublicId"),
+  gameId: __t.string().name("GameId"),
+  playerName: __t.string().name("PlayerName"),
+  playerLevel: __t.i32().name("PlayerLevel"),
+  progressIndex: __t.i32().name("ProgressIndex"),
+  isBot: __t.bool().name("IsBot"),
+  isAnonymous: __t.bool().name("IsAnonymous"),
+  createdAt: __t.i64().name("CreatedAt"),
+  characterHistory: __t.byteArray().name("CharacterHistory"),
+  time: __t.i64().name("Time"),
+  placement: __t.i32().name("Placement"),
+  joinCode: __t.string().name("JoinCode"),
+  wpm: __t.f64().name("Wpm"),
   get playerColor() {
-    return PlayerColor.name("player_color");
+    return PlayerColor.name("PlayerColor");
   },
-  highestProgress: __t.i32().name("highest_progress"),
+  highestProgress: __t.i32().name("HighestProgress"),
 });

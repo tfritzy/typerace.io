@@ -224,14 +224,14 @@ const tablesSchema = __schema({
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
-  __reducerSchema("join_game", JoinGameReducer),
-  __reducerSchema("join_private_game", JoinPrivateGameReducer),
-  __reducerSchema("rematch", RematchReducer),
-  __reducerSchema("set_player_color", SetPlayerColorReducer),
-  __reducerSchema("set_player_name", SetPlayerNameReducer),
-  __reducerSchema("start_private_game", StartPrivateGameReducer),
-  __reducerSchema("sync_anonymous_status", SyncAnonymousStatusReducer),
-  __reducerSchema("update_progress", UpdateProgressReducer),
+  __reducerSchema("JoinGame", JoinGameReducer),
+  __reducerSchema("JoinPrivateGame", JoinPrivateGameReducer),
+  __reducerSchema("Rematch", RematchReducer),
+  __reducerSchema("SetPlayerColor", SetPlayerColorReducer),
+  __reducerSchema("SetPlayerName", SetPlayerNameReducer),
+  __reducerSchema("StartPrivateGame", StartPrivateGameReducer),
+  __reducerSchema("SyncAnonymousStatus", SyncAnonymousStatusReducer),
+  __reducerSchema("UpdateProgress", UpdateProgressReducer),
 );
 
 /** The schema information for all procedures in this module. This is defined the same way as the procedures would have been defined in the server. */

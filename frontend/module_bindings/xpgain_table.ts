@@ -15,13 +15,13 @@ import {
 
 
 export default __t.row({
-  id: __t.string().primaryKey(),
-  playerId: __t.identity().name("player_id"),
-  gameId: __t.string().name("game_id"),
-  timestamp: __t.i64(),
-  baseXp: __t.i32().name("base_xp"),
+  id: __t.string().primaryKey().name("Id"),
+  playerId: __t.identity().name("PlayerId"),
+  gameId: __t.string().name("GameId"),
+  timestamp: __t.i64().name("Timestamp"),
+  baseXp: __t.i32().name("BaseXp"),
   get multipliers() {
-    return __t.array(XpMultiplier);
+    return __t.array(XpMultiplier).name("Multipliers");
   },
-  totalXp: __t.i32().name("total_xp"),
+  totalXp: __t.i32().name("TotalXp"),
 });

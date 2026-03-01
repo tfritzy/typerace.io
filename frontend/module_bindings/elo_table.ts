@@ -15,10 +15,10 @@ import {
 
 
 export default __t.row({
-  id: __t.string().primaryKey(),
-  playerId: __t.identity().name("player_id"),
+  id: __t.string().primaryKey().name("Id"),
+  playerId: __t.identity().name("PlayerId"),
   get gameMode() {
-    return GameMode.name("game_mode");
+    return GameMode.name("GameMode");
   },
-  rating: __t.i32(),
+  rating: __t.i32().name("Rating"),
 });

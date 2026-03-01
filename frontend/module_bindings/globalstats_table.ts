@@ -15,12 +15,12 @@ import {
 
 
 export default __t.row({
-  date: __t.string().primaryKey(),
+  date: __t.string().primaryKey().name("Date"),
   get stats() {
-    return __t.array(GameModeCount);
+    return __t.array(GameModeCount).name("Stats");
   },
   get total() {
-    return GameModeCount;
+    return GameModeCount.name("Total");
   },
-  dailyActivePlayers: __t.i32().name("daily_active_players"),
+  dailyActivePlayers: __t.i32().name("DailyActivePlayers"),
 });

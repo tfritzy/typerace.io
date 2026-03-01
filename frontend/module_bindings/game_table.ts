@@ -17,21 +17,21 @@ import {
 
 
 export default __t.row({
-  id: __t.string().primaryKey(),
-  phrase: __t.string(),
-  createdAt: __t.i64().name("created_at"),
-  racingStartedAt: __t.i64().name("racing_started_at"),
-  countdownDurationMs: __t.i64().name("countdown_duration_ms"),
+  id: __t.string().primaryKey().name("Id"),
+  phrase: __t.string().name("Phrase"),
+  createdAt: __t.i64().name("CreatedAt"),
+  racingStartedAt: __t.i64().name("RacingStartedAt"),
+  countdownDurationMs: __t.i64().name("CountdownDurationMs"),
   get state() {
-    return GameState;
+    return GameState.name("State");
   },
   get gameMode() {
-    return GameMode.name("game_mode");
+    return GameMode.name("GameMode");
   },
   get gameType() {
-    return GameType.name("game_type");
+    return GameType.name("GameType");
   },
-  placements: __t.array(__t.identity()),
-  owner: __t.option(__t.identity()),
-  attribution: __t.option(__t.string()),
+  placements: __t.array(__t.identity()).name("Placements"),
+  owner: __t.option(__t.identity()).name("Owner"),
+  attribution: __t.option(__t.string()).name("Attribution"),
 });

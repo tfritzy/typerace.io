@@ -16,22 +16,22 @@ import {
 
 
 export default __t.row({
-  id: __t.string().primaryKey(),
-  playerId: __t.identity().name("player_id"),
-  gameId: __t.string().name("game_id"),
+  id: __t.string().primaryKey().name("Id"),
+  playerId: __t.identity().name("PlayerId"),
+  gameId: __t.string().name("GameId"),
   get gameMode() {
-    return GameMode.name("game_mode");
+    return GameMode.name("GameMode");
   },
   get gameType() {
-    return GameType.name("game_type");
+    return GameType.name("GameType");
   },
-  year: __t.i32(),
-  month: __t.i32(),
-  date: __t.i64(),
-  timeMs: __t.i64().name("time_ms"),
-  placement: __t.i32(),
-  wpm: __t.f64(),
-  xpGained: __t.i32().name("xp_gained"),
-  eloChange: __t.i32().name("elo_change"),
-  day: __t.string(),
+  year: __t.i32().name("Year"),
+  month: __t.i32().name("Month"),
+  date: __t.i64().name("Date"),
+  timeMs: __t.i64().name("TimeMs"),
+  placement: __t.i32().name("Placement"),
+  wpm: __t.f64().name("Wpm"),
+  xpGained: __t.i32().name("XpGained"),
+  eloChange: __t.i32().name("EloChange"),
+  day: __t.string().name("Day"),
 });
