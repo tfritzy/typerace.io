@@ -296,13 +296,8 @@ body {
   background: radial-gradient(ellipse at bottom, #1a1a2e 0%, #0d0d1a 50%, #050510 100%);
 }
 
-.moon {
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #f5f3ce, #e8e4b8 40%, #d4cfa0 70%);
-  box-shadow:
-    0 0 20px rgba(245, 243, 206, 0.3),
-    0 0 60px rgba(245, 243, 206, 0.15),
-    0 0 100px rgba(245, 243, 206, 0.08);
+.horizon-glow {
+  background: linear-gradient(to top, rgba(251, 191, 36, 0.08) 0%, rgba(251, 191, 36, 0.03) 30%, transparent 100%);
 }
 
 @keyframes starTwinkle {
@@ -336,11 +331,11 @@ body {
   position: absolute;
   width: 3px;
   height: 3px;
-  background: white;
+  background: #fbbf24;
   border-radius: 50%;
   animation: shootingStar 1.2s ease-out forwards;
   box-shadow:
-    0 0 4px 1px rgba(255, 255, 255, 0.6),
-    -20px 0 12px rgba(255, 255, 255, 0.3),
-    -40px 0 20px rgba(255, 255, 255, 0.1);
+    0 0 4px 1px rgba(251, 191, 36, 0.6),
+    -20px 0 12px rgba(251, 191, 36, 0.3),
+    -40px 0 20px rgba(251, 191, 36, 0.1);
 }

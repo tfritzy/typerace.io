@@ -64,12 +64,10 @@ export const StarryBackground = () => {
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
       <div className="absolute inset-0 starry-sky" />
 
-      <div className="absolute w-[80px] h-[80px] moon" style={{ top: "8%", right: "10%" }} />
-
       {starsRef.current.map((star, i) => (
         <div
           key={i}
-          className="absolute rounded-full bg-white star-twinkle"
+          className="absolute rounded-full star-twinkle"
           style={{
             left: `${star.x}%`,
             top: `${star.y}%`,
@@ -77,11 +75,14 @@ export const StarryBackground = () => {
             height: `${star.size}px`,
             animationDelay: `${star.twinkleDelay}s`,
             animationDuration: `${star.twinkleDuration}s`,
+            backgroundColor: `rgba(251, 191, 36, ${0.6 + Math.random() * 0.4})`,
           }}
         />
       ))}
 
       <div ref={shootingStarContainerRef} className="absolute inset-0" />
+
+      <div className="absolute inset-x-0 bottom-0 h-[30%] horizon-glow" />
     </div>
   );
 };
