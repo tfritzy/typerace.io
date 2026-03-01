@@ -5,6 +5,7 @@ import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { useToast } from "./useToast";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import type { EventContext } from "../../module_bindings";
+import { getLangPrefix } from "../utils/modes";
 
 export const useFindGame = () => {
   const [isSearching, setIsSearching] = useState(false);
@@ -21,7 +22,7 @@ export const useFindGame = () => {
     const handleInsert = (_ctx: EventContext, progress: PlayerProgress) => {
       if (conn?.identity && progress.playerId.isEqual(conn.identity)) {
         if (progress.joinCode === joinCode) {
-          navigate(`/game/${progress.gameId}`, { replace: true });
+          navigate(`${getLangPrefix()}/game/${progress.gameId}`, { replace: true });
           setIsSearching(false);
           pendingJoinCodeRef.current = null;
         }
