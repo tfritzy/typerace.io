@@ -1,86 +1,35 @@
-const KEYS: {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  r: number;
-  o: number;
-  l?: string;
-}[] = [
-  { x: 120, y: 80, w: 44, h: 44, r: -15, o: 0.07 },
-  { x: 380, y: 55, w: 48, h: 48, r: 8, o: 0.09, l: "E" },
-  { x: 700, y: 85, w: 46, h: 46, r: -6, o: 0.08, l: "T" },
-  { x: 1000, y: 65, w: 44, h: 44, r: 12, o: 0.07 },
-  { x: 1250, y: 90, w: 42, h: 42, r: -10, o: 0.06 },
-
-  { x: 55, y: 250, w: 46, h: 46, r: -20, o: 0.06 },
-  { x: 300, y: 225, w: 50, h: 50, r: 5, o: 0.11, l: "W" },
-  { x: 580, y: 235, w: 48, h: 48, r: -3, o: 0.09, l: "R" },
-  { x: 900, y: 215, w: 52, h: 52, r: 7, o: 0.11, l: "Y" },
-  { x: 1200, y: 245, w: 44, h: 44, r: -12, o: 0.07 },
-
-  { x: 180, y: 395, w: 52, h: 52, r: -8, o: 0.09, l: "A" },
-  { x: 380, y: 375, w: 54, h: 54, r: 2, o: 0.13, l: "S" },
-  { x: 560, y: 385, w: 56, h: 56, r: -1, o: 0.15, l: "D" },
-  { x: 740, y: 380, w: 58, h: 58, r: 1, o: 0.18, l: "F" },
-  { x: 920, y: 385, w: 56, h: 56, r: -2, o: 0.15, l: "J" },
-  { x: 1100, y: 375, w: 52, h: 52, r: 4, o: 0.11, l: "K" },
-  { x: 1280, y: 395, w: 48, h: 48, r: -6, o: 0.08, l: "L" },
-
-  { x: 200, y: 555, w: 48, h: 48, r: 10, o: 0.09, l: "Z" },
-  { x: 480, y: 545, w: 50, h: 50, r: -5, o: 0.11, l: "C" },
-  { x: 750, y: 555, w: 48, h: 48, r: 6, o: 0.09, l: "V" },
-  { x: 1050, y: 550, w: 46, h: 46, r: -8, o: 0.08 },
-
-  { x: 100, y: 715, w: 42, h: 42, r: -18, o: 0.05 },
-  { x: 420, y: 695, w: 46, h: 46, r: 12, o: 0.07 },
-  { x: 650, y: 715, w: 140, h: 48, r: 1, o: 0.09 },
-  { x: 1000, y: 705, w: 44, h: 44, r: -10, o: 0.06 },
-  { x: 1300, y: 725, w: 40, h: 40, r: 14, o: 0.05 },
-];
-
 export const LobbyBackground = () => {
   return (
     <div className="lobby-bg">
       <div className="lobby-bg-glow" />
       <svg
-        className="lobby-bg-keys"
+        className="lobby-bg-svg"
         viewBox="0 0 1400 900"
         preserveAspectRatio="xMidYMid slice"
         fill="none"
-        style={{ color: "var(--color-accent)" }}
       >
-        {KEYS.map((k) => (
-          <g
-            key={`${k.x}-${k.y}`}
-            transform={`translate(${k.x}, ${k.y}) rotate(${k.r}, ${k.w / 2}, ${k.h / 2})`}
-            opacity={k.o}
-          >
-            <rect
-              width={k.w}
-              height={k.h}
-              rx={8}
-              stroke="currentColor"
-              strokeWidth={1.5}
-              fill="currentColor"
-              fillOpacity={0.15}
-            />
-            {k.l && (
-              <text
-                x={k.w / 2}
-                y={k.h / 2 + 1}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fill="currentColor"
-                fontSize={k.w > 100 ? 12 : 16}
-                fontWeight={500}
-                fontFamily="system-ui, sans-serif"
-              >
-                {k.l}
-              </text>
-            )}
-          </g>
-        ))}
+        <defs>
+          <linearGradient id="streak-fade" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="var(--color-accent)" stopOpacity="0" />
+            <stop offset="15%" stopColor="var(--color-accent)" stopOpacity="1" />
+            <stop offset="85%" stopColor="var(--color-accent)" stopOpacity="1" />
+            <stop offset="100%" stopColor="var(--color-accent)" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+
+        <path d="M0,340 Q350,310 700,335 T1400,300" stroke="url(#streak-fade)" strokeWidth="1.5" opacity="0.12" />
+        <path d="M0,380 Q350,360 700,375 T1400,350" stroke="url(#streak-fade)" strokeWidth="2" opacity="0.18" />
+        <path d="M0,420 Q350,400 700,415 T1400,390" stroke="url(#streak-fade)" strokeWidth="2.5" opacity="0.22" />
+        <path d="M0,450 Q350,435 700,448 T1400,425" stroke="url(#streak-fade)" strokeWidth="3" opacity="0.28" />
+        <path d="M0,475 Q350,465 700,473 T1400,455" stroke="url(#streak-fade)" strokeWidth="2.5" opacity="0.22" />
+        <path d="M0,510 Q350,500 700,508 T1400,490" stroke="url(#streak-fade)" strokeWidth="2" opacity="0.18" />
+        <path d="M0,550 Q350,535 700,545 T1400,525" stroke="url(#streak-fade)" strokeWidth="1.5" opacity="0.12" />
+
+        <path d="M100,370 Q400,345 750,365 T1300,340" stroke="url(#streak-fade)" strokeWidth="1" opacity="0.08" />
+        <path d="M50,490 Q400,475 750,488 T1350,470" stroke="url(#streak-fade)" strokeWidth="1" opacity="0.08" />
+
+        <path d="M200,430 Q500,415 800,428 T1200,410" stroke="var(--color-accent)" strokeWidth="1" opacity="0.06" strokeDasharray="4 12" />
+        <path d="M150,460 Q500,450 850,458 T1250,445" stroke="var(--color-accent)" strokeWidth="1" opacity="0.06" strokeDasharray="4 12" />
       </svg>
     </div>
   );
