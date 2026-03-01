@@ -1,133 +1,128 @@
-const ROWS: string[][] = [
-  ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="],
-  ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]"],
-  ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'"],
-  ["Z", "X", "C", "V", "B", "N", "M", ",", ".", "/"],
-];
+import { useEffect, useRef } from "react";
 
-const ROW_OFFSETS = [0, 0.5, 0.85, 1.35];
+const AMBER = [251, 191, 36] as const;
+const STREAK_COUNT = 22;
+const SPAWN_X_OFFSET = 400;
+const VERTICAL_PAD = 24;
+const MIN_LENGTH = 24;
+const MAX_LENGTH_DEPTH_SCALE = 320;
+const MAX_LENGTH_RANDOM = 80;
+const BASE_SPEED = 0.4;
+const MAX_SPEED_DEPTH_SCALE = 9;
+const MAX_SPEED_RANDOM = 2;
+const MIN_OPACITY = 0.025;
+const MAX_OPACITY_DEPTH_SCALE = 0.24;
+const MAX_OPACITY_RANDOM = 0.05;
+const MIN_WIDTH = 0.4;
+const MAX_WIDTH_DEPTH_SCALE = 2.8;
+const GRADIENT_MID_STOP = 0.55;
+const MID_OPACITY_MULTIPLIER = 0.28;
+const GLOW_OPACITY_THRESHOLD = 0.09;
+const GLOW_RADIUS_MULTIPLIER = 5;
+const GLOW_OPACITY_MULTIPLIER = 1.6;
 
-const HOME_ROW_KEYS = new Set(["A", "S", "D", "F", "J", "K", "L", ";"]);
+type Streak = {
+  x: number;
+  y: number;
+  length: number;
+  speed: number;
+  opacity: number;
+  width: number;
+};
 
-const KEY_SIZE = 52;
-const GAP = 6;
-const UNIT = KEY_SIZE + GAP;
-const PAD = 20;
-
-const BOARD_WIDTH = PAD + 12 * UNIT + PAD;
-const ROWS_HEIGHT = ROWS.length * UNIT;
-const SPACE_ROW_HEIGHT = UNIT;
-const BOARD_HEIGHT = PAD + ROWS_HEIGHT + SPACE_ROW_HEIGHT + PAD;
-
-const AMBER = "251, 191, 36";
+function makeStreak(w: number, h: number): Streak {
+  const depth = Math.pow(Math.random(), 1.5);
+  return {
+    x: Math.random() * (w + SPAWN_X_OFFSET),
+    y: VERTICAL_PAD + Math.random() * (h - VERTICAL_PAD * 2),
+    length: MIN_LENGTH + depth * MAX_LENGTH_DEPTH_SCALE + Math.random() * MAX_LENGTH_RANDOM,
+    speed: BASE_SPEED + depth * MAX_SPEED_DEPTH_SCALE + Math.random() * MAX_SPEED_RANDOM,
+    opacity: MIN_OPACITY + depth * MAX_OPACITY_DEPTH_SCALE + Math.random() * MAX_OPACITY_RANDOM,
+    width: MIN_WIDTH + depth * MAX_WIDTH_DEPTH_SCALE,
+  };
+}
 
 export const KeyboardBackground = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let w = 0;
+    let h = 0;
+    let streaks: Streak[] = [];
+    let animId: number;
+
+    const init = () => {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w;
+      canvas.height = h;
+      streaks = Array.from({ length: STREAK_COUNT }, () => makeStreak(w, h));
+    };
+
+    init();
+    window.addEventListener("resize", init);
+
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+
+      for (const s of streaks) {
+        s.x += s.speed;
+
+        if (s.x - s.length > w) {
+          const next = makeStreak(w, h);
+          next.x = -next.length;
+          next.y = VERTICAL_PAD + Math.random() * (h - VERTICAL_PAD * 2);
+          Object.assign(s, next);
+        }
+
+        const [r, g, b] = AMBER;
+        const grad = ctx.createLinearGradient(s.x - s.length, s.y, s.x + 2, s.y);
+        grad.addColorStop(0, `rgba(${r},${g},${b},0)`);
+        grad.addColorStop(GRADIENT_MID_STOP, `rgba(${r},${g},${b},${s.opacity * MID_OPACITY_MULTIPLIER})`);
+        grad.addColorStop(1, `rgba(${r},${g},${b},${s.opacity})`);
+
+        ctx.beginPath();
+        ctx.moveTo(s.x - s.length, s.y);
+        ctx.lineTo(s.x, s.y);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = s.width;
+        ctx.lineCap = "round";
+        ctx.stroke();
+
+        if (s.opacity > GLOW_OPACITY_THRESHOLD) {
+          const glowR = s.width * GLOW_RADIUS_MULTIPLIER;
+          const glow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, glowR);
+          glow.addColorStop(0, `rgba(${r},${g},${b},${s.opacity * GLOW_OPACITY_MULTIPLIER})`);
+          glow.addColorStop(1, `rgba(${r},${g},${b},0)`);
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, glowR, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      animId = requestAnimationFrame(draw);
+    };
+
+    animId = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", init);
+    };
+  }, []);
+
   return (
-    <div
-      className="absolute inset-0 overflow-hidden pointer-events-none select-none"
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 pointer-events-none"
       aria-hidden="true"
-    >
-      <div
-        style={{
-          position: "absolute",
-          bottom: "-40px",
-          left: "50%",
-          transform:
-            "translateX(-50%) perspective(1100px) rotateX(42deg)",
-          transformOrigin: "bottom center",
-        }}
-      >
-        <svg
-          width={BOARD_WIDTH}
-          height={BOARD_HEIGHT}
-          viewBox={`0 0 ${BOARD_WIDTH} ${BOARD_HEIGHT}`}
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <filter id="kb-glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="4" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-            <radialGradient id="board-fade" cx="50%" cy="50%" r="55%">
-              <stop offset="0%" stopColor={`rgba(${AMBER}, 0.06)`} />
-              <stop offset="100%" stopColor={`rgba(${AMBER}, 0.01)`} />
-            </radialGradient>
-          </defs>
-
-          <rect
-            x={0}
-            y={0}
-            width={BOARD_WIDTH}
-            height={BOARD_HEIGHT}
-            rx={14}
-            fill="url(#board-fade)"
-            stroke={`rgba(${AMBER}, 0.18)`}
-            strokeWidth={1.5}
-          />
-
-          {ROWS.map((row, rowIdx) =>
-            row.map((label, colIdx) => {
-              const isHome = HOME_ROW_KEYS.has(label);
-              const x = PAD + (colIdx + ROW_OFFSETS[rowIdx]) * UNIT;
-              const y = PAD + rowIdx * UNIT;
-              return (
-                <g
-                  key={`${rowIdx}-${colIdx}`}
-                  filter={isHome ? "url(#kb-glow)" : undefined}
-                >
-                  <rect
-                    x={x}
-                    y={y}
-                    width={KEY_SIZE}
-                    height={KEY_SIZE}
-                    rx={7}
-                    fill={
-                      isHome
-                        ? `rgba(${AMBER}, 0.12)`
-                        : `rgba(${AMBER}, 0.04)`
-                    }
-                    stroke={
-                      isHome
-                        ? `rgba(${AMBER}, 0.55)`
-                        : `rgba(${AMBER}, 0.22)`
-                    }
-                    strokeWidth={1}
-                  />
-                  <text
-                    x={x + KEY_SIZE / 2}
-                    y={y + KEY_SIZE / 2 + 5}
-                    textAnchor="middle"
-                    fill={
-                      isHome
-                        ? `rgba(${AMBER}, 0.75)`
-                        : `rgba(${AMBER}, 0.35)`
-                    }
-                    fontSize={13}
-                    fontFamily="JetBrains Mono, ui-monospace, monospace"
-                    fontWeight={isHome ? 400 : 200}
-                  >
-                    {label}
-                  </text>
-                </g>
-              );
-            })
-          )}
-
-          <rect
-            x={PAD + ROW_OFFSETS[3] * UNIT + 2.5 * UNIT}
-            y={PAD + ROWS.length * UNIT}
-            width={5.5 * UNIT}
-            height={KEY_SIZE}
-            rx={7}
-            fill={`rgba(${AMBER}, 0.04)`}
-            stroke={`rgba(${AMBER}, 0.22)`}
-            strokeWidth={1}
-          />
-        </svg>
-      </div>
-    </div>
+    />
   );
 };
+
