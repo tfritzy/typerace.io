@@ -102,11 +102,14 @@ function addHreflangToBase(baseHtml: string): string {
 }
 
 export default function i18nHtmlPlugin(): Plugin {
+    let originalHtml: string;
+
     return {
         name: 'i18n-html',
         transformIndexHtml: {
             order: 'pre',
             handler(html) {
+                originalHtml = html;
                 return addHreflangToBase(html);
             },
         },
@@ -116,19 +119,28 @@ export default function i18nHtmlPlugin(): Plugin {
 
             if (!fs.existsSync(baseHtmlPath)) return;
 
-            const baseHtml = fs.readFileSync(baseHtmlPath, 'utf-8');
+            const builtBaseHtml = fs.readFileSync(baseHtmlPath, 'utf-8');
 
             for (const lang of languagePages) {
                 const langDir = path.join(distDir, lang.slug);
                 fs.mkdirSync(langDir, { recursive: true });
 
-                const originalBaseHtml = baseHtml
-                    .replace('<link rel="canonical" href="https://typerace.io/" />', '')
-                    .replace(/<\s*link rel="alternate" hreflang=".*?" href=".*?" \/>\s*/g, '')
-                    .replace(/\n\s*\n\s*\n/g, '\n');
-
-                const langHtml = generateLanguageHtml(originalBaseHtml, lang);
-                fs.writeFileSync(path.join(langDir, 'index.html'), langHtml);
+                const langHtml = generateLanguageHtml(originalHtml || builtBaseHtml, lang);
+                const finalHtml = langHtml.replace(
+                    /(<script type="module".*?src=")\/src\/main\.tsx(".*?<\/script>)/,
+                    (_match, prefix, suffix) => {
+                        const scriptTag = builtBaseHtml.match(/<script type="module"[^>]*src="([^"]*)"[^>]*><\/script>/);
+                        return scriptTag ? `<script type="module" crossorigin src="${scriptTag[1]}"></script>` : `${prefix}/src/main.tsx${suffix}`;
+                    }
+                );
+                const withCss = (() => {
+                    const cssLink = builtBaseHtml.match(/<link rel="stylesheet" crossorigin href="([^"]*)">/);
+                    if (cssLink && !finalHtml.includes(cssLink[1])) {
+                        return finalHtml.replace('</head>', `  <link rel="stylesheet" crossorigin href="${cssLink[1]}">\n  </head>`);
+                    }
+                    return finalHtml;
+                })();
+                fs.writeFileSync(path.join(langDir, 'index.html'), withCss);
             }
         },
     };
