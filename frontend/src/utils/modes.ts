@@ -234,20 +234,20 @@ const languageStartupPhrases: Record<Language, string[]> = {
   [Language.Python]: [
     "import antigravity",
     "pip install",
-    "hello, world",
+    "def main():",
     "it's snake time",
     "python -m game",
   ],
   [Language.CSharp]: [
     "using System;",
     "new Game()",
-    "Ctrl+Shift+B",
+    "dotnet run",
     "Console.WriteLine",
     "await Task.WhenAll",
   ],
   [Language.TypeScript]: [
     "tsc --watch",
-    "interface Props {",
+    "export type",
     "const fn = () =>",
     "npm run dev",
     "await Promise.all",

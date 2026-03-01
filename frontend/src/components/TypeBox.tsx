@@ -9,6 +9,8 @@ import React, {
 import { Cursor } from "./Cursor";
 import { codeToTokens } from "shiki";
 
+const separators = [" ", "\n"];
+
 type TypeBoxProps = {
   phrase: string;
   attribution?: string;
@@ -52,8 +54,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const [isComplete, setIsComplete] = useState(false);
     const [hasReachedErrorLimit, setHasReachedErrorLimit] = useState(false);
     const [tokenColors, setTokenColors] = useState<string[]>([]);
-
-    const separators = [" ", "\n"];
 
     const targetRef = useRef<HTMLElement>(null);
     const phraseRef = useRef<HTMLDivElement>(null);
