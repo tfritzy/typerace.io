@@ -6,7 +6,7 @@ import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
 import { GameOptionsSelector, type GameTypeValue } from "../components/ModeSelector";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
-import { getRandomStartupPhrase, getLanguageFromSlug, getContentTypeFromMode } from "../utils/modes";
+import { getRandomStartupPhrase, getLanguageFromSlug, getContentTypeFromMode, storeLangSlug } from "../utils/modes";
 import { useFindGame } from "../hooks/useFindGame";
 
 const GAME_TYPE_KEY = "typerace_game_type";
@@ -42,6 +42,8 @@ export const LobbyPage = () => {
   const typeBoxRef = useRef<TypeBoxRef>(null);
   const { findGame } = useFindGame();
   const currentLang = getLanguageFromSlug(lang);
+
+  useMemo(() => storeLangSlug(currentLang.slug), [currentLang.slug]);
 
   const handleModeSelect = useCallback((mode: GameMode) => {
     setSelectedMode(mode);

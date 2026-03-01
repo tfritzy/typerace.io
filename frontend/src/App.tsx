@@ -15,6 +15,7 @@ function App() {
           <Route path="/" element={<LobbyPage />} />
           <Route path="/:lang" element={<LobbyPage />} />
           <Route path="/game/:gameId" element={<GamePage />} />
+          <Route path="/:lang/game/:gameId" element={<GamePage />} />
           <Route path="/profile/:playerId" element={<ProfilePage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/stats" element={<SiteStatsPage />} />
