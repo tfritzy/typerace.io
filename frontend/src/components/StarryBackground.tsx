@@ -3,6 +3,8 @@ import { useEffect, useRef } from "react";
 const STAR_COUNT = 200;
 const SHOOTING_STAR_INTERVAL_MIN = 4000;
 const SHOOTING_STAR_INTERVAL_MAX = 10000;
+const MIN_STAR_OPACITY = 0.6;
+const STAR_OPACITY_RANGE = 0.4;
 
 interface Star {
   x: number;
@@ -75,7 +77,7 @@ export const StarryBackground = () => {
             height: `${star.size}px`,
             animationDelay: `${star.twinkleDelay}s`,
             animationDuration: `${star.twinkleDuration}s`,
-            backgroundColor: `rgba(251, 191, 36, ${0.6 + Math.random() * 0.4})`,
+            backgroundColor: `rgba(251, 191, 36, ${MIN_STAR_OPACITY + Math.random() * STAR_OPACITY_RANGE})`,
           }}
         />
       ))}
