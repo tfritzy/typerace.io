@@ -6,10 +6,17 @@ import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { SiteStatsPage } from "./pages/SiteStatsPage";
 import { ToastProvider } from "./hooks/useToast";
 import { ToastContainer } from "./components/Toast";
+import { useFirestoreSync } from "./firebase/useFirestoreSync";
+
+function FirestoreSync() {
+  useFirestoreSync();
+  return null;
+}
 
 function App() {
   return (
     <ToastProvider>
+      <FirestoreSync />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LobbyPage />} />

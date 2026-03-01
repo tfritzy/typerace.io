@@ -1376,18 +1376,32 @@ public static partial class Module
     {
         var fiveMinutesAgo = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 300_000_000;
 
+        var gamesToDelete = new List<Game>();
         foreach (var game in ctx.Db.game.State.Filter(GameState.Racing))
         {
             if (game.CreatedAt < fiveMinutesAgo)
             {
-                UpdateGlobalStatsForGame(ctx, game);
-
-                var updatedGame = game;
-                updatedGame.State = GameState.Archived;
-                ctx.Db.game.Id.Update(updatedGame);
-
-                Log.Info($"Game {game.Id} transitioned to Archived state");
+                gamesToDelete.Add(game);
             }
+        }
+
+        foreach (var game in gamesToDelete)
+        {
+            UpdateGlobalStatsForGame(ctx, game);
+
+            var progressToDelete = new List<PlayerProgress>();
+            foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
+            {
+                progressToDelete.Add(progress);
+            }
+            foreach (var progress in progressToDelete)
+            {
+                ctx.Db.playerprogress.Id.Delete(progress.Id);
+            }
+
+            ctx.Db.game.Id.Delete(game.Id);
+
+            Log.Info($"Game {game.Id} deleted");
         }
     }
 

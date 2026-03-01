@@ -1,6 +1,5 @@
-import { type Player, type GameRecord, type PlayerColor } from "../types/stdb";
-import { WpmChart } from "../components/WpmChart";
-import { useEffect, useMemo, useState } from "react";
+import { type Player, type PlayerColor } from "../types/stdb";
+import { useEffect, useState } from "react";
 import { Header } from "../components/Header";
 import { PlayerAvatar } from "../components/PlayerAvatar";
 import { useParams, useNavigate } from "react-router-dom";
@@ -10,19 +9,12 @@ import { EditNameModal } from "../components/EditNameModal";
 import { EditColorModal } from "../components/EditColorModal";
 import { formatNumber, formatTimeSpent } from "../utils/formatters";
 import { useAuth } from "../firebase/AuthContext";
-import { Select } from "../components/Select";
-import { RecentGames } from "../components/RecentGames";
 import { useDatabase } from "../contexts/SpacetimeContext";
-
-type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
 export const ProfilePage = () => {
     const { playerId } = useParams<{ playerId: string }>();
     const conn = useDatabase();
     const [viewedPlayer, setViewedPlayer] = useState<Player | null>(null);
-    const [gameRecords, setGameRecords] = useState<GameRecord[]>([]);
-    const [selectedMode, setSelectedMode] = useState<string>('all');
-    const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('all');
     const [isEditNameModalOpen, setIsEditNameModalOpen] = useState(false);
     const [isEditColorModalOpen, setIsEditColorModalOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -64,30 +56,6 @@ export const ProfilePage = () => {
             subscription.unsubscribe();
         };
     }, [conn, playerId]);
-
-    useEffect(() => {
-        if (!conn || !playerId) return;
-
-        const handleGameRecordInsert = (_ctx: any, record: GameRecord) => {
-            if (record.playerId.toHexString() === playerId) {
-                setGameRecords(prev => [...prev, record]);
-            }
-        };
-
-        conn.db.gamerecord.onInsert(handleGameRecordInsert);
-
-        const subscription = conn.subscriptionBuilder()
-            .onApplied(() => {
-                const records = Array.from(conn.db.gamerecord.iter());
-                setGameRecords(records);
-            })
-            .subscribe([`SELECT * FROM gamerecord WHERE PlayerId = '${viewedPlayer?.identity}'`]);
-
-        return () => {
-            conn.db.gamerecord.removeOnInsert(handleGameRecordInsert);
-            subscription.unsubscribe();
-        };
-    }, [conn, viewedPlayer?.identity]);
 
     useEffect(() => {
         if (viewedPlayer && viewedPlayer.isAnonymous) {
@@ -135,62 +103,6 @@ export const ProfilePage = () => {
             setIsMenuClosing(false);
         }, 150);
     };
-
-    const getTimeFrameFilter = (timeFrame: TimeFrame): number => {
-        const now = Date.now() * 1000;
-        switch (timeFrame) {
-            case 'today':
-                const startOfDay = new Date();
-                startOfDay.setHours(0, 0, 0, 0);
-                return startOfDay.getTime() * 1000;
-            case 'week':
-                return now - (7 * 24 * 60 * 60 * 1000 * 1000);
-            case 'month':
-                return now - (30 * 24 * 60 * 60 * 1000 * 1000);
-            case '3months':
-                return now - (90 * 24 * 60 * 60 * 1000 * 1000);
-            default:
-                return 0;
-        }
-    };
-
-    const realGameData = useMemo(() => {
-        if (!viewedPlayer) return [];
-
-        let playerStats = gameRecords.filter(stat =>
-            stat.playerId.isEqual(viewedPlayer.identity)
-        );
-
-        if (selectedMode !== 'all') {
-            playerStats = playerStats.filter(stat => stat.gameMode.tag === selectedMode);
-        }
-
-        if (selectedTimeFrame !== 'all') {
-            const cutoffTime = getTimeFrameFilter(selectedTimeFrame);
-            playerStats = playerStats.filter(stat => stat.date >= cutoffTime);
-        }
-
-        return playerStats.sort((a, b) => {
-            if (a.timeMs < b.timeMs) {
-                return -1;
-            }
-            if (a.timeMs > b.timeMs) {
-                return 1;
-            }
-            return 0;
-        });
-    }, [gameRecords, viewedPlayer, selectedMode, selectedTimeFrame]);
-
-    const availableModes = useMemo(() => {
-        if (!viewedPlayer) return [];
-
-        const modesSet = new Set<string>();
-        gameRecords
-            .filter(stat => stat.playerId.isEqual(viewedPlayer.identity))
-            .forEach(stat => modesSet.add(stat.gameMode.tag));
-
-        return Array.from(modesSet).sort();
-    }, [gameRecords, viewedPlayer]);
 
     return (
         <div className="min-h-screen">
@@ -342,53 +254,6 @@ export const ProfilePage = () => {
                                 </div>
                             </>
                         )}
-                    </div>
-
-                    <div>
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-white text-2xl font-bold m-0">
-                                Performance History
-                            </h2>
-
-                            <div className="flex gap-3 items-center">
-                                <Select
-                                    label="Mode"
-                                    value={selectedMode}
-                                    onChange={setSelectedMode}
-                                    options={[
-                                        { value: 'all', label: 'All Modes' },
-                                        ...availableModes.map(mode => ({
-                                            value: mode,
-                                            label: mode.replace(/(\d+)/, ' $1')
-                                        }))
-                                    ]}
-                                />
-
-                                <Select
-                                    label="Time Frame"
-                                    value={selectedTimeFrame}
-                                    onChange={(value) => setSelectedTimeFrame(value as TimeFrame)}
-                                    options={[
-                                        { value: 'all', label: 'All Time' },
-                                        { value: 'today', label: 'Today' },
-                                        { value: 'week', label: 'Last Week' },
-                                        { value: 'month', label: 'Last Month' },
-                                        { value: '3months', label: 'Last 3 Months' }
-                                    ]}
-                                />
-                            </div>
-                        </div>
-
-                        <WpmChart
-                            data={realGameData}
-                        />
-                    </div>
-
-                    <div className="mt-8">
-                        <h2 className="text-white text-2xl font-bold mb-6">
-                            Recent Games
-                        </h2>
-                        <RecentGames gameRecords={realGameData} />
                     </div>
                 </div>
             </div>
