@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { DbConnection } from "../../module_bindings";
-import { type GameMode, type Reducers } from "../types/stdb";
+import { type GameMode } from "../types/stdb";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { useFindGame } from "../hooks/useFindGame";
 
@@ -21,7 +21,7 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
 
   const handleRematch = useCallback(() => {
     if (conn && gameId && canRematch) {
-      ((conn.reducers as unknown) as Reducers).Rematch({ gameId });
+      conn.reducers.rematch({ gameId });
     }
   }, [conn, gameId, canRematch]);
 

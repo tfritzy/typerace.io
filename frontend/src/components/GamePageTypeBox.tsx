@@ -1,7 +1,6 @@
 import { memo, useCallback, useRef, useState } from "react";
 import { TypeBox, type TypeBoxRef } from "./TypeBox";
 import type { DbConnection } from "../../module_bindings";
-import type { Reducers } from "../types/stdb";
 import { WordXpIndicator } from "./WordXpIndicator";
 
 interface XpIndicatorInstance {
@@ -44,7 +43,7 @@ export const GamePageTypeBox = memo(
         if (!conn || !gameId) return;
 
         const eventTypeEnum = { tag: eventType };
-        ((conn.reducers as unknown) as Reducers).UpdateProgress({
+        conn.reducers.updateProgress({
             gameId,
             newIndex: correctCharCount,
             eventType: eventTypeEnum

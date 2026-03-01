@@ -3,7 +3,6 @@ import { useEffect, useCallback, useState } from "react";
 import {
   type Game,
   type PlayerProgress,
-  type Reducers,
 } from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
@@ -168,7 +167,7 @@ export const GamePage = () => {
       );
 
       if (!hasProgress) {
-        ((conn.reducers as unknown) as Reducers).JoinPrivateGame({ gameId });
+        conn.reducers.joinPrivateGame({ gameId });
       }
     }
   }, [conn, game, gameId, gamePlayerProgress]);

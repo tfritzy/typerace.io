@@ -223,17 +223,22 @@ const tablesSchema = __schema({
   }, XpGainRow),
 });
 
-/** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
+function __fixedReducerSchema<N extends string, P extends Record<string, any>>(name: N, params: P) {
+  const schema = __reducerSchema(name, params);
+  const camelName = name.charAt(0).toLowerCase() + name.slice(1);
+  return Object.assign({}, schema, { accessorName: camelName as any });
+}
+
 const reducersSchema = __reducers(
-  __reducerSchema("JoinGame", JoinGameReducer),
-  __reducerSchema("JoinPrivateGame", JoinPrivateGameReducer),
-  __reducerSchema("MigrateToV2", MigrateToV2Reducer),
-  __reducerSchema("Rematch", RematchReducer),
-  __reducerSchema("SetPlayerColor", SetPlayerColorReducer),
-  __reducerSchema("SetPlayerName", SetPlayerNameReducer),
-  __reducerSchema("StartPrivateGame", StartPrivateGameReducer),
-  __reducerSchema("SyncAnonymousStatus", SyncAnonymousStatusReducer),
-  __reducerSchema("UpdateProgress", UpdateProgressReducer),
+  __fixedReducerSchema("JoinGame", JoinGameReducer),
+  __fixedReducerSchema("JoinPrivateGame", JoinPrivateGameReducer),
+  __fixedReducerSchema("MigrateToV2", MigrateToV2Reducer),
+  __fixedReducerSchema("Rematch", RematchReducer),
+  __fixedReducerSchema("SetPlayerColor", SetPlayerColorReducer),
+  __fixedReducerSchema("SetPlayerName", SetPlayerNameReducer),
+  __fixedReducerSchema("StartPrivateGame", StartPrivateGameReducer),
+  __fixedReducerSchema("SyncAnonymousStatus", SyncAnonymousStatusReducer),
+  __fixedReducerSchema("UpdateProgress", UpdateProgressReducer),
 );
 
 /** The schema information for all procedures in this module. This is defined the same way as the procedures would have been defined in the server. */

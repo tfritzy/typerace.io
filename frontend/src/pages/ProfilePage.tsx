@@ -1,4 +1,4 @@
-import { type Player, type GameRecord, type PlayerColor, type Reducers } from "../types/stdb";
+import { type Player, type GameRecord, type PlayerColor } from "../types/stdb";
 import { WpmChart } from "../components/WpmChart";
 import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
@@ -97,13 +97,13 @@ export const ProfilePage = () => {
 
     const handleNameSave = (name: string) => {
         if (!conn) return;
-        ((conn.reducers as unknown) as Reducers).SetPlayerName({ name });
+        conn.reducers.setPlayerName({ name });
         setIsEditNameModalOpen(false);
     };
 
     const handleColorSave = (color: PlayerColor['tag']) => {
         if (!conn) return;
-        ((conn.reducers as unknown) as Reducers).SetPlayerColor({ color: { tag: color } as PlayerColor });
+        conn.reducers.setPlayerColor({ color: { tag: color } as PlayerColor });
         setIsEditColorModalOpen(false);
     };
 

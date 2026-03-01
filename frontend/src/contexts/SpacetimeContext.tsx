@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { DbConnection } from '../../module_bindings';
 import { useAuth } from '../firebase/AuthContext';
 import { LoadingDots } from '../components/LoadingDots';
-import type { Reducers } from '../types/stdb';
 
 interface SpacetimeProviderProps {
     children: React.ReactNode;
@@ -51,7 +50,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
             const connection = builder
                 .onConnect((conn) => {
                     console.log('Connected to SpacetimeDB');
-                    ((conn.reducers as unknown) as Reducers).SyncAnonymousStatus({ isAnonymous: user?.isAnonymous ?? true });
+                    conn.reducers.syncAnonymousStatus({ isAnonymous: user?.isAnonymous ?? true });
                     setConn(conn);
                     setShowReconnectModal(false);
                     setIsReconnecting(false);
