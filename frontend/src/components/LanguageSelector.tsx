@@ -39,12 +39,15 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                 <span className="text-xl leading-none">{currentLang.flag}</span>
             </button>
 
-            {isOpen && (
-                <div
-                    ref={menuRef}
-                    className="absolute bottom-16 left-0 rounded-xl border border-white/15 p-2 min-w-[180px] max-h-[70vh] overflow-y-auto"
-                    style={{ backgroundColor: "var(--color-box-bg)" }}
-                >
+            <div
+                ref={menuRef}
+                className={`absolute bottom-16 left-0 rounded-xl border border-white/15 p-2 min-w-[180px] max-h-[70vh] overflow-y-auto transition-all ${
+                    isOpen
+                        ? "opacity-100 visible"
+                        : "opacity-0 invisible pointer-events-none"
+                }`}
+                style={{ backgroundColor: "var(--color-box-bg)" }}
+            >
                     {languages.map((lang) => {
                         const href = lang.slug ? `/${lang.slug}` : "/";
                         const isSelected = lang.language === currentLang.language;
@@ -65,7 +68,6 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                         );
                     })}
                 </div>
-            )}
         </div>
     );
 }
