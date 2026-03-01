@@ -291,3 +291,27 @@ body {
   font-style: italic;
   margin-left: -0.2rem;
 }
+
+.lobby-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.lobby-bg-glow {
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(ellipse at 50% 45%, var(--color-accent) 0%, transparent 50%);
+  opacity: 0.1;
+}
+
+.lobby-bg-keys {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 80%);
+}

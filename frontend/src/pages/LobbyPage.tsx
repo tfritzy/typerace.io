@@ -7,6 +7,7 @@ import { GameOptionsSelector, type GameTypeValue } from "../components/ModeSelec
 import { LanguageSelector } from "../components/LanguageSelector";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import { LobbyBackground } from "../components/LobbyBackground";
 import { getRandomStartupPhrase, getLanguageFromSlug, getContentTypeFromMode, storeLangSlug } from "../utils/modes";
 import { useFindGame } from "../hooks/useFindGame";
 
@@ -73,6 +74,7 @@ export const LobbyPage = () => {
 
   return (
     <div className="relative h-screen flex flex-col overflow-hidden">
+      <LobbyBackground />
       <Header />
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="content-container">
