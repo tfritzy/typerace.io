@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import "../components/SelectionButton.css";
 import { type GameMode } from "../types/stdb";
 import { ChevronUp, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
-import { languages, getContentTypeFromMode, type ContentTypeValue } from "../utils/modes";
+import { languages, getContentTypeFromMode, type ContentTypeValue, type LanguageInfo } from "../utils/modes";
 
 export type GameTypeValue = "Public" | "Private" | "Practice";
 
@@ -11,17 +11,16 @@ interface GameOptionsSelectorProps {
     onModeSelect: (mode: GameMode) => void;
     gameType: GameTypeValue;
     setGameType: (value: GameTypeValue) => void;
+    currentLang: LanguageInfo;
 }
 
-export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setGameType }: GameOptionsSelectorProps) {
+export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setGameType, currentLang }: GameOptionsSelectorProps) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [contentType, setContentType] = useState<ContentTypeValue>(() => getContentTypeFromMode(selectedMode.tag));
 
     const selectedLanguage = useMemo(() => {
-        return languages.find(l =>
-            l.randomWordsMode === selectedMode.tag || l.quotesMode === selectedMode.tag
-        ) || languages[0];
-    }, [selectedMode.tag]);
+        return currentLang;
+    }, [currentLang]);
 
     const quotesAvailableForLanguage = selectedLanguage.quotesMode !== null;
 
@@ -90,23 +89,18 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     <h2 className="text-white/50 text-sm font-medium mb-2">Language</h2>
                     <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2">
                         {languages.map((lang) => {
-                            const mode = contentType === "Quotes" ? lang.quotesMode : lang.randomWordsMode;
-                            const isDisabled = contentType === "Quotes" && !lang.quotesMode;
+                            const href = lang.slug ? `/${lang.slug}` : "/";
+                            const isSelected = lang.language === currentLang.language;
 
                             return (
-                                <button
+                                <a
                                     key={lang.language}
-                                    className={`selection-button ${selectedMode.tag === mode ? "selected" : ""}`}
-                                    onClick={() => {
-                                        if (mode) {
-                                            onModeSelect({ tag: mode } as GameMode);
-                                        }
-                                    }}
-                                    disabled={isDisabled}
+                                    href={href}
+                                    className={`selection-button ${isSelected ? "selected" : ""}`}
                                 >
                                     <span className="flag leading-none">{lang.flag}</span>
-                                    <span>{lang.language}</span>
-                                </button>
+                                    <span>{lang.nativeName}</span>
+                                </a>
                             );
                         })}
                     </div>
@@ -126,7 +120,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                         <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>
                             {selectedLanguage.flag}
                         </span>
-                        <span>{selectedLanguage.language}</span>
+                        <span>{selectedLanguage.nativeName}</span>
                     </div>
                     <ChevronUp size={20} />
                 </button>
@@ -195,23 +189,18 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                 <h3 className="text-white/80 text-base font-medium mb-3">Language</h3>
                                 <div className="grid grid-cols-2 gap-3">
                                     {languages.map((lang) => {
-                                        const mode = contentType === "Quotes" ? lang.quotesMode : lang.randomWordsMode;
-                                        const isDisabled = contentType === "Quotes" && !lang.quotesMode;
+                                        const href = lang.slug ? `/${lang.slug}` : "/";
+                                        const isSelected = lang.language === currentLang.language;
 
                                         return (
-                                            <button
+                                            <a
                                                 key={lang.language}
-                                                className={`selection-button ${selectedMode.tag === mode ? "selected" : ""}`}
-                                                onClick={() => {
-                                                    if (mode) {
-                                                        onModeSelect({ tag: mode } as GameMode);
-                                                    }
-                                                }}
-                                                disabled={isDisabled}
+                                                href={href}
+                                                className={`selection-button ${isSelected ? "selected" : ""}`}
                                             >
                                                 <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>{lang.flag}</span>
-                                                <span>{lang.language}</span>
-                                            </button>
+                                                <span>{lang.nativeName}</span>
+                                            </a>
                                         );
                                     })}
                                 </div>

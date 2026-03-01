@@ -1,26 +1,26 @@
 import { useState, useCallback, useRef, useMemo } from "react";
+import { useParams } from "react-router-dom";
 import "../components/SelectionButton.css";
 import { type GameMode } from "../types/stdb";
 import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
 import { GameOptionsSelector, type GameTypeValue } from "../components/ModeSelector";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
-import { getRandomStartupPhrase } from "../utils/modes";
+import { getRandomStartupPhrase, getLanguageFromSlug, getContentTypeFromMode } from "../utils/modes";
 import { useFindGame } from "../hooks/useFindGame";
 
-const SELECTED_MODE_KEY = "typerace_selected_mode";
 const GAME_TYPE_KEY = "typerace_game_type";
+const CONTENT_TYPE_KEY = "typerace_content_type";
 
-const getInitialMode = (): GameMode => {
+const getInitialMode = (langSlug: string | undefined): GameMode => {
+  const langInfo = getLanguageFromSlug(langSlug);
   try {
-    const stored = localStorage.getItem(SELECTED_MODE_KEY);
-    if (stored) {
-      return JSON.parse(stored) as GameMode;
+    const storedContentType = localStorage.getItem(CONTENT_TYPE_KEY);
+    if (storedContentType === "Quotes" && langInfo.quotesMode) {
+      return { tag: langInfo.quotesMode } as GameMode;
     }
-  } catch (error) {
-    console.error("Failed to load selected mode from localStorage:", error);
-  }
-  return { tag: "EnglishQuotes" };
+  } catch {}
+  return { tag: langInfo.randomWordsMode } as GameMode;
 };
 
 const getInitialGameType = (): GameTypeValue => {
@@ -36,18 +36,19 @@ const getInitialGameType = (): GameTypeValue => {
 };
 
 export const LobbyPage = () => {
-  const [selectedMode, setSelectedMode] = useState<GameMode>(getInitialMode);
+  const { lang } = useParams<{ lang?: string }>();
+  const [selectedMode, setSelectedMode] = useState<GameMode>(() => getInitialMode(lang));
   const [gameType, setGameType] = useState<GameTypeValue>(getInitialGameType);
   const typeBoxRef = useRef<TypeBoxRef>(null);
   const { findGame } = useFindGame();
+  const currentLang = getLanguageFromSlug(lang);
 
   const handleModeSelect = useCallback((mode: GameMode) => {
     setSelectedMode(mode);
     try {
-      localStorage.setItem(SELECTED_MODE_KEY, JSON.stringify(mode));
-    } catch (error) {
-      console.error("Failed to save selected mode to localStorage:", error);
-    }
+      const contentType = getContentTypeFromMode(mode.tag);
+      localStorage.setItem(CONTENT_TYPE_KEY, contentType);
+    } catch {}
   }, []);
 
   const handleGameTypeChange = useCallback((type: GameTypeValue) => {
@@ -90,6 +91,7 @@ export const LobbyPage = () => {
               onModeSelect={handleModeSelect}
               gameType={gameType}
               setGameType={handleGameTypeChange}
+              currentLang={currentLang}
             />
           </div>
         </div>
