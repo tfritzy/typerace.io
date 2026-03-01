@@ -292,7 +292,7 @@ public static partial class Module
         public int HighestProgress;
     }
 
-    [Table(Accessor = "player", Name = "player_v2", Public = true)]
+    [Table(Accessor = "Player", Name = "player_v2", Public = true)]
     public partial struct Player
     {
         [PrimaryKey]
@@ -315,7 +315,7 @@ public static partial class Module
         public long LastGameDate;
     }
 
-    [Table(Accessor = "game", Name = "game_v2", Public = true)]
+    [Table(Accessor = "Game", Name = "game_v2", Public = true)]
     [SpacetimeDB.Index.BTree(Accessor = "State_GameType", Columns = new[] { nameof(State), nameof(GameType) })]
     public partial struct Game
     {
@@ -341,7 +341,7 @@ public static partial class Module
         public string? Attribution;
     }
 
-    [Table(Accessor = "gamerecord", Name = "game_record_v2", Public = true)]
+    [Table(Accessor = "GameRecord", Name = "game_record_v2", Public = true)]
     [SpacetimeDB.Index.BTree(Accessor = "PlayerId_Day", Columns = new[] { nameof(GameRecord.PlayerId), nameof(GameRecord.Day) })]
     public partial struct GameRecord
     {
@@ -369,7 +369,7 @@ public static partial class Module
         public string Day;
     }
 
-    [Table(Accessor = "personalrecord", Name = "personal_record_v2", Public = true)]
+    [Table(Accessor = "PersonalRecord", Name = "personal_record_v2", Public = true)]
     [SpacetimeDB.Index.BTree(Accessor = "PlayerId_GameMode", Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
     public partial struct PersonalRecord
     {
@@ -383,7 +383,7 @@ public static partial class Module
         public double Wpm;
     }
 
-    [Table(Accessor = "xpgain", Name = "xp_gain_v2", Public = true)]
+    [Table(Accessor = "XpGain", Name = "xp_gain_v2", Public = true)]
     public partial struct XpGain
     {
         [PrimaryKey]
@@ -398,7 +398,7 @@ public static partial class Module
         public int TotalXp;
     }
 
-    [Table(Accessor = "elo", Name = "elo_v2", Public = true)]
+    [Table(Accessor = "Elo", Name = "elo_v2", Public = true)]
     [SpacetimeDB.Index.BTree(Accessor = "PlayerId_GameMode", Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
     public partial struct Elo
     {
@@ -460,7 +460,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Accessor = "globalstats", Name = "global_stats_v2", Public = true)]
+    [Table(Accessor = "GlobalStats", Name = "global_stats_v2", Public = true)]
     public partial struct GlobalStats
     {
         [PrimaryKey]
@@ -471,7 +471,7 @@ public static partial class Module
         public int DailyActivePlayers;
     }
 
-    [Table(Accessor = "playerprogress", Name = "player_progress_v2", Public = true)]
+    [Table(Accessor = "PlayerProgress", Name = "player_progress_v2", Public = true)]
     public partial struct PlayerProgress
     {
         [PrimaryKey]
@@ -531,7 +531,7 @@ public static partial class Module
             Array.Resize(ref identityBytes, 32);
             var identity = new Identity(identityBytes);
 
-            ctx.Db.player.Insert(new Player
+            ctx.Db.Player.Insert(new Player
             {
                 Identity = identity,
                 PlayerId = IdGenerator.Generate("plyr_", ctx.Rng),
@@ -564,8 +564,8 @@ public static partial class Module
         var playerCount = 0;
         foreach (var legacy in ctx.Db.playerLegacy.Iter())
         {
-            if (ctx.Db.player.Identity.Find(legacy.Identity) != null) continue;
-            ctx.Db.player.Insert(new Player
+            if (ctx.Db.Player.Identity.Find(legacy.Identity) != null) continue;
+            ctx.Db.Player.Insert(new Player
             {
                 Identity = legacy.Identity,
                 PlayerId = legacy.PlayerId,
@@ -590,8 +590,8 @@ public static partial class Module
         var gameCount = 0;
         foreach (var legacy in ctx.Db.gameLegacy.Iter())
         {
-            if (ctx.Db.game.Id.Find(legacy.Id) != null) continue;
-            ctx.Db.game.Insert(new Game
+            if (ctx.Db.Game.Id.Find(legacy.Id) != null) continue;
+            ctx.Db.Game.Insert(new Game
             {
                 Id = legacy.Id,
                 Phrase = legacy.Phrase,
@@ -612,8 +612,8 @@ public static partial class Module
         var gameRecordCount = 0;
         foreach (var legacy in ctx.Db.gamerecordLegacy.Iter())
         {
-            if (ctx.Db.gamerecord.Id.Find(legacy.Id) != null) continue;
-            ctx.Db.gamerecord.Insert(new GameRecord
+            if (ctx.Db.GameRecord.Id.Find(legacy.Id) != null) continue;
+            ctx.Db.GameRecord.Insert(new GameRecord
             {
                 Id = legacy.Id,
                 PlayerId = legacy.PlayerId,
@@ -637,8 +637,8 @@ public static partial class Module
         var personalRecordCount = 0;
         foreach (var legacy in ctx.Db.personalrecordLegacy.Iter())
         {
-            if (ctx.Db.personalrecord.Id.Find(legacy.Id) != null) continue;
-            ctx.Db.personalrecord.Insert(new PersonalRecord
+            if (ctx.Db.PersonalRecord.Id.Find(legacy.Id) != null) continue;
+            ctx.Db.PersonalRecord.Insert(new PersonalRecord
             {
                 Id = legacy.Id,
                 PlayerId = legacy.PlayerId,
@@ -653,8 +653,8 @@ public static partial class Module
         var xpGainCount = 0;
         foreach (var legacy in ctx.Db.xpgainLegacy.Iter())
         {
-            if (ctx.Db.xpgain.Id.Find(legacy.Id) != null) continue;
-            ctx.Db.xpgain.Insert(new XpGain
+            if (ctx.Db.XpGain.Id.Find(legacy.Id) != null) continue;
+            ctx.Db.XpGain.Insert(new XpGain
             {
                 Id = legacy.Id,
                 PlayerId = legacy.PlayerId,
@@ -671,8 +671,8 @@ public static partial class Module
         var eloCount = 0;
         foreach (var legacy in ctx.Db.eloLegacy.Iter())
         {
-            if (ctx.Db.elo.Id.Find(legacy.Id) != null) continue;
-            ctx.Db.elo.Insert(new Elo
+            if (ctx.Db.Elo.Id.Find(legacy.Id) != null) continue;
+            ctx.Db.Elo.Insert(new Elo
             {
                 Id = legacy.Id,
                 PlayerId = legacy.PlayerId,
@@ -686,8 +686,8 @@ public static partial class Module
         var globalStatsCount = 0;
         foreach (var legacy in ctx.Db.globalstatsLegacy.Iter())
         {
-            if (ctx.Db.globalstats.Date.Find(legacy.Date) != null) continue;
-            ctx.Db.globalstats.Insert(new GlobalStats
+            if (ctx.Db.GlobalStats.Date.Find(legacy.Date) != null) continue;
+            ctx.Db.GlobalStats.Insert(new GlobalStats
             {
                 Date = legacy.Date,
                 Stats = legacy.Stats,
@@ -701,8 +701,8 @@ public static partial class Module
         var playerProgressCount = 0;
         foreach (var legacy in ctx.Db.playerprogressLegacy.Iter())
         {
-            if (ctx.Db.playerprogress.Id.Find(legacy.Id) != null) continue;
-            ctx.Db.playerprogress.Insert(new PlayerProgress
+            if (ctx.Db.PlayerProgress.Id.Find(legacy.Id) != null) continue;
+            ctx.Db.PlayerProgress.Insert(new PlayerProgress
             {
                 Id = legacy.Id,
                 PlayerId = legacy.PlayerId,
@@ -763,12 +763,12 @@ public static partial class Module
     [Reducer(ReducerKind.ClientConnected)]
     public static void ClientConnected(ReducerContext ctx)
     {
-        var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
+        var existingPlayer = ctx.Db.Player.Identity.Find(ctx.Sender);
 
         if (existingPlayer == null)
         {
             var animalName = AnimalNameGenerator.Generate(ctx.Rng);
-            ctx.Db.player.Insert(new Player
+            ctx.Db.Player.Insert(new Player
             {
                 Identity = ctx.Sender,
                 PlayerId = IdGenerator.Generate("plyr_", ctx.Rng),
@@ -798,7 +798,7 @@ public static partial class Module
     [Reducer]
     public static void SyncAnonymousStatus(ReducerContext ctx, bool isAnonymous)
     {
-        var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
+        var existingPlayer = ctx.Db.Player.Identity.Find(ctx.Sender);
 
         if (existingPlayer != null)
         {
@@ -812,7 +812,7 @@ public static partial class Module
                 Log.Info($"Updated player name from Anonymous to {newAdjective} for {ctx.Sender}");
             }
 
-            ctx.Db.player.Identity.Update(updatedPlayer);
+            ctx.Db.Player.Identity.Update(updatedPlayer);
             Log.Info($"Updated anonymous status for {ctx.Sender} to {isAnonymous}");
         }
     }
@@ -843,13 +843,13 @@ public static partial class Module
             return;
         }
 
-        var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
+        var existingPlayer = ctx.Db.Player.Identity.Find(ctx.Sender);
 
         if (existingPlayer != null)
         {
             var updatedPlayer = existingPlayer.Value;
             updatedPlayer.Name = trimmedName;
-            ctx.Db.player.Identity.Update(updatedPlayer);
+            ctx.Db.Player.Identity.Update(updatedPlayer);
             Log.Info($"Updated player name for {ctx.Sender} to {trimmedName}");
         }
     }
@@ -857,13 +857,13 @@ public static partial class Module
     [Reducer]
     public static void SetPlayerColor(ReducerContext ctx, PlayerColor color)
     {
-        var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
+        var existingPlayer = ctx.Db.Player.Identity.Find(ctx.Sender);
 
         if (existingPlayer != null)
         {
             var updatedPlayer = existingPlayer.Value;
             updatedPlayer.Color = color;
-            ctx.Db.player.Identity.Update(updatedPlayer);
+            ctx.Db.Player.Identity.Update(updatedPlayer);
             Log.Info($"Updated player color for {ctx.Sender} to {color}");
         }
     }
@@ -888,7 +888,7 @@ public static partial class Module
 
                 var updatedGame = foundGame.Value;
                 updatedGame.State = GameState.Countdown;
-                ctx.Db.game.Id.Update(updatedGame);
+                ctx.Db.Game.Id.Update(updatedGame);
 
                 Log.Info($"Game {foundGame.Value.Id} reached {requiredPlayers} players, transitioning to Countdown state");
 
@@ -934,7 +934,7 @@ public static partial class Module
                 {
                     var updatedGame = newGame;
                     updatedGame.State = GameState.Countdown;
-                    ctx.Db.game.Id.Update(updatedGame);
+                    ctx.Db.Game.Id.Update(updatedGame);
 
                     Log.Info($"Game {newGame.Id} reached {requiredPlayers} players, transitioning to Countdown state");
 
@@ -972,7 +972,7 @@ public static partial class Module
             return null;
         }
 
-        foreach (var game in ctx.Db.game.State_GameType.Filter((GameState.Lobby, GameType.Public)))
+        foreach (var game in ctx.Db.Game.State_GameType.Filter((GameState.Lobby, GameType.Public)))
         {
             if (CountPlayersInGame(ctx, game.Id) < GetMaxPlayerCount(gameType))
             {
@@ -988,7 +988,7 @@ public static partial class Module
     private static int CountPlayersInGame(ReducerContext ctx, string gameId)
     {
         int count = 0;
-        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(gameId))
+        foreach (var progress in ctx.Db.PlayerProgress.GameId.Filter(gameId))
         {
             count++;
         }
@@ -1018,7 +1018,7 @@ public static partial class Module
 
         var phrase = PhraseGenerator.GeneratePhraseForMode(gameMode, ctx.Rng);
 
-        return ctx.Db.game.Insert(new Game
+        return ctx.Db.Game.Insert(new Game
         {
             Id = IdGenerator.Generate("game_", ctx.Rng),
             Phrase = phrase.Text,
@@ -1051,14 +1051,14 @@ public static partial class Module
 
     private static void InsertPlayerProgress(ReducerContext ctx, string gameId, string joinCode)
     {
-        var player = ctx.Db.player.Identity.Find(ctx.Sender);
+        var player = ctx.Db.Player.Identity.Find(ctx.Sender);
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
         var playerColor = player?.Color ?? PlayerColor.Amber;
         var playerPublicId = player?.PlayerId ?? "";
 
-        ctx.Db.playerprogress.Insert(new PlayerProgress
+        ctx.Db.PlayerProgress.Insert(new PlayerProgress
         {
             Id = IdGenerator.Generate("pp_", ctx.Rng),
             PlayerId = ctx.Sender,
@@ -1081,7 +1081,7 @@ public static partial class Module
     [Reducer]
     public static void FillGameWithBots(ReducerContext ctx, BotFillTrigger args)
     {
-        var game = ctx.Db.game.Id.Find(args.GameId);
+        var game = ctx.Db.Game.Id.Find(args.GameId);
 
         if (game != null && game.Value.State == GameState.Lobby && game.Value.GameType == GameType.Public)
         {
@@ -1090,7 +1090,7 @@ public static partial class Module
             int botsToAdd = 3 - currentPlayerCount;
 
             var humanPlayerElos = new List<int>();
-            foreach (var progress in ctx.Db.playerprogress.GameId.Filter(args.GameId))
+            foreach (var progress in ctx.Db.PlayerProgress.GameId.Filter(args.GameId))
             {
                 if (!progress.IsBot)
                 {
@@ -1120,7 +1120,7 @@ public static partial class Module
 
             foreach (var selectedBot in selectedBots)
             {
-                ctx.Db.playerprogress.Insert(new PlayerProgress
+                ctx.Db.PlayerProgress.Insert(new PlayerProgress
                 {
                     Id = IdGenerator.Generate("pp_", ctx.Rng),
                     PlayerId = selectedBot.Identity,
@@ -1144,7 +1144,7 @@ public static partial class Module
 
             var updatedGame = game.Value;
             updatedGame.State = GameState.Countdown;
-            ctx.Db.game.Id.Update(updatedGame);
+            ctx.Db.Game.Id.Update(updatedGame);
 
             Log.Info($"Game {args.GameId} filled with {selectedBots.Count} bots and transitioned to Countdown state");
 
@@ -1164,7 +1164,7 @@ public static partial class Module
     private static List<Player> GetEligibleBots(ReducerContext ctx, GameMode gameMode, int targetElo, string gameId)
     {
         var botsWithElo = new List<(Player bot, int elo)>();
-        foreach (var bot in ctx.Db.player.IsBot.Filter(true))
+        foreach (var bot in ctx.Db.Player.IsBot.Filter(true))
         {
             int botElo = GetBotElo(ctx, bot.Identity, gameMode);
             botsWithElo.Add((bot, botElo));
@@ -1196,7 +1196,7 @@ public static partial class Module
 
     private static int GetBotElo(ReducerContext ctx, Identity botId, GameMode gameMode)
     {
-        foreach (var elo in ctx.Db.elo.PlayerId_GameMode.Filter((botId, gameMode)))
+        foreach (var elo in ctx.Db.Elo.PlayerId_GameMode.Filter((botId, gameMode)))
         {
             return elo.Rating;
         }
@@ -1206,15 +1206,15 @@ public static partial class Module
     [Reducer]
     public static void UpdateBotProgress(ReducerContext ctx, BotProgressUpdate args)
     {
-        var progress = ctx.Db.playerprogress.Id.Find(args.PlayerProgressId);
+        var progress = ctx.Db.PlayerProgress.Id.Find(args.PlayerProgressId);
 
         if (progress != null && progress.Value.IsBot)
         {
-            var game = ctx.Db.game.Id.Find(progress.Value.GameId);
+            var game = ctx.Db.Game.Id.Find(progress.Value.GameId);
 
             if (game != null && game.Value.State == GameState.Racing)
             {
-                var botPlayer = ctx.Db.player.Identity.Find(progress.Value.PlayerId);
+                var botPlayer = ctx.Db.Player.Identity.Find(progress.Value.PlayerId);
                 if (botPlayer == null || botPlayer.Value.BotConfig == null)
                 {
                     Log.Info($"Bot player {progress.Value.PlayerId} not found or missing BotConfig");
@@ -1229,7 +1229,7 @@ public static partial class Module
                     var updatedProgress = progress.Value;
                     AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, CharacterEventType.Incorrect);
                     AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, CharacterEventType.Backspace);
-                    ctx.Db.playerprogress.Id.Update(updatedProgress);
+                    ctx.Db.PlayerProgress.Id.Update(updatedProgress);
 
                     var errorDelay = new TimeDuration { Microseconds = (long)(botConfig.TypingRate * 0.5) };
                     ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
@@ -1276,13 +1276,13 @@ public static partial class Module
     [Reducer]
     public static void StartCountdown(ReducerContext ctx, CountdownStart args)
     {
-        var game = ctx.Db.game.Id.Find(args.GameId);
+        var game = ctx.Db.Game.Id.Find(args.GameId);
 
         if (game != null && game.Value.State == GameState.Lobby)
         {
             var updatedGame = game.Value;
             updatedGame.State = GameState.Countdown;
-            ctx.Db.game.Id.Update(updatedGame);
+            ctx.Db.Game.Id.Update(updatedGame);
 
             Log.Info($"Game {args.GameId} transitioned to Countdown state");
 
@@ -1302,22 +1302,22 @@ public static partial class Module
     [Reducer]
     public static void StartGame(ReducerContext ctx, GameStart args)
     {
-        var game = ctx.Db.game.Id.Find(args.GameId);
+        var game = ctx.Db.Game.Id.Find(args.GameId);
 
         if (game != null && game.Value.State == GameState.Countdown)
         {
             var updatedGame = game.Value;
             updatedGame.State = GameState.Racing;
             updatedGame.RacingStartedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
-            ctx.Db.game.Id.Update(updatedGame);
+            ctx.Db.Game.Id.Update(updatedGame);
 
             Log.Info($"Game {args.GameId} transitioned to Racing state");
 
-            foreach (var progress in ctx.Db.playerprogress.GameId.Filter(args.GameId))
+            foreach (var progress in ctx.Db.PlayerProgress.GameId.Filter(args.GameId))
             {
                 if (progress.IsBot)
                 {
-                    var botPlayer = ctx.Db.player.Identity.Find(progress.PlayerId);
+                    var botPlayer = ctx.Db.Player.Identity.Find(progress.PlayerId);
                     long delayMicroseconds;
 
                     if (botPlayer != null && botPlayer.Value.BotConfig != null)
@@ -1346,7 +1346,7 @@ public static partial class Module
     [Reducer]
     public static void StartPrivateGame(ReducerContext ctx, string gameId)
     {
-        var game = ctx.Db.game.Id.Find(gameId);
+        var game = ctx.Db.Game.Id.Find(gameId);
 
         if (game == null)
         {
@@ -1381,7 +1381,7 @@ public static partial class Module
 
         var updatedGame = game.Value;
         updatedGame.State = GameState.Countdown;
-        ctx.Db.game.Id.Update(updatedGame);
+        ctx.Db.Game.Id.Update(updatedGame);
 
         Log.Info($"Private/practice game {gameId} transitioned to Countdown state");
 
@@ -1400,7 +1400,7 @@ public static partial class Module
     [Reducer]
     public static void JoinPrivateGame(ReducerContext ctx, string gameId)
     {
-        var game = ctx.Db.game.Id.Find(gameId);
+        var game = ctx.Db.Game.Id.Find(gameId);
 
         if (game == null)
         {
@@ -1434,7 +1434,7 @@ public static partial class Module
     [Reducer]
     public static void Rematch(ReducerContext ctx, string gameId)
     {
-        var game = ctx.Db.game.Id.Find(gameId);
+        var game = ctx.Db.Game.Id.Find(gameId);
 
         if (game == null)
         {
@@ -1459,18 +1459,18 @@ public static partial class Module
 
         Log.Info($"Created rematch game {newGame.Id} for original game {gameId}");
 
-        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(gameId))
+        foreach (var progress in ctx.Db.PlayerProgress.GameId.Filter(gameId))
         {
             if (!progress.IsBot)
             {
-                var player = ctx.Db.player.Identity.Find(progress.PlayerId);
+                var player = ctx.Db.Player.Identity.Find(progress.PlayerId);
                 var playerName = player?.Name ?? "Unknown";
                 var playerLevel = player?.Level ?? 1;
                 var isAnonymous = player?.IsAnonymous ?? true;
                 var playerColor = player?.Color ?? PlayerColor.Amber;
                 var playerPublicId = player?.PlayerId ?? "";
 
-                ctx.Db.playerprogress.Insert(new PlayerProgress
+                ctx.Db.PlayerProgress.Insert(new PlayerProgress
                 {
                     Id = IdGenerator.Generate("pp_", ctx.Rng),
                     PlayerId = progress.PlayerId,
@@ -1502,7 +1502,7 @@ public static partial class Module
 
         Log.Info($"[UpdateGlobalStats] Processing game {game.Id} for date {dateKey}");
 
-        var existingStats = ctx.Db.globalstats.Date.Find(dateKey);
+        var existingStats = ctx.Db.GlobalStats.Date.Find(dateKey);
         List<GameModeCount> statsList;
         GameModeCount total;
         int dailyActivePlayers;
@@ -1570,7 +1570,7 @@ public static partial class Module
         total.StartedGames++;
 
         var finishedHumanCount = 0;
-        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
+        foreach (var progress in ctx.Db.PlayerProgress.GameId.Filter(game.Id))
         {
             if (progress.Placement > 0)
             {
@@ -1642,7 +1642,7 @@ public static partial class Module
 
         if (existingStats == null)
         {
-            ctx.Db.globalstats.Insert(new GlobalStats
+            ctx.Db.GlobalStats.Insert(new GlobalStats
             {
                 Date = dateKey,
                 Stats = statsList,
@@ -1652,7 +1652,7 @@ public static partial class Module
         }
         else
         {
-            ctx.Db.globalstats.Date.Update(new GlobalStats
+            ctx.Db.GlobalStats.Date.Update(new GlobalStats
             {
                 Date = dateKey,
                 Stats = statsList,
@@ -1669,7 +1669,7 @@ public static partial class Module
     {
         var fiveMinutesAgo = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 300_000_000;
 
-        foreach (var game in ctx.Db.game.State.Filter(GameState.Racing))
+        foreach (var game in ctx.Db.Game.State.Filter(GameState.Racing))
         {
             if (game.CreatedAt < fiveMinutesAgo)
             {
@@ -1677,7 +1677,7 @@ public static partial class Module
 
                 var updatedGame = game;
                 updatedGame.State = GameState.Archived;
-                ctx.Db.game.Id.Update(updatedGame);
+                ctx.Db.Game.Id.Update(updatedGame);
 
                 Log.Info($"Game {game.Id} transitioned to Archived state");
             }
@@ -1691,17 +1691,17 @@ public static partial class Module
 
     private static void UpdateDailyActivePlayerCount(ReducerContext ctx, Identity playerId, string dateKey)
     {
-        var gamesPlayedToday = ctx.Db.gamerecord.PlayerId_Day.Filter((playerId, dateKey)).Count();
+        var gamesPlayedToday = ctx.Db.GameRecord.PlayerId_Day.Filter((playerId, dateKey)).Count();
 
         Log.Info($"[DailyActivePlayers] Player {playerId} finished game on {dateKey}, GamesToday={gamesPlayedToday}");
 
         if (gamesPlayedToday == 1)
         {
-            var existingStats = ctx.Db.globalstats.Date.Find(dateKey);
+            var existingStats = ctx.Db.GlobalStats.Date.Find(dateKey);
 
             if (existingStats == null)
             {
-                ctx.Db.globalstats.Insert(new GlobalStats
+                ctx.Db.GlobalStats.Insert(new GlobalStats
                 {
                     Date = dateKey,
                     Stats = new List<GameModeCount>(),
@@ -1725,7 +1725,7 @@ public static partial class Module
             {
                 var updatedStats = existingStats.Value;
                 updatedStats.DailyActivePlayers++;
-                ctx.Db.globalstats.Date.Update(updatedStats);
+                ctx.Db.GlobalStats.Date.Update(updatedStats);
                 Log.Info($"[DailyActivePlayers] Player {playerId} is NEW today, incremented count to {updatedStats.DailyActivePlayers}");
             }
         }
@@ -1736,9 +1736,9 @@ public static partial class Module
         var updatedProgress = progress;
         updatedProgress.Time = timeElapsed;
         updatedProgress.Placement = placement;
-        ctx.Db.playerprogress.Id.Update(updatedProgress);
+        ctx.Db.PlayerProgress.Id.Update(updatedProgress);
 
-        var player = ctx.Db.player.Identity.Find(progress.PlayerId);
+        var player = ctx.Db.Player.Identity.Find(progress.PlayerId);
         if (player == null) return;
 
         var wpm = CalculateWpm(game.Phrase.Length, timeElapsed);
@@ -1748,7 +1748,7 @@ public static partial class Module
         var updatedPlayer = player.Value;
         UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped, timeElapsed / 1000);
         LevelUpPlayer(ref updatedPlayer);
-        ctx.Db.player.Identity.Update(updatedPlayer);
+        ctx.Db.Player.Identity.Update(updatedPlayer);
 
         var eloChange = UpdatePlayerElo(ctx, progress.PlayerId, game, placement);
 
@@ -1760,7 +1760,7 @@ public static partial class Module
         var month = dateTime.Month;
         var day = dateTime.ToString("yyyy-MM-dd");
 
-        ctx.Db.gamerecord.Insert(new GameRecord
+        ctx.Db.GameRecord.Insert(new GameRecord
         {
             Id = statsId,
             PlayerId = progress.PlayerId,
@@ -1817,7 +1817,7 @@ public static partial class Module
     private static void UpdatePersonalRecord(ReducerContext ctx, Identity playerId, GameMode gameMode, string gameRecordId, double wpm)
     {
         PersonalRecord? existingRecord = null;
-        foreach (var record in ctx.Db.personalrecord.PlayerId_GameMode.Filter((playerId, gameMode)))
+        foreach (var record in ctx.Db.PersonalRecord.PlayerId_GameMode.Filter((playerId, gameMode)))
         {
             existingRecord = record;
             break;
@@ -1827,10 +1827,10 @@ public static partial class Module
         {
             if (existingRecord != null)
             {
-                ctx.Db.personalrecord.Id.Delete(existingRecord.Value.Id);
+                ctx.Db.PersonalRecord.Id.Delete(existingRecord.Value.Id);
             }
 
-            ctx.Db.personalrecord.Insert(new PersonalRecord
+            ctx.Db.PersonalRecord.Insert(new PersonalRecord
             {
                 Id = IdGenerator.Generate("pr_", ctx.Rng),
                 PlayerId = playerId,
@@ -1888,7 +1888,7 @@ public static partial class Module
 
         var totalEloChange = 0;
         var opponentCount = 0;
-        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
+        foreach (var progress in ctx.Db.PlayerProgress.GameId.Filter(game.Id))
         {
             if (progress.PlayerId != playerId)
             {
@@ -1908,7 +1908,7 @@ public static partial class Module
         var updatedElo = currentElo;
         updatedElo.Rating += totalEloChange;
         updatedElo.Rating = Math.Max(0, updatedElo.Rating);
-        ctx.Db.elo.Id.Update(updatedElo);
+        ctx.Db.Elo.Id.Update(updatedElo);
 
         Log.Info($"Player {playerId} ELO updated: {currentElo.Rating} -> {updatedElo.Rating} (change: {totalEloChange:+0;-0}) in mode {game.GameMode}");
 
@@ -1917,12 +1917,12 @@ public static partial class Module
 
     private static Elo GetOrCreatePlayerElo(ReducerContext ctx, Identity playerId, GameMode gameMode)
     {
-        foreach (var elo in ctx.Db.elo.PlayerId_GameMode.Filter((playerId, gameMode)))
+        foreach (var elo in ctx.Db.Elo.PlayerId_GameMode.Filter((playerId, gameMode)))
         {
             return elo;
         }
 
-        var newElo = ctx.Db.elo.Insert(new Elo
+        var newElo = ctx.Db.Elo.Insert(new Elo
         {
             Id = IdGenerator.Generate("elo_", ctx.Rng),
             PlayerId = playerId,
@@ -1960,7 +1960,7 @@ public static partial class Module
 
     private static void AwardInstantXpForProgress(ReducerContext ctx, PlayerProgress progress, Game game, int newIndex)
     {
-        var player = ctx.Db.player.Identity.Find(progress.PlayerId);
+        var player = ctx.Db.Player.Identity.Find(progress.PlayerId);
         if (player == null || player.Value.IsAnonymous)
         {
             return;
@@ -1989,7 +1989,7 @@ public static partial class Module
                     var updatedPlayer = player.Value;
                     updatedPlayer.Xp += xpToAward;
                     LevelUpPlayer(ref updatedPlayer);
-                    ctx.Db.player.Identity.Update(updatedPlayer);
+                    ctx.Db.Player.Identity.Update(updatedPlayer);
                 }
             }
         }
@@ -2019,14 +2019,14 @@ public static partial class Module
             }
         }
 
-        ctx.Db.playerprogress.Id.Update(updatedProgress);
+        ctx.Db.PlayerProgress.Id.Update(updatedProgress);
 
         if (newIndex >= game.Phrase.Length)
         {
             var updatedGame = game;
             updatedGame.Placements.Add(progress.PlayerId);
             var placement = updatedGame.Placements.Count;
-            ctx.Db.game.Id.Update(updatedGame);
+            ctx.Db.Game.Id.Update(updatedGame);
 
             var timeElapsed = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.RacingStartedAt;
 
@@ -2040,7 +2040,7 @@ public static partial class Module
     public static void UpdateProgress(ReducerContext ctx, string gameId, int newIndex, CharacterEventType eventType)
     {
         var playerId = ctx.Sender;
-        var game = ctx.Db.game.Id.Find(gameId);
+        var game = ctx.Db.Game.Id.Find(gameId);
 
         if (game == null || game.Value.State != GameState.Racing)
         {
@@ -2061,7 +2061,7 @@ public static partial class Module
 
     private static PlayerProgress? FindPlayerProgress(ReducerContext ctx, Identity playerId, string gameId)
     {
-        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(gameId))
+        foreach (var progress in ctx.Db.PlayerProgress.GameId.Filter(gameId))
         {
             if (progress.PlayerId == playerId)
             {

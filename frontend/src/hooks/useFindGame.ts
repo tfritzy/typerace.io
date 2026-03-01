@@ -28,13 +28,13 @@ export const useFindGame = () => {
       }
     };
 
-    conn.db.playerprogress.onInsert(handleInsert);
+    conn.db.playerProgress.onInsert(handleInsert);
 
     const subscription = conn.subscriptionBuilder()
-      .subscribe([`SELECT * FROM playerprogress WHERE JoinCode = '${joinCode}'`]);
+      .subscribe([`SELECT * FROM player_progress_v2 WHERE JoinCode = '${joinCode}'`]);
 
     return () => {
-      conn.db.playerprogress.removeOnInsert(handleInsert);
+      conn.db.playerProgress.removeOnInsert(handleInsert);
       subscription.unsubscribe();
     };
   }, [conn, navigate, pendingJoinCodeRef.current]);

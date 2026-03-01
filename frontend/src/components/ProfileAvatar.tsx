@@ -52,7 +52,7 @@ export const ProfileAvatar = memo(() => {
     const subscription = conn
       .subscriptionBuilder()
       .subscribe([
-        `SELECT * FROM player WHERE Identity = '${currentIdentity}'`,
+        `SELECT * FROM player_v2 WHERE Identity = '${currentIdentity}'`,
       ]);
 
     return () => {

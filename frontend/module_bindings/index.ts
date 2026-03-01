@@ -105,7 +105,7 @@ const tablesSchema = __schema({
       { name: 'game_v2_Id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, GameRow),
-  gamerecord: __table({
+  gameRecord: __table({
     name: 'game_record_v2',
     indexes: [
       { name: 'Day', algorithm: 'btree', columns: [
@@ -138,7 +138,7 @@ const tablesSchema = __schema({
       { name: 'game_record_v2_Id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, GamerecordRow),
-  globalstats: __table({
+  globalStats: __table({
     name: 'global_stats_v2',
     indexes: [
       { name: 'Date', algorithm: 'btree', columns: [
@@ -149,7 +149,7 @@ const tablesSchema = __schema({
       { name: 'global_stats_v2_Date_key', constraint: 'unique', columns: ['date'] },
     ],
   }, GlobalstatsRow),
-  personalrecord: __table({
+  personalRecord: __table({
     name: 'personal_record_v2',
     indexes: [
       { name: 'GameMode', algorithm: 'btree', columns: [
@@ -187,7 +187,7 @@ const tablesSchema = __schema({
       { name: 'player_v2_Identity_key', constraint: 'unique', columns: ['identity'] },
     ],
   }, PlayerRow),
-  playerprogress: __table({
+  playerProgress: __table({
     name: 'player_progress_v2',
     indexes: [
       { name: 'GameId', algorithm: 'btree', columns: [
@@ -204,7 +204,7 @@ const tablesSchema = __schema({
       { name: 'player_progress_v2_Id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, PlayerprogressRow),
-  xpgain: __table({
+  xpGain: __table({
     name: 'xp_gain_v2',
     indexes: [
       { name: 'Id', algorithm: 'btree', columns: [

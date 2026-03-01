@@ -56,7 +56,7 @@ export const ProfilePage = () => {
                 const p = allPlayers.find(player => player.playerId === playerId);
                 if (p) setViewedPlayer(p);
             })
-            .subscribe([`SELECT * FROM player WHERE PlayerId = '${playerId}'`]);
+            .subscribe([`SELECT * FROM player_v2 WHERE PlayerId = '${playerId}'`]);
 
         return () => {
             conn.db.player.removeOnInsert(handlePlayerInsert);
@@ -74,17 +74,17 @@ export const ProfilePage = () => {
             }
         };
 
-        conn.db.gamerecord.onInsert(handleGameRecordInsert);
+        conn.db.gameRecord.onInsert(handleGameRecordInsert);
 
         const subscription = conn.subscriptionBuilder()
             .onApplied(() => {
-                const records = Array.from(conn.db.gamerecord.iter());
+                const records = Array.from(conn.db.gameRecord.iter());
                 setGameRecords(records);
             })
-            .subscribe([`SELECT * FROM gamerecord WHERE PlayerId = '${viewedPlayer?.identity}'`]);
+            .subscribe([`SELECT * FROM game_record_v2 WHERE PlayerId = '${viewedPlayer?.identity}'`]);
 
         return () => {
-            conn.db.gamerecord.removeOnInsert(handleGameRecordInsert);
+            conn.db.gameRecord.removeOnInsert(handleGameRecordInsert);
             subscription.unsubscribe();
         };
     }, [conn, viewedPlayer?.identity]);

@@ -80,7 +80,7 @@ export const GamePage = () => {
         const g = conn.db.game.id.find(gameId);
         if (g) setGame(g);
       })
-      .subscribe([`SELECT * FROM game WHERE Id = '${gameId}'`]);
+      .subscribe([`SELECT * FROM game_v2 WHERE Id = '${gameId}'`]);
 
     return () => {
       conn.db.game.removeOnInsert(handleGameInsert);
@@ -117,22 +117,22 @@ export const GamePage = () => {
       }
     };
 
-    conn.db.playerprogress.onInsert(handleProgressInsert);
-    conn.db.playerprogress.onUpdate(handleProgressUpdate);
+    conn.db.playerProgress.onInsert(handleProgressInsert);
+    conn.db.playerProgress.onUpdate(handleProgressUpdate);
 
     const progressSubscription = conn.subscriptionBuilder()
       .onApplied(() => {
-        const allProgress = Array.from(conn.db.playerprogress.iter());
+        const allProgress = Array.from(conn.db.playerProgress.iter());
         const currentGameProgress = allProgress.filter(pp => pp.gameId.toString() === gameId);
         setGamePlayerProgress(currentGameProgress);
       })
       .subscribe([
-        `SELECT * FROM playerprogress WHERE GameId = '${gameId}' OR PlayerId = '${conn.identity}'`
+        `SELECT * FROM player_progress_v2 WHERE GameId = '${gameId}' OR PlayerId = '${conn.identity}'`
       ]);
 
     return () => {
-      conn.db.playerprogress.removeOnInsert(handleProgressInsert);
-      conn.db.playerprogress.removeOnUpdate(handleProgressUpdate);
+      conn.db.playerProgress.removeOnInsert(handleProgressInsert);
+      conn.db.playerProgress.removeOnUpdate(handleProgressUpdate);
       progressSubscription.unsubscribe();
     };
   }, [conn, gameId, navigate]);

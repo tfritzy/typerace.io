@@ -35,7 +35,7 @@ export const Countdown = () => {
         const g = conn.db.game.id.find(gameId);
         if (g) setGame(g);
       })
-      .subscribe([`SELECT * FROM game WHERE Id = '${gameId}'`]);
+      .subscribe([`SELECT * FROM game_v2 WHERE Id = '${gameId}'`]);
 
     return () => {
       conn.db.game.removeOnInsert(handleGameInsert);
