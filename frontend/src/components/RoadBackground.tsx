@@ -79,13 +79,15 @@ export const RoadBackground = () => {
 
           <linearGradient id="roadHint" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#0a0e17" stopOpacity="0" />
-            <stop offset="40%" stopColor="#0a0e17" stopOpacity="0.3" />
+            <stop offset="30%" stopColor="#0a0e17" stopOpacity="0" />
+            <stop offset="60%" stopColor="#0a0e17" stopOpacity="0.25" />
             <stop offset="100%" stopColor="#0a0e17" stopOpacity="0.5" />
           </linearGradient>
 
           <linearGradient id="roadEdge" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#fbbf24" stopOpacity="0" />
-            <stop offset="50%" stopColor="#fbbf24" stopOpacity="0.04" />
+            <stop offset="40%" stopColor="#fbbf24" stopOpacity="0" />
+            <stop offset="70%" stopColor="#fbbf24" stopOpacity="0.04" />
             <stop offset="100%" stopColor="#fbbf24" stopOpacity="0.08" />
           </linearGradient>
 
@@ -132,7 +134,7 @@ export const RoadBackground = () => {
           <line
             key={`cl${i}`}
             x1={960}
-            y1={580}
+            y1={400}
             x2={cl.endX}
             y2={1080}
             stroke="url(#convergeLine)"
@@ -143,7 +145,7 @@ export const RoadBackground = () => {
         ))}
 
         {[0.2, 0.4, 0.6, 0.8].map((t, i) => {
-          const y = 580 + t * 500;
+          const y = 680 + t * 400;
           const halfW = t * 320;
           return (
             <line
@@ -174,12 +176,12 @@ export const RoadBackground = () => {
         ))}
 
         <polygon
-          points="960,580 760,1080 1160,1080"
+          points="930,680 990,680 1160,1080 760,1080"
           fill="url(#roadHint)"
         />
 
-        <line x1="960" y1="580" x2="760" y2="1080" stroke="url(#roadEdge)" strokeWidth="1" />
-        <line x1="960" y1="580" x2="1160" y2="1080" stroke="url(#roadEdge)" strokeWidth="1" />
+        <line x1="930" y1="680" x2="760" y2="1080" stroke="url(#roadEdge)" strokeWidth="1" />
+        <line x1="990" y1="680" x2="1160" y2="1080" stroke="url(#roadEdge)" strokeWidth="1" />
       </svg>
     </div>
   );
