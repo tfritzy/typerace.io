@@ -292,7 +292,7 @@ public static partial class Module
         public int HighestProgress;
     }
 
-    [Table(Accessor = "player", Name = "PlayerV2", Public = true)]
+    [Table(Accessor = "player", Name = "player_v2", Public = true)]
     public partial struct Player
     {
         [PrimaryKey]
@@ -315,7 +315,7 @@ public static partial class Module
         public long LastGameDate;
     }
 
-    [Table(Accessor = "game", Name = "GameV2", Public = true)]
+    [Table(Accessor = "game", Name = "game_v2", Public = true)]
     [SpacetimeDB.Index.BTree(Accessor = "State_GameType", Columns = new[] { nameof(State), nameof(GameType) })]
     public partial struct Game
     {
@@ -341,7 +341,7 @@ public static partial class Module
         public string? Attribution;
     }
 
-    [Table(Accessor = "gamerecord", Name = "GameRecordV2", Public = true)]
+    [Table(Accessor = "gamerecord", Name = "game_record_v2", Public = true)]
     [SpacetimeDB.Index.BTree(Accessor = "PlayerId_Day", Columns = new[] { nameof(GameRecord.PlayerId), nameof(GameRecord.Day) })]
     public partial struct GameRecord
     {
@@ -369,7 +369,7 @@ public static partial class Module
         public string Day;
     }
 
-    [Table(Accessor = "personalrecord", Name = "PersonalRecordV2", Public = true)]
+    [Table(Accessor = "personalrecord", Name = "personal_record_v2", Public = true)]
     [SpacetimeDB.Index.BTree(Accessor = "PlayerId_GameMode", Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
     public partial struct PersonalRecord
     {
@@ -383,7 +383,7 @@ public static partial class Module
         public double Wpm;
     }
 
-    [Table(Accessor = "xpgain", Name = "XpGainV2", Public = true)]
+    [Table(Accessor = "xpgain", Name = "xp_gain_v2", Public = true)]
     public partial struct XpGain
     {
         [PrimaryKey]
@@ -398,7 +398,7 @@ public static partial class Module
         public int TotalXp;
     }
 
-    [Table(Accessor = "elo", Name = "EloV2", Public = true)]
+    [Table(Accessor = "elo", Name = "elo_v2", Public = true)]
     [SpacetimeDB.Index.BTree(Accessor = "PlayerId_GameMode", Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
     public partial struct Elo
     {
@@ -460,7 +460,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Accessor = "globalstats", Name = "GlobalStatsV2", Public = true)]
+    [Table(Accessor = "globalstats", Name = "global_stats_v2", Public = true)]
     public partial struct GlobalStats
     {
         [PrimaryKey]
@@ -471,7 +471,7 @@ public static partial class Module
         public int DailyActivePlayers;
     }
 
-    [Table(Accessor = "playerprogress", Name = "PlayerProgressV2", Public = true)]
+    [Table(Accessor = "playerprogress", Name = "player_progress_v2", Public = true)]
     public partial struct PlayerProgress
     {
         [PrimaryKey]

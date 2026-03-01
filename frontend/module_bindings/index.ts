@@ -61,7 +61,7 @@ import XpgainRow from "./xpgain_table";
 /** The schema information for all tables in this module. This is defined the same was as the tables would have been defined in the server. */
 const tablesSchema = __schema({
   elo: __table({
-    name: 'EloV2',
+    name: 'elo_v2',
     indexes: [
       { name: 'GameMode', algorithm: 'btree', columns: [
         'gameMode',
@@ -78,11 +78,11 @@ const tablesSchema = __schema({
       ] },
     ],
     constraints: [
-      { name: 'EloV2_Id_key', constraint: 'unique', columns: ['id'] },
+      { name: 'elo_v2_Id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, EloRow),
   game: __table({
-    name: 'GameV2',
+    name: 'game_v2',
     indexes: [
       { name: 'GameMode', algorithm: 'btree', columns: [
         'gameMode',
@@ -102,11 +102,11 @@ const tablesSchema = __schema({
       ] },
     ],
     constraints: [
-      { name: 'GameV2_Id_key', constraint: 'unique', columns: ['id'] },
+      { name: 'game_v2_Id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, GameRow),
   gamerecord: __table({
-    name: 'GameRecordV2',
+    name: 'game_record_v2',
     indexes: [
       { name: 'Day', algorithm: 'btree', columns: [
         'day',
@@ -135,22 +135,22 @@ const tablesSchema = __schema({
       ] },
     ],
     constraints: [
-      { name: 'GameRecordV2_Id_key', constraint: 'unique', columns: ['id'] },
+      { name: 'game_record_v2_Id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, GamerecordRow),
   globalstats: __table({
-    name: 'GlobalStatsV2',
+    name: 'global_stats_v2',
     indexes: [
       { name: 'Date', algorithm: 'btree', columns: [
         'date',
       ] },
     ],
     constraints: [
-      { name: 'GlobalStatsV2_Date_key', constraint: 'unique', columns: ['date'] },
+      { name: 'global_stats_v2_Date_key', constraint: 'unique', columns: ['date'] },
     ],
   }, GlobalstatsRow),
   personalrecord: __table({
-    name: 'PersonalRecordV2',
+    name: 'personal_record_v2',
     indexes: [
       { name: 'GameMode', algorithm: 'btree', columns: [
         'gameMode',
@@ -167,11 +167,11 @@ const tablesSchema = __schema({
       ] },
     ],
     constraints: [
-      { name: 'PersonalRecordV2_Id_key', constraint: 'unique', columns: ['id'] },
+      { name: 'personal_record_v2_Id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, PersonalrecordRow),
   player: __table({
-    name: 'PlayerV2',
+    name: 'player_v2',
     indexes: [
       { name: 'Identity', algorithm: 'btree', columns: [
         'identity',
@@ -184,11 +184,11 @@ const tablesSchema = __schema({
       ] },
     ],
     constraints: [
-      { name: 'PlayerV2_Identity_key', constraint: 'unique', columns: ['identity'] },
+      { name: 'player_v2_Identity_key', constraint: 'unique', columns: ['identity'] },
     ],
   }, PlayerRow),
   playerprogress: __table({
-    name: 'PlayerProgressV2',
+    name: 'player_progress_v2',
     indexes: [
       { name: 'GameId', algorithm: 'btree', columns: [
         'gameId',
@@ -201,11 +201,11 @@ const tablesSchema = __schema({
       ] },
     ],
     constraints: [
-      { name: 'PlayerProgressV2_Id_key', constraint: 'unique', columns: ['id'] },
+      { name: 'player_progress_v2_Id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, PlayerprogressRow),
   xpgain: __table({
-    name: 'XpGainV2',
+    name: 'xp_gain_v2',
     indexes: [
       { name: 'Id', algorithm: 'btree', columns: [
         'id',
@@ -218,7 +218,7 @@ const tablesSchema = __schema({
       ] },
     ],
     constraints: [
-      { name: 'XpGainV2_Id_key', constraint: 'unique', columns: ['id'] },
+      { name: 'xp_gain_v2_Id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, XpgainRow),
 });
