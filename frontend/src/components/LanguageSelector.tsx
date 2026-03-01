@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { Globe } from "lucide-react";
 import { languages, type LanguageInfo } from "../utils/modes";
 
 interface LanguageSelectorProps {
@@ -37,7 +36,7 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                 style={{ backgroundColor: "var(--color-box-bg)" }}
                 aria-label="Select language"
             >
-                <Globe size={20} className="text-white/80" />
+                <span className="text-xl leading-none">{currentLang.flag}</span>
             </button>
 
             {isOpen && (
