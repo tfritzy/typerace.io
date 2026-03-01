@@ -56,6 +56,16 @@ export const Elo = __t.object("Elo", {
 });
 export type Elo = __Infer<typeof Elo>;
 
+export const EloLegacy = __t.object("EloLegacy", {
+  id: __t.string(),
+  playerId: __t.identity(),
+  get gameMode() {
+    return GameMode;
+  },
+  rating: __t.i32(),
+});
+export type EloLegacy = __Infer<typeof EloLegacy>;
+
 export const Game = __t.object("Game", {
   id: __t.string(),
   phrase: __t.string(),
@@ -82,6 +92,27 @@ export const GameArchiver = __t.object("GameArchiver", {
   scheduledAt: __t.scheduleAt(),
 });
 export type GameArchiver = __Infer<typeof GameArchiver>;
+
+export const GameLegacy = __t.object("GameLegacy", {
+  id: __t.string(),
+  phrase: __t.string(),
+  createdAt: __t.i64(),
+  racingStartedAt: __t.i64(),
+  countdownDurationMs: __t.i64(),
+  get state() {
+    return GameState;
+  },
+  get gameMode() {
+    return GameMode;
+  },
+  get gameType() {
+    return GameType;
+  },
+  placements: __t.array(__t.identity()),
+  owner: __t.option(__t.identity()),
+  attribution: __t.option(__t.string()),
+});
+export type GameLegacy = __Infer<typeof GameLegacy>;
 
 // The tagged union or sum type for the algebraic type `GameMode`.
 export const GameMode = __t.enum("GameMode", {
@@ -157,6 +188,28 @@ export const GameRecord = __t.object("GameRecord", {
 });
 export type GameRecord = __Infer<typeof GameRecord>;
 
+export const GameRecordLegacy = __t.object("GameRecordLegacy", {
+  id: __t.string(),
+  playerId: __t.identity(),
+  gameId: __t.string(),
+  get gameMode() {
+    return GameMode;
+  },
+  get gameType() {
+    return GameType;
+  },
+  year: __t.i32(),
+  month: __t.i32(),
+  date: __t.i64(),
+  timeMs: __t.i64(),
+  placement: __t.i32(),
+  wpm: __t.f64(),
+  xpGained: __t.i32(),
+  eloChange: __t.i32(),
+  day: __t.string(),
+});
+export type GameRecordLegacy = __Infer<typeof GameRecordLegacy>;
+
 export const GameStart = __t.object("GameStart", {
   scheduledId: __t.u64(),
   gameId: __t.string(),
@@ -193,6 +246,18 @@ export const GlobalStats = __t.object("GlobalStats", {
 });
 export type GlobalStats = __Infer<typeof GlobalStats>;
 
+export const GlobalStatsLegacy = __t.object("GlobalStatsLegacy", {
+  date: __t.string(),
+  get stats() {
+    return __t.array(GameModeCount);
+  },
+  get total() {
+    return GameModeCount;
+  },
+  dailyActivePlayers: __t.i32(),
+});
+export type GlobalStatsLegacy = __Infer<typeof GlobalStatsLegacy>;
+
 export const PersonalRecord = __t.object("PersonalRecord", {
   id: __t.string(),
   playerId: __t.identity(),
@@ -203,6 +268,17 @@ export const PersonalRecord = __t.object("PersonalRecord", {
   wpm: __t.f64(),
 });
 export type PersonalRecord = __Infer<typeof PersonalRecord>;
+
+export const PersonalRecordLegacy = __t.object("PersonalRecordLegacy", {
+  id: __t.string(),
+  playerId: __t.identity(),
+  get gameMode() {
+    return GameMode;
+  },
+  gameRecordId: __t.string(),
+  wpm: __t.f64(),
+});
+export type PersonalRecordLegacy = __Infer<typeof PersonalRecordLegacy>;
 
 export const Player = __t.object("Player", {
   identity: __t.identity(),
@@ -249,6 +325,29 @@ export const PlayerColor = __t.enum("PlayerColor", {
 });
 export type PlayerColor = __Infer<typeof PlayerColor>;
 
+export const PlayerLegacy = __t.object("PlayerLegacy", {
+  identity: __t.identity(),
+  playerId: __t.string(),
+  name: __t.string(),
+  totalGames: __t.i32(),
+  wins: __t.i32(),
+  level: __t.i32(),
+  xp: __t.i32(),
+  xpRequiredForNextLevel: __t.i32(),
+  totalWordsTyped: __t.i32(),
+  totalTimeSpentMs: __t.i64(),
+  isBot: __t.bool(),
+  get botConfig() {
+    return __t.option(BotConfig);
+  },
+  get color() {
+    return PlayerColor;
+  },
+  isAnonymous: __t.bool(),
+  lastGameDate: __t.i64(),
+});
+export type PlayerLegacy = __Infer<typeof PlayerLegacy>;
+
 export const PlayerProgress = __t.object("PlayerProgress", {
   id: __t.string(),
   playerId: __t.identity(),
@@ -272,6 +371,29 @@ export const PlayerProgress = __t.object("PlayerProgress", {
 });
 export type PlayerProgress = __Infer<typeof PlayerProgress>;
 
+export const PlayerProgressLegacy = __t.object("PlayerProgressLegacy", {
+  id: __t.string(),
+  playerId: __t.identity(),
+  playerPublicId: __t.string(),
+  gameId: __t.string(),
+  playerName: __t.string(),
+  playerLevel: __t.i32(),
+  progressIndex: __t.i32(),
+  isBot: __t.bool(),
+  isAnonymous: __t.bool(),
+  createdAt: __t.i64(),
+  characterHistory: __t.byteArray(),
+  time: __t.i64(),
+  placement: __t.i32(),
+  joinCode: __t.string(),
+  wpm: __t.f64(),
+  get playerColor() {
+    return PlayerColor;
+  },
+  highestProgress: __t.i32(),
+});
+export type PlayerProgressLegacy = __Infer<typeof PlayerProgressLegacy>;
+
 export const XpGain = __t.object("XpGain", {
   id: __t.string(),
   playerId: __t.identity(),
@@ -290,6 +412,19 @@ export const XpGainCleaner = __t.object("XpGainCleaner", {
   scheduledAt: __t.scheduleAt(),
 });
 export type XpGainCleaner = __Infer<typeof XpGainCleaner>;
+
+export const XpGainLegacy = __t.object("XpGainLegacy", {
+  id: __t.string(),
+  playerId: __t.identity(),
+  gameId: __t.string(),
+  timestamp: __t.i64(),
+  baseXp: __t.i32(),
+  get multipliers() {
+    return __t.array(XpMultiplier);
+  },
+  totalXp: __t.i32(),
+});
+export type XpGainLegacy = __Infer<typeof XpGainLegacy>;
 
 export const XpMultiplier = __t.object("XpMultiplier", {
   label: __t.string(),

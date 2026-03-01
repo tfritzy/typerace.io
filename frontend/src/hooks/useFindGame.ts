@@ -28,13 +28,13 @@ export const useFindGame = () => {
       }
     };
 
-    conn.db.playerProgress.onInsert(handleInsert);
+    conn.db.player_progress_v2.onInsert(handleInsert);
 
     const subscription = conn.subscriptionBuilder()
       .subscribe([`SELECT * FROM player_progress_v2 WHERE JoinCode = '${joinCode}'`]);
 
     return () => {
-      conn.db.playerProgress.removeOnInsert(handleInsert);
+      conn.db.player_progress_v2.removeOnInsert(handleInsert);
       subscription.unsubscribe();
     };
   }, [conn, navigate, pendingJoinCodeRef.current]);
@@ -49,7 +49,7 @@ export const useFindGame = () => {
 
     const gameTypeEnum = { tag: gameType };
     try {
-      await conn.reducers.joinGame({
+      await (conn.reducers as any).JoinGame({
         gameMode: mode,
         joinCode: newJoinCode,
         gameType: gameTypeEnum as never

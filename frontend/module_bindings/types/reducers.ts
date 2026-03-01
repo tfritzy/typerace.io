@@ -8,6 +8,7 @@ import { type Infer as __Infer } from "spacetimedb";
 // Import all reducer arg schemas
 import JoinGameReducer from "../join_game_reducer";
 import JoinPrivateGameReducer from "../join_private_game_reducer";
+import MigrateToV2Reducer from "../migrate_to_v_2_reducer";
 import RematchReducer from "../rematch_reducer";
 import SetPlayerColorReducer from "../set_player_color_reducer";
 import SetPlayerNameReducer from "../set_player_name_reducer";
@@ -17,6 +18,7 @@ import UpdateProgressReducer from "../update_progress_reducer";
 
 export type JoinGameParams = __Infer<typeof JoinGameReducer>;
 export type JoinPrivateGameParams = __Infer<typeof JoinPrivateGameReducer>;
+export type MigrateToV2Params = __Infer<typeof MigrateToV2Reducer>;
 export type RematchParams = __Infer<typeof RematchReducer>;
 export type SetPlayerColorParams = __Infer<typeof SetPlayerColorReducer>;
 export type SetPlayerNameParams = __Infer<typeof SetPlayerNameReducer>;

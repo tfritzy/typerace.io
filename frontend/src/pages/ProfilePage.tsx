@@ -47,20 +47,20 @@ export const ProfilePage = () => {
             }
         };
 
-        conn.db.player.onInsert(handlePlayerInsert);
-        conn.db.player.onUpdate(handlePlayerUpdate);
+        conn.db.player_v2.onInsert(handlePlayerInsert);
+        conn.db.player_v2.onUpdate(handlePlayerUpdate);
 
         const subscription = conn.subscriptionBuilder()
             .onApplied(() => {
-                const allPlayers = Array.from(conn.db.player.iter());
+                const allPlayers = Array.from(conn.db.player_v2.iter());
                 const p = allPlayers.find(player => player.playerId === playerId);
                 if (p) setViewedPlayer(p);
             })
             .subscribe([`SELECT * FROM player_v2 WHERE PlayerId = '${playerId}'`]);
 
         return () => {
-            conn.db.player.removeOnInsert(handlePlayerInsert);
-            conn.db.player.removeOnUpdate(handlePlayerUpdate);
+            conn.db.player_v2.removeOnInsert(handlePlayerInsert);
+            conn.db.player_v2.removeOnUpdate(handlePlayerUpdate);
             subscription.unsubscribe();
         };
     }, [conn, playerId]);
@@ -74,17 +74,17 @@ export const ProfilePage = () => {
             }
         };
 
-        conn.db.gameRecord.onInsert(handleGameRecordInsert);
+        conn.db.game_record_v2.onInsert(handleGameRecordInsert);
 
         const subscription = conn.subscriptionBuilder()
             .onApplied(() => {
-                const records = Array.from(conn.db.gameRecord.iter());
+                const records = Array.from(conn.db.game_record_v2.iter());
                 setGameRecords(records);
             })
             .subscribe([`SELECT * FROM game_record_v2 WHERE PlayerId = '${viewedPlayer?.identity}'`]);
 
         return () => {
-            conn.db.gameRecord.removeOnInsert(handleGameRecordInsert);
+            conn.db.game_record_v2.removeOnInsert(handleGameRecordInsert);
             subscription.unsubscribe();
         };
     }, [conn, viewedPlayer?.identity]);
@@ -97,13 +97,13 @@ export const ProfilePage = () => {
 
     const handleNameSave = (name: string) => {
         if (!conn) return;
-        conn.reducers.setPlayerName({ name });
+        (conn.reducers as any).SetPlayerName({ name });
         setIsEditNameModalOpen(false);
     };
 
     const handleColorSave = (color: PlayerColor['tag']) => {
         if (!conn) return;
-        conn.reducers.setPlayerColor({ color: { tag: color } as any });
+        (conn.reducers as any).SetPlayerColor({ color: { tag: color } as any });
         setIsEditColorModalOpen(false);
     };
 

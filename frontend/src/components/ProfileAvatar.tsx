@@ -45,9 +45,9 @@ export const ProfileAvatar = memo(() => {
       }
     };
 
-    conn.db.player.onInsert(handlePlayerInsert);
-    conn.db.player.onUpdate(handlePlayerUpdate);
-    conn.db.player.onDelete(handlePlayerDelete);
+    conn.db.player_v2.onInsert(handlePlayerInsert);
+    conn.db.player_v2.onUpdate(handlePlayerUpdate);
+    conn.db.player_v2.onDelete(handlePlayerDelete);
 
     const subscription = conn
       .subscriptionBuilder()
@@ -56,9 +56,9 @@ export const ProfileAvatar = memo(() => {
       ]);
 
     return () => {
-      conn.db.player.removeOnInsert(handlePlayerInsert);
-      conn.db.player.removeOnUpdate(handlePlayerUpdate);
-      conn.db.player.removeOnDelete(handlePlayerDelete);
+      conn.db.player_v2.removeOnInsert(handlePlayerInsert);
+      conn.db.player_v2.removeOnUpdate(handlePlayerUpdate);
+      conn.db.player_v2.removeOnDelete(handlePlayerDelete);
       subscription.unsubscribe();
     };
   }, [conn]);

@@ -27,19 +27,19 @@ export const Countdown = () => {
       }
     };
 
-    conn.db.game.onInsert(handleGameInsert);
-    conn.db.game.onUpdate(handleGameUpdate);
+    conn.db.game_v2.onInsert(handleGameInsert);
+    conn.db.game_v2.onUpdate(handleGameUpdate);
 
     const subscription = conn.subscriptionBuilder()
       .onApplied(() => {
-        const g = conn.db.game.id.find(gameId);
+        const g = conn.db.game_v2.id.find(gameId);
         if (g) setGame(g);
       })
       .subscribe([`SELECT * FROM game_v2 WHERE Id = '${gameId}'`]);
 
     return () => {
-      conn.db.game.removeOnInsert(handleGameInsert);
-      conn.db.game.removeOnUpdate(handleGameUpdate);
+      conn.db.game_v2.removeOnInsert(handleGameInsert);
+      conn.db.game_v2.removeOnUpdate(handleGameUpdate);
       subscription.unsubscribe();
     };
   }, [conn, gameId]);

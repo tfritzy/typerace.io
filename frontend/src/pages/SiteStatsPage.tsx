@@ -74,18 +74,18 @@ export const SiteStatsPage = () => {
             );
         };
 
-        conn.db.globalStats.onInsert(handleStatsInsert);
-        conn.db.globalStats.onUpdate(handleStatsUpdate);
+        conn.db.global_stats_v2.onInsert(handleStatsInsert);
+        conn.db.global_stats_v2.onUpdate(handleStatsUpdate);
 
         const subscription = conn.subscriptionBuilder()
             .onApplied(() => {
-                setGlobalStats(Array.from(conn.db.globalStats.iter()));
+                setGlobalStats(Array.from(conn.db.global_stats_v2.iter()));
             })
             .subscribe([`SELECT * FROM global_stats_v2`]);
 
         return () => {
-            conn.db.globalStats.removeOnInsert(handleStatsInsert);
-            conn.db.globalStats.removeOnUpdate(handleStatsUpdate);
+            conn.db.global_stats_v2.removeOnInsert(handleStatsInsert);
+            conn.db.global_stats_v2.removeOnUpdate(handleStatsUpdate);
             subscription.unsubscribe();
         };
     }, [conn]);

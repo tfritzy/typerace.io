@@ -72,19 +72,19 @@ export const GamePage = () => {
       }
     };
 
-    conn.db.game.onInsert(handleGameInsert);
-    conn.db.game.onUpdate(handleGameUpdate);
+    conn.db.game_v2.onInsert(handleGameInsert);
+    conn.db.game_v2.onUpdate(handleGameUpdate);
 
     const gameSubscription = conn.subscriptionBuilder()
       .onApplied(() => {
-        const g = conn.db.game.id.find(gameId);
+        const g = conn.db.game_v2.id.find(gameId);
         if (g) setGame(g);
       })
       .subscribe([`SELECT * FROM game_v2 WHERE Id = '${gameId}'`]);
 
     return () => {
-      conn.db.game.removeOnInsert(handleGameInsert);
-      conn.db.game.removeOnUpdate(handleGameUpdate);
+      conn.db.game_v2.removeOnInsert(handleGameInsert);
+      conn.db.game_v2.removeOnUpdate(handleGameUpdate);
       gameSubscription.unsubscribe();
     };
   }, [conn, gameId]);
@@ -117,12 +117,12 @@ export const GamePage = () => {
       }
     };
 
-    conn.db.playerProgress.onInsert(handleProgressInsert);
-    conn.db.playerProgress.onUpdate(handleProgressUpdate);
+    conn.db.player_progress_v2.onInsert(handleProgressInsert);
+    conn.db.player_progress_v2.onUpdate(handleProgressUpdate);
 
     const progressSubscription = conn.subscriptionBuilder()
       .onApplied(() => {
-        const allProgress = Array.from(conn.db.playerProgress.iter());
+        const allProgress = Array.from(conn.db.player_progress_v2.iter());
         const currentGameProgress = allProgress.filter(pp => pp.gameId.toString() === gameId);
         setGamePlayerProgress(currentGameProgress);
       })
@@ -131,8 +131,8 @@ export const GamePage = () => {
       ]);
 
     return () => {
-      conn.db.playerProgress.removeOnInsert(handleProgressInsert);
-      conn.db.playerProgress.removeOnUpdate(handleProgressUpdate);
+      conn.db.player_progress_v2.removeOnInsert(handleProgressInsert);
+      conn.db.player_progress_v2.removeOnUpdate(handleProgressUpdate);
       progressSubscription.unsubscribe();
     };
   }, [conn, gameId, navigate]);
@@ -167,7 +167,7 @@ export const GamePage = () => {
       );
 
       if (!hasProgress) {
-        conn.reducers.joinPrivateGame({ gameId });
+        (conn.reducers as any).JoinPrivateGame({ gameId });
       }
     }
   }, [conn, game, gameId, gamePlayerProgress]);

@@ -22,7 +22,7 @@ export const useDatabase = () => {
 };
 
 export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
     const [conn, setConn] = useState<DbConnection | null>(null);
     const [showReconnectModal, setShowReconnectModal] = useState(false);
     const [isReconnecting, setIsReconnecting] = useState(false);
@@ -31,23 +31,26 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     const failureTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const connect = async (isAutoReconnect = false) => {
-        if (!user) return;
-
         if (isAutoReconnect) {
             setIsReconnecting(true);
             setReconnectFailed(false);
         }
 
         try {
-            const idToken = await user.getIdToken();
+            const idToken = user ? await user.getIdToken() : undefined;
 
-            const connection = DbConnection.builder()
+            const builder = DbConnection.builder()
                 .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
-                .withDatabaseName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace')
-                .withToken(idToken)
+                .withDatabaseName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace');
+
+            if (idToken) {
+                builder.withToken(idToken);
+            }
+
+            const connection = builder
                 .onConnect((conn) => {
                     console.log('Connected to SpacetimeDB');
-                    conn.reducers.syncAnonymousStatus({ isAnonymous: user.isAnonymous });
+                    (conn.reducers as any).SyncAnonymousStatus({ isAnonymous: user?.isAnonymous ?? true });
                     setConn(conn);
                     setShowReconnectModal(false);
                     setIsReconnecting(false);
@@ -115,7 +118,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     };
 
     useEffect(() => {
-        if (!user) {
+        if (loading) {
             return;
         }
 
@@ -133,9 +136,9 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                 setConn(null);
             });
         };
-    }, [user?.uid]);
+    }, [user?.uid, loading]);
 
-    if (!user) {
+    if (loading) {
         return <LoadingDots />;
     }
 

@@ -36,31 +36,31 @@ import {
 // Import all reducer arg schemas
 import JoinGameReducer from "./join_game_reducer";
 import JoinPrivateGameReducer from "./join_private_game_reducer";
+import MigrateToV2Reducer from "./migrate_to_v_2_reducer";
 import RematchReducer from "./rematch_reducer";
 import SetPlayerColorReducer from "./set_player_color_reducer";
 import SetPlayerNameReducer from "./set_player_name_reducer";
 import StartPrivateGameReducer from "./start_private_game_reducer";
 import SyncAnonymousStatusReducer from "./sync_anonymous_status_reducer";
 import UpdateProgressReducer from "./update_progress_reducer";
-import MigrateToV2Reducer from "./migrate_to_v2_reducer";
 
 // Import all procedure arg schemas
 
 // Import all table schema definitions
 import EloRow from "./elo_table";
 import GameRow from "./game_table";
-import GamerecordRow from "./gamerecord_table";
-import GlobalstatsRow from "./globalstats_table";
-import PersonalrecordRow from "./personalrecord_table";
+import GameRecordRow from "./game_record_table";
+import GlobalStatsRow from "./global_stats_table";
+import PersonalRecordRow from "./personal_record_table";
 import PlayerRow from "./player_table";
-import PlayerprogressRow from "./playerprogress_table";
-import XpgainRow from "./xpgain_table";
+import PlayerProgressRow from "./player_progress_table";
+import XpGainRow from "./xp_gain_table";
 
 /** Type-only namespace exports for generated type groups. */
 
 /** The schema information for all tables in this module. This is defined the same was as the tables would have been defined in the server. */
 const tablesSchema = __schema({
-  elo: __table({
+  elo_v2: __table({
     name: 'elo_v2',
     indexes: [
       { name: 'GameMode', algorithm: 'btree', columns: [
@@ -78,34 +78,10 @@ const tablesSchema = __schema({
       ] },
     ],
     constraints: [
-      { name: 'elo_v2_Id_key', constraint: 'unique', columns: ['id'] },
+      { name: 'elo_v2_id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, EloRow),
-  game: __table({
-    name: 'game_v2',
-    indexes: [
-      { name: 'GameMode', algorithm: 'btree', columns: [
-        'gameMode',
-      ] },
-      { name: 'GameType', algorithm: 'btree', columns: [
-        'gameType',
-      ] },
-      { name: 'Id', algorithm: 'btree', columns: [
-        'id',
-      ] },
-      { name: 'State_GameType', algorithm: 'btree', columns: [
-        'state',
-        'gameType',
-      ] },
-      { name: 'State', algorithm: 'btree', columns: [
-        'state',
-      ] },
-    ],
-    constraints: [
-      { name: 'game_v2_Id_key', constraint: 'unique', columns: ['id'] },
-    ],
-  }, GameRow),
-  gameRecord: __table({
+  game_record_v2: __table({
     name: 'game_record_v2',
     indexes: [
       { name: 'Day', algorithm: 'btree', columns: [
@@ -135,10 +111,34 @@ const tablesSchema = __schema({
       ] },
     ],
     constraints: [
-      { name: 'game_record_v2_Id_key', constraint: 'unique', columns: ['id'] },
+      { name: 'game_record_v2_id_key', constraint: 'unique', columns: ['id'] },
     ],
-  }, GamerecordRow),
-  globalStats: __table({
+  }, GameRecordRow),
+  game_v2: __table({
+    name: 'game_v2',
+    indexes: [
+      { name: 'GameMode', algorithm: 'btree', columns: [
+        'gameMode',
+      ] },
+      { name: 'GameType', algorithm: 'btree', columns: [
+        'gameType',
+      ] },
+      { name: 'Id', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { name: 'State_GameType', algorithm: 'btree', columns: [
+        'state',
+        'gameType',
+      ] },
+      { name: 'State', algorithm: 'btree', columns: [
+        'state',
+      ] },
+    ],
+    constraints: [
+      { name: 'game_v2_id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, GameRow),
+  global_stats_v2: __table({
     name: 'global_stats_v2',
     indexes: [
       { name: 'Date', algorithm: 'btree', columns: [
@@ -146,10 +146,10 @@ const tablesSchema = __schema({
       ] },
     ],
     constraints: [
-      { name: 'global_stats_v2_Date_key', constraint: 'unique', columns: ['date'] },
+      { name: 'global_stats_v2_date_key', constraint: 'unique', columns: ['date'] },
     ],
-  }, GlobalstatsRow),
-  personalRecord: __table({
+  }, GlobalStatsRow),
+  personal_record_v2: __table({
     name: 'personal_record_v2',
     indexes: [
       { name: 'GameMode', algorithm: 'btree', columns: [
@@ -167,27 +167,10 @@ const tablesSchema = __schema({
       ] },
     ],
     constraints: [
-      { name: 'personal_record_v2_Id_key', constraint: 'unique', columns: ['id'] },
+      { name: 'personal_record_v2_id_key', constraint: 'unique', columns: ['id'] },
     ],
-  }, PersonalrecordRow),
-  player: __table({
-    name: 'player_v2',
-    indexes: [
-      { name: 'Identity', algorithm: 'btree', columns: [
-        'identity',
-      ] },
-      { name: 'IsBot', algorithm: 'btree', columns: [
-        'isBot',
-      ] },
-      { name: 'PlayerId', algorithm: 'btree', columns: [
-        'playerId',
-      ] },
-    ],
-    constraints: [
-      { name: 'player_v2_Identity_key', constraint: 'unique', columns: ['identity'] },
-    ],
-  }, PlayerRow),
-  playerProgress: __table({
+  }, PersonalRecordRow),
+  player_progress_v2: __table({
     name: 'player_progress_v2',
     indexes: [
       { name: 'GameId', algorithm: 'btree', columns: [
@@ -201,10 +184,27 @@ const tablesSchema = __schema({
       ] },
     ],
     constraints: [
-      { name: 'player_progress_v2_Id_key', constraint: 'unique', columns: ['id'] },
+      { name: 'player_progress_v2_id_key', constraint: 'unique', columns: ['id'] },
     ],
-  }, PlayerprogressRow),
-  xpGain: __table({
+  }, PlayerProgressRow),
+  player_v2: __table({
+    name: 'player_v2',
+    indexes: [
+      { name: 'Identity', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+      { name: 'IsBot', algorithm: 'btree', columns: [
+        'isBot',
+      ] },
+      { name: 'PlayerId', algorithm: 'btree', columns: [
+        'playerId',
+      ] },
+    ],
+    constraints: [
+      { name: 'player_v2_identity_key', constraint: 'unique', columns: ['identity'] },
+    ],
+  }, PlayerRow),
+  xp_gain_v2: __table({
     name: 'xp_gain_v2',
     indexes: [
       { name: 'Id', algorithm: 'btree', columns: [
@@ -218,22 +218,22 @@ const tablesSchema = __schema({
       ] },
     ],
     constraints: [
-      { name: 'xp_gain_v2_Id_key', constraint: 'unique', columns: ['id'] },
+      { name: 'xp_gain_v2_id_key', constraint: 'unique', columns: ['id'] },
     ],
-  }, XpgainRow),
+  }, XpGainRow),
 });
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
   __reducerSchema("JoinGame", JoinGameReducer),
   __reducerSchema("JoinPrivateGame", JoinPrivateGameReducer),
+  __reducerSchema("MigrateToV2", MigrateToV2Reducer),
   __reducerSchema("Rematch", RematchReducer),
   __reducerSchema("SetPlayerColor", SetPlayerColorReducer),
   __reducerSchema("SetPlayerName", SetPlayerNameReducer),
   __reducerSchema("StartPrivateGame", StartPrivateGameReducer),
   __reducerSchema("SyncAnonymousStatus", SyncAnonymousStatusReducer),
   __reducerSchema("UpdateProgress", UpdateProgressReducer),
-  __reducerSchema("MigrateToV2", MigrateToV2Reducer),
 );
 
 /** The schema information for all procedures in this module. This is defined the same way as the procedures would have been defined in the server. */
