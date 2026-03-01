@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import "../components/SelectionButton.css";
 import { type GameMode } from "../types/stdb";
 import { ChevronUp, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
-import { languages, getContentTypeFromMode, type ContentTypeValue, type LanguageInfo } from "../utils/modes";
+import { getContentTypeFromMode, type ContentTypeValue, type LanguageInfo } from "../utils/modes";
 
 export type GameTypeValue = "Public" | "Private" | "Practice";
 
@@ -18,9 +18,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [contentType, setContentType] = useState<ContentTypeValue>(() => getContentTypeFromMode(selectedMode.tag));
 
-    const selectedLanguage = useMemo(() => {
-        return currentLang;
-    }, [currentLang]);
+    const selectedLanguage = currentLang;
 
     const quotesAvailableForLanguage = selectedLanguage.quotesMode !== null;
 
@@ -85,26 +83,6 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                         </button>
                     </div>
                 </div>
-                <div className="pb-6">
-                    <h2 className="text-white/50 text-sm font-medium mb-2">Language</h2>
-                    <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2">
-                        {languages.map((lang) => {
-                            const href = lang.slug ? `/${lang.slug}` : "/";
-                            const isSelected = lang.language === currentLang.language;
-
-                            return (
-                                <a
-                                    key={lang.language}
-                                    href={href}
-                                    className={`selection-button ${isSelected ? "selected" : ""}`}
-                                >
-                                    <span className="flag leading-none">{lang.flag}</span>
-                                    <span>{lang.nativeName}</span>
-                                </a>
-                            );
-                        })}
-                    </div>
-                </div>
             </div>
 
             <div className="md:hidden pb-2">
@@ -117,10 +95,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                         {gameType === "Private" && <Lock size={18} />}
                         {gameType === "Practice" && <Target size={18} />}
                         {contentType === "Quotes" ? <Quote size={18} /> : <Shuffle size={18} />}
-                        <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>
-                            {selectedLanguage.flag}
-                        </span>
-                        <span>{selectedLanguage.nativeName}</span>
+                        <span>{gameType} · {contentType === "Quotes" ? "Quotes" : "Random Words"}</span>
                     </div>
                     <ChevronUp size={20} />
                 </button>
@@ -185,24 +160,6 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                         <Quote size={20} />
                                         <span>Quotes</span>
                                     </button>
-                                </div>
-                                <h3 className="text-white/80 text-base font-medium mb-3">Language</h3>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {languages.map((lang) => {
-                                        const href = lang.slug ? `/${lang.slug}` : "/";
-                                        const isSelected = lang.language === currentLang.language;
-
-                                        return (
-                                            <a
-                                                key={lang.language}
-                                                href={href}
-                                                className={`selection-button ${isSelected ? "selected" : ""}`}
-                                            >
-                                                <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>{lang.flag}</span>
-                                                <span>{lang.nativeName}</span>
-                                            </a>
-                                        );
-                                    })}
                                 </div>
                             </div>
                         </div>
