@@ -3,9 +3,10 @@ import { useEffect, useRef } from "react";
 const AMBER_R = 251;
 const AMBER_G = 191;
 const AMBER_B = 36;
-const LINE_ANGLE = (35 * Math.PI) / 180;
-const PATTERN_CYCLE = 90;
+const STRIPE_SPACING = 90;
+const HALF_SHIFT = STRIPE_SPACING / 2;
 const ANIM_SPEED = 0.18;
+const OVERDRAW = 200;
 const VIGNETTE_INNER_RATIO = 0.35;
 const VIGNETTE_OUTER_RATIO = 0.75;
 const VIGNETTE_MAX_ALPHA = 0.82;
@@ -46,21 +47,18 @@ export const KeyboardBackground = () => {
     init();
     window.addEventListener("resize", init);
 
-    const draw = () => {
-      ctx.clearRect(0, 0, w, h);
-
+    const drawHalf = (x0: number, x1: number, phase: number) => {
       ctx.save();
-      ctx.translate(w / 2, h / 2);
-      ctx.rotate(LINE_ANGLE);
+      ctx.beginPath();
+      ctx.rect(x0, 0, x1 - x0, h);
+      ctx.clip();
 
-      const diagonal = Math.sqrt(w * w + h * h);
-      const halfDiag = diagonal / 2;
-      const numCycles = Math.ceil(diagonal / PATTERN_CYCLE) + 2;
-      const animOffset = offset % PATTERN_CYCLE;
+      const maxC = w + h + OVERDRAW;
+      const minBase = Math.floor(-OVERDRAW / STRIPE_SPACING) * STRIPE_SPACING;
 
-      for (let cycle = -numCycles; cycle <= numCycles; cycle++) {
+      for (let base = minBase; base <= maxC; base += STRIPE_SPACING) {
         for (const stripe of STRIPE_DEFS) {
-          const y = cycle * PATTERN_CYCLE + stripe.offset - animOffset;
+          const c = base + stripe.offset - phase;
           if (stripe.glow) {
             ctx.shadowColor = `rgba(${AMBER_R},${AMBER_G},${AMBER_B},${GLOW_SHADOW_ALPHA})`;
             ctx.shadowBlur = GLOW_BLUR;
@@ -68,8 +66,8 @@ export const KeyboardBackground = () => {
             ctx.shadowBlur = 0;
           }
           ctx.beginPath();
-          ctx.moveTo(-halfDiag, y);
-          ctx.lineTo(halfDiag, y);
+          ctx.moveTo(-OVERDRAW, c + OVERDRAW);
+          ctx.lineTo(c + OVERDRAW, -OVERDRAW);
           ctx.strokeStyle = `rgba(${AMBER_R},${AMBER_G},${AMBER_B},${stripe.opacity})`;
           ctx.lineWidth = stripe.width;
           ctx.stroke();
@@ -78,6 +76,16 @@ export const KeyboardBackground = () => {
 
       ctx.shadowBlur = 0;
       ctx.restore();
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+
+      const phase = offset % STRIPE_SPACING;
+      const halfW = w / 2;
+
+      drawHalf(0, halfW, phase);
+      drawHalf(halfW, w, (phase + HALF_SHIFT) % STRIPE_SPACING);
 
       const vignette = ctx.createRadialGradient(
         w / 2, h / 2, Math.min(w, h) * VIGNETTE_INNER_RATIO,
