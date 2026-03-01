@@ -7,6 +7,7 @@ import { GameOptionsSelector, type GameTypeValue } from "../components/ModeSelec
 import { LanguageSelector } from "../components/LanguageSelector";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import { RacingBackground } from "../components/RacingBackground";
 import { getRandomStartupPhrase, getLanguageFromSlug, getContentTypeFromMode, storeLangSlug } from "../utils/modes";
 import { useFindGame } from "../hooks/useFindGame";
 
@@ -73,20 +74,24 @@ export const LobbyPage = () => {
 
   return (
     <div className="relative h-screen flex flex-col overflow-hidden">
-      <Header />
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="content-container">
-          <div className="text-2xl mb-[400px]">
-            <TypeBox
-              ref={typeBoxRef}
-              phrase={startupPhrase}
-              onComplete={handlePhraseComplete}
-              resetOnComplete={true}
-            />
+      <RacingBackground />
+      <div className="relative z-10 flex flex-col h-full">
+        <Header />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="content-container">
+            <div className="text-2xl mb-[400px]">
+              <TypeBox
+                ref={typeBoxRef}
+                phrase={startupPhrase}
+                onComplete={handlePhraseComplete}
+                resetOnComplete={true}
+              />
+            </div>
           </div>
         </div>
+        <Footer />
       </div>
-      <div className="fixed bottom-10 left-0 right-0">
+      <div className="fixed bottom-10 left-0 right-0 z-10">
         <div className="px-4">
           <div className="content-container">
             <GameOptionsSelector
@@ -99,7 +104,6 @@ export const LobbyPage = () => {
           </div>
         </div>
       </div>
-      <Footer />
       <LanguageSelector currentLang={currentLang} />
     </div>
   );
