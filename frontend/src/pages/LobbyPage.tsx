@@ -9,6 +9,7 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { getRandomStartupPhrase, getLanguageFromSlug, getContentTypeFromMode, storeLangSlug } from "../utils/modes";
 import { useFindGame } from "../hooks/useFindGame";
+import { KeyboardBackground } from "../components/KeyboardBackground";
 
 const GAME_TYPE_KEY = "typerace_game_type";
 const CONTENT_TYPE_KEY = "typerace_content_type";
@@ -73,6 +74,7 @@ export const LobbyPage = () => {
 
   return (
     <div className="relative h-screen flex flex-col overflow-hidden">
+      <KeyboardBackground />
       <Header />
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="content-container">
