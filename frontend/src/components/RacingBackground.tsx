@@ -38,7 +38,7 @@ export const RacingBackground = () => {
       return () => cancelAnimationFrame(frame);
     } else {
       setActive(false);
-      const timer = setTimeout(() => setShouldRender(false), 800);
+      const timer = setTimeout(() => setShouldRender(false), 650);
       return () => clearTimeout(timer);
     }
   }, [isLobby]);
