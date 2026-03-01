@@ -2,8 +2,8 @@ spacetime generate --lang typescript --out-dir frontend/module_bindings --projec
 
 spacetime sql typerace "SELECT * from player"
 
-spacetime publish --project-path spacetimedb typerace
-spacetime publish -c --project-path spacetimedb typerace -y
+spacetime publish --project-path spacetimedb typerace -s local
+spacetime publish -c --project-path spacetimedb typerace -y -s local
 
 QA ENVIRONMENT DEPLOYMENT:
 spacetime publish -c -y --project-path spacetimedb --server maincloud typerace-qa
