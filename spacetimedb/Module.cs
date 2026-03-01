@@ -171,7 +171,128 @@ public static partial class Module
         return count;
     }
 
-    [Table(Accessor = "player", Public = true)]
+    [Table(Accessor = "playerLegacy", Name = "player")]
+    public partial struct PlayerLegacy
+    {
+        public Identity Identity;
+        public string PlayerId;
+        public string Name;
+        public int TotalGames;
+        public int Wins;
+        public int Level;
+        public int Xp;
+        public int XpRequiredForNextLevel;
+        public int TotalWordsTyped;
+        public long TotalTimeSpentMs;
+        public bool IsBot;
+        public BotConfig? BotConfig;
+        public PlayerColor Color;
+        public bool IsAnonymous;
+        public long LastGameDate;
+    }
+
+    [Table(Accessor = "gameLegacy", Name = "game")]
+    public partial struct GameLegacy
+    {
+        public string Id;
+        public string Phrase;
+        public long CreatedAt;
+        public long RacingStartedAt;
+        public long CountdownDurationMs;
+        public GameState State;
+        public GameMode GameMode;
+        public GameType GameType;
+        public List<Identity> Placements;
+        public Identity? Owner;
+        [Default("")]
+        public string? Attribution;
+    }
+
+    [Table(Accessor = "gamerecordLegacy", Name = "gamerecord")]
+    public partial struct GameRecordLegacy
+    {
+        public string Id;
+        public Identity PlayerId;
+        public string GameId;
+        public GameMode GameMode;
+        public GameType GameType;
+        public int Year;
+        public int Month;
+        public long Date;
+        public long TimeMs;
+        public int Placement;
+        public double Wpm;
+        public int XpGained;
+        public int EloChange;
+        [Default("")]
+        public string Day;
+    }
+
+    [Table(Accessor = "personalrecordLegacy", Name = "personalrecord")]
+    public partial struct PersonalRecordLegacy
+    {
+        public string Id;
+        public Identity PlayerId;
+        public GameMode GameMode;
+        public string GameRecordId;
+        public double Wpm;
+    }
+
+    [Table(Accessor = "xpgainLegacy", Name = "xpgain")]
+    public partial struct XpGainLegacy
+    {
+        public string Id;
+        public Identity PlayerId;
+        public string GameId;
+        public long Timestamp;
+        public int BaseXp;
+        public List<XpMultiplier> Multipliers;
+        public int TotalXp;
+    }
+
+    [Table(Accessor = "eloLegacy", Name = "elo")]
+    public partial struct EloLegacy
+    {
+        public string Id;
+        public Identity PlayerId;
+        public GameMode GameMode;
+        public int Rating;
+    }
+
+    [Table(Accessor = "globalstatsLegacy", Name = "globalstats")]
+    public partial struct GlobalStatsLegacy
+    {
+        public string Date;
+        public List<GameModeCount> Stats;
+        public GameModeCount Total;
+        [Default(0)]
+        public int DailyActivePlayers;
+    }
+
+    [Table(Accessor = "playerprogressLegacy", Name = "playerprogress")]
+    public partial struct PlayerProgressLegacy
+    {
+        public string Id;
+        public Identity PlayerId;
+        public string PlayerPublicId;
+        public string GameId;
+        public string PlayerName;
+        public int PlayerLevel;
+        public int ProgressIndex;
+        public bool IsBot;
+        public bool IsAnonymous;
+        public long CreatedAt;
+        public byte[] CharacterHistory;
+        public long Time;
+        public int Placement;
+        public string JoinCode;
+        public double Wpm;
+        public PlayerColor PlayerColor;
+        [Default(0)]
+        public int HighestProgress;
+    }
+
+    [Table(Accessor = "player", Name = "PlayerV2", Public = true)]
     public partial struct Player
     {
         [PrimaryKey]
@@ -194,7 +315,7 @@ public static partial class Module
         public long LastGameDate;
     }
 
-    [Table(Accessor = "game", Public = true)]
+    [Table(Accessor = "game", Name = "GameV2", Public = true)]
     [SpacetimeDB.Index.BTree(Accessor = "State_GameType", Columns = new[] { nameof(State), nameof(GameType) })]
     public partial struct Game
     {
@@ -220,7 +341,7 @@ public static partial class Module
         public string? Attribution;
     }
 
-    [Table(Accessor = "gamerecord", Public = true)]
+    [Table(Accessor = "gamerecord", Name = "GameRecordV2", Public = true)]
     [SpacetimeDB.Index.BTree(Accessor = "PlayerId_Day", Columns = new[] { nameof(GameRecord.PlayerId), nameof(GameRecord.Day) })]
     public partial struct GameRecord
     {
@@ -248,7 +369,7 @@ public static partial class Module
         public string Day;
     }
 
-    [Table(Accessor = "personalrecord", Public = true)]
+    [Table(Accessor = "personalrecord", Name = "PersonalRecordV2", Public = true)]
     [SpacetimeDB.Index.BTree(Accessor = "PlayerId_GameMode", Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
     public partial struct PersonalRecord
     {
@@ -262,7 +383,7 @@ public static partial class Module
         public double Wpm;
     }
 
-    [Table(Accessor = "xpgain", Public = true)]
+    [Table(Accessor = "xpgain", Name = "XpGainV2", Public = true)]
     public partial struct XpGain
     {
         [PrimaryKey]
@@ -277,7 +398,7 @@ public static partial class Module
         public int TotalXp;
     }
 
-    [Table(Accessor = "elo", Public = true)]
+    [Table(Accessor = "elo", Name = "EloV2", Public = true)]
     [SpacetimeDB.Index.BTree(Accessor = "PlayerId_GameMode", Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
     public partial struct Elo
     {
@@ -339,7 +460,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Accessor = "globalstats", Public = true)]
+    [Table(Accessor = "globalstats", Name = "GlobalStatsV2", Public = true)]
     public partial struct GlobalStats
     {
         [PrimaryKey]
@@ -350,7 +471,7 @@ public static partial class Module
         public int DailyActivePlayers;
     }
 
-    [Table(Accessor = "playerprogress", Public = true)]
+    [Table(Accessor = "playerprogress", Name = "PlayerProgressV2", Public = true)]
     public partial struct PlayerProgress
     {
         [PrimaryKey]
@@ -435,6 +556,175 @@ public static partial class Module
         }
 
         Log.Info("Initialized 100 bot players");
+    }
+
+    [Reducer]
+    public static void MigrateToV2(ReducerContext ctx)
+    {
+        var playerCount = 0;
+        foreach (var legacy in ctx.Db.playerLegacy.Iter())
+        {
+            if (ctx.Db.player.Identity.Find(legacy.Identity) != null) continue;
+            ctx.Db.player.Insert(new Player
+            {
+                Identity = legacy.Identity,
+                PlayerId = legacy.PlayerId,
+                Name = legacy.Name,
+                TotalGames = legacy.TotalGames,
+                Wins = legacy.Wins,
+                Level = legacy.Level,
+                Xp = legacy.Xp,
+                XpRequiredForNextLevel = legacy.XpRequiredForNextLevel,
+                TotalWordsTyped = legacy.TotalWordsTyped,
+                TotalTimeSpentMs = legacy.TotalTimeSpentMs,
+                IsBot = legacy.IsBot,
+                BotConfig = legacy.BotConfig,
+                Color = legacy.Color,
+                IsAnonymous = legacy.IsAnonymous,
+                LastGameDate = legacy.LastGameDate
+            });
+            playerCount++;
+        }
+        Log.Info($"Migrated {playerCount} players to V2");
+
+        var gameCount = 0;
+        foreach (var legacy in ctx.Db.gameLegacy.Iter())
+        {
+            if (ctx.Db.game.Id.Find(legacy.Id) != null) continue;
+            ctx.Db.game.Insert(new Game
+            {
+                Id = legacy.Id,
+                Phrase = legacy.Phrase,
+                CreatedAt = legacy.CreatedAt,
+                RacingStartedAt = legacy.RacingStartedAt,
+                CountdownDurationMs = legacy.CountdownDurationMs,
+                State = legacy.State,
+                GameMode = legacy.GameMode,
+                GameType = legacy.GameType,
+                Placements = legacy.Placements,
+                Owner = legacy.Owner,
+                Attribution = legacy.Attribution
+            });
+            gameCount++;
+        }
+        Log.Info($"Migrated {gameCount} games to V2");
+
+        var gameRecordCount = 0;
+        foreach (var legacy in ctx.Db.gamerecordLegacy.Iter())
+        {
+            if (ctx.Db.gamerecord.Id.Find(legacy.Id) != null) continue;
+            ctx.Db.gamerecord.Insert(new GameRecord
+            {
+                Id = legacy.Id,
+                PlayerId = legacy.PlayerId,
+                GameId = legacy.GameId,
+                GameMode = legacy.GameMode,
+                GameType = legacy.GameType,
+                Year = legacy.Year,
+                Month = legacy.Month,
+                Date = legacy.Date,
+                TimeMs = legacy.TimeMs,
+                Placement = legacy.Placement,
+                Wpm = legacy.Wpm,
+                XpGained = legacy.XpGained,
+                EloChange = legacy.EloChange,
+                Day = legacy.Day
+            });
+            gameRecordCount++;
+        }
+        Log.Info($"Migrated {gameRecordCount} game records to V2");
+
+        var personalRecordCount = 0;
+        foreach (var legacy in ctx.Db.personalrecordLegacy.Iter())
+        {
+            if (ctx.Db.personalrecord.Id.Find(legacy.Id) != null) continue;
+            ctx.Db.personalrecord.Insert(new PersonalRecord
+            {
+                Id = legacy.Id,
+                PlayerId = legacy.PlayerId,
+                GameMode = legacy.GameMode,
+                GameRecordId = legacy.GameRecordId,
+                Wpm = legacy.Wpm
+            });
+            personalRecordCount++;
+        }
+        Log.Info($"Migrated {personalRecordCount} personal records to V2");
+
+        var xpGainCount = 0;
+        foreach (var legacy in ctx.Db.xpgainLegacy.Iter())
+        {
+            if (ctx.Db.xpgain.Id.Find(legacy.Id) != null) continue;
+            ctx.Db.xpgain.Insert(new XpGain
+            {
+                Id = legacy.Id,
+                PlayerId = legacy.PlayerId,
+                GameId = legacy.GameId,
+                Timestamp = legacy.Timestamp,
+                BaseXp = legacy.BaseXp,
+                Multipliers = legacy.Multipliers,
+                TotalXp = legacy.TotalXp
+            });
+            xpGainCount++;
+        }
+        Log.Info($"Migrated {xpGainCount} xp gains to V2");
+
+        var eloCount = 0;
+        foreach (var legacy in ctx.Db.eloLegacy.Iter())
+        {
+            if (ctx.Db.elo.Id.Find(legacy.Id) != null) continue;
+            ctx.Db.elo.Insert(new Elo
+            {
+                Id = legacy.Id,
+                PlayerId = legacy.PlayerId,
+                GameMode = legacy.GameMode,
+                Rating = legacy.Rating
+            });
+            eloCount++;
+        }
+        Log.Info($"Migrated {eloCount} elo records to V2");
+
+        var globalStatsCount = 0;
+        foreach (var legacy in ctx.Db.globalstatsLegacy.Iter())
+        {
+            if (ctx.Db.globalstats.Date.Find(legacy.Date) != null) continue;
+            ctx.Db.globalstats.Insert(new GlobalStats
+            {
+                Date = legacy.Date,
+                Stats = legacy.Stats,
+                Total = legacy.Total,
+                DailyActivePlayers = legacy.DailyActivePlayers
+            });
+            globalStatsCount++;
+        }
+        Log.Info($"Migrated {globalStatsCount} global stats to V2");
+
+        var playerProgressCount = 0;
+        foreach (var legacy in ctx.Db.playerprogressLegacy.Iter())
+        {
+            if (ctx.Db.playerprogress.Id.Find(legacy.Id) != null) continue;
+            ctx.Db.playerprogress.Insert(new PlayerProgress
+            {
+                Id = legacy.Id,
+                PlayerId = legacy.PlayerId,
+                PlayerPublicId = legacy.PlayerPublicId,
+                GameId = legacy.GameId,
+                PlayerName = legacy.PlayerName,
+                PlayerLevel = legacy.PlayerLevel,
+                ProgressIndex = legacy.ProgressIndex,
+                IsBot = legacy.IsBot,
+                IsAnonymous = legacy.IsAnonymous,
+                CreatedAt = legacy.CreatedAt,
+                CharacterHistory = legacy.CharacterHistory,
+                Time = legacy.Time,
+                Placement = legacy.Placement,
+                JoinCode = legacy.JoinCode,
+                Wpm = legacy.Wpm,
+                PlayerColor = legacy.PlayerColor,
+                HighestProgress = legacy.HighestProgress
+            });
+            playerProgressCount++;
+        }
+        Log.Info($"Migrated {playerProgressCount} player progress records to V2");
     }
 
     private static double GenerateTypingRate(Random rng)
