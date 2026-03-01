@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { type GameMode, type PlayerProgress } from "../types/stdb";
+import { type GameMode, type PlayerProgress, type Reducers } from "../types/stdb";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { useToast } from "./useToast";
 import { useDatabase } from "../contexts/SpacetimeContext";
@@ -49,7 +49,7 @@ export const useFindGame = () => {
 
     const gameTypeEnum = { tag: gameType };
     try {
-      await (conn.reducers as any).JoinGame({
+      await ((conn.reducers as unknown) as Reducers).JoinGame({
         gameMode: mode,
         joinCode: newJoinCode,
         gameType: gameTypeEnum as never

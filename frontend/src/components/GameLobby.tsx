@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Check, Clipboard } from "lucide-react";
 import type { DbConnection } from "../../module_bindings";
+import type { Reducers } from "../types/stdb";
 
 type GameLobbyProps = {
   gameId: string;
@@ -13,7 +14,7 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
 
   const handleStartGame = useCallback(() => {
     if (!conn || !gameId || !isOwner) return;
-    (conn.reducers as any).StartPrivateGame({ gameId });
+    ((conn.reducers as unknown) as Reducers).StartPrivateGame({ gameId });
   }, [conn, gameId, isOwner]);
 
   const gameUrl = `${window.location.origin}/game/${gameId}`;
