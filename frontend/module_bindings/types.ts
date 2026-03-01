@@ -11,23 +11,23 @@ import {
 } from "spacetimedb";
 
 export const BotConfig = __t.object("BotConfig", {
-  typingRate: __t.f64().name("TypingRate"),
-  errorRate: __t.f64().name("ErrorRate"),
+  typingRate: __t.f64(),
+  errorRate: __t.f64(),
 });
 export type BotConfig = __Infer<typeof BotConfig>;
 
 export const BotFillTrigger = __t.object("BotFillTrigger", {
-  scheduledId: __t.u64().name("ScheduledId"),
-  gameId: __t.string().name("GameId"),
-  scheduledAt: __t.scheduleAt().name("ScheduledAt"),
+  scheduledId: __t.u64(),
+  gameId: __t.string(),
+  scheduledAt: __t.scheduleAt(),
 });
 export type BotFillTrigger = __Infer<typeof BotFillTrigger>;
 
 export const BotProgressUpdate = __t.object("BotProgressUpdate", {
-  scheduledId: __t.u64().name("ScheduledId"),
-  playerProgressId: __t.string().name("PlayerProgressId"),
-  phraseLength: __t.i32().name("PhraseLength"),
-  scheduledAt: __t.scheduleAt().name("ScheduledAt"),
+  scheduledId: __t.u64(),
+  playerProgressId: __t.string(),
+  phraseLength: __t.i32(),
+  scheduledAt: __t.scheduleAt(),
 });
 export type BotProgressUpdate = __Infer<typeof BotProgressUpdate>;
 
@@ -40,46 +40,46 @@ export const CharacterEventType = __t.enum("CharacterEventType", {
 export type CharacterEventType = __Infer<typeof CharacterEventType>;
 
 export const CountdownStart = __t.object("CountdownStart", {
-  scheduledId: __t.u64().name("ScheduledId"),
-  gameId: __t.string().name("GameId"),
-  scheduledAt: __t.scheduleAt().name("ScheduledAt"),
+  scheduledId: __t.u64(),
+  gameId: __t.string(),
+  scheduledAt: __t.scheduleAt(),
 });
 export type CountdownStart = __Infer<typeof CountdownStart>;
 
 export const Elo = __t.object("Elo", {
-  id: __t.string().name("Id"),
-  playerId: __t.identity().name("PlayerId"),
+  id: __t.string(),
+  playerId: __t.identity(),
   get gameMode() {
-    return GameMode.name("GameMode");
+    return GameMode;
   },
-  rating: __t.i32().name("Rating"),
+  rating: __t.i32(),
 });
 export type Elo = __Infer<typeof Elo>;
 
 export const Game = __t.object("Game", {
-  id: __t.string().name("Id"),
-  phrase: __t.string().name("Phrase"),
-  createdAt: __t.i64().name("CreatedAt"),
-  racingStartedAt: __t.i64().name("RacingStartedAt"),
-  countdownDurationMs: __t.i64().name("CountdownDurationMs"),
+  id: __t.string(),
+  phrase: __t.string(),
+  createdAt: __t.i64(),
+  racingStartedAt: __t.i64(),
+  countdownDurationMs: __t.i64(),
   get state() {
-    return GameState.name("State");
+    return GameState;
   },
   get gameMode() {
-    return GameMode.name("GameMode");
+    return GameMode;
   },
   get gameType() {
-    return GameType.name("GameType");
+    return GameType;
   },
-  placements: __t.array(__t.identity()).name("Placements"),
-  owner: __t.option(__t.identity()).name("Owner"),
-  attribution: __t.option(__t.string()).name("Attribution"),
+  placements: __t.array(__t.identity()),
+  owner: __t.option(__t.identity()),
+  attribution: __t.option(__t.string()),
 });
 export type Game = __Infer<typeof Game>;
 
 export const GameArchiver = __t.object("GameArchiver", {
-  scheduledId: __t.u64().name("ScheduledId"),
-  scheduledAt: __t.scheduleAt().name("ScheduledAt"),
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
 });
 export type GameArchiver = __Infer<typeof GameArchiver>;
 
@@ -120,47 +120,47 @@ export type GameMode = __Infer<typeof GameMode>;
 
 export const GameModeCount = __t.object("GameModeCount", {
   get gameType() {
-    return GameType.name("GameType");
+    return GameType;
   },
   get gameMode() {
-    return GameMode.name("GameMode");
+    return GameMode;
   },
-  finishedGames: __t.i32().name("FinishedGames"),
-  nonLonelyGames: __t.i32().name("NonLonelyGames"),
-  startedGames: __t.i32().name("StartedGames"),
-  totalWpm: __t.f64().name("TotalWpm"),
-  minWpm: __t.f64().name("MinWpm"),
-  maxWpm: __t.f64().name("MaxWpm"),
-  gameCount: __t.i32().name("GameCount"),
+  finishedGames: __t.i32(),
+  nonLonelyGames: __t.i32(),
+  startedGames: __t.i32(),
+  totalWpm: __t.f64(),
+  minWpm: __t.f64(),
+  maxWpm: __t.f64(),
+  gameCount: __t.i32(),
 });
 export type GameModeCount = __Infer<typeof GameModeCount>;
 
 export const GameRecord = __t.object("GameRecord", {
-  id: __t.string().name("Id"),
-  playerId: __t.identity().name("PlayerId"),
-  gameId: __t.string().name("GameId"),
+  id: __t.string(),
+  playerId: __t.identity(),
+  gameId: __t.string(),
   get gameMode() {
-    return GameMode.name("GameMode");
+    return GameMode;
   },
   get gameType() {
-    return GameType.name("GameType");
+    return GameType;
   },
-  year: __t.i32().name("Year"),
-  month: __t.i32().name("Month"),
-  date: __t.i64().name("Date"),
-  timeMs: __t.i64().name("TimeMs"),
-  placement: __t.i32().name("Placement"),
-  wpm: __t.f64().name("Wpm"),
-  xpGained: __t.i32().name("XpGained"),
-  eloChange: __t.i32().name("EloChange"),
-  day: __t.string().name("Day"),
+  year: __t.i32(),
+  month: __t.i32(),
+  date: __t.i64(),
+  timeMs: __t.i64(),
+  placement: __t.i32(),
+  wpm: __t.f64(),
+  xpGained: __t.i32(),
+  eloChange: __t.i32(),
+  day: __t.string(),
 });
 export type GameRecord = __Infer<typeof GameRecord>;
 
 export const GameStart = __t.object("GameStart", {
-  scheduledId: __t.u64().name("ScheduledId"),
-  gameId: __t.string().name("GameId"),
-  scheduledAt: __t.scheduleAt().name("ScheduledAt"),
+  scheduledId: __t.u64(),
+  gameId: __t.string(),
+  scheduledAt: __t.scheduleAt(),
 });
 export type GameStart = __Infer<typeof GameStart>;
 
@@ -182,48 +182,48 @@ export const GameType = __t.enum("GameType", {
 export type GameType = __Infer<typeof GameType>;
 
 export const GlobalStats = __t.object("GlobalStats", {
-  date: __t.string().name("Date"),
+  date: __t.string(),
   get stats() {
-    return __t.array(GameModeCount).name("Stats");
+    return __t.array(GameModeCount);
   },
   get total() {
-    return GameModeCount.name("Total");
+    return GameModeCount;
   },
-  dailyActivePlayers: __t.i32().name("DailyActivePlayers"),
+  dailyActivePlayers: __t.i32(),
 });
 export type GlobalStats = __Infer<typeof GlobalStats>;
 
 export const PersonalRecord = __t.object("PersonalRecord", {
-  id: __t.string().name("Id"),
-  playerId: __t.identity().name("PlayerId"),
+  id: __t.string(),
+  playerId: __t.identity(),
   get gameMode() {
-    return GameMode.name("GameMode");
+    return GameMode;
   },
-  gameRecordId: __t.string().name("GameRecordId"),
-  wpm: __t.f64().name("Wpm"),
+  gameRecordId: __t.string(),
+  wpm: __t.f64(),
 });
 export type PersonalRecord = __Infer<typeof PersonalRecord>;
 
 export const Player = __t.object("Player", {
-  identity: __t.identity().name("Identity"),
-  playerId: __t.string().name("PlayerId"),
-  name: __t.string().name("Name"),
-  totalGames: __t.i32().name("TotalGames"),
-  wins: __t.i32().name("Wins"),
-  level: __t.i32().name("Level"),
-  xp: __t.i32().name("Xp"),
-  xpRequiredForNextLevel: __t.i32().name("XpRequiredForNextLevel"),
-  totalWordsTyped: __t.i32().name("TotalWordsTyped"),
-  totalTimeSpentMs: __t.i64().name("TotalTimeSpentMs"),
-  isBot: __t.bool().name("IsBot"),
+  identity: __t.identity(),
+  playerId: __t.string(),
+  name: __t.string(),
+  totalGames: __t.i32(),
+  wins: __t.i32(),
+  level: __t.i32(),
+  xp: __t.i32(),
+  xpRequiredForNextLevel: __t.i32(),
+  totalWordsTyped: __t.i32(),
+  totalTimeSpentMs: __t.i64(),
+  isBot: __t.bool(),
   get botConfig() {
-    return __t.option(BotConfig).name("BotConfig");
+    return __t.option(BotConfig);
   },
   get color() {
-    return PlayerColor.name("Color");
+    return PlayerColor;
   },
-  isAnonymous: __t.bool().name("IsAnonymous"),
-  lastGameDate: __t.i64().name("LastGameDate"),
+  isAnonymous: __t.bool(),
+  lastGameDate: __t.i64(),
 });
 export type Player = __Infer<typeof Player>;
 
@@ -250,51 +250,51 @@ export const PlayerColor = __t.enum("PlayerColor", {
 export type PlayerColor = __Infer<typeof PlayerColor>;
 
 export const PlayerProgress = __t.object("PlayerProgress", {
-  id: __t.string().name("Id"),
-  playerId: __t.identity().name("PlayerId"),
-  playerPublicId: __t.string().name("PlayerPublicId"),
-  gameId: __t.string().name("GameId"),
-  playerName: __t.string().name("PlayerName"),
-  playerLevel: __t.i32().name("PlayerLevel"),
-  progressIndex: __t.i32().name("ProgressIndex"),
-  isBot: __t.bool().name("IsBot"),
-  isAnonymous: __t.bool().name("IsAnonymous"),
-  createdAt: __t.i64().name("CreatedAt"),
-  characterHistory: __t.byteArray().name("CharacterHistory"),
-  time: __t.i64().name("Time"),
-  placement: __t.i32().name("Placement"),
-  joinCode: __t.string().name("JoinCode"),
-  wpm: __t.f64().name("Wpm"),
+  id: __t.string(),
+  playerId: __t.identity(),
+  playerPublicId: __t.string(),
+  gameId: __t.string(),
+  playerName: __t.string(),
+  playerLevel: __t.i32(),
+  progressIndex: __t.i32(),
+  isBot: __t.bool(),
+  isAnonymous: __t.bool(),
+  createdAt: __t.i64(),
+  characterHistory: __t.byteArray(),
+  time: __t.i64(),
+  placement: __t.i32(),
+  joinCode: __t.string(),
+  wpm: __t.f64(),
   get playerColor() {
-    return PlayerColor.name("PlayerColor");
+    return PlayerColor;
   },
-  highestProgress: __t.i32().name("HighestProgress"),
+  highestProgress: __t.i32(),
 });
 export type PlayerProgress = __Infer<typeof PlayerProgress>;
 
 export const XpGain = __t.object("XpGain", {
-  id: __t.string().name("Id"),
-  playerId: __t.identity().name("PlayerId"),
-  gameId: __t.string().name("GameId"),
-  timestamp: __t.i64().name("Timestamp"),
-  baseXp: __t.i32().name("BaseXp"),
+  id: __t.string(),
+  playerId: __t.identity(),
+  gameId: __t.string(),
+  timestamp: __t.i64(),
+  baseXp: __t.i32(),
   get multipliers() {
-    return __t.array(XpMultiplier).name("Multipliers");
+    return __t.array(XpMultiplier);
   },
-  totalXp: __t.i32().name("TotalXp"),
+  totalXp: __t.i32(),
 });
 export type XpGain = __Infer<typeof XpGain>;
 
 export const XpGainCleaner = __t.object("XpGainCleaner", {
-  scheduledId: __t.u64().name("ScheduledId"),
-  scheduledAt: __t.scheduleAt().name("ScheduledAt"),
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
 });
 export type XpGainCleaner = __Infer<typeof XpGainCleaner>;
 
 export const XpMultiplier = __t.object("XpMultiplier", {
-  label: __t.string().name("Label"),
-  value: __t.string().name("Value"),
-  type: __t.string().name("Type"),
+  label: __t.string(),
+  value: __t.string(),
+  type: __t.string(),
 });
 export type XpMultiplier = __Infer<typeof XpMultiplier>;
 
