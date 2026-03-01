@@ -1,46 +1,26 @@
 import { useEffect, useRef } from "react";
 
-const AMBER = [251, 191, 36] as const;
-const STREAK_COUNT = 22;
-const SPAWN_X_OFFSET = 400;
-const VERTICAL_PAD = 24;
-const MIN_LENGTH = 24;
-const MAX_LENGTH_DEPTH_SCALE = 320;
-const MAX_LENGTH_RANDOM = 80;
-const BASE_SPEED = 0.4;
-const MAX_SPEED_DEPTH_SCALE = 9;
-const MAX_SPEED_RANDOM = 2;
-const MIN_OPACITY = 0.025;
-const MAX_OPACITY_DEPTH_SCALE = 0.24;
-const MAX_OPACITY_RANDOM = 0.05;
-const MIN_WIDTH = 0.4;
-const MAX_WIDTH_DEPTH_SCALE = 2.8;
-const GRADIENT_MID_STOP = 0.55;
-const MID_OPACITY_MULTIPLIER = 0.28;
-const GLOW_OPACITY_THRESHOLD = 0.09;
-const GLOW_RADIUS_MULTIPLIER = 5;
-const GLOW_OPACITY_MULTIPLIER = 1.6;
+const AMBER_R = 251;
+const AMBER_G = 191;
+const AMBER_B = 36;
+const LINE_ANGLE = (35 * Math.PI) / 180;
+const PATTERN_CYCLE = 90;
+const ANIM_SPEED = 0.18;
+const VIGNETTE_INNER_RATIO = 0.35;
+const VIGNETTE_OUTER_RATIO = 0.75;
+const VIGNETTE_MAX_ALPHA = 0.82;
+const GLOW_SHADOW_ALPHA = 0.4;
+const GLOW_BLUR = 10;
 
-type Streak = {
-  x: number;
-  y: number;
-  length: number;
-  speed: number;
-  opacity: number;
-  width: number;
-};
+type StripeDef = { offset: number; width: number; opacity: number; glow?: boolean };
 
-function makeStreak(w: number, h: number): Streak {
-  const depth = Math.pow(Math.random(), 1.5);
-  return {
-    x: Math.random() * (w + SPAWN_X_OFFSET),
-    y: VERTICAL_PAD + Math.random() * (h - VERTICAL_PAD * 2),
-    length: MIN_LENGTH + depth * MAX_LENGTH_DEPTH_SCALE + Math.random() * MAX_LENGTH_RANDOM,
-    speed: BASE_SPEED + depth * MAX_SPEED_DEPTH_SCALE + Math.random() * MAX_SPEED_RANDOM,
-    opacity: MIN_OPACITY + depth * MAX_OPACITY_DEPTH_SCALE + Math.random() * MAX_OPACITY_RANDOM,
-    width: MIN_WIDTH + depth * MAX_WIDTH_DEPTH_SCALE,
-  };
-}
+const STRIPE_DEFS: StripeDef[] = [
+  { offset: 0, width: 0.5, opacity: 0.03 },
+  { offset: 16, width: 1.2, opacity: 0.055 },
+  { offset: 32, width: 0.5, opacity: 0.02 },
+  { offset: 60, width: 2.2, opacity: 0.1, glow: true },
+  { offset: 70, width: 0.6, opacity: 0.035 },
+];
 
 export const KeyboardBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -53,7 +33,7 @@ export const KeyboardBackground = () => {
 
     let w = 0;
     let h = 0;
-    let streaks: Streak[] = [];
+    let offset = 0;
     let animId: number;
 
     const init = () => {
@@ -61,7 +41,6 @@ export const KeyboardBackground = () => {
       h = window.innerHeight;
       canvas.width = w;
       canvas.height = h;
-      streaks = Array.from({ length: STREAK_COUNT }, () => makeStreak(w, h));
     };
 
     init();
@@ -70,42 +49,46 @@ export const KeyboardBackground = () => {
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
 
-      for (const s of streaks) {
-        s.x += s.speed;
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+      ctx.rotate(LINE_ANGLE);
 
-        if (s.x - s.length > w) {
-          const next = makeStreak(w, h);
-          next.x = -next.length;
-          next.y = VERTICAL_PAD + Math.random() * (h - VERTICAL_PAD * 2);
-          Object.assign(s, next);
-        }
+      const diagonal = Math.sqrt(w * w + h * h);
+      const halfDiag = diagonal / 2;
+      const numCycles = Math.ceil(diagonal / PATTERN_CYCLE) + 2;
+      const animOffset = offset % PATTERN_CYCLE;
 
-        const [r, g, b] = AMBER;
-        const grad = ctx.createLinearGradient(s.x - s.length, s.y, s.x + 2, s.y);
-        grad.addColorStop(0, `rgba(${r},${g},${b},0)`);
-        grad.addColorStop(GRADIENT_MID_STOP, `rgba(${r},${g},${b},${s.opacity * MID_OPACITY_MULTIPLIER})`);
-        grad.addColorStop(1, `rgba(${r},${g},${b},${s.opacity})`);
-
-        ctx.beginPath();
-        ctx.moveTo(s.x - s.length, s.y);
-        ctx.lineTo(s.x, s.y);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = s.width;
-        ctx.lineCap = "round";
-        ctx.stroke();
-
-        if (s.opacity > GLOW_OPACITY_THRESHOLD) {
-          const glowR = s.width * GLOW_RADIUS_MULTIPLIER;
-          const glow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, glowR);
-          glow.addColorStop(0, `rgba(${r},${g},${b},${s.opacity * GLOW_OPACITY_MULTIPLIER})`);
-          glow.addColorStop(1, `rgba(${r},${g},${b},0)`);
-          ctx.fillStyle = glow;
+      for (let cycle = -numCycles; cycle <= numCycles; cycle++) {
+        for (const stripe of STRIPE_DEFS) {
+          const y = cycle * PATTERN_CYCLE + stripe.offset - animOffset;
+          if (stripe.glow) {
+            ctx.shadowColor = `rgba(${AMBER_R},${AMBER_G},${AMBER_B},${GLOW_SHADOW_ALPHA})`;
+            ctx.shadowBlur = GLOW_BLUR;
+          } else {
+            ctx.shadowBlur = 0;
+          }
           ctx.beginPath();
-          ctx.arc(s.x, s.y, glowR, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.moveTo(-halfDiag, y);
+          ctx.lineTo(halfDiag, y);
+          ctx.strokeStyle = `rgba(${AMBER_R},${AMBER_G},${AMBER_B},${stripe.opacity})`;
+          ctx.lineWidth = stripe.width;
+          ctx.stroke();
         }
       }
 
+      ctx.shadowBlur = 0;
+      ctx.restore();
+
+      const vignette = ctx.createRadialGradient(
+        w / 2, h / 2, Math.min(w, h) * VIGNETTE_INNER_RATIO,
+        w / 2, h / 2, Math.max(w, h) * VIGNETTE_OUTER_RATIO
+      );
+      vignette.addColorStop(0, "rgba(32,32,32,0)");
+      vignette.addColorStop(1, `rgba(32,32,32,${VIGNETTE_MAX_ALPHA})`);
+      ctx.fillStyle = vignette;
+      ctx.fillRect(0, 0, w, h);
+
+      offset += ANIM_SPEED;
       animId = requestAnimationFrame(draw);
     };
 
@@ -125,4 +108,5 @@ export const KeyboardBackground = () => {
     />
   );
 };
+
 
