@@ -37,7 +37,7 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                 aria-label="Select language"
             >
                 <img
-                    src={getFlagUrl(currentLang.flag)}
+                    src={getFlagUrl(currentLang)}
                     alt={currentLang.nativeName}
                     className="w-full h-full object-cover"
                 />
@@ -67,7 +67,7 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                                 }`}
                             >
                                 <img
-                                    src={getFlagUrl(lang.flag)}
+                                    src={getFlagUrl(lang)}
                                     alt={lang.nativeName}
                                     className="w-5 h-5 rounded-sm object-cover"
                                 />

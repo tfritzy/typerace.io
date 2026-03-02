@@ -20,7 +20,6 @@ export enum Language {
 
 export interface LanguageInfo {
     language: Language;
-    flag: string;
     slug: string;
     randomWordsMode: string;
     quotesMode: string | null;
@@ -31,21 +30,39 @@ export interface LanguageInfo {
 }
 
 export const languages: LanguageInfo[] = [
-    { language: Language.English, flag: "gb", slug: "", randomWordsMode: "English500", quotesMode: "EnglishQuotes", nativeName: "English", htmlLang: "en", title: "TypeRace.io - Multiplayer Typing Race", description: "Race against players worldwide in real-time typing competitions. Test and improve your typing speed in multiplayer races." },
-    { language: Language.Spanish, flag: "es", slug: "es", randomWordsMode: "Spanish500", quotesMode: "SpanishQuotes", nativeName: "Español", htmlLang: "es", title: "TypeRace.io - Carrera de mecanografía", description: "Compite contra jugadores de todo el mundo en carreras de mecanografía en tiempo real. Mejora tu velocidad de escritura." },
-    { language: Language.French, flag: "fr", slug: "fr", randomWordsMode: "French500", quotesMode: "FrenchQuotes", nativeName: "Français", htmlLang: "fr", title: "TypeRace.io - Course de dactylographie", description: "Affrontez des joueurs du monde entier dans des compétitions de frappe en temps réel. Améliorez votre vitesse de frappe." },
-    { language: Language.German, flag: "de", slug: "de", randomWordsMode: "German500", quotesMode: "GermanQuotes", nativeName: "Deutsch", htmlLang: "de", title: "TypeRace.io - Tippwettbewerb", description: "Tritt gegen Spieler weltweit in Echtzeit-Tippwettbewerben an. Verbessere deine Tippgeschwindigkeit." },
-    { language: Language.Italian, flag: "it", slug: "it", randomWordsMode: "Italian500", quotesMode: "ItalianQuotes", nativeName: "Italiano", htmlLang: "it", title: "TypeRace.io - Gara di digitazione", description: "Gareggia contro giocatori di tutto il mondo in competizioni di digitazione in tempo reale. Migliora la tua velocità di battitura." },
-    { language: Language.Portuguese, flag: "pt", slug: "pt", randomWordsMode: "Portuguese500", quotesMode: "PortugueseQuotes", nativeName: "Português", htmlLang: "pt", title: "TypeRace.io - Corrida de digitação", description: "Compita contra jogadores de todo o mundo em competições de digitação em tempo real. Melhore sua velocidade de digitação." },
-    { language: Language.Japanese, flag: "jp", slug: "ja", randomWordsMode: "Japanese500", quotesMode: "JapaneseQuotes", nativeName: "日本語", htmlLang: "ja", title: "TypeRace.io - タイピングレース", description: "世界中のプレイヤーとリアルタイムのタイピング競争で対戦しましょう。タイピング速度を向上させましょう。" },
-    { language: Language.Korean, flag: "kr", slug: "ko", randomWordsMode: "Korean500", quotesMode: "KoreanQuotes", nativeName: "한국어", htmlLang: "ko", title: "TypeRace.io - 타이핑 레이스", description: "전 세계 플레이어와 실시간 타이핑 대회에서 경쟁하세요. 타이핑 속도를 향상시키세요." },
-    { language: Language.Chinese, flag: "cn", slug: "zh", randomWordsMode: "Chinese500", quotesMode: "ChineseQuotes", nativeName: "中文", htmlLang: "zh", title: "TypeRace.io - 打字竞赛", description: "与全球玩家进行实时打字比赛。提高你的打字速度。" },
-    { language: Language.Ukrainian, flag: "ua", slug: "uk", randomWordsMode: "Ukrainian500", quotesMode: "UkrainianQuotes", nativeName: "Українська", htmlLang: "uk", title: "TypeRace.io - Змагання з друку", description: "Змагайтеся з гравцями з усього світу в змаганнях з друку в реальному часі. Покращуйте швидкість друку." },
-    { language: Language.Hindi, flag: "in", slug: "hi", randomWordsMode: "Hindi500", quotesMode: "HindiQuotes", nativeName: "हिन्दी", htmlLang: "hi", title: "TypeRace.io - टाइपिंग रेस", description: "वास्तविक समय में टाइपिंग प्रतियोगिताओं में दुनिया भर के खिलाड़ियों के खिलाफ प्रतिस्पर्धा करें। अपनी टाइपिंग गति में सुधार करें।" },
-    { language: Language.Dutch, flag: "nl", slug: "nl", randomWordsMode: "Dutch500", quotesMode: "DutchQuotes", nativeName: "Nederlands", htmlLang: "nl", title: "TypeRace.io - Typwedstrijd", description: "Race tegen spelers wereldwijd in real-time typwedstrijden. Verbeter je typsnelheid." },
-    { language: Language.Swedish, flag: "se", slug: "sv", randomWordsMode: "Swedish500", quotesMode: "SwedishQuotes", nativeName: "Svenska", htmlLang: "sv", title: "TypeRace.io - Skrivtävling", description: "Tävla mot spelare världen över i skrivtävlingar i realtid. Förbättra din skrivhastighet." },
-    { language: Language.Turkish, flag: "tr", slug: "tr", randomWordsMode: "Turkish500", quotesMode: "TurkishQuotes", nativeName: "Türkçe", htmlLang: "tr", title: "TypeRace.io - Yazma yarışı", description: "Dünya genelindeki oyuncularla gerçek zamanlı yazma yarışmalarında yarışın. Yazma hızınızı geliştirin." },
+    { language: Language.English, slug: "", randomWordsMode: "English500", quotesMode: "EnglishQuotes", nativeName: "English", htmlLang: "en", title: "TypeRace.io - Multiplayer Typing Race", description: "Race against players worldwide in real-time typing competitions. Test and improve your typing speed in multiplayer races." },
+    { language: Language.Spanish, slug: "es", randomWordsMode: "Spanish500", quotesMode: "SpanishQuotes", nativeName: "Español", htmlLang: "es", title: "TypeRace.io - Carrera de mecanografía", description: "Compite contra jugadores de todo el mundo en carreras de mecanografía en tiempo real. Mejora tu velocidad de escritura." },
+    { language: Language.French, slug: "fr", randomWordsMode: "French500", quotesMode: "FrenchQuotes", nativeName: "Français", htmlLang: "fr", title: "TypeRace.io - Course de dactylographie", description: "Affrontez des joueurs du monde entier dans des compétitions de frappe en temps réel. Améliorez votre vitesse de frappe." },
+    { language: Language.German, slug: "de", randomWordsMode: "German500", quotesMode: "GermanQuotes", nativeName: "Deutsch", htmlLang: "de", title: "TypeRace.io - Tippwettbewerb", description: "Tritt gegen Spieler weltweit in Echtzeit-Tippwettbewerben an. Verbessere deine Tippgeschwindigkeit." },
+    { language: Language.Italian, slug: "it", randomWordsMode: "Italian500", quotesMode: "ItalianQuotes", nativeName: "Italiano", htmlLang: "it", title: "TypeRace.io - Gara di digitazione", description: "Gareggia contro giocatori di tutto il mondo in competizioni di digitazione in tempo reale. Migliora la tua velocità di battitura." },
+    { language: Language.Portuguese, slug: "pt", randomWordsMode: "Portuguese500", quotesMode: "PortugueseQuotes", nativeName: "Português", htmlLang: "pt", title: "TypeRace.io - Corrida de digitação", description: "Compita contra jogadores de todo o mundo em competições de digitação em tempo real. Melhore sua velocidade de digitação." },
+    { language: Language.Japanese, slug: "ja", randomWordsMode: "Japanese500", quotesMode: "JapaneseQuotes", nativeName: "日本語", htmlLang: "ja", title: "TypeRace.io - タイピングレース", description: "世界中のプレイヤーとリアルタイムのタイピング競争で対戦しましょう。タイピング速度を向上させましょう。" },
+    { language: Language.Korean, slug: "ko", randomWordsMode: "Korean500", quotesMode: "KoreanQuotes", nativeName: "한국어", htmlLang: "ko", title: "TypeRace.io - 타이핑 레이스", description: "전 세계 플레이어와 실시간 타이핑 대회에서 경쟁하세요. 타이핑 속도를 향상시키세요." },
+    { language: Language.Chinese, slug: "zh", randomWordsMode: "Chinese500", quotesMode: "ChineseQuotes", nativeName: "中文", htmlLang: "zh", title: "TypeRace.io - 打字竞赛", description: "与全球玩家进行实时打字比赛。提高你的打字速度。" },
+    { language: Language.Ukrainian, slug: "uk", randomWordsMode: "Ukrainian500", quotesMode: "UkrainianQuotes", nativeName: "Українська", htmlLang: "uk", title: "TypeRace.io - Змагання з друку", description: "Змагайтеся з гравцями з усього світу в змаганнях з друку в реальному часі. Покращуйте швидкість друку." },
+    { language: Language.Hindi, slug: "hi", randomWordsMode: "Hindi500", quotesMode: "HindiQuotes", nativeName: "हिन्दी", htmlLang: "hi", title: "TypeRace.io - टाइपिंग रेस", description: "वास्तविक समय में टाइपिंग प्रतियोगिताओं में दुनिया भर के खिलाड़ियों के खिलाफ प्रतिस्पर्धा करें। अपनी टाइपिंग गति में सुधार करें।" },
+    { language: Language.Dutch, slug: "nl", randomWordsMode: "Dutch500", quotesMode: "DutchQuotes", nativeName: "Nederlands", htmlLang: "nl", title: "TypeRace.io - Typwedstrijd", description: "Race tegen spelers wereldwijd in real-time typwedstrijden. Verbeter je typsnelheid." },
+    { language: Language.Swedish, slug: "sv", randomWordsMode: "Swedish500", quotesMode: "SwedishQuotes", nativeName: "Svenska", htmlLang: "sv", title: "TypeRace.io - Skrivtävling", description: "Tävla mot spelare världen över i skrivtävlingar i realtid. Förbättra din skrivhastighet." },
+    { language: Language.Turkish, slug: "tr", randomWordsMode: "Turkish500", quotesMode: "TurkishQuotes", nativeName: "Türkçe", htmlLang: "tr", title: "TypeRace.io - Yazma yarışı", description: "Dünya genelindeki oyuncularla gerçek zamanlı yazma yarışmalarında yarışın. Yazma hızınızı geliştirin." },
 ].sort((a, b) => a.language.localeCompare(b.language));
+
+const FLAG_CODE_OVERRIDES: Partial<Record<Language, string>> = {
+    [Language.English]: "gb",
+    [Language.Japanese]: "jp",
+    [Language.Korean]: "kr",
+    [Language.Chinese]: "cn",
+    [Language.Ukrainian]: "ua",
+    [Language.Hindi]: "in",
+    [Language.Swedish]: "se",
+};
+
+export function getFlagCode(lang: LanguageInfo): string {
+    return FLAG_CODE_OVERRIDES[lang.language] ?? lang.htmlLang;
+}
+
+export function getFlagUrl(lang: LanguageInfo): string {
+    return `/flags/${getFlagCode(lang)}.svg`;
+}
 
 export interface ModeOption {
     mode: { tag: string };
@@ -56,7 +73,7 @@ export interface ModeOption {
 export const randomWordsModes: ModeOption[] = languages.map(l => ({
     mode: { tag: l.randomWordsMode },
     label: l.language,
-    flag: l.flag,
+    flag: getFlagCode(l),
 }));
 
 export const quotesModes: ModeOption[] = languages
@@ -64,7 +81,7 @@ export const quotesModes: ModeOption[] = languages
     .map(l => ({
         mode: { tag: l.quotesMode! },
         label: l.language,
-        flag: l.flag,
+        flag: getFlagCode(l),
     }));
 
 export function getLanguageFromMode(modeTag: string): Language {
@@ -97,10 +114,6 @@ export function getLangPrefix(): string {
         if (slug) return `/${slug}`;
     } catch {}
     return "";
-}
-
-export function getFlagUrl(countryCode: string): string {
-    return `/flags/${countryCode}.svg`;
 }
 
 export function getContentTypeFromMode(modeTag: string): ContentTypeValue {
