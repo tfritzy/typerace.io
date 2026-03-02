@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { languages, type LanguageInfo } from "../utils/modes";
+import { languages, getFlagUrl, type LanguageInfo } from "../utils/modes";
 
 interface LanguageSelectorProps {
     currentLang: LanguageInfo;
@@ -28,20 +28,24 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
     }, [isOpen]);
 
     return (
-        <div className="fixed bottom-6 left-6 z-50">
+        <div className="fixed bottom-6 right-6 z-50">
             <button
                 ref={buttonRef}
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-12 h-12 rounded-full flex items-center justify-center cursor-pointer border border-white/20 hover:border-white/40 transition-all hover:scale-105"
+                className="w-12 h-12 rounded-full flex items-center justify-center cursor-pointer border border-white/20 hover:border-white/40 transition-all hover:scale-105 overflow-hidden p-0"
                 style={{ backgroundColor: "var(--color-box-bg)" }}
                 aria-label="Select language"
             >
-                <span className="text-xl leading-none">{currentLang.flag}</span>
+                <img
+                    src={getFlagUrl(currentLang.flag)}
+                    alt={currentLang.nativeName}
+                    className="w-full h-full object-cover"
+                />
             </button>
 
             <div
                 ref={menuRef}
-                className={`absolute bottom-16 left-0 rounded-xl border border-white/15 p-2 min-w-[180px] max-h-[70vh] overflow-y-auto transition-all ${
+                className={`absolute bottom-16 right-0 rounded-xl border border-white/15 p-2 min-w-[180px] max-h-[70vh] overflow-y-auto transition-all ${
                     isOpen
                         ? "opacity-100 visible"
                         : "opacity-0 invisible pointer-events-none"
@@ -62,7 +66,11 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                                         : "text-white/70 hover:bg-white/5 hover:text-white"
                                 }`}
                             >
-                                <span className="text-base leading-none">{lang.flag}</span>
+                                <img
+                                    src={getFlagUrl(lang.flag)}
+                                    alt={lang.nativeName}
+                                    className="w-5 h-5 rounded-sm object-cover"
+                                />
                                 <span>{lang.nativeName}</span>
                             </a>
                         );
