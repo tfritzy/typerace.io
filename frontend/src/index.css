@@ -293,11 +293,11 @@ body {
 }
 
 .starry-sky {
-  background: radial-gradient(ellipse at bottom, #1a1a2e 0%, #0d0d1a 50%, #050510 100%);
+  background: radial-gradient(ellipse at bottom, #12121e 0%, #0a0a15 50%, #050510 100%);
 }
 
 .horizon-glow {
-  background: linear-gradient(to top, rgba(251, 191, 36, 0.08) 0%, rgba(251, 191, 36, 0.03) 30%, transparent 100%);
+  background: linear-gradient(to top, rgba(251, 191, 36, 0.04) 0%, rgba(251, 191, 36, 0.015) 30%, transparent 100%);
 }
 
 @keyframes starTwinkle {
