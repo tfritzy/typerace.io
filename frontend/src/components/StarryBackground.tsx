@@ -5,8 +5,8 @@ const SHOOTING_STAR_INTERVAL_MIN = 4000;
 const SHOOTING_STAR_INTERVAL_MAX = 10000;
 const MIN_STAR_OPACITY = 0.6;
 const STAR_OPACITY_RANGE = 0.4;
-const BACK_TREE_COUNT = 55;
-const FRONT_TREE_COUNT = 60;
+const BACK_TREE_COUNT = 110;
+const FRONT_TREE_COUNT = 120;
 
 interface Star {
   x: number;
@@ -116,22 +116,22 @@ export const StarryBackground = () => {
         preserveAspectRatio="none"
         style={{ width: "100%", height: "150px" }}
       >
-        <rect x="-50" y="170" width="2020" height="30" fill="#0c0c0c" />
+        <rect x="-50" y="185" width="2020" height="15" fill="#0c0c0c" />
         {backTreesRef.current.map((tree, i) => (
           <path
             key={`b${i}`}
             d={TREE_PATHS[tree.treeType]}
             fill="#0c0c0c"
-            transform={`translate(${tree.x},170) scale(${tree.scale})`}
+            transform={`translate(${tree.x},185) scale(${tree.scale})`}
           />
         ))}
-        <rect x="-50" y="172" width="2020" height="28" fill="black" />
+        <rect x="-50" y="187" width="2020" height="13" fill="black" />
         {frontTreesRef.current.map((tree, i) => (
           <path
             key={`f${i}`}
             d={TREE_PATHS[tree.treeType]}
             fill="black"
-            transform={`translate(${tree.x},172) scale(${tree.scale})`}
+            transform={`translate(${tree.x},187) scale(${tree.scale})`}
           />
         ))}
       </svg>
