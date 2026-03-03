@@ -11,13 +11,13 @@
   /* Color Variables */
   --color-bg-primary: #202020;
   --color-white: #ffffff;
-  --color-white-25: rgba(255, 255, 255, 0.25);
+  --color-white-25: #595959;
   --color-error: #ef4444;
   --color-accent: #fbbf24;
   --color-accent-light: #fcd34d;
   --color-accent-dark: #f59e0b;
   --color-box-bg: #272727;
-  --color-box-border: rgba(255, 255, 255, 0.12);
+  --color-box-border: #3b3b3b;
   
   --max-content-width: 1000px;
   
@@ -112,8 +112,8 @@ body {
 }
 
 .box-with-focus:focus-within {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.3);
+  background-color: #2d2d2d;
+  border-color: #595959;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 

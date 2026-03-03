@@ -264,11 +264,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         if (isTyped && !isCorrect) {
           style.color = "var(--color-error)";
         } else if (isInCompletedWord) {
-          style.color = "rgba(255, 255, 255, 0.15)";
+          style.color = "#404040";
         } else if (isInCurrentWord) {
           style.color = "var(--color-white)";
         } else {
-          style.color = "rgba(255, 255, 255, 0.35)";
+          style.color = "#6b6b6b";
         }
 
         return (

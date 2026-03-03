@@ -45,7 +45,7 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
         }}
         onMouseEnter={(e) => {
           if (!linkCopied) {
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            e.currentTarget.style.borderColor = '#595959';
           }
         }}
         onMouseLeave={(e) => {
@@ -58,7 +58,7 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
           <div className="flex-1 min-w-0">
             <div
               className="text-[10px] uppercase tracking-wider mb-1.5 font-semibold transition-colors duration-200"
-              style={{ color: linkCopied ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.4)' }}
+              style={{ color: linkCopied ? 'var(--color-accent)' : '#737373' }}
             >
               {linkCopied ? 'Copied!' : 'Game Link'}
             </div>
@@ -68,7 +68,7 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
           </div>
           <div
             className="shrink-0 transition-all duration-200"
-            style={{ color: linkCopied ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
+            style={{ color: linkCopied ? 'var(--color-accent)' : '#888888' }}
           >
             {linkCopied ? <Check size={20} /> : <Clipboard size={20} />}
           </div>
@@ -81,7 +81,7 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
           className="bg-transparent text-white border rounded-lg px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-200"
           style={{ borderColor: 'var(--color-box-border)' }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            e.currentTarget.style.borderColor = '#595959';
             e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseLeave={(e) => {

@@ -46,8 +46,8 @@ export const LoadingDots = () => {
                         marginTop: '-16px',
                         width: '32px',
                         height: '32px',
-                        border: '3px solid rgba(255, 255, 255, 0.1)',
-                        borderTopColor: 'rgba(255, 255, 255, 0.6)',
+                        border: '3px solid #2e2e2e',
+                        borderTopColor: '#a6a6a6',
                         borderRadius: '50%',
                         animation: 'spin 0.8s linear infinite'
                     }}

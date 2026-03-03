@@ -32,20 +32,20 @@ export const XpGainPopup = ({ xpGain, onComplete }: XpGainPopupProps) => {
                     />
                 ))}
 
-                <div className="my-2 border-t" style={{ borderColor: 'rgba(255, 255, 255, 0.15)' }} />
+                <div className="my-2 border-t" style={{ borderColor: '#3b3b3b' }} />
 
                 <div
                     className="flex items-center justify-between py-2 px-3 rounded font-semibold text-sm"
                     style={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                        color: 'rgba(255, 255, 255, 0.95)',
+                        backgroundColor: '#333333',
+                        color: '#f2f2f2',
                     }}
                 >
                     <span>Total XP</span>
                     <span
                         className="tabular-nums text-base"
                         style={{
-                            color: 'rgba(255, 255, 255, 0.95)',
+                            color: '#f2f2f2',
                         }}
                     >
                         +{xpGain.totalXp}
@@ -68,14 +68,14 @@ const MultiplierRow = ({ label, value }: MultiplierRowProps) => {
         <div
             className="flex items-center justify-between py-1.5 px-2"
             style={{
-                color: isBonus ? 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 255, 255, 0.65)',
+                color: isBonus ? '#d9d9d9' : '#ababab',
             }}
         >
             <span className="font-medium text-sm">{label}</span>
             <span
                 className="font-bold tabular-nums text-sm tracking-wide"
                 style={{
-                    color: isBonus ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.75)',
+                    color: isBonus ? '#e6e6e6' : '#bfbfbf',
                 }}
             >
                 {value}

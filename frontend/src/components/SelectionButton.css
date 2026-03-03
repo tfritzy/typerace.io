@@ -8,7 +8,7 @@
   background-color: var(--color-box-bg);
   border: 1px solid var(--color-box-border);
   border-radius: 0.5rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: #e6e6e6;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -16,8 +16,8 @@
 }
 
 .selection-button:hover {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.25);
+  background-color: #2e2e2e;
+  border-color: #595959;
   transform: translateY(-1px);
 }
 
@@ -33,10 +33,10 @@
 }
 
 .selection-button:disabled {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: #292929;
   border-color: var(--color-box-border);
   border-style: dashed;
-  color: rgba(255, 255, 255, 0.45);
+  color: #808080;
   filter: saturate(0.7);
   cursor: not-allowed;
   pointer-events: none;

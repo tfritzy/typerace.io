@@ -38,7 +38,7 @@ export const AllPlayersResults = ({
                                 className="px-3 py-2 border rounded-md text-[13px] font-semibold cursor-pointer transition-all duration-200 tracking-wide flex items-center gap-2"
                                 style={{
                                     backgroundColor: isSelected ? '#363636' : 'transparent',
-                                    color: isSelected ? '#f2f2f2' : 'rgba(255, 255, 255, 0.5)',
+                                    color: isSelected ? '#f2f2f2' : '#888888',
                                     borderColor: 'var(--color-box-border)'
                                 }}
                             >
