@@ -5,7 +5,6 @@ import { type GameMode } from "../types/stdb";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { useFindGame } from "../hooks/useFindGame";
 import { getLangHome } from "../utils/modes";
-import "./SelectionButton.css";
 
 type ActionBarProps = {
   mode?: GameMode;
@@ -52,18 +51,19 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
     <div className="flex gap-3 mt-3 animate-slideUpFadeIn" style={{ animationDelay: '0.2s' }}>
       <button
         onClick={() => navigate(getLangHome())}
-        className="selection-button flex-1 text-base py-4"
+        className="box rounded-lg px-8 py-4 bg-transparent text-white text-base font-semibold cursor-pointer opacity-80 flex-1"
       >
-        Main Menu <span className="ml-1 border px-1 rounded-xs font-light border-[rgba(251,191,36,0.3)] text-[rgba(255,255,255,0.6)]">M</span>
+        Main Menu <span className="ml-1 border px-1 rounded-xs font-light border-white/40 text-white/75">M</span>
       </button>
       {gameId && gameType === "Private" && (
         <div className="relative flex-1 group">
           <button
             onClick={handleRematch}
             disabled={!canRematch}
-            className="selection-button w-full text-base py-4"
+            className={`box rounded-lg px-8 py-4 bg-transparent text-white text-base font-semibold w-full ${canRematch ? 'cursor-pointer opacity-80' : 'cursor-not-allowed opacity-40'
+              }`}
           >
-            Rematch <span className="ml-1 border px-1 rounded-xs font-light border-[rgba(251,191,36,0.3)] text-[rgba(255,255,255,0.6)]">R</span>
+            Rematch <span className="ml-1 border px-1 rounded-xs font-light border-white/40 text-white/75">R</span>
           </button>
           {!canRematch && (
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-white text-sm rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
@@ -76,9 +76,9 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
       {gameType !== "Private" && (
         <button
           onClick={handlePlayAgain}
-          className="selection-button flex-1 text-base py-4"
+          className="box rounded-lg px-8 py-4 bg-transparent text-white text-base font-semibold cursor-pointer opacity-80 flex-1"
         >
-          Play Again <span className="ml-1 border px-1 rounded-xs font-light border-[rgba(251,191,36,0.3)] text-[rgba(255,255,255,0.6)]">P</span>
+          Play Again <span className="ml-1 border px-1 rounded-xs font-light border-white/40 text-white/75">P</span>
         </button>
       )}
     </div>

@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 import { Check, Clipboard } from "lucide-react";
 import type { DbConnection } from "../../module_bindings";
-import "./SelectionButton.css";
 
 type GameLobbyProps = {
   gameId: string;
@@ -79,7 +78,16 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
       {isOwner && (
         <button
           onClick={handleStartGame}
-          className="selection-button w-full text-base py-3 selected"
+          className="bg-transparent text-white border rounded-lg px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-200"
+          style={{ borderColor: 'var(--color-box-border)' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            e.currentTarget.style.transform = 'translateY(-1px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--color-box-border)';
+            e.currentTarget.style.transform = 'translateY(0)';
+          }}
         >
           Start Game
         </button>
