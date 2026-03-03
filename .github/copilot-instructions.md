@@ -87,6 +87,19 @@ Under NO circumstances should you create, add, or modify any of the following fi
 
 This is a STRICT requirement. If you need to reference external documentation, always link to it rather than copying or creating local copies.
 
+### Screenshot Policy — MANDATORY ON EVERY PR
+
+**You MUST show screenshots from the actual running game on every PR. This is the first and most important rule.**
+
+You are fully capable of setting up the complete local environment:
+1. `spacetime start` — start the SpacetimeDB server
+2. `spacetime publish -c -y -p spacetimedb typerace -s local` — publish the module
+3. `npx firebase emulators:start --only auth` — start the Firebase Auth emulator
+4. `cd frontend && npm run dev` — start the Vite dev server
+5. Navigate to `http://localhost:5173` with Playwright and take a screenshot
+
+Do NOT stop until you have a real screenshot from the actual running application. Do NOT use static HTML mocks or fake screenshots. Always verify the page has fully loaded (auth, SpacetimeDB connection, and the typing box visible) before capturing.
+
 ### SpacetimeDB Documentation Reference
 
 For comprehensive SpacetimeDB documentation, including API references, best practices, and detailed examples, refer to the official documentation:
