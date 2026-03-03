@@ -27,7 +27,7 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
     return (
         <div ref={containerRef} className="fixed bottom-0 right-8 z-50">
             <div
-                className={`absolute bottom-28 left-0 rounded-xl border border-white/15 p-2 min-w-[180px] max-h-[70vh] overflow-y-auto transition-all ${
+                className={`absolute bottom-28 right-0 rounded-xl border border-white/15 p-2 min-w-[180px] max-h-[70vh] overflow-y-auto transition-all ${
                     isOpen
                         ? "opacity-100 visible"
                         : "opacity-0 invisible pointer-events-none"
@@ -68,7 +68,7 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                     }}
                 />
                 <span
-                    className="text-2xl leading-none ml-[-1px] mt-[-2px] transition-transform group-hover:scale-110"
+                    className="text-2xl leading-none ml-[-1px] mt-[-2px]"
                     style={{
                         filter: "drop-shadow(0 0 4px rgba(0,0,0,0.5))",
                     }}
