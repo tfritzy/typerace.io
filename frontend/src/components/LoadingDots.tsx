@@ -1,6 +1,7 @@
 import { Logo } from "./Logo";
 import { useEffect, useRef, useMemo } from "react";
 import { LanguageSelector } from "./LanguageSelector";
+import { StarryBackground } from "./StarryBackground";
 import { getLanguageFromSlug } from "../utils/modes";
 
 export const LoadingDots = () => {
@@ -21,10 +22,8 @@ export const LoadingDots = () => {
     }, []);
 
     return (
-        <div style={{
-            width: '100%',
-            padding: '0 1rem'
-        }}>
+        <div className="relative h-screen flex flex-col overflow-hidden">
+            <StarryBackground />
             <style>
                 {`
                     @keyframes spin {
@@ -32,33 +31,38 @@ export const LoadingDots = () => {
                     }
                 `}
             </style>
-            <div style={{
+            <div className="relative z-10" style={{
                 width: '100%',
-                maxWidth: '1000px',
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                height: '4rem'
+                padding: '0 1rem'
             }}>
-                <Logo />
-                <div
-                    ref={spinnerRef}
-                    style={{
-                        position: 'fixed',
-                        top: '50%',
-                        left: '50%',
-                        marginLeft: '-16px',
-                        marginTop: '-16px',
-                        width: '32px',
-                        height: '32px',
-                        border: '3px solid rgba(255, 255, 255, 0.1)',
-                        borderTopColor: 'rgba(255, 255, 255, 0.6)',
-                        borderRadius: '50%',
-                        animation: 'spin 0.8s linear infinite'
-                    }}
-                />
+                <div style={{
+                    width: '100%',
+                    maxWidth: '1000px',
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    height: '4rem'
+                }}>
+                    <Logo />
+                    <div
+                        ref={spinnerRef}
+                        style={{
+                            position: 'fixed',
+                            top: '50%',
+                            left: '50%',
+                            marginLeft: '-16px',
+                            marginTop: '-16px',
+                            width: '32px',
+                            height: '32px',
+                            border: '3px solid rgba(255, 255, 255, 0.1)',
+                            borderTopColor: 'rgba(255, 255, 255, 0.6)',
+                            borderRadius: '50%',
+                            animation: 'spin 0.8s linear infinite'
+                        }}
+                    />
+                </div>
             </div>
             <LanguageSelector currentLang={currentLang} />
         </div>
