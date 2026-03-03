@@ -68,27 +68,14 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                         background: "linear-gradient(to bottom, #c0c0c0 0%, #888 8%, #333 20%, black 35%)",
                     }}
                 />
-                <div className="relative">
-                    <span
-                        className="text-2xl leading-none ml-[-1px] mt-[-2px] block transition-transform duration-150 group-hover:scale-125"
-                        style={{
-                            filter: "drop-shadow(0 0 4px rgba(0,0,0,0.5))",
-                        }}
-                    >
-                        {currentLang.flag}
-                    </span>
-                    <span
-                        className={[
-                            "absolute -top-7 left-1/2 -translate-x-1/2",
-                            "whitespace-nowrap rounded px-1.5 py-0.5",
-                            "text-xs text-white/80 pointer-events-none",
-                            "opacity-0 group-hover:opacity-100 transition-opacity duration-150",
-                        ].join(" ")}
-                        style={{ backgroundColor: "var(--color-box-bg)" }}
-                    >
-                        Change language
-                    </span>
-                </div>
+                <span
+                    className="text-2xl leading-none ml-[-1px] mt-[-2px] block transition-transform duration-150 group-hover:scale-125"
+                    style={{
+                        filter: "drop-shadow(0 0 4px rgba(0,0,0,0.5))",
+                    }}
+                >
+                    {currentLang.flag}
+                </span>
             </button>
         </div>
     );
