@@ -1,12 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const STAR_COUNT = 200;
 const SHOOTING_STAR_INTERVAL_MIN = 4000;
 const SHOOTING_STAR_INTERVAL_MAX = 10000;
 const MIN_STAR_OPACITY = 0.6;
 const STAR_OPACITY_RANGE = 0.4;
-const BACK_TREE_COUNT = 110;
-const FRONT_TREE_COUNT = 120;
+const BACK_TREE_DENSITY = 110 / 1920;
+const FRONT_TREE_DENSITY = 120 / 1920;
 
 interface Star {
   x: number;
@@ -42,9 +42,10 @@ const generateStars = (): Star[] => {
   }));
 };
 
-const generateTreeLayer = (count: number): TreePlacement[] => {
+const generateTreeLayer = (width: number, density: number): TreePlacement[] => {
+  const count = Math.round(density * width);
   return Array.from({ length: count }, () => ({
-    x: Math.random() * 1920,
+    x: Math.random() * width,
     treeType: Math.floor(Math.random() * TREE_PATHS.length),
     scale: 0.85 + Math.random() * 0.3,
   }));
@@ -53,8 +54,24 @@ const generateTreeLayer = (count: number): TreePlacement[] => {
 export const StarryBackground = () => {
   const shootingStarContainerRef = useRef<HTMLDivElement>(null);
   const starsRef = useRef<Star[]>(generateStars());
-  const backTreesRef = useRef<TreePlacement[]>(generateTreeLayer(BACK_TREE_COUNT));
-  const frontTreesRef = useRef<TreePlacement[]>(generateTreeLayer(FRONT_TREE_COUNT));
+  const [viewBoxWidth, setViewBoxWidth] = useState(window.innerWidth);
+  const [backTrees, setBackTrees] = useState(() =>
+    generateTreeLayer(window.innerWidth, BACK_TREE_DENSITY)
+  );
+  const [frontTrees, setFrontTrees] = useState(() =>
+    generateTreeLayer(window.innerWidth, FRONT_TREE_DENSITY)
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      setViewBoxWidth(w);
+      setBackTrees(generateTreeLayer(w, BACK_TREE_DENSITY));
+      setFrontTrees(generateTreeLayer(w, FRONT_TREE_DENSITY));
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const container = shootingStarContainerRef.current;
@@ -133,12 +150,12 @@ export const StarryBackground = () => {
 
       <svg
         className="absolute inset-x-0 bottom-0"
-        viewBox="0 0 1920 200"
+        viewBox={`0 0 ${viewBoxWidth} 200`}
         preserveAspectRatio="none"
         style={{ width: "100%", height: "150px" }}
       >
-        <rect x="-50" y="185" width="2020" height="15" fill="#0c0c0c" />
-        {backTreesRef.current.map((tree, i) => (
+        <rect x="-50" y="185" width={viewBoxWidth + 100} height="15" fill="#0c0c0c" />
+        {backTrees.map((tree, i) => (
           <path
             key={`b${i}`}
             d={TREE_PATHS[tree.treeType]}
@@ -146,8 +163,8 @@ export const StarryBackground = () => {
             transform={`translate(${tree.x},185) scale(${tree.scale})`}
           />
         ))}
-        <rect x="-50" y="187" width="2020" height="13" fill="black" />
-        {frontTreesRef.current.map((tree, i) => (
+        <rect x="-50" y="187" width={viewBoxWidth + 100} height="13" fill="black" />
+        {frontTrees.map((tree, i) => (
           <path
             key={`f${i}`}
             d={TREE_PATHS[tree.treeType]}
