@@ -64,7 +64,7 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                     className="w-[2px] flex-shrink-0"
                     style={{
                         height: "130px",
-                        background: "black",
+                        background: "linear-gradient(to bottom, #c0c0c0 0%, #888 8%, #333 20%, black 35%)",
                     }}
                 />
                 <span
