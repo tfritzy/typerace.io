@@ -122,7 +122,7 @@ export const StarryBackground = () => {
                 top: `${star.y}%`,
                 animationDelay: `${star.twinkleDelay}s`,
                 animationDuration: `${star.twinkleDuration}s`,
-                "--cross-size": `${star.size * 4 + 4}px`,
+                "--cross-size": `${(star.size * 4 + 4) * 0.3}px`,
                 "--cross-color": `rgba(251, 191, 36, ${star.opacity})`,
               } as React.CSSProperties
             }
