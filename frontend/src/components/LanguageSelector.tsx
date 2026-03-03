@@ -25,9 +25,9 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
     }, [isOpen]);
 
     return (
-        <div ref={containerRef} className="fixed bottom-0 right-8 z-50 flex flex-col items-center">
+        <div ref={containerRef} className="fixed bottom-0 right-8 z-50">
             <div
-                className={`absolute bottom-28 right-0 rounded-xl border border-white/15 p-2 min-w-[180px] max-h-[70vh] overflow-y-auto transition-all ${
+                className={`absolute bottom-28 left-0 rounded-xl border border-white/15 p-2 min-w-[180px] max-h-[70vh] overflow-y-auto transition-all ${
                     isOpen
                         ? "opacity-100 visible"
                         : "opacity-0 invisible pointer-events-none"
@@ -57,24 +57,24 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
 
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="cursor-pointer bg-transparent border-none p-0 flex flex-col items-center group"
+                className="cursor-pointer bg-transparent border-none p-0 flex items-start group"
                 aria-label="Select language"
             >
+                <div
+                    className="w-[2px] flex-shrink-0"
+                    style={{
+                        height: "130px",
+                        background: "black",
+                    }}
+                />
                 <span
-                    className="text-2xl leading-none mb-[-2px] transition-transform group-hover:scale-110"
+                    className="text-2xl leading-none ml-[-1px] mt-[-2px] transition-transform group-hover:scale-110"
                     style={{
                         filter: "drop-shadow(0 0 4px rgba(0,0,0,0.5))",
                     }}
                 >
                     {currentLang.flag}
                 </span>
-                <div
-                    className="w-[3px] rounded-t-sm"
-                    style={{
-                        height: "100px",
-                        background: "linear-gradient(to bottom, #8B7355, #6B5340)",
-                    }}
-                />
             </button>
         </div>
     );
