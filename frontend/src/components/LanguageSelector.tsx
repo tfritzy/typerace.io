@@ -59,6 +59,7 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                 onClick={() => setIsOpen(!isOpen)}
                 className="cursor-pointer bg-transparent border-none p-0 flex items-start group"
                 aria-label="Select language"
+                title="Change language"
             >
                 <div
                     className="w-[2px] flex-shrink-0"
@@ -68,7 +69,7 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                     }}
                 />
                 <span
-                    className="text-2xl leading-none ml-[-1px] mt-[-2px]"
+                    className="text-2xl leading-none ml-[-1px] mt-[-2px] block transition-transform duration-150 group-hover:scale-125"
                     style={{
                         filter: "drop-shadow(0 0 4px rgba(0,0,0,0.5))",
                     }}
