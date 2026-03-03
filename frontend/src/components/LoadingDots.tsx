@@ -1,8 +1,15 @@
 import { Logo } from "./Logo";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
+import { LanguageSelector } from "./LanguageSelector";
+import { getLanguageFromSlug } from "../utils/modes";
 
 export const LoadingDots = () => {
     const spinnerRef = useRef<HTMLDivElement>(null);
+
+    const currentLang = useMemo(() => {
+        const pathSegment = window.location.pathname.split('/')[1] || '';
+        return getLanguageFromSlug(pathSegment || undefined);
+    }, []);
 
     useEffect(() => {
         if (spinnerRef.current) {
@@ -53,6 +60,7 @@ export const LoadingDots = () => {
                     }}
                 />
             </div>
+            <LanguageSelector currentLang={currentLang} />
         </div>
     );
 };
