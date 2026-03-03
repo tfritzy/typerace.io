@@ -301,16 +301,16 @@ body {
 }
 
 @keyframes starTwinkle {
-  0%, 100% {
-    opacity: 0.3;
-  }
-  50% {
+  0%, 88%, 100% {
     opacity: 1;
+  }
+  94% {
+    opacity: 0.2;
   }
 }
 
 .star-twinkle {
-  animation: starTwinkle ease-in-out infinite;
+  animation: starTwinkle linear infinite;
 }
 
 @keyframes shootingStar {

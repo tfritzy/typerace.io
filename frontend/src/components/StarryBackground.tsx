@@ -33,8 +33,8 @@ const generateStars = (): Star[] => {
     x: Math.random() * 100,
     y: Math.random() * 100,
     size: Math.random() * 2 + 0.5,
-    twinkleDelay: Math.random() * 5,
-    twinkleDuration: 2 + Math.random() * 3,
+    twinkleDelay: Math.random() * 15,
+    twinkleDuration: 8 + Math.random() * 8,
   }));
 };
 
