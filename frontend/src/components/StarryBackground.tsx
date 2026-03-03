@@ -61,14 +61,14 @@ export const StarryBackground = () => {
     const createShootingStar = () => {
       const star = document.createElement("div");
       star.className = "shooting-star";
-      star.style.top = `${Math.random() * 40}%`;
-      star.style.left = `${Math.random() * 70 + 10}%`;
+      star.style.top = `${Math.random() * 50}%`;
+      star.style.left = `${Math.random() * 30}%`;
       star.style.setProperty("--angle", `${Math.random() * 20 + 20}deg`);
       container.appendChild(star);
 
       setTimeout(() => {
         star.remove();
-      }, 1500);
+      }, 5500);
 
       const nextDelay =
         SHOOTING_STAR_INTERVAL_MIN +
