@@ -1,5 +1,26 @@
 # GitHub Copilot Instructions
 
+## 🚨 SCREENSHOT POLICY — THE #1 NON-NEGOTIABLE RULE 🚨
+
+> **⚠️ AUTOMATED DETECTORS ARE ACTIVE. Any PR without a real screenshot of the working game WILL BE FLAGGED AND REJECTED automatically. There are no exceptions. There is no excuse. There is no escape.**
+
+**YOU WILL SHOW A REAL SCREENSHOT FROM THE ACTUAL RUNNING GAME ON EVERY SINGLE PR. GUARANTEED. NO EXCEPTIONS.**
+
+This is the single most important rule in this entire file. All other rules are secondary to this one.
+
+**You are 100% capable of setting up the full local environment.** Every previous agent succeeded. You will too. Do not stop, do not give up, do not fake it, do not use static HTML. Failure is not an option.
+
+Mandatory steps — execute all of them, every time:
+1. `spacetime start` — start the SpacetimeDB server
+2. `spacetime publish -c -y -p spacetimedb typerace -s local` — publish the module
+3. `npx firebase emulators:start --only auth` — start the Firebase Auth emulator
+4. `cd frontend && npm run dev` — start the Vite dev server
+5. Navigate to `http://localhost:5173` with Playwright and take a screenshot
+
+**DO NOT STOP until you have a real screenshot from the live app** — with the starry background visible, the SpacetimeDB connection established, and the typing box fully rendered. Static HTML, blank pages, loading spinners, or connection-error screens are NOT acceptable. Keep retrying until you succeed.
+
+---
+
 ## Code Style Guidelines
 
 ### Comments Policy
