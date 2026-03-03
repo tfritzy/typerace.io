@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "../components/SelectionButton.css";
 import { type GameMode } from "../types/stdb";
-import { ChevronUp, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
+import { ChevronUp } from "lucide-react";
 import { getContentTypeFromMode, type ContentTypeValue, type LanguageInfo } from "../utils/modes";
 
 export type GameTypeValue = "Public" | "Private" | "Practice";
@@ -45,21 +45,18 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                             className={`selection-button ${gameType === "Public" ? 'selected' : ''}`}
                             onClick={() => setGameType("Public")}
                         >
-                            <Globe size={20} />
                             <span>Public Match</span>
                         </button>
                         <button
                             className={`selection-button ${gameType === "Private" ? 'selected' : ''}`}
                             onClick={() => setGameType("Private")}
                         >
-                            <Lock size={20} />
                             <span>Private Lobby</span>
                         </button>
                         <button
                             className={`selection-button ${gameType === "Practice" ? 'selected' : ''}`}
                             onClick={() => setGameType("Practice")}
                         >
-                            <Target size={20} />
                             <span>Practice Mode</span>
                         </button>
                     </div>
@@ -71,14 +68,12 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                             className={`selection-button ${contentType === "Quotes" ? 'selected' : ''}`}
                             onClick={() => handleContentTypeChange("Quotes")}
                         >
-                            <Quote size={20} />
                             <span>Quotes</span>
                         </button>
                         <button
                             className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
                             onClick={() => handleContentTypeChange("RandomWords")}
                         >
-                            <Shuffle size={20} />
                             <span>Random words</span>
                         </button>
                     </div>
@@ -91,10 +86,6 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     onClick={() => setIsDrawerOpen(true)}
                 >
                     <div className="flex items-center gap-2">
-                        {gameType === "Public" && <Globe size={18} />}
-                        {gameType === "Private" && <Lock size={18} />}
-                        {gameType === "Practice" && <Target size={18} />}
-                        {contentType === "Quotes" ? <Quote size={18} /> : <Shuffle size={18} />}
                         <span>{gameType} · {contentType === "Quotes" ? "Quotes" : "Random Words"}</span>
                     </div>
                     <ChevronUp size={20} />
@@ -125,21 +116,18 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                         className={`selection-button ${gameType === "Public" ? 'selected' : ''}`}
                                         onClick={() => setGameType("Public")}
                                     >
-                                        <Globe size={20} />
                                         <span>Public Match</span>
                                     </button>
                                     <button
                                         className={`selection-button ${gameType === "Private" ? 'selected' : ''}`}
                                         onClick={() => setGameType("Private")}
                                     >
-                                        <Lock size={20} />
                                         <span>Private Lobby</span>
                                     </button>
                                     <button
                                         className={`selection-button ${gameType === "Practice" ? 'selected' : ''}`}
                                         onClick={() => setGameType("Practice")}
                                     >
-                                        <Target size={20} />
                                         <span>Practice Mode</span>
                                     </button>
                                 </div>
@@ -149,7 +137,6 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                         className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
                                         onClick={() => handleContentTypeChange("RandomWords")}
                                     >
-                                        <Shuffle size={20} />
                                         <span>Random Words</span>
                                     </button>
                                     <button
@@ -157,7 +144,6 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                         onClick={() => handleContentTypeChange("Quotes")}
                                         disabled={!quotesAvailableForLanguage}
                                     >
-                                        <Quote size={20} />
                                         <span>Quotes</span>
                                     </button>
                                 </div>
