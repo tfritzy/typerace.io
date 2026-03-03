@@ -14,6 +14,8 @@ interface Star {
   size: number;
   twinkleDelay: number;
   twinkleDuration: number;
+  opacity: number;
+  isCross: boolean;
 }
 
 interface TreePlacement {
@@ -35,6 +37,8 @@ const generateStars = (): Star[] => {
     size: Math.random() * 2 + 0.5,
     twinkleDelay: Math.random() * 5,
     twinkleDuration: 2 + Math.random() * 3,
+    opacity: MIN_STAR_OPACITY + Math.random() * STAR_OPACITY_RANGE,
+    isCross: Math.random() < 0.08,
   }));
 };
 
@@ -90,21 +94,38 @@ export const StarryBackground = () => {
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
       <div className="absolute inset-0 starry-sky" />
 
-      {starsRef.current.map((star, i) => (
-        <div
-          key={i}
-          className="absolute rounded-full star-twinkle"
-          style={{
-            left: `${star.x}%`,
-            top: `${star.y}%`,
-            width: `${star.size}px`,
-            height: `${star.size}px`,
-            animationDelay: `${star.twinkleDelay}s`,
-            animationDuration: `${star.twinkleDuration}s`,
-            backgroundColor: `rgba(251, 191, 36, ${MIN_STAR_OPACITY + Math.random() * STAR_OPACITY_RANGE})`,
-          }}
-        />
-      ))}
+      {starsRef.current.map((star, i) =>
+        star.isCross ? (
+          <div
+            key={i}
+            className="absolute star-cross star-twinkle"
+            style={
+              {
+                left: `${star.x}%`,
+                top: `${star.y}%`,
+                animationDelay: `${star.twinkleDelay}s`,
+                animationDuration: `${star.twinkleDuration}s`,
+                "--cross-size": `${star.size * 4 + 4}px`,
+                "--cross-color": `rgba(251, 191, 36, ${star.opacity})`,
+              } as React.CSSProperties
+            }
+          />
+        ) : (
+          <div
+            key={i}
+            className="absolute rounded-full star-twinkle"
+            style={{
+              left: `${star.x}%`,
+              top: `${star.y}%`,
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              animationDelay: `${star.twinkleDelay}s`,
+              animationDuration: `${star.twinkleDuration}s`,
+              backgroundColor: `rgba(251, 191, 36, ${star.opacity})`,
+            }}
+          />
+        ),
+      )}
 
       <div ref={shootingStarContainerRef} className="absolute inset-0" />
 

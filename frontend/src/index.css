@@ -313,6 +313,35 @@ body {
   animation: starTwinkle ease-in-out infinite;
 }
 
+.star-cross {
+  width: 2px;
+  height: 2px;
+  background: var(--cross-color);
+  border-radius: 50%;
+  box-shadow: 0 0 3px 1px var(--cross-color);
+}
+
+.star-cross::before,
+.star-cross::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--cross-color);
+  border-radius: 1px;
+}
+
+.star-cross::before {
+  width: var(--cross-size);
+  height: 1px;
+}
+
+.star-cross::after {
+  width: 1px;
+  height: var(--cross-size);
+}
+
 @keyframes shootingStar {
   0% {
     opacity: 1;
