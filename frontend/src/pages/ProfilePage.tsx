@@ -28,7 +28,7 @@ export const ProfilePage = () => {
     const [isEditColorModalOpen, setIsEditColorModalOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMenuClosing, setIsMenuClosing] = useState(false);
-    const { signOut } = useAuth();
+    const { signOut, isFirebaseEnabled } = useAuth();
     const navigate = useNavigate();
 
     const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.identity);
@@ -235,15 +235,17 @@ export const ProfilePage = () => {
                                                 >
                                                     Change Color
                                                 </button>
-                                                <button
-                                                    onClick={() => {
-                                                        handleSignOut();
-                                                        handleMenuClose();
-                                                    }}
-                                                    className="w-full text-left px-3 py-2 text-red-400 text-sm hover:bg-white/10 transition-colors bg-transparent border-0 cursor-pointer rounded-md"
-                                                >
-                                                    Sign Out
-                                                </button>
+                                                {isFirebaseEnabled && (
+                                                    <button
+                                                        onClick={() => {
+                                                            handleSignOut();
+                                                            handleMenuClose();
+                                                        }}
+                                                        className="w-full text-left px-3 py-2 text-red-400 text-sm hover:bg-white/10 transition-colors bg-transparent border-0 cursor-pointer rounded-md"
+                                                    >
+                                                        Sign Out
+                                                    </button>
+                                                )}
                                             </div>
                                         </>
                                     )}

@@ -10,7 +10,7 @@ import { useDatabase } from "../contexts/SpacetimeContext";
 export const ProfileAvatar = memo(() => {
   const navigate = useNavigate();
   const conn = useDatabase();
-  const { signInWithGoogle, signInWithGithub } = useAuth();
+  const { signInWithGoogle, signInWithGithub, isFirebaseEnabled } = useAuth();
   const [myPlayer, setMyPlayer] = useState<Player | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -166,7 +166,7 @@ export const ProfileAvatar = memo(() => {
           </div>
         </button>
 
-        {showMenu && (
+        {showMenu && isFirebaseEnabled && (
           <div className="absolute top-full right-0 bg-[#2a2a2a] border border-white/10 rounded-md shadow-lg overflow-hidden z-50 w-56 mt-1">
             <div className="px-3 py-2 border-b border-white/10">
               <div className="text-white/70 text-xs font-semibold">

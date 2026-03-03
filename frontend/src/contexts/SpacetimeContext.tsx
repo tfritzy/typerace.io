@@ -1,7 +1,10 @@
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { DbConnection } from '../../module_bindings';
 import { useAuth } from '../firebase/AuthContext';
+import { isFirebaseEnabled } from '../firebase/config';
 import { LoadingDots } from '../components/LoadingDots';
+
+const SPACETIMEDB_TOKEN_KEY = 'spacetimedb_token';
 
 interface SpacetimeProviderProps {
     children: React.ReactNode;
@@ -31,7 +34,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     const failureTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const connect = async (isAutoReconnect = false) => {
-        if (!user) return;
+        if (isFirebaseEnabled && !user) return;
 
         if (isAutoReconnect) {
             setIsReconnecting(true);
@@ -39,15 +42,28 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
         }
 
         try {
-            const idToken = await user.getIdToken();
-
-            const connection = DbConnection.builder()
+            const builder = DbConnection.builder()
                 .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
-                .withDatabaseName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace')
-                .withToken(idToken)
-                .onConnect((conn) => {
+                .withDatabaseName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace');
+
+            if (isFirebaseEnabled && user) {
+                const idToken = await user.getIdToken();
+                builder.withToken(idToken);
+            } else {
+                const savedToken = localStorage.getItem(SPACETIMEDB_TOKEN_KEY);
+                if (savedToken) {
+                    builder.withToken(savedToken);
+                }
+            }
+
+            const connection = builder
+                .onConnect((conn, _identity, token) => {
                     console.log('Connected to SpacetimeDB');
-                    conn.reducers.syncAnonymousStatus({ isAnonymous: user.isAnonymous });
+                    if (!isFirebaseEnabled) {
+                        localStorage.setItem(SPACETIMEDB_TOKEN_KEY, token);
+                    }
+                    const isAnonymous = isFirebaseEnabled ? (user?.isAnonymous ?? true) : true;
+                    conn.reducers.syncAnonymousStatus({ isAnonymous });
                     setConn(conn);
                     setShowReconnectModal(false);
                     setIsReconnecting(false);
@@ -114,8 +130,10 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
             });
     };
 
+    const connectionDep = isFirebaseEnabled ? user?.uid : 'no-firebase';
+
     useEffect(() => {
-        if (!user) {
+        if (isFirebaseEnabled && !user) {
             return;
         }
 
@@ -133,9 +151,9 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                 setConn(null);
             });
         };
-    }, [user?.uid]);
+    }, [connectionDep]);
 
-    if (!user) {
+    if (isFirebaseEnabled && !user) {
         return <LoadingDots />;
     }
 
