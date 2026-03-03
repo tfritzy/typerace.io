@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { PlayerProgress } from "../types/stdb";
 import { RaceResultsChart } from "./RaceResultsChart";
 import { PlayerAvatar } from "./PlayerAvatar";
+import "./SelectionButton.css";
 
 interface AllPlayersResultsProps {
     allPlayerProgress: PlayerProgress[];
@@ -35,12 +36,7 @@ export const AllPlayersResults = ({
                             <button
                                 key={pp.playerId.toHexString()}
                                 onClick={() => setSelectedPlayerId(pp.playerId.toHexString())}
-                                className="px-3 py-2 border rounded-md text-[13px] font-semibold cursor-pointer transition-all duration-200 tracking-wide flex items-center gap-2"
-                                style={{
-                                    backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-                                    color: isSelected ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.5)',
-                                    borderColor: 'var(--color-box-border)'
-                                }}
+                                className={`selection-button${isSelected ? ' selected' : ''}`}
                             >
                                 <PlayerAvatar
                                     size={24}

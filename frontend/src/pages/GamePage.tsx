@@ -12,6 +12,7 @@ import { AllPlayersResults } from "../components/AllPlayersResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
+import { StarryBackground } from "../components/StarryBackground";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import type { CSSProperties } from "react";
 
@@ -218,6 +219,7 @@ export const GamePage = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col">
+      <StarryBackground />
       <Header />
 
       <Countdown />
