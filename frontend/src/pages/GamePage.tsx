@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
 import {
   type Game,
   type PlayerProgress,
@@ -47,15 +47,29 @@ export const GamePage = () => {
   const navigate = useNavigate();
   const conn = useDatabase();
   const [hasFinished, setHasFinished] = useState(false);
+  const finishDelayRef = useRef(false);
+  const finishTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [game, setGame] = useState<Game | null>(null);
   const [gamePlayerProgress, setGamePlayerProgress] = useState<PlayerProgress[]>([]);
 
   useEffect(() => {
-    // Reset data when game switches to a new one via play again.
     setGame(null);
     setGamePlayerProgress([]);
     setHasFinished(false);
+    finishDelayRef.current = false;
+    if (finishTimeoutRef.current) {
+      clearTimeout(finishTimeoutRef.current);
+      finishTimeoutRef.current = null;
+    }
   }, [gameId]);
+
+  useEffect(() => {
+    return () => {
+      if (finishTimeoutRef.current) {
+        clearTimeout(finishTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -149,7 +163,9 @@ export const GamePage = () => {
 
     if (currentPlayerProgress && game.phrase) {
       const hasCompletedRace = currentPlayerProgress.progressIndex >= game.phrase.length;
-      setHasFinished(hasCompletedRace);
+      if (!finishDelayRef.current) {
+        setHasFinished(hasCompletedRace);
+      }
     } else if (gamePlayerProgress.length > 0 && !currentPlayerProgress) {
       setHasFinished(true);
     } else {
@@ -173,7 +189,12 @@ export const GamePage = () => {
   }, [conn, game, gameId, gamePlayerProgress]);
 
   const handleFinish = useCallback(() => {
-    setHasFinished(true);
+    finishDelayRef.current = true;
+    finishTimeoutRef.current = setTimeout(() => {
+      setHasFinished(true);
+      finishDelayRef.current = false;
+      finishTimeoutRef.current = null;
+    }, 1500);
   }, []);
 
   if (!game) {
