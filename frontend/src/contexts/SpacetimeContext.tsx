@@ -52,7 +52,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
             const { token, isAnonymous } = await getToken();
             const builder = DbConnection.builder()
                 .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
-                .withDatabaseName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace');
+                .withModuleName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace');
 
             if (token) {
                 builder.withToken(token);
