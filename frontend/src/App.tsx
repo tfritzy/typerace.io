@@ -6,12 +6,12 @@ import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { SiteStatsPage } from "./pages/SiteStatsPage";
 import { ToastProvider } from "./hooks/useToast";
 import { ToastContainer } from "./components/Toast";
-import { StarryBackground } from "./components/StarryBackground";
+import { Background } from "./components/Background";
 
 function App() {
   return (
     <ToastProvider>
-      <StarryBackground />
+      <Background />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LobbyPage />} />
