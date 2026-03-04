@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { type GameMode } from "../types/stdb";
+import { type GameMode, type PlayerProgress } from "../types/stdb";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { useToast } from "./useToast";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import type { EventContext } from "../../module_bindings";
 import { getLangPrefix } from "../utils/modes";
 
 export const useFindGame = () => {
@@ -18,7 +19,7 @@ export const useFindGame = () => {
 
     const joinCode = pendingJoinCodeRef.current;
 
-    const handleInsert = (_ctx: any, progress: any) => {
+    const handleInsert = (_ctx: EventContext, progress: PlayerProgress) => {
       if (conn?.identity && progress.playerId.isEqual(conn.identity)) {
         if (progress.joinCode === joinCode) {
           navigate(`${getLangPrefix()}/game/${progress.gameId.toString()}`, { replace: true });
@@ -78,7 +79,7 @@ export const useFindGame = () => {
     conn.reducers.joinGame({
       gameMode: mode,
       joinCode: newJoinCode,
-      gameType: gameTypeEnum as any
+      gameType: gameTypeEnum as never
     });
   }, [conn, isSearching]);
 
