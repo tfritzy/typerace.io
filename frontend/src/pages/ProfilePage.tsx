@@ -10,7 +10,7 @@ import { EditNameModal } from "../components/EditNameModal";
 import { EditColorModal } from "../components/EditColorModal";
 import { getLangHome } from "../utils/modes";
 import { formatNumber, formatTimeSpent } from "../utils/formatters";
-import { useAuth } from "../firebase/AuthContext";
+import { signOut } from "../firebase/auth";
 import { Select } from "../components/Select";
 import { RecentGames } from "../components/RecentGames";
 import { useDatabase } from "../contexts/SpacetimeContext";
@@ -28,7 +28,6 @@ export const ProfilePage = () => {
     const [isEditColorModalOpen, setIsEditColorModalOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMenuClosing, setIsMenuClosing] = useState(false);
-    const { signOut } = useAuth();
     const navigate = useNavigate();
 
     const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.identity);
@@ -110,7 +109,7 @@ export const ProfilePage = () => {
 
     const handleSignOut = async () => {
         try {
-            await signOut();
+            await signOut?.();
             navigate(getLangHome());
         } catch (error) {
             console.error('Error signing out:', error);
@@ -235,15 +234,17 @@ export const ProfilePage = () => {
                                                 >
                                                     Change Color
                                                 </button>
-                                                <button
-                                                    onClick={() => {
-                                                        handleSignOut();
-                                                        handleMenuClose();
-                                                    }}
-                                                    className="w-full text-left px-3 py-2 text-red-400 text-sm hover:bg-white/10 transition-colors bg-transparent border-0 cursor-pointer rounded-md"
-                                                >
-                                                    Sign Out
-                                                </button>
+                                                {signOut && (
+                                                    <button
+                                                        onClick={() => {
+                                                            handleSignOut();
+                                                            handleMenuClose();
+                                                        }}
+                                                        className="w-full text-left px-3 py-2 text-red-400 text-sm hover:bg-white/10 transition-colors bg-transparent border-0 cursor-pointer rounded-md"
+                                                    >
+                                                        Sign Out
+                                                    </button>
+                                                )}
                                             </div>
                                         </>
                                     )}

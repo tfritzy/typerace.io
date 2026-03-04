@@ -4,13 +4,12 @@ import { PlayerAvatar } from "./PlayerAvatar";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { useEffect, useState, useRef, memo } from "react";
 import { setAccentColor } from "../utils/colorMapping";
-import { useAuth } from "../firebase/AuthContext";
+import { signInWithGoogle, signInWithGithub } from "../firebase/auth";
 import { useDatabase } from "../contexts/SpacetimeContext";
 
 export const ProfileAvatar = memo(() => {
   const navigate = useNavigate();
   const conn = useDatabase();
-  const { signInWithGoogle, signInWithGithub } = useAuth();
   const [myPlayer, setMyPlayer] = useState<Player | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -77,9 +76,9 @@ export const ProfileAvatar = memo(() => {
 
     try {
       if (provider === "google") {
-        await signInWithGoogle();
+        await signInWithGoogle?.();
       } else if (provider === "github") {
-        await signInWithGithub();
+        await signInWithGithub?.();
       }
       setShowMenu(false);
     } catch (err: any) {
@@ -166,7 +165,7 @@ export const ProfileAvatar = memo(() => {
           </div>
         </button>
 
-        {showMenu && (
+        {showMenu && signInWithGoogle && (
           <div className="absolute top-full right-0 bg-[#2a2a2a] border border-white/10 rounded-md shadow-lg overflow-hidden z-50 w-56 mt-1">
             <div className="px-3 py-2 border-b border-white/10">
               <div className="text-white/70 text-xs font-semibold">
