@@ -365,11 +365,13 @@ export const StarryBackground = () => {
 
     initCanvas();
 
-    let time = 0;
+    const TIME_PERIOD = 100000;
+    const startTime = performance.now();
+
     const animate = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      time += 1;
+      const time = ((performance.now() - startTime) * 0.06) % TIME_PERIOD;
 
       ctx.clearRect(0, 0, w, h);
       drawBackground(ctx, w, h);
@@ -398,11 +400,16 @@ export const StarryBackground = () => {
 
     animFrameRef.current = requestAnimationFrame(animate);
 
-    const handleResize = () => initCanvas();
+    let resizeTimer: ReturnType<typeof setTimeout>;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(initCanvas, 150);
+    };
     window.addEventListener("resize", handleResize);
 
     return () => {
       cancelAnimationFrame(animFrameRef.current);
+      clearTimeout(resizeTimer);
       window.removeEventListener("resize", handleResize);
     };
   }, []);
