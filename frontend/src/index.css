@@ -320,9 +320,18 @@ body {
 .horizon-glow {
   background: linear-gradient(
     to top,
-    rgba(100, 140, 220, 0.12) 0%,
-    rgba(80, 130, 210, 0.07) 25%,
-    rgba(70, 120, 200, 0.03) 60%,
+    rgba(168, 183, 232, 0.06) 0%,
+    rgba(168, 183, 232, 0.02) 32%,
+    transparent 100%
+  );
+}
+
+.atmosphere-glow {
+  background: linear-gradient(
+    to top,
+    rgba(60, 120, 220, 0.28) 0%,
+    rgba(50, 100, 200, 0.18) 20%,
+    rgba(45, 90, 190, 0.08) 55%,
     transparent 100%
   );
 }
