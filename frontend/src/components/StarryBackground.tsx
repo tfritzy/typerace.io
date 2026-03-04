@@ -1,69 +1,20 @@
 import { useEffect, useState } from "react";
 
-const MIN_STAR_OPACITY = 0.6;
-const STAR_OPACITY_RANGE = 0.4;
 const BACK_TREE_DENSITY = 110 / 1920;
 const FRONT_TREE_DENSITY = 120 / 1920;
 const BACK_TREE_COLOR = "#0c0c0c";
 const FRONT_TREE_COLOR = "0, 0, 0";
-const BASE_AREA = 1920 * 1080;
-const BASE_STAR_COUNT = 600;
-const STAR_DENSITY = BASE_STAR_COUNT / BASE_AREA;
-const MIN_STAR_COUNT = 260;
-const MAX_STAR_COUNT = 2400;
 
-interface Star {
-  x: number;
-  y: number;
-  size: number;
-  twinkleDelay: number;
-  twinkleDuration: number;
-  opacity: number;
-  isCross: boolean;
-  color: string;
-}
+export const SPACE_BACKGROUNDS = [
+  { id: "deep-field", file: "/backgrounds/deep-field.jpg", label: "Hubble Deep Field" },
+  { id: "ngc-6397", file: "/backgrounds/starfield.jpg", label: "NGC 6397" },
+  { id: "galaxy-cluster", file: "/backgrounds/galaxy-cluster.jpg", label: "Galaxy Cluster" },
+  { id: "carina-nebula", file: "/backgrounds/carina-nebula.jpg", label: "Carina Nebula" },
+  { id: "extreme-deep-field", file: "/backgrounds/extreme-deep-field.jpg", label: "Extreme Deep Field" },
+  { id: "westerlund-2", file: "/backgrounds/star-cluster.jpg", label: "Westerlund 2" },
+] as const;
 
-type WeightedStarColor = {
-  rgb: [number, number, number];
-  weight: number;
-};
-
-const STAR_COLOR_VARIANTS: WeightedStarColor[] = [
-  { rgb: [255, 244, 234], weight: 24 },
-  { rgb: [255, 236, 214], weight: 20 },
-  { rgb: [255, 252, 244], weight: 24 },
-  { rgb: [248, 251, 255], weight: 16 },
-  { rgb: [230, 239, 255], weight: 8 },
-  { rgb: [214, 228, 255], weight: 4 },
-  { rgb: [255, 222, 201], weight: 3 },
-  { rgb: [255, 205, 188], weight: 1 },
-];
-
-const TOTAL_STAR_COLOR_WEIGHT = STAR_COLOR_VARIANTS.reduce(
-  (total, variant) => total + variant.weight,
-  0
-);
-
-const clamp = (value: number): number => Math.max(0, Math.min(255, value));
-
-const pickStarColor = (): string => {
-  let threshold = Math.random() * TOTAL_STAR_COLOR_WEIGHT;
-  let selected = STAR_COLOR_VARIANTS[0];
-
-  for (const variant of STAR_COLOR_VARIANTS) {
-    threshold -= variant.weight;
-    if (threshold <= 0) {
-      selected = variant;
-      break;
-    }
-  }
-
-  const jitter = 7;
-  const red = clamp(Math.round(selected.rgb[0] + (Math.random() * 2 - 1) * jitter));
-  const green = clamp(Math.round(selected.rgb[1] + (Math.random() * 2 - 1) * jitter));
-  const blue = clamp(Math.round(selected.rgb[2] + (Math.random() * 2 - 1) * jitter));
-  return `${red}, ${green}, ${blue}`;
-};
+export type SpaceBackgroundId = (typeof SPACE_BACKGROUNDS)[number]["id"];
 
 interface TreePlacement {
   x: number;
@@ -77,24 +28,6 @@ const TREE_PATHS = [
   "M0,-68 L6,-60 L18,-56 L8,-54 L15,-46 L30,-40 L13,-38 L22,-28 L40,-20 L16,-18 L26,-10 L48,-3 L4,-2 L4,0 L-4,0 L-4,-2 L-48,-3 L-26,-10 L-16,-18 L-40,-20 L-22,-28 L-13,-38 L-30,-40 L-15,-46 L-8,-54 L-18,-56 L-6,-60 Z",
 ];
 
-const getStarCount = (width: number, height: number): number => {
-  const countByArea = Math.round(width * height * STAR_DENSITY);
-  return Math.max(MIN_STAR_COUNT, Math.min(MAX_STAR_COUNT, countByArea));
-};
-
-const generateStars = (count: number): Star[] => {
-  return Array.from({ length: count }, () => ({
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 2 + 0.5,
-    twinkleDelay: Math.random() * 15,
-    twinkleDuration: 8 + Math.random() * 8,
-    opacity: MIN_STAR_OPACITY + Math.random() * STAR_OPACITY_RANGE,
-    isCross: Math.random() < 0.08,
-    color: pickStarColor(),
-  }));
-};
-
 const generateTreeLayer = (width: number, density: number): TreePlacement[] => {
   const count = Math.round(density * width);
   return Array.from({ length: count }, () => ({
@@ -104,10 +37,11 @@ const generateTreeLayer = (width: number, density: number): TreePlacement[] => {
   }));
 };
 
-export const StarryBackground = () => {
-  const [stars, setStars] = useState<Star[]>(() =>
-    generateStars(getStarCount(window.innerWidth, window.innerHeight))
-  );
+interface StarryBackgroundProps {
+  backgroundId?: SpaceBackgroundId;
+}
+
+export const StarryBackground = ({ backgroundId = "deep-field" }: StarryBackgroundProps) => {
   const [viewBoxWidth, setViewBoxWidth] = useState(window.innerWidth);
   const [backTrees, setBackTrees] = useState(() =>
     generateTreeLayer(window.innerWidth, BACK_TREE_DENSITY)
@@ -116,11 +50,11 @@ export const StarryBackground = () => {
     generateTreeLayer(window.innerWidth, FRONT_TREE_DENSITY)
   );
 
+  const bg = SPACE_BACKGROUNDS.find((b) => b.id === backgroundId) ?? SPACE_BACKGROUNDS[0];
+
   useEffect(() => {
     const handleResize = () => {
       const w = window.innerWidth;
-      const h = window.innerHeight;
-      setStars(generateStars(getStarCount(w, h)));
       setViewBoxWidth(w);
       setBackTrees(generateTreeLayer(w, BACK_TREE_DENSITY));
       setFrontTrees(generateTreeLayer(w, FRONT_TREE_DENSITY));
@@ -131,43 +65,11 @@ export const StarryBackground = () => {
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      <div className="absolute inset-0 starry-sky" />
+      <div
+        className="absolute inset-0 space-background"
+        style={{ backgroundImage: `url(${bg.file})` }}
+      />
 
-      {stars.map((star, i) =>
-        star.isCross ? (
-          <div
-            key={i}
-            className="absolute star-cross star-twinkle"
-            style={
-              {
-                left: `${star.x}%`,
-                top: `${star.y}%`,
-                animationDelay: `${star.twinkleDelay}s`,
-                animationDuration: `${star.twinkleDuration}s`,
-                "--cross-size": `${(star.size * 4 + 4) * 0.5}px`,
-                "--cross-color": `rgba(${star.color}, ${star.opacity})`,
-              } as React.CSSProperties
-            }
-          />
-        ) : (
-          <div
-            key={i}
-            className="absolute rounded-full star-twinkle"
-            style={{
-              left: `${star.x}%`,
-              top: `${star.y}%`,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              animationDelay: `${star.twinkleDelay}s`,
-              animationDuration: `${star.twinkleDuration}s`,
-              backgroundColor: `rgba(${star.color}, ${star.opacity})`,
-              boxShadow: `0 0 ${Math.max(2, star.size * 1.8)}px rgba(${star.color}, ${
-                star.opacity * 0.55
-              })`,
-            }}
-          />
-        ),
-      )}
       <div className="absolute inset-x-0 bottom-0 h-[20%] horizon-glow" />
 
       <svg
