@@ -4,7 +4,6 @@ const MIN_STAR_OPACITY = 0.6;
 const STAR_OPACITY_RANGE = 0.4;
 const BACK_TREE_DENSITY = 110 / 1920;
 const FRONT_TREE_DENSITY = 120 / 1920;
-const STAR_COLOR = "255, 255, 255";
 const BACK_TREE_COLOR = "#0c0c0c";
 const FRONT_TREE_COLOR = "0, 0, 0";
 const BASE_AREA = 1920 * 1080;
@@ -21,7 +20,50 @@ interface Star {
   twinkleDuration: number;
   opacity: number;
   isCross: boolean;
+  color: string;
 }
+
+type WeightedStarColor = {
+  rgb: [number, number, number];
+  weight: number;
+};
+
+const STAR_COLOR_VARIANTS: WeightedStarColor[] = [
+  { rgb: [255, 244, 234], weight: 24 },
+  { rgb: [255, 236, 214], weight: 20 },
+  { rgb: [255, 252, 244], weight: 24 },
+  { rgb: [248, 251, 255], weight: 16 },
+  { rgb: [230, 239, 255], weight: 8 },
+  { rgb: [214, 228, 255], weight: 4 },
+  { rgb: [255, 222, 201], weight: 3 },
+  { rgb: [255, 205, 188], weight: 1 },
+];
+
+const TOTAL_STAR_COLOR_WEIGHT = STAR_COLOR_VARIANTS.reduce(
+  (total, variant) => total + variant.weight,
+  0
+);
+
+const clamp = (value: number): number => Math.max(0, Math.min(255, value));
+
+const pickStarColor = (): string => {
+  let threshold = Math.random() * TOTAL_STAR_COLOR_WEIGHT;
+  let selected = STAR_COLOR_VARIANTS[0];
+
+  for (const variant of STAR_COLOR_VARIANTS) {
+    threshold -= variant.weight;
+    if (threshold <= 0) {
+      selected = variant;
+      break;
+    }
+  }
+
+  const jitter = 7;
+  const red = clamp(Math.round(selected.rgb[0] + (Math.random() * 2 - 1) * jitter));
+  const green = clamp(Math.round(selected.rgb[1] + (Math.random() * 2 - 1) * jitter));
+  const blue = clamp(Math.round(selected.rgb[2] + (Math.random() * 2 - 1) * jitter));
+  return `${red}, ${green}, ${blue}`;
+};
 
 interface TreePlacement {
   x: number;
@@ -49,6 +91,7 @@ const generateStars = (count: number): Star[] => {
     twinkleDuration: 8 + Math.random() * 8,
     opacity: MIN_STAR_OPACITY + Math.random() * STAR_OPACITY_RANGE,
     isCross: Math.random() < 0.08,
+    color: pickStarColor(),
   }));
 };
 
@@ -102,7 +145,7 @@ export const StarryBackground = () => {
                 animationDelay: `${star.twinkleDelay}s`,
                 animationDuration: `${star.twinkleDuration}s`,
                 "--cross-size": `${(star.size * 4 + 4) * 0.5}px`,
-                "--cross-color": `rgba(${STAR_COLOR}, ${star.opacity})`,
+                "--cross-color": `rgba(${star.color}, ${star.opacity})`,
               } as React.CSSProperties
             }
           />
@@ -117,8 +160,8 @@ export const StarryBackground = () => {
               height: `${star.size}px`,
               animationDelay: `${star.twinkleDelay}s`,
               animationDuration: `${star.twinkleDuration}s`,
-              backgroundColor: `rgba(${STAR_COLOR}, ${star.opacity})`,
-              boxShadow: `0 0 ${Math.max(2, star.size * 1.8)}px rgba(${STAR_COLOR}, ${
+              backgroundColor: `rgba(${star.color}, ${star.opacity})`,
+              boxShadow: `0 0 ${Math.max(2, star.size * 1.8)}px rgba(${star.color}, ${
                 star.opacity * 0.55
               })`,
             }}
