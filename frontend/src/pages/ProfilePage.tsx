@@ -10,7 +10,7 @@ import { EditNameModal } from "../components/EditNameModal";
 import { EditColorModal } from "../components/EditColorModal";
 import { getLangHome } from "../utils/modes";
 import { formatNumber, formatTimeSpent } from "../utils/formatters";
-import { useAuth } from "../firebase/AuthContext";
+import { signOut } from "../firebase/auth";
 import { Select } from "../components/Select";
 import { RecentGames } from "../components/RecentGames";
 import { useDatabase } from "../contexts/SpacetimeContext";
@@ -28,7 +28,6 @@ export const ProfilePage = () => {
     const [isEditColorModalOpen, setIsEditColorModalOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMenuClosing, setIsMenuClosing] = useState(false);
-    const { signOut, isFirebaseEnabled } = useAuth();
     const navigate = useNavigate();
 
     const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.identity);
@@ -110,7 +109,7 @@ export const ProfilePage = () => {
 
     const handleSignOut = async () => {
         try {
-            await signOut();
+            await signOut?.();
             navigate(getLangHome());
         } catch (error) {
             console.error('Error signing out:', error);
@@ -235,7 +234,7 @@ export const ProfilePage = () => {
                                                 >
                                                     Change Color
                                                 </button>
-                                                {isFirebaseEnabled && (
+                                                {signOut && (
                                                     <button
                                                         onClick={() => {
                                                             handleSignOut();
