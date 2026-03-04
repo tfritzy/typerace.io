@@ -335,6 +335,22 @@ body {
   }
 }
 
+@keyframes cloudDrift {
+  0% {
+    transform: translateX(-20%);
+  }
+  50% {
+    transform: translateX(20%);
+  }
+  100% {
+    transform: translateX(-20%);
+  }
+}
+
+.cloud-drift {
+  animation: cloudDrift linear infinite;
+}
+
 .star-twinkle {
   animation: starTwinkle linear infinite;
 }

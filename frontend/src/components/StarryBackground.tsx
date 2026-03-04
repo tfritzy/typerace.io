@@ -11,6 +11,7 @@ const BASE_STAR_COUNT = 600;
 const STAR_DENSITY = BASE_STAR_COUNT / BASE_AREA;
 const MIN_STAR_COUNT = 260;
 const MAX_STAR_COUNT = 2400;
+const CLOUD_COUNT = 5;
 
 interface Star {
   x: number;
@@ -65,6 +66,17 @@ const pickStarColor = (): string => {
   return `${red}, ${green}, ${blue}`;
 };
 
+interface Cloud {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  opacity: number;
+  driftDuration: number;
+  driftDelay: number;
+  blurRadius: number;
+}
+
 interface TreePlacement {
   x: number;
   treeType: number;
@@ -104,6 +116,19 @@ const generateTreeLayer = (width: number, density: number): TreePlacement[] => {
   }));
 };
 
+const generateClouds = (): Cloud[] => {
+  return Array.from({ length: CLOUD_COUNT }, () => ({
+    x: Math.random() * 100,
+    y: 5 + Math.random() * 50,
+    width: 250 + Math.random() * 400,
+    height: 50 + Math.random() * 80,
+    opacity: 0.035 + Math.random() * 0.045,
+    driftDuration: 120 + Math.random() * 180,
+    driftDelay: Math.random() * -200,
+    blurRadius: 25 + Math.random() * 35,
+  }));
+};
+
 export const StarryBackground = () => {
   const [stars, setStars] = useState<Star[]>(() =>
     generateStars(getStarCount(window.innerWidth, window.innerHeight))
@@ -115,6 +140,7 @@ export const StarryBackground = () => {
   const [frontTrees, setFrontTrees] = useState(() =>
     generateTreeLayer(window.innerWidth, FRONT_TREE_DENSITY)
   );
+  const [clouds] = useState(() => generateClouds());
 
   useEffect(() => {
     const handleResize = () => {
@@ -168,6 +194,24 @@ export const StarryBackground = () => {
           />
         ),
       )}
+      <div className="absolute inset-0 overflow-hidden">
+        {clouds.map((cloud, i) => (
+          <div
+            key={`cloud-${i}`}
+            className="absolute rounded-full cloud-drift"
+            style={{
+              left: `${cloud.x}%`,
+              top: `${cloud.y}%`,
+              width: `${cloud.width}px`,
+              height: `${cloud.height}px`,
+              background: `radial-gradient(ellipse at center, rgba(180, 190, 220, ${cloud.opacity}) 0%, rgba(150, 165, 200, ${cloud.opacity * 0.5}) 40%, transparent 70%)`,
+              filter: `blur(${cloud.blurRadius}px)`,
+              animationDuration: `${cloud.driftDuration}s`,
+              animationDelay: `${cloud.driftDelay}s`,
+            }}
+          />
+        ))}
+      </div>
       <div className="absolute inset-x-0 bottom-0 h-[20%] horizon-glow" />
 
       <svg
