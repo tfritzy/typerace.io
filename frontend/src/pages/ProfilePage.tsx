@@ -97,13 +97,13 @@ export const ProfilePage = () => {
 
     const handleNameSave = (name: string) => {
         if (!conn) return;
-        (conn.reducers as any).SetPlayerName({ name });
+        conn.reducers.setPlayerName({ name });
         setIsEditNameModalOpen(false);
     };
 
     const handleColorSave = (color: PlayerColor['tag']) => {
         if (!conn) return;
-        (conn.reducers as any).SetPlayerColor({ color: { tag: color } as any });
+        conn.reducers.setPlayerColor({ color: { tag: color } as any });
         setIsEditColorModalOpen(false);
     };
 

@@ -64,7 +64,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                     if (!isFirebaseEnabled) {
                         localStorage.setItem(SPACETIMEDB_TOKEN_KEY, returnedToken);
                     }
-                    (conn.reducers as any).SyncAnonymousStatus({ isAnonymous });
+                    conn.reducers.syncAnonymousStatus({ isAnonymous });
                     setConn(conn);
                     connectionRef.current = conn;
                     setShowReconnectModal(false);
