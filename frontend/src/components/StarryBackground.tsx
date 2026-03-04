@@ -1,12 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-const STAR_COUNT = 200;
-const SHOOTING_STAR_INTERVAL_MIN = 4000;
-const SHOOTING_STAR_INTERVAL_MAX = 10000;
 const MIN_STAR_OPACITY = 0.6;
 const STAR_OPACITY_RANGE = 0.4;
 const BACK_TREE_DENSITY = 110 / 1920;
 const FRONT_TREE_DENSITY = 120 / 1920;
+const STAR_COLOR = "255, 255, 255";
+const BACK_TREE_COLOR = "#0c0c0c";
+const FRONT_TREE_COLOR = "0, 0, 0";
+const BASE_AREA = 1920 * 1080;
+const BASE_STAR_COUNT = 600;
+const STAR_DENSITY = BASE_STAR_COUNT / BASE_AREA;
+const MIN_STAR_COUNT = 260;
+const MAX_STAR_COUNT = 2400;
 
 interface Star {
   x: number;
@@ -30,8 +35,13 @@ const TREE_PATHS = [
   "M0,-68 L6,-60 L18,-56 L8,-54 L15,-46 L30,-40 L13,-38 L22,-28 L40,-20 L16,-18 L26,-10 L48,-3 L4,-2 L4,0 L-4,0 L-4,-2 L-48,-3 L-26,-10 L-16,-18 L-40,-20 L-22,-28 L-13,-38 L-30,-40 L-15,-46 L-8,-54 L-18,-56 L-6,-60 Z",
 ];
 
-const generateStars = (): Star[] => {
-  return Array.from({ length: STAR_COUNT }, () => ({
+const getStarCount = (width: number, height: number): number => {
+  const countByArea = Math.round(width * height * STAR_DENSITY);
+  return Math.max(MIN_STAR_COUNT, Math.min(MAX_STAR_COUNT, countByArea));
+};
+
+const generateStars = (count: number): Star[] => {
+  return Array.from({ length: count }, () => ({
     x: Math.random() * 100,
     y: Math.random() * 100,
     size: Math.random() * 2 + 0.5,
@@ -52,8 +62,9 @@ const generateTreeLayer = (width: number, density: number): TreePlacement[] => {
 };
 
 export const StarryBackground = () => {
-  const shootingStarContainerRef = useRef<HTMLDivElement>(null);
-  const starsRef = useRef<Star[]>(generateStars());
+  const [stars, setStars] = useState<Star[]>(() =>
+    generateStars(getStarCount(window.innerWidth, window.innerHeight))
+  );
   const [viewBoxWidth, setViewBoxWidth] = useState(window.innerWidth);
   const [backTrees, setBackTrees] = useState(() =>
     generateTreeLayer(window.innerWidth, BACK_TREE_DENSITY)
@@ -65,6 +76,8 @@ export const StarryBackground = () => {
   useEffect(() => {
     const handleResize = () => {
       const w = window.innerWidth;
+      const h = window.innerHeight;
+      setStars(generateStars(getStarCount(w, h)));
       setViewBoxWidth(w);
       setBackTrees(generateTreeLayer(w, BACK_TREE_DENSITY));
       setFrontTrees(generateTreeLayer(w, FRONT_TREE_DENSITY));
@@ -73,45 +86,11 @@ export const StarryBackground = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  useEffect(() => {
-    const container = shootingStarContainerRef.current;
-    if (!container) return;
-
-    let timeoutId: ReturnType<typeof setTimeout>;
-
-    const createShootingStar = () => {
-      const star = document.createElement("div");
-      star.className = "shooting-star";
-      star.style.top = `${Math.random() * 50}%`;
-      star.style.left = `${Math.random() * 30}%`;
-      star.style.setProperty("--angle", `${Math.random() * 20 + 20}deg`);
-      container.appendChild(star);
-
-      setTimeout(() => {
-        star.remove();
-      }, 5500);
-
-      const nextDelay =
-        SHOOTING_STAR_INTERVAL_MIN +
-        Math.random() * (SHOOTING_STAR_INTERVAL_MAX - SHOOTING_STAR_INTERVAL_MIN);
-      timeoutId = setTimeout(createShootingStar, nextDelay);
-    };
-
-    const initialDelay =
-      SHOOTING_STAR_INTERVAL_MIN +
-      Math.random() * (SHOOTING_STAR_INTERVAL_MAX - SHOOTING_STAR_INTERVAL_MIN);
-    timeoutId = setTimeout(createShootingStar, initialDelay);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, []);
-
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
       <div className="absolute inset-0 starry-sky" />
 
-      {starsRef.current.map((star, i) =>
+      {stars.map((star, i) =>
         star.isCross ? (
           <div
             key={i}
@@ -123,7 +102,7 @@ export const StarryBackground = () => {
                 animationDelay: `${star.twinkleDelay}s`,
                 animationDuration: `${star.twinkleDuration}s`,
                 "--cross-size": `${(star.size * 4 + 4) * 0.5}px`,
-                "--cross-color": `rgba(251, 191, 36, ${star.opacity})`,
+                "--cross-color": `rgba(${STAR_COLOR}, ${star.opacity})`,
               } as React.CSSProperties
             }
           />
@@ -138,14 +117,14 @@ export const StarryBackground = () => {
               height: `${star.size}px`,
               animationDelay: `${star.twinkleDelay}s`,
               animationDuration: `${star.twinkleDuration}s`,
-              backgroundColor: `rgba(251, 191, 36, ${star.opacity})`,
+              backgroundColor: `rgba(${STAR_COLOR}, ${star.opacity})`,
+              boxShadow: `0 0 ${Math.max(2, star.size * 1.8)}px rgba(${STAR_COLOR}, ${
+                star.opacity * 0.55
+              })`,
             }}
           />
         ),
       )}
-
-      <div ref={shootingStarContainerRef} className="absolute inset-0" />
-
       <div className="absolute inset-x-0 bottom-0 h-[20%] horizon-glow" />
 
       <svg
@@ -154,21 +133,21 @@ export const StarryBackground = () => {
         preserveAspectRatio="none"
         style={{ width: "100%", height: "150px" }}
       >
-        <rect x="-50" y="185" width={viewBoxWidth + 100} height="15" fill="#0c0c0c" />
+        <rect x="-50" y="185" width={viewBoxWidth + 100} height="15" fill={BACK_TREE_COLOR} />
         {backTrees.map((tree, i) => (
           <path
             key={`b${i}`}
             d={TREE_PATHS[tree.treeType]}
-            fill="#0c0c0c"
+            fill={BACK_TREE_COLOR}
             transform={`translate(${tree.x},185) scale(${tree.scale})`}
           />
         ))}
-        <rect x="-50" y="187" width={viewBoxWidth + 100} height="13" fill="black" />
+        <rect x="-50" y="187" width={viewBoxWidth + 100} height="13" fill={`rgb(${FRONT_TREE_COLOR})`} />
         {frontTrees.map((tree, i) => (
           <path
             key={`f${i}`}
             d={TREE_PATHS[tree.treeType]}
-            fill="black"
+            fill={`rgb(${FRONT_TREE_COLOR})`}
             transform={`translate(${tree.x},187) scale(${tree.scale})`}
           />
         ))}

@@ -13,9 +13,9 @@
   --color-white: #ffffff;
   --color-white-25: rgba(255, 255, 255, 0.25);
   --color-error: #ef4444;
-  --color-accent: #fbbf24;
-  --color-accent-light: #fcd34d;
-  --color-accent-dark: #f59e0b;
+  --color-accent: #d9a441;
+  --color-accent-light: #e3b34d;
+  --color-accent-dark: #c89335;
   --color-box-bg: rgba(39, 39, 39, 0.22);
   --color-box-border: rgba(255, 255, 255, 0.2);
   --color-input-bg: rgba(18, 18, 18, 0.14);
@@ -111,15 +111,17 @@ body {
 .box-with-focus {
   background-color: var(--color-box-bg);
   border: 1px solid var(--color-box-border);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .box-with-focus:focus-within {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
 }
 
 .glass-surface {
@@ -284,7 +286,7 @@ body {
 }
 
 .logo:hover .logo-accent {
-  filter: drop-shadow(0 0 15px #fbbf24) brightness(1.1);
+  filter: drop-shadow(0 0 15px var(--color-accent)) brightness(1.1);
 }
 
 .logo-text {
@@ -293,14 +295,14 @@ body {
 }
 
 .logo-accent {
-  background: linear-gradient(135deg, #fbbf24 0%, color-mix(in srgb, #fbbf24 80%, white) 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 80%, white) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-style: italic;
   position: relative;
   transition: filter 0.2s ease;
-  filter: drop-shadow(0 0 10px color-mix(in srgb, #fbbf24 50%, transparent));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-accent) 50%, transparent));
 }
 
 .logo-io {
@@ -316,7 +318,12 @@ body {
 }
 
 .horizon-glow {
-  background: linear-gradient(to top, rgba(251, 191, 36, 0.04) 0%, rgba(251, 191, 36, 0.015) 30%, transparent 100%);
+  background: linear-gradient(
+    to top,
+    rgba(168, 183, 232, 0.06) 0%,
+    rgba(168, 183, 232, 0.02) 32%,
+    transparent 100%
+  );
 }
 
 @keyframes starTwinkle {
@@ -359,37 +366,4 @@ body {
 .star-cross::after {
   width: 1px;
   height: var(--cross-size);
-}
-
-@keyframes shootingStar {
-  0% {
-    opacity: 0;
-    transform: rotate(var(--angle, 30deg)) translateX(0);
-  }
-  5% {
-    opacity: 1;
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: rotate(var(--angle, 30deg)) translateX(85vw);
-  }
-}
-
-.shooting-star {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: #fbbf24;
-  border-radius: 50%;
-  animation: shootingStar 5s ease-in-out forwards;
-  box-shadow:
-    0 0 3px 1px rgba(251, 191, 36, 0.9),
-    -15px 0 8px rgba(251, 191, 36, 0.6),
-    -40px 0 14px rgba(251, 191, 36, 0.4),
-    -80px 0 20px rgba(251, 191, 36, 0.2),
-    -130px 0 26px rgba(251, 191, 36, 0.1),
-    -180px 0 30px rgba(251, 191, 36, 0.05);
 }

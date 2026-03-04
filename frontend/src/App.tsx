@@ -13,7 +13,6 @@ function App() {
     <ToastProvider>
       <StarryBackground />
       <BrowserRouter>
-        <StarryBackground />
         <Routes>
           <Route path="/" element={<LobbyPage />} />
           <Route path="/:lang" element={<LobbyPage />} />
