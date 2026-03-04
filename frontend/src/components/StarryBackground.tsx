@@ -11,6 +11,8 @@ const BASE_STAR_COUNT = 600;
 const STAR_DENSITY = BASE_STAR_COUNT / BASE_AREA;
 const MIN_STAR_COUNT = 260;
 const MAX_STAR_COUNT = 2400;
+const GALAXY_COUNT_MIN = 2;
+const GALAXY_COUNT_MAX = 4;
 
 interface Star {
   x: number;
@@ -22,6 +24,24 @@ interface Star {
   isCross: boolean;
   color: string;
 }
+
+interface Galaxy {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+  opacity: number;
+  blur: number;
+  palette: GalaxyPalette;
+}
+
+type GalaxyPalette = {
+  core: string;
+  mid: string;
+  outer: string;
+  accent: string;
+};
 
 type WeightedStarColor = {
   rgb: [number, number, number];
@@ -77,6 +97,58 @@ const TREE_PATHS = [
   "M0,-68 L6,-60 L18,-56 L8,-54 L15,-46 L30,-40 L13,-38 L22,-28 L40,-20 L16,-18 L26,-10 L48,-3 L4,-2 L4,0 L-4,0 L-4,-2 L-48,-3 L-26,-10 L-16,-18 L-40,-20 L-22,-28 L-13,-38 L-30,-40 L-15,-46 L-8,-54 L-18,-56 L-6,-60 Z",
 ];
 
+const GALAXY_PALETTES: GalaxyPalette[] = [
+  {
+    core: "255, 240, 245",
+    mid: "180, 120, 200",
+    outer: "100, 60, 160",
+    accent: "80, 140, 220",
+  },
+  {
+    core: "255, 245, 235",
+    mid: "200, 140, 100",
+    outer: "140, 80, 120",
+    accent: "100, 120, 200",
+  },
+  {
+    core: "240, 248, 255",
+    mid: "120, 160, 220",
+    outer: "80, 100, 180",
+    accent: "160, 100, 200",
+  },
+  {
+    core: "255, 240, 250",
+    mid: "200, 100, 160",
+    outer: "120, 60, 140",
+    accent: "220, 140, 180",
+  },
+  {
+    core: "255, 250, 240",
+    mid: "180, 160, 100",
+    outer: "120, 100, 60",
+    accent: "100, 160, 180",
+  },
+];
+
+const generateGalaxies = (): Galaxy[] => {
+  const count =
+    GALAXY_COUNT_MIN + Math.floor(Math.random() * (GALAXY_COUNT_MAX - GALAXY_COUNT_MIN + 1));
+  return Array.from({ length: count }, () => {
+    const baseSize = 150 + Math.random() * 250;
+    const elongation = 0.4 + Math.random() * 0.3;
+    return {
+      x: 5 + Math.random() * 85,
+      y: 5 + Math.random() * 60,
+      width: baseSize,
+      height: baseSize * elongation,
+      rotation: Math.random() * 360,
+      opacity: 0.12 + Math.random() * 0.15,
+      blur: 3 + Math.random() * 2,
+      palette: GALAXY_PALETTES[Math.floor(Math.random() * GALAXY_PALETTES.length)],
+    };
+  });
+};
+
 const getStarCount = (width: number, height: number): number => {
   const countByArea = Math.round(width * height * STAR_DENSITY);
   return Math.max(MIN_STAR_COUNT, Math.min(MAX_STAR_COUNT, countByArea));
@@ -115,6 +187,7 @@ export const StarryBackground = () => {
   const [frontTrees, setFrontTrees] = useState(() =>
     generateTreeLayer(window.innerWidth, FRONT_TREE_DENSITY)
   );
+  const [galaxies] = useState(() => generateGalaxies());
 
   useEffect(() => {
     const handleResize = () => {
@@ -132,6 +205,32 @@ export const StarryBackground = () => {
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
       <div className="absolute inset-0 starry-sky" />
+
+      {galaxies.map((galaxy, i) => (
+        <div
+          key={`galaxy-${i}`}
+          className="absolute galaxy"
+          style={{
+            left: `${galaxy.x}%`,
+            top: `${galaxy.y}%`,
+            width: `${galaxy.width}px`,
+            height: `${galaxy.height}px`,
+            transform: `translate(-50%, -50%) rotate(${galaxy.rotation}deg)`,
+            opacity: galaxy.opacity,
+            background: `
+              radial-gradient(
+                50% 50% at 50% 50%,
+                rgba(${galaxy.palette.core}, 0.9) 0%,
+                rgba(${galaxy.palette.mid}, 0.5) 20%,
+                rgba(${galaxy.palette.outer}, 0.25) 45%,
+                rgba(${galaxy.palette.accent}, 0.1) 65%,
+                transparent 100%
+              )
+            `,
+            filter: `blur(${galaxy.blur}px)`,
+          }}
+        />
+      ))}
 
       {stars.map((star, i) =>
         star.isCross ? (
