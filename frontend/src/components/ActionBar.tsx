@@ -22,7 +22,7 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
 
   const handleRematch = useCallback(() => {
     if (conn && gameId && canRematch) {
-      conn.reducers.rematch({ gameId });
+      (conn.reducers as any).Rematch({ gameId });
     }
   }, [conn, gameId, canRematch]);
 

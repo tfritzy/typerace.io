@@ -183,7 +183,7 @@ export const GamePage = () => {
       );
 
       if (!hasProgress) {
-        conn.reducers.joinPrivateGame({ gameId });
+        (conn.reducers as any).JoinPrivateGame({ gameId });
       }
     }
   }, [conn, game, gameId, gamePlayerProgress]);

@@ -75,7 +75,7 @@ export const useFindGame = () => {
     pendingJoinCodeRef.current = newJoinCode;
 
     const gameTypeEnum = { tag: gameType };
-    conn.reducers.joinGame({
+    (conn.reducers as any).JoinGame({
       gameMode: mode,
       joinCode: newJoinCode,
       gameType: gameTypeEnum as any

@@ -42,3 +42,5 @@ scripts/model_comparison_*.txt
 *.njsproj
 *.sln
 *.sw?
+spacetimedb/bin/
+spacetimedb/obj/
