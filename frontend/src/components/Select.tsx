@@ -18,7 +18,7 @@ export const Select = ({ value, onChange, options, label, className = '' }: Sele
                 <select
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
-                    className="w-full bg-[#1a1a1a] text-white border border-white/15 rounded-md pl-4 pr-10 py-2.5 text-sm cursor-pointer outline-none appearance-none h-[42px]"
+                    className="w-full glass-input text-white rounded-md pl-4 pr-10 py-2.5 text-sm cursor-pointer outline-none appearance-none h-[42px]"
                 >
                     {options.map(option => (
                         <option key={option.value} value={option.value}>

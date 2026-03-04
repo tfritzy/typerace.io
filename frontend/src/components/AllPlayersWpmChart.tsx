@@ -86,7 +86,7 @@ export const AllPlayersWpmChart = ({
                 }
             },
             tooltip: {
-                backgroundColor: 'rgba(26, 26, 26, 0.95)',
+                backgroundColor: 'rgba(24, 24, 24, 0.72)',
                 borderColor: 'rgba(255, 255, 255, 0.2)',
                 borderWidth: 1,
                 titleColor: 'rgba(255, 255, 255, 0.7)',

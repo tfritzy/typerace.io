@@ -27,12 +27,11 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
     return (
         <div ref={containerRef} className="fixed bottom-0 right-8 z-50">
             <div
-                className={`absolute bottom-28 right-0 rounded-xl border border-white/15 p-2 min-w-[180px] max-h-[70vh] overflow-y-auto transition-all ${
+                className={`absolute bottom-28 right-0 glass-surface rounded-xl p-2 min-w-[180px] max-h-[70vh] overflow-y-auto transition-all ${
                     isOpen
                         ? "opacity-100 visible"
                         : "opacity-0 invisible pointer-events-none"
                 }`}
-                style={{ backgroundColor: "var(--color-box-bg)" }}
             >
                 {languages.map((lang) => {
                     const href = lang.slug ? `/${lang.slug}` : "/";

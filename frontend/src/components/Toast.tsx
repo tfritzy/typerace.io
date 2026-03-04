@@ -11,7 +11,7 @@ export const ToastContainer = () => {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className="flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-slideInRight bg-(--color-box-bg) border border-(--color-box-border)"
+          className="flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-slideInRight bg-(--color-box-bg) border border-(--color-box-border) backdrop-blur-md"
           style={{
             borderColor: toast.type === "error" ? "var(--color-error)" : undefined,
           }}

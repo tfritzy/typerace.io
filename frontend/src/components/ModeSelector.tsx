@@ -108,8 +108,8 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                         onClick={() => setIsDrawerOpen(false)}
                     />
                     <div className="fixed inset-x-0 bottom-0 z-50 md:hidden animate-slideUp">
-                        <div className="bg-(--color-box-bg) border-t border-(--color-box-border) rounded-t-2xl max-h-[70vh] overflow-y-auto">
-                            <div className="sticky top-0 bg-(--color-box-bg) border-b border-(--color-box-border) px-4 py-3 flex items-center justify-between">
+                        <div className="glass-surface border-t rounded-t-2xl max-h-[70vh] overflow-y-auto">
+                            <div className="sticky top-0 glass-surface border-x-0 border-t-0 border-b px-4 py-3 flex items-center justify-between">
                                 <h3 className="text-white text-lg font-medium">Game Options</h3>
                                 <button
                                     onClick={() => setIsDrawerOpen(false)}

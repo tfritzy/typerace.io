@@ -220,7 +220,7 @@ export const ProfilePage = () => {
                                                 onClick={handleMenuClose}
                                             />
                                             <div
-                                                className="absolute right-0 top-full mt-2 bg-[#272727] border border-white/15 rounded-lg shadow-lg p-2 min-w-40 z-20"
+                                                className="absolute right-0 top-full mt-2 glass-surface rounded-lg shadow-lg p-2 min-w-40 z-20"
                                                 style={{
                                                     animation: isMenuClosing ? 'menuSlideOut 0.15s ease-out' : 'menuSlideIn 0.15s ease-out'
                                                 }}
@@ -301,7 +301,7 @@ export const ProfilePage = () => {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4 mt-8">
-                                    <div className="bg-black/5 border border-white/8 rounded-lg p-5">
+                                    <div className="glass-surface rounded-lg p-5">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <div className="text-white/50 text-xs mb-2 uppercase tracking-wider font-semibold">
@@ -321,7 +321,7 @@ export const ProfilePage = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="bg-black/5 border border-white/8 rounded-lg p-5">
+                                    <div className="glass-surface rounded-lg p-5">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <div className="text-white/50 text-xs mb-2 uppercase tracking-wider font-semibold">

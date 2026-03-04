@@ -182,7 +182,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                         `}
                     </style>
                     <div
-                        className="bg-[#272727] border border-white/15 rounded-xl p-8 min-w-[400px] max-w-[500px]"
+                        className="glass-surface rounded-xl p-8 min-w-[400px] max-w-[500px]"
                         style={{
                             animation: 'modalSlideIn 0.2s ease-out'
                         }}

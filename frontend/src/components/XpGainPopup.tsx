@@ -17,11 +17,7 @@ export const XpGainPopup = ({ xpGain, onComplete }: XpGainPopupProps) => {
 
     return (
         <div
-            className="rounded-lg px-4 py-3 shadow-lg min-w-[280px] animate-[modalFadeIn_0.3s_ease-out,modalFadeOut_0.3s_ease-in_5.3s_forwards]"
-            style={{
-                backgroundColor: 'var(--color-box-bg)',
-                border: '1px solid var(--color-box-border)',
-            }}
+            className="glass-surface rounded-lg px-4 py-3 shadow-lg min-w-[280px] animate-[modalFadeIn_0.3s_ease-out,modalFadeOut_0.3s_ease-in_5.3s_forwards]"
         >
             <div className="space-y-0.5 text-xs">
                 {xpGain.multipliers.map((multiplier, index) => (

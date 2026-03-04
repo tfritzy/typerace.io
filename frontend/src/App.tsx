@@ -11,6 +11,7 @@ import { StarryBackground } from "./components/StarryBackground";
 function App() {
   return (
     <ToastProvider>
+      <StarryBackground />
       <BrowserRouter>
         <StarryBackground />
         <Routes>

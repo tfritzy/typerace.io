@@ -27,16 +27,16 @@ const getPlacementBoxStyle = (placement?: number): CSSProperties => {
   }
   if (placement === 2) {
     return {
-      backgroundColor: 'rgba(192, 192, 192, 0.04)',
-      borderColor: 'rgba(192, 192, 192, 0.2)',
-      boxShadow: '0 0 15px rgba(192, 192, 192, 0.05)',
+      backgroundColor: 'rgba(192, 192, 192, 0.09)',
+      borderColor: 'rgba(192, 192, 192, 0.32)',
+      boxShadow: '0 0 18px rgba(192, 192, 192, 0.12), inset 0 1px 0 rgba(192, 192, 192, 0.12)',
     };
   }
   if (placement === 3) {
     return {
-      backgroundColor: 'rgba(205, 127, 50, 0.05)',
-      borderColor: 'rgba(205, 127, 50, 0.2)',
-      boxShadow: '0 0 15px rgba(205, 127, 50, 0.05)',
+      backgroundColor: 'rgba(205, 127, 50, 0.1)',
+      borderColor: 'rgba(205, 127, 50, 0.34)',
+      boxShadow: '0 0 18px rgba(205, 127, 50, 0.13), inset 0 1px 0 rgba(205, 127, 50, 0.12)',
     };
   }
   return {};

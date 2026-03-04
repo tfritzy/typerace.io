@@ -22,10 +22,14 @@ export const Cursor = memo(({ targetRef, lerp = .2, fadeDelay = 2000, visible = 
             if (!targetRef?.current || !followerRef.current) return;
             const targetRect = targetRef.current.getBoundingClientRect();
             const followerRect = followerRef.current.getBoundingClientRect();
+            const container = followerRef.current.offsetParent as HTMLElement | null;
+            const containerRect = container?.getBoundingClientRect();
+
+            if (!containerRect) return;
 
             const newTarget = {
-                x: targetRect.left - followerRect.width / 2,
-                y: targetRect.top + (targetRect.height - followerRect.height) / 2,
+                x: targetRect.left - containerRect.left - followerRect.width / 2,
+                y: targetRect.top - containerRect.top + (targetRect.height - followerRect.height) / 2,
             };
 
             if (newTarget.x !== target.current.x || newTarget.y !== target.current.y) {
@@ -81,7 +85,7 @@ export const Cursor = memo(({ targetRef, lerp = .2, fadeDelay = 2000, visible = 
     return (
         <div
             ref={followerRef}
-            className={`max-w-0 h-8 -translate-y-px fixed -top-0.5 left-0 ${isBlinking && visible ? 'animate-blink' : ''}`}
+            className={`max-w-0 h-8 -translate-y-px absolute -top-0.5 left-0 ${isBlinking && visible ? 'animate-blink' : ''}`}
             style={{ opacity: visible ? 1 : 0 }}
         >
             <div className="h-full rounded-full" style={{ borderRight: '2px solid var(--color-accent)' }} />

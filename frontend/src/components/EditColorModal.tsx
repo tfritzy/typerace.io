@@ -33,7 +33,7 @@ export const EditColorModal = ({ currentColor, onSave, onClose }: EditColorModal
             }}
         >
             <div
-                className="bg-[#272727] border border-white/15 rounded-xl p-8 min-w-[400px] max-w-[500px]"
+                className="glass-surface rounded-xl p-8 min-w-[400px] max-w-[500px]"
                 onClick={(e) => e.stopPropagation()}
                 style={{
                     animation: isClosing ? 'modalSlideOut 0.2s ease-out' : 'modalSlideIn 0.2s ease-out'

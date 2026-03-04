@@ -38,9 +38,8 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
 
       <div
         onClick={handleCopyLink}
-        className="rounded-lg p-4 cursor-pointer transition-all duration-200 relative"
+        className="glass-surface rounded-lg p-4 cursor-pointer transition-all duration-200 relative"
         style={{
-          backgroundColor: 'var(--color-box-bg)',
           border: linkCopied ? '1px solid var(--color-accent)' : '1px solid var(--color-box-border)'
         }}
         onMouseEnter={(e) => {

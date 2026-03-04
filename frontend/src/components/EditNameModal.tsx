@@ -31,7 +31,7 @@ export const EditNameModal = ({ currentName, onSave, onClose }: EditNameModalPro
             }}
         >
             <div
-                className="bg-[#272727] border border-white/15 rounded-xl p-8 min-w-[400px] max-w-[500px]"
+                className="glass-surface rounded-xl p-8 min-w-[400px] max-w-[500px]"
                 onClick={(e) => e.stopPropagation()}
                 style={{
                     animation: isClosing ? 'modalSlideOut 0.2s ease-out' : 'modalSlideIn 0.2s ease-out'
@@ -49,7 +49,7 @@ export const EditNameModal = ({ currentName, onSave, onClose }: EditNameModalPro
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full bg-[#1a1a1a] text-white border border-white/15 rounded-md px-3 py-2.5 text-sm outline-none box-border"
+                        className="w-full glass-input text-white rounded-md px-3 py-2.5 text-sm outline-none box-border"
                         maxLength={30}
                         autoFocus
                     />

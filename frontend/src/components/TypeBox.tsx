@@ -296,7 +296,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           </div>
         )}
         <div className="relative select-none flex-1">
-          <div className="type-box">
+          <div className="type-box relative">
             <div
               className="whitespace-pre-wrap text-start font-mono"
               ref={phraseRef}

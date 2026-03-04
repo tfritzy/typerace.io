@@ -304,7 +304,7 @@ export const SiteStatsPage = () => {
                 }
             },
             tooltip: {
-                backgroundColor: '#1a1a1a',
+                backgroundColor: 'rgba(24, 24, 24, 0.72)',
                 borderColor: 'rgba(255, 255, 255, 0.12)',
                 borderWidth: 1,
                 titleColor: '#ffffff',
@@ -356,7 +356,7 @@ export const SiteStatsPage = () => {
                 }
             },
             tooltip: {
-                backgroundColor: '#1a1a1a',
+                backgroundColor: 'rgba(24, 24, 24, 0.72)',
                 borderColor: 'rgba(255, 255, 255, 0.12)',
                 borderWidth: 1,
                 titleColor: '#ffffff',
@@ -406,7 +406,7 @@ export const SiteStatsPage = () => {
                 }
             },
             tooltip: {
-                backgroundColor: '#1a1a1a',
+                backgroundColor: 'rgba(24, 24, 24, 0.72)',
                 borderColor: 'rgba(255, 255, 255, 0.12)',
                 borderWidth: 1,
                 titleColor: '#ffffff',
