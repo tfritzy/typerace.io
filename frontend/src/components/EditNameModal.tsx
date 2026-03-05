@@ -1,4 +1,8 @@
 import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 
 type EditNameModalProps = {
     currentName: string;
@@ -8,74 +12,41 @@ type EditNameModalProps = {
 
 export const EditNameModal = ({ currentName, onSave, onClose }: EditNameModalProps) => {
     const [name, setName] = useState(currentName);
-    const [isClosing, setIsClosing] = useState(false);
-
-    const handleClose = () => {
-        setIsClosing(true);
-        setTimeout(onClose, 200);
-    };
 
     const handleSave = () => {
         if (name.trim()) {
             onSave(name.trim());
-            handleClose();
+            onClose();
         }
     };
 
     return (
-        <div
-            className="fixed inset-0 bg-black/20 flex items-center justify-center z-2000"
-            onClick={handleClose}
-            style={{
-                animation: isClosing ? 'modalFadeOut 0.2s ease-out' : 'modalFadeIn 0.2s ease-out'
-            }}
-        >
-            <div
-                className="bg-[#272727] border border-white/15 rounded-xl p-8 min-w-[400px] max-w-[500px]"
-                onClick={(e) => e.stopPropagation()}
-                style={{
-                    animation: isClosing ? 'modalSlideOut 0.2s ease-out' : 'modalSlideIn 0.2s ease-out'
-                }}
-            >
-                <h2 className="text-white text-2xl font-bold mb-6 mt-0">
-                    Edit Name
-                </h2>
+        <Dialog open={true} onOpenChange={(open) => { if (!open) onClose(); }}>
+            <DialogContent className="min-w-[400px] max-w-[500px]">
+                <DialogHeader className="mb-6">
+                    <DialogTitle>Edit Name</DialogTitle>
+                </DialogHeader>
 
                 <div className="mb-8">
-                    <label className="text-white/60 text-sm mb-2 block">
-                        Name
-                    </label>
-                    <input
+                    <Label className="mb-2 block">Name</Label>
+                    <Input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full bg-[#1a1a1a] text-white border border-white/15 rounded-md px-3 py-2.5 text-sm outline-none box-border"
                         maxLength={30}
                         autoFocus
                     />
                 </div>
 
                 <div className="flex gap-3 justify-end">
-                    <button
-                        onClick={handleClose}
-                        className="bg-transparent text-white/60 border border-white/15 rounded-md px-5 py-2.5 text-sm cursor-pointer font-medium"
-                    >
+                    <Button variant="outline" onClick={onClose}>
                         Cancel
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={!name.trim()}
-                        className="border-0 rounded-md px-5 py-2.5 text-sm font-semibold text-white"
-                        style={{
-                            backgroundColor: 'var(--color-accent)',
-                            cursor: name.trim() ? 'pointer' : 'not-allowed',
-                            opacity: name.trim() ? 1 : 0.5
-                        }}
-                    >
+                    </Button>
+                    <Button onClick={handleSave} disabled={!name.trim()}>
                         Save
-                    </button>
+                    </Button>
                 </div>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 };
