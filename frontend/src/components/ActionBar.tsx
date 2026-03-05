@@ -4,7 +4,6 @@ import type { DbConnection } from "../../module_bindings";
 import { type GameMode } from "../types/stdb";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { useFindGame } from "../hooks/useFindGame";
-import { getLangHome } from "../utils/modes";
 
 type ActionBarProps = {
   mode?: GameMode;
@@ -37,7 +36,7 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
       if (gameType !== "Private" && (event.key === "p" || event.key === "P")) {
         handlePlayAgain();
       } else if (event.key === "m" || event.key === "M") {
-        navigate(getLangHome());
+        navigate("/");
       } else if ((event.key === "r" || event.key === "R") && canRematch) {
         handleRematch();
       }
@@ -50,7 +49,7 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
   return (
     <div className="flex gap-3 mt-3 animate-slideUpFadeIn" style={{ animationDelay: '0.2s' }}>
       <button
-        onClick={() => navigate(getLangHome())}
+        onClick={() => navigate("/")}
         className="box rounded-lg px-8 py-4 bg-transparent text-white text-base font-semibold cursor-pointer opacity-80 flex-1"
       >
         Main Menu <span className="ml-1 border px-1 rounded-xs font-light border-white/40 text-white/75">M</span>

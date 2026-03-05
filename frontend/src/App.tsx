@@ -6,18 +6,14 @@ import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { SiteStatsPage } from "./pages/SiteStatsPage";
 import { ToastProvider } from "./hooks/useToast";
 import { ToastContainer } from "./components/Toast";
-import { StarryBackground } from "./components/StarryBackground";
 
 function App() {
   return (
     <ToastProvider>
-      <StarryBackground />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LobbyPage />} />
-          <Route path="/:lang" element={<LobbyPage />} />
           <Route path="/game/:gameId" element={<GamePage />} />
-          <Route path="/:lang/game/:gameId" element={<GamePage />} />
           <Route path="/profile/:playerId" element={<ProfilePage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/stats" element={<SiteStatsPage />} />

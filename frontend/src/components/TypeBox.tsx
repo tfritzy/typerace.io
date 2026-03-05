@@ -286,7 +286,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     return (
       <div
-        className={`relative box-with-focus w-full rounded-lg px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-red-500!" : ""} ${disabled ? "pointer-events-none" : ""} ${className || ""}`}
+        className={`relative box-with-focus w-full rounded-lg px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-red-500!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
         style={height ? { minHeight: height } : undefined}
         onClick={() => inputRef.current?.focus()}
       >
@@ -296,7 +296,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           </div>
         )}
         <div className="relative select-none flex-1">
-          <div className="type-box relative">
+          <div className="type-box">
             <div
               className="whitespace-pre-wrap text-start font-mono"
               ref={phraseRef}

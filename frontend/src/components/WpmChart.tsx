@@ -180,7 +180,7 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                 display: false,
             },
             tooltip: {
-                backgroundColor: 'rgba(24, 24, 24, 0.72)',
+                backgroundColor: '#1a1a1a',
                 borderColor: borderColor,
                 borderWidth: 1,
                 titleColor: '#ffffff',
@@ -276,7 +276,7 @@ export const WpmChart = ({ data }: WpmChartProps) => {
     };
 
     return (
-        <div className="mb-8 box box-shadow rounded-lg p-6 w-full">
+        <div className="mb-8 bg-[#272727] border border-white/15 rounded-lg p-6 shadow-[0_4px_12px_rgba(0,0,0,0.2),0_1px_3px_rgba(0,0,0,0.1)] w-full">
             <div className="h-[280px] relative w-full">
                 <Line data={chartData} options={options} />
             </div>

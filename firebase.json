@@ -1,10 +1,4 @@
 {
-  "emulators": {
-    "auth": {
-      "host": "localhost",
-      "port": 9099
-    }
-  },
   "hosting": [
     {
       "target": "production",
@@ -15,58 +9,6 @@
         "**/node_modules/**"
       ],
       "rewrites": [
-        {
-          "source": "/es",
-          "destination": "/es/index.html"
-        },
-        {
-          "source": "/fr",
-          "destination": "/fr/index.html"
-        },
-        {
-          "source": "/de",
-          "destination": "/de/index.html"
-        },
-        {
-          "source": "/it",
-          "destination": "/it/index.html"
-        },
-        {
-          "source": "/pt",
-          "destination": "/pt/index.html"
-        },
-        {
-          "source": "/ja",
-          "destination": "/ja/index.html"
-        },
-        {
-          "source": "/ko",
-          "destination": "/ko/index.html"
-        },
-        {
-          "source": "/zh",
-          "destination": "/zh/index.html"
-        },
-        {
-          "source": "/uk",
-          "destination": "/uk/index.html"
-        },
-        {
-          "source": "/hi",
-          "destination": "/hi/index.html"
-        },
-        {
-          "source": "/nl",
-          "destination": "/nl/index.html"
-        },
-        {
-          "source": "/sv",
-          "destination": "/sv/index.html"
-        },
-        {
-          "source": "/tr",
-          "destination": "/tr/index.html"
-        },
         {
           "source": "**",
           "destination": "/index.html"
@@ -82,58 +24,6 @@
         "**/node_modules/**"
       ],
       "rewrites": [
-        {
-          "source": "/es",
-          "destination": "/es/index.html"
-        },
-        {
-          "source": "/fr",
-          "destination": "/fr/index.html"
-        },
-        {
-          "source": "/de",
-          "destination": "/de/index.html"
-        },
-        {
-          "source": "/it",
-          "destination": "/it/index.html"
-        },
-        {
-          "source": "/pt",
-          "destination": "/pt/index.html"
-        },
-        {
-          "source": "/ja",
-          "destination": "/ja/index.html"
-        },
-        {
-          "source": "/ko",
-          "destination": "/ko/index.html"
-        },
-        {
-          "source": "/zh",
-          "destination": "/zh/index.html"
-        },
-        {
-          "source": "/uk",
-          "destination": "/uk/index.html"
-        },
-        {
-          "source": "/hi",
-          "destination": "/hi/index.html"
-        },
-        {
-          "source": "/nl",
-          "destination": "/nl/index.html"
-        },
-        {
-          "source": "/sv",
-          "destination": "/sv/index.html"
-        },
-        {
-          "source": "/tr",
-          "destination": "/tr/index.html"
-        },
         {
           "source": "**",
           "destination": "/index.html"

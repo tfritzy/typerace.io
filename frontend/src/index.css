@@ -13,12 +13,11 @@
   --color-white: #ffffff;
   --color-white-25: rgba(255, 255, 255, 0.25);
   --color-error: #ef4444;
-  --color-accent: #d9a441;
-  --color-accent-light: #e3b34d;
-  --color-accent-dark: #c89335;
-  --color-box-bg: rgba(39, 39, 39, 0.22);
-  --color-box-border: rgba(255, 255, 255, 0.2);
-  --color-input-bg: rgba(18, 18, 18, 0.14);
+  --color-accent: #fbbf24;
+  --color-accent-light: #fcd34d;
+  --color-accent-dark: #f59e0b;
+  --color-box-bg: #272727;
+  --color-box-border: rgba(255, 255, 255, 0.12);
   
   --max-content-width: 1000px;
   
@@ -99,9 +98,7 @@ body {
 .box {
   background-color: var(--color-box-bg);
   border: 1px solid var(--color-box-border);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: background-color 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease, transform 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .box-shadow {
@@ -111,31 +108,13 @@ body {
 .box-with-focus {
   background-color: var(--color-box-bg);
   border: 1px solid var(--color-box-border);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .box-with-focus:focus-within {
-  background-color: rgba(255, 255, 255, 0.035);
-  border-color: rgba(255, 255, 255, 0.24);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
-}
-
-.glass-surface {
-  background-color: var(--color-box-bg);
-  border: 1px solid var(--color-box-border);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-
-.glass-input {
-  background-color: var(--color-input-bg);
-  border: 1px solid var(--color-box-border);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes modalFadeIn {
@@ -286,7 +265,7 @@ body {
 }
 
 .logo:hover .logo-accent {
-  filter: drop-shadow(0 0 15px var(--color-accent)) brightness(1.1);
+  filter: drop-shadow(0 0 15px #fbbf24) brightness(1.1);
 }
 
 .logo-text {
@@ -295,14 +274,14 @@ body {
 }
 
 .logo-accent {
-  background: linear-gradient(135deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 80%, white) 100%);
+  background: linear-gradient(135deg, #fbbf24 0%, color-mix(in srgb, #fbbf24 80%, white) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-style: italic;
   position: relative;
   transition: filter 0.2s ease;
-  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-accent) 50%, transparent));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, #fbbf24 50%, transparent));
 }
 
 .logo-io {
@@ -311,69 +290,4 @@ body {
   font-weight: 600;
   font-style: italic;
   margin-left: -0.2rem;
-}
-
-.starry-sky {
-  background: radial-gradient(ellipse at bottom, #12121e 0%, #0a0a15 50%, #050510 100%);
-}
-
-.horizon-glow {
-  background: linear-gradient(
-    to top,
-    rgba(168, 183, 232, 0.06) 0%,
-    rgba(168, 183, 232, 0.02) 32%,
-    transparent 100%
-  );
-}
-
-.atmosphere-glow {
-  background: linear-gradient(
-    to top,
-    rgba(60, 120, 220, 0.28) 0%,
-    rgba(50, 100, 200, 0.18) 20%,
-    rgba(45, 90, 190, 0.08) 55%,
-    transparent 100%
-  );
-}
-
-@keyframes starTwinkle {
-  0%, 88%, 100% {
-    opacity: 1;
-  }
-  94% {
-    opacity: 0.2;
-  }
-}
-
-.star-twinkle {
-  animation: starTwinkle linear infinite;
-}
-
-.star-cross {
-  width: 2px;
-  height: 2px;
-  background: var(--cross-color);
-  border-radius: 50%;
-  box-shadow: 0 0 3px 1px var(--cross-color);
-}
-
-.star-cross::before,
-.star-cross::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: var(--cross-color);
-  border-radius: 1px;
-}
-
-.star-cross::before {
-  width: var(--cross-size);
-  height: 1px;
-}
-
-.star-cross::after {
-  width: 1px;
-  height: var(--cross-size);
 }

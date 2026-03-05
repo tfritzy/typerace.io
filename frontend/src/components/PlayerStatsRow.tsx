@@ -24,7 +24,7 @@ export const PlayerStatsRow = memo(({
 
     return (
         <div className="flex gap-3 mb-3 items-stretch min-h-[100px] flex-wrap">
-            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 glass-surface rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300">
+            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
                 <div
                     className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
                     style={{ color: isHighWpm ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
@@ -39,7 +39,7 @@ export const PlayerStatsRow = memo(({
                 </div>
             </div>
 
-            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 glass-surface rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300">
+            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
                 <div
                     className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
                     style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
@@ -54,7 +54,7 @@ export const PlayerStatsRow = memo(({
                 </div>
             </div>
 
-            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 glass-surface rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300">
+            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
                 <div
                     className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
                     style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
@@ -69,7 +69,7 @@ export const PlayerStatsRow = memo(({
                 </div>
             </div>
 
-            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 glass-surface rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300">
+            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
                 <div
                     className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
                     style={{ color: isPerfectAccuracy ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}

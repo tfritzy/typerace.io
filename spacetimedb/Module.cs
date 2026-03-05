@@ -168,7 +168,7 @@ public static partial class Module
         return count;
     }
 
-    [Table(Accessor = "player", Public = true)]
+    [Table(Name = "player", Public = true)]
     public partial struct Player
     {
         [PrimaryKey]
@@ -191,8 +191,8 @@ public static partial class Module
         public long LastGameDate;
     }
 
-    [Table(Accessor = "game", Public = true)]
-    [SpacetimeDB.Index.BTree(Accessor = "State_GameType", Columns = new[] { nameof(State), nameof(GameType) })]
+    [Table(Name = "game", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(State), nameof(GameType) })]
     public partial struct Game
     {
         [PrimaryKey]
@@ -217,8 +217,8 @@ public static partial class Module
         public string? Attribution;
     }
 
-    [Table(Accessor = "gamerecord", Public = true)]
-    [SpacetimeDB.Index.BTree(Accessor = "PlayerId_Day", Columns = new[] { nameof(GameRecord.PlayerId), nameof(GameRecord.Day) })]
+    [Table(Name = "gamerecord", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameRecord.PlayerId), nameof(GameRecord.Day) })]
     public partial struct GameRecord
     {
         [PrimaryKey]
@@ -245,8 +245,8 @@ public static partial class Module
         public string Day;
     }
 
-    [Table(Accessor = "personalrecord", Public = true)]
-    [SpacetimeDB.Index.BTree(Accessor = "PlayerId_GameMode", Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
+    [Table(Name = "personalrecord", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
     public partial struct PersonalRecord
     {
         [PrimaryKey]
@@ -259,7 +259,7 @@ public static partial class Module
         public double Wpm;
     }
 
-    [Table(Accessor = "xpgain", Public = true)]
+    [Table(Name = "xpgain", Public = true)]
     public partial struct XpGain
     {
         [PrimaryKey]
@@ -274,8 +274,8 @@ public static partial class Module
         public int TotalXp;
     }
 
-    [Table(Accessor = "elo", Public = true)]
-    [SpacetimeDB.Index.BTree(Accessor = "PlayerId_GameMode", Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
+    [Table(Name = "elo", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
     public partial struct Elo
     {
         [PrimaryKey]
@@ -287,7 +287,7 @@ public static partial class Module
         public int Rating;
     }
 
-    [Table(Accessor = "BotFillTrigger", Scheduled = nameof(FillGameWithBots), ScheduledAt = nameof(ScheduledAt))]
+    [Table(Scheduled = nameof(FillGameWithBots))]
     public partial struct BotFillTrigger
     {
         [AutoInc]
@@ -298,7 +298,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Accessor = "CountdownStart", Scheduled = nameof(StartCountdown), ScheduledAt = nameof(ScheduledAt))]
+    [Table(Scheduled = nameof(StartCountdown))]
     public partial struct CountdownStart
     {
         [AutoInc]
@@ -308,7 +308,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Accessor = "GameStart", Scheduled = nameof(StartGame), ScheduledAt = nameof(ScheduledAt))]
+    [Table(Scheduled = nameof(StartGame))]
     public partial struct GameStart
     {
         [AutoInc]
@@ -318,7 +318,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Accessor = "GameArchiver", Scheduled = nameof(ArchiveOldGames), ScheduledAt = nameof(ScheduledAt))]
+    [Table(Scheduled = nameof(ArchiveOldGames))]
     public partial struct GameArchiver
     {
         [AutoInc]
@@ -327,7 +327,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Accessor = "XpGainCleaner", Scheduled = nameof(CleanupOldXpGains), ScheduledAt = nameof(ScheduledAt))]
+    [Table(Scheduled = nameof(CleanupOldXpGains))]
     public partial struct XpGainCleaner
     {
         [AutoInc]
@@ -336,7 +336,7 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
-    [Table(Accessor = "globalstats", Public = true)]
+    [Table(Name = "globalstats", Public = true)]
     public partial struct GlobalStats
     {
         [PrimaryKey]
@@ -347,7 +347,7 @@ public static partial class Module
         public int DailyActivePlayers;
     }
 
-    [Table(Accessor = "playerprogress", Public = true)]
+    [Table(Name = "playerprogress", Public = true)]
     public partial struct PlayerProgress
     {
         [PrimaryKey]
@@ -373,7 +373,7 @@ public static partial class Module
         public int HighestProgress;
     }
 
-    [Table(Accessor = "BotProgressUpdate", Scheduled = nameof(UpdateBotProgress), ScheduledAt = nameof(ScheduledAt))]
+    [Table(Scheduled = nameof(UpdateBotProgress))]
     public partial struct BotProgressUpdate
     {
         [AutoInc]

@@ -11,8 +11,6 @@
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.95rem;
   font-weight: 600;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
@@ -24,19 +22,14 @@
 }
 
 .selection-button.selected {
-  background-color: rgba(168, 183, 232, 0.14);
-  border-color: rgba(168, 183, 232, 0.42);
-  color: rgba(235, 241, 255, 0.98);
-  box-shadow: 0 0 0 1px rgba(168, 183, 232, 0.2) inset, 0 0 14px rgba(120, 142, 214, 0.16);
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
 .selection-button:active {
   transform: translateY(0);
-}
-
-.selection-button:focus-visible {
-  outline: 2px solid rgba(168, 183, 232, 0.55);
-  outline-offset: 2px;
 }
 
 .selection-button:disabled {

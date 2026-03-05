@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useCallback, useState, useRef } from "react";
+import { useEffect, useCallback, useState } from "react";
 import {
   type Game,
   type PlayerProgress,
@@ -13,63 +13,21 @@ import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
-import type { CSSProperties } from "react";
-
-const getPlacementBoxStyle = (placement?: number): CSSProperties => {
-  if (!placement) return {};
-
-  if (placement === 1) {
-    return {
-      backgroundColor: 'rgba(255, 201, 0, 0.06)',
-      borderColor: 'rgba(255, 201, 0, 0.3)',
-      boxShadow: '0 0 20px rgba(255, 201, 0, 0.07), inset 0 1px 0 rgba(255, 201, 0, 0.08)',
-    };
-  }
-  if (placement === 2) {
-    return {
-      backgroundColor: 'rgba(192, 192, 192, 0.09)',
-      borderColor: 'rgba(192, 192, 192, 0.32)',
-      boxShadow: '0 0 18px rgba(192, 192, 192, 0.12), inset 0 1px 0 rgba(192, 192, 192, 0.12)',
-    };
-  }
-  if (placement === 3) {
-    return {
-      backgroundColor: 'rgba(205, 127, 50, 0.1)',
-      borderColor: 'rgba(205, 127, 50, 0.34)',
-      boxShadow: '0 0 18px rgba(205, 127, 50, 0.13), inset 0 1px 0 rgba(205, 127, 50, 0.12)',
-    };
-  }
-  return {};
-};
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
   const conn = useDatabase();
   const [hasFinished, setHasFinished] = useState(false);
-  const finishDelayRef = useRef(false);
-  const finishTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [game, setGame] = useState<Game | null>(null);
   const [gamePlayerProgress, setGamePlayerProgress] = useState<PlayerProgress[]>([]);
 
   useEffect(() => {
+    // Reset data when game switches to a new one via play again.
     setGame(null);
     setGamePlayerProgress([]);
     setHasFinished(false);
-    finishDelayRef.current = false;
-    if (finishTimeoutRef.current) {
-      clearTimeout(finishTimeoutRef.current);
-      finishTimeoutRef.current = null;
-    }
   }, [gameId]);
-
-  useEffect(() => {
-    return () => {
-      if (finishTimeoutRef.current) {
-        clearTimeout(finishTimeoutRef.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -163,9 +121,7 @@ export const GamePage = () => {
 
     if (currentPlayerProgress && game.phrase) {
       const hasCompletedRace = currentPlayerProgress.progressIndex >= game.phrase.length;
-      if (!finishDelayRef.current) {
-        setHasFinished(hasCompletedRace);
-      }
+      setHasFinished(hasCompletedRace);
     } else if (gamePlayerProgress.length > 0 && !currentPlayerProgress) {
       setHasFinished(true);
     } else {
@@ -189,12 +145,7 @@ export const GamePage = () => {
   }, [conn, game, gameId, gamePlayerProgress]);
 
   const handleFinish = useCallback(() => {
-    finishDelayRef.current = true;
-    finishTimeoutRef.current = setTimeout(() => {
-      setHasFinished(true);
-      finishDelayRef.current = false;
-      finishTimeoutRef.current = null;
-    }, 1500);
+    setHasFinished(true);
   }, []);
 
   if (!game) {
@@ -250,10 +201,8 @@ export const GamePage = () => {
                 );
               }
 
-              const placementStyle = getPlacementBoxStyle(pp.placement);
-
               return (
-                <div key={pp.id.toString()} className="box w-full rounded-lg px-8 py-6 relative" style={placementStyle}>
+                <div key={pp.id.toString()} className="box w-full rounded-lg px-8 py-6 relative">
                   <PlayerProgressBar
                     key={pp.id.toString()}
                     name={pp.playerName}
