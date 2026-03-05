@@ -385,7 +385,7 @@ public static partial class Module
     }
 
     [Reducer(ReducerKind.Init)]
-    public static void Init(ReducerContext ctx)
+    public static void init(ReducerContext ctx)
     {
         var fiveMinutes = new TimeDuration { Microseconds = 300_000_000 };
 
@@ -468,7 +468,7 @@ public static partial class Module
     }
 
     [Reducer(ReducerKind.ClientConnected)]
-    public static void ClientConnected(ReducerContext ctx)
+    public static void clientConnected(ReducerContext ctx)
     {
         var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
 
@@ -498,12 +498,12 @@ public static partial class Module
     }
 
     [Reducer(ReducerKind.ClientDisconnected)]
-    public static void ClientDisconnected(ReducerContext ctx)
+    public static void clientDisconnected(ReducerContext ctx)
     {
     }
 
     [Reducer]
-    public static void SyncAnonymousStatus(ReducerContext ctx, bool isAnonymous)
+    public static void syncAnonymousStatus(ReducerContext ctx, bool isAnonymous)
     {
         var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
 
@@ -531,7 +531,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void SetPlayerName(ReducerContext ctx, string name)
+    public static void setPlayerName(ReducerContext ctx, string name)
     {
         const int MinNameLength = 1;
         const int MaxNameLength = 30;
@@ -562,7 +562,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void SetPlayerColor(ReducerContext ctx, PlayerColor color)
+    public static void setPlayerColor(ReducerContext ctx, PlayerColor color)
     {
         var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
 
@@ -576,7 +576,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void JoinGame(ReducerContext ctx, GameMode gameMode, string joinCode, GameType gameType)
+    public static void joinGame(ReducerContext ctx, GameMode gameMode, string joinCode, GameType gameType)
     {
         Log.Info($"Player {ctx.Sender} looking for game.");
         var foundGame = FindLobbyGame(ctx, gameMode, gameType);
@@ -1051,7 +1051,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void StartPrivateGame(ReducerContext ctx, string gameId)
+    public static void startPrivateGame(ReducerContext ctx, string gameId)
     {
         var game = ctx.Db.game.Id.Find(gameId);
 
@@ -1105,7 +1105,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void JoinPrivateGame(ReducerContext ctx, string gameId)
+    public static void joinPrivateGame(ReducerContext ctx, string gameId)
     {
         var game = ctx.Db.game.Id.Find(gameId);
 
@@ -1139,7 +1139,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void Rematch(ReducerContext ctx, string gameId)
+    public static void rematch(ReducerContext ctx, string gameId)
     {
         var game = ctx.Db.game.Id.Find(gameId);
 
@@ -1744,7 +1744,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void UpdateProgress(ReducerContext ctx, string gameId, int newIndex, CharacterEventType eventType)
+    public static void updateProgress(ReducerContext ctx, string gameId, int newIndex, CharacterEventType eventType)
     {
         var playerId = ctx.Sender;
         var game = ctx.Db.game.Id.Find(gameId);

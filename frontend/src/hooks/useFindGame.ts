@@ -70,7 +70,10 @@ export const useFindGame = () => {
 
     setIsSearching(true);
 
-    const newJoinCode = `join_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    const uniqueId = typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}_${Math.floor(Math.random() * 1_000_000_000)}`;
+    const newJoinCode = `join_${uniqueId}`;
     pendingJoinCodeRef.current = newJoinCode;
 
     const gameTypeEnum = { tag: gameType };

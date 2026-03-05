@@ -30,17 +30,14 @@ export const Countdown = () => {
     conn.db.game.onInsert(handleGameInsert);
     conn.db.game.onUpdate(handleGameUpdate);
 
-    const subscription = conn.subscriptionBuilder()
-      .onApplied(() => {
-        const g = conn.db.game.id.find(gameId);
-        if (g) setGame(g);
-      })
-      .subscribe([`SELECT * FROM game WHERE Id = '${gameId}'`]);
+    const currentGame = conn.db.game.id.find(gameId);
+    if (currentGame) {
+      setGame(currentGame);
+    }
 
     return () => {
       conn.db.game.removeOnInsert(handleGameInsert);
       conn.db.game.removeOnUpdate(handleGameUpdate);
-      subscription.unsubscribe();
     };
   }, [conn, gameId]);
 

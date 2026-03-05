@@ -23,7 +23,6 @@ export const GamePage = () => {
   const [gamePlayerProgress, setGamePlayerProgress] = useState<PlayerProgress[]>([]);
 
   useEffect(() => {
-    // Reset data when game switches to a new one via play again.
     setGame(null);
     setGamePlayerProgress([]);
     setHasFinished(false);
@@ -44,37 +43,17 @@ export const GamePage = () => {
       }
     };
 
-    conn.db.game.onInsert(handleGameInsert);
-    conn.db.game.onUpdate(handleGameUpdate);
-
-    const gameSubscription = conn.subscriptionBuilder()
-      .onApplied(() => {
-        const g = conn.db.game.id.find(gameId);
-        if (g) setGame(g);
-      })
-      .subscribe([`SELECT * FROM game WHERE Id = '${gameId}'`]);
-
-    return () => {
-      conn.db.game.removeOnInsert(handleGameInsert);
-      conn.db.game.removeOnUpdate(handleGameUpdate);
-      gameSubscription.unsubscribe();
-    };
-  }, [conn, gameId]);
-
-  useEffect(() => {
-    if (!conn || !gameId || !conn.identity) return;
-
     const handleProgressInsert = (_ctx: any, pp: PlayerProgress) => {
       if (pp.gameId.toString() === gameId) {
-        setGamePlayerProgress(prev => {
-          if (prev.some(p => p.id === pp.id)) {
+        setGamePlayerProgress((prev) => {
+          if (prev.some((p) => p.id === pp.id)) {
             return prev;
           }
           return [...prev, pp];
         });
       }
 
-      if (conn?.identity && pp.playerId.isEqual(conn.identity)) {
+      if (conn.identity && pp.playerId.isEqual(conn.identity)) {
         if (pp.joinCode === gameId && pp.gameId.toString() !== gameId) {
           navigate(`/game/${pp.gameId.toString()}`, { replace: true });
         }
@@ -83,29 +62,49 @@ export const GamePage = () => {
 
     const handleProgressUpdate = (_ctx: any, _oldPP: PlayerProgress, newPP: PlayerProgress) => {
       if (newPP.gameId.toString() === gameId) {
-        setGamePlayerProgress(prev =>
-          prev.map(pp => pp.id === newPP.id ? newPP : pp)
-        );
+        setGamePlayerProgress((prev) => {
+          const existingIndex = prev.findIndex((pp) => pp.id === newPP.id);
+          if (existingIndex === -1) {
+            return [...prev, newPP];
+          }
+
+          const next = [...prev];
+          next[existingIndex] = newPP;
+          return next;
+        });
       }
     };
 
+    conn.db.game.onInsert(handleGameInsert);
+    conn.db.game.onUpdate(handleGameUpdate);
     conn.db.playerprogress.onInsert(handleProgressInsert);
     conn.db.playerprogress.onUpdate(handleProgressUpdate);
 
-    const progressSubscription = conn.subscriptionBuilder()
+    const progressQuery = `SELECT * FROM playerprogress WHERE GameId = '${gameId}'`;
+    const gameQuery = `SELECT * FROM game WHERE Id = '${gameId}'`;
+
+    const pageSubscription = conn.subscriptionBuilder()
       .onApplied(() => {
-        const allProgress = Array.from(conn.db.playerprogress.iter());
-        const currentGameProgress = allProgress.filter(pp => pp.gameId.toString() === gameId);
+        const currentGame = conn.db.game.id.find(gameId);
+        if (currentGame) {
+          setGame(currentGame);
+        }
+
+        const currentGameProgress = Array.from(conn.db.playerprogress.iter())
+          .filter((pp) => pp.gameId.toString() === gameId);
         setGamePlayerProgress(currentGameProgress);
       })
       .subscribe([
-        `SELECT * FROM playerprogress WHERE GameId = '${gameId}' OR PlayerId = '${conn.identity}'`
+        gameQuery,
+        progressQuery,
       ]);
 
     return () => {
       conn.db.playerprogress.removeOnInsert(handleProgressInsert);
       conn.db.playerprogress.removeOnUpdate(handleProgressUpdate);
-      progressSubscription.unsubscribe();
+      conn.db.game.removeOnInsert(handleGameInsert);
+      conn.db.game.removeOnUpdate(handleGameUpdate);
+      pageSubscription.unsubscribe();
     };
   }, [conn, gameId, navigate]);
 
