@@ -69,7 +69,7 @@ export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
     if (sortedGames.length === 0) {
         return (
             <div className="box box-shadow rounded-xl p-6">
-                <div className="text-white/60 text-center">
+                <div className="text-muted-foreground text-center">
                     No games played yet
                 </div>
             </div>
@@ -79,7 +79,7 @@ export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
     return (
         <div className="box box-shadow rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
-                <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-white/10 text-white text-xs uppercase tracking-wider font-bold min-w-[700px]">
+                <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-border text-foreground text-xs uppercase tracking-wider font-bold min-w-[700px]">
                     <div>Game Mode</div>
                     <div className="text-center">Type</div>
                     <div className="text-center">Placement</div>
@@ -91,46 +91,46 @@ export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
                     <button
                         key={gameRecord.id}
                         onClick={() => navigate(`/game/${gameRecord.gameId}`)}
-                        className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors cursor-pointer w-full text-left bg-transparent border-0 min-w-[700px]"
+                        className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-border last:border-b-0 hover:bg-muted transition-colors cursor-pointer w-full text-left bg-transparent border-0 min-w-[700px]"
                     >
-                        <div className="text-white/70">
+                        <div className="text-muted-foreground">
                             {formatGameMode(gameRecord.gameMode.tag)}
                         </div>
-                        <div className="text-center text-white/70">
+                        <div className="text-center text-muted-foreground">
                             {formatGameType(gameRecord.gameType.tag)}
                         </div>
-                        <div className="text-center text-white/70 flex items-center justify-center gap-1">
-                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" style={{ opacity: gameRecord.placement === 1 ? 1 : 0 }} />
+                        <div className="text-center text-muted-foreground flex items-center justify-center gap-1">
+                            <Star className="w-4 h-4 fill-accent-primary text-accent-primary" style={{ opacity: gameRecord.placement === 1 ? 1 : 0 }} />
                             <span>{gameRecord.placement}{getPlacementSuffix(gameRecord.placement)}</span>
                         </div>
-                        <div className="text-white/70 text-center">
+                        <div className="text-muted-foreground text-center">
                             {formatTime(gameRecord.timeMs)}
                         </div>
-                        <div className="text-white/70 text-center">
+                        <div className="text-muted-foreground text-center">
                             {Math.round(gameRecord.wpm)}
                         </div>
-                        <div className="text-white/60 text-right text-sm">
+                        <div className="text-muted-foreground text-right text-sm">
                             {formatDate(gameRecord.date)}
                         </div>
                     </button>
                 ))}
             </div>
             {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 p-4 border-t border-white/10">
+                <div className="flex items-center justify-center gap-2 p-4 border-t border-border">
                     <button
                         onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
-                        className="px-3 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white transition-colors"
+                        className="px-3 py-1 rounded bg-muted hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed text-foreground transition-colors"
                     >
                         Previous
                     </button>
-                    <span className="text-white/70 text-sm">
+                    <span className="text-muted-foreground text-sm">
                         Page {currentPage} of {totalPages}
                     </span>
                     <button
                         onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                         disabled={currentPage === totalPages}
-                        className="px-3 py-1 rounded bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white transition-colors"
+                        className="px-3 py-1 rounded bg-muted hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed text-foreground transition-colors"
                     >
                         Next
                     </button>

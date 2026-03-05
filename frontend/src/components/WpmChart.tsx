@@ -123,11 +123,11 @@ export const WpmChart = ({ data }: WpmChartProps) => {
     const timeConfig = getTimeConfig();
 
     const accentColor = colorTrigger >= 0 ? getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-accent').trim() : '';
+        .getPropertyValue('--accent-primary').trim() : '';
     const secondaryColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-white-25').trim();
-    const borderColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-box-border').trim();
+        .getPropertyValue('--muted-foreground').trim();
+    const borderColorVal = getComputedStyle(document.documentElement)
+        .getPropertyValue('--border').trim();
 
 
     const chartData = {
@@ -154,7 +154,7 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                 pointHitRadius: 10,
                 pointHoverRadius: 6,
                 pointHoverBackgroundColor: accentColor,
-                pointHoverBorderColor: '#ffffff',
+                pointHoverBorderColor: 'var(--foreground)',
                 pointHoverBorderWidth: 2,
                 showLine: false,
             },
@@ -180,11 +180,11 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                 display: false,
             },
             tooltip: {
-                backgroundColor: '#1a1a1a',
-                borderColor: borderColor,
+                backgroundColor: 'var(--input)',
+                borderColor: borderColorVal,
                 borderWidth: 1,
-                titleColor: '#ffffff',
-                bodyColor: 'rgba(255, 255, 255, 0.9)',
+                titleColor: 'var(--foreground)',
+                bodyColor: 'var(--secondary-foreground)',
                 padding: 16,
                 displayColors: false,
                 titleFont: {
@@ -239,7 +239,7 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                     display: false
                 },
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: 'var(--muted-foreground)',
                     font: {
                         size: 11
                     }
@@ -258,7 +258,7 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                     display: false
                 },
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: 'var(--muted-foreground)',
                     font: {
                         size: 11
                     },
@@ -276,7 +276,7 @@ export const WpmChart = ({ data }: WpmChartProps) => {
     };
 
     return (
-        <div className="mb-8 bg-[#272727] border border-white/15 rounded-lg p-6 shadow-[0_4px_12px_rgba(0,0,0,0.2),0_1px_3px_rgba(0,0,0,0.1)] w-full">
+        <div className="mb-8 bg-card border border-border rounded-lg p-6 shadow-[0_4px_12px_rgba(0,0,0,0.2),0_1px_3px_rgba(0,0,0,0.1)] w-full">
             <div className="h-[280px] relative w-full">
                 <Line data={chartData} options={options} />
             </div>

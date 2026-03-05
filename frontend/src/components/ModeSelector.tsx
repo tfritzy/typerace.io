@@ -42,7 +42,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
         <>
             <div className="hidden md:block">
                 <div className="mb-4">
-                    <h2 className="text-white/50 text-sm font-medium mb-2">Match Type</h2>
+                    <h2 className="text-muted-foreground text-sm font-medium mb-2">Match Type</h2>
                     <div className="flex gap-2">
                         <button
                             className={`selection-button ${gameType === "Public" ? 'selected' : ''}`}
@@ -68,7 +68,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     </div>
                 </div>
                 <div className="mb-4">
-                    <h2 className="text-white/50 text-sm font-medium mb-2">Mode</h2>
+                    <h2 className="text-muted-foreground text-sm font-medium mb-2">Mode</h2>
                     <div className="flex gap-2">
                         <button
                             className={`selection-button ${contentType === "Quotes" ? 'selected' : ''}`}
@@ -87,7 +87,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     </div>
                 </div>
                 <div className="pb-6">
-                    <h2 className="text-white/50 text-sm font-medium mb-2">Language</h2>
+                    <h2 className="text-muted-foreground text-sm font-medium mb-2">Language</h2>
                     <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2">
                         {languages.map((lang) => {
                             const mode = contentType === "Quotes" ? lang.quotesMode : lang.randomWordsMode;
@@ -139,18 +139,18 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                         onClick={() => setIsDrawerOpen(false)}
                     />
                     <div className="fixed inset-x-0 bottom-0 z-50 md:hidden animate-slideUp">
-                        <div className="bg-(--color-box-bg) border-t border-(--color-box-border) rounded-t-2xl max-h-[70vh] overflow-y-auto">
-                            <div className="sticky top-0 bg-(--color-box-bg) border-b border-(--color-box-border) px-4 py-3 flex items-center justify-between">
-                                <h3 className="text-white text-lg font-medium">Game Options</h3>
+                        <div className="bg-card border-t border-border rounded-t-2xl max-h-[70vh] overflow-y-auto">
+                            <div className="sticky top-0 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
+                                <h3 className="text-foreground text-lg font-medium">Game Options</h3>
                                 <button
                                     onClick={() => setIsDrawerOpen(false)}
-                                    className="text-white/60 hover:text-white transition-colors"
+                                    className="text-muted-foreground hover:text-foreground transition-colors"
                                 >
                                     <ChevronUp size={24} className="rotate-180" />
                                 </button>
                             </div>
                             <div className="p-4 pb-8">
-                                <h3 className="text-white/80 text-base font-medium mb-3">Match Type</h3>
+                                <h3 className="text-secondary-foreground text-base font-medium mb-3">Match Type</h3>
                                 <div className="flex flex-col gap-2 mb-6">
                                     <button
                                         className={`selection-button ${gameType === "Public" ? 'selected' : ''}`}
@@ -174,7 +174,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                         <span>Practice Mode</span>
                                     </button>
                                 </div>
-                                <h3 className="text-white/80 text-base font-medium mb-3">Mode</h3>
+                                <h3 className="text-secondary-foreground text-base font-medium mb-3">Mode</h3>
                                 <div className="flex flex-col gap-2 mb-6">
                                     <button
                                         className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
@@ -192,7 +192,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                         <span>Quotes</span>
                                     </button>
                                 </div>
-                                <h3 className="text-white/80 text-base font-medium mb-3">Language</h3>
+                                <h3 className="text-secondary-foreground text-base font-medium mb-3">Language</h3>
                                 <div className="grid grid-cols-2 gap-3">
                                     {languages.map((lang) => {
                                         const mode = contentType === "Quotes" ? lang.quotesMode : lang.randomWordsMode;

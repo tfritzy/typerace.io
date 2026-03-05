@@ -262,11 +262,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
         const style: React.CSSProperties = {};
         if (isTyped && !isCorrect) {
-          style.color = "var(--color-error)";
+          style.color = "var(--destructive)";
         } else if (isInCompletedWord) {
           style.color = "rgba(255, 255, 255, 0.15)";
         } else if (isInCurrentWord) {
-          style.color = "var(--color-white)";
+          style.color = "var(--foreground)";
         } else {
           style.color = "rgba(255, 255, 255, 0.35)";
         }
@@ -274,7 +274,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         return (
           <span
             key={i}
-            className={`transition-all duration-150 ${isTyped && !isCorrect ? "underline decoration-2 decoration-red-500" : ""}`}
+            className={`transition-all duration-150 ${isTyped && !isCorrect ? "underline decoration-2 decoration-destructive" : ""}`}
             style={style}
           >
             {isCursor && <span id="target" ref={targetRef} />}
@@ -291,7 +291,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         onClick={() => inputRef.current?.focus()}
       >
         {hasReachedErrorLimit && (
-          <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-(--color-error)">
+          <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-destructive">
             You must fix all errors
           </div>
         )}
@@ -328,7 +328,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             />
           </div>
           {attribution && (
-            <div className="mt-6 text-lg text-white/40 italic font-light text-right select-none pr-2">
+            <div className="mt-6 text-lg text-muted-foreground italic font-light text-right select-none pr-2">
               - {attribution}
             </div>
           )}

@@ -24,61 +24,61 @@ export const PlayerStatsRow = memo(({
 
     return (
         <div className="flex gap-3 mb-3 items-stretch min-h-[100px] flex-wrap">
-            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
+            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
                 <div
                     className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
-                    style={{ color: isHighWpm ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
+                    style={{ color: isHighWpm ? 'var(--accent-primary)' : 'var(--muted-foreground)' }}
                 >
                     WPM
                 </div>
                 <div
                     className="text-4xl font-bold leading-none"
-                    style={{ color: isHighWpm ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)' }}
+                    style={{ color: isHighWpm ? 'var(--accent-primary)' : 'var(--secondary-foreground)' }}
                 >
                     {Math.round(finalWpm)}
                 </div>
             </div>
 
-            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
+            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
                 <div
                     className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
-                    style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
+                    style={{ color: isFirstPlace ? 'var(--accent-primary)' : 'var(--muted-foreground)' }}
                 >
                     Time
                 </div>
                 <div
                     className="text-4xl font-bold font-mono leading-none tracking-[0.02em]"
-                    style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)' }}
+                    style={{ color: isFirstPlace ? 'var(--accent-primary)' : 'var(--secondary-foreground)' }}
                 >
                     {formatStopwatchTime(raceTime)}
                 </div>
             </div>
 
-            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
+            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
                 <div
                     className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
-                    style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
+                    style={{ color: isFirstPlace ? 'var(--accent-primary)' : 'var(--muted-foreground)' }}
                 >
                     Place
                 </div>
                 <div
                     className="text-4xl font-bold leading-none"
-                    style={{ color: isFirstPlace ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)' }}
+                    style={{ color: isFirstPlace ? 'var(--accent-primary)' : 'var(--secondary-foreground)' }}
                 >
                     {getOrdinalPlacement(placement)}
                 </div>
             </div>
 
-            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300" style={{ backgroundColor: 'var(--color-box-bg)', borderColor: 'var(--color-box-border)' }}>
+            <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
                 <div
                     className="text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold"
-                    style={{ color: isPerfectAccuracy ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.5)' }}
+                    style={{ color: isPerfectAccuracy ? 'var(--accent-primary)' : 'var(--muted-foreground)' }}
                 >
                     Accuracy
                 </div>
                 <div
                     className="text-4xl font-bold leading-none"
-                    style={{ color: isPerfectAccuracy ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.95)' }}
+                    style={{ color: isPerfectAccuracy ? 'var(--accent-primary)' : 'var(--secondary-foreground)' }}
                 >
                     {Math.round(accuracy)}%
                 </div>

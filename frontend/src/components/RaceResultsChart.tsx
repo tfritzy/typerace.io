@@ -43,9 +43,9 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
     const colorConfig = getColorConfig(playerColor);
     const primaryColor = colorConfig.primary;
     const secondaryColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-white-25').trim();
+        .getPropertyValue('--muted-foreground').trim();
     const errorColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-error').trim();
+        .getPropertyValue('--destructive').trim();
     const chartData = {
         datasets: [
             {
@@ -111,7 +111,7 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
                 position: 'top',
                 align: 'end',
                 labels: {
-                    color: 'rgba(255, 255, 255, 0.9)',
+                    color: 'var(--secondary-foreground)',
                     font: {
                         size: 12,
                     },
@@ -120,11 +120,11 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
                 }
             },
             tooltip: {
-                backgroundColor: 'rgba(26, 26, 26, 0.95)',
-                borderColor: 'rgba(255, 255, 255, 0.2)',
+                backgroundColor: 'var(--input)',
+                borderColor: 'var(--border)',
                 borderWidth: 1,
-                titleColor: 'rgba(255, 255, 255, 0.7)',
-                bodyColor: '#ffffff',
+                titleColor: 'var(--foreground)',
+                bodyColor: 'var(--foreground)',
                 padding: 16,
                 displayColors: true,
                 usePointStyle: true,
@@ -165,13 +165,13 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
                 title: {
                     display: true,
                     text: 'Time (seconds)',
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: 'var(--muted-foreground)',
                     font: {
                         size: 12
                     }
                 },
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: 'var(--muted-foreground)',
                     font: {
                         size: 11
                     }
@@ -190,13 +190,13 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
                 title: {
                     display: true,
                     text: 'WPM',
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: 'var(--muted-foreground)',
                     font: {
                         size: 12
                     }
                 },
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: 'var(--muted-foreground)',
                     font: {
                         size: 11
                     },
@@ -223,7 +223,7 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
                     }
                 },
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: 'var(--muted-foreground)',
                     font: {
                         size: 11
                     },
@@ -241,7 +241,7 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
 
     if (rawWpmData.length === 0 && aggWpmData.length === 0 && errorCountsData.length === 0) {
         return (
-            <div className="w-full text-center text-white/60 py-6">
+            <div className="w-full text-center text-muted-foreground py-6">
                 No typing data available
             </div>
         );

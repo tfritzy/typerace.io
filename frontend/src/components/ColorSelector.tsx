@@ -44,7 +44,7 @@ export const ColorSelector = ({ selectedColor, onColorSelect }: ColorSelectorPro
                         aria-pressed={isSelected}
                     >
                         {isSelected && (
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white/95 shadow-[0_2px_6px_rgba(0,0,0,0.3)] flex items-center justify-center">
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-foreground/95 shadow-[0_2px_6px_rgba(0,0,0,0.3)] flex items-center justify-center">
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                                     <path
                                         d="M11.5 3.5L5.5 9.5L2.5 6.5"

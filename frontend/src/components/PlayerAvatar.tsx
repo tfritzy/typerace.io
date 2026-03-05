@@ -23,22 +23,22 @@ export const PlayerAvatar = memo(({
     const colorConfig = getColorConfig(color);
 
     const getCrownColor = (place: number) => {
-        if (place === 1) return '#FFC900';
+        if (place === 1) return 'var(--medal-gold)';
         return null;
     };
 
     const getMedalColor = (place: number) => {
-        if (place === 1) return '#FFC900';
-        if (place === 2) return '#C0C0C0';
-        if (place === 3) return '#CD7F32';
-        if (place > 3) return '#9CA3AF';
+        if (place === 1) return 'var(--medal-gold)';
+        if (place === 2) return 'var(--medal-silver)';
+        if (place === 3) return 'var(--medal-bronze)';
+        if (place > 3) return 'var(--medal-default)';
         return null;
     };
 
     const getBorderColor = (place: number) => {
-        if (place === 1) return '#FFC900';
-        if (place === 2) return '#C0C0C0';
-        if (place === 3) return '#CD7F32';
+        if (place === 1) return 'var(--medal-gold)';
+        if (place === 2) return 'var(--medal-silver)';
+        if (place === 3) return 'var(--medal-bronze)';
         return null;
     };
 
@@ -79,7 +79,7 @@ export const PlayerAvatar = memo(({
             )}
             {isLoading ? (
                 <div
-                    className="bg-white/5 rounded-full"
+                    className="bg-muted rounded-full"
                     style={{ width: size, height: size }}
                 />
             ) : (

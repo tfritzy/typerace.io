@@ -10,7 +10,7 @@ export const Select = ({ value, onChange, options, label, className = '' }: Sele
     return (
         <div className={`flex flex-col gap-1 ${className}`}>
             {label && (
-                <label className="text-white/60 text-xs font-medium">
+                <label className="text-muted-foreground text-xs font-medium">
                     {label}
                 </label>
             )}
@@ -18,7 +18,7 @@ export const Select = ({ value, onChange, options, label, className = '' }: Sele
                 <select
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
-                    className="w-full bg-[#1a1a1a] text-white border border-white/15 rounded-md pl-4 pr-10 py-2.5 text-sm cursor-pointer outline-none appearance-none h-[42px]"
+                    className="w-full bg-input text-foreground border border-border rounded-md pl-4 pr-10 py-2.5 text-sm cursor-pointer outline-none appearance-none h-[42px]"
                 >
                     {options.map(option => (
                         <option key={option.value} value={option.value}>
@@ -27,7 +27,7 @@ export const Select = ({ value, onChange, options, label, className = '' }: Sele
                     ))}
                 </select>
                 <svg
-                    className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/60"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground"
                     width="16"
                     height="16"
                     viewBox="0 0 24 24"
