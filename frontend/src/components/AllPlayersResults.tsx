@@ -26,7 +26,7 @@ export const AllPlayersResults = ({
     ) || allPlayerProgress[0];
 
     return (
-        <div className="glass-surface rounded-lg p-3">
+        <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--color-box-bg)', border: '1px solid var(--color-box-border)' }}>
             {allPlayerProgress.length > 1 && (
                 <div className="flex gap-3 mb-3 flex-wrap">
                     {allPlayerProgress.map((pp) => {

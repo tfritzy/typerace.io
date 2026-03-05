@@ -1,10 +1,7 @@
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { DbConnection } from '../../module_bindings';
-import { isFirebaseEnabled, auth } from '../firebase/config';
-import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
+import { useAuth } from '../firebase/AuthContext';
 import { LoadingDots } from '../components/LoadingDots';
-
-const SPACETIMEDB_TOKEN_KEY = 'spacetimedb_token';
 
 interface SpacetimeProviderProps {
     children: React.ReactNode;
@@ -25,48 +22,33 @@ export const useDatabase = () => {
 };
 
 export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
+    const { user } = useAuth();
     const [conn, setConn] = useState<DbConnection | null>(null);
     const [showReconnectModal, setShowReconnectModal] = useState(false);
     const [isReconnecting, setIsReconnecting] = useState(false);
     const [reconnectFailed, setReconnectFailed] = useState(false);
     const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const failureTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const connectionRef = useRef<DbConnection | null>(null);
-
-    const getToken = async (): Promise<{ token?: string; isAnonymous: boolean }> => {
-        if (isFirebaseEnabled && auth?.currentUser) {
-            const idToken = await auth.currentUser.getIdToken();
-            return { token: idToken, isAnonymous: auth.currentUser.isAnonymous };
-        }
-        const savedToken = localStorage.getItem(SPACETIMEDB_TOKEN_KEY) || undefined;
-        return { token: savedToken, isAnonymous: true };
-    };
 
     const connect = async (isAutoReconnect = false) => {
+        if (!user) return;
+
         if (isAutoReconnect) {
             setIsReconnecting(true);
             setReconnectFailed(false);
         }
 
         try {
-            const { token, isAnonymous } = await getToken();
-            const builder = DbConnection.builder()
+            const idToken = await user.getIdToken();
+
+            const connection = DbConnection.builder()
                 .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
-                .withDatabaseName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace');
-
-            if (token) {
-                builder.withToken(token);
-            }
-
-            const connection = builder
-                .onConnect((conn, _identity, returnedToken) => {
+                .withModuleName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace')
+                .withToken(idToken)
+                .onConnect((conn) => {
                     console.log('Connected to SpacetimeDB');
-                    if (!isFirebaseEnabled) {
-                        localStorage.setItem(SPACETIMEDB_TOKEN_KEY, returnedToken);
-                    }
-                    conn.reducers.syncAnonymousStatus({ isAnonymous });
+                    conn.reducers.SyncAnonymousStatus({ isAnonymous: user.isAnonymous });
                     setConn(conn);
-                    connectionRef.current = conn;
                     setShowReconnectModal(false);
                     setIsReconnecting(false);
                     setReconnectFailed(false);
@@ -83,7 +65,6 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                 .onDisconnect(() => {
                     console.warn('Disconnected from SpacetimeDB');
                     setConn(null);
-                    connectionRef.current = null;
                     setShowReconnectModal(true);
                     setIsReconnecting(true);
                     setReconnectFailed(false);
@@ -92,7 +73,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                         try {
                             await connect(true);
                             failureTimeoutRef.current = setTimeout(() => {
-                                if (!connectionRef.current) {
+                                if (!conn) {
                                     setIsReconnecting(false);
                                     setReconnectFailed(true);
                                 }
@@ -121,7 +102,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
         connect(true)
             .then(() => {
                 failureTimeoutRef.current = setTimeout(() => {
-                    if (!connectionRef.current) {
+                    if (!conn) {
                         setIsReconnecting(false);
                         setReconnectFailed(true);
                     }
@@ -134,32 +115,29 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     };
 
     useEffect(() => {
-        const cleanup = () => {
-            if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-            if (failureTimeoutRef.current) clearTimeout(failureTimeoutRef.current);
-            connectionRef.current?.disconnect();
-            setConn(null);
-        };
-
-        if (isFirebaseEnabled && auth) {
-            const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-                if (!firebaseUser) {
-                    try {
-                        await signInAnonymously(auth!);
-                    } catch (error) {
-                        console.error('Failed to sign in anonymously:', error);
-                    }
-                    return;
-                }
-                connectionRef.current?.disconnect();
-                connect();
-            });
-            return () => { unsubscribe(); cleanup(); };
+        if (!user) {
+            return;
         }
 
-        connect();
-        return cleanup;
-    }, []);
+        const connectionPromise = connect();
+
+        return () => {
+            if (reconnectTimeoutRef.current) {
+                clearTimeout(reconnectTimeoutRef.current);
+            }
+            if (failureTimeoutRef.current) {
+                clearTimeout(failureTimeoutRef.current);
+            }
+            connectionPromise.then((connection) => {
+                connection?.disconnect();
+                setConn(null);
+            });
+        };
+    }, [user?.uid]);
+
+    if (!user) {
+        return <LoadingDots />;
+    }
 
     if (!conn?.identity && !showReconnectModal) {
         return <LoadingDots />;
@@ -182,7 +160,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                         `}
                     </style>
                     <div
-                        className="glass-surface rounded-xl p-8 min-w-[400px] max-w-[500px]"
+                        className="bg-[#272727] border border-white/15 rounded-xl p-8 min-w-[400px] max-w-[500px]"
                         style={{
                             animation: 'modalSlideIn 0.2s ease-out'
                         }}
