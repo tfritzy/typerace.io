@@ -1,38 +1,95 @@
 import { useMemo } from "react";
 
 const VIEW_WIDTH = 1920;
-const VIEW_HEIGHT = 250;
-const TREE_BASE_Y = 230;
-const TREE_SEED = 137;
+const VIEW_HEIGHT = 200;
 
 const seededRandom = (seed: number): [number, number] => {
   const next = (seed * 16807) % 2147483647;
   return [next / 2147483647, next];
 };
 
+const generateMountains = (
+  baseY: number,
+  minPeak: number,
+  maxPeak: number,
+  minWidth: number,
+  maxWidth: number,
+  initialSeed: number
+): string => {
+  let path = `M0,${VIEW_HEIGHT} L0,${baseY} `;
+  let x = 0;
+  let seed = initialSeed;
+
+  while (x < VIEW_WIDTH) {
+    let val: number;
+    [val, seed] = seededRandom(seed);
+    const peakHeight = minPeak + val * (maxPeak - minPeak);
+    [val, seed] = seededRandom(seed);
+    const width = minWidth + val * (maxWidth - minWidth);
+
+    path += `L${(x + width / 2).toFixed(1)},${(baseY - peakHeight).toFixed(1)} `;
+    x += width;
+    path += `L${x.toFixed(1)},${baseY} `;
+  }
+
+  path += `L${VIEW_WIDTH},${VIEW_HEIGHT} Z`;
+  return path;
+};
+
+const generateTreeLine = (
+  baseY: number,
+  minH: number,
+  maxH: number,
+  minW: number,
+  maxW: number,
+  spacing: number,
+  initialSeed: number
+): string => {
+  let d = "";
+  let x = -20;
+  let seed = initialSeed;
+
+  while (x < VIEW_WIDTH + 40) {
+    let val: number;
+    [val, seed] = seededRandom(seed);
+    const h = minH + val * (maxH - minH);
+    [val, seed] = seededRandom(seed);
+    const w = minW + val * (maxW - minW);
+    [val, seed] = seededRandom(seed);
+    const cx = x + (val - 0.5) * spacing * 0.5;
+
+    const tip = baseY - h;
+    const t0 = baseY - h * 0.65;
+    const t1 = baseY - h * 0.35;
+
+    d += `M${cx.toFixed(1)},${tip.toFixed(1)} `;
+    d += `L${(cx + w * 0.18).toFixed(1)},${t0.toFixed(1)} `;
+    d += `L${(cx + w * 0.10).toFixed(1)},${t0.toFixed(1)} `;
+    d += `L${(cx + w * 0.30).toFixed(1)},${t1.toFixed(1)} `;
+    d += `L${(cx + w * 0.18).toFixed(1)},${t1.toFixed(1)} `;
+    d += `L${(cx + w * 0.42).toFixed(1)},${baseY.toFixed(1)} `;
+    d += `L${(cx - w * 0.42).toFixed(1)},${baseY.toFixed(1)} `;
+    d += `L${(cx - w * 0.18).toFixed(1)},${t1.toFixed(1)} `;
+    d += `L${(cx - w * 0.30).toFixed(1)},${t1.toFixed(1)} `;
+    d += `L${(cx - w * 0.10).toFixed(1)},${t0.toFixed(1)} `;
+    d += `L${(cx - w * 0.18).toFixed(1)},${t0.toFixed(1)} `;
+    d += `Z `;
+
+    x += spacing;
+  }
+
+  return d;
+};
+
 export const Scenery = () => {
-  const treePath = useMemo(() => {
-    let path = `M0,${VIEW_HEIGHT} L0,${TREE_BASE_Y} `;
-    let x = -5;
-    let seed = TREE_SEED;
-
-    while (x < VIEW_WIDTH + 50) {
-      let val: number;
-      [val, seed] = seededRandom(seed);
-      const height = 12 + val * 35;
-      [val, seed] = seededRandom(seed);
-      const width = 8 + val * 18;
-      [val, seed] = seededRandom(seed);
-      const gap = val * 5;
-      const peak = TREE_BASE_Y - height;
-      const mid = x + width / 2;
-      path += `L${mid.toFixed(1)},${peak.toFixed(1)} L${(x + width).toFixed(1)},${TREE_BASE_Y} `;
-      x += width + gap;
-    }
-
-    path += `L${VIEW_WIDTH},${TREE_BASE_Y} L${VIEW_WIDTH},${VIEW_HEIGHT} Z`;
-    return path;
-  }, []);
+  const farMountains = useMemo(
+    () => generateMountains(155, 40, 100, 100, 250, 42), []);
+  const nearMountains = useMemo(
+    () => generateMountains(170, 25, 55, 60, 160, 137), []);
+  const backTrees = useMemo(
+    () => generateTreeLine(192, 18, 40, 20, 35, 14, 73), []);
+  const frontTrees = useMemo(
+    () => generateTreeLine(200, 14, 32, 18, 28, 11, 211), []);
 
   return (
     <div
@@ -44,15 +101,10 @@ export const Scenery = () => {
         preserveAspectRatio="xMidYMax slice"
         className="w-full block"
       >
-        <path
-          d="M0,250 L0,160 Q240,95 480,145 Q720,70 960,130 Q1200,60 1440,120 Q1680,90 1920,150 L1920,250 Z"
-          fill="#272727"
-        />
-        <path
-          d="M0,250 L0,210 Q160,175 360,205 Q540,165 720,198 Q920,170 1100,195 Q1300,168 1500,198 Q1700,180 1920,205 L1920,250 Z"
-          fill="#242424"
-        />
-        <path d={treePath} fill="#2b2b2b" />
+        <path d={farMountains} fill="#222222" />
+        <path d={nearMountains} fill="#242424" />
+        <path d={backTrees} fill="#232323" />
+        <path d={frontTrees} fill="#252525" />
       </svg>
     </div>
   );
