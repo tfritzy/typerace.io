@@ -6,11 +6,13 @@ import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { SiteStatsPage } from "./pages/SiteStatsPage";
 import { ToastProvider } from "./hooks/useToast";
 import { ToastContainer } from "./components/Toast";
+import { Scenery } from "./components/Scenery";
 
 function App() {
   return (
     <ToastProvider>
       <BrowserRouter>
+        <Scenery />
         <Routes>
           <Route path="/" element={<LobbyPage />} />
           <Route path="/game/:gameId" element={<GamePage />} />
