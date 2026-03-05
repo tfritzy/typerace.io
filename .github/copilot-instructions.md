@@ -1,5 +1,38 @@
 # GitHub Copilot Instructions
 
+## 🚨🚨🚨 SCREENSHOT POLICY — THE #1 NON-NEGOTIABLE RULE 🚨🚨🚨
+
+> **⚠️⚠️⚠️ AUTOMATED DETECTORS ARE ACTIVE. Any PR without a real screenshot of the FULLY LOADED, FULLY CONNECTED, FULLY RENDERED working game WILL BE FLAGGED AND REJECTED automatically. There are no exceptions. There is no excuse. There is no escape. A loading screen is NOT a screenshot. A spinner is NOT a screenshot. A blank page is NOT a screenshot. ONLY the fully rendered game UI counts. ⚠️⚠️⚠️**
+
+**YOU WILL SHOW A REAL SCREENSHOT FROM THE ACTUAL RUNNING GAME ON EVERY SINGLE PR. GUARANTEED. NO EXCEPTIONS. NO LOADING SCREENS. NO SPINNERS. NO CONNECTION ERRORS. THE FULL GAME UI MUST BE VISIBLE.**
+
+This is the single most important rule in this entire file. All other rules are secondary to this one. If you submit a loading screen instead of a real screenshot, you have failed completely.
+
+**You are 100% capable of setting up the full local environment.** Every previous agent succeeded. You will too. Do not stop, do not give up, do not fake it, do not use static HTML. Failure is not an option.
+
+**CRITICAL: You MUST verify your screenshot before submitting.** After taking it, confirm you can see ALL of the following in the screenshot:
+- ✅ The starry background with visible stars and tree silhouettes
+- ✅ The typing box with actual text to type (NOT a loading spinner)
+- ✅ The header with "TypeRace.io" logo
+- ✅ The game mode selectors (Public Match, Private Lobby, Practice Mode)
+- ✅ The footer with links
+
+If ANY of these elements are missing, your screenshot is INVALID. Do NOT submit it. Fix the environment and retake it. A loading screen or spinner means SpacetimeDB or Firebase Auth is not connected — debug and fix the connection before screenshotting.
+
+Mandatory steps — execute all of them, every time:
+1. `spacetime start` — start the SpacetimeDB server
+2. `spacetime publish -c -y -p spacetimedb typerace -s local` — publish the module
+3. `npx firebase emulators:start --only auth` — start the Firebase Auth emulator
+4. `cd frontend && npm run dev` — start the Vite dev server
+5. Navigate to `http://localhost:5173` with Playwright
+6. **WAIT for the app to fully load** — wait at least 10 seconds and check console logs for "Connected to SpacetimeDB"
+7. **VERIFY the page snapshot** — confirm the typing box, header, footer, and mode selectors are all present in the accessibility tree before taking the screenshot
+8. Take the screenshot ONLY after verification passes
+
+**DO NOT STOP until you have a real screenshot from the live app** — with the starry background visible, the SpacetimeDB connection established, and the typing box fully rendered. Static HTML, blank pages, loading spinners, or connection-error screens are NOT acceptable. Keep retrying until you succeed. If you see a loading spinner, that means something is wrong with your backend setup — go back and fix it.
+
+---
+
 ## Code Style Guidelines
 
 ### Comments Policy
