@@ -124,6 +124,10 @@ export const SiteStatsPage = () => {
         );
     }, []);
 
+    const chartNeutralColor = useMemo(() => {
+        return getComputedStyle(document.documentElement).getPropertyValue('--chart-neutral').trim();
+    }, []);
+
     const chartBackgroundAlpha = '33';
 
     const createLineDatasets = (gameModes: Map<string, number[]>) => {
@@ -238,8 +242,8 @@ export const SiteStatsPage = () => {
                 {
                     label: 'Lonely Games %',
                     data: lonelyPercentages,
-                    borderColor: 'var(--muted-foreground)',
-                    backgroundColor: 'rgba(107, 114, 128, 0.3)',
+                    borderColor: chartNeutralColor,
+                    backgroundColor: `${chartNeutralColor}4D`,
                     fill: true,
                     tension: 0.4,
                 }
@@ -276,8 +280,8 @@ export const SiteStatsPage = () => {
                 {
                     label: 'Incomplete %',
                     data: incompletePercentages,
-                    borderColor: 'var(--muted-foreground)',
-                    backgroundColor: 'rgba(107, 114, 128, 0.3)',
+                    borderColor: chartNeutralColor,
+                    backgroundColor: `${chartNeutralColor}4D`,
                     fill: true,
                     tension: 0.4,
                 }
@@ -323,7 +327,7 @@ export const SiteStatsPage = () => {
                     minRotation: 45,
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: 'var(--grid-line)',
                 },
                 border: { display: false }
             },
@@ -335,7 +339,7 @@ export const SiteStatsPage = () => {
                     font: { size: 10 },
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: 'var(--grid-line)',
                 },
                 border: { display: false }
             }
@@ -374,7 +378,7 @@ export const SiteStatsPage = () => {
                     minRotation: 45,
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: 'var(--grid-line)',
                 },
                 border: { display: false }
             },
@@ -385,7 +389,7 @@ export const SiteStatsPage = () => {
                     font: { size: 10 },
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: 'var(--grid-line)',
                 },
                 border: { display: false }
             }
@@ -428,7 +432,7 @@ export const SiteStatsPage = () => {
                     minRotation: 45,
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: 'var(--grid-line)',
                 },
                 border: { display: false }
             },
@@ -442,7 +446,7 @@ export const SiteStatsPage = () => {
                     callback: (value: number | string) => `${value}%`
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: 'var(--grid-line)',
                 },
                 border: { display: false }
             }

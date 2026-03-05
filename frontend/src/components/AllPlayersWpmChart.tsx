@@ -140,7 +140,7 @@ export const AllPlayersWpmChart = ({
                     }
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: 'var(--grid-line)',
                     drawTicks: false
                 },
                 border: {
@@ -164,7 +164,7 @@ export const AllPlayersWpmChart = ({
                     padding: 8
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: 'var(--grid-line)',
                     drawTicks: false
                 },
                 border: {

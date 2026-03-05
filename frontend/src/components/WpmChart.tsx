@@ -245,7 +245,7 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                     }
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: 'var(--grid-line)',
                     drawTicks: false
                 },
                 border: {
@@ -265,7 +265,7 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                     padding: 8
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: 'var(--grid-line)',
                     drawTicks: false
                 },
                 border: {

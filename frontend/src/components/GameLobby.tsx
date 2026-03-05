@@ -45,7 +45,7 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
         }}
         onMouseEnter={(e) => {
           if (!linkCopied) {
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            e.currentTarget.style.borderColor = 'var(--border-hover)';
           }
         }}
         onMouseLeave={(e) => {
@@ -81,7 +81,7 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
           className="bg-transparent text-foreground border rounded-lg px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-200"
           style={{ borderColor: 'var(--border)' }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            e.currentTarget.style.borderColor = 'var(--border-hover)';
             e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseLeave={(e) => {

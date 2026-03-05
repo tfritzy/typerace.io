@@ -160,12 +160,12 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                         `}
                     </style>
                     <div
-                        className="bg-[#272727] border border-white/15 rounded-xl p-8 min-w-[400px] max-w-[500px]"
+                        className="bg-card border border-border rounded-xl p-8 min-w-[400px] max-w-[500px]"
                         style={{
                             animation: 'modalSlideIn 0.2s ease-out'
                         }}
                     >
-                        <h2 className="text-white text-2xl font-bold mb-4 mt-0">
+                        <h2 className="text-foreground text-2xl font-bold mb-4 mt-0">
                             Connection Lost
                         </h2>
                         {isReconnecting ? (
@@ -174,33 +174,30 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                                     style={{
                                         width: '32px',
                                         height: '32px',
-                                        border: '3px solid rgba(255, 255, 255, 0.1)',
-                                        borderTopColor: 'rgba(255, 255, 255, 0.6)',
+                                        border: '3px solid var(--secondary)',
+                                        borderTopColor: 'var(--muted-foreground)',
                                         borderRadius: '50%',
                                         animation: 'spin 0.8s linear infinite'
                                     }}
                                 />
-                                <p className="text-white/60 mt-4 mb-0">
+                                <p className="text-muted-foreground mt-4 mb-0">
                                     Reconnecting...
                                 </p>
                             </div>
                         ) : reconnectFailed ? (
                             <>
-                                <p className="text-white/60 mb-8">
+                                <p className="text-muted-foreground mb-8">
                                     Failed to reconnect automatically. Please try again.
                                 </p>
                                 <button
                                     onClick={handleManualReconnect}
-                                    className="w-full border-0 rounded-md px-5 py-2.5 text-sm font-semibold text-white cursor-pointer"
-                                    style={{
-                                        backgroundColor: 'var(--color-accent)'
-                                    }}
+                                    className="w-full border-0 rounded-md px-5 py-2.5 text-sm font-semibold text-foreground cursor-pointer bg-primary"
                                 >
                                     Reconnect
                                 </button>
                             </>
                         ) : (
-                            <p className="text-white/60 mb-0">
+                            <p className="text-muted-foreground mb-0">
                                 Your connection to the server has been lost.
                             </p>
                         )}

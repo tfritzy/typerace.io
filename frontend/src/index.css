@@ -90,10 +90,17 @@
   --input: #1a1a1a;
   --ring: #fbbf24;
 
+  --grid-line: rgba(255, 255, 255, 0.06);
+  --text-completed: rgba(255, 255, 255, 0.15);
+  --text-untyped: rgba(255, 255, 255, 0.35);
+  --border-hover: rgba(255, 255, 255, 0.3);
+
   --medal-gold: #FFC900;
   --medal-silver: #C0C0C0;
   --medal-bronze: #CD7F32;
   --medal-default: #9CA3AF;
+
+  --chart-neutral: #6b7280;
 
   --chart-1: #ef4444;
   --chart-2: #f97316;

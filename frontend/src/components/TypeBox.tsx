@@ -264,11 +264,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         if (isTyped && !isCorrect) {
           style.color = "var(--destructive)";
         } else if (isInCompletedWord) {
-          style.color = "rgba(255, 255, 255, 0.15)";
+          style.color = "var(--text-completed)";
         } else if (isInCurrentWord) {
           style.color = "var(--foreground)";
         } else {
-          style.color = "rgba(255, 255, 255, 0.35)";
+          style.color = "var(--text-untyped)";
         }
 
         return (
@@ -286,7 +286,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     return (
       <div
-        className={`relative box-with-focus w-full rounded-lg px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-red-500!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
+        className={`relative box-with-focus w-full rounded-lg px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
         style={height ? { minHeight: height } : undefined}
         onClick={() => inputRef.current?.focus()}
       >
