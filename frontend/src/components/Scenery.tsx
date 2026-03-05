@@ -1,5 +1,10 @@
 import { useMemo } from "react";
 
+const VIEW_WIDTH = 1920;
+const VIEW_HEIGHT = 250;
+const TREE_BASE_Y = 230;
+const TREE_SEED = 137;
+
 const seededRandom = (seed: number): [number, number] => {
   const next = (seed * 16807) % 2147483647;
   return [next / 2147483647, next];
@@ -7,13 +12,11 @@ const seededRandom = (seed: number): [number, number] => {
 
 export const Scenery = () => {
   const treePath = useMemo(() => {
-    const viewWidth = 1920;
-    const treeBaseY = 230;
-    let path = `M0,250 L0,${treeBaseY} `;
+    let path = `M0,${VIEW_HEIGHT} L0,${TREE_BASE_Y} `;
     let x = -5;
-    let seed = 137;
+    let seed = TREE_SEED;
 
-    while (x < viewWidth + 50) {
+    while (x < VIEW_WIDTH + 50) {
       let val: number;
       [val, seed] = seededRandom(seed);
       const height = 12 + val * 35;
@@ -21,13 +24,13 @@ export const Scenery = () => {
       const width = 8 + val * 18;
       [val, seed] = seededRandom(seed);
       const gap = val * 5;
-      const peak = treeBaseY - height;
+      const peak = TREE_BASE_Y - height;
       const mid = x + width / 2;
-      path += `L${mid.toFixed(1)},${peak.toFixed(1)} L${(x + width).toFixed(1)},${treeBaseY} `;
+      path += `L${mid.toFixed(1)},${peak.toFixed(1)} L${(x + width).toFixed(1)},${TREE_BASE_Y} `;
       x += width + gap;
     }
 
-    path += `L${viewWidth},${treeBaseY} L${viewWidth},250 Z`;
+    path += `L${VIEW_WIDTH},${TREE_BASE_Y} L${VIEW_WIDTH},${VIEW_HEIGHT} Z`;
     return path;
   }, []);
 
@@ -37,7 +40,7 @@ export const Scenery = () => {
       style={{ zIndex: 0 }}
     >
       <svg
-        viewBox="0 0 1920 250"
+        viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
         preserveAspectRatio="xMidYMax slice"
         className="w-full block"
       >
