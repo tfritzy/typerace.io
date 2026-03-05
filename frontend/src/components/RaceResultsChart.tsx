@@ -42,10 +42,14 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
 
     const colorConfig = getColorConfig(playerColor);
     const primaryColor = colorConfig.primary;
-    const secondaryColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--muted-foreground').trim();
-    const errorColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--destructive').trim();
+    const style = getComputedStyle(document.documentElement);
+    const secondaryColor = style.getPropertyValue('--muted-foreground').trim();
+    const errorColor = style.getPropertyValue('--destructive').trim();
+    const gridLineColor = style.getPropertyValue('--grid-line').trim();
+    const foregroundColor = style.getPropertyValue('--foreground').trim();
+    const inputColor = style.getPropertyValue('--input').trim();
+    const borderColorVal = style.getPropertyValue('--border').trim();
+    const secondaryFgColor = style.getPropertyValue('--secondary-foreground').trim();
     const chartData = {
         datasets: [
             {
@@ -111,7 +115,7 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
                 position: 'top',
                 align: 'end',
                 labels: {
-                    color: 'var(--secondary-foreground)',
+                    color: secondaryFgColor,
                     font: {
                         size: 12,
                     },
@@ -120,11 +124,11 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
                 }
             },
             tooltip: {
-                backgroundColor: 'var(--input)',
-                borderColor: 'var(--border)',
+                backgroundColor: inputColor,
+                borderColor: borderColorVal,
                 borderWidth: 1,
-                titleColor: 'var(--foreground)',
-                bodyColor: 'var(--foreground)',
+                titleColor: foregroundColor,
+                bodyColor: foregroundColor,
                 padding: 16,
                 displayColors: true,
                 usePointStyle: true,
@@ -165,19 +169,19 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
                 title: {
                     display: true,
                     text: 'Time (seconds)',
-                    color: 'var(--muted-foreground)',
+                    color: secondaryColor,
                     font: {
                         size: 12
                     }
                 },
                 ticks: {
-                    color: 'var(--muted-foreground)',
+                    color: secondaryColor,
                     font: {
                         size: 11
                     }
                 },
                 grid: {
-                    color: 'var(--grid-line)',
+                    color: gridLineColor,
                     drawTicks: false
                 },
                 border: {
@@ -190,20 +194,20 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
                 title: {
                     display: true,
                     text: 'WPM',
-                    color: 'var(--muted-foreground)',
+                    color: secondaryColor,
                     font: {
                         size: 12
                     }
                 },
                 ticks: {
-                    color: 'var(--muted-foreground)',
+                    color: secondaryColor,
                     font: {
                         size: 11
                     },
                     padding: 8
                 },
                 grid: {
-                    color: 'var(--grid-line)',
+                    color: gridLineColor,
                     drawTicks: false
                 },
                 border: {
@@ -223,7 +227,7 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, play
                     }
                 },
                 ticks: {
-                    color: 'var(--muted-foreground)',
+                    color: secondaryColor,
                     font: {
                         size: 11
                     },

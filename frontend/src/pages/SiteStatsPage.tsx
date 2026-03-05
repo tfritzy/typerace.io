@@ -128,6 +128,18 @@ export const SiteStatsPage = () => {
         return getComputedStyle(document.documentElement).getPropertyValue('--chart-neutral').trim();
     }, []);
 
+    const resolvedColors = useMemo(() => {
+        const s = getComputedStyle(document.documentElement);
+        return {
+            gridLine: s.getPropertyValue('--grid-line').trim(),
+            mutedFg: s.getPropertyValue('--muted-foreground').trim(),
+            secondaryFg: s.getPropertyValue('--secondary-foreground').trim(),
+            foreground: s.getPropertyValue('--foreground').trim(),
+            input: s.getPropertyValue('--input').trim(),
+            border: s.getPropertyValue('--border').trim(),
+        };
+    }, []);
+
     const chartBackgroundAlpha = '33';
 
     const createLineDatasets = (gameModes: Map<string, number[]>) => {
@@ -302,18 +314,18 @@ export const SiteStatsPage = () => {
                 display: true,
                 position: 'bottom' as const,
                 labels: {
-                    color: 'var(--secondary-foreground)',
+                    color: resolvedColors.secondaryFg,
                     font: { size: 11 },
                     boxWidth: 12,
                     padding: 10,
                 }
             },
             tooltip: {
-                backgroundColor: 'var(--input)',
-                borderColor: 'var(--border)',
+                backgroundColor: resolvedColors.input,
+                borderColor: resolvedColors.border,
                 borderWidth: 1,
-                titleColor: 'var(--foreground)',
-                bodyColor: 'var(--secondary-foreground)',
+                titleColor: resolvedColors.foreground,
+                bodyColor: resolvedColors.secondaryFg,
                 padding: 12,
             }
         },
@@ -321,13 +333,13 @@ export const SiteStatsPage = () => {
             x: {
                 stacked: true,
                 ticks: {
-                    color: 'var(--muted-foreground)',
+                    color: resolvedColors.mutedFg,
                     font: { size: 10 },
                     maxRotation: 45,
                     minRotation: 45,
                 },
                 grid: {
-                    color: 'var(--grid-line)',
+                    color: resolvedColors.gridLine,
                 },
                 border: { display: false }
             },
@@ -335,11 +347,11 @@ export const SiteStatsPage = () => {
                 stacked: true,
                 beginAtZero: true,
                 ticks: {
-                    color: 'var(--muted-foreground)',
+                    color: resolvedColors.mutedFg,
                     font: { size: 10 },
                 },
                 grid: {
-                    color: 'var(--grid-line)',
+                    color: resolvedColors.gridLine,
                 },
                 border: { display: false }
             }
@@ -354,42 +366,42 @@ export const SiteStatsPage = () => {
                 display: true,
                 position: 'bottom' as const,
                 labels: {
-                    color: 'var(--secondary-foreground)',
+                    color: resolvedColors.secondaryFg,
                     font: { size: 11 },
                     boxWidth: 12,
                     padding: 10,
                 }
             },
             tooltip: {
-                backgroundColor: 'var(--input)',
-                borderColor: 'var(--border)',
+                backgroundColor: resolvedColors.input,
+                borderColor: resolvedColors.border,
                 borderWidth: 1,
-                titleColor: 'var(--foreground)',
-                bodyColor: 'var(--secondary-foreground)',
+                titleColor: resolvedColors.foreground,
+                bodyColor: resolvedColors.secondaryFg,
                 padding: 12,
             }
         },
         scales: {
             x: {
                 ticks: {
-                    color: 'var(--muted-foreground)',
+                    color: resolvedColors.mutedFg,
                     font: { size: 10 },
                     maxRotation: 45,
                     minRotation: 45,
                 },
                 grid: {
-                    color: 'var(--grid-line)',
+                    color: resolvedColors.gridLine,
                 },
                 border: { display: false }
             },
             y: {
                 beginAtZero: true,
                 ticks: {
-                    color: 'var(--muted-foreground)',
+                    color: resolvedColors.mutedFg,
                     font: { size: 10 },
                 },
                 grid: {
-                    color: 'var(--grid-line)',
+                    color: resolvedColors.gridLine,
                 },
                 border: { display: false }
             }
@@ -404,18 +416,18 @@ export const SiteStatsPage = () => {
                 display: true,
                 position: 'bottom' as const,
                 labels: {
-                    color: 'var(--secondary-foreground)',
+                    color: resolvedColors.secondaryFg,
                     font: { size: 11 },
                     boxWidth: 12,
                     padding: 10,
                 }
             },
             tooltip: {
-                backgroundColor: 'var(--input)',
-                borderColor: 'var(--border)',
+                backgroundColor: resolvedColors.input,
+                borderColor: resolvedColors.border,
                 borderWidth: 1,
-                titleColor: 'var(--foreground)',
-                bodyColor: 'var(--secondary-foreground)',
+                titleColor: resolvedColors.foreground,
+                bodyColor: resolvedColors.secondaryFg,
                 padding: 12,
                 callbacks: {
                     label: (context: { parsed: { y: number } }) => `${context.parsed.y.toFixed(1)}%`
@@ -426,13 +438,13 @@ export const SiteStatsPage = () => {
             x: {
                 stacked: true,
                 ticks: {
-                    color: 'var(--muted-foreground)',
+                    color: resolvedColors.mutedFg,
                     font: { size: 10 },
                     maxRotation: 45,
                     minRotation: 45,
                 },
                 grid: {
-                    color: 'var(--grid-line)',
+                    color: resolvedColors.gridLine,
                 },
                 border: { display: false }
             },
@@ -441,12 +453,12 @@ export const SiteStatsPage = () => {
                 min: 0,
                 max: 100,
                 ticks: {
-                    color: 'var(--muted-foreground)',
+                    color: resolvedColors.mutedFg,
                     font: { size: 10 },
                     callback: (value: number | string) => `${value}%`
                 },
                 grid: {
-                    color: 'var(--grid-line)',
+                    color: resolvedColors.gridLine,
                 },
                 border: { display: false }
             }

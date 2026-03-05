@@ -122,12 +122,15 @@ export const WpmChart = ({ data }: WpmChartProps) => {
 
     const timeConfig = getTimeConfig();
 
-    const accentColor = colorTrigger >= 0 ? getComputedStyle(document.documentElement)
-        .getPropertyValue('--accent-primary').trim() : '';
-    const secondaryColor = getComputedStyle(document.documentElement)
-        .getPropertyValue('--muted-foreground').trim();
-    const borderColorVal = getComputedStyle(document.documentElement)
-        .getPropertyValue('--border').trim();
+    void colorTrigger;
+    const style = getComputedStyle(document.documentElement);
+    const accentColor = style.getPropertyValue('--accent-primary').trim();
+    const secondaryColor = style.getPropertyValue('--muted-foreground').trim();
+    const borderColorVal = style.getPropertyValue('--border').trim();
+    const gridLineColor = style.getPropertyValue('--grid-line').trim();
+    const foregroundColor = style.getPropertyValue('--foreground').trim();
+    const inputColor = style.getPropertyValue('--input').trim();
+    const secondaryFgColor = style.getPropertyValue('--secondary-foreground').trim();
 
 
     const chartData = {
@@ -154,7 +157,7 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                 pointHitRadius: 10,
                 pointHoverRadius: 6,
                 pointHoverBackgroundColor: accentColor,
-                pointHoverBorderColor: 'var(--foreground)',
+                pointHoverBorderColor: foregroundColor,
                 pointHoverBorderWidth: 2,
                 showLine: false,
             },
@@ -180,11 +183,11 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                 display: false,
             },
             tooltip: {
-                backgroundColor: 'var(--input)',
+                backgroundColor: inputColor,
                 borderColor: borderColorVal,
                 borderWidth: 1,
-                titleColor: 'var(--foreground)',
-                bodyColor: 'var(--secondary-foreground)',
+                titleColor: foregroundColor,
+                bodyColor: secondaryFgColor,
                 padding: 16,
                 displayColors: false,
                 titleFont: {
@@ -239,13 +242,13 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                     display: false
                 },
                 ticks: {
-                    color: 'var(--muted-foreground)',
+                    color: secondaryColor,
                     font: {
                         size: 11
                     }
                 },
                 grid: {
-                    color: 'var(--grid-line)',
+                    color: gridLineColor,
                     drawTicks: false
                 },
                 border: {
@@ -258,14 +261,14 @@ export const WpmChart = ({ data }: WpmChartProps) => {
                     display: false
                 },
                 ticks: {
-                    color: 'var(--muted-foreground)',
+                    color: secondaryColor,
                     font: {
                         size: 11
                     },
                     padding: 8
                 },
                 grid: {
-                    color: 'var(--grid-line)',
+                    color: gridLineColor,
                     drawTicks: false
                 },
                 border: {
