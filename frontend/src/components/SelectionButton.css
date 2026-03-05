@@ -5,10 +5,10 @@
   gap: 0.4rem;
   padding: 0.75rem 1rem;
   min-height: 44px;
-  background-color: var(--color-box-bg);
-  border: 1px solid var(--color-box-border);
+  background-color: var(--card);
+  border: 1px solid var(--border);
   border-radius: 0.5rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--secondary-foreground);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -17,15 +17,15 @@
 
 .selection-button:hover {
   background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--color-white-25);
   transform: translateY(-1px);
 }
 
 .selection-button.selected {
   background-color: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.35);
-  color: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  border-color: var(--muted-foreground);
+  color: var(--secondary-foreground);
+  box-shadow: 0 0 0 1px var(--muted) inset;
 }
 
 .selection-button:active {
@@ -34,7 +34,7 @@
 
 .selection-button:disabled {
   background-color: rgba(255, 255, 255, 0.02);
-  border-color: var(--color-box-border);
+  border-color: var(--border);
   border-style: dashed;
   color: rgba(255, 255, 255, 0.45);
   filter: saturate(0.7);

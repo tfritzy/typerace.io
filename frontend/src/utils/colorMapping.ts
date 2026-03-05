@@ -173,6 +173,12 @@ export function getColorConfig(color: PlayerColor): ColorConfig {
 export function setAccentColor(color: PlayerColor): void {
     const config = getColorConfig(color);
     const root = document.documentElement;
+    root.style.setProperty('--accent-primary', config.primary);
+    root.style.setProperty('--accent-light', config.light);
+    root.style.setProperty('--accent-dark', config.dark);
+    root.style.setProperty('--accent', config.primary);
+    root.style.setProperty('--ring', config.primary);
+    root.style.setProperty('--primary', config.primary);
     root.style.setProperty('--color-accent', config.primary);
     root.style.setProperty('--color-accent-light', config.light);
     root.style.setProperty('--color-accent-dark', config.dark);
