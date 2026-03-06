@@ -77,10 +77,10 @@
       (function() {
         try {
           var themeBackgrounds = {
-            Amber: '#202020', Red: '#1c1616', Orange: '#1c1917', Yellow: '#1c1c17',
-            Lime: '#181c16', Green: '#161c18', Emerald: '#161c1a', Teal: '#2e3440',
-            Cyan: '#161c1e', Blue: '#151922', Indigo: '#141420', Violet: '#1a1520',
-            Purple: '#282a36', Fuchsia: '#0d0d14', Sky: '#f8fafc', Pink: '#fdf2f8', Rose: '#fff1f2'
+            Red: '#0d1117', Orange: '#282a36', Amber: '#272822', Yellow: '#2e3440',
+            Lime: '#282c34', Green: '#002b36', Emerald: '#1a1b26', Teal: '#193549',
+            Cyan: '#282828', Sky: '#ffffff', Blue: '#fdf6e3', Indigo: '#fafafa',
+            Violet: '#eff1f5', Purple: '#fbf1c7', Fuchsia: '#fafafa', Pink: '#faf4ed', Rose: '#f2eee3'
           };
           var saved = localStorage.getItem('selectedTheme');
           if (saved && themeBackgrounds[saved]) {
@@ -89,8 +89,8 @@
           } else {
             var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             if (!prefersDark) {
-              document.documentElement.style.setProperty('--color-bg-primary', '#f8fafc');
-              document.documentElement.style.setProperty('--background', '#f8fafc');
+              document.documentElement.style.setProperty('--color-bg-primary', '#ffffff');
+              document.documentElement.style.setProperty('--background', '#ffffff');
             }
           }
         } catch (e) {}
@@ -98,10 +98,10 @@
     </script>
     <style>
       :root {
-        --color-bg-primary: #202020;
-        --color-white: #ffffff;
-        --color-white-25: rgba(255, 255, 255, 0.25);
-        --color-accent: #fbbf24;
+        --color-bg-primary: #0d1117;
+        --color-white: #e6edf3;
+        --color-white-25: rgba(230, 237, 243, 0.25);
+        --color-accent: #58a6ff;
         --max-content-width: 1000px;
       }
 
@@ -142,13 +142,13 @@
       }
 
       .loading-logo-accent {
-        background: linear-gradient(135deg, #fbbf24 0%, color-mix(in srgb, #fbbf24 70%, white) 100%);
+        background: linear-gradient(135deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 70%, white) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
         font-style: italic;
         position: relative;
-        filter: drop-shadow(0 0 10px color-mix(in srgb, #fbbf24 50%, transparent));
+        filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-accent) 50%, transparent));
       }
 
       .loading-logo-io {
