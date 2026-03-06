@@ -76,9 +76,22 @@
     <script>
       (function() {
         try {
-          const savedColor = localStorage.getItem('accentColor');
-          if (savedColor) {
-            document.documentElement.style.setProperty('--color-accent', savedColor);
+          var themeBackgrounds = {
+            Amber: '#202020', Red: '#1c1616', Orange: '#1c1917', Yellow: '#1c1c17',
+            Lime: '#181c16', Green: '#161c18', Emerald: '#161c1a', Teal: '#2e3440',
+            Cyan: '#161c1e', Blue: '#151922', Indigo: '#141420', Violet: '#1a1520',
+            Purple: '#282a36', Fuchsia: '#0d0d14', Sky: '#f8fafc', Pink: '#fdf2f8', Rose: '#fff1f2'
+          };
+          var saved = localStorage.getItem('selectedTheme');
+          if (saved && themeBackgrounds[saved]) {
+            document.documentElement.style.setProperty('--color-bg-primary', themeBackgrounds[saved]);
+            document.documentElement.style.setProperty('--background', themeBackgrounds[saved]);
+          } else {
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (!prefersDark) {
+              document.documentElement.style.setProperty('--color-bg-primary', '#f8fafc');
+              document.documentElement.style.setProperty('--background', '#f8fafc');
+            }
           }
         } catch (e) {}
       })();

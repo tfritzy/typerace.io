@@ -232,7 +232,7 @@ export const ProfilePage = () => {
                                                     }}
                                                     className="w-full text-left px-3 py-2 text-foreground text-sm hover:bg-secondary transition-colors bg-transparent border-0 cursor-pointer rounded-md"
                                                 >
-                                                    Change Color
+                                                    Change Theme
                                                 </button>
                                                 <button
                                                     onClick={() => {
