@@ -1,5 +1,43 @@
 @import "tailwindcss";
 
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-medal-gold: var(--medal-gold);
+  --color-medal-silver: var(--medal-silver);
+  --color-medal-bronze: var(--medal-bronze);
+  --color-medal-default: var(--medal-default);
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dark: var(--accent-dark);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
 @layer base {
   .font-mono {
     font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -8,24 +46,75 @@
 }
 
 :root {
-  /* Color Variables */
-  --color-bg-primary: #202020;
-  --color-white: #ffffff;
+  --radius: 0.5rem;
+
+  --background: #202020;
+  --foreground: #ffffff;
+
+  --card: #272727;
+  --card-foreground: #ffffff;
+
+  --popover: #2a2a2a;
+  --popover-foreground: #ffffff;
+
+  --primary: #fbbf24;
+  --primary-foreground: #000000;
+
+  --secondary: rgba(255, 255, 255, 0.1);
+  --secondary-foreground: rgba(255, 255, 255, 0.9);
+
+  --muted: rgba(255, 255, 255, 0.05);
+  --muted-foreground: rgba(255, 255, 255, 0.5);
+
+  --accent: #fbbf24;
+  --accent-foreground: #000000;
+
+  --accent-primary: #fbbf24;
+  --accent-light: #fcd34d;
+  --accent-dark: #f59e0b;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: rgba(255, 255, 255, 0.12);
+  --input: #1a1a1a;
+  --ring: #fbbf24;
+
+  --grid-line: rgba(255, 255, 255, 0.06);
+  --text-completed: rgba(255, 255, 255, 0.15);
+  --text-untyped: rgba(255, 255, 255, 0.35);
+  --border-hover: rgba(255, 255, 255, 0.3);
+
+  --medal-gold: #FFC900;
+  --medal-silver: #C0C0C0;
+  --medal-bronze: #CD7F32;
+  --medal-default: #9CA3AF;
+
+  --chart-neutral: #6b7280;
+
+  --chart-1: #3b82f6;
+  --chart-2: #22c55e;
+  --chart-3: #f59e0b;
+  --chart-4: #ef4444;
+  --chart-5: #8b5cf6;
+
+  --color-bg-primary: var(--background);
+  --color-white: var(--foreground);
   --color-white-25: rgba(255, 255, 255, 0.25);
-  --color-error: #ef4444;
-  --color-accent: #fbbf24;
-  --color-accent-light: #fcd34d;
-  --color-accent-dark: #f59e0b;
-  --color-box-bg: #272727;
-  --color-box-border: rgba(255, 255, 255, 0.12);
-  
+  --color-error: var(--destructive);
+  --color-accent: var(--accent-primary);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dark: var(--accent-dark);
+  --color-box-bg: var(--card);
+  --color-box-border: var(--border);
+
   --max-content-width: 1000px;
-  
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  background-color: var(--color-bg-primary);
+  background-color: var(--background);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -112,7 +201,7 @@ body {
 }
 
 .box-with-focus:focus-within {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--muted);
   border-color: rgba(255, 255, 255, 0.3);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.1);
 }
@@ -265,23 +354,23 @@ body {
 }
 
 .logo:hover .logo-accent {
-  filter: drop-shadow(0 0 15px #fbbf24) brightness(1.1);
+  filter: drop-shadow(0 0 15px var(--accent-primary)) brightness(1.1);
 }
 
 .logo-text {
-  color: var(--color-white);
+  color: var(--foreground);
   text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
 }
 
 .logo-accent {
-  background: linear-gradient(135deg, #fbbf24 0%, color-mix(in srgb, #fbbf24 80%, white) 100%);
+  background: linear-gradient(135deg, var(--accent-primary) 0%, color-mix(in srgb, var(--accent-primary) 80%, white) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-style: italic;
   position: relative;
   transition: filter 0.2s ease;
-  filter: drop-shadow(0 0 10px color-mix(in srgb, #fbbf24 50%, transparent));
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent-primary) 50%, transparent));
 }
 
 .logo-io {

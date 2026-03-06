@@ -95,7 +95,7 @@ export const Countdown = () => {
           style={{
             fontSize: "20rem",
             fontWeight: "bold",
-            color: "#fff",
+            color: "var(--foreground)",
             animation: "countdownPop 1s ease-out forwards",
           }}
         >

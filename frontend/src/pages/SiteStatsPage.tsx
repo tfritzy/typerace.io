@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Header } from "../components/Header";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import {
@@ -117,11 +117,32 @@ export const SiteStatsPage = () => {
 
     const filteredStats = getFilteredStats();
 
-    const chartColors = [
-        '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
-        '#22c55e', '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
-        '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef'
-    ];
+    const chartColors = useMemo(() => {
+        const style = getComputedStyle(document.documentElement);
+        return Array.from({ length: 5 }, (_, i) =>
+            style.getPropertyValue(`--chart-${i + 1}`).trim()
+        );
+    }, []);
+
+    const chartNeutralColor = useMemo(() => {
+        return getComputedStyle(document.documentElement).getPropertyValue('--chart-neutral').trim();
+    }, []);
+
+    const accentColor = useMemo(() => {
+        return getComputedStyle(document.documentElement).getPropertyValue('--accent-primary').trim();
+    }, []);
+
+    const resolvedColors = useMemo(() => {
+        const s = getComputedStyle(document.documentElement);
+        return {
+            gridLine: s.getPropertyValue('--grid-line').trim(),
+            mutedFg: s.getPropertyValue('--muted-foreground').trim(),
+            secondaryFg: s.getPropertyValue('--secondary-foreground').trim(),
+            foreground: s.getPropertyValue('--foreground').trim(),
+            input: s.getPropertyValue('--input').trim(),
+            border: s.getPropertyValue('--border').trim(),
+        };
+    }, []);
 
     const chartBackgroundAlpha = '33';
 
@@ -198,8 +219,8 @@ export const SiteStatsPage = () => {
                 {
                     label: 'Unique Daily Players',
                     data: playerCounts,
-                    backgroundColor: `${chartColors[0]}${chartBackgroundAlpha}`,
-                    borderColor: chartColors[0],
+                    backgroundColor: `${accentColor}${chartBackgroundAlpha}`,
+                    borderColor: accentColor,
                     borderWidth: 2,
                     fill: false,
                     tension: 0.4,
@@ -229,16 +250,16 @@ export const SiteStatsPage = () => {
                 {
                     label: 'Non-Lonely Games %',
                     data: nonLonelyPercentages,
-                    borderColor: '#fbbf24',
-                    backgroundColor: 'rgba(251, 191, 36, 0.5)',
+                    borderColor: accentColor,
+                    backgroundColor: `${accentColor}80`,
                     fill: true,
                     tension: 0.4,
                 },
                 {
                     label: 'Lonely Games %',
                     data: lonelyPercentages,
-                    borderColor: '#6b7280',
-                    backgroundColor: 'rgba(107, 114, 128, 0.3)',
+                    borderColor: chartNeutralColor,
+                    backgroundColor: `${chartNeutralColor}4D`,
                     fill: true,
                     tension: 0.4,
                 }
@@ -267,16 +288,16 @@ export const SiteStatsPage = () => {
                 {
                     label: 'Completed %',
                     data: completionPercentages,
-                    borderColor: '#22c55e',
-                    backgroundColor: 'rgba(34, 197, 94, 0.5)',
+                    borderColor: accentColor,
+                    backgroundColor: `${accentColor}80`,
                     fill: true,
                     tension: 0.4,
                 },
                 {
                     label: 'Incomplete %',
                     data: incompletePercentages,
-                    borderColor: '#6b7280',
-                    backgroundColor: 'rgba(107, 114, 128, 0.3)',
+                    borderColor: chartNeutralColor,
+                    backgroundColor: `${chartNeutralColor}4D`,
                     fill: true,
                     tension: 0.4,
                 }
@@ -297,18 +318,18 @@ export const SiteStatsPage = () => {
                 display: true,
                 position: 'bottom' as const,
                 labels: {
-                    color: 'rgba(255, 255, 255, 0.8)',
+                    color: resolvedColors.secondaryFg,
                     font: { size: 11 },
                     boxWidth: 12,
                     padding: 10,
                 }
             },
             tooltip: {
-                backgroundColor: '#1a1a1a',
-                borderColor: 'rgba(255, 255, 255, 0.12)',
+                backgroundColor: resolvedColors.input,
+                borderColor: resolvedColors.border,
                 borderWidth: 1,
-                titleColor: '#ffffff',
-                bodyColor: 'rgba(255, 255, 255, 0.9)',
+                titleColor: resolvedColors.foreground,
+                bodyColor: resolvedColors.secondaryFg,
                 padding: 12,
             }
         },
@@ -316,13 +337,13 @@ export const SiteStatsPage = () => {
             x: {
                 stacked: true,
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: resolvedColors.mutedFg,
                     font: { size: 10 },
                     maxRotation: 45,
                     minRotation: 45,
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: resolvedColors.gridLine,
                 },
                 border: { display: false }
             },
@@ -330,11 +351,11 @@ export const SiteStatsPage = () => {
                 stacked: true,
                 beginAtZero: true,
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: resolvedColors.mutedFg,
                     font: { size: 10 },
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: resolvedColors.gridLine,
                 },
                 border: { display: false }
             }
@@ -349,42 +370,42 @@ export const SiteStatsPage = () => {
                 display: true,
                 position: 'bottom' as const,
                 labels: {
-                    color: 'rgba(255, 255, 255, 0.8)',
+                    color: resolvedColors.secondaryFg,
                     font: { size: 11 },
                     boxWidth: 12,
                     padding: 10,
                 }
             },
             tooltip: {
-                backgroundColor: '#1a1a1a',
-                borderColor: 'rgba(255, 255, 255, 0.12)',
+                backgroundColor: resolvedColors.input,
+                borderColor: resolvedColors.border,
                 borderWidth: 1,
-                titleColor: '#ffffff',
-                bodyColor: 'rgba(255, 255, 255, 0.9)',
+                titleColor: resolvedColors.foreground,
+                bodyColor: resolvedColors.secondaryFg,
                 padding: 12,
             }
         },
         scales: {
             x: {
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: resolvedColors.mutedFg,
                     font: { size: 10 },
                     maxRotation: 45,
                     minRotation: 45,
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: resolvedColors.gridLine,
                 },
                 border: { display: false }
             },
             y: {
                 beginAtZero: true,
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: resolvedColors.mutedFg,
                     font: { size: 10 },
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: resolvedColors.gridLine,
                 },
                 border: { display: false }
             }
@@ -399,18 +420,18 @@ export const SiteStatsPage = () => {
                 display: true,
                 position: 'bottom' as const,
                 labels: {
-                    color: 'rgba(255, 255, 255, 0.8)',
+                    color: resolvedColors.secondaryFg,
                     font: { size: 11 },
                     boxWidth: 12,
                     padding: 10,
                 }
             },
             tooltip: {
-                backgroundColor: '#1a1a1a',
-                borderColor: 'rgba(255, 255, 255, 0.12)',
+                backgroundColor: resolvedColors.input,
+                borderColor: resolvedColors.border,
                 borderWidth: 1,
-                titleColor: '#ffffff',
-                bodyColor: 'rgba(255, 255, 255, 0.9)',
+                titleColor: resolvedColors.foreground,
+                bodyColor: resolvedColors.secondaryFg,
                 padding: 12,
                 callbacks: {
                     label: (context: { parsed: { y: number } }) => `${context.parsed.y.toFixed(1)}%`
@@ -421,13 +442,13 @@ export const SiteStatsPage = () => {
             x: {
                 stacked: true,
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: resolvedColors.mutedFg,
                     font: { size: 10 },
                     maxRotation: 45,
                     minRotation: 45,
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: resolvedColors.gridLine,
                 },
                 border: { display: false }
             },
@@ -436,12 +457,12 @@ export const SiteStatsPage = () => {
                 min: 0,
                 max: 100,
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: resolvedColors.mutedFg,
                     font: { size: 10 },
                     callback: (value: number | string) => `${value}%`
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: resolvedColors.gridLine,
                 },
                 border: { display: false }
             }
@@ -453,7 +474,7 @@ export const SiteStatsPage = () => {
             <Header />
             <div className="flex flex-col items-center px-4 pb-12">
                 <div className="content-container">
-                    <h1 className="text-3xl font-bold mb-6 text-white">Site Statistics</h1>
+                    <h1 className="text-3xl font-bold mb-6 text-foreground">Site Statistics</h1>
 
                     <div className="mb-6 flex gap-2">
                         {(['1month', '6months', '1year', 'all'] as TimeFrame[]).map(timeFrame => (
@@ -461,8 +482,8 @@ export const SiteStatsPage = () => {
                                 key={timeFrame}
                                 onClick={() => setSelectedTimeFrame(timeFrame)}
                                 className={`px-4 py-2 rounded-lg transition-all ${selectedTimeFrame === timeFrame
-                                    ? 'bg-amber-400 text-black font-semibold'
-                                    : 'bg-white/5 text-white/80 hover:bg-white/10'
+                                    ? 'bg-primary text-primary-foreground font-semibold'
+                                    : 'bg-muted text-secondary-foreground hover:bg-secondary'
                                     }`}
                             >
                                 {timeFrame === '1month' ? '1 Month' :
@@ -473,22 +494,22 @@ export const SiteStatsPage = () => {
                     </div>
 
                     <section className="mb-8 box box-shadow rounded-lg p-6">
-                        <h2 className="text-xl font-semibold mb-4 text-white">Games Played Per Day by Game Mode</h2>
+                        <h2 className="text-xl font-semibold mb-4 text-foreground">Games Played Per Day by Game Mode</h2>
                         <div className="h-[300px]">
                             <Line data={gamesPerDayData} options={stackedAreaChartOptions} />
                         </div>
                     </section>
 
                     <section className="mb-8 box box-shadow rounded-lg p-6">
-                        <h2 className="text-xl font-semibold mb-4 text-white">Unique Daily Active Players</h2>
+                        <h2 className="text-xl font-semibold mb-4 text-foreground">Unique Daily Active Players</h2>
                         <div className="h-[300px]">
                             <Line data={playersPerDayData} options={lineChartOptions} />
                         </div>
                     </section>
 
                     <section className="mb-8 box box-shadow rounded-lg p-6">
-                        <h2 className="text-xl font-semibold mb-2 text-white">Non-Lonely Games</h2>
-                        <p className="text-sm text-gray-400 mb-4">
+                        <h2 className="text-xl font-semibold mb-2 text-foreground">Non-Lonely Games</h2>
+                        <p className="text-sm text-muted-foreground mb-4">
                             Percentage of games with 2+ human players
                         </p>
                         <div className="h-[280px]">
@@ -497,8 +518,8 @@ export const SiteStatsPage = () => {
                     </section>
 
                     <section className="mb-8 box box-shadow rounded-lg p-6">
-                        <h2 className="text-xl font-semibold mb-2 text-white">Game Completion Rate</h2>
-                        <p className="text-sm text-gray-400 mb-4">
+                        <h2 className="text-xl font-semibold mb-2 text-foreground">Game Completion Rate</h2>
+                        <p className="text-sm text-muted-foreground mb-4">
                             Percentage of started games that were completed
                         </p>
                         <div className="h-[280px]">

@@ -26,7 +26,7 @@ export const AllPlayersResults = ({
     ) || allPlayerProgress[0];
 
     return (
-        <div className="rounded-lg p-3" style={{ backgroundColor: 'var(--color-box-bg)', border: '1px solid var(--color-box-border)' }}>
+        <div className="rounded-lg p-3 bg-card border border-border">
             {allPlayerProgress.length > 1 && (
                 <div className="flex gap-3 mb-3 flex-wrap">
                     {allPlayerProgress.map((pp) => {
@@ -37,9 +37,9 @@ export const AllPlayersResults = ({
                                 onClick={() => setSelectedPlayerId(pp.playerId.toHexString())}
                                 className="px-3 py-2 border rounded-md text-[13px] font-semibold cursor-pointer transition-all duration-200 tracking-wide flex items-center gap-2"
                                 style={{
-                                    backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-                                    color: isSelected ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.5)',
-                                    borderColor: 'var(--color-box-border)'
+                                    backgroundColor: isSelected ? 'var(--secondary)' : 'transparent',
+                                    color: isSelected ? 'var(--secondary-foreground)' : 'var(--muted-foreground)',
+                                    borderColor: 'var(--border)'
                                 }}
                             >
                                 <PlayerAvatar

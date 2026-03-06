@@ -262,19 +262,19 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
         const style: React.CSSProperties = {};
         if (isTyped && !isCorrect) {
-          style.color = "var(--color-error)";
+          style.color = "var(--destructive)";
         } else if (isInCompletedWord) {
-          style.color = "rgba(255, 255, 255, 0.15)";
+          style.color = "var(--text-completed)";
         } else if (isInCurrentWord) {
-          style.color = "var(--color-white)";
+          style.color = "var(--foreground)";
         } else {
-          style.color = "rgba(255, 255, 255, 0.35)";
+          style.color = "var(--text-untyped)";
         }
 
         return (
           <span
             key={i}
-            className={`transition-all duration-150 ${isTyped && !isCorrect ? "underline decoration-2 decoration-red-500" : ""}`}
+            className={`transition-all duration-150 ${isTyped && !isCorrect ? "underline decoration-2 decoration-destructive" : ""}`}
             style={style}
           >
             {isCursor && <span id="target" ref={targetRef} />}
@@ -286,12 +286,12 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     return (
       <div
-        className={`relative box-with-focus w-full rounded-lg px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-red-500!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
+        className={`relative box-with-focus w-full rounded-lg px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
         style={height ? { minHeight: height } : undefined}
         onClick={() => inputRef.current?.focus()}
       >
         {hasReachedErrorLimit && (
-          <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-(--color-error)">
+          <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-destructive">
             You must fix all errors
           </div>
         )}
@@ -328,7 +328,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             />
           </div>
           {attribution && (
-            <div className="mt-6 text-lg text-white/40 italic font-light text-right select-none pr-2">
+            <div className="mt-6 text-lg text-muted-foreground italic font-light text-right select-none pr-2">
               - {attribution}
             </div>
           )}

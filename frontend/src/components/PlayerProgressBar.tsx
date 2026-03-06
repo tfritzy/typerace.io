@@ -74,36 +74,36 @@ export const PlayerProgressBar = memo(({
                 <div className="flex items-center gap-2 justify-between">
                     <div className="flex items-center gap-2">
                         {isLoading ? (
-                            <span className="text-sm font-semibold text-white/30">Waiting...</span>
+                            <span className="text-sm font-semibold text-muted-foreground">Waiting...</span>
                         ) : (
                             <>
                                 <div className="flex items-center gap-1">
-                                    <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-white' : 'text-white/70'}`}>
+                                    <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-foreground' : 'text-muted-foreground'}`}>
                                         {name}
                                     </span>
                                     {isBot && (
                                         <div className="group relative">
-                                            <Bot className="w-4 h-4 text-white/50" />
-                                            <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-(--color-box-bg) text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-10 shadow-lg w-64">
+                                            <Bot className="w-4 h-4 text-muted-foreground" />
+                                            <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-card text-foreground text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-10 shadow-lg w-64">
                                                 This player is a bot. Share this game with your friends to reduce the amount they need to be added to games.
-                                                <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-(--color-box-bg)"></div>
+                                                <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-card"></div>
                                             </div>
                                         </div>
                                     )}
                                 </div>
-                                <span className="text-xs font-medium text-white/50">
+                                <span className="text-xs font-medium text-muted-foreground">
                                     Lvl {level}
                                 </span>
                             </>
                         )}
                     </div>
                     {!isLoading && wpm !== undefined && wpm > 0 && (
-                        <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-white' : 'text-white/70'}`}>
+                        <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-foreground' : 'text-muted-foreground'}`}>
                             {Math.round(wpm)} WPM
                         </span>
                     )}
                 </div>
-                <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
+                <div className="w-full h-2.5 bg-secondary rounded-full overflow-hidden">
                     <div
                         className="h-full rounded-full transition-all duration-200"
                         style={{

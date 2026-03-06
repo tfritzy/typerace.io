@@ -204,7 +204,7 @@ export const ProfilePage = () => {
                                 <div className="relative">
                                     <button
                                         onClick={handleMenuToggle}
-                                        className="bg-transparent border-0 text-white/50 cursor-pointer p-2 hover:text-white/70 transition-colors"
+                                        className="bg-transparent border-0 text-muted-foreground cursor-pointer p-2 hover:text-foreground/70 transition-colors"
                                         title="Options"
                                     >
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -220,7 +220,7 @@ export const ProfilePage = () => {
                                                 onClick={handleMenuClose}
                                             />
                                             <div
-                                                className="absolute right-0 top-full mt-2 bg-[#272727] border border-white/15 rounded-lg shadow-lg p-2 min-w-40 z-20"
+                                                className="absolute right-0 top-full mt-2 bg-card border border-border rounded-lg shadow-lg p-2 min-w-40 z-20"
                                                 style={{
                                                     animation: isMenuClosing ? 'menuSlideOut 0.15s ease-out' : 'menuSlideIn 0.15s ease-out'
                                                 }}
@@ -230,7 +230,7 @@ export const ProfilePage = () => {
                                                         setIsEditColorModalOpen(true);
                                                         handleMenuClose();
                                                     }}
-                                                    className="w-full text-left px-3 py-2 text-white text-sm hover:bg-white/10 transition-colors bg-transparent border-0 cursor-pointer rounded-md"
+                                                    className="w-full text-left px-3 py-2 text-foreground text-sm hover:bg-secondary transition-colors bg-transparent border-0 cursor-pointer rounded-md"
                                                 >
                                                     Change Color
                                                 </button>
@@ -239,7 +239,7 @@ export const ProfilePage = () => {
                                                         handleSignOut();
                                                         handleMenuClose();
                                                     }}
-                                                    className="w-full text-left px-3 py-2 text-red-400 text-sm hover:bg-white/10 transition-colors bg-transparent border-0 cursor-pointer rounded-md"
+                                                    className="w-full text-left px-3 py-2 text-destructive text-sm hover:bg-secondary transition-colors bg-transparent border-0 cursor-pointer rounded-md"
                                                 >
                                                     Sign Out
                                                 </button>
@@ -261,13 +261,13 @@ export const ProfilePage = () => {
 
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-3">
-                                            <h1 className="text-white text-3xl font-bold m-0">
+                                            <h1 className="text-foreground text-3xl font-bold m-0">
                                                 {viewedPlayer.name}
                                             </h1>
                                             {isOwnProfile && (
                                                 <button
                                                     onClick={() => setIsEditNameModalOpen(true)}
-                                                    className="bg-transparent border-0 text-white/50 cursor-pointer p-1 hover:text-white/70 transition-colors"
+                                                    className="bg-transparent border-0 text-muted-foreground cursor-pointer p-1 hover:text-foreground/70 transition-colors"
                                                     title="Edit Name"
                                                 >
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -279,19 +279,19 @@ export const ProfilePage = () => {
                                         </div>
 
                                         <div className="flex items-center gap-3">
-                                            <span className="text-white/60 text-sm font-medium">
+                                            <span className="text-muted-foreground text-sm font-medium">
                                                 Level {viewedPlayer.level}
                                             </span>
-                                            <div className="flex-1 h-2.5 bg-white/10 rounded-[5px] overflow-hidden">
+                                            <div className="flex-1 h-2.5 bg-secondary rounded-[5px] overflow-hidden">
                                                 <div
                                                     className="h-full rounded-[5px] transition-[width_0.3s_ease]"
                                                     style={{
-                                                        background: viewedPlayer ? getColorConfig(viewedPlayer.color).gradient : 'var(--color-accent)',
+                                                        background: viewedPlayer ? getColorConfig(viewedPlayer.color).gradient : 'var(--accent-primary)',
                                                         width: `${viewedPlayer ? xpProgressToNextLevel(viewedPlayer.xp, viewedPlayer.xpRequiredForNextLevel) : 0}%`
                                                     }}
                                                 />
                                             </div>
-                                            <span className="text-white/60 text-sm font-mono">
+                                            <span className="text-muted-foreground text-sm font-mono">
                                                 {viewedPlayer.xp}/{viewedPlayer.xpRequiredForNextLevel}
                                             </span>
                                         </div>
@@ -299,41 +299,41 @@ export const ProfilePage = () => {
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4 mt-8">
-                                    <div className="bg-black/5 border border-white/8 rounded-lg p-5">
+                                    <div className="bg-black/5 border border-border rounded-lg p-5">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <div className="text-white/50 text-xs mb-2 uppercase tracking-wider font-semibold">
+                                                <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
                                                     Games Played
                                                 </div>
-                                                <div className="text-white text-3xl font-bold">
+                                                <div className="text-foreground text-3xl font-bold">
                                                     {viewedPlayer.totalGames}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div className="text-white/50 text-xs mb-2 uppercase tracking-wider font-semibold">
+                                                <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
                                                     Wins
                                                 </div>
-                                                <div className="text-white text-3xl font-bold">
+                                                <div className="text-foreground text-3xl font-bold">
                                                     {viewedPlayer.wins}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="bg-black/5 border border-white/8 rounded-lg p-5">
+                                    <div className="bg-black/5 border border-border rounded-lg p-5">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <div className="text-white/50 text-xs mb-2 uppercase tracking-wider font-semibold">
+                                                <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
                                                     Words Typed
                                                 </div>
-                                                <div className="text-white text-3xl font-bold">
+                                                <div className="text-foreground text-3xl font-bold">
                                                     {formatNumber(viewedPlayer.totalWordsTyped)}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div className="text-white/50 text-xs mb-2 uppercase tracking-wider font-semibold">
+                                                <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
                                                     Time Spent
                                                 </div>
-                                                <div className="text-white text-3xl font-bold">
+                                                <div className="text-foreground text-3xl font-bold">
                                                     {formatTimeSpent(Number(viewedPlayer.totalTimeSpentMs))}
                                                 </div>
                                             </div>
@@ -346,7 +346,7 @@ export const ProfilePage = () => {
 
                     <div>
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-white text-2xl font-bold m-0">
+                            <h2 className="text-foreground text-2xl font-bold m-0">
                                 Performance History
                             </h2>
 
@@ -385,7 +385,7 @@ export const ProfilePage = () => {
                     </div>
 
                     <div className="mt-8">
-                        <h2 className="text-white text-2xl font-bold mb-6">
+                        <h2 className="text-foreground text-2xl font-bold mb-6">
                             Recent Games
                         </h2>
                         <RecentGames gameRecords={realGameData} />
