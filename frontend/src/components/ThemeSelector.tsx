@@ -13,7 +13,7 @@ export const ThemeSelector = ({ selectedTheme, onThemeSelect }: ThemeSelectorPro
     const containerRef = useRef<HTMLDivElement>(null);
     const themes = Object.entries(THEMES) as [PlayerColor['tag'], typeof THEMES[keyof typeof THEMES]][];
 
-    const currentTheme = THEMES[selectedTheme] || THEMES.Red;
+    const currentTheme = THEMES[selectedTheme] || THEMES.GitHubDark;
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

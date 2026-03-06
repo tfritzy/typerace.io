@@ -30,7 +30,7 @@ export const PlayerProgressBar = memo(({
     playerPublicId,
     isCurrentPlayer = false,
     isLoading = false,
-    playerColor = { tag: "Amber" } as PlayerColor,
+    playerColor = { tag: "Monokai" } as PlayerColor,
     wpm,
     placement,
     isBot = false,

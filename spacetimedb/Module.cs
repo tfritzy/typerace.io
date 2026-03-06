@@ -65,23 +65,23 @@ public enum CharacterEventType
 [Type]
 public enum PlayerColor
 {
-    Red,
-    Orange,
-    Amber,
-    Yellow,
-    Lime,
-    Green,
-    Emerald,
-    Teal,
-    Cyan,
-    Sky,
-    Blue,
-    Indigo,
-    Violet,
-    Purple,
-    Fuchsia,
-    Pink,
-    Rose
+    GitHubDark,
+    Dracula,
+    Monokai,
+    Nord,
+    OneDark,
+    SolarizedDark,
+    TokyoNight,
+    Cobalt2,
+    GruvboxDark,
+    GitHubLight,
+    SolarizedLight,
+    OneLight,
+    CatppuccinLatte,
+    GruvboxLight,
+    AyuLight,
+    RosePineDawn,
+    TokyoNightDay
 }
 
 public struct Quote
@@ -489,7 +489,7 @@ public static partial class Module
                 TotalTimeSpentMs = 0,
                 IsBot = false,
                 BotConfig = null,
-                Color = PlayerColor.Amber,
+                Color = PlayerColor.Monokai,
                 IsAnonymous = true,
                 LastGameDate = 0
             });
@@ -762,7 +762,7 @@ public static partial class Module
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
-        var playerColor = player?.Color ?? PlayerColor.Amber;
+        var playerColor = player?.Color ?? PlayerColor.Monokai;
         var playerPublicId = player?.PlayerId ?? "";
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
@@ -1174,7 +1174,7 @@ public static partial class Module
                 var playerName = player?.Name ?? "Unknown";
                 var playerLevel = player?.Level ?? 1;
                 var isAnonymous = player?.IsAnonymous ?? true;
-                var playerColor = player?.Color ?? PlayerColor.Amber;
+                var playerColor = player?.Color ?? PlayerColor.Monokai;
                 var playerPublicId = player?.PlayerId ?? "";
 
                 ctx.Db.playerprogress.Insert(new PlayerProgress

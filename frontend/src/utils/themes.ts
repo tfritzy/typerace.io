@@ -36,11 +36,11 @@ export interface ThemeConfig {
     gradient: string;
 }
 
-const DEFAULT_DARK_THEME_TAG: PlayerColor['tag'] = 'Red';
-const DEFAULT_LIGHT_THEME_TAG: PlayerColor['tag'] = 'Sky';
+const DEFAULT_DARK_THEME_TAG: PlayerColor['tag'] = 'GitHubDark';
+const DEFAULT_LIGHT_THEME_TAG: PlayerColor['tag'] = 'GitHubLight';
 
 export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
-    Red: {
+    GitHubDark: {
         name: 'GitHub Dark',
         mode: 'dark',
         colors: {
@@ -75,7 +75,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#0d1117', '#4493f8', '#3fb950', '#f85149'],
         gradient: 'linear-gradient(to right, #1f6feb, #4493f8)',
     },
-    Orange: {
+    Dracula: {
         name: 'Dracula',
         mode: 'dark',
         colors: {
@@ -110,7 +110,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#282a36', '#bd93f9', '#ff79c6', '#50fa7b'],
         gradient: 'linear-gradient(to right, #9b6dff, #bd93f9)',
     },
-    Amber: {
+    Monokai: {
         name: 'Monokai',
         mode: 'dark',
         colors: {
@@ -145,7 +145,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#272822', '#a6e22e', '#f92672', '#66d9ef'],
         gradient: 'linear-gradient(to right, #86b818, #a6e22e)',
     },
-    Yellow: {
+    Nord: {
         name: 'Nord',
         mode: 'dark',
         colors: {
@@ -180,7 +180,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#2e3440', '#88c0d0', '#81a1c1', '#5e81ac'],
         gradient: 'linear-gradient(to right, #81a1c1, #88c0d0)',
     },
-    Lime: {
+    OneDark: {
         name: 'One Dark',
         mode: 'dark',
         colors: {
@@ -215,7 +215,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#282c34', '#61afef', '#98c379', '#e06c75'],
         gradient: 'linear-gradient(to right, #4d9de0, #61afef)',
     },
-    Green: {
+    SolarizedDark: {
         name: 'Solarized Dark',
         mode: 'dark',
         colors: {
@@ -250,7 +250,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#002b36', '#2aa198', '#268bd2', '#b58900'],
         gradient: 'linear-gradient(to right, #1f7a73, #2aa198)',
     },
-    Emerald: {
+    TokyoNight: {
         name: 'Tokyo Night',
         mode: 'dark',
         colors: {
@@ -285,7 +285,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#1a1b26', '#7aa2f7', '#bb9af7', '#7dcfff'],
         gradient: 'linear-gradient(to right, #3d59a1, #7aa2f7)',
     },
-    Teal: {
+    Cobalt2: {
         name: 'Cobalt 2',
         mode: 'dark',
         colors: {
@@ -320,7 +320,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#193549', '#ffc600', '#0088ff', '#ff628c'],
         gradient: 'linear-gradient(to right, #e6b200, #ffc600)',
     },
-    Cyan: {
+    GruvboxDark: {
         name: 'Gruvbox Dark',
         mode: 'dark',
         colors: {
@@ -355,7 +355,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#282828', '#fabd2f', '#b8bb26', '#fb4934'],
         gradient: 'linear-gradient(to right, #d79921, #fabd2f)',
     },
-    Sky: {
+    GitHubLight: {
         name: 'GitHub Light',
         mode: 'light',
         colors: {
@@ -390,7 +390,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#ffffff', '#0969da', '#1a7f37', '#d1242f'],
         gradient: 'linear-gradient(to right, #0550ae, #0969da)',
     },
-    Blue: {
+    SolarizedLight: {
         name: 'Solarized Light',
         mode: 'light',
         colors: {
@@ -425,7 +425,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#fdf6e3', '#268bd2', '#2aa198', '#b58900'],
         gradient: 'linear-gradient(to right, #1a6fa8, #268bd2)',
     },
-    Indigo: {
+    OneLight: {
         name: 'One Light',
         mode: 'light',
         colors: {
@@ -460,7 +460,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#fafafa', '#4078f2', '#50a14f', '#e45649'],
         gradient: 'linear-gradient(to right, #2f64d8, #4078f2)',
     },
-    Violet: {
+    CatppuccinLatte: {
         name: 'Catppuccin Latte',
         mode: 'light',
         colors: {
@@ -495,7 +495,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#eff1f5', '#8839ef', '#1e66f5', '#40a02b'],
         gradient: 'linear-gradient(to right, #7029d6, #8839ef)',
     },
-    Purple: {
+    GruvboxLight: {
         name: 'Gruvbox Light',
         mode: 'light',
         colors: {
@@ -530,7 +530,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#fbf1c7', '#b57614', '#79740e', '#9d0006'],
         gradient: 'linear-gradient(to right, #945f10, #b57614)',
     },
-    Fuchsia: {
+    AyuLight: {
         name: 'Ayu Light',
         mode: 'light',
         colors: {
@@ -565,7 +565,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#fafafa', '#ff9940', '#399ee6', '#86b300'],
         gradient: 'linear-gradient(to right, #e6832b, #ff9940)',
     },
-    Pink: {
+    RosePineDawn: {
         name: 'Rosé Pine Dawn',
         mode: 'light',
         colors: {
@@ -600,7 +600,7 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
         previewColors: ['#faf4ed', '#907aa9', '#d7827e', '#56949f'],
         gradient: 'linear-gradient(to right, #796ba2, #907aa9)',
     },
-    Rose: {
+    TokyoNightDay: {
         name: 'Tokyo Night Day',
         mode: 'light',
         colors: {
@@ -638,13 +638,17 @@ export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
 };
 
 export function getThemeConfig(color: PlayerColor): ThemeConfig {
-    return THEMES[color.tag] || THEMES.Red;
+    if (color.tag in THEMES) {
+        return THEMES[color.tag];
+    }
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark ? THEMES[DEFAULT_DARK_THEME_TAG] : THEMES[DEFAULT_LIGHT_THEME_TAG];
 }
 
-export function getInitialTheme(): PlayerColor['tag'] {
+export function getInitialTheme(): string {
     try {
         const saved = localStorage.getItem('selectedTheme');
-        if (saved && saved in THEMES) return saved as PlayerColor['tag'];
+        if (saved && saved in THEMES) return saved;
     } catch (_e) {
     }
 
@@ -652,8 +656,14 @@ export function getInitialTheme(): PlayerColor['tag'] {
     return prefersDark ? DEFAULT_DARK_THEME_TAG : DEFAULT_LIGHT_THEME_TAG;
 }
 
-export function applyTheme(colorTag: PlayerColor['tag']): void {
-    const theme = THEMES[colorTag] || THEMES.Red;
+export function applyTheme(colorTag: string): void {
+    let theme: ThemeConfig;
+    if (colorTag in THEMES) {
+        theme = THEMES[colorTag as PlayerColor['tag']];
+    } else {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        theme = prefersDark ? THEMES[DEFAULT_DARK_THEME_TAG] : THEMES[DEFAULT_LIGHT_THEME_TAG];
+    }
     const root = document.documentElement;
 
     root.style.setProperty('--background', theme.colors.background);
