@@ -33,14 +33,24 @@ export const AllPlayersWpmChart = ({
         const style = getComputedStyle(document.documentElement);
         return [
             style.getPropertyValue('--accent-primary').trim(),
-            style.getPropertyValue('--chart-11').trim(),
-            style.getPropertyValue('--chart-13').trim(),
             style.getPropertyValue('--chart-1').trim(),
-            style.getPropertyValue('--chart-6').trim(),
+            style.getPropertyValue('--chart-2').trim(),
+            style.getPropertyValue('--chart-3').trim(),
             style.getPropertyValue('--chart-4').trim(),
-            style.getPropertyValue('--chart-14').trim(),
-            style.getPropertyValue('--chart-9').trim(),
+            style.getPropertyValue('--chart-5').trim(),
         ];
+    }, []);
+
+    const resolvedColors = useMemo(() => {
+        const s = getComputedStyle(document.documentElement);
+        return {
+            gridLine: s.getPropertyValue('--grid-line').trim(),
+            mutedFg: s.getPropertyValue('--muted-foreground').trim(),
+            secondaryFg: s.getPropertyValue('--secondary-foreground').trim(),
+            foreground: s.getPropertyValue('--foreground').trim(),
+            input: s.getPropertyValue('--input').trim(),
+            border: s.getPropertyValue('--border').trim(),
+        };
     }, []);
     const datasets = allPlayerProgress.map((playerProgress, index) => {
         const wpmData = getAggWpmBySecond(
@@ -79,7 +89,7 @@ export const AllPlayersWpmChart = ({
                 position: 'top',
                 align: 'end',
                 labels: {
-                    color: 'var(--secondary-foreground)',
+                    color: resolvedColors.secondaryFg,
                     font: {
                         size: 12,
                     },
@@ -89,11 +99,11 @@ export const AllPlayersWpmChart = ({
                 }
             },
             tooltip: {
-                backgroundColor: 'var(--input)',
-                borderColor: 'var(--border)',
+                backgroundColor: resolvedColors.input,
+                borderColor: resolvedColors.border,
                 borderWidth: 1,
-                titleColor: 'var(--foreground)',
-                bodyColor: 'var(--foreground)',
+                titleColor: resolvedColors.foreground,
+                bodyColor: resolvedColors.foreground,
                 padding: 16,
                 displayColors: true,
                 usePointStyle: true,
@@ -128,19 +138,19 @@ export const AllPlayersWpmChart = ({
                 title: {
                     display: true,
                     text: 'Time (seconds)',
-                    color: 'var(--muted-foreground)',
+                    color: resolvedColors.mutedFg,
                     font: {
                         size: 12
                     }
                 },
                 ticks: {
-                    color: 'var(--muted-foreground)',
+                    color: resolvedColors.mutedFg,
                     font: {
                         size: 11
                     }
                 },
                 grid: {
-                    color: 'var(--grid-line)',
+                    color: resolvedColors.gridLine,
                     drawTicks: false
                 },
                 border: {
@@ -151,20 +161,20 @@ export const AllPlayersWpmChart = ({
                 title: {
                     display: true,
                     text: 'WPM',
-                    color: 'var(--muted-foreground)',
+                    color: resolvedColors.mutedFg,
                     font: {
                         size: 12
                     }
                 },
                 ticks: {
-                    color: 'var(--muted-foreground)',
+                    color: resolvedColors.mutedFg,
                     font: {
                         size: 11
                     },
                     padding: 8
                 },
                 grid: {
-                    color: 'var(--grid-line)',
+                    color: resolvedColors.gridLine,
                     drawTicks: false
                 },
                 border: {

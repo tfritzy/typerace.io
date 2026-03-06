@@ -119,13 +119,17 @@ export const SiteStatsPage = () => {
 
     const chartColors = useMemo(() => {
         const style = getComputedStyle(document.documentElement);
-        return Array.from({ length: 15 }, (_, i) =>
+        return Array.from({ length: 5 }, (_, i) =>
             style.getPropertyValue(`--chart-${i + 1}`).trim()
         );
     }, []);
 
     const chartNeutralColor = useMemo(() => {
         return getComputedStyle(document.documentElement).getPropertyValue('--chart-neutral').trim();
+    }, []);
+
+    const accentColor = useMemo(() => {
+        return getComputedStyle(document.documentElement).getPropertyValue('--accent-primary').trim();
     }, []);
 
     const resolvedColors = useMemo(() => {
@@ -215,8 +219,8 @@ export const SiteStatsPage = () => {
                 {
                     label: 'Unique Daily Players',
                     data: playerCounts,
-                    backgroundColor: `${chartColors[0]}${chartBackgroundAlpha}`,
-                    borderColor: chartColors[0],
+                    backgroundColor: `${accentColor}${chartBackgroundAlpha}`,
+                    borderColor: accentColor,
                     borderWidth: 2,
                     fill: false,
                     tension: 0.4,
@@ -246,8 +250,8 @@ export const SiteStatsPage = () => {
                 {
                     label: 'Non-Lonely Games %',
                     data: nonLonelyPercentages,
-                    borderColor: chartColors[5],
-                    backgroundColor: `${chartColors[5]}80`,
+                    borderColor: accentColor,
+                    backgroundColor: `${accentColor}80`,
                     fill: true,
                     tension: 0.4,
                 },
@@ -284,8 +288,8 @@ export const SiteStatsPage = () => {
                 {
                     label: 'Completed %',
                     data: completionPercentages,
-                    borderColor: chartColors[5],
-                    backgroundColor: `${chartColors[5]}80`,
+                    borderColor: accentColor,
+                    backgroundColor: `${accentColor}80`,
                     fill: true,
                     tension: 0.4,
                 },

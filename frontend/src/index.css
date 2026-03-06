@@ -25,16 +25,6 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --color-chart-6: var(--chart-6);
-  --color-chart-7: var(--chart-7);
-  --color-chart-8: var(--chart-8);
-  --color-chart-9: var(--chart-9);
-  --color-chart-10: var(--chart-10);
-  --color-chart-11: var(--chart-11);
-  --color-chart-12: var(--chart-12);
-  --color-chart-13: var(--chart-13);
-  --color-chart-14: var(--chart-14);
-  --color-chart-15: var(--chart-15);
   --color-medal-gold: var(--medal-gold);
   --color-medal-silver: var(--medal-silver);
   --color-medal-bronze: var(--medal-bronze);
@@ -102,21 +92,11 @@
 
   --chart-neutral: #6b7280;
 
-  --chart-1: #ef4444;
-  --chart-2: #f97316;
+  --chart-1: #3b82f6;
+  --chart-2: #22c55e;
   --chart-3: #f59e0b;
-  --chart-4: #eab308;
-  --chart-5: #84cc16;
-  --chart-6: #22c55e;
-  --chart-7: #10b981;
-  --chart-8: #14b8a6;
-  --chart-9: #06b6d4;
-  --chart-10: #0ea5e9;
-  --chart-11: #3b82f6;
-  --chart-12: #6366f1;
-  --chart-13: #8b5cf6;
-  --chart-14: #a855f7;
-  --chart-15: #d946ef;
+  --chart-4: #ef4444;
+  --chart-5: #8b5cf6;
 
   --color-bg-primary: var(--background);
   --color-white: var(--foreground);
