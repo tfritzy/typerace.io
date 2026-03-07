@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { type Player, type PlayerColor } from "../types/stdb";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
-import { useEffect, useState, useRef, memo } from "react";
+import { useEffect, useState, useRef, memo, useMemo } from "react";
 import { useAuth } from "../firebase/AuthContext";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import { getInitialTheme } from "../utils/themes";
@@ -63,8 +63,10 @@ export const ProfileAvatar = memo(() => {
     };
   }, [conn]);
 
-  const currentThemeTag = getInitialTheme();
-  const currentThemeColor = { tag: currentThemeTag } as PlayerColor;
+  const currentThemeColor = useMemo(() => {
+    const tag = getInitialTheme();
+    return { tag } as PlayerColor;
+  }, []);
 
   const handleSocialSignIn = async (
     provider: "google" | "github" | "discord"
