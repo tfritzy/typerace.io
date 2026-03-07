@@ -13,6 +13,7 @@ import { useAuth } from "../firebase/AuthContext";
 import { Select } from "../components/Select";
 import { RecentGames } from "../components/RecentGames";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { type ThemeSettings, applyCustomTheme } from "../utils/themes";
 
 type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
@@ -101,9 +102,23 @@ export const ProfilePage = () => {
         setIsEditNameModalOpen(false);
     };
 
-    const handleColorSave = (color: PlayerColor['tag']) => {
+    const handleColorSave = (color: PlayerColor['tag'], customSettings?: ThemeSettings) => {
         if (!conn) return;
-        conn.reducers.setPlayerColor({ color: { tag: color } as any });
+        if (customSettings) {
+            applyCustomTheme(customSettings);
+            conn.reducers.setPlayerTheme({
+                backgroundColor: customSettings.backgroundColor,
+                textColor: customSettings.textColor,
+                borderColor: customSettings.borderColor,
+                borderWidth: customSettings.borderWidth,
+                borderRadius: customSettings.borderRadius,
+                accentColor: customSettings.accentColor,
+                font: customSettings.font,
+                fontWeight: customSettings.fontWeight,
+            } as any);
+        } else {
+            conn.reducers.setPlayerColor({ color: { tag: color } as any });
+        }
         setIsEditColorModalOpen(false);
     };
 

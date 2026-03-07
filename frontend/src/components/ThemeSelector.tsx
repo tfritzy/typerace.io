@@ -3,7 +3,7 @@ import { THEMES } from '../utils/themes';
 import { useState, useRef, useEffect } from 'react';
 
 type ThemeSelectorProps = {
-    selectedTheme: PlayerColor['tag'];
+    selectedTheme?: PlayerColor['tag'];
     onThemeSelect: (theme: PlayerColor['tag']) => void;
 };
 
@@ -13,7 +13,7 @@ export const ThemeSelector = ({ selectedTheme, onThemeSelect }: ThemeSelectorPro
     const containerRef = useRef<HTMLDivElement>(null);
     const themes = Object.entries(THEMES) as [PlayerColor['tag'], typeof THEMES[keyof typeof THEMES]][];
 
-    const currentTheme = THEMES[selectedTheme] || THEMES.GitHubDark;
+    const currentTheme = selectedTheme ? (THEMES[selectedTheme] || THEMES.GitHubDark) : null;
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -51,19 +51,25 @@ export const ThemeSelector = ({ selectedTheme, onThemeSelect }: ThemeSelectorPro
                 className="w-full bg-input text-foreground border border-border rounded-md px-4 py-3 text-sm cursor-pointer outline-none flex items-center justify-between gap-3 hover:border-[var(--border-hover)] transition-colors"
             >
                 <div className="flex items-center gap-3">
-                    <div className="flex gap-1">
-                        {currentTheme.previewColors.map((color, i) => (
-                            <div
-                                key={i}
-                                className="w-4 h-4 rounded-full border border-white/20"
-                                style={{ backgroundColor: color }}
-                            />
-                        ))}
-                    </div>
-                    <span>{currentTheme.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                        ({currentTheme.mode})
-                    </span>
+                    {currentTheme ? (
+                        <>
+                            <div className="flex gap-1">
+                                {currentTheme.previewColors.map((color, i) => (
+                                    <div
+                                        key={i}
+                                        className="w-4 h-4 rounded-full border border-white/20"
+                                        style={{ backgroundColor: color }}
+                                    />
+                                ))}
+                            </div>
+                            <span>{currentTheme.name}</span>
+                            <span className="text-xs text-muted-foreground">
+                                ({currentTheme.mode})
+                            </span>
+                        </>
+                    ) : (
+                        <span className="text-muted-foreground">Select a preset...</span>
+                    )}
                 </div>
                 <svg
                     className="text-muted-foreground shrink-0"
