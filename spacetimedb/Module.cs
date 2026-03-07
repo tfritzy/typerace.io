@@ -77,9 +77,9 @@ public enum PlayerColor
     CatppuccinLatte,
     GruvboxLight,
     RosePineDawn,
-    Mainframe,
-    Cyberdeck,
-    RedAlert
+    Pico8,
+    Endesga,
+    Sweetie16
 }
 
 [Table(Name = "playertheme", Public = true)]

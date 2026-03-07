@@ -82,7 +82,7 @@ function ThemePreviewCard({ theme, isSelected, onSelect }: {
 export const ThemeSelector = ({ selectedTheme, onThemeSelect, open, onOpenChange }: ThemeSelectorProps) => {
     const themes = Object.entries(THEMES) as [PlayerColor['tag'], typeof THEMES[keyof typeof THEMES]][];
 
-    const pixelTags = new Set(['Mainframe', 'Cyberdeck', 'RedAlert']);
+    const pixelTags = new Set(['Pico8', 'Endesga', 'Sweetie16']);
     const darkThemes = themes.filter(([tag, t]) => t.mode === 'dark' && !pixelTags.has(tag));
     const lightThemes = themes.filter(([, t]) => t.mode === 'light');
     const pixelThemes = themes.filter(([tag]) => pixelTags.has(tag));
