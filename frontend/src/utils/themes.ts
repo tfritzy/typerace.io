@@ -19,6 +19,10 @@ export interface ThemePreset extends ThemeSettings {
 export interface ResolvedTheme {
     name: string;
     mode: 'light' | 'dark';
+    font: string;
+    fontWeight: number;
+    borderWidth: number;
+    borderRadius: number;
     colors: {
         background: string;
         foreground: string;
@@ -98,6 +102,10 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
     return {
         name,
         mode: isDark ? 'dark' : 'light',
+        font: settings.font,
+        fontWeight: settings.fontWeight,
+        borderWidth: settings.borderWidth,
+        borderRadius: settings.borderRadius,
         colors: {
             background: settings.backgroundColor,
             foreground: settings.textColor,
@@ -189,7 +197,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         textColor: '#eceff4',
         borderColor: 'rgba(236, 239, 244, 0.1)',
         borderWidth: 1,
-        borderRadius: 8,
+        borderRadius: 12,
         accentColor: '#88c0d0',
         font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
         fontWeight: 400,
@@ -236,11 +244,11 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#193549',
         textColor: '#e1efff',
         borderColor: 'rgba(225, 239, 255, 0.1)',
-        borderWidth: 1,
-        borderRadius: 8,
+        borderWidth: 2,
+        borderRadius: 4,
         accentColor: '#ffc600',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
-        fontWeight: 400,
+        font: "'Courier New', monospace",
+        fontWeight: 500,
         previewColors: ['#193549', '#ffc600', '#0088ff', '#ff628c'],
     },
     GruvboxDark: {
@@ -351,6 +359,42 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         fontWeight: 400,
         previewColors: ['#e6e7ed', '#2959aa', '#587539', '#8f5e15'],
     },
+    PixelGreen: {
+        name: 'Pixel Green',
+        backgroundColor: '#0a0a0a',
+        textColor: '#33ff33',
+        borderColor: '#33ff33',
+        borderWidth: 2,
+        borderRadius: 0,
+        accentColor: '#33ff33',
+        font: "'Courier New', monospace",
+        fontWeight: 700,
+        previewColors: ['#0a0a0a', '#33ff33', '#00cc00', '#009900'],
+    },
+    PixelBlue: {
+        name: 'Pixel Blue',
+        backgroundColor: '#000033',
+        textColor: '#00ccff',
+        borderColor: '#0066ff',
+        borderWidth: 2,
+        borderRadius: 0,
+        accentColor: '#00ccff',
+        font: "'Courier New', monospace",
+        fontWeight: 700,
+        previewColors: ['#000033', '#00ccff', '#0066ff', '#ff6600'],
+    },
+    PixelRed: {
+        name: 'Pixel Red',
+        backgroundColor: '#1a0000',
+        textColor: '#ff4444',
+        borderColor: '#ff4444',
+        borderWidth: 2,
+        borderRadius: 0,
+        accentColor: '#ff4444',
+        font: "'Courier New', monospace",
+        fontWeight: 700,
+        previewColors: ['#1a0000', '#ff4444', '#ff8800', '#ffcc00'],
+    },
 };
 
 export const THEMES: Record<PlayerColor['tag'], ResolvedTheme> = Object.fromEntries(
@@ -454,6 +498,11 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     root.style.setProperty('--color-white', theme.colors.foreground);
     root.style.setProperty('--color-box-bg', theme.colors.card);
     root.style.setProperty('--color-box-border', theme.colors.border);
+
+    root.style.setProperty('--font-family', theme.font);
+    root.style.setProperty('--font-weight', String(theme.fontWeight));
+    root.style.setProperty('--border-width', `${theme.borderWidth}px`);
+    root.style.setProperty('--radius', `${theme.borderRadius}px`);
 
     try {
         localStorage.setItem('selectedTheme', tag);

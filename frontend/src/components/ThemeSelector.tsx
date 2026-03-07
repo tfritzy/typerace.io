@@ -1,139 +1,127 @@
 import { type PlayerColor } from '../types/stdb';
-import { THEMES } from '../utils/themes';
-import { useState, useRef, useEffect } from 'react';
+import { THEMES, type ResolvedTheme } from '../utils/themes';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 
 type ThemeSelectorProps = {
     selectedTheme?: PlayerColor['tag'];
     onThemeSelect: (theme: PlayerColor['tag']) => void;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
 };
 
-export const ThemeSelector = ({ selectedTheme, onThemeSelect }: ThemeSelectorProps) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
+function ThemePreviewCard({ tag, theme, isSelected, onSelect }: {
+    tag: string;
+    theme: ResolvedTheme;
+    isSelected: boolean;
+    onSelect: () => void;
+}) {
+    const progressWidth = 65;
+    return (
+        <button
+            onClick={onSelect}
+            className="w-full border-0 cursor-pointer text-left transition-transform hover:scale-[1.02]"
+            style={{
+                background: theme.colors.background,
+                borderRadius: `${theme.borderRadius}px`,
+                border: `${theme.borderWidth}px solid ${isSelected ? theme.colors.accentPrimary : theme.colors.border}`,
+                padding: '12px',
+                fontFamily: theme.font,
+                fontWeight: theme.fontWeight,
+                outline: isSelected ? `2px solid ${theme.colors.accentPrimary}` : 'none',
+                outlineOffset: '2px',
+            }}
+        >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <span style={{ color: theme.colors.foreground, fontSize: '13px', fontWeight: 600 }}>{theme.name}</span>
+                <span style={{ color: theme.colors.mutedForeground, fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{theme.mode}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                <div style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: `${theme.borderRadius}px`,
+                    background: theme.gradient,
+                    flexShrink: 0,
+                }} />
+                <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <span style={{ color: theme.colors.foreground, fontSize: '11px', fontWeight: 600 }}>Player</span>
+                        <span style={{ color: theme.colors.mutedForeground, fontSize: '11px' }}>72 WPM</span>
+                    </div>
+                    <div style={{
+                        width: '100%',
+                        height: '6px',
+                        background: theme.colors.secondary,
+                        borderRadius: `${theme.borderRadius}px`,
+                        overflow: 'hidden',
+                    }}>
+                        <div style={{
+                            width: `${progressWidth}%`,
+                            height: '100%',
+                            borderRadius: `${theme.borderRadius}px`,
+                            background: theme.gradient,
+                        }} />
+                    </div>
+                </div>
+            </div>
+            <div style={{ display: 'flex', gap: '4px' }}>
+                {theme.previewColors.map((color, i) => (
+                    <div key={i} style={{
+                        width: '14px',
+                        height: '14px',
+                        borderRadius: `${Math.min(theme.borderRadius, 7)}px`,
+                        background: color,
+                        border: `1px solid ${theme.colors.border}`,
+                    }} />
+                ))}
+            </div>
+        </button>
+    );
+}
+
+export const ThemeSelector = ({ selectedTheme, onThemeSelect, open, onOpenChange }: ThemeSelectorProps) => {
     const themes = Object.entries(THEMES) as [PlayerColor['tag'], typeof THEMES[keyof typeof THEMES]][];
 
-    const currentTheme = selectedTheme ? (THEMES[selectedTheme] || THEMES.GitHubDark) : null;
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-                handleClose();
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isOpen]);
-
-    const handleClose = () => {
-        setIsClosing(true);
-        setTimeout(() => {
-            setIsOpen(false);
-            setIsClosing(false);
-        }, 150);
-    };
-
-    const handleSelect = (themeTag: PlayerColor['tag']) => {
-        onThemeSelect(themeTag);
-        handleClose();
-    };
+    const darkThemes = themes.filter(([, t]) => t.mode === 'dark');
+    const lightThemes = themes.filter(([, t]) => t.mode === 'light');
 
     return (
-        <div className="relative" ref={containerRef}>
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-full bg-input text-foreground border border-border rounded-md px-4 py-3 text-sm cursor-pointer outline-none flex items-center justify-between gap-3 hover:border-[var(--border-hover)] transition-colors"
-            >
-                <div className="flex items-center gap-3">
-                    {currentTheme ? (
-                        <>
-                            <div className="flex gap-1">
-                                {currentTheme.previewColors.map((color, i) => (
-                                    <div
-                                        key={i}
-                                        className="w-4 h-4 rounded-full border border-white/20"
-                                        style={{ backgroundColor: color }}
-                                    />
-                                ))}
-                            </div>
-                            <span>{currentTheme.name}</span>
-                            <span className="text-xs text-muted-foreground">
-                                ({currentTheme.mode})
-                            </span>
-                        </>
-                    ) : (
-                        <span className="text-muted-foreground">Select a preset...</span>
-                    )}
-                </div>
-                <svg
-                    className="text-muted-foreground shrink-0"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                >
-                    <polyline points="6 9 12 15 18 9" />
-                </svg>
-            </button>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="min-w-[700px] max-w-[800px] max-h-[80vh] overflow-y-auto">
+                <DialogHeader className="mb-4">
+                    <DialogTitle>Choose Theme</DialogTitle>
+                </DialogHeader>
 
-            {isOpen && (
-                <div
-                    className="absolute left-0 right-0 top-full mt-1 bg-popover border border-border rounded-md shadow-lg z-50 max-h-64 overflow-y-auto"
-                    style={{
-                        animation: isClosing ? 'menuSlideOut 0.15s ease-out' : 'menuSlideIn 0.15s ease-out'
-                    }}
-                >
-                    {themes.map(([tag, theme]) => {
-                        const isSelected = selectedTheme === tag;
-                        return (
-                            <button
+                <div className="mb-4">
+                    <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Dark Themes</h3>
+                    <div className="grid grid-cols-3 gap-3">
+                        {darkThemes.map(([tag, theme]) => (
+                            <ThemePreviewCard
                                 key={tag}
-                                onClick={() => handleSelect(tag)}
-                                className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer border-0 transition-colors text-left ${
-                                    isSelected
-                                        ? 'bg-accent/20 text-foreground'
-                                        : 'bg-transparent text-foreground hover:bg-muted'
-                                }`}
-                            >
-                                <div className="flex gap-1">
-                                    {theme.previewColors.map((color, i) => (
-                                        <div
-                                            key={i}
-                                            className="w-4 h-4 rounded-full border border-white/20"
-                                            style={{ backgroundColor: color }}
-                                        />
-                                    ))}
-                                </div>
-                                <span className="flex-1">{theme.name}</span>
-                                <span className="text-xs text-muted-foreground">
-                                    {theme.mode}
-                                </span>
-                                {isSelected && (
-                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                        <path
-                                            d="M11.5 3.5L5.5 9.5L2.5 6.5"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
-                                    </svg>
-                                )}
-                            </button>
-                        );
-                    })}
+                                tag={tag}
+                                theme={theme}
+                                isSelected={selectedTheme === tag}
+                                onSelect={() => onThemeSelect(tag)}
+                            />
+                        ))}
+                    </div>
                 </div>
-            )}
-        </div>
+
+                <div>
+                    <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Light Themes</h3>
+                    <div className="grid grid-cols-3 gap-3">
+                        {lightThemes.map(([tag, theme]) => (
+                            <ThemePreviewCard
+                                key={tag}
+                                tag={tag}
+                                theme={theme}
+                                isSelected={selectedTheme === tag}
+                                onSelect={() => onThemeSelect(tag)}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 };

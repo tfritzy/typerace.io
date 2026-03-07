@@ -81,7 +81,10 @@ public enum PlayerColor
     GruvboxLight,
     AyuLight,
     RosePineDawn,
-    TokyoNightDay
+    TokyoNightDay,
+    PixelGreen,
+    PixelBlue,
+    PixelRed
 }
 
 [Table(Name = "playertheme", Public = true)]
