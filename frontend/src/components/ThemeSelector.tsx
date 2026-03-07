@@ -15,27 +15,17 @@ function ThemeOption({ theme, isSelected, onSelect }: {
     return (
         <button
             onClick={onSelect}
-            className="w-full border-0 cursor-pointer text-left flex items-center gap-3 px-3 py-2 hover:bg-secondary/50 transition-colors"
-            style={{
-                background: isSelected ? 'var(--secondary)' : 'transparent',
-            }}
+            className={`w-full border-0 cursor-pointer text-left flex items-center gap-3 px-3 py-2 hover:bg-secondary/50 transition-colors ${isSelected ? 'bg-secondary' : 'bg-transparent'}`}
         >
             <div
-                className="shrink-0 flex items-center justify-center gap-[3px] border border-border"
+                className="shrink-0 w-9 h-6 flex items-center justify-center gap-[3px] border border-border"
                 style={{
-                    width: '36px',
-                    height: '24px',
                     borderRadius: `${Math.min(theme.borderRadius, 6)}px`,
                     background: theme.colors.background,
                 }}
             >
                 {theme.previewColors.slice(0, 4).map((color, i) => (
-                    <div key={i} style={{
-                        width: '6px',
-                        height: '6px',
-                        borderRadius: '50%',
-                        background: color,
-                    }} />
+                    <div key={i} className="size-1.5 rounded-full" style={{ background: color }} />
                 ))}
             </div>
             <span className="text-sm text-foreground">{theme.name}</span>
@@ -78,26 +68,18 @@ export const ThemeSelector = ({ selectedTheme, onThemeSelect }: ThemeSelectorPro
         <div ref={containerRef} className="relative">
             <button
                 onClick={() => setOpen(!open)}
-                className="w-full bg-input text-foreground border border-border px-3 py-2 text-sm cursor-pointer outline-none flex items-center justify-between gap-3 hover:border-[var(--border-hover)] transition-colors"
-                style={{ borderRadius: 'var(--radius)' }}
+                className="w-full bg-input text-foreground border border-border rounded-lg px-3 py-2 text-sm cursor-pointer outline-none flex items-center justify-between gap-3 hover:border-[var(--border-hover)] transition-colors"
             >
                 <div className="flex items-center gap-3">
                     <div
-                        className="shrink-0 flex items-center justify-center gap-[3px] border border-border"
+                        className="shrink-0 w-9 h-6 flex items-center justify-center gap-[3px] border border-border"
                         style={{
-                            width: '36px',
-                            height: '24px',
                             borderRadius: `${Math.min(currentTheme.borderRadius, 6)}px`,
                             background: currentTheme.colors.background,
                         }}
                     >
                         {currentTheme.previewColors.slice(0, 4).map((color, i) => (
-                            <div key={i} style={{
-                                width: '6px',
-                                height: '6px',
-                                borderRadius: '50%',
-                                background: color,
-                            }} />
+                            <div key={i} className="size-1.5 rounded-full" style={{ background: color }} />
                         ))}
                     </div>
                     <span>{currentTheme.name}</span>
@@ -109,11 +91,7 @@ export const ThemeSelector = ({ selectedTheme, onThemeSelect }: ThemeSelectorPro
 
             {open && (
                 <div
-                    className="absolute z-50 w-full mt-1 border border-border bg-popover shadow-lg overflow-y-auto"
-                    style={{
-                        borderRadius: 'var(--radius)',
-                        maxHeight: '320px',
-                    }}
+                    className="absolute z-50 w-full mt-1 border border-border bg-popover shadow-lg overflow-y-auto rounded-lg max-h-80"
                 >
                     <div className="px-3 pt-2 pb-1">
                         <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Dark</span>
