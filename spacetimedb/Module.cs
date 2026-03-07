@@ -593,6 +593,22 @@ public static partial class Module
     [Reducer]
     public static void setPlayerTheme(ReducerContext ctx, string backgroundColor, string textColor, string borderColor, int borderWidth, float borderRadius, string accentColor, string font, int fontWeight)
     {
+        if (backgroundColor.Length > 50 || textColor.Length > 50 || borderColor.Length > 50 || accentColor.Length > 50)
+        {
+            Log.Warn($"Color value too long from {ctx.Sender}");
+            return;
+        }
+
+        if (font.Length > 200)
+        {
+            Log.Warn($"Font value too long from {ctx.Sender}");
+            return;
+        }
+
+        borderWidth = Math.Clamp(borderWidth, 0, 10);
+        borderRadius = Math.Clamp(borderRadius, 0, 50);
+        fontWeight = Math.Clamp(fontWeight, 100, 900);
+
         var existing = ctx.Db.playertheme.Owner.Find(ctx.Sender);
         var theme = new PlayerTheme
         {

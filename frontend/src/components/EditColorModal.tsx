@@ -4,11 +4,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { ThemeSelector } from './ThemeSelector';
-import { THEME_PRESETS, applyTheme, applyCustomTheme, getCustomThemeSettings, DEFAULT_THEME_SETTINGS, type ThemeSettings } from '../utils/themes';
+import { applyTheme, applyCustomTheme, getCustomThemeSettings, DEFAULT_THEME_SETTINGS, type ThemeSettings } from '../utils/themes';
+
+function cssColorToHex(color: string): string {
+    if (color.startsWith('#')) return color;
+    const el = document.createElement('div');
+    el.style.color = color;
+    document.body.appendChild(el);
+    const computed = getComputedStyle(el).color;
+    document.body.removeChild(el);
+    const match = computed.match(/(\d+),\s*(\d+),\s*(\d+)/);
+    if (!match) return '#333333';
+    return `#${parseInt(match[1]).toString(16).padStart(2, '0')}${parseInt(match[2]).toString(16).padStart(2, '0')}${parseInt(match[3]).toString(16).padStart(2, '0')}`;
+}
 
 type EditColorModalProps = {
-    currentColor: PlayerColor['tag'];
-    onSave: (color: PlayerColor['tag'], customSettings?: ThemeSettings) => void;
+    currentColor: string;
+    onSave: (color: string, customSettings?: ThemeSettings) => void;
     onClose: () => void;
 };
 
@@ -33,7 +45,7 @@ export const EditColorModal = ({ currentColor, onSave, onClose }: EditColorModal
 
     const handleSave = () => {
         if (mode === 'custom') {
-            onSave('custom' as PlayerColor['tag'], custom);
+            onSave('custom', custom);
         } else {
             onSave(theme);
         }
@@ -119,7 +131,7 @@ export const EditColorModal = ({ currentColor, onSave, onClose }: EditColorModal
                             <div className="flex items-center gap-2">
                                 <input
                                     type="color"
-                                    value={custom.borderColor.startsWith('rgba') ? '#333333' : custom.borderColor}
+                                    value={cssColorToHex(custom.borderColor)}
                                     onChange={(e) => handleCustomChange('borderColor', e.target.value)}
                                     className="w-8 h-8 rounded cursor-pointer border border-border bg-transparent"
                                 />

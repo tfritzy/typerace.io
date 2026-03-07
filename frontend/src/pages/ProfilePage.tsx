@@ -102,11 +102,11 @@ export const ProfilePage = () => {
         setIsEditNameModalOpen(false);
     };
 
-    const handleColorSave = (color: PlayerColor['tag'], customSettings?: ThemeSettings) => {
+    const handleColorSave = (color: string, customSettings?: ThemeSettings) => {
         if (!conn) return;
         if (customSettings) {
             applyCustomTheme(customSettings);
-            conn.reducers.setPlayerTheme({
+            (conn.reducers as any).setPlayerTheme({
                 backgroundColor: customSettings.backgroundColor,
                 textColor: customSettings.textColor,
                 borderColor: customSettings.borderColor,
@@ -115,7 +115,7 @@ export const ProfilePage = () => {
                 accentColor: customSettings.accentColor,
                 font: customSettings.font,
                 fontWeight: customSettings.fontWeight,
-            } as any);
+            });
         } else {
             conn.reducers.setPlayerColor({ color: { tag: color } as any });
         }
