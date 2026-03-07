@@ -23,9 +23,8 @@
 
 .selection-button.selected {
   background-color: var(--secondary);
-  border-color: var(--muted-foreground);
+  border-color: var(--accent-primary, var(--muted-foreground));
   color: var(--secondary-foreground);
-  box-shadow: 0 0 0 1px var(--muted) inset;
 }
 
 .selection-button:active {
