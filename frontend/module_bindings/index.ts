@@ -51,6 +51,8 @@ import SetPlayerColor from "./set_player_color_reducer";
 export { SetPlayerColor };
 import SetPlayerName from "./set_player_name_reducer";
 export { SetPlayerName };
+import SetPlayerTheme from "./set_player_theme_reducer";
+export { SetPlayerTheme };
 import StartCountdown from "./start_countdown_reducer";
 export { StartCountdown };
 import StartGame from "./start_game_reducer";
@@ -93,6 +95,8 @@ import PlayerRow from "./player_table";
 export { PlayerRow };
 import PlayerprogressRow from "./playerprogress_table";
 export { PlayerprogressRow };
+import PlayerthemeRow from "./playertheme_table";
+export { PlayerthemeRow };
 import XpgainRow from "./xpgain_table";
 export { XpgainRow };
 
@@ -135,6 +139,8 @@ import PlayerColor from "./player_color_type";
 export { PlayerColor };
 import PlayerProgress from "./player_progress_type";
 export { PlayerProgress };
+import PlayerTheme from "./player_theme_type";
+export { PlayerTheme };
 import XpGain from "./xp_gain_type";
 export { XpGain };
 import XpGainCleaner from "./xp_gain_cleaner_type";
@@ -358,6 +364,17 @@ const tablesSchema = __schema(
     ],
   }, PlayerprogressRow),
   __table({
+    name: 'playertheme',
+    indexes: [
+      { name: 'Owner', algorithm: 'btree', columns: [
+        'owner',
+      ] },
+    ],
+    constraints: [
+      { name: 'playertheme_Owner_key', constraint: 'unique', columns: ['owner'] },
+    ],
+  }, PlayerthemeRow),
+  __table({
     name: 'xpgain',
     indexes: [
       { name: 'Id', algorithm: 'btree', columns: [
@@ -378,19 +395,20 @@ const tablesSchema = __schema(
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
-  __reducerSchema("archiveOldGames", ArchiveOldGames),
-  __reducerSchema("cleanupOldXpGains", CleanupOldXpGains),
-  __reducerSchema("fillGameWithBots", FillGameWithBots),
+  __reducerSchema("ArchiveOldGames", ArchiveOldGames),
+  __reducerSchema("CleanupOldXpGains", CleanupOldXpGains),
+  __reducerSchema("FillGameWithBots", FillGameWithBots),
   __reducerSchema("joinGame", JoinGame),
   __reducerSchema("joinPrivateGame", JoinPrivateGame),
   __reducerSchema("rematch", Rematch),
   __reducerSchema("setPlayerColor", SetPlayerColor),
   __reducerSchema("setPlayerName", SetPlayerName),
-  __reducerSchema("startCountdown", StartCountdown),
-  __reducerSchema("startGame", StartGame),
+  __reducerSchema("setPlayerTheme", SetPlayerTheme),
+  __reducerSchema("StartCountdown", StartCountdown),
+  __reducerSchema("StartGame", StartGame),
   __reducerSchema("startPrivateGame", StartPrivateGame),
   __reducerSchema("syncAnonymousStatus", SyncAnonymousStatus),
-  __reducerSchema("updateBotProgress", UpdateBotProgress),
+  __reducerSchema("UpdateBotProgress", UpdateBotProgress),
   __reducerSchema("updateProgress", UpdateProgress),
 );
 
