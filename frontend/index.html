@@ -75,24 +75,27 @@
     <script>
       (function() {
         try {
-          var themeBackgrounds = {
-            Dracula: '#282a36', Monokai: '#272822', Nord: '#2e3440',
-            TokyoNight: '#1a1b26', GruvboxDark: '#282828', CatppuccinMocha: '#1e1e2e',
-            GitHubLight: '#ffffff', SolarizedLight: '#fdf6e3', OneLight: '#fafafa',
-            CatppuccinLatte: '#eff1f5', GruvboxLight: '#fbf1c7', RosePineDawn: '#faf4ed',
-            Mainframe: '#0a0a0a', Cyberdeck: '#000033', RedAlert: '#1a0000'
+          var themes = {
+            Dracula: {bg:'#282a36',fg:'#f8f8f2'}, Monokai: {bg:'#272822',fg:'#f8f8f2'}, Nord: {bg:'#2e3440',fg:'#eceff4'},
+            TokyoNight: {bg:'#1a1b26',fg:'#a9b1d6'}, GruvboxDark: {bg:'#282828',fg:'#ebdbb2'}, CatppuccinMocha: {bg:'#1e1e2e',fg:'#cdd6f4'},
+            GitHubLight: {bg:'#ffffff',fg:'#1f2328'}, SolarizedLight: {bg:'#fdf6e3',fg:'#657b83'}, OneLight: {bg:'#fafafa',fg:'#383a42'},
+            CatppuccinLatte: {bg:'#eff1f5',fg:'#4c4f69'}, GruvboxLight: {bg:'#fbf1c7',fg:'#3c3836'}, RosePineDawn: {bg:'#faf4ed',fg:'#575279'},
+            Mainframe: {bg:'#0a0a0a',fg:'#33ff33'}, Cyberdeck: {bg:'#000033',fg:'#00ccff'}, RedAlert: {bg:'#1a0000',fg:'#ff4444'}
           };
           var saved = localStorage.getItem('selectedTheme');
-          if (saved && themeBackgrounds[saved]) {
-            document.documentElement.style.setProperty('--color-bg-primary', themeBackgrounds[saved]);
-            document.documentElement.style.setProperty('--background', themeBackgrounds[saved]);
-          } else {
+          var t = saved && themes[saved] ? themes[saved] : null;
+          if (!t) {
             var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (!prefersDark) {
-              document.documentElement.style.setProperty('--color-bg-primary', '#ffffff');
-              document.documentElement.style.setProperty('--background', '#ffffff');
-            }
+            t = prefersDark ? themes.CatppuccinMocha : themes.GitHubLight;
           }
+          var r = document.documentElement.style;
+          r.setProperty('--color-bg-primary', t.bg);
+          r.setProperty('--background', t.bg);
+          r.setProperty('--foreground', t.fg);
+          r.setProperty('--color-white', t.fg);
+          var h = t.fg.replace('#','');
+          var fr = parseInt(h.substring(0,2),16), fgr = parseInt(h.substring(2,4),16), fb = parseInt(h.substring(4,6),16);
+          r.setProperty('--color-white-25', 'rgba('+fr+','+fgr+','+fb+',0.25)');
         } catch (e) {}
       })();
     </script>

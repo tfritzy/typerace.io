@@ -59,6 +59,35 @@ export function fontNameToCss(name: string): string {
     return `'${name}', ${fallback}`;
 }
 
+const MONO_PAIRINGS: Record<string, string> = {
+    'System UI': 'JetBrains Mono',
+    'Inter': 'JetBrains Mono',
+    'Roboto': 'IBM Plex Mono',
+    'Open Sans': 'Source Code Pro',
+    'Nunito': 'JetBrains Mono',
+    'Poppins': 'JetBrains Mono',
+    'Lato': 'Source Code Pro',
+    'Work Sans': 'IBM Plex Mono',
+    'DM Sans': 'JetBrains Mono',
+    'Fira Code': 'Fira Code',
+    'JetBrains Mono': 'JetBrains Mono',
+    'Source Code Pro': 'Source Code Pro',
+    'IBM Plex Mono': 'IBM Plex Mono',
+    'Space Mono': 'Space Mono',
+    'Inconsolata': 'Inconsolata',
+    'Merriweather': 'Source Code Pro',
+    'Playfair Display': 'Source Code Pro',
+    'Lora': 'Source Code Pro',
+    'Source Serif 4': 'Source Code Pro',
+    'Press Start 2P': 'Press Start 2P',
+    'VT323': 'VT323',
+    'Silkscreen': 'Silkscreen',
+};
+
+export function getMonoPairing(fontName: string): string {
+    return MONO_PAIRINGS[fontName] || 'JetBrains Mono';
+}
+
 export interface ThemeSettings {
     backgroundColor: string;
     textColor: string;
@@ -80,6 +109,8 @@ export interface ResolvedTheme {
     mode: 'light' | 'dark';
     fontName: string;
     font: string;
+    monoFontName: string;
+    monoFont: string;
     fontWeight: number;
     borderWidth: number;
     borderRadius: number;
@@ -159,11 +190,15 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
     const accentDark = adjustAccent(settings.accentColor, -0.25);
     const contrastForAccent = luminance(settings.accentColor) > 0.5 ? '#000000' : '#ffffff';
 
+    const monoFontName = getMonoPairing(settings.font);
+
     return {
         name,
         mode: isDark ? 'dark' : 'light',
         fontName: settings.font,
         font: fontNameToCss(settings.font),
+        monoFontName,
+        monoFont: fontNameToCss(monoFontName),
         fontWeight: settings.fontWeight,
         borderWidth: settings.borderWidth,
         borderRadius: settings.borderRadius,
@@ -292,7 +327,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         name: 'GitHub Light',
         backgroundColor: '#ffffff',
         textColor: '#1f2328',
-        borderColor: 'rgba(31, 35, 40, 0.15)',
+        borderColor: 'rgba(31, 35, 40, 0.2)',
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#0969da',
@@ -304,7 +339,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         name: 'Solarized Light',
         backgroundColor: '#fdf6e3',
         textColor: '#657b83',
-        borderColor: 'rgba(101, 123, 131, 0.15)',
+        borderColor: 'rgba(101, 123, 131, 0.2)',
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#268bd2',
@@ -316,7 +351,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         name: 'One Light',
         backgroundColor: '#fafafa',
         textColor: '#383a42',
-        borderColor: 'rgba(56, 58, 66, 0.12)',
+        borderColor: 'rgba(56, 58, 66, 0.18)',
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#4078f2',
@@ -328,7 +363,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         name: 'Catppuccin Latte',
         backgroundColor: '#eff1f5',
         textColor: '#4c4f69',
-        borderColor: 'rgba(76, 79, 105, 0.12)',
+        borderColor: 'rgba(76, 79, 105, 0.18)',
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#8839ef',
@@ -340,7 +375,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         name: 'Gruvbox Light',
         backgroundColor: '#fbf1c7',
         textColor: '#3c3836',
-        borderColor: 'rgba(60, 56, 54, 0.15)',
+        borderColor: 'rgba(60, 56, 54, 0.2)',
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#b57614',
@@ -352,7 +387,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         name: 'Rosé Pine Dawn',
         backgroundColor: '#faf4ed',
         textColor: '#575279',
-        borderColor: 'rgba(87, 82, 121, 0.12)',
+        borderColor: 'rgba(87, 82, 121, 0.18)',
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#907aa9',
@@ -464,7 +499,11 @@ export function applyCustomTheme(settings: ThemeSettings): void {
 
 function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     loadGoogleFont(theme.fontName, theme.fontWeight);
+    if (theme.monoFontName !== theme.fontName) {
+        loadGoogleFont(theme.monoFontName);
+    }
     const root = document.documentElement;
+    const fg = hexToRgb(theme.colors.foreground);
 
     root.style.setProperty('--background', theme.colors.background);
     root.style.setProperty('--foreground', theme.colors.foreground);
@@ -498,10 +537,12 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     root.style.setProperty('--color-accent-dark', theme.colors.accentDark);
     root.style.setProperty('--color-bg-primary', theme.colors.background);
     root.style.setProperty('--color-white', theme.colors.foreground);
+    root.style.setProperty('--color-white-25', `rgba(${fg.r}, ${fg.g}, ${fg.b}, 0.25)`);
     root.style.setProperty('--color-box-bg', theme.colors.card);
     root.style.setProperty('--color-box-border', theme.colors.border);
 
     root.style.setProperty('--font-family', theme.font);
+    root.style.setProperty('--font-family-mono', theme.monoFont);
     root.style.setProperty('--font-weight', String(theme.fontWeight));
     root.style.setProperty('--border-width', `${theme.borderWidth}px`);
     root.style.setProperty('--radius', `${theme.borderRadius}px`);
