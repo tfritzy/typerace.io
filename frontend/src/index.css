@@ -110,9 +110,9 @@
 
   --max-content-width: 1000px;
 
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: var(--font-family, system-ui, sans-serif);
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: var(--font-weight, 400);
 
   background-color: var(--background);
 

@@ -1,5 +1,64 @@
 import { type PlayerColor } from "../types/stdb";
 
+export interface GoogleFont {
+    name: string;
+    category: 'sans-serif' | 'serif' | 'monospace' | 'display';
+    weights: number[];
+}
+
+export const GOOGLE_FONTS: GoogleFont[] = [
+    { name: 'System UI', category: 'sans-serif', weights: [200, 400, 500, 700] },
+    { name: 'Inter', category: 'sans-serif', weights: [200, 400, 500, 700] },
+    { name: 'Roboto', category: 'sans-serif', weights: [200, 400, 500, 700] },
+    { name: 'Open Sans', category: 'sans-serif', weights: [200, 400, 500, 700] },
+    { name: 'Nunito', category: 'sans-serif', weights: [200, 400, 500, 700] },
+    { name: 'Poppins', category: 'sans-serif', weights: [200, 400, 500, 700] },
+    { name: 'Lato', category: 'sans-serif', weights: [200, 400, 700] },
+    { name: 'Work Sans', category: 'sans-serif', weights: [200, 400, 500, 700] },
+    { name: 'DM Sans', category: 'sans-serif', weights: [200, 400, 500, 700] },
+    { name: 'Fira Code', category: 'monospace', weights: [400, 500, 700] },
+    { name: 'JetBrains Mono', category: 'monospace', weights: [200, 400, 500, 700] },
+    { name: 'Source Code Pro', category: 'monospace', weights: [200, 400, 500, 700] },
+    { name: 'IBM Plex Mono', category: 'monospace', weights: [200, 400, 500, 700] },
+    { name: 'Space Mono', category: 'monospace', weights: [400, 700] },
+    { name: 'Inconsolata', category: 'monospace', weights: [200, 400, 500, 700] },
+    { name: 'Merriweather', category: 'serif', weights: [400, 700] },
+    { name: 'Playfair Display', category: 'serif', weights: [400, 500, 700] },
+    { name: 'Lora', category: 'serif', weights: [400, 500, 700] },
+    { name: 'Source Serif 4', category: 'serif', weights: [200, 400, 500, 700] },
+    { name: 'Press Start 2P', category: 'display', weights: [400] },
+    { name: 'VT323', category: 'display', weights: [400] },
+    { name: 'Silkscreen', category: 'display', weights: [400, 700] },
+];
+
+const loadedFonts = new Set<string>();
+
+export function loadGoogleFont(fontName: string, weight?: number): void {
+    if (fontName === 'System UI') return;
+    const font = GOOGLE_FONTS.find(f => f.name === fontName);
+    if (!font) return;
+    const weights = weight ? [weight] : font.weights;
+    const key = `${fontName}:${weights.join(',')}`;
+    if (loadedFonts.has(key)) return;
+    loadedFonts.add(key);
+    const family = fontName.replace(/ /g, '+');
+    const wghtParam = weights.join(';');
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `https://fonts.googleapis.com/css2?family=${family}:wght@${wghtParam}&display=swap`;
+    document.head.appendChild(link);
+}
+
+export function fontNameToCss(name: string): string {
+    if (name === 'System UI') return 'system-ui, sans-serif';
+    const font = GOOGLE_FONTS.find(f => f.name === name);
+    if (!font) return `'${name}', sans-serif`;
+    const fallback = font.category === 'monospace' ? 'monospace'
+                   : font.category === 'serif' ? 'serif'
+                   : 'sans-serif';
+    return `'${name}', ${fallback}`;
+}
+
 export interface ThemeSettings {
     backgroundColor: string;
     textColor: string;
@@ -19,6 +78,7 @@ export interface ThemePreset extends ThemeSettings {
 export interface ResolvedTheme {
     name: string;
     mode: 'light' | 'dark';
+    fontName: string;
     font: string;
     fontWeight: number;
     borderWidth: number;
@@ -102,7 +162,8 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
     return {
         name,
         mode: isDark ? 'dark' : 'light',
-        font: settings.font,
+        fontName: settings.font,
+        font: fontNameToCss(settings.font),
         fontWeight: settings.fontWeight,
         borderWidth: settings.borderWidth,
         borderRadius: settings.borderRadius,
@@ -150,7 +211,7 @@ const DEFAULT_THEME_SETTINGS: ThemeSettings = {
     borderWidth: 1,
     borderRadius: 8,
     accentColor: '#4493f8',
-    font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+    font: 'Inter',
     fontWeight: 400,
 };
 
@@ -163,7 +224,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#4493f8',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Inter',
         fontWeight: 400,
         previewColors: ['#0d1117', '#4493f8', '#3fb950', '#f85149'],
     },
@@ -175,7 +236,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#bd93f9',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Fira Code',
         fontWeight: 400,
         previewColors: ['#282a36', '#bd93f9', '#ff79c6', '#50fa7b'],
     },
@@ -187,7 +248,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#a6e22e',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Source Code Pro',
         fontWeight: 400,
         previewColors: ['#272822', '#a6e22e', '#f92672', '#66d9ef'],
     },
@@ -199,7 +260,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 12,
         accentColor: '#88c0d0',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Inter',
         fontWeight: 400,
         previewColors: ['#2e3440', '#88c0d0', '#81a1c1', '#5e81ac'],
     },
@@ -211,7 +272,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#61afef',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'JetBrains Mono',
         fontWeight: 400,
         previewColors: ['#282c34', '#61afef', '#98c379', '#e06c75'],
     },
@@ -223,7 +284,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#2aa198',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Inter',
         fontWeight: 400,
         previewColors: ['#002b36', '#2aa198', '#268bd2', '#b58900'],
     },
@@ -235,7 +296,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#7aa2f7',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Inter',
         fontWeight: 400,
         previewColors: ['#1a1b26', '#7aa2f7', '#bb9af7', '#7dcfff'],
     },
@@ -247,7 +308,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 2,
         borderRadius: 4,
         accentColor: '#ffc600',
-        font: "'Courier New', monospace",
+        font: 'Fira Code',
         fontWeight: 500,
         previewColors: ['#193549', '#ffc600', '#0088ff', '#ff628c'],
     },
@@ -259,7 +320,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#fabd2f',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Inter',
         fontWeight: 400,
         previewColors: ['#282828', '#fabd2f', '#b8bb26', '#fb4934'],
     },
@@ -271,7 +332,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#0969da',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Inter',
         fontWeight: 400,
         previewColors: ['#ffffff', '#0969da', '#1a7f37', '#d1242f'],
     },
@@ -283,7 +344,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#268bd2',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Inter',
         fontWeight: 400,
         previewColors: ['#fdf6e3', '#268bd2', '#2aa198', '#b58900'],
     },
@@ -295,7 +356,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#4078f2',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Inter',
         fontWeight: 400,
         previewColors: ['#fafafa', '#4078f2', '#50a14f', '#e45649'],
     },
@@ -307,7 +368,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#8839ef',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Nunito',
         fontWeight: 400,
         previewColors: ['#eff1f5', '#8839ef', '#1e66f5', '#40a02b'],
     },
@@ -319,7 +380,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#b57614',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Inter',
         fontWeight: 400,
         previewColors: ['#fbf1c7', '#b57614', '#79740e', '#9d0006'],
     },
@@ -331,7 +392,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#ff9940',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Inter',
         fontWeight: 400,
         previewColors: ['#fafafa', '#ff9940', '#399ee6', '#86b300'],
     },
@@ -343,7 +404,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#907aa9',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Lora',
         fontWeight: 400,
         previewColors: ['#faf4ed', '#907aa9', '#d7827e', '#56949f'],
     },
@@ -355,7 +416,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#2959aa',
-        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        font: 'Inter',
         fontWeight: 400,
         previewColors: ['#e6e7ed', '#2959aa', '#587539', '#8f5e15'],
     },
@@ -367,7 +428,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 2,
         borderRadius: 0,
         accentColor: '#33ff33',
-        font: "'Courier New', monospace",
+        font: 'Press Start 2P',
         fontWeight: 700,
         previewColors: ['#0a0a0a', '#33ff33', '#00cc00', '#009900'],
     },
@@ -379,7 +440,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 2,
         borderRadius: 0,
         accentColor: '#00ccff',
-        font: "'Courier New', monospace",
+        font: 'VT323',
         fontWeight: 700,
         previewColors: ['#000033', '#00ccff', '#0066ff', '#ff6600'],
     },
@@ -391,7 +452,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 2,
         borderRadius: 0,
         accentColor: '#ff4444',
-        font: "'Courier New', monospace",
+        font: 'Silkscreen',
         fontWeight: 700,
         previewColors: ['#1a0000', '#ff4444', '#ff8800', '#ffcc00'],
     },
@@ -462,6 +523,7 @@ export function applyCustomTheme(settings: ThemeSettings): void {
 }
 
 function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
+    loadGoogleFont(theme.fontName, theme.fontWeight);
     const root = document.documentElement;
 
     root.style.setProperty('--background', theme.colors.background);

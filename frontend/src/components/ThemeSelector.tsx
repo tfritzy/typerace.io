@@ -1,5 +1,6 @@
+import { useEffect } from 'react';
 import { type PlayerColor } from '../types/stdb';
-import { THEMES, type ResolvedTheme } from '../utils/themes';
+import { THEMES, loadGoogleFont, type ResolvedTheme } from '../utils/themes';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 
 type ThemeSelectorProps = {
@@ -84,6 +85,12 @@ export const ThemeSelector = ({ selectedTheme, onThemeSelect, open, onOpenChange
     const darkThemes = themes.filter(([, t]) => t.mode === 'dark');
     const lightThemes = themes.filter(([, t]) => t.mode === 'light');
 
+    useEffect(() => {
+        if (!open) return;
+        const uniqueFonts = new Set(themes.map(([, t]) => t.fontName));
+        uniqueFonts.forEach(fontName => loadGoogleFont(fontName));
+    }, [open, themes]);
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="min-w-[700px] max-w-[800px] max-h-[80vh] overflow-y-auto">
@@ -111,7 +118,6 @@ export const ThemeSelector = ({ selectedTheme, onThemeSelect, open, onOpenChange
                         {lightThemes.map(([tag, theme]) => (
                             <ThemePreviewCard
                                 key={tag}
-                                theme={theme}
                                 theme={theme}
                                 isSelected={selectedTheme === tag}
                                 onSelect={() => onThemeSelect(tag)}

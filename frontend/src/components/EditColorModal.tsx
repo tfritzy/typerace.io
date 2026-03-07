@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { ThemeSelector } from './ThemeSelector';
-import { THEMES, applyTheme, applyCustomTheme, getCustomThemeSettings, DEFAULT_THEME_SETTINGS, type ThemeSettings } from '../utils/themes';
+import { THEMES, applyTheme, applyCustomTheme, getCustomThemeSettings, DEFAULT_THEME_SETTINGS, GOOGLE_FONTS, loadGoogleFont, fontNameToCss, type ThemeSettings } from '../utils/themes';
 
 function cssColorToHex(color: string): string {
     if (color.startsWith('#')) return color;
@@ -207,12 +207,13 @@ export const EditColorModal = ({ currentColor, onSave, onClose }: EditColorModal
                                 <select
                                     value={custom.font}
                                     onChange={(e) => handleCustomChange('font', e.target.value)}
+                                    onFocus={() => GOOGLE_FONTS.forEach(f => loadGoogleFont(f.name))}
                                     className="w-full bg-input border border-border rounded px-2 py-1.5 text-xs text-foreground cursor-pointer"
+                                    style={{ fontFamily: fontNameToCss(custom.font) }}
                                 >
-                                    <option value="system-ui, Avenir, Helvetica, Arial, sans-serif">System UI</option>
-                                    <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
-                                    <option value="'Courier New', monospace">Courier New</option>
-                                    <option value="Georgia, serif">Georgia</option>
+                                    {GOOGLE_FONTS.map(f => (
+                                        <option key={f.name} value={f.name}>{f.name}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div>
