@@ -19,7 +19,7 @@ export const EditProfileModal = ({ currentName, currentColor, onSave, onClose }:
     const [theme, setTheme] = useState(currentColor);
     const [themeSelectorOpen, setThemeSelectorOpen] = useState(false);
 
-    const currentTheme = theme in THEMES ? THEMES[theme] : THEMES.GitHubDark;
+    const currentTheme = theme in THEMES ? THEMES[theme] : THEMES.CatppuccinMocha;
 
     const handleSave = () => {
         if (name.trim()) {

@@ -65,26 +65,21 @@ public enum CharacterEventType
 [Type]
 public enum PlayerColor
 {
-    GitHubDark,
     Dracula,
     Monokai,
     Nord,
-    OneDark,
-    SolarizedDark,
     TokyoNight,
-    Cobalt2,
     GruvboxDark,
+    CatppuccinMocha,
     GitHubLight,
     SolarizedLight,
     OneLight,
     CatppuccinLatte,
     GruvboxLight,
-    AyuLight,
     RosePineDawn,
-    TokyoNightDay,
-    PixelGreen,
-    PixelBlue,
-    PixelRed
+    Mainframe,
+    Cyberdeck,
+    RedAlert
 }
 
 [Table(Name = "playertheme", Public = true)]
@@ -507,7 +502,7 @@ public static partial class Module
                 TotalTimeSpentMs = 0,
                 IsBot = false,
                 BotConfig = null,
-                Color = PlayerColor.Monokai,
+                Color = PlayerColor.CatppuccinMocha,
                 IsAnonymous = true,
                 LastGameDate = 0
             });
@@ -823,7 +818,7 @@ public static partial class Module
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
-        var playerColor = player?.Color ?? PlayerColor.Monokai;
+        var playerColor = player?.Color ?? PlayerColor.CatppuccinMocha;
         var playerPublicId = player?.PlayerId ?? "";
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
@@ -1235,7 +1230,7 @@ public static partial class Module
                 var playerName = player?.Name ?? "Unknown";
                 var playerLevel = player?.Level ?? 1;
                 var isAnonymous = player?.IsAnonymous ?? true;
-                var playerColor = player?.Color ?? PlayerColor.Monokai;
+                var playerColor = player?.Color ?? PlayerColor.CatppuccinMocha;
                 var playerPublicId = player?.PlayerId ?? "";
 
                 ctx.Db.playerprogress.Insert(new PlayerProgress

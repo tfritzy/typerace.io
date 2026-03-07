@@ -76,10 +76,11 @@
       (function() {
         try {
           var themeBackgrounds = {
-            GitHubDark: '#0d1117', Dracula: '#282a36', Monokai: '#272822', Nord: '#2e3440',
-            OneDark: '#282c34', SolarizedDark: '#002b36', TokyoNight: '#1a1b26', Cobalt2: '#193549',
-            GruvboxDark: '#282828', GitHubLight: '#ffffff', SolarizedLight: '#fdf6e3', OneLight: '#fafafa',
-            CatppuccinLatte: '#eff1f5', GruvboxLight: '#fbf1c7', AyuLight: '#fafafa', RosePineDawn: '#faf4ed', TokyoNightDay: '#e6e7ed'
+            Dracula: '#282a36', Monokai: '#272822', Nord: '#2e3440',
+            TokyoNight: '#1a1b26', GruvboxDark: '#282828', CatppuccinMocha: '#1e1e2e',
+            GitHubLight: '#ffffff', SolarizedLight: '#fdf6e3', OneLight: '#fafafa',
+            CatppuccinLatte: '#eff1f5', GruvboxLight: '#fbf1c7', RosePineDawn: '#faf4ed',
+            Mainframe: '#0a0a0a', Cyberdeck: '#000033', RedAlert: '#1a0000'
           };
           var saved = localStorage.getItem('selectedTheme');
           if (saved && themeBackgrounds[saved]) {
@@ -97,10 +98,10 @@
     </script>
     <style>
       :root {
-        --color-bg-primary: #0d1117;
-        --color-white: #f0f6fc;
-        --color-white-25: rgba(240, 246, 252, 0.25);
-        --color-accent: #4493f8;
+        --color-bg-primary: #1e1e2e;
+        --color-white: #cdd6f4;
+        --color-white-25: rgba(205, 214, 244, 0.25);
+        --color-accent: #cba6f7;
         --max-content-width: 1000px;
       }
 

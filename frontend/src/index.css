@@ -48,42 +48,42 @@
 :root {
   --radius: 0.5rem;
 
-  --background: #202020;
-  --foreground: #ffffff;
+  --background: #1e1e2e;
+  --foreground: #cdd6f4;
 
-  --card: #272727;
-  --card-foreground: #ffffff;
+  --card: #2a2a3e;
+  --card-foreground: #cdd6f4;
 
-  --popover: #2a2a2a;
-  --popover-foreground: #ffffff;
+  --popover: #313244;
+  --popover-foreground: #cdd6f4;
 
-  --primary: #fbbf24;
+  --primary: #cba6f7;
   --primary-foreground: #000000;
 
-  --secondary: rgba(255, 255, 255, 0.1);
-  --secondary-foreground: rgba(255, 255, 255, 0.9);
+  --secondary: rgba(205, 214, 244, 0.08);
+  --secondary-foreground: rgba(205, 214, 244, 0.9);
 
-  --muted: rgba(255, 255, 255, 0.05);
-  --muted-foreground: rgba(255, 255, 255, 0.5);
+  --muted: rgba(205, 214, 244, 0.04);
+  --muted-foreground: rgba(205, 214, 244, 0.5);
 
-  --accent: #fbbf24;
+  --accent: #cba6f7;
   --accent-foreground: #000000;
 
-  --accent-primary: #fbbf24;
-  --accent-light: #fcd34d;
-  --accent-dark: #f59e0b;
+  --accent-primary: #cba6f7;
+  --accent-light: #d6b8f8;
+  --accent-dark: #987cf5;
 
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
+  --destructive: #f85149;
+  --destructive-foreground: #cdd6f4;
 
-  --border: rgba(255, 255, 255, 0.12);
-  --input: #1a1a1a;
-  --ring: #fbbf24;
+  --border: rgba(205, 214, 244, 0.1);
+  --input: #161626;
+  --ring: #cba6f7;
 
-  --grid-line: rgba(255, 255, 255, 0.06);
-  --text-completed: rgba(255, 255, 255, 0.15);
-  --text-untyped: rgba(255, 255, 255, 0.35);
-  --border-hover: rgba(255, 255, 255, 0.3);
+  --grid-line: rgba(205, 214, 244, 0.06);
+  --text-completed: rgba(205, 214, 244, 0.15);
+  --text-untyped: rgba(205, 214, 244, 0.35);
+  --border-hover: rgba(205, 214, 244, 0.25);
 
   --medal-gold: #FFC900;
   --medal-silver: #C0C0C0;
@@ -100,7 +100,7 @@
 
   --color-bg-primary: var(--background);
   --color-white: var(--foreground);
-  --color-white-25: rgba(255, 255, 255, 0.25);
+  --color-white-25: rgba(205, 214, 244, 0.25);
   --color-error: var(--destructive);
   --color-accent: var(--accent-primary);
   --color-accent-light: var(--accent-light);
@@ -186,7 +186,8 @@ body {
 
 .box {
   background-color: var(--color-box-bg);
-  border: 1px solid var(--color-box-border);
+  border: var(--border-width, 1px) solid var(--color-box-border);
+  border-radius: var(--radius, 8px);
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
@@ -196,7 +197,8 @@ body {
 
 .box-with-focus {
   background-color: var(--color-box-bg);
-  border: 1px solid var(--color-box-border);
+  border: var(--border-width, 1px) solid var(--color-box-border);
+  border-radius: var(--radius, 8px);
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 

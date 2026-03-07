@@ -201,33 +201,21 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
     };
 }
 
-const DEFAULT_DARK_THEME_TAG: PlayerColor['tag'] = 'GitHubDark';
+const DEFAULT_DARK_THEME_TAG: PlayerColor['tag'] = 'CatppuccinMocha';
 const DEFAULT_LIGHT_THEME_TAG: PlayerColor['tag'] = 'GitHubLight';
 
 const DEFAULT_THEME_SETTINGS: ThemeSettings = {
-    backgroundColor: '#0d1117',
-    textColor: '#f0f6fc',
-    borderColor: 'rgba(240, 246, 252, 0.1)',
+    backgroundColor: '#1e1e2e',
+    textColor: '#cdd6f4',
+    borderColor: 'rgba(205, 214, 244, 0.1)',
     borderWidth: 1,
     borderRadius: 8,
-    accentColor: '#4493f8',
+    accentColor: '#cba6f7',
     font: 'Inter',
     fontWeight: 400,
 };
 
 export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
-    GitHubDark: {
-        name: 'GitHub Dark',
-        backgroundColor: '#0d1117',
-        textColor: '#f0f6fc',
-        borderColor: 'rgba(240, 246, 252, 0.1)',
-        borderWidth: 1,
-        borderRadius: 8,
-        accentColor: '#4493f8',
-        font: 'Inter',
-        fontWeight: 400,
-        previewColors: ['#0d1117', '#4493f8', '#3fb950', '#f85149'],
-    },
     Dracula: {
         name: 'Dracula',
         backgroundColor: '#282a36',
@@ -264,30 +252,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         fontWeight: 400,
         previewColors: ['#2e3440', '#88c0d0', '#81a1c1', '#5e81ac'],
     },
-    OneDark: {
-        name: 'One Dark',
-        backgroundColor: '#282c34',
-        textColor: '#abb2bf',
-        borderColor: 'rgba(171, 178, 191, 0.1)',
-        borderWidth: 1,
-        borderRadius: 8,
-        accentColor: '#61afef',
-        font: 'JetBrains Mono',
-        fontWeight: 400,
-        previewColors: ['#282c34', '#61afef', '#98c379', '#e06c75'],
-    },
-    SolarizedDark: {
-        name: 'Solarized Dark',
-        backgroundColor: '#002b36',
-        textColor: '#839496',
-        borderColor: 'rgba(131, 148, 150, 0.12)',
-        borderWidth: 1,
-        borderRadius: 8,
-        accentColor: '#2aa198',
-        font: 'Inter',
-        fontWeight: 400,
-        previewColors: ['#002b36', '#2aa198', '#268bd2', '#b58900'],
-    },
     TokyoNight: {
         name: 'Tokyo Night',
         backgroundColor: '#1a1b26',
@@ -300,18 +264,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         fontWeight: 400,
         previewColors: ['#1a1b26', '#7aa2f7', '#bb9af7', '#7dcfff'],
     },
-    Cobalt2: {
-        name: 'Cobalt 2',
-        backgroundColor: '#193549',
-        textColor: '#e1efff',
-        borderColor: 'rgba(225, 239, 255, 0.1)',
-        borderWidth: 2,
-        borderRadius: 4,
-        accentColor: '#ffc600',
-        font: 'Fira Code',
-        fontWeight: 500,
-        previewColors: ['#193549', '#ffc600', '#0088ff', '#ff628c'],
-    },
     GruvboxDark: {
         name: 'Gruvbox Dark',
         backgroundColor: '#282828',
@@ -323,6 +275,18 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         font: 'Inter',
         fontWeight: 400,
         previewColors: ['#282828', '#fabd2f', '#b8bb26', '#fb4934'],
+    },
+    CatppuccinMocha: {
+        name: 'Catppuccin Mocha',
+        backgroundColor: '#1e1e2e',
+        textColor: '#cdd6f4',
+        borderColor: 'rgba(205, 214, 244, 0.1)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#cba6f7',
+        font: 'Inter',
+        fontWeight: 400,
+        previewColors: ['#1e1e2e', '#cba6f7', '#89b4fa', '#a6e3a1'],
     },
     GitHubLight: {
         name: 'GitHub Light',
@@ -384,18 +348,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         fontWeight: 400,
         previewColors: ['#fbf1c7', '#b57614', '#79740e', '#9d0006'],
     },
-    AyuLight: {
-        name: 'Ayu Light',
-        backgroundColor: '#fafafa',
-        textColor: '#575f66',
-        borderColor: 'rgba(87, 95, 102, 0.12)',
-        borderWidth: 1,
-        borderRadius: 8,
-        accentColor: '#ff9940',
-        font: 'Inter',
-        fontWeight: 400,
-        previewColors: ['#fafafa', '#ff9940', '#399ee6', '#86b300'],
-    },
     RosePineDawn: {
         name: 'Rosé Pine Dawn',
         backgroundColor: '#faf4ed',
@@ -408,20 +360,8 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         fontWeight: 400,
         previewColors: ['#faf4ed', '#907aa9', '#d7827e', '#56949f'],
     },
-    TokyoNightDay: {
-        name: 'Tokyo Night Day',
-        backgroundColor: '#e6e7ed',
-        textColor: '#343b59',
-        borderColor: 'rgba(52, 59, 89, 0.15)',
-        borderWidth: 1,
-        borderRadius: 8,
-        accentColor: '#2959aa',
-        font: 'Inter',
-        fontWeight: 400,
-        previewColors: ['#e6e7ed', '#2959aa', '#587539', '#8f5e15'],
-    },
-    PixelGreen: {
-        name: 'Pixel Green',
+    Mainframe: {
+        name: 'Mainframe',
         backgroundColor: '#0a0a0a',
         textColor: '#33ff33',
         borderColor: '#33ff33',
@@ -432,8 +372,8 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         fontWeight: 700,
         previewColors: ['#0a0a0a', '#33ff33', '#00cc00', '#009900'],
     },
-    PixelBlue: {
-        name: 'Pixel Blue',
+    Cyberdeck: {
+        name: 'Cyberdeck',
         backgroundColor: '#000033',
         textColor: '#00ccff',
         borderColor: '#0066ff',
@@ -444,8 +384,8 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         fontWeight: 700,
         previewColors: ['#000033', '#00ccff', '#0066ff', '#ff6600'],
     },
-    PixelRed: {
-        name: 'Pixel Red',
+    RedAlert: {
+        name: 'Red Alert',
         backgroundColor: '#1a0000',
         textColor: '#ff4444',
         borderColor: '#ff4444',

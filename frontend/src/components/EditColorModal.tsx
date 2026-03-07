@@ -27,7 +27,7 @@ type EditColorModalProps = {
 export const EditColorModal = ({ currentColor, onSave, onClose }: EditColorModalProps) => {
     const existingCustom = getCustomThemeSettings();
     const [mode, setMode] = useState<'preset' | 'custom'>(currentColor === 'custom' ? 'custom' : 'preset');
-    const [theme, setTheme] = useState(currentColor === 'custom' ? 'GitHubDark' as PlayerColor['tag'] : currentColor);
+    const [theme, setTheme] = useState(currentColor === 'custom' ? 'CatppuccinMocha' as PlayerColor['tag'] : currentColor);
     const [custom, setCustom] = useState<ThemeSettings>(existingCustom || DEFAULT_THEME_SETTINGS);
     const [themeSelectorOpen, setThemeSelectorOpen] = useState(false);
 

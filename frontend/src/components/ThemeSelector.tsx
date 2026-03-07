@@ -82,8 +82,10 @@ function ThemePreviewCard({ theme, isSelected, onSelect }: {
 export const ThemeSelector = ({ selectedTheme, onThemeSelect, open, onOpenChange }: ThemeSelectorProps) => {
     const themes = Object.entries(THEMES) as [PlayerColor['tag'], typeof THEMES[keyof typeof THEMES]][];
 
-    const darkThemes = themes.filter(([, t]) => t.mode === 'dark');
+    const pixelTags = new Set(['Mainframe', 'Cyberdeck', 'RedAlert']);
+    const darkThemes = themes.filter(([tag, t]) => t.mode === 'dark' && !pixelTags.has(tag));
     const lightThemes = themes.filter(([, t]) => t.mode === 'light');
+    const pixelThemes = themes.filter(([tag]) => pixelTags.has(tag));
 
     useEffect(() => {
         if (!open) return;
@@ -93,14 +95,14 @@ export const ThemeSelector = ({ selectedTheme, onThemeSelect, open, onOpenChange
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="min-w-[700px] max-w-[800px] max-h-[80vh] overflow-y-auto">
+            <DialogContent className="min-w-[500px] max-w-[600px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader className="mb-4">
                     <DialogTitle>Choose Theme</DialogTitle>
                 </DialogHeader>
 
                 <div className="mb-4">
                     <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Dark Themes</h3>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 gap-3">
                         {darkThemes.map(([tag, theme]) => (
                             <ThemePreviewCard
                                 key={tag}
@@ -112,10 +114,24 @@ export const ThemeSelector = ({ selectedTheme, onThemeSelect, open, onOpenChange
                     </div>
                 </div>
 
-                <div>
+                <div className="mb-4">
                     <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Light Themes</h3>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 gap-3">
                         {lightThemes.map(([tag, theme]) => (
+                            <ThemePreviewCard
+                                key={tag}
+                                theme={theme}
+                                isSelected={selectedTheme === tag}
+                                onSelect={() => onThemeSelect(tag)}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                <div>
+                    <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Pixel Themes</h3>
+                    <div className="grid grid-cols-1 gap-3">
+                        {pixelThemes.map(([tag, theme]) => (
                             <ThemePreviewCard
                                 key={tag}
                                 theme={theme}
