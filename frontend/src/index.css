@@ -361,7 +361,6 @@ body {
 
 .logo-text {
   color: var(--foreground);
-  text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
 }
 
 .logo-accent {

@@ -327,7 +327,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         name: 'GitHub Light',
         backgroundColor: '#ffffff',
         textColor: '#1f2328',
-        borderColor: 'rgba(31, 35, 40, 0.2)',
+        borderColor: 'rgba(31, 35, 40, 0.25)',
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#0969da',
@@ -339,7 +339,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         name: 'Solarized Light',
         backgroundColor: '#fdf6e3',
         textColor: '#657b83',
-        borderColor: 'rgba(101, 123, 131, 0.2)',
+        borderColor: 'rgba(101, 123, 131, 0.25)',
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#268bd2',
@@ -351,7 +351,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         name: 'One Light',
         backgroundColor: '#fafafa',
         textColor: '#383a42',
-        borderColor: 'rgba(56, 58, 66, 0.18)',
+        borderColor: 'rgba(56, 58, 66, 0.25)',
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#4078f2',
@@ -363,7 +363,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         name: 'Catppuccin Latte',
         backgroundColor: '#eff1f5',
         textColor: '#4c4f69',
-        borderColor: 'rgba(76, 79, 105, 0.18)',
+        borderColor: 'rgba(76, 79, 105, 0.25)',
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#8839ef',
@@ -375,7 +375,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         name: 'Gruvbox Light',
         backgroundColor: '#fbf1c7',
         textColor: '#3c3836',
-        borderColor: 'rgba(60, 56, 54, 0.2)',
+        borderColor: 'rgba(60, 56, 54, 0.25)',
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#b57614',
@@ -387,7 +387,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         name: 'Rosé Pine Dawn',
         backgroundColor: '#faf4ed',
         textColor: '#575279',
-        borderColor: 'rgba(87, 82, 121, 0.18)',
+        borderColor: 'rgba(87, 82, 121, 0.25)',
         borderWidth: 1,
         borderRadius: 8,
         accentColor: '#907aa9',
@@ -537,7 +537,8 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     root.style.setProperty('--color-accent-dark', theme.colors.accentDark);
     root.style.setProperty('--color-bg-primary', theme.colors.background);
     root.style.setProperty('--color-white', theme.colors.foreground);
-    root.style.setProperty('--color-white-25', `rgba(${fg.r}, ${fg.g}, ${fg.b}, 0.25)`);
+    const ioOpacity = theme.mode === 'light' ? 0.45 : 0.25;
+    root.style.setProperty('--color-white-25', `rgba(${fg.r}, ${fg.g}, ${fg.b}, ${ioOpacity})`);
     root.style.setProperty('--color-box-bg', theme.colors.card);
     root.style.setProperty('--color-box-border', theme.colors.border);
 

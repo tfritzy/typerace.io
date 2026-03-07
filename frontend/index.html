@@ -95,7 +95,11 @@
           r.setProperty('--color-white', t.fg);
           var h = t.fg.replace('#','');
           var fr = parseInt(h.substring(0,2),16), fgr = parseInt(h.substring(2,4),16), fb = parseInt(h.substring(4,6),16);
-          r.setProperty('--color-white-25', 'rgba('+fr+','+fgr+','+fb+',0.25)');
+          var bh = t.bg.replace('#','');
+          var br = parseInt(bh.substring(0,2),16), bgr = parseInt(bh.substring(2,4),16), bb = parseInt(bh.substring(4,6),16);
+          var lum = (0.299*br + 0.587*bgr + 0.114*bb)/255;
+          var ioOp = lum >= 0.5 ? 0.45 : 0.25;
+          r.setProperty('--color-white-25', 'rgba('+fr+','+fgr+','+fb+','+ioOp+')');
         } catch (e) {}
       })();
     </script>

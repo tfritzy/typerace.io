@@ -1,4 +1,4 @@
-import { type Player, type GameRecord, type PlayerColor } from "../types/stdb";
+import { type Player, type GameRecord } from "../types/stdb";
 import { WpmChart } from "../components/WpmChart";
 import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
