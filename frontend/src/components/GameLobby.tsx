@@ -26,7 +26,7 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
   }, [gameUrl]);
 
   return (
-    <div className="box w-full rounded-lg px-8 py-12 min-h-[430px] flex flex-col justify-center gap-6">
+    <div className="box w-full px-8 py-12 min-h-[430px] flex flex-col justify-center gap-6">
       <div className="text-center space-y-4">
         <h2 className="text-xl font-semibold text-secondary-foreground">
           {isOwner ? "Waiting for players..." : "Waiting for owner to start..."}
@@ -38,10 +38,11 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
 
       <div
         onClick={handleCopyLink}
-        className="rounded-lg p-4 cursor-pointer transition-all duration-200 relative"
+        className="p-4 cursor-pointer transition-all duration-200 relative"
         style={{
           backgroundColor: 'var(--card)',
-          border: linkCopied ? '1px solid var(--accent-primary)' : '1px solid var(--border)'
+          border: linkCopied ? 'var(--border-width, 1px) solid var(--accent-primary)' : 'var(--border-width, 1px) solid var(--border)',
+          borderRadius: 'var(--radius, 8px)'
         }}
         onMouseEnter={(e) => {
           if (!linkCopied) {
@@ -78,8 +79,8 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
       {isOwner && (
         <button
           onClick={handleStartGame}
-          className="bg-transparent text-foreground border rounded-lg px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-200"
-          style={{ borderColor: 'var(--border)' }}
+          className="bg-transparent text-foreground border px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-200"
+          style={{ borderColor: 'var(--border)', borderWidth: 'var(--border-width, 1px)', borderRadius: 'var(--radius, 8px)' }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = 'var(--border-hover)';
             e.currentTarget.style.transform = 'translateY(-1px)';

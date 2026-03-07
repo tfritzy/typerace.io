@@ -82,7 +82,7 @@ export const EditColorModal = ({ currentColor, onSave, onClose }: EditColorModal
                                             {currentTheme.previewColors.map((color, i) => (
                                                 <div
                                                     key={i}
-                                                    className="w-4 h-4 rounded-full border border-white/20"
+                                                    className="w-4 h-4 rounded-full border border-border"
                                                     style={{ backgroundColor: color }}
                                                 />
                                             ))}

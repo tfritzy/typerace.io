@@ -11,7 +11,7 @@ interface MatchTypeSelectorProps {
 
 export const MatchTypeSelector: React.FC<MatchTypeSelectorProps> = ({ gameType, setGameType }) => (
     <div className="mb-6">
-        <h2 className="text-white/80 text-lg font-medium mb-3">Match Type</h2>
+        <h2 className="text-secondary-foreground text-lg font-medium mb-3">Match Type</h2>
         <div className="flex gap-3">
             <button
                 className={`selection-button ${gameType === "Public" ? 'selected' : ''}`}

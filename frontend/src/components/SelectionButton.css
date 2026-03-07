@@ -6,8 +6,8 @@
   padding: 0.75rem 1rem;
   min-height: 44px;
   background-color: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
+  border: var(--border-width, 1px) solid var(--border);
+  border-radius: var(--radius, 0.5rem);
   color: var(--secondary-foreground);
   font-size: 0.95rem;
   font-weight: 600;
@@ -16,13 +16,13 @@
 }
 
 .selection-button:hover {
-  background-color: rgba(255, 255, 255, 0.06);
-  border-color: var(--color-white-25);
+  background-color: var(--secondary);
+  border-color: var(--border-hover);
   transform: translateY(-1px);
 }
 
 .selection-button.selected {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: var(--secondary);
   border-color: var(--muted-foreground);
   color: var(--secondary-foreground);
   box-shadow: 0 0 0 1px var(--muted) inset;
@@ -33,10 +33,10 @@
 }
 
 .selection-button:disabled {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: var(--muted);
   border-color: var(--border);
   border-style: dashed;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--muted-foreground);
   filter: saturate(0.7);
   cursor: not-allowed;
   pointer-events: none;
