@@ -9,8 +9,7 @@ type ThemeSelectorProps = {
     onOpenChange: (open: boolean) => void;
 };
 
-function ThemePreviewCard({ tag, theme, isSelected, onSelect }: {
-    tag: string;
+function ThemePreviewCard({ theme, isSelected, onSelect }: {
     theme: ResolvedTheme;
     isSelected: boolean;
     onSelect: () => void;
@@ -98,7 +97,6 @@ export const ThemeSelector = ({ selectedTheme, onThemeSelect, open, onOpenChange
                         {darkThemes.map(([tag, theme]) => (
                             <ThemePreviewCard
                                 key={tag}
-                                tag={tag}
                                 theme={theme}
                                 isSelected={selectedTheme === tag}
                                 onSelect={() => onThemeSelect(tag)}
@@ -113,7 +111,7 @@ export const ThemeSelector = ({ selectedTheme, onThemeSelect, open, onOpenChange
                         {lightThemes.map(([tag, theme]) => (
                             <ThemePreviewCard
                                 key={tag}
-                                tag={tag}
+                                theme={theme}
                                 theme={theme}
                                 isSelected={selectedTheme === tag}
                                 onSelect={() => onThemeSelect(tag)}
