@@ -57,7 +57,6 @@ export const AllPlayersResults = ({
             <RaceResultsChart
                 playerProgress={selectedPlayerProgress}
                 raceStartTimestamp={raceStartTimestamp}
-                playerColor={selectedPlayerProgress.playerColor}
             />
         </div>
     );
