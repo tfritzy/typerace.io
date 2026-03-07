@@ -84,6 +84,21 @@ public enum PlayerColor
     TokyoNightDay
 }
 
+[Table(Name = "playertheme", Public = true)]
+public partial struct PlayerTheme
+{
+    [PrimaryKey]
+    public Identity Owner;
+    public string BackgroundColor;
+    public string TextColor;
+    public string BorderColor;
+    public int BorderWidth;
+    public float BorderRadius;
+    public string AccentColor;
+    public string Font;
+    public int FontWeight;
+}
+
 public struct Quote
 {
     public string Id;
@@ -572,6 +587,33 @@ public static partial class Module
             updatedPlayer.Color = color;
             ctx.Db.player.Identity.Update(updatedPlayer);
             Log.Info($"Updated player color for {ctx.Sender} to {color}");
+        }
+    }
+
+    [Reducer]
+    public static void setPlayerTheme(ReducerContext ctx, string backgroundColor, string textColor, string borderColor, int borderWidth, float borderRadius, string accentColor, string font, int fontWeight)
+    {
+        var existing = ctx.Db.playertheme.Owner.Find(ctx.Sender);
+        var theme = new PlayerTheme
+        {
+            Owner = ctx.Sender,
+            BackgroundColor = backgroundColor,
+            TextColor = textColor,
+            BorderColor = borderColor,
+            BorderWidth = borderWidth,
+            BorderRadius = borderRadius,
+            AccentColor = accentColor,
+            Font = font,
+            FontWeight = fontWeight
+        };
+
+        if (existing != null)
+        {
+            ctx.Db.playertheme.Owner.Update(theme);
+        }
+        else
+        {
+            ctx.Db.playertheme.Insert(theme);
         }
     }
 

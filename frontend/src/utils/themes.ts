@@ -1,6 +1,22 @@
 import { type PlayerColor } from "../types/stdb";
 
-export interface ThemeConfig {
+export interface ThemeSettings {
+    backgroundColor: string;
+    textColor: string;
+    borderColor: string;
+    borderWidth: number;
+    borderRadius: number;
+    accentColor: string;
+    font: string;
+    fontWeight: number;
+}
+
+export interface ThemePreset extends ThemeSettings {
+    name: string;
+    previewColors: string[];
+}
+
+export interface ResolvedTheme {
     name: string;
     mode: 'light' | 'dark';
     colors: {
@@ -36,606 +52,317 @@ export interface ThemeConfig {
     gradient: string;
 }
 
+export type ThemeConfig = ResolvedTheme;
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+    const h = hex.replace('#', '');
+    return {
+        r: parseInt(h.substring(0, 2), 16),
+        g: parseInt(h.substring(2, 4), 16),
+        b: parseInt(h.substring(4, 6), 16),
+    };
+}
+
+function luminance(hex: string): number {
+    const { r, g, b } = hexToRgb(hex);
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+function adjustBrightness(hex: string, amount: number): string {
+    const { r, g, b } = hexToRgb(hex);
+    const clamp = (v: number) => Math.max(0, Math.min(255, Math.round(v)));
+    return `#${clamp(r + amount).toString(16).padStart(2, '0')}${clamp(g + amount).toString(16).padStart(2, '0')}${clamp(b + amount).toString(16).padStart(2, '0')}`;
+}
+
+function adjustAccent(hex: string, amount: number): string {
+    const { r, g, b } = hexToRgb(hex);
+    const clamp = (v: number) => Math.max(0, Math.min(255, Math.round(v)));
+    if (amount > 0) {
+        return `#${clamp(r + (255 - r) * amount).toString(16).padStart(2, '0')}${clamp(g + (255 - g) * amount).toString(16).padStart(2, '0')}${clamp(b + (255 - b) * amount).toString(16).padStart(2, '0')}`;
+    }
+    const factor = 1 + amount;
+    return `#${clamp(r * factor).toString(16).padStart(2, '0')}${clamp(g * factor).toString(16).padStart(2, '0')}${clamp(b * factor).toString(16).padStart(2, '0')}`;
+}
+
+export function resolveTheme(settings: ThemeSettings, name: string, previewColors: string[]): ResolvedTheme {
+    const isDark = luminance(settings.backgroundColor) < 0.5;
+    const fg = hexToRgb(settings.textColor);
+    const fgRgba = `${fg.r}, ${fg.g}, ${fg.b}`;
+    const card = isDark ? adjustBrightness(settings.backgroundColor, 12) : adjustBrightness(settings.backgroundColor, -10);
+    const popover = isDark ? adjustBrightness(settings.backgroundColor, 20) : adjustBrightness(settings.backgroundColor, -10);
+    const input = isDark ? adjustBrightness(settings.backgroundColor, -8) : adjustBrightness(settings.backgroundColor, -5);
+    const accentLight = adjustAccent(settings.accentColor, 0.2);
+    const accentDark = adjustAccent(settings.accentColor, -0.25);
+    const contrastForAccent = luminance(settings.accentColor) > 0.5 ? '#000000' : '#ffffff';
+
+    return {
+        name,
+        mode: isDark ? 'dark' : 'light',
+        colors: {
+            background: settings.backgroundColor,
+            foreground: settings.textColor,
+            card,
+            cardForeground: settings.textColor,
+            popover,
+            popoverForeground: settings.textColor,
+            primary: settings.accentColor,
+            primaryForeground: contrastForAccent,
+            secondary: isDark ? `rgba(${fgRgba}, 0.08)` : `rgba(${fgRgba}, 0.06)`,
+            secondaryForeground: isDark ? `rgba(${fgRgba}, 0.9)` : `rgba(${fgRgba}, 0.8)`,
+            muted: `rgba(${fgRgba}, 0.04)`,
+            mutedForeground: `rgba(${fgRgba}, 0.5)`,
+            accent: settings.accentColor,
+            accentForeground: contrastForAccent,
+            accentPrimary: settings.accentColor,
+            accentLight,
+            accentDark,
+            destructive: isDark ? '#f85149' : '#d1242f',
+            destructiveForeground: isDark ? settings.textColor : '#ffffff',
+            border: settings.borderColor,
+            input,
+            ring: settings.accentColor,
+            gridLine: `rgba(${fgRgba}, 0.06)`,
+            textCompleted: isDark ? `rgba(${fgRgba}, 0.15)` : `rgba(${fgRgba}, 0.2)`,
+            textUntyped: isDark ? `rgba(${fgRgba}, 0.35)` : `rgba(${fgRgba}, 0.4)`,
+            borderHover: isDark ? `rgba(${fgRgba}, 0.25)` : `rgba(${fgRgba}, 0.25)`,
+        },
+        avatarColors: [settings.accentColor, accentDark, isDark ? popover : card],
+        previewColors,
+        gradient: `linear-gradient(to right, ${accentDark}, ${settings.accentColor})`,
+    };
+}
+
 const DEFAULT_DARK_THEME_TAG: PlayerColor['tag'] = 'GitHubDark';
 const DEFAULT_LIGHT_THEME_TAG: PlayerColor['tag'] = 'GitHubLight';
 
-export const THEMES: Record<PlayerColor['tag'], ThemeConfig> = {
+const DEFAULT_THEME_SETTINGS: ThemeSettings = {
+    backgroundColor: '#0d1117',
+    textColor: '#f0f6fc',
+    borderColor: 'rgba(240, 246, 252, 0.1)',
+    borderWidth: 1,
+    borderRadius: 8,
+    accentColor: '#4493f8',
+    font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+    fontWeight: 400,
+};
+
+export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
     GitHubDark: {
         name: 'GitHub Dark',
-        mode: 'dark',
-        colors: {
-            background: '#0d1117',
-            foreground: '#f0f6fc',
-            card: '#151b23',
-            cardForeground: '#f0f6fc',
-            popover: '#212830',
-            popoverForeground: '#f0f6fc',
-            primary: '#4493f8',
-            primaryForeground: '#ffffff',
-            secondary: 'rgba(240, 246, 252, 0.08)',
-            secondaryForeground: 'rgba(240, 246, 252, 0.9)',
-            muted: 'rgba(240, 246, 252, 0.04)',
-            mutedForeground: 'rgba(240, 246, 252, 0.5)',
-            accent: '#4493f8',
-            accentForeground: '#0d1117',
-            accentPrimary: '#4493f8',
-            accentLight: '#58a6ff',
-            accentDark: '#1f6feb',
-            destructive: '#f85149',
-            destructiveForeground: '#f0f6fc',
-            border: 'rgba(240, 246, 252, 0.1)',
-            input: '#0d1117',
-            ring: '#4493f8',
-            gridLine: 'rgba(240, 246, 252, 0.06)',
-            textCompleted: 'rgba(240, 246, 252, 0.15)',
-            textUntyped: 'rgba(240, 246, 252, 0.35)',
-            borderHover: 'rgba(240, 246, 252, 0.25)',
-        },
-        avatarColors: ['#4493f8', '#1f6feb', '#212830'],
+        backgroundColor: '#0d1117',
+        textColor: '#f0f6fc',
+        borderColor: 'rgba(240, 246, 252, 0.1)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#4493f8',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#0d1117', '#4493f8', '#3fb950', '#f85149'],
-        gradient: 'linear-gradient(to right, #1f6feb, #4493f8)',
     },
     Dracula: {
         name: 'Dracula',
-        mode: 'dark',
-        colors: {
-            background: '#282a36',
-            foreground: '#f8f8f2',
-            card: '#343746',
-            cardForeground: '#f8f8f2',
-            popover: '#3c3f58',
-            popoverForeground: '#f8f8f2',
-            primary: '#bd93f9',
-            primaryForeground: '#282a36',
-            secondary: 'rgba(248, 248, 242, 0.08)',
-            secondaryForeground: 'rgba(248, 248, 242, 0.9)',
-            muted: 'rgba(248, 248, 242, 0.04)',
-            mutedForeground: 'rgba(248, 248, 242, 0.5)',
-            accent: '#bd93f9',
-            accentForeground: '#282a36',
-            accentPrimary: '#bd93f9',
-            accentLight: '#d6bcfa',
-            accentDark: '#9b6dff',
-            destructive: '#ff5555',
-            destructiveForeground: '#f8f8f2',
-            border: 'rgba(248, 248, 242, 0.1)',
-            input: '#21222c',
-            ring: '#bd93f9',
-            gridLine: 'rgba(248, 248, 242, 0.06)',
-            textCompleted: 'rgba(248, 248, 242, 0.15)',
-            textUntyped: 'rgba(248, 248, 242, 0.35)',
-            borderHover: 'rgba(248, 248, 242, 0.25)',
-        },
-        avatarColors: ['#bd93f9', '#6272a4', '#44475a'],
+        backgroundColor: '#282a36',
+        textColor: '#f8f8f2',
+        borderColor: 'rgba(248, 248, 242, 0.1)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#bd93f9',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#282a36', '#bd93f9', '#ff79c6', '#50fa7b'],
-        gradient: 'linear-gradient(to right, #9b6dff, #bd93f9)',
     },
     Monokai: {
         name: 'Monokai',
-        mode: 'dark',
-        colors: {
-            background: '#272822',
-            foreground: '#f8f8f2',
-            card: '#2e2f28',
-            cardForeground: '#f8f8f2',
-            popover: '#35362e',
-            popoverForeground: '#f8f8f2',
-            primary: '#a6e22e',
-            primaryForeground: '#272822',
-            secondary: 'rgba(248, 248, 242, 0.08)',
-            secondaryForeground: 'rgba(248, 248, 242, 0.9)',
-            muted: 'rgba(248, 248, 242, 0.04)',
-            mutedForeground: 'rgba(248, 248, 242, 0.5)',
-            accent: '#a6e22e',
-            accentForeground: '#272822',
-            accentPrimary: '#a6e22e',
-            accentLight: '#c2f05e',
-            accentDark: '#86b818',
-            destructive: '#f92672',
-            destructiveForeground: '#f8f8f2',
-            border: 'rgba(248, 248, 242, 0.1)',
-            input: '#1e1f1a',
-            ring: '#a6e22e',
-            gridLine: 'rgba(248, 248, 242, 0.06)',
-            textCompleted: 'rgba(248, 248, 242, 0.15)',
-            textUntyped: 'rgba(248, 248, 242, 0.35)',
-            borderHover: 'rgba(248, 248, 242, 0.25)',
-        },
-        avatarColors: ['#a6e22e', '#66d9ef', '#f92672'],
+        backgroundColor: '#272822',
+        textColor: '#f8f8f2',
+        borderColor: 'rgba(248, 248, 242, 0.1)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#a6e22e',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#272822', '#a6e22e', '#f92672', '#66d9ef'],
-        gradient: 'linear-gradient(to right, #86b818, #a6e22e)',
     },
     Nord: {
         name: 'Nord',
-        mode: 'dark',
-        colors: {
-            background: '#2e3440',
-            foreground: '#eceff4',
-            card: '#3b4252',
-            cardForeground: '#eceff4',
-            popover: '#434c5e',
-            popoverForeground: '#eceff4',
-            primary: '#88c0d0',
-            primaryForeground: '#2e3440',
-            secondary: 'rgba(236, 239, 244, 0.08)',
-            secondaryForeground: 'rgba(236, 239, 244, 0.9)',
-            muted: 'rgba(236, 239, 244, 0.04)',
-            mutedForeground: 'rgba(236, 239, 244, 0.5)',
-            accent: '#88c0d0',
-            accentForeground: '#2e3440',
-            accentPrimary: '#88c0d0',
-            accentLight: '#8fbcbb',
-            accentDark: '#81a1c1',
-            destructive: '#bf616a',
-            destructiveForeground: '#eceff4',
-            border: 'rgba(236, 239, 244, 0.1)',
-            input: '#2e3440',
-            ring: '#88c0d0',
-            gridLine: 'rgba(236, 239, 244, 0.06)',
-            textCompleted: 'rgba(236, 239, 244, 0.15)',
-            textUntyped: 'rgba(236, 239, 244, 0.35)',
-            borderHover: 'rgba(236, 239, 244, 0.25)',
-        },
-        avatarColors: ['#88c0d0', '#5e81ac', '#4c566a'],
+        backgroundColor: '#2e3440',
+        textColor: '#eceff4',
+        borderColor: 'rgba(236, 239, 244, 0.1)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#88c0d0',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#2e3440', '#88c0d0', '#81a1c1', '#5e81ac'],
-        gradient: 'linear-gradient(to right, #81a1c1, #88c0d0)',
     },
     OneDark: {
         name: 'One Dark',
-        mode: 'dark',
-        colors: {
-            background: '#282c34',
-            foreground: '#abb2bf',
-            card: '#2c313a',
-            cardForeground: '#abb2bf',
-            popover: '#333842',
-            popoverForeground: '#abb2bf',
-            primary: '#61afef',
-            primaryForeground: '#282c34',
-            secondary: 'rgba(171, 178, 191, 0.08)',
-            secondaryForeground: 'rgba(171, 178, 191, 0.9)',
-            muted: 'rgba(171, 178, 191, 0.04)',
-            mutedForeground: 'rgba(171, 178, 191, 0.5)',
-            accent: '#61afef',
-            accentForeground: '#282c34',
-            accentPrimary: '#61afef',
-            accentLight: '#82c4f8',
-            accentDark: '#4d9de0',
-            destructive: '#e06c75',
-            destructiveForeground: '#abb2bf',
-            border: 'rgba(171, 178, 191, 0.1)',
-            input: '#21252b',
-            ring: '#61afef',
-            gridLine: 'rgba(171, 178, 191, 0.06)',
-            textCompleted: 'rgba(171, 178, 191, 0.15)',
-            textUntyped: 'rgba(171, 178, 191, 0.35)',
-            borderHover: 'rgba(171, 178, 191, 0.25)',
-        },
-        avatarColors: ['#61afef', '#98c379', '#e5c07b'],
+        backgroundColor: '#282c34',
+        textColor: '#abb2bf',
+        borderColor: 'rgba(171, 178, 191, 0.1)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#61afef',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#282c34', '#61afef', '#98c379', '#e06c75'],
-        gradient: 'linear-gradient(to right, #4d9de0, #61afef)',
     },
     SolarizedDark: {
         name: 'Solarized Dark',
-        mode: 'dark',
-        colors: {
-            background: '#002b36',
-            foreground: '#839496',
-            card: '#073642',
-            cardForeground: '#93a1a1',
-            popover: '#073642',
-            popoverForeground: '#93a1a1',
-            primary: '#2aa198',
-            primaryForeground: '#002b36',
-            secondary: 'rgba(131, 148, 150, 0.08)',
-            secondaryForeground: 'rgba(131, 148, 150, 0.9)',
-            muted: 'rgba(131, 148, 150, 0.04)',
-            mutedForeground: 'rgba(131, 148, 150, 0.5)',
-            accent: '#2aa198',
-            accentForeground: '#002b36',
-            accentPrimary: '#2aa198',
-            accentLight: '#35c2b8',
-            accentDark: '#1f7a73',
-            destructive: '#dc322f',
-            destructiveForeground: '#fdf6e3',
-            border: 'rgba(131, 148, 150, 0.12)',
-            input: '#002028',
-            ring: '#2aa198',
-            gridLine: 'rgba(131, 148, 150, 0.06)',
-            textCompleted: 'rgba(131, 148, 150, 0.15)',
-            textUntyped: 'rgba(131, 148, 150, 0.35)',
-            borderHover: 'rgba(131, 148, 150, 0.25)',
-        },
-        avatarColors: ['#2aa198', '#268bd2', '#586e75'],
+        backgroundColor: '#002b36',
+        textColor: '#839496',
+        borderColor: 'rgba(131, 148, 150, 0.12)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#2aa198',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#002b36', '#2aa198', '#268bd2', '#b58900'],
-        gradient: 'linear-gradient(to right, #1f7a73, #2aa198)',
     },
     TokyoNight: {
         name: 'Tokyo Night',
-        mode: 'dark',
-        colors: {
-            background: '#1a1b26',
-            foreground: '#a9b1d6',
-            card: '#16161e',
-            cardForeground: '#a9b1d6',
-            popover: '#16161e',
-            popoverForeground: '#a9b1d6',
-            primary: '#7aa2f7',
-            primaryForeground: '#1a1b26',
-            secondary: 'rgba(169, 177, 214, 0.08)',
-            secondaryForeground: 'rgba(169, 177, 214, 0.9)',
-            muted: 'rgba(169, 177, 214, 0.04)',
-            mutedForeground: 'rgba(169, 177, 214, 0.5)',
-            accent: '#7aa2f7',
-            accentForeground: '#1a1b26',
-            accentPrimary: '#7aa2f7',
-            accentLight: '#9ab8f9',
-            accentDark: '#3d59a1',
-            destructive: '#f7768e',
-            destructiveForeground: '#a9b1d6',
-            border: 'rgba(169, 177, 214, 0.1)',
-            input: '#14141b',
-            ring: '#7aa2f7',
-            gridLine: 'rgba(169, 177, 214, 0.06)',
-            textCompleted: 'rgba(169, 177, 214, 0.15)',
-            textUntyped: 'rgba(169, 177, 214, 0.35)',
-            borderHover: 'rgba(169, 177, 214, 0.25)',
-        },
-        avatarColors: ['#7aa2f7', '#bb9af7', '#7dcfff'],
+        backgroundColor: '#1a1b26',
+        textColor: '#a9b1d6',
+        borderColor: 'rgba(169, 177, 214, 0.1)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#7aa2f7',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#1a1b26', '#7aa2f7', '#bb9af7', '#7dcfff'],
-        gradient: 'linear-gradient(to right, #3d59a1, #7aa2f7)',
     },
     Cobalt2: {
         name: 'Cobalt 2',
-        mode: 'dark',
-        colors: {
-            background: '#193549',
-            foreground: '#e1efff',
-            card: '#1f4662',
-            cardForeground: '#e1efff',
-            popover: '#245578',
-            popoverForeground: '#e1efff',
-            primary: '#ffc600',
-            primaryForeground: '#193549',
-            secondary: 'rgba(225, 239, 255, 0.08)',
-            secondaryForeground: 'rgba(225, 239, 255, 0.9)',
-            muted: 'rgba(225, 239, 255, 0.04)',
-            mutedForeground: 'rgba(225, 239, 255, 0.5)',
-            accent: '#ffc600',
-            accentForeground: '#193549',
-            accentPrimary: '#ffc600',
-            accentLight: '#ffd84d',
-            accentDark: '#e6b200',
-            destructive: '#ff628c',
-            destructiveForeground: '#e1efff',
-            border: 'rgba(225, 239, 255, 0.1)',
-            input: '#122a3a',
-            ring: '#ffc600',
-            gridLine: 'rgba(225, 239, 255, 0.06)',
-            textCompleted: 'rgba(225, 239, 255, 0.15)',
-            textUntyped: 'rgba(225, 239, 255, 0.35)',
-            borderHover: 'rgba(225, 239, 255, 0.25)',
-        },
-        avatarColors: ['#ffc600', '#ff9d00', '#0088ff'],
+        backgroundColor: '#193549',
+        textColor: '#e1efff',
+        borderColor: 'rgba(225, 239, 255, 0.1)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#ffc600',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#193549', '#ffc600', '#0088ff', '#ff628c'],
-        gradient: 'linear-gradient(to right, #e6b200, #ffc600)',
     },
     GruvboxDark: {
         name: 'Gruvbox Dark',
-        mode: 'dark',
-        colors: {
-            background: '#282828',
-            foreground: '#ebdbb2',
-            card: '#3c3836',
-            cardForeground: '#ebdbb2',
-            popover: '#3c3836',
-            popoverForeground: '#ebdbb2',
-            primary: '#fabd2f',
-            primaryForeground: '#282828',
-            secondary: 'rgba(235, 219, 178, 0.08)',
-            secondaryForeground: 'rgba(235, 219, 178, 0.9)',
-            muted: 'rgba(235, 219, 178, 0.04)',
-            mutedForeground: 'rgba(235, 219, 178, 0.5)',
-            accent: '#fabd2f',
-            accentForeground: '#282828',
-            accentPrimary: '#fabd2f',
-            accentLight: '#fcd462',
-            accentDark: '#d79921',
-            destructive: '#fb4934',
-            destructiveForeground: '#ebdbb2',
-            border: 'rgba(235, 219, 178, 0.1)',
-            input: '#1d2021',
-            ring: '#fabd2f',
-            gridLine: 'rgba(235, 219, 178, 0.06)',
-            textCompleted: 'rgba(235, 219, 178, 0.15)',
-            textUntyped: 'rgba(235, 219, 178, 0.35)',
-            borderHover: 'rgba(235, 219, 178, 0.25)',
-        },
-        avatarColors: ['#fabd2f', '#b8bb26', '#83a598'],
+        backgroundColor: '#282828',
+        textColor: '#ebdbb2',
+        borderColor: 'rgba(235, 219, 178, 0.1)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#fabd2f',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#282828', '#fabd2f', '#b8bb26', '#fb4934'],
-        gradient: 'linear-gradient(to right, #d79921, #fabd2f)',
     },
     GitHubLight: {
         name: 'GitHub Light',
-        mode: 'light',
-        colors: {
-            background: '#ffffff',
-            foreground: '#1f2328',
-            card: '#f6f8fa',
-            cardForeground: '#1f2328',
-            popover: '#f6f8fa',
-            popoverForeground: '#1f2328',
-            primary: '#0969da',
-            primaryForeground: '#ffffff',
-            secondary: 'rgba(31, 35, 40, 0.06)',
-            secondaryForeground: 'rgba(31, 35, 40, 0.8)',
-            muted: 'rgba(31, 35, 40, 0.04)',
-            mutedForeground: 'rgba(31, 35, 40, 0.5)',
-            accent: '#0969da',
-            accentForeground: '#ffffff',
-            accentPrimary: '#0969da',
-            accentLight: '#218bff',
-            accentDark: '#0550ae',
-            destructive: '#d1242f',
-            destructiveForeground: '#ffffff',
-            border: 'rgba(31, 35, 40, 0.15)',
-            input: '#f6f8fa',
-            ring: '#0969da',
-            gridLine: 'rgba(31, 35, 40, 0.08)',
-            textCompleted: 'rgba(31, 35, 40, 0.2)',
-            textUntyped: 'rgba(31, 35, 40, 0.4)',
-            borderHover: 'rgba(31, 35, 40, 0.25)',
-        },
-        avatarColors: ['#0969da', '#1a7f37', '#d1242f'],
+        backgroundColor: '#ffffff',
+        textColor: '#1f2328',
+        borderColor: 'rgba(31, 35, 40, 0.15)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#0969da',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#ffffff', '#0969da', '#1a7f37', '#d1242f'],
-        gradient: 'linear-gradient(to right, #0550ae, #0969da)',
     },
     SolarizedLight: {
         name: 'Solarized Light',
-        mode: 'light',
-        colors: {
-            background: '#fdf6e3',
-            foreground: '#657b83',
-            card: '#eee8d5',
-            cardForeground: '#586e75',
-            popover: '#eee8d5',
-            popoverForeground: '#586e75',
-            primary: '#268bd2',
-            primaryForeground: '#fdf6e3',
-            secondary: 'rgba(101, 123, 131, 0.08)',
-            secondaryForeground: 'rgba(101, 123, 131, 0.8)',
-            muted: 'rgba(101, 123, 131, 0.04)',
-            mutedForeground: 'rgba(101, 123, 131, 0.5)',
-            accent: '#268bd2',
-            accentForeground: '#fdf6e3',
-            accentPrimary: '#268bd2',
-            accentLight: '#4ba3e0',
-            accentDark: '#1a6fa8',
-            destructive: '#dc322f',
-            destructiveForeground: '#fdf6e3',
-            border: 'rgba(101, 123, 131, 0.15)',
-            input: '#eee8d5',
-            ring: '#268bd2',
-            gridLine: 'rgba(101, 123, 131, 0.08)',
-            textCompleted: 'rgba(101, 123, 131, 0.2)',
-            textUntyped: 'rgba(101, 123, 131, 0.4)',
-            borderHover: 'rgba(101, 123, 131, 0.25)',
-        },
-        avatarColors: ['#268bd2', '#2aa198', '#b58900'],
+        backgroundColor: '#fdf6e3',
+        textColor: '#657b83',
+        borderColor: 'rgba(101, 123, 131, 0.15)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#268bd2',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#fdf6e3', '#268bd2', '#2aa198', '#b58900'],
-        gradient: 'linear-gradient(to right, #1a6fa8, #268bd2)',
     },
     OneLight: {
         name: 'One Light',
-        mode: 'light',
-        colors: {
-            background: '#fafafa',
-            foreground: '#383a42',
-            card: '#f0f0f0',
-            cardForeground: '#383a42',
-            popover: '#f0f0f0',
-            popoverForeground: '#383a42',
-            primary: '#4078f2',
-            primaryForeground: '#ffffff',
-            secondary: 'rgba(56, 58, 66, 0.06)',
-            secondaryForeground: 'rgba(56, 58, 66, 0.8)',
-            muted: 'rgba(56, 58, 66, 0.04)',
-            mutedForeground: 'rgba(56, 58, 66, 0.5)',
-            accent: '#4078f2',
-            accentForeground: '#ffffff',
-            accentPrimary: '#4078f2',
-            accentLight: '#6694f5',
-            accentDark: '#2f64d8',
-            destructive: '#e45649',
-            destructiveForeground: '#ffffff',
-            border: 'rgba(56, 58, 66, 0.12)',
-            input: '#eaeaeb',
-            ring: '#4078f2',
-            gridLine: 'rgba(56, 58, 66, 0.06)',
-            textCompleted: 'rgba(56, 58, 66, 0.2)',
-            textUntyped: 'rgba(56, 58, 66, 0.4)',
-            borderHover: 'rgba(56, 58, 66, 0.22)',
-        },
-        avatarColors: ['#4078f2', '#50a14f', '#e45649'],
+        backgroundColor: '#fafafa',
+        textColor: '#383a42',
+        borderColor: 'rgba(56, 58, 66, 0.12)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#4078f2',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#fafafa', '#4078f2', '#50a14f', '#e45649'],
-        gradient: 'linear-gradient(to right, #2f64d8, #4078f2)',
     },
     CatppuccinLatte: {
         name: 'Catppuccin Latte',
-        mode: 'light',
-        colors: {
-            background: '#eff1f5',
-            foreground: '#4c4f69',
-            card: '#e6e9ef',
-            cardForeground: '#4c4f69',
-            popover: '#e6e9ef',
-            popoverForeground: '#4c4f69',
-            primary: '#8839ef',
-            primaryForeground: '#eff1f5',
-            secondary: 'rgba(76, 79, 105, 0.06)',
-            secondaryForeground: 'rgba(76, 79, 105, 0.8)',
-            muted: 'rgba(76, 79, 105, 0.04)',
-            mutedForeground: 'rgba(76, 79, 105, 0.5)',
-            accent: '#8839ef',
-            accentForeground: '#eff1f5',
-            accentPrimary: '#8839ef',
-            accentLight: '#a45ff5',
-            accentDark: '#7029d6',
-            destructive: '#d20f39',
-            destructiveForeground: '#eff1f5',
-            border: 'rgba(76, 79, 105, 0.12)',
-            input: '#dce0e8',
-            ring: '#8839ef',
-            gridLine: 'rgba(76, 79, 105, 0.06)',
-            textCompleted: 'rgba(76, 79, 105, 0.2)',
-            textUntyped: 'rgba(76, 79, 105, 0.4)',
-            borderHover: 'rgba(76, 79, 105, 0.22)',
-        },
-        avatarColors: ['#8839ef', '#1e66f5', '#40a02b'],
+        backgroundColor: '#eff1f5',
+        textColor: '#4c4f69',
+        borderColor: 'rgba(76, 79, 105, 0.12)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#8839ef',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#eff1f5', '#8839ef', '#1e66f5', '#40a02b'],
-        gradient: 'linear-gradient(to right, #7029d6, #8839ef)',
     },
     GruvboxLight: {
         name: 'Gruvbox Light',
-        mode: 'light',
-        colors: {
-            background: '#fbf1c7',
-            foreground: '#3c3836',
-            card: '#ebdbb2',
-            cardForeground: '#3c3836',
-            popover: '#ebdbb2',
-            popoverForeground: '#3c3836',
-            primary: '#b57614',
-            primaryForeground: '#fbf1c7',
-            secondary: 'rgba(60, 56, 54, 0.08)',
-            secondaryForeground: 'rgba(60, 56, 54, 0.8)',
-            muted: 'rgba(60, 56, 54, 0.04)',
-            mutedForeground: 'rgba(60, 56, 54, 0.5)',
-            accent: '#b57614',
-            accentForeground: '#fbf1c7',
-            accentPrimary: '#b57614',
-            accentLight: '#d4941a',
-            accentDark: '#945f10',
-            destructive: '#9d0006',
-            destructiveForeground: '#fbf1c7',
-            border: 'rgba(60, 56, 54, 0.15)',
-            input: '#ebdbb2',
-            ring: '#b57614',
-            gridLine: 'rgba(60, 56, 54, 0.08)',
-            textCompleted: 'rgba(60, 56, 54, 0.2)',
-            textUntyped: 'rgba(60, 56, 54, 0.4)',
-            borderHover: 'rgba(60, 56, 54, 0.25)',
-        },
-        avatarColors: ['#b57614', '#79740e', '#076678'],
+        backgroundColor: '#fbf1c7',
+        textColor: '#3c3836',
+        borderColor: 'rgba(60, 56, 54, 0.15)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#b57614',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#fbf1c7', '#b57614', '#79740e', '#9d0006'],
-        gradient: 'linear-gradient(to right, #945f10, #b57614)',
     },
     AyuLight: {
         name: 'Ayu Light',
-        mode: 'light',
-        colors: {
-            background: '#fafafa',
-            foreground: '#575f66',
-            card: '#f3f4f5',
-            cardForeground: '#575f66',
-            popover: '#f3f4f5',
-            popoverForeground: '#575f66',
-            primary: '#ff9940',
-            primaryForeground: '#fafafa',
-            secondary: 'rgba(87, 95, 102, 0.06)',
-            secondaryForeground: 'rgba(87, 95, 102, 0.8)',
-            muted: 'rgba(87, 95, 102, 0.04)',
-            mutedForeground: 'rgba(87, 95, 102, 0.5)',
-            accent: '#ff9940',
-            accentForeground: '#fafafa',
-            accentPrimary: '#ff9940',
-            accentLight: '#ffb36b',
-            accentDark: '#e6832b',
-            destructive: '#f51818',
-            destructiveForeground: '#ffffff',
-            border: 'rgba(87, 95, 102, 0.12)',
-            input: '#eef0f1',
-            ring: '#ff9940',
-            gridLine: 'rgba(87, 95, 102, 0.06)',
-            textCompleted: 'rgba(87, 95, 102, 0.2)',
-            textUntyped: 'rgba(87, 95, 102, 0.4)',
-            borderHover: 'rgba(87, 95, 102, 0.22)',
-        },
-        avatarColors: ['#ff9940', '#399ee6', '#86b300'],
+        backgroundColor: '#fafafa',
+        textColor: '#575f66',
+        borderColor: 'rgba(87, 95, 102, 0.12)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#ff9940',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#fafafa', '#ff9940', '#399ee6', '#86b300'],
-        gradient: 'linear-gradient(to right, #e6832b, #ff9940)',
     },
     RosePineDawn: {
         name: 'Rosé Pine Dawn',
-        mode: 'light',
-        colors: {
-            background: '#faf4ed',
-            foreground: '#575279',
-            card: '#fffaf3',
-            cardForeground: '#575279',
-            popover: '#f2e9e1',
-            popoverForeground: '#575279',
-            primary: '#907aa9',
-            primaryForeground: '#faf4ed',
-            secondary: 'rgba(87, 82, 121, 0.06)',
-            secondaryForeground: 'rgba(87, 82, 121, 0.8)',
-            muted: 'rgba(87, 82, 121, 0.04)',
-            mutedForeground: '#9893a5',
-            accent: '#907aa9',
-            accentForeground: '#faf4ed',
-            accentPrimary: '#907aa9',
-            accentLight: '#c4a7e7',
-            accentDark: '#796ba2',
-            destructive: '#b4637a',
-            destructiveForeground: '#faf4ed',
-            border: 'rgba(87, 82, 121, 0.12)',
-            input: '#f2e9e1',
-            ring: '#907aa9',
-            gridLine: 'rgba(87, 82, 121, 0.06)',
-            textCompleted: 'rgba(87, 82, 121, 0.2)',
-            textUntyped: 'rgba(87, 82, 121, 0.4)',
-            borderHover: 'rgba(87, 82, 121, 0.22)',
-        },
-        avatarColors: ['#907aa9', '#d7827e', '#56949f'],
+        backgroundColor: '#faf4ed',
+        textColor: '#575279',
+        borderColor: 'rgba(87, 82, 121, 0.12)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#907aa9',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#faf4ed', '#907aa9', '#d7827e', '#56949f'],
-        gradient: 'linear-gradient(to right, #796ba2, #907aa9)',
     },
     TokyoNightDay: {
         name: 'Tokyo Night Day',
-        mode: 'light',
-        colors: {
-            background: '#e6e7ed',
-            foreground: '#343b59',
-            card: '#d6d8df',
-            cardForeground: '#343b59',
-            popover: '#d6d8df',
-            popoverForeground: '#343b59',
-            primary: '#2959aa',
-            primaryForeground: '#ffffff',
-            secondary: 'rgba(52, 59, 89, 0.06)',
-            secondaryForeground: 'rgba(52, 59, 89, 0.8)',
-            muted: 'rgba(52, 59, 89, 0.04)',
-            mutedForeground: '#707280',
-            accent: '#2959aa',
-            accentForeground: '#ffffff',
-            accentPrimary: '#2959aa',
-            accentLight: '#2e7de9',
-            accentDark: '#1d3f7a',
-            destructive: '#942f2f',
-            destructiveForeground: '#e6e7ed',
-            border: 'rgba(52, 59, 89, 0.15)',
-            input: '#e6e7ed',
-            ring: '#2959aa',
-            gridLine: 'rgba(52, 59, 89, 0.08)',
-            textCompleted: 'rgba(52, 59, 89, 0.2)',
-            textUntyped: 'rgba(52, 59, 89, 0.4)',
-            borderHover: 'rgba(52, 59, 89, 0.25)',
-        },
-        avatarColors: ['#2959aa', '#587539', '#8f5e15'],
+        backgroundColor: '#e6e7ed',
+        textColor: '#343b59',
+        borderColor: 'rgba(52, 59, 89, 0.15)',
+        borderWidth: 1,
+        borderRadius: 8,
+        accentColor: '#2959aa',
+        font: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
+        fontWeight: 400,
         previewColors: ['#e6e7ed', '#2959aa', '#587539', '#8f5e15'],
-        gradient: 'linear-gradient(to right, #1d3f7a, #2959aa)',
     },
 };
+
+export const THEMES: Record<PlayerColor['tag'], ResolvedTheme> = Object.fromEntries(
+    Object.entries(THEME_PRESETS).map(([key, preset]) => [
+        key,
+        resolveTheme(preset, preset.name, preset.previewColors),
+    ])
+) as Record<PlayerColor['tag'], ResolvedTheme>;
+
+export function resolveCustomTheme(settings: ThemeSettings): ResolvedTheme {
+    return resolveTheme(settings, 'Custom', [settings.backgroundColor, settings.accentColor]);
+}
 
 export function getThemeConfig(color: PlayerColor): ThemeConfig {
     if (color.tag in THEMES) {
@@ -649,6 +376,8 @@ export function getInitialTheme(): string {
     try {
         const saved = localStorage.getItem('selectedTheme');
         if (saved && saved in THEMES) return saved;
+        const custom = localStorage.getItem('customTheme');
+        if (custom) return 'custom';
     } catch (_e) {
     }
 
@@ -656,14 +385,39 @@ export function getInitialTheme(): string {
     return prefersDark ? DEFAULT_DARK_THEME_TAG : DEFAULT_LIGHT_THEME_TAG;
 }
 
+export function getCustomThemeSettings(): ThemeSettings | null {
+    try {
+        const raw = localStorage.getItem('customTheme');
+        if (raw) return JSON.parse(raw) as ThemeSettings;
+    } catch (_e) {
+    }
+    return null;
+}
+
 export function applyTheme(colorTag: string): void {
-    let theme: ThemeConfig;
-    if (colorTag in THEMES) {
+    let theme: ResolvedTheme;
+    if (colorTag === 'custom') {
+        const custom = getCustomThemeSettings();
+        theme = custom ? resolveCustomTheme(custom) : THEMES[DEFAULT_DARK_THEME_TAG];
+    } else if (colorTag in THEMES) {
         theme = THEMES[colorTag as PlayerColor['tag']];
     } else {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         theme = prefersDark ? THEMES[DEFAULT_DARK_THEME_TAG] : THEMES[DEFAULT_LIGHT_THEME_TAG];
     }
+    applyResolvedTheme(theme, colorTag);
+}
+
+export function applyCustomTheme(settings: ThemeSettings): void {
+    const theme = resolveCustomTheme(settings);
+    try {
+        localStorage.setItem('customTheme', JSON.stringify(settings));
+    } catch (_e) {
+    }
+    applyResolvedTheme(theme, 'custom');
+}
+
+function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     const root = document.documentElement;
 
     root.style.setProperty('--background', theme.colors.background);
@@ -702,7 +456,9 @@ export function applyTheme(colorTag: string): void {
     root.style.setProperty('--color-box-border', theme.colors.border);
 
     try {
-        localStorage.setItem('selectedTheme', colorTag);
+        localStorage.setItem('selectedTheme', tag);
     } catch (_e) {
     }
 }
+
+export { DEFAULT_THEME_SETTINGS };
