@@ -26,7 +26,7 @@ export const LoadingDots = () => {
                 <Logo />
                 <div
                     ref={spinnerRef}
-                    className="fixed top-1/2 left-1/2 -ml-4 -mt-4 w-8 h-8 border-3 border-border border-t-muted-foreground rounded-full"
+                    className="fixed top-1/2 left-1/2 -ml-4 -mt-4 w-8 h-8 border-[3px] border-border border-t-muted-foreground rounded-full"
                     style={{
                         animation: 'spin 0.8s linear infinite'
                     }}
