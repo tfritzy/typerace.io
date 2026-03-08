@@ -21,8 +21,6 @@ type ThemeEditorModalProps = {
     onClose: () => void;
 };
 
-const PIXEL_TAGS = new Set<string>(['Pico8', 'Endesga', 'Sweetie16']);
-
 function cssColorToHex(color: string): string {
     if (color.startsWith('#')) return color;
     const el = document.createElement('div');
@@ -187,9 +185,6 @@ export const ThemeEditorModal = ({ currentColor, onSave, onClose }: ThemeEditorM
         () => Object.entries(THEMES) as [PlayerColor['tag'], (typeof THEMES)[keyof typeof THEMES]][],
         []
     );
-    const darkThemes = themeEntries.filter(([tag, t]) => t.mode === 'dark' && !PIXEL_TAGS.has(tag));
-    const lightThemes = themeEntries.filter(([, t]) => t.mode === 'light');
-    const pixelThemes = themeEntries.filter(([tag]) => PIXEL_TAGS.has(tag));
 
     const handlePresetSelect = (tag: string) => {
         const presetSettings = settingsFromPreset(tag);
@@ -241,12 +236,6 @@ export const ThemeEditorModal = ({ currentColor, onSave, onClose }: ThemeEditorM
         onClose();
     };
 
-    const sections = [
-        { label: 'Dark', themes: darkThemes },
-        { label: 'Light', themes: lightThemes },
-        { label: 'Pixel', themes: pixelThemes },
-    ];
-
     return (
         <Dialog open={true} onOpenChange={(open) => { if (!open) handleCancel(); }}>
             <DialogContent className="min-w-[520px] max-w-[680px]">
@@ -257,49 +246,49 @@ export const ThemeEditorModal = ({ currentColor, onSave, onClose }: ThemeEditorM
                 <div className="max-h-[70vh] overflow-y-auto pr-1">
                     <div className="mb-4">
                         <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                            Presets
+                            Theme
                         </div>
-                        <div className="space-y-3">
-                            {sections.map((section) => (
-                                <div key={section.label}>
-                                    <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
-                                        {section.label}
+                        <div className="grid grid-cols-3 gap-1.5">
+                            {themeEntries.map(([tag, theme]) => (
+                                <button
+                                    key={tag}
+                                    type="button"
+                                    onClick={() => handlePresetSelect(tag)}
+                                    className={`border rounded-md px-2 py-1.5 text-left transition-all cursor-pointer ${
+                                        selectedPreset === tag
+                                            ? 'border-primary bg-secondary ring-1 ring-primary/30'
+                                            : 'border-border hover:border-border-hover'
+                                    }`}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <div
+                                            className="shrink-0 w-7 h-5 flex items-center justify-center gap-[2px] border border-border/50 rounded-sm"
+                                            style={{ backgroundColor: theme.colors.background }}
+                                        >
+                                            {theme.previewColors.slice(0, 3).map((color, i) => (
+                                                <span
+                                                    key={i}
+                                                    className="w-1 h-1 rounded-full"
+                                                    style={{ backgroundColor: color }}
+                                                />
+                                            ))}
+                                        </div>
+                                        <span className="text-xs text-foreground truncate">
+                                            {theme.name}
+                                        </span>
                                     </div>
-                                    <div className="grid grid-cols-3 gap-1.5">
-                                        {section.themes.map(([tag, theme]) => (
-                                            <button
-                                                key={tag}
-                                                type="button"
-                                                onClick={() => handlePresetSelect(tag)}
-                                                className={`border rounded-md px-2 py-1.5 text-left transition-all cursor-pointer ${
-                                                    selectedPreset === tag
-                                                        ? 'border-primary bg-secondary ring-1 ring-primary/30'
-                                                        : 'border-border hover:border-border-hover'
-                                                }`}
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <div
-                                                        className="shrink-0 w-7 h-5 flex items-center justify-center gap-[2px] border border-border/50 rounded-sm"
-                                                        style={{ backgroundColor: theme.colors.background }}
-                                                    >
-                                                        {theme.previewColors.slice(0, 3).map((color, i) => (
-                                                            <span
-                                                                key={i}
-                                                                className="w-1 h-1 rounded-full"
-                                                                style={{ backgroundColor: color }}
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                    <span className="text-xs text-foreground truncate">
-                                                        {theme.name}
-                                                    </span>
-                                                </div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
+                                </button>
                             ))}
                         </div>
+                    </div>
+
+                    <div className="border-t border-border my-4" />
+
+                    <div className="mb-4">
+                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                            Font
+                        </div>
+                        <FontPicker value={settings.font} onChange={handleFontChange} />
                     </div>
 
                     <div className="border-t border-border my-4" />
@@ -332,7 +321,7 @@ export const ThemeEditorModal = ({ currentColor, onSave, onClose }: ThemeEditorM
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3 mb-4">
+                        <div className="grid grid-cols-2 gap-3">
                             <div>
                                 <label className="text-xs text-muted-foreground block mb-1.5">
                                     Border Radius
@@ -375,11 +364,6 @@ export const ThemeEditorModal = ({ currentColor, onSave, onClose }: ThemeEditorM
                                     </span>
                                 </div>
                             </div>
-                        </div>
-
-                        <div>
-                            <label className="text-xs text-muted-foreground block mb-1.5">Font</label>
-                            <FontPicker value={settings.font} onChange={handleFontChange} />
                         </div>
                     </div>
                 </div>
