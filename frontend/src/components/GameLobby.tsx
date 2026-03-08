@@ -26,7 +26,7 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
   }, [gameUrl]);
 
   return (
-    <div className="box w-full px-4 py-6 sm:px-8 sm:py-12 min-h-[250px] sm:min-h-[430px] flex flex-col justify-center gap-4 sm:gap-6">
+    <div className="box w-full px-8 py-12 min-h-[430px] flex flex-col justify-center gap-6">
       <div className="text-center space-y-4">
         <h2 className="text-xl font-semibold text-secondary-foreground">
           {isOwner ? "Waiting for players..." : "Waiting for owner to start..."}

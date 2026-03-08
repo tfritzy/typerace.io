@@ -76,7 +76,7 @@ export const LobbyPage = () => {
       <Header />
       <div className="flex-1 flex items-center justify-center p-4 min-h-0">
         <div className="content-container">
-          <div className="text-base sm:text-2xl">
+          <div className="text-2xl">
             <TypeBox
               ref={typeBoxRef}
               phrase={startupPhrase}
