@@ -209,7 +209,7 @@ export const ProfilePage = () => {
     }, [gameRecords, viewedPlayer]);
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-dvh">
             <Header hideAvatar={true} />
 
             <div className="flex flex-col items-center px-4 pb-12">

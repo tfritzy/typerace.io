@@ -167,7 +167,7 @@ export const GamePage = () => {
     : false;
 
   return (
-    <div className="relative min-h-screen flex flex-col">
+    <div className="relative min-h-dvh flex flex-col">
       <Header />
 
       <Countdown />
