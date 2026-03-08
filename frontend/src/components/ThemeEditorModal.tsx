@@ -21,34 +21,102 @@ type ThemeEditorModalProps = {
     onClose: () => void;
 };
 
-function cssColorToHex(color: string): string {
-    if (color.startsWith('#')) return color;
-    const el = document.createElement('div');
-    el.style.color = color;
-    document.body.appendChild(el);
-    const computed = getComputedStyle(el).color;
-    document.body.removeChild(el);
-    const match = computed.match(/(\d+),\s*(\d+),\s*(\d+)/);
-    if (!match) return '#333333';
-    return `#${parseInt(match[1]).toString(16).padStart(2, '0')}${parseInt(match[2]).toString(16).padStart(2, '0')}${parseInt(match[3]).toString(16).padStart(2, '0')}`;
+function ThemeDropdown({
+    value,
+    onChange,
+}: {
+    value: string;
+    onChange: (tag: string) => void;
+}) {
+    const [open, setOpen] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const themes = useMemo(
+        () => Object.entries(THEMES) as [PlayerColor['tag'], (typeof THEMES)[keyof typeof THEMES]][],
+        []
+    );
+    const currentTheme = value in THEMES ? THEMES[value as keyof typeof THEMES] : THEMES.CatppuccinMocha;
+
+    useEffect(() => {
+        if (!open) return;
+        const handleClick = (e: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, [open]);
+
+    return (
+        <div ref={containerRef} className="relative">
+            <button
+                type="button"
+                onClick={() => setOpen(!open)}
+                className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm text-foreground cursor-pointer text-left flex items-center justify-between gap-3 hover:border-border-hover transition-colors"
+            >
+                <div className="flex items-center gap-3">
+                    <div
+                        className="shrink-0 w-9 h-6 flex items-center justify-center gap-[3px] border border-border"
+                        style={{
+                            borderRadius: `${Math.min(currentTheme.borderRadius, 6)}px`,
+                            background: currentTheme.colors.background,
+                        }}
+                    >
+                        {currentTheme.previewColors.slice(0, 4).map((color, i) => (
+                            <div key={i} className="size-1.5 rounded-full" style={{ background: color }} />
+                        ))}
+                    </div>
+                    <span>{currentTheme.name}</span>
+                </div>
+                <svg
+                    className="text-muted-foreground shrink-0"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                >
+                    <polyline points={open ? '18 15 12 9 6 15' : '6 9 12 15 18 9'} />
+                </svg>
+            </button>
+            {open && (
+                <div className="absolute z-50 w-full mt-1 border border-border bg-popover shadow-lg overflow-y-auto rounded-lg max-h-80">
+                    {themes.map(([tag, theme]) => (
+                        <button
+                            key={tag}
+                            type="button"
+                            onClick={() => {
+                                onChange(tag);
+                                setOpen(false);
+                            }}
+                            className={`w-full border-0 cursor-pointer text-left flex items-center gap-3 px-3 py-2 hover:bg-secondary/50 transition-colors ${
+                                value === tag ? 'bg-secondary' : 'bg-transparent'
+                            }`}
+                        >
+                            <div
+                                className="shrink-0 w-9 h-6 flex items-center justify-center gap-[3px] border border-border"
+                                style={{
+                                    borderRadius: `${Math.min(theme.borderRadius, 6)}px`,
+                                    background: theme.colors.background,
+                                }}
+                            >
+                                {theme.previewColors.slice(0, 4).map((color, i) => (
+                                    <div key={i} className="size-1.5 rounded-full" style={{ background: color }} />
+                                ))}
+                            </div>
+                            <span className="text-sm text-foreground">{theme.name}</span>
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 }
 
-function settingsFromPreset(tag: string): ThemeSettings | null {
-    const preset = THEME_PRESETS[tag as PlayerColor['tag']];
-    if (!preset) return null;
-    return {
-        backgroundColor: cssColorToHex(preset.backgroundColor),
-        textColor: cssColorToHex(preset.textColor),
-        accentColor: cssColorToHex(preset.accentColor),
-        borderColor: cssColorToHex(preset.borderColor),
-        borderWidth: preset.borderWidth,
-        borderRadius: preset.borderRadius,
-        font: preset.font,
-        fontWeight: preset.fontWeight,
-    };
-}
-
-function FontPicker({ value, onChange }: { value: string; onChange: (font: string) => void }) {
+function FontDropdown({ value, onChange }: { value: string; onChange: (font: string) => void }) {
     const [open, setOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -74,14 +142,14 @@ function FontPicker({ value, onChange }: { value: string; onChange: (font: strin
             <button
                 type="button"
                 onClick={() => setOpen(!open)}
-                className="w-full bg-input border border-border rounded-md px-3 py-2 text-sm text-foreground cursor-pointer text-left flex items-center justify-between hover:border-border-hover transition-colors"
+                className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm text-foreground cursor-pointer text-left flex items-center justify-between hover:border-border-hover transition-colors"
                 style={{ fontFamily: fontNameToCss(value) }}
             >
                 <span>{value}</span>
                 <svg
                     className="text-muted-foreground shrink-0"
-                    width="14"
-                    height="14"
+                    width="16"
+                    height="16"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -118,101 +186,55 @@ function FontPicker({ value, onChange }: { value: string; onChange: (font: strin
     );
 }
 
-function ColorField({
-    label,
-    value,
-    onChange,
-}: {
-    label: string;
-    value: string;
-    onChange: (v: string) => void;
-}) {
-    return (
-        <div>
-            <label className="text-xs text-muted-foreground block mb-1.5">{label}</label>
-            <div className="flex items-center gap-2">
-                <label className="relative shrink-0 cursor-pointer">
-                    <input
-                        type="color"
-                        value={value}
-                        onChange={(e) => onChange(e.target.value)}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    />
-                    <div
-                        className="w-9 h-9 rounded-md border border-border"
-                        style={{ backgroundColor: value }}
-                    />
-                </label>
-                <div className="flex-1 bg-input border border-border rounded-md px-2.5 py-1.5 flex items-center gap-2">
-                    <span
-                        className="w-3 h-3 rounded-full border border-border shrink-0"
-                        style={{ backgroundColor: value }}
-                    />
-                    <span className="text-xs font-mono text-foreground">{value.toUpperCase()}</span>
-                </div>
-            </div>
-        </div>
-    );
-}
-
 export const ThemeEditorModal = ({ currentColor, onSave, onClose }: ThemeEditorModalProps) => {
     const originalThemeTag = useRef(getInitialTheme());
     const originalCustomSettings = useRef(getCustomThemeSettings());
 
-    const [selectedPreset, setSelectedPreset] = useState<string | null>(() => {
-        if (currentColor === 'custom') return null;
+    const [selectedPreset, setSelectedPreset] = useState<string>(() => {
         if (currentColor in THEMES) return currentColor;
         return 'CatppuccinMocha';
     });
 
-    const [settings, setSettings] = useState<ThemeSettings>(() => {
+    const [selectedFont, setSelectedFont] = useState<string>(() => {
         if (currentColor === 'custom') {
             const custom = getCustomThemeSettings();
-            if (custom) {
-                return {
-                    ...custom,
-                    backgroundColor: cssColorToHex(custom.backgroundColor),
-                    textColor: cssColorToHex(custom.textColor),
-                    accentColor: cssColorToHex(custom.accentColor),
-                    borderColor: cssColorToHex(custom.borderColor),
-                };
-            }
+            if (custom) return custom.font;
         }
-        return settingsFromPreset(currentColor) || settingsFromPreset('CatppuccinMocha')!;
+        const preset = THEME_PRESETS[currentColor as PlayerColor['tag']];
+        return preset?.font || 'Inter';
     });
 
-    const themeEntries = useMemo(
-        () => Object.entries(THEMES) as [PlayerColor['tag'], (typeof THEMES)[keyof typeof THEMES]][],
-        []
-    );
-
-    const handlePresetSelect = (tag: string) => {
-        const presetSettings = settingsFromPreset(tag);
-        if (!presetSettings) return;
+    const handleThemeSelect = (tag: string) => {
         setSelectedPreset(tag);
-        setSettings(presetSettings);
         applyTheme(tag);
-    };
-
-    const handleSettingChange = (updates: Partial<ThemeSettings>) => {
-        const updated = { ...settings, ...updates };
-        setSettings(updated);
-        setSelectedPreset(null);
-        applyCustomTheme(updated);
+        const preset = THEME_PRESETS[tag as PlayerColor['tag']];
+        if (preset) {
+            applyCustomTheme({ ...preset, font: selectedFont });
+        }
     };
 
     const handleFontChange = (fontName: string) => {
         const font = GOOGLE_FONTS.find((f) => f.name === fontName);
         if (!font) return;
-        const weight = font.weights.includes(400) ? 400 : font.weights[0];
-        handleSettingChange({ font: fontName, fontWeight: weight });
+        setSelectedFont(fontName);
+        const preset = THEME_PRESETS[selectedPreset as PlayerColor['tag']];
+        if (preset) {
+            const weight = font.weights.includes(400) ? 400 : font.weights[0];
+            applyCustomTheme({ ...preset, font: fontName, fontWeight: weight });
+        }
     };
 
     const handleSave = () => {
-        if (selectedPreset && selectedPreset in THEME_PRESETS) {
-            onSave(selectedPreset);
-        } else {
-            onSave('custom', settings);
+        const preset = THEME_PRESETS[selectedPreset as PlayerColor['tag']];
+        if (preset) {
+            const defaultFont = preset.font;
+            if (selectedFont === defaultFont) {
+                onSave(selectedPreset);
+            } else {
+                const font = GOOGLE_FONTS.find((f) => f.name === selectedFont);
+                const weight = font && font.weights.includes(400) ? 400 : font?.weights[0] || 400;
+                onSave('custom', { ...preset, font: selectedFont, fontWeight: weight });
+            }
         }
         onClose();
     };
@@ -238,133 +260,24 @@ export const ThemeEditorModal = ({ currentColor, onSave, onClose }: ThemeEditorM
 
     return (
         <Dialog open={true} onOpenChange={(open) => { if (!open) handleCancel(); }}>
-            <DialogContent className="min-w-[520px] max-w-[680px]">
+            <DialogContent className="max-w-[420px]">
                 <DialogHeader className="mb-2">
                     <DialogTitle>Theme Editor</DialogTitle>
                 </DialogHeader>
 
-                <div className="max-h-[70vh] overflow-y-auto pr-1">
-                    <div className="mb-4">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                <div className="space-y-4">
+                    <div>
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
                             Theme
-                        </div>
-                        <div className="grid grid-cols-3 gap-1.5">
-                            {themeEntries.map(([tag, theme]) => (
-                                <button
-                                    key={tag}
-                                    type="button"
-                                    onClick={() => handlePresetSelect(tag)}
-                                    className={`border rounded-md px-2 py-1.5 text-left transition-all cursor-pointer ${
-                                        selectedPreset === tag
-                                            ? 'border-primary bg-secondary ring-1 ring-primary/30'
-                                            : 'border-border hover:border-border-hover'
-                                    }`}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <div
-                                            className="shrink-0 w-7 h-5 flex items-center justify-center gap-[2px] border border-border/50 rounded-sm"
-                                            style={{ backgroundColor: theme.colors.background }}
-                                        >
-                                            {theme.previewColors.slice(0, 3).map((color, i) => (
-                                                <span
-                                                    key={i}
-                                                    className="w-1 h-1 rounded-full"
-                                                    style={{ backgroundColor: color }}
-                                                />
-                                            ))}
-                                        </div>
-                                        <span className="text-xs text-foreground truncate">
-                                            {theme.name}
-                                        </span>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
+                        </label>
+                        <ThemeDropdown value={selectedPreset} onChange={handleThemeSelect} />
                     </div>
 
-                    <div className="border-t border-border my-4" />
-
-                    <div className="mb-4">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                    <div>
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
                             Font
-                        </div>
-                        <FontPicker value={settings.font} onChange={handleFontChange} />
-                    </div>
-
-                    <div className="border-t border-border my-4" />
-
-                    <div className="mb-4">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                            Customize
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3 mb-4">
-                            <ColorField
-                                label="Background"
-                                value={settings.backgroundColor}
-                                onChange={(v) => handleSettingChange({ backgroundColor: v })}
-                            />
-                            <ColorField
-                                label="Text"
-                                value={settings.textColor}
-                                onChange={(v) => handleSettingChange({ textColor: v })}
-                            />
-                            <ColorField
-                                label="Accent"
-                                value={settings.accentColor}
-                                onChange={(v) => handleSettingChange({ accentColor: v })}
-                            />
-                            <ColorField
-                                label="Border"
-                                value={settings.borderColor}
-                                onChange={(v) => handleSettingChange({ borderColor: v })}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                            <div>
-                                <label className="text-xs text-muted-foreground block mb-1.5">
-                                    Border Radius
-                                </label>
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="16"
-                                        step="2"
-                                        value={settings.borderRadius}
-                                        onChange={(e) =>
-                                            handleSettingChange({ borderRadius: parseInt(e.target.value) })
-                                        }
-                                        className="flex-1"
-                                    />
-                                    <span className="text-xs text-muted-foreground w-8 text-right">
-                                        {settings.borderRadius}px
-                                    </span>
-                                </div>
-                            </div>
-                            <div>
-                                <label className="text-xs text-muted-foreground block mb-1.5">
-                                    Border Width
-                                </label>
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="3"
-                                        step="1"
-                                        value={settings.borderWidth}
-                                        onChange={(e) =>
-                                            handleSettingChange({ borderWidth: parseInt(e.target.value) })
-                                        }
-                                        className="flex-1"
-                                    />
-                                    <span className="text-xs text-muted-foreground w-8 text-right">
-                                        {settings.borderWidth}px
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                        </label>
+                        <FontDropdown value={selectedFont} onChange={handleFontChange} />
                     </div>
                 </div>
 
