@@ -267,7 +267,7 @@ export const ProfilePage = () => {
                         )}
                         {viewedPlayer && (
                             <>
-                                <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6">
+                                <div className={`flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6 ${isOwnProfile ? 'pt-8 sm:pt-0' : ''}`}>
                                     <PlayerAvatar
                                         size={80}
                                         identity={viewedPlayer.identity.toHexString()}
@@ -276,8 +276,8 @@ export const ProfilePage = () => {
                                     />
 
                                     <div className="flex-1 min-w-0 w-full">
-                                        <div className="flex items-center gap-2 mb-3 min-w-0 pr-10 sm:pr-0">
-                                            <h1 className="text-foreground text-2xl sm:text-3xl font-bold m-0 truncate">
+                                        <div className="flex items-center gap-2 mb-3 min-w-0">
+                                            <h1 className="text-foreground text-2xl sm:text-3xl font-bold m-0 truncate" title={viewedPlayer.name}>
                                                 {viewedPlayer.name}
                                             </h1>
                                             {isOwnProfile && (
@@ -301,7 +301,7 @@ export const ProfilePage = () => {
                                             <span className="text-muted-foreground text-xs sm:text-sm font-mono">
                                                 {viewedPlayer.xp}/{viewedPlayer.xpRequiredForNextLevel}
                                             </span>
-                                            <div className="basis-full sm:basis-auto sm:flex-1 h-2 bg-secondary rounded-[5px] overflow-hidden">
+                                            <div className="w-full sm:flex-1 h-2 sm:h-2.5 bg-secondary rounded-[5px] overflow-hidden">
                                                 <div
                                                     className="h-full rounded-[5px] transition-[width_0.3s_ease]"
                                                     style={{
