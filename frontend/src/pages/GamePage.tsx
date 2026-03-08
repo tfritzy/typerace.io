@@ -167,13 +167,13 @@ export const GamePage = () => {
     : false;
 
   return (
-    <div className="relative min-h-dvh flex flex-col">
+    <div className="relative h-full flex flex-col">
       <Header />
 
       <Countdown />
 
-      <div className="flex-1 flex flex-col items-center justify-center px-4">
-        <div className="content-container w-full">
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4">
+        <div className="content-container w-full my-auto">
           <div className="mb-3 space-y-3">
             {Array.from({ length: maxPlayers }).map((_, index) => {
               const pp = gamePlayerProgress[index];

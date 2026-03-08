@@ -470,9 +470,9 @@ export const SiteStatsPage = () => {
     };
 
     return (
-        <div className="min-h-dvh">
+        <div className="h-full flex flex-col">
             <Header />
-            <div className="flex flex-col items-center px-4 pb-12">
+            <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
                 <div className="content-container">
                     <h1 className="text-3xl font-bold mb-6 text-foreground">Site Statistics</h1>
 
