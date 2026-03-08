@@ -19,12 +19,12 @@ spacetime start
 
 2. Publish spacetime module
 ```bash
-spacetime publish --project-path spacetimedb typerace
+spacetime publish --module-path spacetimedb typerace
 ```
 
 3. Generate TypeScript bindings from the SpacetimeDB module:
 ```bash
-spacetime generate --lang typescript --out-dir src/module_bindings --project-path spacetimedb
+spacetime generate --lang typescript --out-dir src/module_bindings --module-path spacetimedb
 ```
 
 4. Install dependencies:

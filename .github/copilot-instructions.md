@@ -93,16 +93,16 @@ Always check the table definition for available indexes before writing queries.
 ### Local dev commands
 
 Generate bindings:
-spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
+spacetime generate --lang typescript --out-dir frontend/module_bindings --module-path spacetimedb
 
 If you're curious about the state of a table:
 spacetime sql typerace "SELECT \* from player"
 
 Publish module without wiping db:
-spacetime publish --project-path spacetimedb typerace
+spacetime publish --module-path spacetimedb typerace
 
 Publish module with wiping db:
-spacetime publish -c --project-path spacetimedb typerace -y
+spacetime publish -c --module-path spacetimedb typerace -y
 
 ### File Creation Policy
 
