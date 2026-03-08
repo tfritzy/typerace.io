@@ -40,7 +40,7 @@ jobs:
 
       - name: Generate TypeScript bindings
         run: |
-          spacetime generate --lang typescript --out-dir src/module_bindings --project-path spacetimedb
+          spacetime generate --lang typescript --out-dir src/module_bindings --module-path spacetimedb
 
       - name: Build with Vite
         run: npm run build
