@@ -214,9 +214,9 @@ export const ProfilePage = () => {
 
             <div className="flex flex-col items-center px-4 pb-12">
                 <div className="content-container">
-                    <div className="box box-shadow rounded-xl p-8 mb-8 relative">
+                    <div className="box box-shadow rounded-xl p-4 sm:p-8 mb-8 relative">
                         {isOwnProfile && (
-                            <div className="absolute top-5 right-5 flex items-center gap-2">
+                            <div className="absolute top-3 right-3 sm:top-5 sm:right-5 flex items-center gap-2">
                                 <div className="relative">
                                     <button
                                         onClick={handleMenuToggle}
@@ -267,7 +267,7 @@ export const ProfilePage = () => {
                         )}
                         {viewedPlayer && (
                             <>
-                                <div className="flex items-start gap-6 mb-6">
+                                <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6">
                                     <PlayerAvatar
                                         size={80}
                                         identity={viewedPlayer.identity.toHexString()}
@@ -275,9 +275,9 @@ export const ProfilePage = () => {
                                         isHighlighted={true}
                                     />
 
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <h1 className="text-foreground text-3xl font-bold m-0">
+                                    <div className="flex-1 min-w-0 w-full">
+                                        <div className="flex items-center gap-2 mb-3 min-w-0 pr-10 sm:pr-0">
+                                            <h1 className="text-foreground text-2xl sm:text-3xl font-bold m-0 truncate">
                                                 {viewedPlayer.name}
                                             </h1>
                                             {isOwnProfile && (
@@ -294,11 +294,14 @@ export const ProfilePage = () => {
                                             )}
                                         </div>
 
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-muted-foreground text-sm font-medium">
+                                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                                            <span className="text-muted-foreground text-xs sm:text-sm font-medium">
                                                 Level {viewedPlayer.level}
                                             </span>
-                                            <div className="flex-1 h-2.5 bg-secondary rounded-[5px] overflow-hidden">
+                                            <span className="text-muted-foreground text-xs sm:text-sm font-mono">
+                                                {viewedPlayer.xp}/{viewedPlayer.xpRequiredForNextLevel}
+                                            </span>
+                                            <div className="basis-full sm:basis-auto sm:flex-1 h-2 bg-secondary rounded-[5px] overflow-hidden">
                                                 <div
                                                     className="h-full rounded-[5px] transition-[width_0.3s_ease]"
                                                     style={{
@@ -307,21 +310,18 @@ export const ProfilePage = () => {
                                                     }}
                                                 />
                                             </div>
-                                            <span className="text-muted-foreground text-sm font-mono">
-                                                {viewedPlayer.xp}/{viewedPlayer.xpRequiredForNextLevel}
-                                            </span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4 mt-8">
-                                    <div className="bg-black/5 border border-border rounded-lg p-5">
-                                        <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-6 sm:mt-8">
+                                    <div className="bg-black/5 border border-border rounded-lg p-4 sm:p-5">
+                                        <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                             <div>
                                                 <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
                                                     Games Played
                                                 </div>
-                                                <div className="text-foreground text-3xl font-bold">
+                                                <div className="text-foreground text-2xl sm:text-3xl font-bold">
                                                     {viewedPlayer.totalGames}
                                                 </div>
                                             </div>
@@ -329,19 +329,19 @@ export const ProfilePage = () => {
                                                 <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
                                                     Wins
                                                 </div>
-                                                <div className="text-foreground text-3xl font-bold">
+                                                <div className="text-foreground text-2xl sm:text-3xl font-bold">
                                                     {viewedPlayer.wins}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="bg-black/5 border border-border rounded-lg p-5">
-                                        <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-black/5 border border-border rounded-lg p-4 sm:p-5">
+                                        <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                             <div>
                                                 <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
                                                     Words Typed
                                                 </div>
-                                                <div className="text-foreground text-3xl font-bold">
+                                                <div className="text-foreground text-2xl sm:text-3xl font-bold">
                                                     {formatNumber(viewedPlayer.totalWordsTyped)}
                                                 </div>
                                             </div>
@@ -349,7 +349,7 @@ export const ProfilePage = () => {
                                                 <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
                                                     Time Spent
                                                 </div>
-                                                <div className="text-foreground text-3xl font-bold">
+                                                <div className="text-foreground text-2xl sm:text-3xl font-bold">
                                                     {formatTimeSpent(Number(viewedPlayer.totalTimeSpentMs))}
                                                 </div>
                                             </div>
