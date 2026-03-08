@@ -49,6 +49,16 @@
   }
 }
 
+html {
+  font-size: 87.5%;
+}
+
+@media (min-width: 640px) {
+  html {
+    font-size: 100%;
+  }
+}
+
 :root {
   --radius: 0.5rem;
 
