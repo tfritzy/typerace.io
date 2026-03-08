@@ -6,7 +6,6 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;400;500;600&display=swap" rel="stylesheet">
     
     <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="/favicons/favicon.ico" />
@@ -76,19 +75,40 @@
     <script>
       (function() {
         try {
-          const savedColor = localStorage.getItem('accentColor');
-          if (savedColor) {
-            document.documentElement.style.setProperty('--color-accent', savedColor);
+          var themes = {
+            Dracula: {bg:'#282a36',fg:'#f8f8f2'}, Monokai: {bg:'#272822',fg:'#f8f8f2'}, Nord: {bg:'#2e3440',fg:'#eceff4'},
+            TokyoNight: {bg:'#1a1b26',fg:'#a9b1d6'}, GruvboxDark: {bg:'#282828',fg:'#ebdbb2'}, CatppuccinMocha: {bg:'#1e1e2e',fg:'#cdd6f4'},
+            GitHubLight: {bg:'#ffffff',fg:'#1f2328'}, SolarizedLight: {bg:'#fdf6e3',fg:'#657b83'}, OneLight: {bg:'#fafafa',fg:'#383a42'},
+            CatppuccinLatte: {bg:'#eff1f5',fg:'#4c4f69'}, GruvboxLight: {bg:'#fbf1c7',fg:'#3c3836'}, RosePineDawn: {bg:'#faf4ed',fg:'#575279'},
+            Pico8: {bg:'#1D2B53',fg:'#FFF1E8'}, Endesga: {bg:'#10141f',fg:'#c5dbd4'}, Sweetie16: {bg:'#1a1c2c',fg:'#f4f4f4'}
+          };
+          var saved = localStorage.getItem('selectedTheme');
+          var t = saved && themes[saved] ? themes[saved] : null;
+          if (!t) {
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            t = prefersDark ? themes.CatppuccinMocha : themes.GitHubLight;
           }
+          var r = document.documentElement.style;
+          r.setProperty('--color-bg-primary', t.bg);
+          r.setProperty('--background', t.bg);
+          r.setProperty('--foreground', t.fg);
+          r.setProperty('--color-white', t.fg);
+          var h = t.fg.replace('#','');
+          var fr = parseInt(h.substring(0,2),16), fgr = parseInt(h.substring(2,4),16), fb = parseInt(h.substring(4,6),16);
+          var bh = t.bg.replace('#','');
+          var br = parseInt(bh.substring(0,2),16), bgr = parseInt(bh.substring(2,4),16), bb = parseInt(bh.substring(4,6),16);
+          var lum = (0.299*br + 0.587*bgr + 0.114*bb)/255;
+          var ioOp = lum >= 0.5 ? 0.45 : 0.25;
+          r.setProperty('--color-white-25', 'rgba('+fr+','+fgr+','+fb+','+ioOp+')');
         } catch (e) {}
       })();
     </script>
     <style>
       :root {
-        --color-bg-primary: #202020;
-        --color-white: #ffffff;
-        --color-white-25: rgba(255, 255, 255, 0.25);
-        --color-accent: #fbbf24;
+        --color-bg-primary: #1e1e2e;
+        --color-white: #cdd6f4;
+        --color-white-25: rgba(205, 214, 244, 0.25);
+        --color-accent: #cba6f7;
         --max-content-width: 1000px;
       }
 
@@ -120,7 +140,7 @@
         font-weight: 800;
         letter-spacing: -0.025em;
         user-select: none;
-        font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+        font-family: system-ui, sans-serif;
       }
 
       .loading-logo-text {
@@ -129,13 +149,13 @@
       }
 
       .loading-logo-accent {
-        background: linear-gradient(135deg, #fbbf24 0%, color-mix(in srgb, #fbbf24 70%, white) 100%);
+        background: linear-gradient(135deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 70%, white) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
         font-style: italic;
         position: relative;
-        filter: drop-shadow(0 0 10px color-mix(in srgb, #fbbf24 50%, transparent));
+        filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-accent) 50%, transparent));
       }
 
       .loading-logo-io {

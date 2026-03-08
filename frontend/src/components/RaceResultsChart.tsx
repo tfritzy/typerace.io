@@ -12,9 +12,8 @@ import {
 import type { ChartOptions } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 import { memo } from 'react';
-import type { PlayerProgress, PlayerColor } from '../types/stdb';
+import type { PlayerProgress } from '../types/stdb';
 import { getRawWpmBySecond, getAggWpmBySecond, getErrorCountsBySecond } from '../utils/wpmCalculator';
-import { getColorConfig } from '../utils/colorMapping';
 
 ChartJS.register(
     LinearScale,
@@ -30,19 +29,17 @@ ChartJS.register(
 interface RaceResultsChartProps {
     playerProgress: PlayerProgress;
     raceStartTimestamp: bigint;
-    playerColor: PlayerColor;
 }
 
-export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, playerColor }: RaceResultsChartProps) => {
+export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp }: RaceResultsChartProps) => {
     const rawWpmData = getRawWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
     const aggWpmData = getAggWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
     const errorCountsData = getErrorCountsBySecond(playerProgress.characterHistory, raceStartTimestamp);
 
     const maxDataIndex = Math.max(rawWpmData.length - 1, aggWpmData.length - 1, errorCountsData.length - 1);
 
-    const colorConfig = getColorConfig(playerColor);
-    const primaryColor = colorConfig.primary;
     const style = getComputedStyle(document.documentElement);
+    const primaryColor = style.getPropertyValue('--accent-primary').trim();
     const secondaryColor = style.getPropertyValue('--muted-foreground').trim();
     const errorColor = style.getPropertyValue('--destructive').trim();
     const gridLineColor = style.getPropertyValue('--grid-line').trim();

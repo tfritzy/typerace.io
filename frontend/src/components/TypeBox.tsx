@@ -260,22 +260,19 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         const isInCurrentWord =
           i >= lastCompletedWordEnd && i < input.length && isCorrect;
 
-        const style: React.CSSProperties = {};
+        let colorClass = 'text-text-untyped';
         if (isTyped && !isCorrect) {
-          style.color = "var(--destructive)";
+          colorClass = 'text-destructive';
         } else if (isInCompletedWord) {
-          style.color = "var(--text-completed)";
+          colorClass = 'text-text-completed';
         } else if (isInCurrentWord) {
-          style.color = "var(--foreground)";
-        } else {
-          style.color = "var(--text-untyped)";
+          colorClass = 'text-foreground';
         }
 
         return (
           <span
             key={i}
-            className={`transition-all duration-150 ${isTyped && !isCorrect ? "underline decoration-2 decoration-destructive" : ""}`}
-            style={style}
+            className={`transition-all duration-150 ${colorClass} ${isTyped && !isCorrect ? "underline decoration-2 decoration-destructive" : ""}`}
           >
             {isCursor && <span id="target" ref={targetRef} />}
             {char}
@@ -286,7 +283,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     return (
       <div
-        className={`relative box-with-focus w-full rounded-lg px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
+        className={`relative box-with-focus w-full px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
         style={height ? { minHeight: height } : undefined}
         onClick={() => inputRef.current?.focus()}
       >

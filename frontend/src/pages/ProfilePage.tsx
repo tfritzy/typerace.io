@@ -1,4 +1,4 @@
-import { type Player, type GameRecord, type PlayerColor } from "../types/stdb";
+import { type Player, type GameRecord } from "../types/stdb";
 import { WpmChart } from "../components/WpmChart";
 import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
@@ -13,6 +13,7 @@ import { useAuth } from "../firebase/AuthContext";
 import { Select } from "../components/Select";
 import { RecentGames } from "../components/RecentGames";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { type ThemeSettings, applyCustomTheme } from "../utils/themes";
 
 type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
@@ -101,9 +102,23 @@ export const ProfilePage = () => {
         setIsEditNameModalOpen(false);
     };
 
-    const handleColorSave = (color: PlayerColor['tag']) => {
+    const handleColorSave = (color: string, customSettings?: ThemeSettings) => {
         if (!conn) return;
-        conn.reducers.setPlayerColor({ color: { tag: color } as any });
+        if (customSettings) {
+            applyCustomTheme(customSettings);
+            (conn.reducers as any).setPlayerTheme({
+                backgroundColor: customSettings.backgroundColor,
+                textColor: customSettings.textColor,
+                borderColor: customSettings.borderColor,
+                borderWidth: customSettings.borderWidth,
+                borderRadius: customSettings.borderRadius,
+                accentColor: customSettings.accentColor,
+                font: customSettings.font,
+                fontWeight: customSettings.fontWeight,
+            });
+        } else {
+            conn.reducers.setPlayerColor({ color: { tag: color } as any });
+        }
         setIsEditColorModalOpen(false);
     };
 
@@ -232,7 +247,7 @@ export const ProfilePage = () => {
                                                     }}
                                                     className="w-full text-left px-3 py-2 text-foreground text-sm hover:bg-secondary transition-colors bg-transparent border-0 cursor-pointer rounded-md"
                                                 >
-                                                    Change Color
+                                                    Change Theme
                                                 </button>
                                                 <button
                                                     onClick={() => {

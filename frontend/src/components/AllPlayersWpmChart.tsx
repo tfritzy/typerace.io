@@ -8,7 +8,6 @@ import {
 } from 'chart.js';
 import type { ChartOptions } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { useMemo } from 'react';
 import type { PlayerProgress } from '../types/stdb';
 import { getAggWpmBySecond } from '../utils/wpmCalculator';
 
@@ -29,29 +28,24 @@ export const AllPlayersWpmChart = ({
     allPlayerProgress,
     raceStartTimestamp
 }: AllPlayersWpmChartProps) => {
-    const playerColors = useMemo(() => {
-        const style = getComputedStyle(document.documentElement);
-        return [
-            style.getPropertyValue('--accent-primary').trim(),
-            style.getPropertyValue('--chart-1').trim(),
-            style.getPropertyValue('--chart-2').trim(),
-            style.getPropertyValue('--chart-3').trim(),
-            style.getPropertyValue('--chart-4').trim(),
-            style.getPropertyValue('--chart-5').trim(),
-        ];
-    }, []);
+    const style = getComputedStyle(document.documentElement);
+    const playerColors = [
+        style.getPropertyValue('--accent-primary').trim(),
+        style.getPropertyValue('--chart-1').trim(),
+        style.getPropertyValue('--chart-2').trim(),
+        style.getPropertyValue('--chart-3').trim(),
+        style.getPropertyValue('--chart-4').trim(),
+        style.getPropertyValue('--chart-5').trim(),
+    ];
 
-    const resolvedColors = useMemo(() => {
-        const s = getComputedStyle(document.documentElement);
-        return {
-            gridLine: s.getPropertyValue('--grid-line').trim(),
-            mutedFg: s.getPropertyValue('--muted-foreground').trim(),
-            secondaryFg: s.getPropertyValue('--secondary-foreground').trim(),
-            foreground: s.getPropertyValue('--foreground').trim(),
-            input: s.getPropertyValue('--input').trim(),
-            border: s.getPropertyValue('--border').trim(),
-        };
-    }, []);
+    const resolvedColors = {
+        gridLine: style.getPropertyValue('--grid-line').trim(),
+        mutedFg: style.getPropertyValue('--muted-foreground').trim(),
+        secondaryFg: style.getPropertyValue('--secondary-foreground').trim(),
+        foreground: style.getPropertyValue('--foreground').trim(),
+        input: style.getPropertyValue('--input').trim(),
+        border: style.getPropertyValue('--border').trim(),
+    };
     const datasets = allPlayerProgress.map((playerProgress, index) => {
         const wpmData = getAggWpmBySecond(
             playerProgress.characterHistory,

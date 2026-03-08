@@ -1,58 +1,211 @@
 import { useState } from 'react';
 import type { PlayerColor } from '../types/stdb';
-import { COLOR_CONFIGS, getColorConfig } from '../utils/colorMapping';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
+import { ThemeSelector } from './ThemeSelector';
+import { applyTheme, applyCustomTheme, getCustomThemeSettings, DEFAULT_THEME_SETTINGS, GOOGLE_FONTS, loadGoogleFont, fontNameToCss, type ThemeSettings } from '../utils/themes';
+
+function cssColorToHex(color: string): string {
+    if (color.startsWith('#')) return color;
+    const el = document.createElement('div');
+    el.style.color = color;
+    document.body.appendChild(el);
+    const computed = getComputedStyle(el).color;
+    document.body.removeChild(el);
+    const match = computed.match(/(\d+),\s*(\d+),\s*(\d+)/);
+    if (!match) return '#333333';
+    return `#${parseInt(match[1]).toString(16).padStart(2, '0')}${parseInt(match[2]).toString(16).padStart(2, '0')}${parseInt(match[3]).toString(16).padStart(2, '0')}`;
+}
 
 type EditColorModalProps = {
-    currentColor: PlayerColor['tag'];
-    onSave: (color: PlayerColor['tag']) => void;
+    currentColor: string;
+    onSave: (color: string, customSettings?: ThemeSettings) => void;
     onClose: () => void;
 };
 
 export const EditColorModal = ({ currentColor, onSave, onClose }: EditColorModalProps) => {
-    const [color, setColor] = useState(currentColor);
+    const existingCustom = getCustomThemeSettings();
+    const [mode, setMode] = useState<'preset' | 'custom'>(currentColor === 'custom' ? 'custom' : 'preset');
+    const [theme, setTheme] = useState(currentColor === 'custom' ? 'CatppuccinMocha' as PlayerColor['tag'] : currentColor);
+    const [custom, setCustom] = useState<ThemeSettings>(existingCustom || DEFAULT_THEME_SETTINGS);
 
-    const availableColors: PlayerColor['tag'][] = Object.keys(COLOR_CONFIGS) as PlayerColor['tag'][];
+    const handlePresetSelect = (tag: PlayerColor['tag']) => {
+        setTheme(tag);
+        setMode('preset');
+        applyTheme(tag);
+    };
+
+    const handleCustomChange = (field: keyof ThemeSettings, value: string | number) => {
+        const updated = { ...custom, [field]: value };
+        setCustom(updated);
+        setMode('custom');
+        applyCustomTheme(updated);
+    };
 
     const handleSave = () => {
-        onSave(color);
+        if (mode === 'custom') {
+            onSave('custom', custom);
+        } else {
+            onSave(theme);
+        }
+        onClose();
+    };
+
+    const handleCancel = () => {
+        applyTheme(currentColor);
         onClose();
     };
 
     return (
-        <Dialog open={true} onOpenChange={(open) => { if (!open) onClose(); }}>
+        <Dialog open={true} onOpenChange={(open) => { if (!open) handleCancel(); }}>
             <DialogContent className="min-w-[400px] max-w-[500px]">
-                <DialogHeader className="mb-6">
-                    <DialogTitle>Change Color</DialogTitle>
+                <DialogHeader className="mb-4">
+                    <DialogTitle>Change Theme</DialogTitle>
                 </DialogHeader>
 
-                <div className="mb-8">
-                    <Label className="mb-3 block">Select Color</Label>
-                    <div className="flex flex-row flex-wrap space-x-2 space-y-2">
-                        {availableColors.map((colorTag) => {
-                            const colorConfig = getColorConfig({ tag: colorTag } as PlayerColor);
-                            const isSelected = color === colorTag;
-                            const borderStyle = isSelected ? { border: '3px solid var(--foreground)' } : {};
-                            return (
-                                <button
-                                    key={colorTag}
-                                    onClick={() => setColor(colorTag)}
-                                    className={`w-10 h-10 rounded cursor-pointer border-0 ${isSelected ? 'opacity-100' : 'opacity-70'}`}
-                                    style={{
-                                        background: colorConfig.primary,
-                                        ...borderStyle
-                                    }}
-                                    title={colorTag}
+                <div className="mb-4">
+                    <Label className="mb-2 block">Preset</Label>
+                    <ThemeSelector
+                        selectedTheme={mode === 'preset' ? theme as PlayerColor['tag'] : undefined}
+                        onThemeSelect={handlePresetSelect}
+                    />
+                </div>
+
+                <div className="mb-4">
+                    <Label className="mb-2 block">Customize</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className="text-xs text-muted-foreground block mb-1">Background</label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="color"
+                                    value={custom.backgroundColor}
+                                    onChange={(e) => handleCustomChange('backgroundColor', e.target.value)}
+                                    className="w-8 h-8 rounded cursor-pointer border border-border bg-transparent"
                                 />
-                            );
-                        })}
+                                <input
+                                    type="text"
+                                    value={custom.backgroundColor}
+                                    onChange={(e) => handleCustomChange('backgroundColor', e.target.value)}
+                                    className="flex-1 bg-input border border-border rounded px-2 py-1 text-xs text-foreground"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="text-xs text-muted-foreground block mb-1">Text</label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="color"
+                                    value={custom.textColor}
+                                    onChange={(e) => handleCustomChange('textColor', e.target.value)}
+                                    className="w-8 h-8 rounded cursor-pointer border border-border bg-transparent"
+                                />
+                                <input
+                                    type="text"
+                                    value={custom.textColor}
+                                    onChange={(e) => handleCustomChange('textColor', e.target.value)}
+                                    className="flex-1 bg-input border border-border rounded px-2 py-1 text-xs text-foreground"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="text-xs text-muted-foreground block mb-1">Accent</label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="color"
+                                    value={custom.accentColor}
+                                    onChange={(e) => handleCustomChange('accentColor', e.target.value)}
+                                    className="w-8 h-8 rounded cursor-pointer border border-border bg-transparent"
+                                />
+                                <input
+                                    type="text"
+                                    value={custom.accentColor}
+                                    onChange={(e) => handleCustomChange('accentColor', e.target.value)}
+                                    className="flex-1 bg-input border border-border rounded px-2 py-1 text-xs text-foreground"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="text-xs text-muted-foreground block mb-1">Border Color</label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="color"
+                                    value={cssColorToHex(custom.borderColor)}
+                                    onChange={(e) => handleCustomChange('borderColor', e.target.value)}
+                                    className="w-8 h-8 rounded cursor-pointer border border-border bg-transparent"
+                                />
+                                <input
+                                    type="text"
+                                    value={custom.borderColor}
+                                    onChange={(e) => handleCustomChange('borderColor', e.target.value)}
+                                    className="flex-1 bg-input border border-border rounded px-2 py-1 text-xs text-foreground"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mb-6">
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className="text-xs text-muted-foreground block mb-1">Border Width</label>
+                            <input
+                                type="range"
+                                min="0"
+                                max="3"
+                                step="1"
+                                value={custom.borderWidth}
+                                onChange={(e) => handleCustomChange('borderWidth', parseInt(e.target.value))}
+                                className="w-full"
+                            />
+                            <span className="text-xs text-muted-foreground">{custom.borderWidth}px</span>
+                        </div>
+                        <div>
+                            <label className="text-xs text-muted-foreground block mb-1">Border Radius</label>
+                            <input
+                                type="range"
+                                min="0"
+                                max="16"
+                                step="2"
+                                value={custom.borderRadius}
+                                onChange={(e) => handleCustomChange('borderRadius', parseInt(e.target.value))}
+                                className="w-full"
+                            />
+                            <span className="text-xs text-muted-foreground">{custom.borderRadius}px</span>
+                        </div>
+                        <div>
+                            <label className="text-xs text-muted-foreground block mb-1">Font</label>
+                            <select
+                                value={custom.font}
+                                onChange={(e) => handleCustomChange('font', e.target.value)}
+                                onFocus={() => GOOGLE_FONTS.forEach(f => loadGoogleFont(f.name))}
+                                className="w-full bg-input border border-border rounded px-2 py-1.5 text-xs text-foreground cursor-pointer"
+                                style={{ fontFamily: fontNameToCss(custom.font) }}
+                            >
+                                {GOOGLE_FONTS.map(f => (
+                                    <option key={f.name} value={f.name}>{f.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="text-xs text-muted-foreground block mb-1">Font Weight</label>
+                            <select
+                                value={custom.fontWeight}
+                                onChange={(e) => handleCustomChange('fontWeight', parseInt(e.target.value))}
+                                className="w-full bg-input border border-border rounded px-2 py-1.5 text-xs text-foreground cursor-pointer"
+                            >
+                                <option value="200">Light (200)</option>
+                                <option value="400">Normal (400)</option>
+                                <option value="500">Medium (500)</option>
+                                <option value="700">Bold (700)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
                 <div className="flex gap-3 justify-end">
-                    <Button variant="outline" onClick={onClose}>
+                    <Button variant="outline" onClick={handleCancel}>
                         Cancel
                     </Button>
                     <Button onClick={handleSave}>

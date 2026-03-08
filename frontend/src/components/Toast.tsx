@@ -11,16 +11,10 @@ export const ToastContainer = () => {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className="flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-slideInRight bg-card border border-border"
-          style={{
-            borderColor: toast.type === "error" ? "var(--destructive)" : undefined,
-          }}
+          className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-slideInRight bg-card border ${toast.type === "error" ? 'border-destructive' : 'border-border'}`}
         >
           <span
-            className="text-sm font-medium"
-            style={{
-              color: toast.type === "error" ? "var(--destructive)" : "var(--foreground)",
-            }}
+            className={`text-sm font-medium ${toast.type === "error" ? 'text-destructive' : 'text-foreground'}`}
           >
             {toast.message}
           </span>

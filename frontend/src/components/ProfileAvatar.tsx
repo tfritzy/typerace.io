@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { type Player } from "../types/stdb";
+import { type Player, type PlayerColor } from "../types/stdb";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
-import { useEffect, useState, useRef, memo } from "react";
-import { setAccentColor } from "../utils/colorMapping";
+import { useEffect, useState, useRef, memo, useMemo } from "react";
 import { useAuth } from "../firebase/AuthContext";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { getInitialTheme } from "../utils/themes";
 
 export const ProfileAvatar = memo(() => {
   const navigate = useNavigate();
@@ -63,11 +63,10 @@ export const ProfileAvatar = memo(() => {
     };
   }, [conn]);
 
-  useEffect(() => {
-    if (myPlayer?.color) {
-      setAccentColor(myPlayer.color);
-    }
-  }, [myPlayer]);
+  const currentThemeColor = useMemo(() => {
+    const tag = getInitialTheme();
+    return { tag } as PlayerColor;
+  }, []);
 
   const handleSocialSignIn = async (
     provider: "google" | "github" | "discord"
@@ -135,7 +134,7 @@ export const ProfileAvatar = memo(() => {
             <PlayerAvatar
               size={40}
               identity={identityHash}
-              color={myPlayer?.color}
+              color={currentThemeColor}
               isHighlighted={false}
             />
           </div>
@@ -231,7 +230,7 @@ export const ProfileAvatar = memo(() => {
         <PlayerAvatar
           size={40}
           identity={identityHash}
-          color={myPlayer?.color}
+          color={currentThemeColor}
           isHighlighted={true}
         />
       </div>

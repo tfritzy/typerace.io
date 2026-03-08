@@ -171,12 +171,8 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                         {isReconnecting ? (
                             <div className="flex flex-col items-center py-4">
                                 <div
+                                    className="w-8 h-8 border-[3px] border-secondary border-t-muted-foreground rounded-full"
                                     style={{
-                                        width: '32px',
-                                        height: '32px',
-                                        border: '3px solid var(--secondary)',
-                                        borderTopColor: 'var(--muted-foreground)',
-                                        borderRadius: '50%',
                                         animation: 'spin 0.8s linear infinite'
                                     }}
                                 />

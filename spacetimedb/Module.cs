@@ -65,23 +65,36 @@ public enum CharacterEventType
 [Type]
 public enum PlayerColor
 {
-    Red,
-    Orange,
-    Amber,
-    Yellow,
-    Lime,
-    Green,
-    Emerald,
-    Teal,
-    Cyan,
-    Sky,
-    Blue,
-    Indigo,
-    Violet,
-    Purple,
-    Fuchsia,
-    Pink,
-    Rose
+    Dracula,
+    Monokai,
+    Nord,
+    TokyoNight,
+    GruvboxDark,
+    CatppuccinMocha,
+    GitHubLight,
+    SolarizedLight,
+    OneLight,
+    CatppuccinLatte,
+    GruvboxLight,
+    RosePineDawn,
+    Pico8,
+    Endesga,
+    Sweetie16
+}
+
+[Table(Name = "playertheme", Public = true)]
+public partial struct PlayerTheme
+{
+    [PrimaryKey]
+    public Identity Owner;
+    public string BackgroundColor;
+    public string TextColor;
+    public string BorderColor;
+    public int BorderWidth;
+    public float BorderRadius;
+    public string AccentColor;
+    public string Font;
+    public int FontWeight;
 }
 
 public struct Quote
@@ -489,7 +502,7 @@ public static partial class Module
                 TotalTimeSpentMs = 0,
                 IsBot = false,
                 BotConfig = null,
-                Color = PlayerColor.Amber,
+                Color = PlayerColor.CatppuccinMocha,
                 IsAnonymous = true,
                 LastGameDate = 0
             });
@@ -572,6 +585,49 @@ public static partial class Module
             updatedPlayer.Color = color;
             ctx.Db.player.Identity.Update(updatedPlayer);
             Log.Info($"Updated player color for {ctx.Sender} to {color}");
+        }
+    }
+
+    [Reducer]
+    public static void setPlayerTheme(ReducerContext ctx, string backgroundColor, string textColor, string borderColor, int borderWidth, float borderRadius, string accentColor, string font, int fontWeight)
+    {
+        if (backgroundColor.Length > 50 || textColor.Length > 50 || borderColor.Length > 50 || accentColor.Length > 50)
+        {
+            Log.Warn($"Color value too long from {ctx.Sender}");
+            return;
+        }
+
+        if (font.Length > 200)
+        {
+            Log.Warn($"Font value too long from {ctx.Sender}");
+            return;
+        }
+
+        borderWidth = Math.Clamp(borderWidth, 0, 10);
+        borderRadius = Math.Clamp(borderRadius, 0, 50);
+        fontWeight = Math.Clamp(fontWeight, 100, 900);
+
+        var existing = ctx.Db.playertheme.Owner.Find(ctx.Sender);
+        var theme = new PlayerTheme
+        {
+            Owner = ctx.Sender,
+            BackgroundColor = backgroundColor,
+            TextColor = textColor,
+            BorderColor = borderColor,
+            BorderWidth = borderWidth,
+            BorderRadius = borderRadius,
+            AccentColor = accentColor,
+            Font = font,
+            FontWeight = fontWeight
+        };
+
+        if (existing != null)
+        {
+            ctx.Db.playertheme.Owner.Update(theme);
+        }
+        else
+        {
+            ctx.Db.playertheme.Insert(theme);
         }
     }
 
@@ -762,7 +818,7 @@ public static partial class Module
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
-        var playerColor = player?.Color ?? PlayerColor.Amber;
+        var playerColor = player?.Color ?? PlayerColor.CatppuccinMocha;
         var playerPublicId = player?.PlayerId ?? "";
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
@@ -1174,7 +1230,7 @@ public static partial class Module
                 var playerName = player?.Name ?? "Unknown";
                 var playerLevel = player?.Level ?? 1;
                 var isAnonymous = player?.IsAnonymous ?? true;
-                var playerColor = player?.Color ?? PlayerColor.Amber;
+                var playerColor = player?.Color ?? PlayerColor.CatppuccinMocha;
                 var playerPublicId = player?.PlayerId ?? "";
 
                 ctx.Db.playerprogress.Insert(new PlayerProgress

@@ -16,7 +16,7 @@ type PlayerAvatarProps = {
 export const PlayerAvatar = memo(({
     size,
     identity,
-    color = { tag: "Amber" } as PlayerColor,
+    color = { tag: "Monokai" } as PlayerColor,
     isLoading = false,
     placement
 }: PlayerAvatarProps) => {

@@ -26,11 +26,10 @@ export const WordXpIndicator = ({
 
   return (
     <div
-      className="fixed pointer-events-none z-50 text-sm font-semibold"
+      className="fixed pointer-events-none z-50 text-sm font-semibold text-accent"
       style={{
         left: `${position.x}px`,
         top: `${position.y - 15}px`,
-        color: "var(--color-accent)",
         animation: "wordXpFloat 1s ease-out forwards",
       }}
     >

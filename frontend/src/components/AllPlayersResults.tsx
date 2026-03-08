@@ -35,12 +35,7 @@ export const AllPlayersResults = ({
                             <button
                                 key={pp.playerId.toHexString()}
                                 onClick={() => setSelectedPlayerId(pp.playerId.toHexString())}
-                                className="px-3 py-2 border rounded-md text-[13px] font-semibold cursor-pointer transition-all duration-200 tracking-wide flex items-center gap-2"
-                                style={{
-                                    backgroundColor: isSelected ? 'var(--secondary)' : 'transparent',
-                                    color: isSelected ? 'var(--secondary-foreground)' : 'var(--muted-foreground)',
-                                    borderColor: 'var(--border)'
-                                }}
+                                className={`px-3 py-2 border rounded-md text-[13px] font-semibold cursor-pointer transition-all duration-200 tracking-wide flex items-center gap-2 border-border ${isSelected ? 'bg-secondary text-secondary-foreground' : 'bg-transparent text-muted-foreground'}`}
                             >
                                 <PlayerAvatar
                                     size={24}
@@ -57,7 +52,6 @@ export const AllPlayersResults = ({
             <RaceResultsChart
                 playerProgress={selectedPlayerProgress}
                 raceStartTimestamp={raceStartTimestamp}
-                playerColor={selectedPlayerProgress.playerColor}
             />
         </div>
     );

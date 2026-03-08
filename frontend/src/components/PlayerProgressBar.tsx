@@ -30,7 +30,7 @@ export const PlayerProgressBar = memo(({
     playerPublicId,
     isCurrentPlayer = false,
     isLoading = false,
-    playerColor = { tag: "Amber" } as PlayerColor,
+    playerColor = { tag: "Monokai" } as PlayerColor,
     wpm,
     placement,
     isBot = false,
@@ -38,6 +38,9 @@ export const PlayerProgressBar = memo(({
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
     const colorConfig = getColorConfig(playerColor);
+    const progressGradient = isCurrentPlayer
+        ? 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))'
+        : colorConfig.gradient;
 
     return (
         <div
@@ -108,7 +111,7 @@ export const PlayerProgressBar = memo(({
                         className="h-full rounded-full transition-all duration-200"
                         style={{
                             width: `${Math.min(100, progressPercentage)}%`,
-                            background: colorConfig.gradient
+                            background: progressGradient
                         }}
                     />
                 </div>
