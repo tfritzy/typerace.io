@@ -24,8 +24,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -34,20 +34,24 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: "8.0.x"
 
       - name: Install SpacetimeDB CLI
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SPACETIME_DOWNLOAD_ROOT: https://github.com/clockworklabs/SpacetimeDB/releases/download/v1.10.0
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://install.spacetimedb.com | sh -s -- -y
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Publish SpacetimeDB Module (QA)
+      - name: Login to SpacetimeDB
         env:
           SPACETIMEDB_TOKEN: ${{ secrets.SPACETIMEDB_TOKEN }}
         run: |
-          spacetime publish -c -y --project-path spacetimedb typerace-qa
+          spacetime login --token "$SPACETIMEDB_TOKEN"
+
+      - name: Publish SpacetimeDB Module (QA)
+        run: |
+          spacetime publish -c -y -s maincloud --project-path spacetimedb typerace-qa
 
       - name: Generate TypeScript bindings
         run: |
@@ -58,9 +62,10 @@ jobs:
         working-directory: frontend
 
       - name: Deploy to Firebase Hosting (QA)
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TYPERACE_160D3 }}
-          projectId: typerace-160d3
-          target: qa
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-sa.json
+        run: |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_TYPERACE_160D3 }}' > /tmp/firebase-sa.json
+          chmod 600 /tmp/firebase-sa.json
+          npx firebase-tools deploy --only hosting:qa --project typerace-160d3
+          rm -f /tmp/firebase-sa.json
