@@ -72,11 +72,11 @@ export const LobbyPage = () => {
   }, [findGame, selectedMode, gameType]);
 
   return (
-    <div className="relative h-screen flex flex-col overflow-hidden">
+    <div className="relative h-dvh flex flex-col">
       <Header />
-      <div className="flex-1 flex items-center justify-center p-4">
+      <div className="flex-1 flex items-center justify-center p-4 min-h-0">
         <div className="content-container">
-          <div className="text-2xl mb-[400px]">
+          <div className="text-2xl">
             <TypeBox
               ref={typeBoxRef}
               phrase={startupPhrase}
@@ -86,17 +86,15 @@ export const LobbyPage = () => {
           </div>
         </div>
       </div>
-      <div className="fixed bottom-10 left-0 right-0">
-        <div className="px-4">
-          <div className="content-container">
-            <GameOptionsSelector
-              selectedMode={selectedMode}
-              onModeSelect={handleModeSelect}
-              gameType={gameType}
-              setGameType={handleGameTypeChange}
-              currentLang={currentLang}
-            />
-          </div>
+      <div className="px-4 pb-2">
+        <div className="content-container">
+          <GameOptionsSelector
+            selectedMode={selectedMode}
+            onModeSelect={handleModeSelect}
+            gameType={gameType}
+            setGameType={handleGameTypeChange}
+            currentLang={currentLang}
+          />
         </div>
       </div>
       <Footer />
