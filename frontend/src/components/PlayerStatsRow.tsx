@@ -37,7 +37,7 @@ export const PlayerStatsRow = memo(({
                 <div className={`text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold ${isFirstPlace ? 'text-accent-primary' : 'text-muted-foreground'}`}>
                     Time
                 </div>
-                <div className={`text-4xl font-bold font-mono leading-none tracking-[0.02em] ${isFirstPlace ? 'text-accent-primary' : 'text-secondary-foreground'}`}>
+                <div className={`text-4xl font-bold leading-none ${isFirstPlace ? 'text-accent-primary' : 'text-secondary-foreground'}`}>
                     {formatStopwatchTime(raceTime)}
                 </div>
             </div>
