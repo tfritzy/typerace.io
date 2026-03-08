@@ -68,7 +68,7 @@ export const ThemeSelector = ({ selectedTheme, onThemeSelect }: ThemeSelectorPro
         <div ref={containerRef} className="relative">
             <button
                 onClick={() => setOpen(!open)}
-                className="w-full bg-input text-foreground border border-border rounded-lg px-3 py-2 text-sm cursor-pointer outline-none flex items-center justify-between gap-3 hover:border-[var(--border-hover)] transition-colors"
+                className="w-full bg-input text-foreground border border-border rounded-lg px-3 py-2 text-sm cursor-pointer outline-none flex items-center justify-between gap-3 hover:border-border-hover transition-colors"
             >
                 <div className="flex items-center gap-3">
                     <div
