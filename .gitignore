@@ -17,9 +17,8 @@ dist-ssr
 bin/
 obj/
 
-# SpacetimeDB build artifacts
-spacetimedb/bin/
-spacetimedb/obj/
+# SpacetimeDB generated bindings
+frontend/module_bindings/
 
 # Python
 __pycache__/

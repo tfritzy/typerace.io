@@ -37,6 +37,8 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Install SpacetimeDB CLI
+        env:
+          SPACETIME_DOWNLOAD_ROOT: https://github.com/clockworklabs/SpacetimeDB/releases/download/v1.10.0
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://install.spacetimedb.com | sh -s -- -y
           echo "$HOME/.local/bin" >> $GITHUB_PATH
