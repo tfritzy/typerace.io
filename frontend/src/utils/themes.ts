@@ -26,9 +26,9 @@ export const GOOGLE_FONTS: GoogleFont[] = [
     { name: 'Playfair Display', category: 'serif', weights: [400, 500, 700] },
     { name: 'Lora', category: 'serif', weights: [400, 500, 700] },
     { name: 'Source Serif 4', category: 'serif', weights: [200, 400, 500, 700] },
-    { name: 'Press Start 2P', category: 'display', weights: [400] },
+    { name: 'Pixelify Sans', category: 'display', weights: [400, 500, 600, 700] },
     { name: 'VT323', category: 'display', weights: [400] },
-    { name: 'Silkscreen', category: 'display', weights: [400, 700] },
+    { name: 'Jersey 15', category: 'display', weights: [400] },
 ];
 
 const loadedFonts = new Set<string>();
@@ -79,9 +79,9 @@ const MONO_PAIRINGS: Record<string, string> = {
     'Playfair Display': 'Source Code Pro',
     'Lora': 'Source Code Pro',
     'Source Serif 4': 'Source Code Pro',
-    'Press Start 2P': 'Press Start 2P',
+    'Pixelify Sans': 'Pixelify Sans',
     'VT323': 'VT323',
-    'Silkscreen': 'Silkscreen',
+    'Jersey 15': 'Jersey 15',
 };
 
 export function getMonoPairing(fontName: string): string {
@@ -403,7 +403,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 2,
         borderRadius: 0,
         accentColor: '#29ADFF',
-        font: 'Press Start 2P',
+        font: 'Pixelify Sans',
         fontWeight: 700,
         previewColors: ['#1D2B53', '#FFF1E8', '#29ADFF', '#FF77A8'],
     },
@@ -427,7 +427,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         borderWidth: 2,
         borderRadius: 0,
         accentColor: '#b13e53',
-        font: 'Silkscreen',
+        font: 'Jersey 15',
         fontWeight: 700,
         previewColors: ['#1a1c2c', '#f4f4f4', '#b13e53', '#41a6f6'],
     },
