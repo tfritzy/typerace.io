@@ -7,7 +7,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { getColorConfig } from "../utils/colorMapping";
 import { EditNameModal } from "../components/EditNameModal";
-import { EditColorModal } from "../components/EditColorModal";
+import { ThemeEditorModal } from "../components/ThemeEditorModal";
 import { getLangHome } from "../utils/modes";
 import { formatNumber, formatTimeSpent } from "../utils/formatters";
 import { useAuth } from "../firebase/AuthContext";
@@ -418,7 +418,7 @@ export const ProfilePage = () => {
             )}
 
             {isEditColorModalOpen && viewedPlayer && (
-                <EditColorModal
+                <ThemeEditorModal
                     currentColor={viewedPlayer.color.tag}
                     onSave={handleColorSave}
                     onClose={() => setIsEditColorModalOpen(false)}
