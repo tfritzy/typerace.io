@@ -2,7 +2,7 @@ import { Header } from "../components/Header";
 
 export const PrivacyPolicyPage = () => {
     return (
-        <div className="relative h-screen flex flex-col overflow-hidden">
+        <div className="relative h-full flex flex-col overflow-hidden">
             <Header />
             <div className="flex-1 overflow-y-auto p-4">
                 <div className="content-container">

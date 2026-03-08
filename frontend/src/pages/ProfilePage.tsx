@@ -209,10 +209,10 @@ export const ProfilePage = () => {
     }, [gameRecords, viewedPlayer]);
 
     return (
-        <div className="min-h-screen">
+        <div className="h-full flex flex-col">
             <Header hideAvatar={true} />
 
-            <div className="flex flex-col items-center px-4 pb-12">
+            <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
                 <div className="content-container">
                     <div className="box box-shadow rounded-xl p-4 sm:p-8 mb-8 relative">
                         {isOwnProfile && (
