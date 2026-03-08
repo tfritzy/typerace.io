@@ -1,6 +1,9 @@
 name: Deploy QA Environment
 
 on:
+  push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
@@ -11,7 +14,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: "qa-deploy-${{ github.event.pull_request.number || 'manual' }}"
+  group: "qa-deploy-${{ github.event.pull_request.number || github.ref }}"
   cancel-in-progress: true
 
 jobs:
