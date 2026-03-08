@@ -33,6 +33,9 @@
   --color-accent-light: var(--accent-light);
   --color-accent-dark: var(--accent-dark);
   --color-border-hover: var(--border-hover);
+  --color-grid-line: var(--grid-line);
+  --color-text-completed: var(--text-completed);
+  --color-text-untyped: var(--text-untyped);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

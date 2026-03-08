@@ -55,17 +55,11 @@ const MultiplierRow = ({ label, value }: MultiplierRowProps) => {
 
     return (
         <div
-            className="flex items-center justify-between py-1.5 px-2"
-            style={{
-                color: isBonus ? 'var(--secondary-foreground)' : 'var(--muted-foreground)',
-            }}
+            className={`flex items-center justify-between py-1.5 px-2 ${isBonus ? 'text-secondary-foreground' : 'text-muted-foreground'}`}
         >
             <span className="font-medium text-sm">{label}</span>
             <span
-                className="font-bold tabular-nums text-sm tracking-wide"
-                style={{
-                    color: isBonus ? 'var(--secondary-foreground)' : 'var(--muted-foreground)',
-                }}
+                className={`font-bold tabular-nums text-sm tracking-wide ${isBonus ? 'text-secondary-foreground' : 'text-muted-foreground'}`}
             >
                 {value}
             </span>

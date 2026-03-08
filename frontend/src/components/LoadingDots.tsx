@@ -14,10 +14,7 @@ export const LoadingDots = () => {
     }, []);
 
     return (
-        <div style={{
-            width: '100%',
-            padding: '0 1rem'
-        }}>
+        <div className="w-full px-4">
             <style>
                 {`
                     @keyframes spin {
@@ -25,30 +22,12 @@ export const LoadingDots = () => {
                     }
                 `}
             </style>
-            <div style={{
-                width: '100%',
-                maxWidth: '1000px',
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                height: '4rem'
-            }}>
+            <div className="w-full max-w-[1000px] mx-auto flex justify-between items-center h-16">
                 <Logo />
                 <div
                     ref={spinnerRef}
+                    className="fixed top-1/2 left-1/2 -ml-4 -mt-4 w-8 h-8 border-3 border-border border-t-muted-foreground rounded-full"
                     style={{
-                        position: 'fixed',
-                        top: '50%',
-                        left: '50%',
-                        marginLeft: '-16px',
-                        marginTop: '-16px',
-                        width: '32px',
-                        height: '32px',
-                        border: '3px solid var(--border)',
-                        borderTopColor: 'var(--muted-foreground)',
-                        borderRadius: '50%',
                         animation: 'spin 0.8s linear infinite'
                     }}
                 />
