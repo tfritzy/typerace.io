@@ -37,11 +37,11 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Install SpacetimeDB CLI
-        env:
-          SPACETIME_DOWNLOAD_ROOT: https://github.com/clockworklabs/SpacetimeDB/releases/download/v1.10.0
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://install.spacetimedb.com | sh -s -- -y
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+          spacetime version install 1.10.0
+          spacetime version use 1.10.0
 
       - name: Login to SpacetimeDB
         env:
@@ -51,11 +51,11 @@ jobs:
 
       - name: Publish SpacetimeDB Module (QA)
         run: |
-          spacetime publish -c -y -s maincloud --module-path spacetimedb typerace-qa
+          spacetime publish -c -y -s maincloud --project-path spacetimedb typerace-qa
 
       - name: Generate TypeScript bindings
         run: |
-          spacetime generate --lang typescript --out-dir frontend/module_bindings --module-path spacetimedb
+          spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
 
       - name: Build with Vite (QA)
         run: npm run build -- --mode qa
