@@ -1,21 +1,23 @@
 name: Deploy QA Environment
 
 on:
-  push:
+  pull_request:
     branches:
       - master
   workflow_dispatch:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
-  group: "qa-deploy"
+  group: "qa-deploy-${{ github.event.pull_request.number || 'manual' }}"
   cancel-in-progress: true
 
 jobs:
   deploy-qa:
     runs-on: ubuntu-latest
+    environment: qa
     steps:
       - name: Checkout
         uses: actions/checkout@v4
