@@ -8,6 +8,7 @@ import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { getColorConfig } from "../utils/colorMapping";
 import { EditNameModal } from "../components/EditNameModal";
 import { EditColorModal } from "../components/EditColorModal";
+import { getLangHome } from "../utils/modes";
 import { formatNumber, formatTimeSpent } from "../utils/formatters";
 import { useAuth } from "../firebase/AuthContext";
 import { Select } from "../components/Select";
@@ -92,7 +93,7 @@ export const ProfilePage = () => {
 
     useEffect(() => {
         if (viewedPlayer && viewedPlayer.isAnonymous) {
-            navigate('/');
+            navigate(getLangHome());
         }
     }, [viewedPlayer, navigate]);
 
@@ -125,7 +126,7 @@ export const ProfilePage = () => {
     const handleSignOut = async () => {
         try {
             await signOut();
-            navigate('/');
+            navigate(getLangHome());
         } catch (error) {
             console.error('Error signing out:', error);
         }
