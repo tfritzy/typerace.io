@@ -346,13 +346,19 @@ body {
   display: flex;
   align-items: baseline;
   gap: 0.15rem;
-  font-size: 1.65rem;
+  font-size: 1.3rem;
   font-weight: 800;
   letter-spacing: -0.025em;
   user-select: none;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
+}
+
+@media (min-width: 640px) {
+  .logo {
+    font-size: 1.65rem;
+  }
 }
 
 .logo:hover {
@@ -380,8 +386,14 @@ body {
 
 .logo-io {
   color: var(--color-white-25);
-  font-size: 1.1rem;
+  font-size: 0.85rem;
   font-weight: 600;
   font-style: italic;
   margin-left: -0.2rem;
+}
+
+@media (min-width: 640px) {
+  .logo-io {
+    font-size: 1.1rem;
+  }
 }

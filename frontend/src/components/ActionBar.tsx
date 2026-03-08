@@ -48,10 +48,10 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
   }, [navigate, gameType, canRematch, handlePlayAgain, handleRematch]);
 
   return (
-    <div className="flex gap-3 mt-3 animate-slideUpFadeIn" style={{ animationDelay: '0.2s' }}>
+    <div className="flex gap-2 sm:gap-3 mt-2 sm:mt-3 animate-slideUpFadeIn" style={{ animationDelay: '0.2s' }}>
       <button
         onClick={() => navigate(getLangHome())}
-        className="box rounded-lg px-8 py-4 bg-transparent text-foreground text-base font-semibold cursor-pointer opacity-80 flex-1"
+        className="box rounded-lg px-4 py-3 sm:px-8 sm:py-4 bg-transparent text-foreground text-sm sm:text-base font-semibold cursor-pointer opacity-80 flex-1"
       >
         Main Menu <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">M</span>
       </button>
@@ -60,7 +60,7 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
           <button
             onClick={handleRematch}
             disabled={!canRematch}
-            className={`box rounded-lg px-8 py-4 bg-transparent text-foreground text-base font-semibold w-full ${canRematch ? 'cursor-pointer opacity-80' : 'cursor-not-allowed opacity-40'
+            className={`box rounded-lg px-4 py-3 sm:px-8 sm:py-4 bg-transparent text-foreground text-sm sm:text-base font-semibold w-full ${canRematch ? 'cursor-pointer opacity-80' : 'cursor-not-allowed opacity-40'
               }`}
           >
             Rematch <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">R</span>
@@ -76,7 +76,7 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
       {gameType !== "Private" && (
         <button
           onClick={handlePlayAgain}
-          className="box rounded-lg px-8 py-4 bg-transparent text-foreground text-base font-semibold cursor-pointer opacity-80 flex-1"
+          className="box rounded-lg px-4 py-3 sm:px-8 sm:py-4 bg-transparent text-foreground text-sm sm:text-base font-semibold cursor-pointer opacity-80 flex-1"
         >
           Play Again <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">P</span>
         </button>

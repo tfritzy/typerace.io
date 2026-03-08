@@ -77,7 +77,7 @@ export const GamePageTypeBox = memo(
     }, []);
 
     return (
-      <div className="text-2xl leading-[1.6]">
+      <div className="text-base sm:text-2xl leading-[1.6]">
         {xpIndicators.map((indicator) => (
           <WordXpIndicator
             key={indicator.id}
@@ -94,7 +94,7 @@ export const GamePageTypeBox = memo(
           onComplete={handleComplete}
           onWordComplete={handleWordComplete}
           disabled={disabled}
-          height="430px"
+          className="min-h-[250px] sm:min-h-[430px]"
           initialProgress={initialProgress}
         />
       </div>

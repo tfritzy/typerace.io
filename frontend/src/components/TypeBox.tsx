@@ -283,7 +283,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     return (
       <div
-        className={`relative box-with-focus w-full px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
+        className={`relative box-with-focus w-full px-3 py-3 sm:px-8 sm:py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
         style={height ? { minHeight: height } : undefined}
         onClick={() => inputRef.current?.focus()}
       >
@@ -325,7 +325,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             />
           </div>
           {attribution && (
-            <div className="mt-6 text-lg text-muted-foreground italic font-light text-right select-none pr-2">
+            <div className="mt-3 text-sm sm:mt-6 sm:text-lg text-muted-foreground italic font-light text-right select-none pr-2">
               - {attribution}
             </div>
           )}
