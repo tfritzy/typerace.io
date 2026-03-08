@@ -361,7 +361,7 @@ export const ProfilePage = () => {
                     </div>
 
                     <div>
-                        <div className="flex justify-between items-center mb-6">
+                        <div className="flex flex-wrap justify-between items-center gap-y-3 mb-6">
                             <h2 className="text-foreground text-2xl font-bold m-0">
                                 Performance History
                             </h2>
