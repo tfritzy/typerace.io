@@ -56,7 +56,8 @@ export const useFindGame = () => {
       joinCode: newJoinCode,
       gameType: gameTypeEnum as any
     }).catch((error: unknown) => {
-      showToast(String(error));
+      const message = error instanceof Error ? error.message : "Failed to join game. Please try again.";
+      showToast(message);
       setIsSearching(false);
       pendingJoinCodeRef.current = null;
     });
