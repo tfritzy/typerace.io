@@ -220,15 +220,6 @@ export const ProfilePage = () => {
                                             >
                                                 <button
                                                     onClick={() => {
-                                                        navigate('/settings');
-                                                        handleMenuClose();
-                                                    }}
-                                                    className="w-full text-left px-3 py-2 text-foreground text-sm hover:bg-secondary transition-colors bg-transparent border-0 cursor-pointer rounded-md"
-                                                >
-                                                    Settings
-                                                </button>
-                                                <button
-                                                    onClick={() => {
                                                         handleSignOut();
                                                         handleMenuClose();
                                                     }}

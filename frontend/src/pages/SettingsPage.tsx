@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import type { Player, PlayerColor } from '../types/stdb';
+import type { PlayerColor } from '../types/stdb';
 import { Header } from '../components/Header';
-import { useDatabase } from '../contexts/SpacetimeContext';
-import { useAuth } from '../firebase/AuthContext';
-import { getLangHome } from '../utils/modes';
+import { Footer } from '../components/Footer';
 import {
     applyTheme,
     applyCustomTheme,
@@ -15,7 +12,6 @@ import {
     fontNameToCss,
     THEMES,
     THEME_PRESETS,
-    type ThemeSettings,
 } from '../utils/themes';
 
 function ThemeDropdown({
@@ -253,11 +249,6 @@ function FontDropdown({ value, onChange }: { value: string; onChange: (font: str
 }
 
 export const SettingsPage = () => {
-    const conn = useDatabase();
-    const navigate = useNavigate();
-    const { signOut } = useAuth();
-    const [myPlayer, setMyPlayer] = useState<Player | null>(null);
-
     const [selectedPreset, setSelectedPreset] = useState<string>(() => {
         const tag = getInitialTheme();
         if (tag in THEMES) return tag;
@@ -274,44 +265,6 @@ export const SettingsPage = () => {
         return preset?.font || 'Inter';
     });
 
-    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-
-    useEffect(() => {
-        if (!conn?.identity) return;
-
-        const currentIdentity = conn.identity;
-
-        const handlePlayerInsert = (_ctx: any, player: Player) => {
-            if (player.identity.isEqual(currentIdentity)) {
-                setMyPlayer(player);
-            }
-        };
-
-        const handlePlayerUpdate = (_ctx: any, _oldPlayer: Player, newPlayer: Player) => {
-            if (newPlayer.identity.isEqual(currentIdentity)) {
-                setMyPlayer(newPlayer);
-            }
-        };
-
-        conn.db.player.onInsert(handlePlayerInsert);
-        conn.db.player.onUpdate(handlePlayerUpdate);
-
-        const subscription = conn.subscriptionBuilder()
-            .subscribe([`SELECT * FROM player WHERE Identity = '${currentIdentity}'`]);
-
-        return () => {
-            conn.db.player.removeOnInsert(handlePlayerInsert);
-            conn.db.player.removeOnUpdate(handlePlayerUpdate);
-            subscription.unsubscribe();
-        };
-    }, [conn]);
-
-    useEffect(() => {
-        if (myPlayer && myPlayer.isAnonymous) {
-            navigate(getLangHome());
-        }
-    }, [myPlayer, navigate]);
-
     const handleThemeSelect = (tag: string) => {
         setSelectedPreset(tag);
         applyTheme(tag);
@@ -319,7 +272,6 @@ export const SettingsPage = () => {
         if (preset) {
             applyCustomTheme({ ...preset, font: selectedFont });
         }
-        setHasUnsavedChanges(true);
     };
 
     const handleFontChange = (fontName: string) => {
@@ -331,43 +283,6 @@ export const SettingsPage = () => {
             const weight = font.weights.includes(400) ? 400 : font.weights[0];
             applyCustomTheme({ ...preset, font: fontName, fontWeight: weight });
         }
-        setHasUnsavedChanges(true);
-    };
-
-    const handleSave = () => {
-        if (!conn) return;
-        const preset = THEME_PRESETS[selectedPreset as PlayerColor['tag']];
-        if (preset) {
-            const defaultFont = preset.font;
-            if (selectedFont === defaultFont) {
-                conn.reducers.setPlayerColor({ color: { tag: selectedPreset } as any });
-            } else {
-                const font = GOOGLE_FONTS.find((f) => f.name === selectedFont);
-                const weight = font && font.weights.includes(400) ? 400 : font?.weights[0] || 400;
-                const customSettings: ThemeSettings = { ...preset, font: selectedFont, fontWeight: weight };
-                applyCustomTheme(customSettings);
-                (conn.reducers as any).setPlayerTheme({
-                    backgroundColor: customSettings.backgroundColor,
-                    textColor: customSettings.textColor,
-                    borderColor: customSettings.borderColor,
-                    borderWidth: customSettings.borderWidth,
-                    borderRadius: customSettings.borderRadius,
-                    accentColor: customSettings.accentColor,
-                    font: customSettings.font,
-                    fontWeight: customSettings.fontWeight,
-                });
-            }
-        }
-        setHasUnsavedChanges(false);
-    };
-
-    const handleSignOut = async () => {
-        try {
-            await signOut();
-            navigate(getLangHome());
-        } catch (error) {
-            console.error('Error signing out:', error);
-        }
     };
 
     return (
@@ -376,60 +291,27 @@ export const SettingsPage = () => {
 
             <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
                 <div className="content-container max-w-lg">
-                    <div className="flex items-center gap-3 mb-8 mt-4">
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="bg-transparent border-0 text-muted-foreground cursor-pointer p-1 hover:text-foreground transition-colors"
-                        >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="15 18 9 12 15 6" />
-                            </svg>
-                        </button>
-                        <h1 className="text-foreground text-2xl font-bold m-0">Settings</h1>
-                    </div>
+                    <h1 className="text-foreground text-2xl font-bold m-0 mb-8 mt-4">Settings</h1>
 
-                    <div className="box box-shadow rounded-xl p-6 mb-6">
-                        <h2 className="text-foreground text-lg font-semibold m-0 mb-5">Appearance</h2>
-
-                        <div className="space-y-5">
-                            <div>
-                                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
-                                    Theme
-                                </label>
-                                <ThemeDropdown value={selectedPreset} onChange={handleThemeSelect} />
-                            </div>
-
-                            <div>
-                                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
-                                    Font
-                                </label>
-                                <FontDropdown value={selectedFont} onChange={handleFontChange} />
-                            </div>
+                    <div className="space-y-5">
+                        <div>
+                            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
+                                Theme
+                            </label>
+                            <ThemeDropdown value={selectedPreset} onChange={handleThemeSelect} />
                         </div>
 
-                        {hasUnsavedChanges && (
-                            <div className="flex justify-end mt-5">
-                                <button
-                                    onClick={handleSave}
-                                    className="bg-accent-primary text-white border-0 rounded-lg px-4 py-2 text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity"
-                                >
-                                    Save
-                                </button>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="box box-shadow rounded-xl p-6">
-                        <h2 className="text-foreground text-lg font-semibold m-0 mb-5">Account</h2>
-                        <button
-                            onClick={handleSignOut}
-                            className="text-destructive text-sm bg-transparent border-0 cursor-pointer hover:opacity-70 transition-opacity p-0"
-                        >
-                            Sign Out
-                        </button>
+                        <div>
+                            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-2">
+                                Font
+                            </label>
+                            <FontDropdown value={selectedFont} onChange={handleFontChange} />
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <Footer />
         </div>
     );
 };
