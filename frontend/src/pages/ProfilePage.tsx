@@ -7,14 +7,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { getColorConfig } from "../utils/colorMapping";
 import { EditNameModal } from "../components/EditNameModal";
-import { ThemeEditorModal } from "../components/ThemeEditorModal";
 import { getLangHome } from "../utils/modes";
 import { formatNumber, formatTimeSpent } from "../utils/formatters";
 import { useAuth } from "../firebase/AuthContext";
 import { Select } from "../components/Select";
 import { RecentGames } from "../components/RecentGames";
 import { useDatabase } from "../contexts/SpacetimeContext";
-import { type ThemeSettings, applyCustomTheme } from "../utils/themes";
 
 type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
@@ -26,7 +24,6 @@ export const ProfilePage = () => {
     const [selectedMode, setSelectedMode] = useState<string>('all');
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('all');
     const [isEditNameModalOpen, setIsEditNameModalOpen] = useState(false);
-    const [isEditColorModalOpen, setIsEditColorModalOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMenuClosing, setIsMenuClosing] = useState(false);
     const { signOut } = useAuth();
@@ -101,26 +98,6 @@ export const ProfilePage = () => {
         if (!conn) return;
         conn.reducers.setPlayerName({ name });
         setIsEditNameModalOpen(false);
-    };
-
-    const handleColorSave = (color: string, customSettings?: ThemeSettings) => {
-        if (!conn) return;
-        if (customSettings) {
-            applyCustomTheme(customSettings);
-            (conn.reducers as any).setPlayerTheme({
-                backgroundColor: customSettings.backgroundColor,
-                textColor: customSettings.textColor,
-                borderColor: customSettings.borderColor,
-                borderWidth: customSettings.borderWidth,
-                borderRadius: customSettings.borderRadius,
-                accentColor: customSettings.accentColor,
-                font: customSettings.font,
-                fontWeight: customSettings.fontWeight,
-            });
-        } else {
-            conn.reducers.setPlayerColor({ color: { tag: color } as any });
-        }
-        setIsEditColorModalOpen(false);
     };
 
     const handleSignOut = async () => {
@@ -243,12 +220,12 @@ export const ProfilePage = () => {
                                             >
                                                 <button
                                                     onClick={() => {
-                                                        setIsEditColorModalOpen(true);
+                                                        navigate('/settings');
                                                         handleMenuClose();
                                                     }}
                                                     className="w-full text-left px-3 py-2 text-foreground text-sm hover:bg-secondary transition-colors bg-transparent border-0 cursor-pointer rounded-md"
                                                 >
-                                                    Change Theme
+                                                    Settings
                                                 </button>
                                                 <button
                                                     onClick={() => {
@@ -414,14 +391,6 @@ export const ProfilePage = () => {
                     currentName={viewedPlayer.name}
                     onSave={handleNameSave}
                     onClose={() => setIsEditNameModalOpen(false)}
-                />
-            )}
-
-            {isEditColorModalOpen && viewedPlayer && (
-                <ThemeEditorModal
-                    currentColor={viewedPlayer.color.tag}
-                    onSave={handleColorSave}
-                    onClose={() => setIsEditColorModalOpen(false)}
                 />
             )}
         </div>

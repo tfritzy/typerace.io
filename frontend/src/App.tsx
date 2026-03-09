@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LobbyPage } from "./pages/LobbyPage";
 import { GamePage } from "./pages/GamePage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { SettingsPage } from "./pages/SettingsPage";
 import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { SiteStatsPage } from "./pages/SiteStatsPage";
 import { ToastProvider } from "./hooks/useToast";
@@ -17,6 +18,7 @@ function App() {
           <Route path="/game/:gameId" element={<GamePage />} />
           <Route path="/:lang/game/:gameId" element={<GamePage />} />
           <Route path="/profile/:playerId" element={<ProfilePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/stats" element={<SiteStatsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
