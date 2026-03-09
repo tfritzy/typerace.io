@@ -365,7 +365,8 @@ export const SettingsPage = () => {
         try {
             await signOut();
             navigate(getLangHome());
-        } catch {
+        } catch (error) {
+            console.error('Error signing out:', error);
         }
     };
 
