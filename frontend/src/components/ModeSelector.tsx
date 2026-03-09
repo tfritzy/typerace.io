@@ -98,7 +98,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                     onClick={() => setIsDrawerOpen(false)}
                                     className="text-muted-foreground hover:text-foreground transition-colors"
                                 >
-                                    <ChevronDown size={24} className="rotate-180" />
+                                    <ChevronDown size={24} />
                                 </button>
                             </div>
                             <div className="p-4 pb-8">
