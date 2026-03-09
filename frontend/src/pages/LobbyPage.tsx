@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import "../components/SelectionButton.css";
 import { type GameMode } from "../types/stdb";
 import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
 import { GameOptionsSelector, type GameTypeValue } from "../components/ModeSelector";
@@ -74,8 +73,17 @@ export const LobbyPage = () => {
   return (
     <div className="relative h-full flex flex-col">
       <Header />
-      <div className="flex-1 flex items-center justify-center p-4 min-h-0">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 min-h-0">
         <div className="content-container">
+          <div className="mb-6">
+            <GameOptionsSelector
+              selectedMode={selectedMode}
+              onModeSelect={handleModeSelect}
+              gameType={gameType}
+              setGameType={handleGameTypeChange}
+              currentLang={currentLang}
+            />
+          </div>
           <div className="text-2xl">
             <TypeBox
               ref={typeBoxRef}
@@ -84,17 +92,6 @@ export const LobbyPage = () => {
               resetOnComplete={true}
             />
           </div>
-        </div>
-      </div>
-      <div className="px-4 pb-2">
-        <div className="content-container">
-          <GameOptionsSelector
-            selectedMode={selectedMode}
-            onModeSelect={handleModeSelect}
-            gameType={gameType}
-            setGameType={handleGameTypeChange}
-            currentLang={currentLang}
-          />
         </div>
       </div>
       <Footer />
