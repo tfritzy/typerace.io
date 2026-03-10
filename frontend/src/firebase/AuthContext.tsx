@@ -14,8 +14,14 @@ import {
 import { auth } from '../firebase/config';
 import { LoadingDots } from '../components/LoadingDots';
 
-interface AuthContextType {
-    user: User | null;
+export interface AuthUser {
+    uid: string;
+    isAnonymous: boolean;
+    getIdToken(): Promise<string>;
+}
+
+export interface AuthContextType {
+    user: AuthUser | null;
     loading: boolean;
     signIn: (email: string, password: string) => Promise<void>;
     signUp: (email: string, password: string) => Promise<void>;
@@ -25,7 +31,7 @@ interface AuthContextType {
     signInWithGithub: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
@@ -88,7 +94,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         await signInWithPopup(auth, provider);
     };
 
-    const value = {
+    const value: AuthContextType = {
         user,
         loading,
         signIn,

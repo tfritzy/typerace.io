@@ -41,10 +41,15 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
         try {
             const idToken = await user.getIdToken();
 
-            const connection = DbConnection.builder()
+            let builder = DbConnection.builder()
                 .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
-                .withModuleName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace')
-                .withToken(idToken)
+                .withModuleName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace');
+
+            if (idToken && idToken !== 'dev-token') {
+                builder = builder.withToken(idToken);
+            }
+
+            const connection = builder
                 .onConnect((conn) => {
                     console.log('Connected to SpacetimeDB');
                     conn.reducers.syncAnonymousStatus({ isAnonymous: user.isAnonymous });
