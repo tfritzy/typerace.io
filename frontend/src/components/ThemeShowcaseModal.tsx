@@ -1,32 +1,114 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import {
     THEME_PRESETS,
     GOOGLE_FONTS,
     loadGoogleFont,
     fontNameToCss,
-    applyTheme,
     applyCustomTheme,
+    applyTheme,
     resolveTheme,
     getInitialTheme,
     getCustomThemeSettings,
-    type ThemePreset,
+    type ThemeSettings,
     type GoogleFont,
 } from '../utils/themes';
-import type { PlayerColor } from '../types/stdb';
 
 const SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog";
 
+interface ShowcaseTheme {
+    tag: string;
+    name: string;
+    settings: ThemeSettings;
+    previewColors: string[];
+}
+
+const DARK_THEMES: ShowcaseTheme[] = [
+    { tag: 'Dracula', name: 'Dracula', settings: THEME_PRESETS.Dracula, previewColors: THEME_PRESETS.Dracula.previewColors },
+    { tag: 'Monokai', name: 'Monokai', settings: THEME_PRESETS.Monokai, previewColors: THEME_PRESETS.Monokai.previewColors },
+    { tag: 'Nord', name: 'Nord', settings: THEME_PRESETS.Nord, previewColors: THEME_PRESETS.Nord.previewColors },
+    { tag: 'TokyoNight', name: 'Tokyo Night', settings: THEME_PRESETS.TokyoNight, previewColors: THEME_PRESETS.TokyoNight.previewColors },
+    { tag: 'GruvboxDark', name: 'Gruvbox Dark', settings: THEME_PRESETS.GruvboxDark, previewColors: THEME_PRESETS.GruvboxDark.previewColors },
+    { tag: 'CatppuccinMocha', name: 'Catppuccin Mocha', settings: THEME_PRESETS.CatppuccinMocha, previewColors: THEME_PRESETS.CatppuccinMocha.previewColors },
+    {
+        tag: 'OneDark', name: 'One Dark',
+        settings: { backgroundColor: '#282c34', textColor: '#abb2bf', borderColor: 'rgba(171, 178, 191, 0.1)', borderWidth: 1, borderRadius: 8, accentColor: '#61afef', font: 'Inter', fontWeight: 400 },
+        previewColors: ['#282c34', '#61afef', '#c678dd', '#98c379'],
+    },
+    {
+        tag: 'RosePine', name: 'Rosé Pine',
+        settings: { backgroundColor: '#191724', textColor: '#e0def4', borderColor: 'rgba(224, 222, 244, 0.1)', borderWidth: 1, borderRadius: 8, accentColor: '#c4a7e7', font: 'Inter', fontWeight: 400 },
+        previewColors: ['#191724', '#c4a7e7', '#ebbcba', '#9ccfd8'],
+    },
+    {
+        tag: 'AyuDark', name: 'Ayu Dark',
+        settings: { backgroundColor: '#0d1017', textColor: '#bfbdb6', borderColor: 'rgba(191, 189, 182, 0.1)', borderWidth: 1, borderRadius: 8, accentColor: '#e6b450', font: 'Inter', fontWeight: 400 },
+        previewColors: ['#0d1017', '#e6b450', '#39bae6', '#aad94c'],
+    },
+    {
+        tag: 'Kanagawa', name: 'Kanagawa',
+        settings: { backgroundColor: '#1f1f28', textColor: '#dcd7ba', borderColor: 'rgba(220, 215, 186, 0.1)', borderWidth: 1, borderRadius: 8, accentColor: '#7e9cd8', font: 'Inter', fontWeight: 400 },
+        previewColors: ['#1f1f28', '#7e9cd8', '#957fb8', '#98bb6c'],
+    },
+    { tag: 'Pico8', name: 'PICO-8', settings: THEME_PRESETS.Pico8, previewColors: THEME_PRESETS.Pico8.previewColors },
+    { tag: 'Endesga', name: 'Endesga 32', settings: THEME_PRESETS.Endesga, previewColors: THEME_PRESETS.Endesga.previewColors },
+    { tag: 'Sweetie16', name: 'Sweetie 16', settings: THEME_PRESETS.Sweetie16, previewColors: THEME_PRESETS.Sweetie16.previewColors },
+];
+
+const LIGHT_THEMES: ShowcaseTheme[] = [
+    { tag: 'GitHubLight', name: 'GitHub Light', settings: THEME_PRESETS.GitHubLight, previewColors: THEME_PRESETS.GitHubLight.previewColors },
+    { tag: 'SolarizedLight', name: 'Solarized Light', settings: THEME_PRESETS.SolarizedLight, previewColors: THEME_PRESETS.SolarizedLight.previewColors },
+    { tag: 'OneLight', name: 'One Light', settings: THEME_PRESETS.OneLight, previewColors: THEME_PRESETS.OneLight.previewColors },
+    { tag: 'CatppuccinLatte', name: 'Catppuccin Latte', settings: THEME_PRESETS.CatppuccinLatte, previewColors: THEME_PRESETS.CatppuccinLatte.previewColors },
+    { tag: 'GruvboxLight', name: 'Gruvbox Light', settings: THEME_PRESETS.GruvboxLight, previewColors: THEME_PRESETS.GruvboxLight.previewColors },
+    { tag: 'RosePineDawn', name: 'Rosé Pine Dawn', settings: THEME_PRESETS.RosePineDawn, previewColors: THEME_PRESETS.RosePineDawn.previewColors },
+    {
+        tag: 'AyuLight', name: 'Ayu Light',
+        settings: { backgroundColor: '#fcfcfc', textColor: '#5c6166', borderColor: 'rgba(92, 97, 102, 0.25)', borderWidth: 1, borderRadius: 8, accentColor: '#ff9940', font: 'Inter', fontWeight: 400 },
+        previewColors: ['#fcfcfc', '#ff9940', '#399ee6', '#86b300'],
+    },
+    {
+        tag: 'NordLight', name: 'Nord Light',
+        settings: { backgroundColor: '#eceff4', textColor: '#2e3440', borderColor: 'rgba(46, 52, 64, 0.2)', borderWidth: 1, borderRadius: 12, accentColor: '#5e81ac', font: 'Inter', fontWeight: 400 },
+        previewColors: ['#eceff4', '#5e81ac', '#88c0d0', '#a3be8c'],
+    },
+    {
+        tag: 'TokyoNightLight', name: 'Tokyo Night Light',
+        settings: { backgroundColor: '#d5d6db', textColor: '#343b58', borderColor: 'rgba(52, 59, 88, 0.25)', borderWidth: 1, borderRadius: 8, accentColor: '#34548a', font: 'Inter', fontWeight: 400 },
+        previewColors: ['#d5d6db', '#34548a', '#5a4a78', '#33635c'],
+    },
+    {
+        tag: 'MaterialLight', name: 'Material Light',
+        settings: { backgroundColor: '#fafafa', textColor: '#546e7a', borderColor: 'rgba(84, 110, 122, 0.25)', borderWidth: 1, borderRadius: 8, accentColor: '#6182b8', font: 'Inter', fontWeight: 400 },
+        previewColors: ['#fafafa', '#6182b8', '#7c4dff', '#91b859'],
+    },
+    {
+        tag: 'Paper', name: 'Paper',
+        settings: { backgroundColor: '#f2eede', textColor: '#4d453e', borderColor: 'rgba(77, 69, 62, 0.2)', borderWidth: 1, borderRadius: 8, accentColor: '#d73737', font: 'Inter', fontWeight: 400 },
+        previewColors: ['#f2eede', '#d73737', '#6684e1', '#60ac39'],
+    },
+    {
+        tag: 'Moonlight', name: 'Quiet Light',
+        settings: { backgroundColor: '#f5f5f5', textColor: '#333333', borderColor: 'rgba(51, 51, 51, 0.2)', borderWidth: 1, borderRadius: 8, accentColor: '#4078f2', font: 'Inter', fontWeight: 400 },
+        previewColors: ['#f5f5f5', '#4078f2', '#7c4dff', '#2aa198'],
+    },
+    {
+        tag: 'EverforestLight', name: 'Everforest Light',
+        settings: { backgroundColor: '#fdf6e3', textColor: '#5c6a72', borderColor: 'rgba(92, 106, 114, 0.25)', borderWidth: 1, borderRadius: 8, accentColor: '#8da101', font: 'Inter', fontWeight: 400 },
+        previewColors: ['#fdf6e3', '#8da101', '#35a77c', '#f85552'],
+    },
+];
+
 function ThemeCard({
-    preset,
+    theme,
     isSelected,
     onSelect,
 }: {
-    preset: ThemePreset;
+    theme: ShowcaseTheme;
     isSelected: boolean;
     onSelect: () => void;
 }) {
-    const theme = resolveTheme(preset, preset.name, preset.previewColors);
+    const resolved = resolveTheme(theme.settings, theme.name, theme.previewColors);
 
     return (
         <button
@@ -40,28 +122,28 @@ function ThemeCard({
             <div
                 className="p-3"
                 style={{
-                    background: theme.colors.background,
-                    borderRadius: `${Math.min(theme.borderRadius, 8)}px ${Math.min(theme.borderRadius, 8)}px 0 0`,
+                    background: resolved.colors.background,
+                    borderRadius: `${Math.min(resolved.borderRadius, 8)}px ${Math.min(resolved.borderRadius, 8)}px 0 0`,
                 }}
             >
                 <div
                     className="p-2 mb-2"
                     style={{
-                        background: theme.colors.card,
-                        border: `${theme.borderWidth}px solid ${theme.colors.border}`,
-                        borderRadius: `${Math.min(theme.borderRadius, 6)}px`,
+                        background: resolved.colors.card,
+                        border: `${resolved.borderWidth}px solid ${resolved.colors.border}`,
+                        borderRadius: `${Math.min(resolved.borderRadius, 6)}px`,
                     }}
                 >
                     <div
                         className="text-xs leading-relaxed"
-                        style={{ fontFamily: theme.font }}
+                        style={{ fontFamily: resolved.font }}
                     >
-                        <span style={{ color: theme.colors.accent }}>the quick </span>
-                        <span style={{ color: theme.colors.textUntyped }}>brown fox</span>
+                        <span style={{ color: resolved.colors.accent }}>the quick </span>
+                        <span style={{ color: resolved.colors.textUntyped }}>brown fox</span>
                     </div>
                 </div>
                 <div className="flex gap-1 mt-2">
-                    {theme.previewColors.slice(1).map((color) => (
+                    {resolved.previewColors.slice(1).map((color) => (
                         <div
                             key={color}
                             className="h-1.5 flex-1 rounded-full"
@@ -73,8 +155,8 @@ function ThemeCard({
             <div
                 className="px-3 py-2 text-xs font-medium"
                 style={{
-                    background: theme.colors.card,
-                    color: theme.colors.foreground,
+                    background: resolved.colors.card,
+                    color: resolved.colors.foreground,
                 }}
             >
                 {theme.name}
@@ -122,18 +204,25 @@ type ThemeShowcaseModalProps = {
 export const ThemeShowcaseModal = ({ onClose }: ThemeShowcaseModalProps) => {
     const [activeTab, setActiveTab] = useState<'themes' | 'fonts'>('themes');
 
+    const allThemes = useMemo(() => {
+        const map = new Map<string, ShowcaseTheme>();
+        for (const t of DARK_THEMES) map.set(t.tag, t);
+        for (const t of LIGHT_THEMES) map.set(t.tag, t);
+        return map;
+    }, []);
+
     const [selectedTheme, setSelectedTheme] = useState<string>(() => {
         const initial = getInitialTheme();
         if (initial === 'custom') {
             const custom = getCustomThemeSettings();
             if (custom) {
-                const match = Object.entries(THEME_PRESETS).find(
-                    ([, p]) =>
-                        p.backgroundColor === custom.backgroundColor &&
-                        p.accentColor === custom.accentColor &&
-                        p.textColor === custom.textColor
-                );
-                if (match) return match[0];
+                for (const [tag, t] of allThemes) {
+                    if (
+                        t.settings.backgroundColor === custom.backgroundColor &&
+                        t.settings.accentColor === custom.accentColor &&
+                        t.settings.textColor === custom.textColor
+                    ) return tag;
+                }
             }
             return 'CatppuccinMocha';
         }
@@ -146,32 +235,28 @@ export const ThemeShowcaseModal = ({ onClose }: ThemeShowcaseModalProps) => {
             const custom = getCustomThemeSettings();
             if (custom) return custom.font;
         }
-        const preset = THEME_PRESETS[initial as PlayerColor['tag']];
-        return preset?.font || 'Inter';
+        const t = allThemes.get(initial);
+        return t?.settings.font || 'Inter';
     });
 
     useEffect(() => {
         GOOGLE_FONTS.forEach((f) => loadGoogleFont(f.name));
     }, []);
 
-    const themes = Object.entries(THEME_PRESETS) as [
-        PlayerColor['tag'],
-        ThemePreset,
-    ][];
-
     const handleThemeSelect = useCallback(
         (tag: string) => {
             setSelectedTheme(tag);
-            const preset = THEME_PRESETS[tag as PlayerColor['tag']];
-            if (!preset) return;
-            if (selectedFont !== preset.font) {
+            const t = allThemes.get(tag);
+            if (!t) return;
+            const isBuiltIn = tag in THEME_PRESETS;
+            if (selectedFont !== t.settings.font || !isBuiltIn) {
                 const font = GOOGLE_FONTS.find((f) => f.name === selectedFont);
                 const weight =
                     font && font.weights.includes(400)
                         ? 400
                         : font?.weights[0] || 400;
                 applyCustomTheme({
-                    ...preset,
+                    ...t.settings,
                     font: selectedFont,
                     fontWeight: weight,
                 });
@@ -179,30 +264,31 @@ export const ThemeShowcaseModal = ({ onClose }: ThemeShowcaseModalProps) => {
                 applyTheme(tag);
             }
         },
-        [selectedFont]
+        [selectedFont, allThemes]
     );
 
     const handleFontSelect = useCallback(
         (fontName: string) => {
             setSelectedFont(fontName);
-            const preset = THEME_PRESETS[selectedTheme as PlayerColor['tag']];
-            if (!preset) return;
+            const t = allThemes.get(selectedTheme);
+            if (!t) return;
             const font = GOOGLE_FONTS.find((f) => f.name === fontName);
             const weight =
                 font && font.weights.includes(400)
                     ? 400
                     : font?.weights[0] || 400;
-            if (fontName === preset.font) {
+            const isBuiltIn = selectedTheme in THEME_PRESETS;
+            if (fontName === t.settings.font && isBuiltIn) {
                 applyTheme(selectedTheme);
             } else {
                 applyCustomTheme({
-                    ...preset,
+                    ...t.settings,
                     font: fontName,
                     fontWeight: weight,
                 });
             }
         },
-        [selectedTheme]
+        [selectedTheme, allThemes]
     );
 
     const handleClose = useCallback(() => {
@@ -211,7 +297,7 @@ export const ThemeShowcaseModal = ({ onClose }: ThemeShowcaseModalProps) => {
 
     return (
         <Dialog open={true} onOpenChange={(open) => { if (!open) handleClose(); }}>
-            <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
+            <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
                 <DialogTitle className="sr-only">Theme & Font Settings</DialogTitle>
                 <div className="flex gap-6 px-6 pt-6 pb-0 border-b border-border shrink-0">
                     <button
@@ -238,15 +324,33 @@ export const ThemeShowcaseModal = ({ onClose }: ThemeShowcaseModalProps) => {
 
                 <div className="flex-1 overflow-y-auto p-6">
                     {activeTab === 'themes' && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                            {themes.map(([tag, preset]) => (
-                                <ThemeCard
-                                    key={tag}
-                                    preset={preset}
-                                    isSelected={selectedTheme === tag}
-                                    onSelect={() => handleThemeSelect(tag)}
-                                />
-                            ))}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Dark</h3>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {DARK_THEMES.map((t) => (
+                                        <ThemeCard
+                                            key={t.tag}
+                                            theme={t}
+                                            isSelected={selectedTheme === t.tag}
+                                            onSelect={() => handleThemeSelect(t.tag)}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Light</h3>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {LIGHT_THEMES.map((t) => (
+                                        <ThemeCard
+                                            key={t.tag}
+                                            theme={t}
+                                            isSelected={selectedTheme === t.tag}
+                                            onSelect={() => handleThemeSelect(t.tag)}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     )}
 
