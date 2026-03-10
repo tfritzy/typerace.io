@@ -44,9 +44,9 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                 }}
                 aria-label="Select language"
             >
-                <span className="flex flex-col items-center pl-[2px]">
+                <span className="flex items-center gap-1.5 pl-[2px]">
+                    <span className="text-xs font-medium text-white/70">{currentLang.nativeName}</span>
                     <span className="text-2xl leading-none">{currentLang.flag}</span>
-                    <span className="text-[10px] font-medium text-white/70 mt-1">{currentLang.nativeName}</span>
                 </span>
                 <div
                     className="absolute left-0 top-0 bottom-0 w-[2px] bg-white/50"
