@@ -75,21 +75,21 @@ export const LobbyPage = () => {
       <Header />
       <div className="flex-1 flex flex-col items-center justify-center p-4 min-h-0">
         <div className="content-container">
-          <div className="mb-6">
-            <GameOptionsSelector
-              selectedMode={selectedMode}
-              onModeSelect={handleModeSelect}
-              gameType={gameType}
-              setGameType={handleGameTypeChange}
-              currentLang={currentLang}
-            />
-          </div>
           <div className="text-2xl">
             <TypeBox
               ref={typeBoxRef}
               phrase={startupPhrase}
               onComplete={handlePhraseComplete}
               resetOnComplete={true}
+            />
+          </div>
+          <div className="mt-6">
+            <GameOptionsSelector
+              selectedMode={selectedMode}
+              onModeSelect={handleModeSelect}
+              gameType={gameType}
+              setGameType={handleGameTypeChange}
+              currentLang={currentLang}
             />
           </div>
         </div>
