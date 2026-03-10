@@ -37,7 +37,7 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
             <button
                 ref={buttonRef}
                 onClick={() => setIsOpen(!isOpen)}
-                className="cursor-pointer bg-transparent border-none px-0 pt-0 pb-10 relative transition-opacity hover:opacity-80"
+                className="cursor-pointer bg-transparent border-none px-0 pt-0 pb-8 relative transition-opacity hover:opacity-80"
                 style={{
                     transform: mounted ? "translateY(0)" : "translateY(100%)",
                     transition: "transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
