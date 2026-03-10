@@ -62,7 +62,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
 
     return (
         <>
-            <div className="hidden md:flex items-center justify-center gap-1 flex-wrap">
+            <div className="hidden md:flex items-center justify-start gap-1 flex-wrap">
                 <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label="Public Match" />
                 <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label="Private Lobby" />
                 <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label="Practice Mode" />
