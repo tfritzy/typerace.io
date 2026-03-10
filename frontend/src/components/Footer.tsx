@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Palette } from "lucide-react";
+import { ThemeShowcaseModal } from "./ThemeShowcaseModal";
 
 export const Footer = () => {
+    const [showThemeModal, setShowThemeModal] = useState(false);
+
     return (
         <footer className="py-4 px-4">
             <div className="content-container">
@@ -36,8 +41,19 @@ export const Footer = () => {
                         </svg>
                         <span>Privacy policy</span>
                     </Link>
+                    <span className="opacity-50">|</span >
+                    <button
+                        onClick={() => setShowThemeModal(true)}
+                        className="flex items-center gap-1.5 hover:text-foreground/60 transition-colors cursor-pointer bg-transparent border-0 p-0 text-sm text-muted-foreground"
+                    >
+                        <Palette className="w-4 h-4" />
+                        <span>Theme</span>
+                    </button>
                 </div>
             </div>
+            {showThemeModal && (
+                <ThemeShowcaseModal onClose={() => setShowThemeModal(false)} />
+            )}
         </footer>
     );
 };
