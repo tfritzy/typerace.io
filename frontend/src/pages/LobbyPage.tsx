@@ -74,7 +74,7 @@ export const LobbyPage = () => {
     <div className="relative h-full flex flex-col">
       <Header />
       <div className="flex-1 flex flex-col items-center p-4 min-h-0">
-        <div className="flex-1" />
+        <div className="flex-[3]" />
         <div className="content-container">
           <div className="text-2xl">
             <TypeBox
@@ -94,7 +94,7 @@ export const LobbyPage = () => {
             />
           </div>
         </div>
-        <div className="flex-[3]" />
+        <div className="flex-[2]" />
       </div>
       <Footer />
       <LanguageSelector currentLang={currentLang} />
