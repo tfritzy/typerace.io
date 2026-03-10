@@ -7,14 +7,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { getColorConfig } from "../utils/colorMapping";
 import { EditNameModal } from "../components/EditNameModal";
-import { ThemeEditorModal } from "../components/ThemeEditorModal";
 import { getLangHome } from "../utils/modes";
 import { formatNumber, formatTimeSpent } from "../utils/formatters";
 import { useAuth } from "../firebase/AuthContext";
 import { Select } from "../components/Select";
 import { RecentGames } from "../components/RecentGames";
 import { useDatabase } from "../contexts/SpacetimeContext";
-import { type ThemeSettings, applyCustomTheme } from "../utils/themes";
 
 type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
@@ -26,9 +24,6 @@ export const ProfilePage = () => {
     const [selectedMode, setSelectedMode] = useState<string>('all');
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('all');
     const [isEditNameModalOpen, setIsEditNameModalOpen] = useState(false);
-    const [isEditColorModalOpen, setIsEditColorModalOpen] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isMenuClosing, setIsMenuClosing] = useState(false);
     const { signOut } = useAuth();
     const navigate = useNavigate();
 
@@ -103,26 +98,6 @@ export const ProfilePage = () => {
         setIsEditNameModalOpen(false);
     };
 
-    const handleColorSave = (color: string, customSettings?: ThemeSettings) => {
-        if (!conn) return;
-        if (customSettings) {
-            applyCustomTheme(customSettings);
-            (conn.reducers as any).setPlayerTheme({
-                backgroundColor: customSettings.backgroundColor,
-                textColor: customSettings.textColor,
-                borderColor: customSettings.borderColor,
-                borderWidth: customSettings.borderWidth,
-                borderRadius: customSettings.borderRadius,
-                accentColor: customSettings.accentColor,
-                font: customSettings.font,
-                fontWeight: customSettings.fontWeight,
-            });
-        } else {
-            conn.reducers.setPlayerColor({ color: { tag: color } as any });
-        }
-        setIsEditColorModalOpen(false);
-    };
-
     const handleSignOut = async () => {
         try {
             await signOut();
@@ -130,26 +105,6 @@ export const ProfilePage = () => {
         } catch (error) {
             console.error('Error signing out:', error);
         }
-    };
-
-    const handleMenuToggle = () => {
-        if (isMenuOpen) {
-            setIsMenuClosing(true);
-            setTimeout(() => {
-                setIsMenuOpen(false);
-                setIsMenuClosing(false);
-            }, 150);
-        } else {
-            setIsMenuOpen(true);
-        }
-    };
-
-    const handleMenuClose = () => {
-        setIsMenuClosing(true);
-        setTimeout(() => {
-            setIsMenuOpen(false);
-            setIsMenuClosing(false);
-        }, 150);
     };
 
     const getTimeFrameFilter = (timeFrame: TimeFrame): number => {
@@ -215,59 +170,9 @@ export const ProfilePage = () => {
             <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
                 <div className="content-container">
                     <div className="box box-shadow rounded-xl p-4 sm:p-8 mb-8 relative">
-                        {isOwnProfile && (
-                            <div className="absolute top-3 right-3 sm:top-5 sm:right-5 flex items-center gap-2">
-                                <div className="relative">
-                                    <button
-                                        onClick={handleMenuToggle}
-                                        className="bg-transparent border-0 text-muted-foreground cursor-pointer p-2 hover:text-foreground/70 transition-colors"
-                                        title="Options"
-                                    >
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <circle cx="12" cy="12" r="1" />
-                                            <circle cx="12" cy="5" r="1" />
-                                            <circle cx="12" cy="19" r="1" />
-                                        </svg>
-                                    </button>
-                                    {isMenuOpen && (
-                                        <>
-                                            <div
-                                                className="fixed inset-0 z-10"
-                                                onClick={handleMenuClose}
-                                            />
-                                            <div
-                                                className="absolute right-0 top-full mt-2 bg-card border border-border rounded-lg shadow-lg p-2 min-w-40 z-20"
-                                                style={{
-                                                    animation: isMenuClosing ? 'menuSlideOut 0.15s ease-out' : 'menuSlideIn 0.15s ease-out'
-                                                }}
-                                            >
-                                                <button
-                                                    onClick={() => {
-                                                        setIsEditColorModalOpen(true);
-                                                        handleMenuClose();
-                                                    }}
-                                                    className="w-full text-left px-3 py-2 text-foreground text-sm hover:bg-secondary transition-colors bg-transparent border-0 cursor-pointer rounded-md"
-                                                >
-                                                    Change Theme
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        handleSignOut();
-                                                        handleMenuClose();
-                                                    }}
-                                                    className="w-full text-left px-3 py-2 text-destructive text-sm hover:bg-secondary transition-colors bg-transparent border-0 cursor-pointer rounded-md"
-                                                >
-                                                    Sign Out
-                                                </button>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-                        )}
                         {viewedPlayer && (
                             <>
-                                <div className={`flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6 ${isOwnProfile ? 'pt-8 sm:pt-0' : ''}`}>
+                                <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6">
                                     <PlayerAvatar
                                         size={80}
                                         identity={viewedPlayer.identity.toHexString()}
@@ -406,6 +311,18 @@ export const ProfilePage = () => {
                         </h2>
                         <RecentGames gameRecords={realGameData} />
                     </div>
+
+                    {isOwnProfile && (
+                        <div className="mt-8 flex justify-center">
+                            <button
+                                onClick={handleSignOut}
+                                className="text-sm text-muted-foreground hover:text-destructive transition-colors bg-transparent border-0 cursor-pointer px-4 py-2"
+                                aria-label="Sign out of your account"
+                            >
+                                Sign Out
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -414,14 +331,6 @@ export const ProfilePage = () => {
                     currentName={viewedPlayer.name}
                     onSave={handleNameSave}
                     onClose={() => setIsEditNameModalOpen(false)}
-                />
-            )}
-
-            {isEditColorModalOpen && viewedPlayer && (
-                <ThemeEditorModal
-                    currentColor={viewedPlayer.color.tag}
-                    onSave={handleColorSave}
-                    onClose={() => setIsEditColorModalOpen(false)}
                 />
             )}
         </div>
