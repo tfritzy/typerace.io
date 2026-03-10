@@ -37,14 +37,14 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
             <button
                 ref={buttonRef}
                 onClick={() => setIsOpen(!isOpen)}
-                className="cursor-pointer bg-transparent border-none px-0 pt-0 pb-8 relative transition-opacity hover:opacity-80"
+                className="cursor-pointer bg-transparent border-none px-0 pt-0 pb-0 relative transition-opacity hover:opacity-80"
                 style={{
                     transform: mounted ? "translateY(0)" : "translateY(100%)",
                     transition: "transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
                 }}
                 aria-label="Select language"
             >
-                <span className="flex flex-col items-center pl-[2px]">
+                <span className="flex flex-col items-center">
                     <span className="flex items-center gap-1 mb-2">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-2.5 h-2.5 text-white/50">
                             <path d="M13.488 2.513a1.75 1.75 0 0 0-2.475 0L6.75 6.774a2.75 2.75 0 0 0-.596.892l-.848 2.047a.75.75 0 0 0 .98.98l2.047-.848a2.75 2.75 0 0 0 .892-.596l4.261-4.262a1.75 1.75 0 0 0 0-2.474Z" />
@@ -52,11 +52,13 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                         </svg>
                         <span className="text-[10px] font-medium text-white/70">{currentLang.nativeName}</span>
                     </span>
-                    <span className="text-2xl leading-none">{currentLang.flag}</span>
+                    <span className="relative pl-[2px] pb-8">
+                        <span className="text-2xl leading-none">{currentLang.flag}</span>
+                        <div
+                            className="absolute left-0 top-0 bottom-0 w-[2px] bg-white/50"
+                        />
+                    </span>
                 </span>
-                <div
-                    className="absolute left-0 top-0 bottom-0 w-[2px] bg-white/50"
-                />
             </button>
 
             <div
