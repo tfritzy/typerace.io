@@ -73,7 +73,7 @@ export const LobbyPage = () => {
   return (
     <div className="relative h-full flex flex-col">
       <Header />
-      <div className="flex-1 flex flex-col items-center justify-center p-4 min-h-0">
+      <div className="flex-1 flex flex-col items-center p-4 min-h-0 pt-[10vh]">
         <div className="content-container">
           <div className="text-2xl">
             <TypeBox
