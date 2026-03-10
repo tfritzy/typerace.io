@@ -6,23 +6,14 @@ import {
     onAuthStateChanged,
     sendPasswordResetEmail,
     signInWithPopup,
-    signInAnonymously,
     GoogleAuthProvider,
     GithubAuthProvider,
     type User
 } from 'firebase/auth';
 import { auth } from '../firebase/config';
-import { LoadingDots } from '../components/LoadingDots';
 
-export interface AuthUser {
-    uid: string;
-    isAnonymous: boolean;
-    getIdToken(): Promise<string>;
-}
-
-export interface AuthContextType {
-    user: AuthUser | null;
-    loading: boolean;
+interface AuthContextType {
+    user: User | null;
     signIn: (email: string, password: string) => Promise<void>;
     signUp: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
@@ -31,7 +22,7 @@ export interface AuthContextType {
     signInWithGithub: () => Promise<void>;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
@@ -47,22 +38,10 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-            if (!firebaseUser) {
-                try {
-                    await signInAnonymously(auth);
-                } catch (error) {
-                    console.error('Failed to sign in anonymously:', error);
-                    setUser(null);
-                    setLoading(false);
-                }
-            } else {
-                setUser(firebaseUser);
-                setLoading(false);
-            }
+        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+            setUser(firebaseUser);
         });
 
         return unsubscribe;
@@ -96,7 +75,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const value: AuthContextType = {
         user,
-        loading,
         signIn,
         signUp,
         signOut,
@@ -107,7 +85,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {loading ? <LoadingDots /> : children}
+            {children}
         </AuthContext.Provider>
     );
 };
