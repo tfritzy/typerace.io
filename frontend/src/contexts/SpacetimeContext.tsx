@@ -31,23 +31,25 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     const failureTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const connect = async (isAutoReconnect = false) => {
-        if (!user) return;
-
         if (isAutoReconnect) {
             setIsReconnecting(true);
             setReconnectFailed(false);
         }
 
         try {
-            const idToken = await user.getIdToken();
-
-            const connection = DbConnection.builder()
+            let builder = DbConnection.builder()
                 .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
-                .withModuleName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace')
-                .withToken(idToken)
+                .withModuleName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace');
+
+            if (user) {
+                const idToken = await user.getIdToken();
+                builder = builder.withToken(idToken);
+            }
+
+            const connection = builder
                 .onConnect((conn) => {
                     console.log('Connected to SpacetimeDB');
-                    conn.reducers.syncAnonymousStatus({ isAnonymous: user.isAnonymous });
+                    conn.reducers.syncAnonymousStatus({ isAnonymous: !user });
                     setConn(conn);
                     setShowReconnectModal(false);
                     setIsReconnecting(false);
@@ -115,10 +117,6 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     };
 
     useEffect(() => {
-        if (!user) {
-            return;
-        }
-
         const connectionPromise = connect();
 
         return () => {
@@ -134,10 +132,6 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
             });
         };
     }, [user?.uid]);
-
-    if (!user) {
-        return <LoadingDots />;
-    }
 
     if (!conn?.identity && !showReconnectModal) {
         return <LoadingDots />;

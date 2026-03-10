@@ -6,17 +6,14 @@ import {
     onAuthStateChanged,
     sendPasswordResetEmail,
     signInWithPopup,
-    signInAnonymously,
     GoogleAuthProvider,
     GithubAuthProvider,
     type User
 } from 'firebase/auth';
 import { auth } from '../firebase/config';
-import { LoadingDots } from '../components/LoadingDots';
 
 interface AuthContextType {
     user: User | null;
-    loading: boolean;
     signIn: (email: string, password: string) => Promise<void>;
     signUp: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
@@ -41,22 +38,10 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-            if (!firebaseUser) {
-                try {
-                    await signInAnonymously(auth);
-                } catch (error) {
-                    console.error('Failed to sign in anonymously:', error);
-                    setUser(null);
-                    setLoading(false);
-                }
-            } else {
-                setUser(firebaseUser);
-                setLoading(false);
-            }
+        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+            setUser(firebaseUser);
         });
 
         return unsubscribe;
@@ -88,9 +73,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         await signInWithPopup(auth, provider);
     };
 
-    const value = {
+    const value: AuthContextType = {
         user,
-        loading,
         signIn,
         signUp,
         signOut,
@@ -101,7 +85,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {loading ? <LoadingDots /> : children}
+            {children}
         </AuthContext.Provider>
     );
 };
