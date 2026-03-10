@@ -61,9 +61,9 @@ function ThemeCard({
                     </div>
                 </div>
                 <div className="flex gap-1 mt-2">
-                    {theme.previewColors.slice(1).map((color, i) => (
+                    {theme.previewColors.slice(1).map((color) => (
                         <div
-                            key={i}
+                            key={color}
                             className="h-1.5 flex-1 rounded-full"
                             style={{ background: color }}
                         />
@@ -128,7 +128,10 @@ export const ThemeShowcaseModal = ({ onClose }: ThemeShowcaseModalProps) => {
             const custom = getCustomThemeSettings();
             if (custom) {
                 const match = Object.entries(THEME_PRESETS).find(
-                    ([, p]) => p.backgroundColor === custom.backgroundColor && p.accentColor === custom.accentColor
+                    ([, p]) =>
+                        p.backgroundColor === custom.backgroundColor &&
+                        p.accentColor === custom.accentColor &&
+                        p.textColor === custom.textColor
                 );
                 if (match) return match[0];
             }
@@ -202,8 +205,12 @@ export const ThemeShowcaseModal = ({ onClose }: ThemeShowcaseModalProps) => {
         [selectedTheme]
     );
 
+    const handleClose = useCallback(() => {
+        onClose();
+    }, [onClose]);
+
     return (
-        <Dialog open={true} onOpenChange={(open) => { if (!open) onClose(); }}>
+        <Dialog open={true} onOpenChange={(open) => { if (!open) handleClose(); }}>
             <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
                 <DialogTitle className="sr-only">Theme & Font Settings</DialogTitle>
                 <div className="flex gap-6 px-6 pt-6 pb-0 border-b border-border shrink-0">
