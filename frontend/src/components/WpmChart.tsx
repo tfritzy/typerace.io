@@ -279,7 +279,7 @@ export const WpmChart = ({ data }: WpmChartProps) => {
     };
 
     return (
-        <div className="mb-8 bg-card border border-border rounded-lg p-6 shadow-[0_4px_12px_rgba(0,0,0,0.2),0_1px_3px_rgba(0,0,0,0.1)] w-full">
+        <div className="mb-8 bg-card border border-border rounded-lg p-6 w-full box-shadow">
             <div className="h-[280px] relative w-full">
                 <Line data={chartData} options={options} />
             </div>
