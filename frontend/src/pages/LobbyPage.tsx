@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { type GameMode } from "../types/stdb";
 import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
 import { GameOptionsSelector, type GameTypeValue } from "../components/ModeSelector";
-import { LanguageSelector } from "../components/LanguageSelector";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { getRandomStartupPhrase, getLanguageFromSlug, getContentTypeFromMode, storeLangSlug } from "../utils/modes";
@@ -95,7 +94,6 @@ export const LobbyPage = () => {
         </div>
       </div>
       <Footer />
-      <LanguageSelector currentLang={currentLang} />
     </div>
   );
 };

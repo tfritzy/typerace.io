@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { type GameMode } from "../types/stdb";
 import { ChevronDown, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
-import { getContentTypeFromMode, type ContentTypeValue, type LanguageInfo } from "../utils/modes";
+import { getContentTypeFromMode, languages, type ContentTypeValue, type LanguageInfo } from "../utils/modes";
 
 export type GameTypeValue = "Public" | "Private" | "Practice";
 
@@ -62,16 +62,38 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
 
     return (
         <>
-            <div className="hidden md:flex items-center justify-center gap-1 flex-wrap">
-                <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label="Public Match" />
-                <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label="Private Lobby" />
-                <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label="Practice Mode" />
-                <span className="mx-2 text-border-hover select-none">|</span>
-                <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label="Quotes" disabled={!quotesAvailableForLanguage} />
-                <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label="Random Words" />
+            <div className="hidden md:flex flex-col items-center gap-2">
+                <div className="flex items-center justify-center gap-1 flex-wrap">
+                    <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label="Public Match" />
+                    <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label="Private Lobby" />
+                    <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label="Practice Mode" />
+                    <span className="mx-2 text-border-hover select-none">|</span>
+                    <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label="Quotes" disabled={!quotesAvailableForLanguage} />
+                    <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label="Random Words" />
+                </div>
+                <div className="flex items-center justify-center gap-1 flex-wrap">
+                    {languages.map((lang) => {
+                        const href = lang.slug ? `/${lang.slug}` : "/";
+                        const isSelected = lang.language === selectedLanguage.language;
+                        return (
+                            <a
+                                key={lang.language}
+                                href={href}
+                                className={`px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 no-underline ${
+                                    isSelected
+                                        ? "bg-accent-primary/15 text-accent-primary"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                                }`}
+                                hrefLang={lang.htmlLang}
+                            >
+                                {lang.nativeName}
+                            </a>
+                        );
+                    })}
+                </div>
             </div>
 
-            <div className="md:hidden flex justify-center">
+            <div className="md:hidden flex flex-col items-center gap-2">
                 <button
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-accent-primary/15 text-accent-primary transition-all duration-200"
                     onClick={() => setIsDrawerOpen(true)}
@@ -82,6 +104,26 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     <span>{gameType} · {contentType === "Quotes" ? "Quotes" : "Random Words"}</span>
                     <ChevronDown size={16} />
                 </button>
+                <div className="flex items-center justify-center gap-1 flex-wrap">
+                    {languages.map((lang) => {
+                        const href = lang.slug ? `/${lang.slug}` : "/";
+                        const isSelected = lang.language === selectedLanguage.language;
+                        return (
+                            <a
+                                key={lang.language}
+                                href={href}
+                                className={`px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 no-underline ${
+                                    isSelected
+                                        ? "bg-accent-primary/15 text-accent-primary"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                                }`}
+                                hrefLang={lang.htmlLang}
+                            >
+                                {lang.nativeName}
+                            </a>
+                        );
+                    })}
+                </div>
             </div>
 
             {isDrawerOpen && (
