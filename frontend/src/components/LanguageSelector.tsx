@@ -33,20 +33,21 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
     }, [isOpen]);
 
     return (
-        <div className="fixed bottom-0 right-6 z-50 flex flex-col items-center">
+        <div className="fixed bottom-0 right-6 z-50">
             <button
                 ref={buttonRef}
                 onClick={() => setIsOpen(!isOpen)}
-                className="cursor-pointer bg-transparent border-none p-0 flex flex-col items-center transition-opacity hover:opacity-80"
+                className="cursor-pointer bg-transparent border-none p-0 relative transition-opacity hover:opacity-80"
                 style={{
                     transform: mounted ? "translateY(0)" : "translateY(100%)",
                     transition: "transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
                 }}
                 aria-label="Select language"
             >
-                <span className="text-2xl leading-none">{currentLang.flag}</span>
+                <span className="text-2xl leading-none block pl-[2px]">{currentLang.flag}</span>
                 <div
-                    className="w-[2px] h-10 bg-white/50"
+                    className="absolute left-0 top-0 w-[2px] bg-white/50"
+                    style={{ height: "calc(100% + 40px)" }}
                 />
             </button>
 
