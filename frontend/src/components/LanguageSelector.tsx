@@ -55,6 +55,7 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                     <button
                         onClick={() => setIsOpen(!isOpen)}
                         className="relative pl-[2px] pb-8 cursor-pointer bg-transparent border-none p-0"
+                        aria-label="Select language flag"
                     >
                         <span className="text-lg leading-none">{currentLang.flag}</span>
                         <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-white/50" />
