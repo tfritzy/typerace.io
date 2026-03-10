@@ -40,12 +40,13 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
 
         try {
             const idToken = await user.getIdToken();
+            const isDevAuth = import.meta.env.VITE_DEV_AUTH === 'true';
 
             let builder = DbConnection.builder()
                 .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
                 .withModuleName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace');
 
-            if (idToken && idToken !== 'dev-token') {
+            if (!isDevAuth) {
                 builder = builder.withToken(idToken);
             }
 

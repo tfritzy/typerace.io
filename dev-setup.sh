@@ -5,7 +5,7 @@ set -e
 if ! command -v spacetime &> /dev/null; then
     echo "Installing SpacetimeDB CLI..."
     curl -sSf https://install.spacetimedb.com | bash
-    export PATH="$HOME/.spacetime/bin:$PATH"
+    export PATH="$HOME/.local/bin:$PATH"
 fi
 
 echo "Starting SpacetimeDB server..."
@@ -14,9 +14,11 @@ STDB_PID=$!
 sleep 3
 
 echo "Publishing module..."
-spacetime publish -c -y --project-path spacetimedb typerace -s local 2>/dev/null || \
-    spacetime publish -c -y --module-path spacetimedb typerace -s local 2>/dev/null || \
-    spacetime publish -c -y typerace -s local
+if spacetime publish --help 2>&1 | grep -q -- '--project-path'; then
+    spacetime publish -c -y --project-path spacetimedb typerace -s local
+else
+    spacetime publish -c -y --module-path spacetimedb typerace -s local
+fi
 
 echo "Installing frontend dependencies..."
 cd frontend
