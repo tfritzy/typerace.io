@@ -213,14 +213,14 @@ body {
 }
 
 .box-with-focus {
-  background-color: var(--color-box-bg);
+  background-color: var(--background);
   border: var(--border-width, 1px) solid var(--color-box-border);
   border-radius: var(--radius, 8px);
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .box-with-focus:focus-within {
-  background-color: var(--color-box-bg);
+  background-color: var(--background);
   border-color: var(--border-hover);
   box-shadow: var(--box-shadow-focus, 0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.1));
 }
