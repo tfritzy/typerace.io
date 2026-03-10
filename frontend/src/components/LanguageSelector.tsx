@@ -47,16 +47,15 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                     variant="ghost"
                     size="sm"
                     onClick={() => setIsOpen(!isOpen)}
-                    className="pointer-events-auto px-2 gap-1"
+                    className="pointer-events-auto px-2 gap-1 h-auto items-start"
                     aria-label="Select language"
                 >
-                    <Pencil size={12} />
-                    <span className="text-lg leading-none">{currentLang.flag}</span>
+                    <Pencil size={12} className="mt-1.5" />
+                    <span className="relative pl-[2px] pb-8">
+                        <span className="text-lg leading-none">{currentLang.flag}</span>
+                        <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-white/50" />
+                    </span>
                 </Button>
-                <div className="relative pl-[2px]">
-                    <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-white/50" />
-                    <div className="pb-8" />
-                </div>
             </div>
 
             <div
