@@ -33,11 +33,11 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
     }, [isOpen]);
 
     return (
-        <div className="fixed bottom-0 right-6 z-50">
+        <div className="fixed bottom-0 right-6 z-50 pointer-events-none">
             <button
                 ref={buttonRef}
                 onClick={() => setIsOpen(!isOpen)}
-                className="cursor-pointer bg-transparent border-none px-0 pt-0 pb-0 relative transition-opacity hover:opacity-80"
+                className="cursor-pointer bg-transparent border-none px-0 pt-0 pb-0 relative transition-opacity hover:opacity-80 pointer-events-auto"
                 style={{
                     transform: mounted ? "translateY(0)" : "translateY(100%)",
                     transition: "transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -65,7 +65,7 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                 ref={menuRef}
                 className={`absolute bottom-full right-0 mb-1 rounded-xl border border-white/15 p-2 min-w-[180px] max-h-[70vh] overflow-y-auto transition-all ${
                     isOpen
-                        ? "opacity-100 visible"
+                        ? "opacity-100 visible pointer-events-auto"
                         : "opacity-0 invisible pointer-events-none"
                 }`}
                 style={{ backgroundColor: "var(--color-box-bg)" }}
