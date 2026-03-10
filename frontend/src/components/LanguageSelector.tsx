@@ -11,7 +11,7 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
-    const buttonRef = useRef<HTMLButtonElement>(null);
+    const buttonRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setMounted(true);
@@ -42,20 +42,24 @@ export function LanguageSelector({ currentLang }: LanguageSelectorProps) {
                     transition: "transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
                 }}
             >
-                <Button
-                    ref={buttonRef}
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="pointer-events-auto px-2 gap-1 h-auto items-start"
-                    aria-label="Select language"
-                >
-                    <Pencil size={12} className="mt-1.5" />
-                    <span className="relative pl-[2px] pb-8">
+                <div ref={buttonRef} className="pointer-events-auto flex items-start gap-1">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="h-6 w-6 mt-0.5"
+                        aria-label="Select language"
+                    >
+                        <Pencil size={12} />
+                    </Button>
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="relative pl-[2px] pb-8 cursor-pointer bg-transparent border-none p-0"
+                    >
                         <span className="text-lg leading-none">{currentLang.flag}</span>
                         <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-white/50" />
-                    </span>
-                </Button>
+                    </button>
+                </div>
             </div>
 
             <div
