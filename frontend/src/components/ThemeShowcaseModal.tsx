@@ -88,7 +88,7 @@ const LIGHT_THEMES: ShowcaseTheme[] = [
         previewColors: ['#f2eede', '#d73737', '#6684e1', '#60ac39'],
     },
     {
-        tag: 'Moonlight', name: 'Quiet Light',
+        tag: 'QuietLight', name: 'Quiet Light',
         settings: { backgroundColor: '#f5f5f5', textColor: '#333333', borderColor: 'rgba(51, 51, 51, 0.2)', borderWidth: 1, borderRadius: 8, accentColor: '#4078f2', font: 'Inter', fontWeight: 400 },
         previewColors: ['#f5f5f5', '#4078f2', '#7c4dff', '#2aa198'],
     },
