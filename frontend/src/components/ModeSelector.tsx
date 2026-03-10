@@ -39,6 +39,31 @@ function ModeButton({ isSelected, onClick, icon, label, disabled }: ModeButtonPr
     );
 }
 
+function LanguageLinks({ currentLang }: { currentLang: LanguageInfo }) {
+    return (
+        <div className="flex items-center justify-center gap-1 flex-wrap">
+            {languages.map((lang) => {
+                const href = lang.slug ? `/${lang.slug}` : "/";
+                const isSelected = lang.language === currentLang.language;
+                return (
+                    <a
+                        key={lang.language}
+                        href={href}
+                        className={`px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 no-underline ${
+                            isSelected
+                                ? "bg-accent-primary/15 text-accent-primary"
+                                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                        }`}
+                        hrefLang={lang.htmlLang}
+                    >
+                        {lang.nativeName}
+                    </a>
+                );
+            })}
+        </div>
+    );
+}
+
 export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setGameType, currentLang }: GameOptionsSelectorProps) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [contentType, setContentType] = useState<ContentTypeValue>(() => getContentTypeFromMode(selectedMode.tag));
@@ -71,26 +96,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label="Quotes" disabled={!quotesAvailableForLanguage} />
                     <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label="Random Words" />
                 </div>
-                <div className="flex items-center justify-center gap-1 flex-wrap">
-                    {languages.map((lang) => {
-                        const href = lang.slug ? `/${lang.slug}` : "/";
-                        const isSelected = lang.language === selectedLanguage.language;
-                        return (
-                            <a
-                                key={lang.language}
-                                href={href}
-                                className={`px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 no-underline ${
-                                    isSelected
-                                        ? "bg-accent-primary/15 text-accent-primary"
-                                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                                }`}
-                                hrefLang={lang.htmlLang}
-                            >
-                                {lang.nativeName}
-                            </a>
-                        );
-                    })}
-                </div>
+                <LanguageLinks currentLang={selectedLanguage} />
             </div>
 
             <div className="md:hidden flex flex-col items-center gap-2">
@@ -104,26 +110,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     <span>{gameType} · {contentType === "Quotes" ? "Quotes" : "Random Words"}</span>
                     <ChevronDown size={16} />
                 </button>
-                <div className="flex items-center justify-center gap-1 flex-wrap">
-                    {languages.map((lang) => {
-                        const href = lang.slug ? `/${lang.slug}` : "/";
-                        const isSelected = lang.language === selectedLanguage.language;
-                        return (
-                            <a
-                                key={lang.language}
-                                href={href}
-                                className={`px-2 py-1 rounded-full text-xs font-medium transition-all duration-200 no-underline ${
-                                    isSelected
-                                        ? "bg-accent-primary/15 text-accent-primary"
-                                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                                }`}
-                                hrefLang={lang.htmlLang}
-                            >
-                                {lang.nativeName}
-                            </a>
-                        );
-                    })}
-                </div>
+                <LanguageLinks currentLang={selectedLanguage} />
             </div>
 
             {isDrawerOpen && (
