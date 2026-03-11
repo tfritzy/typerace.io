@@ -183,16 +183,13 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
     const isDark = luminance(settings.backgroundColor) < 0.5;
     const fg = hexToRgb(settings.textColor);
     const fgRgba = `${fg.r}, ${fg.g}, ${fg.b}`;
-    const cardColor = isDark ? adjustBrightness(settings.backgroundColor, 12) : adjustBrightness(settings.backgroundColor, -10);
-    const popoverColor = isDark ? adjustBrightness(settings.backgroundColor, 20) : adjustBrightness(settings.backgroundColor, -10);
+    const background = isDark ? settings.backgroundColor : adjustBrightness(settings.backgroundColor, -10);
+    const card = isDark ? adjustBrightness(settings.backgroundColor, 12) : settings.backgroundColor;
+    const popover = isDark ? adjustBrightness(settings.backgroundColor, 20) : settings.backgroundColor;
     const input = isDark ? adjustBrightness(settings.backgroundColor, -8) : adjustBrightness(settings.backgroundColor, -5);
     const accentLight = adjustAccent(settings.accentColor, 0.2);
     const accentDark = adjustAccent(settings.accentColor, -0.25);
     const contrastForAccent = luminance(settings.accentColor) > 0.5 ? '#000000' : '#ffffff';
-
-    const background = isDark ? settings.backgroundColor : cardColor;
-    const card = isDark ? cardColor : settings.backgroundColor;
-    const popover = isDark ? popoverColor : settings.backgroundColor;
 
     const monoFontName = getMonoPairing(settings.font);
 
