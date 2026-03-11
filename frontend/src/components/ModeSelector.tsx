@@ -58,11 +58,10 @@ export function LanguageDropdown({ currentLang }: { currentLang: LanguageInfo })
     return (
         <div className="relative inline-flex" ref={dropdownRef}>
             <button
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer text-muted-foreground hover:text-foreground hover:bg-secondary"
+                className="inline-flex items-center px-2 py-1 rounded-full transition-all duration-200 cursor-pointer hover:bg-secondary"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <span className="text-base leading-none">{currentLang.flag}</span>
-                <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                <span className="text-3xl leading-none">{currentLang.flag}</span>
             </button>
             <div
                 className={`absolute top-full left-1/2 -translate-x-1/2 mt-1 rounded-xl border border-border bg-card p-1.5 min-w-[160px] max-h-[50vh] overflow-y-auto z-50 transition-all duration-150 ${
