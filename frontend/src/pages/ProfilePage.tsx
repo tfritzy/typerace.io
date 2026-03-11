@@ -220,7 +220,7 @@ export const ProfilePage = () => {
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-6 sm:mt-8">
-                                    <div className="bg-secondary border border-border rounded-lg p-4 sm:p-5">
+                                    <div className="bg-background border border-border rounded-lg p-4 sm:p-5">
                                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                             <div>
                                                 <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
@@ -240,7 +240,7 @@ export const ProfilePage = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="bg-secondary border border-border rounded-lg p-4 sm:p-5">
+                                    <div className="bg-background border border-border rounded-lg p-4 sm:p-5">
                                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                             <div>
                                                 <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
