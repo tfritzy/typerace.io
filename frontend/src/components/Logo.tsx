@@ -10,7 +10,9 @@ export const Logo = memo(({ className, onClick }: LogoProps) => {
 
     return (
         <Component key="logo" className={`logo ${className || ''}`} onClick={onClick}>
-            <span className="logo-text">Type</span><span className="logo-accent">Race</span><span className="logo-io">.io</span>
+            <span className="logo-text">Type</span>
+            <span className="logo-accent">Race</span>
+            <span className="logo-io">.io</span>
         </Component>
     );
 });
