@@ -92,8 +92,6 @@ export interface ThemeSettings {
     backgroundColor: string;
     textColor: string;
     borderColor: string;
-    borderWidth: number;
-    borderRadius: number;
     accentColor: string;
     font: string;
     fontWeight: number;
@@ -112,8 +110,6 @@ export interface ResolvedTheme {
     monoFontName: string;
     monoFont: string;
     fontWeight: number;
-    borderWidth: number;
-    borderRadius: number;
     colors: {
         background: string;
         foreground: string;
@@ -200,8 +196,6 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
         monoFontName,
         monoFont: fontNameToCss(monoFontName),
         fontWeight: settings.fontWeight,
-        borderWidth: settings.borderWidth,
-        borderRadius: settings.borderRadius,
         colors: {
             background: settings.backgroundColor,
             foreground: settings.textColor,
@@ -243,8 +237,6 @@ const DEFAULT_THEME_SETTINGS: ThemeSettings = {
     backgroundColor: '#1e1e2e',
     textColor: '#cdd6f4',
     borderColor: 'rgba(205, 214, 244, 0.1)',
-    borderWidth: 1,
-    borderRadius: 8,
     accentColor: '#cba6f7',
     font: 'Inter',
     fontWeight: 400,
@@ -256,8 +248,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#282a36',
         textColor: '#f8f8f2',
         borderColor: 'rgba(248, 248, 242, 0.1)',
-        borderWidth: 1,
-        borderRadius: 8,
         accentColor: '#bd93f9',
         font: 'Inter',
         fontWeight: 400,
@@ -268,8 +258,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#272822',
         textColor: '#f8f8f2',
         borderColor: 'rgba(248, 248, 242, 0.1)',
-        borderWidth: 1,
-        borderRadius: 8,
         accentColor: '#a6e22e',
         font: 'Inter',
         fontWeight: 400,
@@ -280,8 +268,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#2e3440',
         textColor: '#eceff4',
         borderColor: 'rgba(236, 239, 244, 0.1)',
-        borderWidth: 1,
-        borderRadius: 12,
         accentColor: '#88c0d0',
         font: 'Inter',
         fontWeight: 400,
@@ -292,8 +278,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#1a1b26',
         textColor: '#a9b1d6',
         borderColor: 'rgba(169, 177, 214, 0.1)',
-        borderWidth: 1,
-        borderRadius: 8,
         accentColor: '#7aa2f7',
         font: 'Inter',
         fontWeight: 400,
@@ -304,8 +288,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#282828',
         textColor: '#ebdbb2',
         borderColor: 'rgba(235, 219, 178, 0.1)',
-        borderWidth: 1,
-        borderRadius: 8,
         accentColor: '#fabd2f',
         font: 'Inter',
         fontWeight: 400,
@@ -316,8 +298,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#1e1e2e',
         textColor: '#cdd6f4',
         borderColor: 'rgba(205, 214, 244, 0.1)',
-        borderWidth: 1,
-        borderRadius: 8,
         accentColor: '#cba6f7',
         font: 'Inter',
         fontWeight: 400,
@@ -328,8 +308,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#ffffff',
         textColor: '#1f2328',
         borderColor: 'rgba(31, 35, 40, 0.25)',
-        borderWidth: 1,
-        borderRadius: 8,
         accentColor: '#0969da',
         font: 'Inter',
         fontWeight: 400,
@@ -340,8 +318,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#fdf6e3',
         textColor: '#657b83',
         borderColor: 'rgba(101, 123, 131, 0.25)',
-        borderWidth: 1,
-        borderRadius: 8,
         accentColor: '#268bd2',
         font: 'Inter',
         fontWeight: 400,
@@ -352,8 +328,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#fafafa',
         textColor: '#383a42',
         borderColor: 'rgba(56, 58, 66, 0.25)',
-        borderWidth: 1,
-        borderRadius: 8,
         accentColor: '#4078f2',
         font: 'Inter',
         fontWeight: 400,
@@ -364,8 +338,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#eff1f5',
         textColor: '#4c4f69',
         borderColor: 'rgba(76, 79, 105, 0.25)',
-        borderWidth: 1,
-        borderRadius: 8,
         accentColor: '#8839ef',
         font: 'Inter',
         fontWeight: 400,
@@ -376,8 +348,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#fbf1c7',
         textColor: '#3c3836',
         borderColor: 'rgba(60, 56, 54, 0.25)',
-        borderWidth: 1,
-        borderRadius: 8,
         accentColor: '#b57614',
         font: 'Inter',
         fontWeight: 400,
@@ -388,8 +358,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#faf4ed',
         textColor: '#575279',
         borderColor: 'rgba(87, 82, 121, 0.25)',
-        borderWidth: 1,
-        borderRadius: 8,
         accentColor: '#907aa9',
         font: 'Inter',
         fontWeight: 400,
@@ -400,8 +368,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#1D2B53',
         textColor: '#FFF1E8',
         borderColor: 'rgba(255, 241, 232, 0.20)',
-        borderWidth: 2,
-        borderRadius: 0,
         accentColor: '#29ADFF',
         font: 'Pixelify Sans',
         fontWeight: 700,
@@ -412,8 +378,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#10141f',
         textColor: '#c5dbd4',
         borderColor: 'rgba(197, 219, 212, 0.20)',
-        borderWidth: 2,
-        borderRadius: 0,
         accentColor: '#f77622',
         font: 'VT323',
         fontWeight: 700,
@@ -424,8 +388,6 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         backgroundColor: '#1a1c2c',
         textColor: '#f4f4f4',
         borderColor: 'rgba(244, 244, 244, 0.20)',
-        borderWidth: 2,
-        borderRadius: 0,
         accentColor: '#b13e53',
         font: 'Jersey 15',
         fontWeight: 700,
@@ -545,8 +507,8 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     root.style.setProperty('--font-family', theme.font);
     root.style.setProperty('--font-family-mono', theme.monoFont);
     root.style.setProperty('--font-weight', String(theme.fontWeight));
-    root.style.setProperty('--border-width', `${theme.borderWidth}px`);
-    root.style.setProperty('--radius', `${theme.borderRadius}px`);
+    root.style.setProperty('--border-width', '1px');
+    root.style.setProperty('--radius', '8px');
 
     try {
         localStorage.setItem('selectedTheme', tag);
