@@ -183,12 +183,16 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
     const isDark = luminance(settings.backgroundColor) < 0.5;
     const fg = hexToRgb(settings.textColor);
     const fgRgba = `${fg.r}, ${fg.g}, ${fg.b}`;
-    const card = isDark ? adjustBrightness(settings.backgroundColor, 12) : adjustBrightness(settings.backgroundColor, -10);
-    const popover = isDark ? adjustBrightness(settings.backgroundColor, 20) : adjustBrightness(settings.backgroundColor, -10);
+    const cardColor = isDark ? adjustBrightness(settings.backgroundColor, 12) : adjustBrightness(settings.backgroundColor, -10);
+    const popoverColor = isDark ? adjustBrightness(settings.backgroundColor, 20) : adjustBrightness(settings.backgroundColor, -10);
     const input = isDark ? adjustBrightness(settings.backgroundColor, -8) : adjustBrightness(settings.backgroundColor, -5);
     const accentLight = adjustAccent(settings.accentColor, 0.2);
     const accentDark = adjustAccent(settings.accentColor, -0.25);
     const contrastForAccent = luminance(settings.accentColor) > 0.5 ? '#000000' : '#ffffff';
+
+    const background = isDark ? settings.backgroundColor : cardColor;
+    const card = isDark ? cardColor : settings.backgroundColor;
+    const popover = isDark ? popoverColor : settings.backgroundColor;
 
     const monoFontName = getMonoPairing(settings.font);
 
@@ -203,7 +207,7 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
         borderWidth: settings.borderWidth,
         borderRadius: settings.borderRadius,
         colors: {
-            background: settings.backgroundColor,
+            background,
             foreground: settings.textColor,
             card,
             cardForeground: settings.textColor,
@@ -505,14 +509,11 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     const root = document.documentElement;
     const fg = hexToRgb(theme.colors.foreground);
 
-    const pageBg = theme.mode === 'light' ? theme.colors.card : theme.colors.background;
-    const boxBg = theme.mode === 'light' ? theme.colors.background : theme.colors.card;
-
-    root.style.setProperty('--background', pageBg);
+    root.style.setProperty('--background', theme.colors.background);
     root.style.setProperty('--foreground', theme.colors.foreground);
-    root.style.setProperty('--card', boxBg);
+    root.style.setProperty('--card', theme.colors.card);
     root.style.setProperty('--card-foreground', theme.colors.cardForeground);
-    root.style.setProperty('--popover', theme.mode === 'light' ? theme.colors.background : theme.colors.popover);
+    root.style.setProperty('--popover', theme.colors.popover);
     root.style.setProperty('--popover-foreground', theme.colors.popoverForeground);
     root.style.setProperty('--primary', theme.colors.primary);
     root.style.setProperty('--primary-foreground', theme.colors.primaryForeground);
@@ -538,11 +539,11 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     root.style.setProperty('--color-accent', theme.colors.accentPrimary);
     root.style.setProperty('--color-accent-light', theme.colors.accentLight);
     root.style.setProperty('--color-accent-dark', theme.colors.accentDark);
-    root.style.setProperty('--color-bg-primary', pageBg);
+    root.style.setProperty('--color-bg-primary', theme.colors.background);
     root.style.setProperty('--color-white', theme.colors.foreground);
     const ioOpacity = theme.mode === 'light' ? 0.45 : 0.25;
     root.style.setProperty('--color-white-25', `rgba(${fg.r}, ${fg.g}, ${fg.b}, ${ioOpacity})`);
-    root.style.setProperty('--color-box-bg', boxBg);
+    root.style.setProperty('--color-box-bg', theme.colors.card);
     root.style.setProperty('--color-box-border', theme.colors.border);
 
     root.style.setProperty('--font-family', theme.font);
