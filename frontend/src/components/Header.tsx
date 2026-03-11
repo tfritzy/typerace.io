@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ProfileAvatar } from "./ProfileAvatar";
 import { Logo } from "./Logo";
+import { LanguageDropdown } from "./LanguageDropdown";
 import { useCallback } from "react";
 import { getLangHome } from "../utils/modes";
 
@@ -19,8 +20,11 @@ export const Header = ({ hideAvatar = false }: HeaderProps) => {
         <div className="w-full px-4">
             <div className="content-container flex justify-between items-center h-16">
                 <Logo onClick={onClick} />
-                <div className={hideAvatar ? "invisible" : ""}>
-                    <ProfileAvatar />
+                <div className="flex items-center gap-2">
+                    <LanguageDropdown />
+                    <div className={hideAvatar ? "invisible" : ""}>
+                        <ProfileAvatar />
+                    </div>
                 </div>
             </div>
         </div>
