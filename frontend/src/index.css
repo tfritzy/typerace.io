@@ -334,24 +334,10 @@ body {
 }
 
 .logo {
-  display: flex;
-  align-items: baseline;
-  gap: 0.15rem;
   font-size: 1.65rem;
   font-weight: 800;
-  letter-spacing: -0.025em;
   user-select: none;
   cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.logo:hover {
-  transform: translateY(-1px);
-}
-
-.logo:hover .logo-accent {
-  filter: drop-shadow(0 0 15px var(--accent-primary)) brightness(1.1);
 }
 
 .logo-text {
@@ -359,21 +345,9 @@ body {
 }
 
 .logo-accent {
-  background: linear-gradient(135deg, var(--accent-primary) 0%, color-mix(in srgb, var(--accent-primary) 80%, white) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  position: relative;
-  transition: filter 0.2s ease;
-  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent-primary) 50%, transparent));
+  color: var(--accent-primary);
 }
 
 .logo-io {
-  background: linear-gradient(135deg, var(--accent-primary) 0%, color-mix(in srgb, var(--accent-primary) 80%, white) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-left: -0.2rem;
+  color: var(--accent-primary);
 }
