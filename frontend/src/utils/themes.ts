@@ -505,11 +505,14 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     const root = document.documentElement;
     const fg = hexToRgb(theme.colors.foreground);
 
-    root.style.setProperty('--background', theme.colors.background);
+    const pageBg = theme.mode === 'light' ? theme.colors.card : theme.colors.background;
+    const boxBg = theme.mode === 'light' ? theme.colors.background : theme.colors.card;
+
+    root.style.setProperty('--background', pageBg);
     root.style.setProperty('--foreground', theme.colors.foreground);
-    root.style.setProperty('--card', theme.colors.card);
+    root.style.setProperty('--card', boxBg);
     root.style.setProperty('--card-foreground', theme.colors.cardForeground);
-    root.style.setProperty('--popover', theme.colors.popover);
+    root.style.setProperty('--popover', theme.mode === 'light' ? theme.colors.background : theme.colors.popover);
     root.style.setProperty('--popover-foreground', theme.colors.popoverForeground);
     root.style.setProperty('--primary', theme.colors.primary);
     root.style.setProperty('--primary-foreground', theme.colors.primaryForeground);
@@ -535,11 +538,11 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     root.style.setProperty('--color-accent', theme.colors.accentPrimary);
     root.style.setProperty('--color-accent-light', theme.colors.accentLight);
     root.style.setProperty('--color-accent-dark', theme.colors.accentDark);
-    root.style.setProperty('--color-bg-primary', theme.colors.background);
+    root.style.setProperty('--color-bg-primary', pageBg);
     root.style.setProperty('--color-white', theme.colors.foreground);
     const ioOpacity = theme.mode === 'light' ? 0.45 : 0.25;
     root.style.setProperty('--color-white-25', `rgba(${fg.r}, ${fg.g}, ${fg.b}, ${ioOpacity})`);
-    root.style.setProperty('--color-box-bg', theme.colors.card);
+    root.style.setProperty('--color-box-bg', boxBg);
     root.style.setProperty('--color-box-border', theme.colors.border);
 
     root.style.setProperty('--font-family', theme.font);
