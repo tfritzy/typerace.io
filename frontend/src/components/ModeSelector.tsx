@@ -58,11 +58,10 @@ function LanguageDropdown({ currentLang }: { currentLang: LanguageInfo }) {
     return (
         <div className="relative inline-flex" ref={dropdownRef}>
             <button
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer text-muted-foreground hover:text-foreground hover:bg-secondary"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer text-muted-foreground hover:text-foreground hover:bg-secondary"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <Globe size={16} />
-                <span>{currentLang.nativeName}</span>
+                <span className="text-base leading-none">{currentLang.flag}</span>
                 <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
             </button>
             <div
@@ -80,12 +79,13 @@ function LanguageDropdown({ currentLang }: { currentLang: LanguageInfo }) {
                             key={lang.language}
                             href={href}
                             hrefLang={lang.htmlLang}
-                            className={`flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors no-underline ${
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors no-underline ${
                                 isSelected
                                     ? "bg-accent-primary/15 text-accent-primary"
                                     : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                             }`}
                         >
+                            <span>{lang.flag}</span>
                             {lang.nativeName}
                         </a>
                     );
