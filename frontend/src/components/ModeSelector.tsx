@@ -23,7 +23,7 @@ interface ModeButtonProps {
 
 function ModeButton({ isSelected, onClick, icon, label, disabled }: ModeButtonProps) {
     const base = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer";
-    const selected = "bg-secondary text-foreground";
+    const selected = "bg-secondary text-secondary-foreground";
     const unselected = "text-muted-foreground hover:text-foreground hover:bg-secondary";
     const disabledStyle = "opacity-40 cursor-not-allowed pointer-events-none";
 
@@ -131,7 +131,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
 
             <div className="md:hidden flex items-center justify-center gap-2">
                 <button
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-secondary text-foreground transition-all duration-200"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-secondary text-secondary-foreground transition-all duration-200"
                     onClick={() => setIsDrawerOpen(true)}
                 >
                     {gameType === "Public" && <Globe size={16} />}
