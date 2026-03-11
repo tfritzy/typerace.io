@@ -47,26 +47,6 @@ export const languages: LanguageInfo[] = [
     { language: Language.Turkish, flag: "🇹🇷", slug: "tr", randomWordsMode: "Turkish500", quotesMode: "TurkishQuotes", nativeName: "Türkçe", htmlLang: "tr", title: "TypeRace.io - Yazma yarışı", description: "Dünya genelindeki oyuncularla gerçek zamanlı yazma yarışmalarında yarışın. Yazma hızınızı geliştirin." },
 ].sort((a, b) => a.language.localeCompare(b.language));
 
-export interface ModeOption {
-    mode: { tag: string };
-    label: string;
-    flag: string;
-}
-
-export const randomWordsModes: ModeOption[] = languages.map(l => ({
-    mode: { tag: l.randomWordsMode },
-    label: l.language,
-    flag: l.flag,
-}));
-
-export const quotesModes: ModeOption[] = languages
-    .filter(l => l.quotesMode !== null)
-    .map(l => ({
-        mode: { tag: l.quotesMode! },
-        label: l.language,
-        flag: l.flag,
-    }));
-
 export function getLanguageFromMode(modeTag: string): Language {
     const langInfo = languages.find(l => l.randomWordsMode === modeTag || l.quotesMode === modeTag);
     return langInfo?.language || Language.English;
