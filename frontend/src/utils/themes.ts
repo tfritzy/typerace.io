@@ -7,14 +7,14 @@ export interface GoogleFont {
 }
 
 export const GOOGLE_FONTS: GoogleFont[] = [
-    { name: 'System UI', category: 'sans-serif', weights: [200, 400, 500, 700] },
-    { name: 'Inter', category: 'sans-serif', weights: [200, 400, 500, 700] },
     { name: 'Fira Code', category: 'monospace', weights: [400, 500, 700] },
     { name: 'JetBrains Mono', category: 'monospace', weights: [200, 400, 500, 700] },
     { name: 'Source Code Pro', category: 'monospace', weights: [200, 400, 500, 700] },
     { name: 'IBM Plex Mono', category: 'monospace', weights: [200, 400, 500, 700] },
     { name: 'Space Mono', category: 'monospace', weights: [400, 700] },
     { name: 'Inconsolata', category: 'monospace', weights: [200, 400, 500, 700] },
+    { name: 'System UI', category: 'sans-serif', weights: [200, 400, 500, 700] },
+    { name: 'Inter', category: 'sans-serif', weights: [200, 400, 500, 700] },
     { name: 'Pixelify Sans', category: 'display', weights: [400, 500, 600, 700] },
     { name: 'VT323', category: 'display', weights: [400] },
     { name: 'Jersey 15', category: 'display', weights: [400] },
