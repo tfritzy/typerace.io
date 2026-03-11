@@ -49,7 +49,7 @@
   }
 
   .type-box {
-    font-family: var(--font-family, "JetBrains Mono"), sans-serif;
+    font-family: var(--font-family, "JetBrains Mono"), monospace;
     font-weight: var(--font-weight, 400);
   }
 }
