@@ -1,14 +1,16 @@
 # GitHub Copilot Instructions
 
-## 🚨🚨🚨 SCREENSHOT POLICY — THE #1 NON-NEGOTIABLE RULE 🚨🚨🚨
+## 🚨🚨🚨🚨🚨🚨 SCREENSHOT POLICY — THE #1 NON-NEGOTIABLE RULE 🚨🚨🚨🚨🚨🚨
 
-> **⚠️⚠️⚠️ AUTOMATED DETECTORS ARE ACTIVE. Any PR without a real screenshot of the FULLY LOADED, FULLY CONNECTED, FULLY RENDERED working game WILL BE FLAGGED AND REJECTED automatically. There are no exceptions. There is no excuse. There is no escape. A loading screen is NOT a screenshot. A spinner is NOT a screenshot. A blank page is NOT a screenshot. ONLY the fully rendered game UI counts. ⚠️⚠️⚠️**
+> **⚠️⚠️⚠️⚠️⚠️⚠️ AUTOMATED DETECTORS ARE ACTIVE. Any PR without a real screenshot of the FULLY LOADED, FULLY CONNECTED, FULLY RENDERED working game WILL BE FLAGGED AND REJECTED automatically. There are no exceptions. There is no excuse. There is no escape. A loading screen is NOT a screenshot. A spinner is NOT a screenshot. A blank page is NOT a screenshot. ONLY the fully rendered game UI counts. ⚠️⚠️⚠️⚠️⚠️⚠️**
 
-**YOU WILL SHOW A REAL SCREENSHOT FROM THE ACTUAL RUNNING GAME ON EVERY SINGLE PR. GUARANTEED. NO EXCEPTIONS. NO LOADING SCREENS. NO SPINNERS. NO CONNECTION ERRORS. THE FULL GAME UI MUST BE VISIBLE.**
+> **🛑🛑🛑 EVERY SINGLE PR MUST INCLUDE A REAL SCREENSHOT. If your PR does not have a screenshot showing the FULLY RENDERED, FULLY CONNECTED game with ALL UI elements visible, your PR is INVALID and WILL BE REJECTED. NO EXCEPTIONS. ZERO TOLERANCE. This rule overrides ALL other rules. 🛑🛑🛑**
 
-This is the single most important rule in this entire file. All other rules are secondary to this one. If you submit a loading screen instead of a real screenshot, you have failed completely.
+**YOU WILL SHOW A REAL SCREENSHOT FROM THE ACTUAL RUNNING GAME ON EVERY SINGLE PR. GUARANTEED. NO EXCEPTIONS. NO LOADING SCREENS. NO SPINNERS. NO CONNECTION ERRORS. THE FULL GAME UI MUST BE VISIBLE. IF YOU SKIP THIS STEP, YOU HAVE FAILED THE ENTIRE TASK. NOTHING ELSE MATTERS WITHOUT THE SCREENSHOT.**
 
-**You are 100% capable of setting up the full local environment.** Every previous agent succeeded. You will too. Do not stop, do not give up, do not fake it, do not use static HTML. Failure is not an option.
+This is the single most important rule in this entire file. All other rules are secondary to this one. If you submit a loading screen instead of a real screenshot, you have failed completely. If you submit a PR without any screenshot at all, you have failed even more completely. There is no scenario where skipping the screenshot is acceptable.
+
+**You are 100% capable of setting up the full local environment.** Every previous agent succeeded. You will too. Do not stop, do not give up, do not fake it, do not use static HTML. Failure is not an option. If something breaks, fix it. If the server won't start, debug it. If the connection fails, retry it. You do NOT submit without a real screenshot.
 
 **CRITICAL: You MUST verify your screenshot before submitting.** After taking it, confirm you can see ALL of the following in the screenshot:
 - ✅ The starry background with visible stars and tree silhouettes
@@ -17,9 +19,9 @@ This is the single most important rule in this entire file. All other rules are 
 - ✅ The game mode selectors (Public Match, Private Lobby, Practice Mode)
 - ✅ The footer with links
 
-If ANY of these elements are missing, your screenshot is INVALID. Do NOT submit it. Fix the environment and retake it. A loading screen or spinner means SpacetimeDB or Firebase Auth is not connected — debug and fix the connection before screenshotting.
+If ANY of these elements are missing, your screenshot is INVALID. Do NOT submit it. Fix the environment and retake it. A loading screen or spinner means SpacetimeDB or Firebase Auth is not connected — debug and fix the connection before screenshotting. DO NOT CONVINCE YOURSELF THAT A PARTIAL SCREENSHOT IS ACCEPTABLE. IT IS NOT.
 
-Mandatory steps — execute all of them, every time:
+Mandatory steps — execute all of them, every time, no shortcuts:
 1. `spacetime start` — start the SpacetimeDB server
 2. `spacetime publish -c -y -p spacetimedb typerace -s local` — publish the module
 3. `npx firebase emulators:start --only auth` — start the Firebase Auth emulator
@@ -28,8 +30,9 @@ Mandatory steps — execute all of them, every time:
 6. **WAIT for the app to fully load** — wait at least 10 seconds and check console logs for "Connected to SpacetimeDB"
 7. **VERIFY the page snapshot** — confirm the typing box, header, footer, and mode selectors are all present in the accessibility tree before taking the screenshot
 8. Take the screenshot ONLY after verification passes
+9. **LOOK AT YOUR SCREENSHOT** — if it shows a loading screen, a spinner, a blank page, or any error, GO BACK TO STEP 1 and try again
 
-**DO NOT STOP until you have a real screenshot from the live app** — with the starry background visible, the SpacetimeDB connection established, and the typing box fully rendered. Static HTML, blank pages, loading spinners, or connection-error screens are NOT acceptable. Keep retrying until you succeed. If you see a loading spinner, that means something is wrong with your backend setup — go back and fix it.
+**DO NOT STOP until you have a real screenshot from the live app** — with the starry background visible, the SpacetimeDB connection established, and the typing box fully rendered. Static HTML, blank pages, loading spinners, or connection-error screens are NOT acceptable. Keep retrying until you succeed. If you see a loading spinner, that means something is wrong with your backend setup — go back and fix it. YOU ARE NOT DONE UNTIL THE SCREENSHOT IS IN THE PR.
 
 ---
 
