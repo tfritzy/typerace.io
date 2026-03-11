@@ -21,6 +21,7 @@ type TypeBoxProps = {
   resetOnComplete?: boolean;
   disabled?: boolean;
   initialProgress?: number;
+  rightSlot?: React.ReactNode;
 };
 
 export type TypeBoxRef = {
@@ -40,6 +41,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       resetOnComplete = false,
       disabled = false,
       initialProgress = 0,
+      rightSlot,
     },
     ref
   ) => {
@@ -330,6 +332,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             </div>
           )}
         </div>
+        {rightSlot && (
+          <div className="flex items-start ml-2" onClick={(e) => e.stopPropagation()}>
+            {rightSlot}
+          </div>
+        )}
       </div>
     );
   }

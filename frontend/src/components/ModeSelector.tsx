@@ -39,7 +39,7 @@ function ModeButton({ isSelected, onClick, icon, label, disabled }: ModeButtonPr
     );
 }
 
-function LanguageDropdown({ currentLang }: { currentLang: LanguageInfo }) {
+export function LanguageDropdown({ currentLang }: { currentLang: LanguageInfo }) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -125,8 +125,6 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                 <span className="mx-2 text-border-hover select-none">|</span>
                 <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label="Quotes" disabled={!quotesAvailableForLanguage} />
                 <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label="Random Words" />
-                <span className="mx-2 text-border-hover select-none">|</span>
-                <LanguageDropdown currentLang={selectedLanguage} />
             </div>
 
             <div className="md:hidden flex items-center justify-center gap-2">
@@ -140,7 +138,6 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     <span>{gameType} · {contentType === "Quotes" ? "Quotes" : "Random Words"}</span>
                     <ChevronDown size={16} />
                 </button>
-                <LanguageDropdown currentLang={selectedLanguage} />
             </div>
 
             {isDrawerOpen && (
