@@ -7,25 +7,14 @@ export interface GoogleFont {
 }
 
 export const GOOGLE_FONTS: GoogleFont[] = [
-    { name: 'System UI', category: 'sans-serif', weights: [200, 400, 500, 700] },
-    { name: 'Inter', category: 'sans-serif', weights: [200, 400, 500, 700] },
-    { name: 'Roboto', category: 'sans-serif', weights: [200, 400, 500, 700] },
-    { name: 'Open Sans', category: 'sans-serif', weights: [200, 400, 500, 700] },
-    { name: 'Nunito', category: 'sans-serif', weights: [200, 400, 500, 700] },
-    { name: 'Poppins', category: 'sans-serif', weights: [200, 400, 500, 700] },
-    { name: 'Lato', category: 'sans-serif', weights: [200, 400, 700] },
-    { name: 'Work Sans', category: 'sans-serif', weights: [200, 400, 500, 700] },
-    { name: 'DM Sans', category: 'sans-serif', weights: [200, 400, 500, 700] },
     { name: 'Fira Code', category: 'monospace', weights: [400, 500, 700] },
     { name: 'JetBrains Mono', category: 'monospace', weights: [200, 400, 500, 700] },
     { name: 'Source Code Pro', category: 'monospace', weights: [200, 400, 500, 700] },
     { name: 'IBM Plex Mono', category: 'monospace', weights: [200, 400, 500, 700] },
     { name: 'Space Mono', category: 'monospace', weights: [400, 700] },
     { name: 'Inconsolata', category: 'monospace', weights: [200, 400, 500, 700] },
-    { name: 'Merriweather', category: 'serif', weights: [400, 700] },
-    { name: 'Playfair Display', category: 'serif', weights: [400, 500, 700] },
-    { name: 'Lora', category: 'serif', weights: [400, 500, 700] },
-    { name: 'Source Serif 4', category: 'serif', weights: [200, 400, 500, 700] },
+    { name: 'System UI', category: 'sans-serif', weights: [200, 400, 500, 700] },
+    { name: 'Inter', category: 'sans-serif', weights: [200, 400, 500, 700] },
     { name: 'Pixelify Sans', category: 'display', weights: [400, 500, 600, 700] },
     { name: 'VT323', category: 'display', weights: [400] },
     { name: 'Jersey 15', category: 'display', weights: [400] },
@@ -59,35 +48,6 @@ export function fontNameToCss(name: string): string {
     return `'${name}', ${fallback}`;
 }
 
-const MONO_PAIRINGS: Record<string, string> = {
-    'System UI': 'JetBrains Mono',
-    'Inter': 'JetBrains Mono',
-    'Roboto': 'IBM Plex Mono',
-    'Open Sans': 'Source Code Pro',
-    'Nunito': 'JetBrains Mono',
-    'Poppins': 'JetBrains Mono',
-    'Lato': 'Source Code Pro',
-    'Work Sans': 'IBM Plex Mono',
-    'DM Sans': 'JetBrains Mono',
-    'Fira Code': 'Fira Code',
-    'JetBrains Mono': 'JetBrains Mono',
-    'Source Code Pro': 'Source Code Pro',
-    'IBM Plex Mono': 'IBM Plex Mono',
-    'Space Mono': 'Space Mono',
-    'Inconsolata': 'Inconsolata',
-    'Merriweather': 'Source Code Pro',
-    'Playfair Display': 'Source Code Pro',
-    'Lora': 'Source Code Pro',
-    'Source Serif 4': 'Source Code Pro',
-    'Pixelify Sans': 'Pixelify Sans',
-    'VT323': 'VT323',
-    'Jersey 15': 'Jersey 15',
-};
-
-export function getMonoPairing(fontName: string): string {
-    return MONO_PAIRINGS[fontName] || 'JetBrains Mono';
-}
-
 export interface ThemeSettings {
     backgroundColor: string;
     textColor: string;
@@ -107,8 +67,6 @@ export interface ResolvedTheme {
     mode: 'light' | 'dark';
     fontName: string;
     font: string;
-    monoFontName: string;
-    monoFont: string;
     fontWeight: number;
     colors: {
         background: string;
@@ -187,15 +145,11 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
     const accentDark = adjustAccent(settings.accentColor, -0.25);
     const contrastForAccent = luminance(settings.accentColor) > 0.5 ? '#000000' : '#ffffff';
 
-    const monoFontName = getMonoPairing(settings.font);
-
     return {
         name,
         mode: isDark ? 'dark' : 'light',
         fontName: settings.font,
         font: fontNameToCss(settings.font),
-        monoFontName,
-        monoFont: fontNameToCss(monoFontName),
         fontWeight: settings.fontWeight,
         colors: {
             background,
@@ -239,7 +193,7 @@ const DEFAULT_THEME_SETTINGS: ThemeSettings = {
     textColor: '#cdd6f4',
     borderColor: 'rgba(205, 214, 244, 0.1)',
     accentColor: '#cba6f7',
-    font: 'Inter',
+    font: 'JetBrains Mono',
     fontWeight: 400,
 };
 
@@ -250,7 +204,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         textColor: '#f8f8f2',
         borderColor: 'rgba(248, 248, 242, 0.1)',
         accentColor: '#bd93f9',
-        font: 'Inter',
+        font: 'JetBrains Mono',
         fontWeight: 400,
         previewColors: ['#282a36', '#bd93f9', '#ff79c6', '#50fa7b'],
     },
@@ -260,7 +214,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         textColor: '#f8f8f2',
         borderColor: 'rgba(248, 248, 242, 0.1)',
         accentColor: '#a6e22e',
-        font: 'Inter',
+        font: 'JetBrains Mono',
         fontWeight: 400,
         previewColors: ['#272822', '#a6e22e', '#f92672', '#66d9ef'],
     },
@@ -270,7 +224,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         textColor: '#eceff4',
         borderColor: 'rgba(236, 239, 244, 0.1)',
         accentColor: '#88c0d0',
-        font: 'Inter',
+        font: 'JetBrains Mono',
         fontWeight: 400,
         previewColors: ['#2e3440', '#88c0d0', '#81a1c1', '#5e81ac'],
     },
@@ -280,7 +234,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         textColor: '#a9b1d6',
         borderColor: 'rgba(169, 177, 214, 0.1)',
         accentColor: '#7aa2f7',
-        font: 'Inter',
+        font: 'JetBrains Mono',
         fontWeight: 400,
         previewColors: ['#1a1b26', '#7aa2f7', '#bb9af7', '#7dcfff'],
     },
@@ -290,7 +244,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         textColor: '#ebdbb2',
         borderColor: 'rgba(235, 219, 178, 0.1)',
         accentColor: '#fabd2f',
-        font: 'Inter',
+        font: 'JetBrains Mono',
         fontWeight: 400,
         previewColors: ['#282828', '#fabd2f', '#b8bb26', '#fb4934'],
     },
@@ -300,7 +254,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         textColor: '#cdd6f4',
         borderColor: 'rgba(205, 214, 244, 0.1)',
         accentColor: '#cba6f7',
-        font: 'Inter',
+        font: 'JetBrains Mono',
         fontWeight: 400,
         previewColors: ['#1e1e2e', '#cba6f7', '#89b4fa', '#a6e3a1'],
     },
@@ -310,7 +264,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         textColor: '#1f2328',
         borderColor: 'rgba(31, 35, 40, 0.25)',
         accentColor: '#0969da',
-        font: 'Inter',
+        font: 'JetBrains Mono',
         fontWeight: 400,
         previewColors: ['#ffffff', '#0969da', '#1a7f37', '#d1242f'],
     },
@@ -320,7 +274,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         textColor: '#657b83',
         borderColor: 'rgba(101, 123, 131, 0.25)',
         accentColor: '#268bd2',
-        font: 'Inter',
+        font: 'JetBrains Mono',
         fontWeight: 400,
         previewColors: ['#fdf6e3', '#268bd2', '#2aa198', '#b58900'],
     },
@@ -330,7 +284,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         textColor: '#383a42',
         borderColor: 'rgba(56, 58, 66, 0.25)',
         accentColor: '#4078f2',
-        font: 'Inter',
+        font: 'JetBrains Mono',
         fontWeight: 400,
         previewColors: ['#fafafa', '#4078f2', '#50a14f', '#e45649'],
     },
@@ -340,7 +294,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         textColor: '#4c4f69',
         borderColor: 'rgba(76, 79, 105, 0.25)',
         accentColor: '#8839ef',
-        font: 'Inter',
+        font: 'JetBrains Mono',
         fontWeight: 400,
         previewColors: ['#eff1f5', '#8839ef', '#1e66f5', '#40a02b'],
     },
@@ -350,7 +304,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         textColor: '#3c3836',
         borderColor: 'rgba(60, 56, 54, 0.25)',
         accentColor: '#b57614',
-        font: 'Inter',
+        font: 'JetBrains Mono',
         fontWeight: 400,
         previewColors: ['#fbf1c7', '#b57614', '#79740e', '#9d0006'],
     },
@@ -360,7 +314,7 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
         textColor: '#575279',
         borderColor: 'rgba(87, 82, 121, 0.25)',
         accentColor: '#907aa9',
-        font: 'Inter',
+        font: 'JetBrains Mono',
         fontWeight: 400,
         previewColors: ['#faf4ed', '#907aa9', '#d7827e', '#56949f'],
     },
@@ -462,9 +416,6 @@ export function applyCustomTheme(settings: ThemeSettings): void {
 
 function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     loadGoogleFont(theme.fontName, theme.fontWeight);
-    if (theme.monoFontName !== theme.fontName) {
-        loadGoogleFont(theme.monoFontName);
-    }
     const root = document.documentElement;
     const fg = hexToRgb(theme.colors.foreground);
 
@@ -506,7 +457,7 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     root.style.setProperty('--color-box-border', theme.colors.border);
 
     root.style.setProperty('--font-family', theme.font);
-    root.style.setProperty('--font-family-mono', theme.monoFont);
+    root.style.setProperty('--font-family-mono', theme.font);
     root.style.setProperty('--font-weight', String(theme.fontWeight));
     root.style.setProperty('--border-width', '1px');
     root.style.setProperty('--radius', '8px');
