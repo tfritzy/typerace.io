@@ -36,9 +36,7 @@ export const PlayerProgressBar = memo(({
     isAnonymous = false,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
-    const progressGradient = isCurrentPlayer
-        ? 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))'
-        : 'var(--muted-foreground)';
+    const progressGradient = 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))';
 
     return (
         <div
@@ -109,7 +107,8 @@ export const PlayerProgressBar = memo(({
                         className="h-full rounded-full transition-all duration-200"
                         style={{
                             width: `${Math.min(100, progressPercentage)}%`,
-                            background: progressGradient
+                            background: progressGradient,
+                            opacity: isCurrentPlayer ? 1 : 0.35
                         }}
                     />
                 </div>
