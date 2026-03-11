@@ -179,8 +179,9 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
     const isDark = luminance(settings.backgroundColor) < 0.5;
     const fg = hexToRgb(settings.textColor);
     const fgRgba = `${fg.r}, ${fg.g}, ${fg.b}`;
-    const card = isDark ? adjustBrightness(settings.backgroundColor, 12) : adjustBrightness(settings.backgroundColor, -10);
-    const popover = isDark ? adjustBrightness(settings.backgroundColor, 20) : adjustBrightness(settings.backgroundColor, -10);
+    const background = isDark ? settings.backgroundColor : adjustBrightness(settings.backgroundColor, -10);
+    const card = isDark ? adjustBrightness(settings.backgroundColor, 12) : settings.backgroundColor;
+    const popover = isDark ? adjustBrightness(settings.backgroundColor, 20) : settings.backgroundColor;
     const input = isDark ? adjustBrightness(settings.backgroundColor, -8) : adjustBrightness(settings.backgroundColor, -5);
     const accentLight = adjustAccent(settings.accentColor, 0.2);
     const accentDark = adjustAccent(settings.accentColor, -0.25);
@@ -197,7 +198,7 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
         monoFont: fontNameToCss(monoFontName),
         fontWeight: settings.fontWeight,
         colors: {
-            background: settings.backgroundColor,
+            background,
             foreground: settings.textColor,
             card,
             cardForeground: settings.textColor,
@@ -509,6 +510,14 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     root.style.setProperty('--font-weight', String(theme.fontWeight));
     root.style.setProperty('--border-width', '1px');
     root.style.setProperty('--radius', '8px');
+
+    if (theme.mode === 'light') {
+        root.style.setProperty('--box-shadow', '0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04)');
+        root.style.setProperty('--box-shadow-focus', '0 8px 20px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04)');
+    } else {
+        root.style.setProperty('--box-shadow', '0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1)');
+        root.style.setProperty('--box-shadow-focus', '0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.1)');
+    }
 
     try {
         localStorage.setItem('selectedTheme', tag);
