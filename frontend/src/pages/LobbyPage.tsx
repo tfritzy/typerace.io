@@ -73,7 +73,8 @@ export const LobbyPage = () => {
   return (
     <div className="relative h-full flex flex-col">
       <Header />
-      <div className="flex-1 flex flex-col items-center justify-center p-4 min-h-0">
+      <div className="flex-1 flex flex-col items-center p-4 min-h-0">
+        <div className="flex-[4]" />
         <div className="content-container">
           <div className="text-2xl">
             <TypeBox
@@ -93,6 +94,7 @@ export const LobbyPage = () => {
             />
           </div>
         </div>
+        <div className="flex-[5]" />
       </div>
       <Footer />
       <LanguageSelector currentLang={currentLang} />
