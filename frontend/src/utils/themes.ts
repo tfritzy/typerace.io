@@ -48,12 +48,6 @@ export function fontNameToCss(name: string): string {
     return `'${name}', ${fallback}`;
 }
 
-export function getMonoPairing(fontName: string): string {
-    const font = GOOGLE_FONTS.find(f => f.name === fontName);
-    if (font && (font.category === 'monospace' || font.category === 'display')) return fontName;
-    return 'JetBrains Mono';
-}
-
 export interface ThemeSettings {
     backgroundColor: string;
     textColor: string;
@@ -75,8 +69,6 @@ export interface ResolvedTheme {
     mode: 'light' | 'dark';
     fontName: string;
     font: string;
-    monoFontName: string;
-    monoFont: string;
     fontWeight: number;
     borderWidth: number;
     borderRadius: number;
@@ -156,15 +148,11 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
     const accentDark = adjustAccent(settings.accentColor, -0.25);
     const contrastForAccent = luminance(settings.accentColor) > 0.5 ? '#000000' : '#ffffff';
 
-    const monoFontName = getMonoPairing(settings.font);
-
     return {
         name,
         mode: isDark ? 'dark' : 'light',
         fontName: settings.font,
         font: fontNameToCss(settings.font),
-        monoFontName,
-        monoFont: fontNameToCss(monoFontName),
         fontWeight: settings.fontWeight,
         borderWidth: settings.borderWidth,
         borderRadius: settings.borderRadius,
@@ -465,9 +453,6 @@ export function applyCustomTheme(settings: ThemeSettings): void {
 
 function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     loadGoogleFont(theme.fontName, theme.fontWeight);
-    if (theme.monoFontName !== theme.fontName) {
-        loadGoogleFont(theme.monoFontName);
-    }
     const root = document.documentElement;
     const fg = hexToRgb(theme.colors.foreground);
 
@@ -509,7 +494,7 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     root.style.setProperty('--color-box-border', theme.colors.border);
 
     root.style.setProperty('--font-family', theme.font);
-    root.style.setProperty('--font-family-mono', theme.monoFont);
+    root.style.setProperty('--font-family-mono', theme.font);
     root.style.setProperty('--font-weight', String(theme.fontWeight));
     root.style.setProperty('--border-width', `${theme.borderWidth}px`);
     root.style.setProperty('--radius', `${theme.borderRadius}px`);
