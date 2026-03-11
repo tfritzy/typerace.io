@@ -39,7 +39,7 @@ function ModeButton({ isSelected, onClick, icon, label, disabled }: ModeButtonPr
     );
 }
 
-export function LanguageDropdown({ currentLang }: { currentLang: LanguageInfo }) {
+function LanguageDropdown({ currentLang }: { currentLang: LanguageInfo }) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +61,7 @@ export function LanguageDropdown({ currentLang }: { currentLang: LanguageInfo })
                 className="inline-flex items-center px-2 py-1 rounded-full transition-all duration-200 cursor-pointer hover:bg-secondary"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <span className="text-3xl leading-none">{currentLang.flag}</span>
+                <span className="text-2xl leading-none">{currentLang.flag}</span>
             </button>
             <div
                 className={`absolute top-full left-1/2 -translate-x-1/2 mt-1 rounded-xl border border-border bg-card p-1.5 min-w-[160px] max-h-[50vh] overflow-y-auto z-50 transition-all duration-150 ${
@@ -124,6 +124,8 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                 <span className="mx-2 text-border-hover select-none">|</span>
                 <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label="Quotes" disabled={!quotesAvailableForLanguage} />
                 <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label="Random Words" />
+                <span className="mx-2 text-border-hover select-none">|</span>
+                <LanguageDropdown currentLang={selectedLanguage} />
             </div>
 
             <div className="md:hidden flex items-center justify-center gap-2">
@@ -137,6 +139,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     <span>{gameType} · {contentType === "Quotes" ? "Quotes" : "Random Words"}</span>
                     <ChevronDown size={16} />
                 </button>
+                <LanguageDropdown currentLang={selectedLanguage} />
             </div>
 
             {isDrawerOpen && (

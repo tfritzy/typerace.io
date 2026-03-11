@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { type GameMode } from "../types/stdb";
 import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
-import { GameOptionsSelector, LanguageDropdown, type GameTypeValue } from "../components/ModeSelector";
+import { GameOptionsSelector, type GameTypeValue } from "../components/ModeSelector";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { getRandomStartupPhrase, getLanguageFromSlug, getContentTypeFromMode, storeLangSlug } from "../utils/modes";
@@ -81,7 +81,6 @@ export const LobbyPage = () => {
               phrase={startupPhrase}
               onComplete={handlePhraseComplete}
               resetOnComplete={true}
-              rightSlot={<LanguageDropdown currentLang={currentLang} />}
             />
           </div>
           <div className="mt-6">
