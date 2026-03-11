@@ -1,4 +1,4 @@
-import { type Player, type GameRecord } from "../types/stdb";
+import { type Player, type GameRecord, type PlayerColor } from "../types/stdb";
 import { WpmChart } from "../components/WpmChart";
 import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
@@ -13,6 +13,7 @@ import { useAuth } from "../firebase/AuthContext";
 import { Select } from "../components/Select";
 import { RecentGames } from "../components/RecentGames";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { getInitialTheme } from "../utils/themes";
 
 type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
@@ -28,6 +29,11 @@ export const ProfilePage = () => {
     const navigate = useNavigate();
 
     const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.identity);
+
+    const currentThemeColor = useMemo(() => {
+        const tag = getInitialTheme();
+        return { tag } as PlayerColor;
+    }, []);
 
     useEffect(() => {
         if (!conn || !playerId) return;
@@ -176,7 +182,7 @@ export const ProfilePage = () => {
                                     <PlayerAvatar
                                         size={80}
                                         identity={viewedPlayer.identity.toHexString()}
-                                        color={viewedPlayer.color}
+                                        color={currentThemeColor}
                                         isHighlighted={true}
                                     />
 
@@ -210,7 +216,7 @@ export const ProfilePage = () => {
                                                 <div
                                                     className="h-full rounded-[5px] transition-[width_0.3s_ease]"
                                                     style={{
-                                                        background: viewedPlayer ? getColorConfig(viewedPlayer.color).gradient : 'var(--accent-primary)',
+                                                        background: getColorConfig(currentThemeColor).gradient,
                                                         width: `${viewedPlayer ? xpProgressToNextLevel(viewedPlayer.xp, viewedPlayer.xpRequiredForNextLevel) : 0}%`
                                                     }}
                                                 />
@@ -220,7 +226,7 @@ export const ProfilePage = () => {
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-6 sm:mt-8">
-                                    <div className="bg-foreground/5 border border-border rounded-lg p-4 sm:p-5">
+                                    <div className="bg-black/5 border border-border rounded-lg p-4 sm:p-5">
                                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                             <div>
                                                 <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
@@ -240,7 +246,7 @@ export const ProfilePage = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="bg-foreground/5 border border-border rounded-lg p-4 sm:p-5">
+                                    <div className="bg-black/5 border border-border rounded-lg p-4 sm:p-5">
                                         <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                             <div>
                                                 <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
