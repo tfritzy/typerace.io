@@ -48,22 +48,10 @@ export function fontNameToCss(name: string): string {
     return `'${name}', ${fallback}`;
 }
 
-const MONO_PAIRINGS: Record<string, string> = {
-    'System UI': 'JetBrains Mono',
-    'Inter': 'JetBrains Mono',
-    'Fira Code': 'Fira Code',
-    'JetBrains Mono': 'JetBrains Mono',
-    'Source Code Pro': 'Source Code Pro',
-    'IBM Plex Mono': 'IBM Plex Mono',
-    'Space Mono': 'Space Mono',
-    'Inconsolata': 'Inconsolata',
-    'Pixelify Sans': 'Pixelify Sans',
-    'VT323': 'VT323',
-    'Jersey 15': 'Jersey 15',
-};
-
 export function getMonoPairing(fontName: string): string {
-    return MONO_PAIRINGS[fontName] || 'JetBrains Mono';
+    const font = GOOGLE_FONTS.find(f => f.name === fontName);
+    if (font && (font.category === 'monospace' || font.category === 'display')) return fontName;
+    return 'JetBrains Mono';
 }
 
 export interface ThemeSettings {
