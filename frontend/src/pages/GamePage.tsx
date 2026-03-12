@@ -82,6 +82,13 @@ export const GamePage = () => {
 
     const progressQuery = `SELECT * FROM playerprogress WHERE GameId = '${gameId}'`;
     const gameQuery = `SELECT * FROM game WHERE Id = '${gameId}'`;
+    const subscriptionQueries = [gameQuery, progressQuery];
+
+    if (conn.identity) {
+      subscriptionQueries.push(
+        `SELECT * FROM playerprogress WHERE PlayerId = '${conn.identity}'`
+      );
+    }
 
     const pageSubscription = conn.subscriptionBuilder()
       .onApplied(() => {
@@ -94,10 +101,7 @@ export const GamePage = () => {
           .filter((pp) => pp.gameId.toString() === gameId);
         setGamePlayerProgress(currentGameProgress);
       })
-      .subscribe([
-        gameQuery,
-        progressQuery,
-      ]);
+      .subscribe(subscriptionQueries);
 
     return () => {
       conn.db.playerprogress.removeOnInsert(handleProgressInsert);
