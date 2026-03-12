@@ -1,7 +1,8 @@
-import { useState } from "react";
-import type { PlayerProgress } from "../types/stdb";
+import { useState, useMemo } from "react";
+import type { PlayerProgress, PlayerColor } from "../types/stdb";
 import { RaceResultsChart } from "./RaceResultsChart";
 import { PlayerAvatar } from "./PlayerAvatar";
+import { getInitialTheme } from "../utils/themes";
 
 interface AllPlayersResultsProps {
     allPlayerProgress: PlayerProgress[];
@@ -17,6 +18,11 @@ export const AllPlayersResults = ({
     if (!allPlayerProgress || allPlayerProgress.length === 0) {
         return null;
     }
+
+    const currentThemeColor = useMemo(() => {
+        const tag = getInitialTheme();
+        return { tag } as PlayerColor;
+    }, []);
 
     const defaultPlayerId = initialSelectedPlayerId || allPlayerProgress[0].playerId.toHexString();
     const [selectedPlayerId, setSelectedPlayerId] = useState<string>(defaultPlayerId);
@@ -40,7 +46,7 @@ export const AllPlayersResults = ({
                                 <PlayerAvatar
                                     size={24}
                                     identity={pp.playerId.toHexString()}
-                                    color={pp.playerColor}
+                                    color={currentThemeColor}
                                 />
                                 {pp.playerName}
                             </button>
