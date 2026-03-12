@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="flag-icons-pt" viewBox="0 0 512 512">
+  <path fill="red" d="M204.8 0H512v512H204.7z"/>
+  <path fill="#060" d="M0 0h204.8v512H-.1z"/>
+  <g fill="#ff0" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width=".6">
+    <path stroke-width=".7" d="M293.8 326.6c-34.4-1-192-99.4-193-115.1l8.6-14.5C125 219.7 286.2 315.4 302 312z"/>
+    <path stroke-width=".7" d="M107.6 195c-3.1 8.3 41.1 35.6 94.3 68 53.2 32.3 99 52.3 102.5 49.5l1.5-2.9q-1 1.6-4.6.6c-14.4-4.2-51.9-21.4-98.3-49.5s-86.8-54.1-93-65.1a7 7 0 0 1-.7-3.3h-.2l-1.3 2.3zm187 132c-.6 1.1-1.7 1.1-3.7 1-12.9-1.5-52-20.5-98-48.1-53.8-32.2-98.2-61.5-93.3-69.1l1.3-2.4.2.1c-4.3 13 87.6 65.5 93 68.9 53.1 33 98 52.2 102 47.2z"/>
+  </g>
+  <g transform="translate(-68.3 28.4)scale(1.13778)">
+    <path fill="#fff" stroke="#000" stroke-width=".7" d="M180.6 211a59 59 0 0 0 17.5 41.7 59 59 0 0 0 41.8 17.6 59 59 0 0 0 42-17.4 59 59 0 0 0 17.4-41.8v-79.2l-118.7-.2z"/>
+    <path fill="red" stroke="#000" stroke-width=".5" d="M183 211.1a56 56 0 0 0 16.8 40 57 57 0 0 0 40.2 16.8 57 57 0 0 0 40.2-16.6 56 56 0 0 0 16.7-40v-77H183v76.8m91-53.7v48.9l-.1 5.1a33 33 0 0 1-10 24 34 34 0 0 1-24 10c-9.4 0-17.7-4-23.9-10.2a34 34 0 0 1-10-24v-54z"/>
+    <g id="pt-f" fill="#fff">
+      <path fill="#039" d="M232.6 202.4a8 8 0 0 0 2.2 5.7 7 7 0 0 0 5.3 2.4q3.2-.2 5.3-2.4a8 8 0 0 0 2.2-5.7v-10.8h-15z"/>
+      <circle cx="236.1" cy="195.7" r="1.5"/>
+      <circle cx="244.4" cy="195.7" r="1.5"/>
+      <circle cx="240.2" cy="199.7" r="1.5"/>
+      <circle cx="236.1" cy="203.9" r="1.5"/>
+      <circle cx="244.4" cy="203.9" r="1.5"/>
+    </g>
+    <use xlink:href="#pt-f" width="100%" height="100%" y="-26"/>
+    <use xlink:href="#pt-f" width="100%" height="100%" x="-20.8"/>
+    <use xlink:href="#pt-f" width="100%" height="100%" x="20.8"/>
+    <use xlink:href="#pt-f" width="100%" height="100%" y="25.8"/>
+  </g>
+</svg>
