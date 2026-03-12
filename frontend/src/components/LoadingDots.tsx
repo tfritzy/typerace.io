@@ -1,10 +1,8 @@
 import { Logo } from "./Logo";
 import { useEffect, useRef } from "react";
-import { isNonDefaultFont } from "../utils/themes";
 
 export const LoadingDots = () => {
     const spinnerRef = useRef<HTMLDivElement>(null);
-    const showLogo = !isNonDefaultFont();
 
     useEffect(() => {
         if (spinnerRef.current) {
@@ -25,7 +23,7 @@ export const LoadingDots = () => {
                 `}
             </style>
             <div className="w-full max-w-[1000px] mx-auto flex justify-between items-center h-16">
-                {showLogo && <Logo />}
+                <Logo />
                 <div
                     ref={spinnerRef}
                     className="fixed top-1/2 left-1/2 -ml-4 -mt-4 w-8 h-8 border-[3px] border-border border-t-muted-foreground rounded-full"

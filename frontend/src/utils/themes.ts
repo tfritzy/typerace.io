@@ -460,14 +460,7 @@ export function applyCustomTheme(settings: ThemeSettings): void {
     applyResolvedTheme(theme, 'custom');
 }
 
-let _currentFontName = 'Inter';
-
-export function isNonDefaultFont(): boolean {
-    return _currentFontName !== 'Inter';
-}
-
 function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
-    _currentFontName = theme.fontName;
     loadGoogleFont(theme.fontName, theme.fontWeight);
     if (theme.monoFontName !== theme.fontName) {
         loadGoogleFont(theme.monoFontName);
