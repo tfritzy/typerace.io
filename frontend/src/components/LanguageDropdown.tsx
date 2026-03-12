@@ -33,7 +33,7 @@ export function LanguageDropdown() {
                 className="inline-flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 cursor-pointer hover:bg-secondary"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <img src={`/flags/${currentLang.countryCode}.svg`} alt={currentLang.nativeName} className="w-6 h-6 rounded-sm object-cover" />
+                <img src={`/flags/${currentLang.countryCode}.svg`} alt={currentLang.nativeName} className="w-8 h-6 rounded-sm" />
             </button>
             <div
                 className={`absolute top-full right-0 mt-1 rounded-xl border border-border bg-card p-1.5 min-w-[160px] max-h-[50vh] overflow-y-auto z-50 transition-all duration-150 ${
@@ -56,7 +56,7 @@ export function LanguageDropdown() {
                                     : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                             }`}
                         >
-                            <img src={`/flags/${lang.countryCode}.svg`} alt={lang.nativeName} className="w-5 h-4 rounded-sm object-cover" />
+                            <img src={`/flags/${lang.countryCode}.svg`} alt={lang.nativeName} className="w-6 h-[18px] rounded-sm" />
                             {lang.nativeName}
                         </a>
                     );
