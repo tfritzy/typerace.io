@@ -1,6 +1,4 @@
 import { PlayerAvatar } from './PlayerAvatar';
-import { getColorConfig } from '../utils/colorMapping';
-import { type PlayerColor } from "../types/stdb";
 import { Bot } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { memo } from 'react';
@@ -14,7 +12,6 @@ type PlayerProgressBarProps = {
     playerPublicId: string;
     isCurrentPlayer?: boolean;
     isLoading?: boolean;
-    playerColor?: PlayerColor;
     wpm?: number;
     placement?: number;
     isBot?: boolean;
@@ -30,17 +27,13 @@ export const PlayerProgressBar = memo(({
     playerPublicId,
     isCurrentPlayer = false,
     isLoading = false,
-    playerColor = { tag: "Monokai" } as PlayerColor,
     wpm,
     placement,
     isBot = false,
     isAnonymous = false,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
-    const colorConfig = getColorConfig(playerColor);
-    const progressGradient = isCurrentPlayer
-        ? 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))'
-        : colorConfig.gradient;
+    const progressGradient = 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))';
 
     return (
         <div
@@ -54,7 +47,6 @@ export const PlayerProgressBar = memo(({
                     key="avatar"
                     size={40}
                     identity={identityHash}
-                    color={playerColor}
                     isHighlighted={isCurrentPlayer}
                     isLoading={isLoading}
                     placement={placement}
@@ -65,7 +57,6 @@ export const PlayerProgressBar = memo(({
                         key="avatar"
                         size={40}
                         identity={identityHash}
-                        color={playerColor}
                         isHighlighted={isCurrentPlayer}
                         isLoading={isLoading}
                         placement={placement}

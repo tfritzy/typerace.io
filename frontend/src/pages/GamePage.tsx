@@ -1,9 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useCallback, useState, useMemo } from "react";
+import { useEffect, useCallback, useState } from "react";
 import {
   type Game,
   type PlayerProgress,
-  type PlayerColor,
 } from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
@@ -14,7 +13,6 @@ import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
-import { getInitialTheme } from "../utils/themes";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -23,11 +21,6 @@ export const GamePage = () => {
   const [hasFinished, setHasFinished] = useState(false);
   const [game, setGame] = useState<Game | null>(null);
   const [gamePlayerProgress, setGamePlayerProgress] = useState<PlayerProgress[]>([]);
-
-  const currentThemeColor = useMemo(() => {
-    const tag = getInitialTheme();
-    return { tag } as PlayerColor;
-  }, []);
 
   useEffect(() => {
     setGame(null);
@@ -218,7 +211,6 @@ export const GamePage = () => {
                     identityHash={pp.playerId.toHexString()}
                     playerPublicId={pp.playerPublicId}
                     isCurrentPlayer={isCurrentPlayer}
-                    playerColor={currentThemeColor}
                     wpm={pp.wpm}
                     placement={pp.placement}
                     isBot={pp.isBot}

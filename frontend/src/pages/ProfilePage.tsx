@@ -1,11 +1,10 @@
-import { type Player, type GameRecord, type PlayerColor } from "../types/stdb";
+import { type Player, type GameRecord } from "../types/stdb";
 import { WpmChart } from "../components/WpmChart";
 import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
 import { PlayerAvatar } from "../components/PlayerAvatar";
 import { useParams, useNavigate } from "react-router-dom";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
-import { getColorConfig } from "../utils/colorMapping";
 import { EditNameModal } from "../components/EditNameModal";
 import { getLangHome } from "../utils/modes";
 import { formatNumber, formatTimeSpent } from "../utils/formatters";
@@ -13,7 +12,6 @@ import { useAuth } from "../firebase/AuthContext";
 import { Select } from "../components/Select";
 import { RecentGames } from "../components/RecentGames";
 import { useDatabase } from "../contexts/SpacetimeContext";
-import { getInitialTheme } from "../utils/themes";
 
 type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
@@ -29,11 +27,6 @@ export const ProfilePage = () => {
     const navigate = useNavigate();
 
     const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.identity);
-
-    const currentThemeColor = useMemo(() => {
-        const tag = getInitialTheme();
-        return { tag } as PlayerColor;
-    }, []);
 
     useEffect(() => {
         if (!conn || !playerId) return;
@@ -182,7 +175,6 @@ export const ProfilePage = () => {
                                     <PlayerAvatar
                                         size={80}
                                         identity={viewedPlayer.identity.toHexString()}
-                                        color={currentThemeColor}
                                         isHighlighted={true}
                                     />
 
@@ -216,7 +208,7 @@ export const ProfilePage = () => {
                                                 <div
                                                     className="h-full rounded-[5px] transition-[width_0.3s_ease]"
                                                     style={{
-                                                        background: getColorConfig(currentThemeColor).gradient,
+                                                        background: 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))',
                                                         width: `${viewedPlayer ? xpProgressToNextLevel(viewedPlayer.xp, viewedPlayer.xpRequiredForNextLevel) : 0}%`
                                                     }}
                                                 />
