@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { ChevronDown } from "lucide-react";
 import { languages, getLanguageFromSlug, type LanguageInfo } from "../utils/modes";
 
 function getCurrentLang(): LanguageInfo {
@@ -35,6 +36,7 @@ export function LanguageDropdown() {
             >
                 <img src={`/flags/${currentLang.countryCode}.svg`} alt={currentLang.nativeName} className="w-4 h-3 rounded-[1px]" />
                 <span>{currentLang.nativeName}</span>
+                <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
             </button>
             <div
                 className={`absolute top-full left-0 mt-1 rounded-xl border border-border bg-card p-1.5 min-w-[160px] max-h-[50vh] overflow-y-auto z-50 transition-all duration-150 ${
