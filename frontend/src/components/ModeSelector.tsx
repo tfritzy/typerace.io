@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { type GameMode } from "../types/stdb";
 import { ChevronDown, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
-import { getContentTypeFromMode, languages, type ContentTypeValue, type LanguageInfo } from "../utils/modes";
+import { getContentTypeFromMode, type ContentTypeValue, type LanguageInfo } from "../utils/modes";
+import { LanguageDropdown } from "./LanguageDropdown";
 
 export type GameTypeValue = "Public" | "Private" | "Practice";
 
@@ -39,62 +40,6 @@ function ModeButton({ isSelected, onClick, icon, label, disabled }: ModeButtonPr
     );
 }
 
-function LanguageDropdown({ currentLang }: { currentLang: LanguageInfo }) {
-    const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-        if (isOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [isOpen]);
-
-    return (
-        <div className="relative inline-flex" ref={dropdownRef}>
-            <button
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer text-muted-foreground hover:text-foreground hover:bg-secondary"
-                onClick={() => setIsOpen(!isOpen)}
-            >
-                <span className="text-base leading-none">{currentLang.flag}</span>
-                <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
-            </button>
-            <div
-                className={`absolute top-full left-1/2 -translate-x-1/2 mt-1 rounded-xl border border-border bg-card p-1.5 min-w-[160px] max-h-[50vh] overflow-y-auto z-50 transition-all duration-150 ${
-                    isOpen
-                        ? "opacity-100 visible"
-                        : "opacity-0 invisible pointer-events-none"
-                }`}
-            >
-                {languages.map((lang) => {
-                    const href = lang.slug ? `/${lang.slug}` : "/";
-                    const isSelected = lang.language === currentLang.language;
-                    return (
-                        <a
-                            key={lang.language}
-                            href={href}
-                            hrefLang={lang.htmlLang}
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors no-underline ${
-                                isSelected
-                                    ? "bg-accent-primary/15 text-accent-primary"
-                                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                            }`}
-                        >
-                            <span>{lang.flag}</span>
-                            {lang.nativeName}
-                        </a>
-                    );
-                })}
-            </div>
-        </div>
-    );
-}
-
 export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setGameType, currentLang }: GameOptionsSelectorProps) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [contentType, setContentType] = useState<ContentTypeValue>(() => getContentTypeFromMode(selectedMode.tag));
@@ -119,17 +64,18 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
     return (
         <>
             <div className="hidden md:flex items-center justify-center gap-1 flex-wrap">
+                <LanguageDropdown />
+                <span className="mx-2 text-border-hover select-none">|</span>
                 <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label="Public Match" />
                 <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label="Private Lobby" />
                 <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label="Practice Mode" />
                 <span className="mx-2 text-border-hover select-none">|</span>
                 <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label="Quotes" disabled={!quotesAvailableForLanguage} />
                 <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label="Random Words" />
-                <span className="mx-2 text-border-hover select-none">|</span>
-                <LanguageDropdown currentLang={selectedLanguage} />
             </div>
 
             <div className="md:hidden flex items-center justify-center gap-2">
+                <LanguageDropdown />
                 <button
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-secondary text-secondary-foreground transition-all duration-200"
                     onClick={() => setIsDrawerOpen(true)}
@@ -140,7 +86,6 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     <span>{gameType} · {contentType === "Quotes" ? "Quotes" : "Random Words"}</span>
                     <ChevronDown size={16} />
                 </button>
-                <LanguageDropdown currentLang={selectedLanguage} />
             </div>
 
             {isDrawerOpen && (
