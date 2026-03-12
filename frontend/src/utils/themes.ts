@@ -556,6 +556,8 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
         localStorage.setItem('selectedTheme', tag);
     } catch (_e) {
     }
+
+    window.dispatchEvent(new Event('themechange'));
 }
 
 export { DEFAULT_THEME_SETTINGS };
