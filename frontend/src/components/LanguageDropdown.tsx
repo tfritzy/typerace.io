@@ -30,14 +30,10 @@ export function LanguageDropdown() {
     return (
         <div className="relative inline-flex" ref={dropdownRef}>
             <button
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer ${
-                    isOpen
-                        ? "bg-accent-primary/15 text-accent-primary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                }`}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer bg-accent-primary/15 text-accent-primary"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <img src={`/flags/${currentLang.countryCode}.svg`} alt={currentLang.nativeName} className="w-5 h-[15px] rounded-[2px]" />
+                <img src={`/flags/${currentLang.countryCode}.svg`} alt={currentLang.nativeName} className="w-4 h-3 rounded-[1px]" />
                 <span>{currentLang.nativeName}</span>
             </button>
             <div
