@@ -215,7 +215,6 @@ export const GamePage = () => {
                     identityHash={pp.playerId.toHexString()}
                     playerPublicId={pp.playerPublicId}
                     isCurrentPlayer={isCurrentPlayer}
-                    playerColor={pp.playerColor}
                     wpm={pp.wpm}
                     placement={pp.placement}
                     isBot={pp.isBot}

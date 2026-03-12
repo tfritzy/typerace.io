@@ -5,7 +5,6 @@ import { Header } from "../components/Header";
 import { PlayerAvatar } from "../components/PlayerAvatar";
 import { useParams, useNavigate } from "react-router-dom";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
-import { getColorConfig } from "../utils/colorMapping";
 import { EditNameModal } from "../components/EditNameModal";
 import { getLangHome } from "../utils/modes";
 import { formatNumber, formatTimeSpent } from "../utils/formatters";
@@ -176,7 +175,6 @@ export const ProfilePage = () => {
                                     <PlayerAvatar
                                         size={80}
                                         identity={viewedPlayer.identity.toHexString()}
-                                        color={viewedPlayer.color}
                                         isHighlighted={true}
                                     />
 
@@ -210,7 +208,7 @@ export const ProfilePage = () => {
                                                 <div
                                                     className="h-full rounded-[5px] transition-[width_0.3s_ease]"
                                                     style={{
-                                                        background: viewedPlayer ? getColorConfig(viewedPlayer.color).gradient : 'var(--accent-primary)',
+                                                        background: 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))',
                                                         width: `${viewedPlayer ? xpProgressToNextLevel(viewedPlayer.xp, viewedPlayer.xpRequiredForNextLevel) : 0}%`
                                                     }}
                                                 />
