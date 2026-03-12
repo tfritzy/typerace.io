@@ -2,6 +2,7 @@ import { useState } from "react";
 import { type GameMode } from "../types/stdb";
 import { ChevronDown, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
 import { getContentTypeFromMode, type ContentTypeValue, type LanguageInfo } from "../utils/modes";
+import { LanguageDropdown } from "./LanguageDropdown";
 
 export type GameTypeValue = "Public" | "Private" | "Practice";
 
@@ -63,6 +64,8 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
     return (
         <>
             <div className="hidden md:flex items-center justify-center gap-1 flex-wrap">
+                <LanguageDropdown />
+                <span className="mx-2 text-border-hover select-none">|</span>
                 <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label="Public Match" />
                 <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label="Private Lobby" />
                 <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label="Practice Mode" />
@@ -72,6 +75,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
             </div>
 
             <div className="md:hidden flex items-center justify-center gap-2">
+                <LanguageDropdown />
                 <button
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-accent-primary/15 text-accent-primary transition-all duration-200"
                     onClick={() => setIsDrawerOpen(true)}
