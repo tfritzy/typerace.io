@@ -7,6 +7,7 @@ import { SpacetimeProvider } from "./contexts/SpacetimeContext.tsx";
 import { getInitialTheme, applyTheme, loadGoogleFont } from "./utils/themes.ts";
 
 applyTheme(getInitialTheme());
+loadGoogleFont('Inter');
 loadGoogleFont('JetBrains Mono');
 
 createRoot(document.getElementById("root")!).render(
