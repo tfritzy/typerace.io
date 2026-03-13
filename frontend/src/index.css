@@ -165,12 +165,12 @@ body {
     linear-gradient(to top, black 0%, transparent 80%),
     repeating-linear-gradient(0deg, black 0 16px, transparent 16px 20px),
     repeating-linear-gradient(90deg, black 0 16px, transparent 16px 20px);
-  -webkit-mask-composite: source-in, source-in;
+  -webkit-mask-composite: source-in;
   mask-image:
     linear-gradient(to top, black 0%, transparent 80%),
     repeating-linear-gradient(0deg, black 0 16px, transparent 16px 20px),
     repeating-linear-gradient(90deg, black 0 16px, transparent 16px 20px);
-  mask-composite: intersect, intersect;
+  mask-composite: intersect;
 }
 
 #root::after {
@@ -180,12 +180,12 @@ body {
     linear-gradient(to top, black 0%, transparent 50%),
     repeating-linear-gradient(0deg, black 0 56px, transparent 56px 64px),
     repeating-linear-gradient(90deg, black 0 56px, transparent 56px 64px);
-  -webkit-mask-composite: source-in, source-in;
+  -webkit-mask-composite: source-in;
   mask-image:
     linear-gradient(to top, black 0%, transparent 50%),
     repeating-linear-gradient(0deg, black 0 56px, transparent 56px 64px),
     repeating-linear-gradient(90deg, black 0 56px, transparent 56px 64px);
-  mask-composite: intersect, intersect;
+  mask-composite: intersect;
 }
 
 .content-container {
