@@ -1,19 +1,18 @@
-import { type PlayerColor } from '../types/stdb';
-import { THEMES } from '../utils/themes';
+import { THEMES, type ThemeTag } from '../utils/themes';
 import { getColorConfig } from '../utils/colorMapping';
 
 type ColorSelectorProps = {
-    selectedColor: PlayerColor['tag'];
-    onColorSelect: (color: PlayerColor['tag']) => void;
+    selectedColor: ThemeTag;
+    onColorSelect: (color: ThemeTag) => void;
 };
 
 export const ColorSelector = ({ selectedColor, onColorSelect }: ColorSelectorProps) => {
-    const colors = Object.keys(THEMES) as PlayerColor['tag'][];
+    const colors = Object.keys(THEMES) as ThemeTag[];
 
     return (
         <div className="grid gap-2 p-4 max-w-[440px]" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(52px, 1fr))' }}>
             {colors.map((key) => {
-                const colorConfig = getColorConfig({ tag: key } as PlayerColor);
+                const colorConfig = getColorConfig(key);
                 const isSelected = selectedColor === key;
                 const boxShadow = isSelected
                     ? `0 0 0 3px rgba(255, 255, 255, 0.1), 0 0 20px ${colorConfig.primary}80, inset 0 2px 4px rgba(0, 0, 0, 0.2)`

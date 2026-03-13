@@ -2,7 +2,6 @@ import { type Infer } from "spacetimedb";
 import * as Bindings from "../../module_bindings";
 
 export type GameMode = Infer<typeof Bindings.GameMode>;
-export type PlayerColor = Infer<typeof Bindings.PlayerColor>;
 export type Game = Infer<typeof Bindings.Game>;
 export type Player = Infer<typeof Bindings.Player>;
 export type GameRecord = Infer<typeof Bindings.GameRecord>;

@@ -82,20 +82,6 @@ public enum PlayerColor
     Sweetie16
 }
 
-[Table(Name = "playertheme", Public = true)]
-public partial struct PlayerTheme
-{
-    [PrimaryKey]
-    public Identity Owner;
-    public string BackgroundColor;
-    public string TextColor;
-    public string BorderColor;
-    public int BorderWidth;
-    public float BorderRadius;
-    public string AccentColor;
-    public string Font;
-    public int FontWeight;
-}
 
 public struct Quote
 {
@@ -571,63 +557,6 @@ public static partial class Module
             updatedPlayer.Name = trimmedName;
             ctx.Db.player.Identity.Update(updatedPlayer);
             Log.Info($"Updated player name for {ctx.Sender} to {trimmedName}");
-        }
-    }
-
-    [Reducer]
-    public static void setPlayerColor(ReducerContext ctx, PlayerColor color)
-    {
-        var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
-
-        if (existingPlayer != null)
-        {
-            var updatedPlayer = existingPlayer.Value;
-            updatedPlayer.Color = color;
-            ctx.Db.player.Identity.Update(updatedPlayer);
-            Log.Info($"Updated player color for {ctx.Sender} to {color}");
-        }
-    }
-
-    [Reducer]
-    public static void setPlayerTheme(ReducerContext ctx, string backgroundColor, string textColor, string borderColor, int borderWidth, float borderRadius, string accentColor, string font, int fontWeight)
-    {
-        if (backgroundColor.Length > 50 || textColor.Length > 50 || borderColor.Length > 50 || accentColor.Length > 50)
-        {
-            Log.Warn($"Color value too long from {ctx.Sender}");
-            return;
-        }
-
-        if (font.Length > 200)
-        {
-            Log.Warn($"Font value too long from {ctx.Sender}");
-            return;
-        }
-
-        borderWidth = Math.Clamp(borderWidth, 0, 10);
-        borderRadius = Math.Clamp(borderRadius, 0, 50);
-        fontWeight = Math.Clamp(fontWeight, 100, 900);
-
-        var existing = ctx.Db.playertheme.Owner.Find(ctx.Sender);
-        var theme = new PlayerTheme
-        {
-            Owner = ctx.Sender,
-            BackgroundColor = backgroundColor,
-            TextColor = textColor,
-            BorderColor = borderColor,
-            BorderWidth = borderWidth,
-            BorderRadius = borderRadius,
-            AccentColor = accentColor,
-            Font = font,
-            FontWeight = fontWeight
-        };
-
-        if (existing != null)
-        {
-            ctx.Db.playertheme.Owner.Update(theme);
-        }
-        else
-        {
-            ctx.Db.playertheme.Insert(theme);
         }
     }
 

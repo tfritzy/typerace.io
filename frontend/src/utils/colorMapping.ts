@@ -1,5 +1,4 @@
-import { type PlayerColor } from "../types/stdb";
-import { getThemeConfig, applyTheme, type ThemeConfig } from "./themes";
+import { getThemeConfig, type ThemeTag } from "./themes";
 
 export interface ColorConfig {
     primary: string;
@@ -11,8 +10,8 @@ export interface ColorConfig {
     gradient: string;
 }
 
-export function getColorConfig(color: PlayerColor): ColorConfig {
-    const theme = getThemeConfig(color);
+export function getColorConfig(tag: ThemeTag): ColorConfig {
+    const theme = getThemeConfig(tag);
     return {
         primary: theme.colors.accentPrimary,
         light: theme.colors.accentLight,
@@ -23,9 +22,3 @@ export function getColorConfig(color: PlayerColor): ColorConfig {
         gradient: theme.gradient,
     };
 }
-
-export function setAccentColor(color: PlayerColor): void {
-    applyTheme(color.tag);
-}
-
-export { type ThemeConfig };
