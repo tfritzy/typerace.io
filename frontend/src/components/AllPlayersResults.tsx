@@ -40,7 +40,6 @@ export const AllPlayersResults = ({
                                 <PlayerAvatar
                                     size={24}
                                     identity={pp.playerId.toHexString()}
-                                    color={pp.playerColor}
                                 />
                                 {pp.playerName}
                             </button>

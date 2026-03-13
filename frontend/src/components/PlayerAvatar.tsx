@@ -1,26 +1,40 @@
 import Avatar from "boring-avatars";
-import { type PlayerColor } from "../types/stdb";
-import { getColorConfig } from "../utils/colorMapping";
 import { Crown, Award } from 'lucide-react';
-import { memo } from "react";
+import { memo, useState, useEffect, useCallback } from "react";
 
 type PlayerAvatarProps = {
     size: number;
     identity: string;
-    color?: PlayerColor;
     isHighlighted?: boolean;
     isLoading?: boolean;
     placement?: number;
 };
 
+function getAvatarColorsFromCSS(): string[] {
+    const style = getComputedStyle(document.documentElement);
+    return [
+        style.getPropertyValue('--avatar-color-1').trim(),
+        style.getPropertyValue('--avatar-color-2').trim(),
+        style.getPropertyValue('--avatar-color-3').trim(),
+    ];
+}
+
 export const PlayerAvatar = memo(({
     size,
     identity,
-    color = { tag: "Monokai" } as PlayerColor,
     isLoading = false,
     placement
 }: PlayerAvatarProps) => {
-    const colorConfig = getColorConfig(color);
+    const [avatarColors, setAvatarColors] = useState(getAvatarColorsFromCSS);
+
+    const onThemeChange = useCallback(() => {
+        setAvatarColors(getAvatarColorsFromCSS());
+    }, []);
+
+    useEffect(() => {
+        window.addEventListener('themechange', onThemeChange);
+        return () => window.removeEventListener('themechange', onThemeChange);
+    }, [onThemeChange]);
 
     const getCrownColor = (place: number) => {
         if (place === 1) return 'var(--medal-gold)';
@@ -49,7 +63,7 @@ export const PlayerAvatar = memo(({
     return (
         <div
             className={`relative shrink-0 border-2 rounded-full ${isLoading ? 'border-dashed' : ''}`}
-            style={{ borderColor: borderColor || colorConfig.avatarColors[2] }}
+            style={{ borderColor: borderColor || avatarColors[2] }}
         >
             {crownColor && (
                 <div
@@ -87,7 +101,7 @@ export const PlayerAvatar = memo(({
                     size={size}
                     name={identity}
                     variant="beam"
-                    colors={colorConfig.avatarColors}
+                    colors={avatarColors}
                 />
             )}
         </div>
