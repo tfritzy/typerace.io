@@ -1,20 +1,13 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import {
     THEME_PRESETS,
-    GOOGLE_FONTS,
-    loadGoogleFont,
-    fontNameToCss,
-    applyCustomTheme,
     applyTheme,
     resolveTheme,
     getInitialTheme,
     getCustomThemeSettings,
     type ThemeSettings,
-    type GoogleFont,
 } from '../utils/themes';
-
-const SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog";
 
 interface ShowcaseTheme {
     tag: string;
@@ -165,45 +158,12 @@ function ThemeCard({
     );
 }
 
-function FontRow({
-    font,
-    isSelected,
-    onSelect,
-}: {
-    font: GoogleFont;
-    isSelected: boolean;
-    onSelect: () => void;
-}) {
-    return (
-        <button
-            onClick={onSelect}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-all cursor-pointer border bg-transparent ${
-                isSelected
-                    ? 'bg-accent/10 border-accent'
-                    : 'border-transparent hover:bg-secondary/50'
-            }`}
-        >
-            <div className="text-xs text-muted-foreground mb-1 tracking-wide">
-                {font.name}
-                <span className="ml-2 opacity-60">{font.category}</span>
-            </div>
-            <div
-                className="text-2xl truncate text-foreground"
-                style={{ fontFamily: fontNameToCss(font.name) }}
-            >
-                {SAMPLE_TEXT}
-            </div>
-        </button>
-    );
-}
-
 type ThemeShowcaseModalProps = {
+    open: boolean;
     onClose: () => void;
 };
 
-export const ThemeShowcaseModal = ({ onClose }: ThemeShowcaseModalProps) => {
-    const [activeTab, setActiveTab] = useState<'themes' | 'fonts'>('themes');
-
+export const ThemeShowcaseModal = ({ open, onClose }: ThemeShowcaseModalProps) => {
     const allThemes = useMemo(() => {
         const map = new Map<string, ShowcaseTheme>();
         for (const t of DARK_THEMES) map.set(t.tag, t);
@@ -216,12 +176,12 @@ export const ThemeShowcaseModal = ({ onClose }: ThemeShowcaseModalProps) => {
         if (initial === 'custom') {
             const custom = getCustomThemeSettings();
             if (custom) {
-                for (const [tag, t] of allThemes) {
+                for (const t of allThemes.values()) {
                     if (
                         t.settings.backgroundColor === custom.backgroundColor &&
                         t.settings.accentColor === custom.accentColor &&
                         t.settings.textColor === custom.textColor
-                    ) return tag;
+                    ) return t.tag;
                 }
             }
             return 'GruvboxDark';
@@ -229,143 +189,48 @@ export const ThemeShowcaseModal = ({ onClose }: ThemeShowcaseModalProps) => {
         return initial;
     });
 
-    const [selectedFont, setSelectedFont] = useState<string>(() => {
-        const initial = getInitialTheme();
-        if (initial === 'custom') {
-            const custom = getCustomThemeSettings();
-            if (custom) return custom.font;
-        }
-        const t = allThemes.get(initial);
-        return t?.settings.font || 'Inter';
-    });
-
-    useEffect(() => {
-        GOOGLE_FONTS.forEach((f) => loadGoogleFont(f.name));
-    }, []);
-
-    const handleThemeSelect = useCallback(
-        (tag: string) => {
-            setSelectedTheme(tag);
-            const t = allThemes.get(tag);
-            if (!t) return;
-            const isBuiltIn = tag in THEME_PRESETS;
-            if (selectedFont !== t.settings.font || !isBuiltIn) {
-                const font = GOOGLE_FONTS.find((f) => f.name === selectedFont);
-                const weight =
-                    font && font.weights.includes(400)
-                        ? 400
-                        : font?.weights[0] || 400;
-                applyCustomTheme({
-                    ...t.settings,
-                    font: selectedFont,
-                    fontWeight: weight,
-                });
-            } else {
-                applyTheme(tag);
-            }
-        },
-        [selectedFont, allThemes]
-    );
-
-    const handleFontSelect = useCallback(
-        (fontName: string) => {
-            setSelectedFont(fontName);
-            const t = allThemes.get(selectedTheme);
-            if (!t) return;
-            const font = GOOGLE_FONTS.find((f) => f.name === fontName);
-            const weight =
-                font && font.weights.includes(400)
-                    ? 400
-                    : font?.weights[0] || 400;
-            const isBuiltIn = selectedTheme in THEME_PRESETS;
-            if (fontName === t.settings.font && isBuiltIn) {
-                applyTheme(selectedTheme);
-            } else {
-                applyCustomTheme({
-                    ...t.settings,
-                    font: fontName,
-                    fontWeight: weight,
-                });
-            }
-        },
-        [selectedTheme, allThemes]
-    );
-
-    const handleClose = useCallback(() => {
-        onClose();
-    }, [onClose]);
+    const handleThemeSelect = (tag: string) => {
+        setSelectedTheme(tag);
+        applyTheme(tag);
+    };
 
     return (
-        <Dialog open={true} onOpenChange={(open) => { if (!open) handleClose(); }}>
+        <Dialog open={open} onOpenChange={(open) => { if (!open) onClose(); }}>
             <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
-                <DialogTitle className="sr-only">Theme & Font Settings</DialogTitle>
-                <div className="flex gap-6 px-6 pt-6 pb-0 border-b border-border shrink-0">
-                    <button
-                        onClick={() => setActiveTab('themes')}
-                        className={`pb-3 text-lg font-semibold border-b-2 transition-colors cursor-pointer bg-transparent ${
-                            activeTab === 'themes'
-                                ? 'border-accent text-foreground'
-                                : 'border-transparent text-muted-foreground hover:text-foreground'
-                        }`}
-                    >
-                        Themes
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('fonts')}
-                        className={`pb-3 text-lg font-semibold border-b-2 transition-colors cursor-pointer bg-transparent ${
-                            activeTab === 'fonts'
-                                ? 'border-accent text-foreground'
-                                : 'border-transparent text-muted-foreground hover:text-foreground'
-                        }`}
-                    >
-                        Fonts
-                    </button>
+                <DialogTitle className="sr-only">Theme Settings</DialogTitle>
+                <div className="px-6 pt-6 pb-3 border-b border-border shrink-0">
+                    <h2 className="text-lg font-semibold text-foreground">Themes</h2>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6">
-                    {activeTab === 'themes' && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div>
-                                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Dark</h3>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {DARK_THEMES.map((t) => (
-                                        <ThemeCard
-                                            key={t.tag}
-                                            theme={t}
-                                            isSelected={selectedTheme === t.tag}
-                                            onSelect={() => handleThemeSelect(t.tag)}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                            <div>
-                                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Light</h3>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {LIGHT_THEMES.map((t) => (
-                                        <ThemeCard
-                                            key={t.tag}
-                                            theme={t}
-                                            isSelected={selectedTheme === t.tag}
-                                            onSelect={() => handleThemeSelect(t.tag)}
-                                        />
-                                    ))}
-                                </div>
+                <div className="flex-1 overflow-y-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-2">
+                        <div className="p-6 bg-[#1a1a2e]">
+                            <h3 className="text-sm font-semibold uppercase tracking-wider mb-3 text-[#a0a0b8]">Dark</h3>
+                            <div className="grid grid-cols-2 gap-3">
+                                {DARK_THEMES.map((t) => (
+                                    <ThemeCard
+                                        key={t.tag}
+                                        theme={t}
+                                        isSelected={selectedTheme === t.tag}
+                                        onSelect={() => handleThemeSelect(t.tag)}
+                                    />
+                                ))}
                             </div>
                         </div>
-                    )}
-
-                    {activeTab === 'fonts' && (
-                        <div className="space-y-1">
-                            {GOOGLE_FONTS.map((font) => (
-                                <FontRow
-                                    key={font.name}
-                                    font={font}
-                                    isSelected={selectedFont === font.name}
-                                    onSelect={() => handleFontSelect(font.name)}
-                                />
-                            ))}
+                        <div className="p-6 bg-[#e8e4dc]">
+                            <h3 className="text-sm font-semibold uppercase tracking-wider mb-3 text-[#6b6560]">Light</h3>
+                            <div className="grid grid-cols-2 gap-3">
+                                {LIGHT_THEMES.map((t) => (
+                                    <ThemeCard
+                                        key={t.tag}
+                                        theme={t}
+                                        isSelected={selectedTheme === t.tag}
+                                        onSelect={() => handleThemeSelect(t.tag)}
+                                    />
+                                ))}
+                            </div>
                         </div>
-                    )}
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>

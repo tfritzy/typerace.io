@@ -51,9 +51,7 @@ export const Footer = () => {
                     </button>
                 </div>
             </div>
-            {showThemeModal && (
-                <ThemeShowcaseModal onClose={() => setShowThemeModal(false)} />
-            )}
+            <ThemeShowcaseModal open={showThemeModal} onClose={() => setShowThemeModal(false)} />
         </footer>
     );
 };
