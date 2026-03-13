@@ -5,6 +5,7 @@ import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
 import { GameOptionsSelector, type GameTypeValue } from "../components/ModeSelector";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import { GridBackground } from "../components/GridBackground";
 import { getRandomStartupPhrase, getLanguageFromSlug, getContentTypeFromMode, storeLangSlug } from "../utils/modes";
 import { useFindGame } from "../hooks/useFindGame";
 
@@ -71,6 +72,7 @@ export const LobbyPage = () => {
 
   return (
     <div className="relative h-full flex flex-col">
+      <GridBackground />
       <Header />
       <div className="flex-1 flex flex-col items-center p-4 min-h-0">
         <div className="flex-[4]" />
