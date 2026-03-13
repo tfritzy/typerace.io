@@ -80,7 +80,7 @@ export const PlayerAvatar = memo(({
             )}
             {medalColor && (
                 <div
-                    className="absolute -bottom-1 right-1 z-10 medal-shadow"
+                    className="absolute -bottom-1 right-1 z-10 drop-shadow-[0_0px_3px_rgba(0,0,0,0.15)] dark:drop-shadow-[0_0px_3px_rgba(0,0,0,0.4)]"
                 >
                     <Award
                         size={size * 0.35}
