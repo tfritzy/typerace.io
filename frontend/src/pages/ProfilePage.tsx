@@ -12,6 +12,7 @@ import { useAuth } from "../firebase/AuthContext";
 import { Select } from "../components/Select";
 import { RecentGames } from "../components/RecentGames";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { LoadingDots } from "../components/LoadingDots";
 
 type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
@@ -36,12 +37,14 @@ export const ProfilePage = () => {
         const handlePlayerInsert = (_ctx: any, player: Player) => {
             if (player.playerId === playerId) {
                 setViewedPlayer(player);
+                setIsProfileLoading(false);
             }
         };
 
         const handlePlayerUpdate = (_ctx: any, _oldPlayer: Player, newPlayer: Player) => {
             if (newPlayer.playerId === playerId) {
                 setViewedPlayer(newPlayer);
+                setIsProfileLoading(false);
             }
         };
 
@@ -49,9 +52,6 @@ export const ProfilePage = () => {
         conn.db.player.onUpdate(handlePlayerUpdate);
 
         const subscription = conn.subscriptionBuilder()
-            .onApplied(() => {
-                setIsProfileLoading(false);
-            })
             .subscribe([`SELECT * FROM player WHERE PlayerId = '${playerId}'`]);
 
         return () => {
@@ -164,15 +164,11 @@ export const ProfilePage = () => {
 
     if (isProfileLoading) {
         return (
-            <div className="h-full flex flex-col">
+            <div className="h-full flex flex-col" role="status" aria-label="Loading profile">
                 <Header hideAvatar={true} />
                 <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
                     <div className="content-container flex-1 flex items-center justify-center">
-                        <div
-                            role="status"
-                            aria-label="Loading profile"
-                            className="w-8 h-8 border-[3px] border-border border-t-muted-foreground rounded-full animate-spin"
-                        />
+                        <LoadingDots showLogo={false} />
                     </div>
                 </div>
             </div>
