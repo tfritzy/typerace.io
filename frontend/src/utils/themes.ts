@@ -185,14 +185,14 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
     };
 }
 
-const DEFAULT_DARK_THEME_TAG: PlayerColor['tag'] = 'CatppuccinMocha';
-const DEFAULT_LIGHT_THEME_TAG: PlayerColor['tag'] = 'GitHubLight';
+const DEFAULT_DARK_THEME_TAG: PlayerColor['tag'] = 'GruvboxDark';
+const DEFAULT_LIGHT_THEME_TAG: PlayerColor['tag'] = 'GruvboxLight';
 
 const DEFAULT_THEME_SETTINGS: ThemeSettings = {
-    backgroundColor: '#1e1e2e',
-    textColor: '#cdd6f4',
-    borderColor: 'rgba(205, 214, 244, 0.1)',
-    accentColor: '#cba6f7',
+    backgroundColor: '#282828',
+    textColor: '#ebdbb2',
+    borderColor: 'rgba(235, 219, 178, 0.1)',
+    accentColor: '#fabd2f',
     font: 'JetBrains Mono',
     fontWeight: 400,
 };
