@@ -50,9 +50,6 @@ export const ProfilePage = () => {
 
         const subscription = conn.subscriptionBuilder()
             .onApplied(() => {
-                const allPlayers = Array.from(conn.db.player.iter());
-                const p = allPlayers.find(player => player.playerId === playerId);
-                if (p) setViewedPlayer(p);
                 setIsProfileLoading(false);
             })
             .subscribe([`SELECT * FROM player WHERE PlayerId = '${playerId}'`]);
