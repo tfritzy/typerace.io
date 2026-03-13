@@ -143,6 +143,49 @@ body {
 
 #root {
   height: 100dvh;
+  position: relative;
+}
+
+#root::before,
+#root::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-color: var(--accent-primary);
+}
+
+#root::before {
+  height: 30%;
+  opacity: 0.09;
+  -webkit-mask-image:
+    linear-gradient(to top, black 0%, transparent 80%),
+    repeating-linear-gradient(0deg, black 0 16px, transparent 16px 20px),
+    repeating-linear-gradient(90deg, black 0 16px, transparent 16px 20px);
+  -webkit-mask-composite: source-in, source-in;
+  mask-image:
+    linear-gradient(to top, black 0%, transparent 80%),
+    repeating-linear-gradient(0deg, black 0 16px, transparent 16px 20px),
+    repeating-linear-gradient(90deg, black 0 16px, transparent 16px 20px);
+  mask-composite: intersect, intersect;
+}
+
+#root::after {
+  height: 55%;
+  opacity: 0.05;
+  -webkit-mask-image:
+    linear-gradient(to top, black 0%, transparent 50%),
+    repeating-linear-gradient(0deg, black 0 56px, transparent 56px 64px),
+    repeating-linear-gradient(90deg, black 0 56px, transparent 56px 64px);
+  -webkit-mask-composite: source-in, source-in;
+  mask-image:
+    linear-gradient(to top, black 0%, transparent 50%),
+    repeating-linear-gradient(0deg, black 0 56px, transparent 56px 64px),
+    repeating-linear-gradient(90deg, black 0 56px, transparent 56px 64px);
+  mask-composite: intersect, intersect;
 }
 
 .content-container {
