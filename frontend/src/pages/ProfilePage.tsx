@@ -23,6 +23,7 @@ export const ProfilePage = () => {
     const [selectedMode, setSelectedMode] = useState<string>('all');
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('all');
     const [isEditNameModalOpen, setIsEditNameModalOpen] = useState(false);
+    const [isProfileLoading, setIsProfileLoading] = useState(true);
     const { signOut } = useAuth();
     const navigate = useNavigate();
 
@@ -30,6 +31,7 @@ export const ProfilePage = () => {
 
     useEffect(() => {
         if (!conn || !playerId) return;
+        setIsProfileLoading(true);
 
         const handlePlayerInsert = (_ctx: any, player: Player) => {
             if (player.playerId === playerId) {
@@ -51,6 +53,7 @@ export const ProfilePage = () => {
                 const allPlayers = Array.from(conn.db.player.iter());
                 const p = allPlayers.find(player => player.playerId === playerId);
                 if (p) setViewedPlayer(p);
+                setIsProfileLoading(false);
             })
             .subscribe([`SELECT * FROM player WHERE PlayerId = '${playerId}'`]);
 
@@ -161,6 +164,23 @@ export const ProfilePage = () => {
 
         return Array.from(modesSet).sort();
     }, [gameRecords, viewedPlayer]);
+
+    if (isProfileLoading) {
+        return (
+            <div className="h-full flex flex-col">
+                <Header hideAvatar={true} />
+                <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
+                    <div className="content-container flex-1 flex items-center justify-center">
+                        <div
+                            role="status"
+                            aria-label="Loading profile"
+                            className="w-8 h-8 border-[3px] border-border border-t-muted-foreground rounded-full animate-spin"
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="h-full flex flex-col">
