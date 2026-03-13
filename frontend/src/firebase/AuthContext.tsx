@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             setUser(firebaseUser);
             setLoading(false);
             try {
-                if (firebaseUser) {
+                if (firebaseUser && !firebaseUser.isAnonymous) {
                     localStorage.setItem(AUTH_FLAG_KEY, 'true');
                 } else {
                     localStorage.removeItem(AUTH_FLAG_KEY);
