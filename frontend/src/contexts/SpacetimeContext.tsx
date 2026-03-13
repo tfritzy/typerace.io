@@ -22,13 +22,14 @@ export const useDatabase = () => {
 };
 
 export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
-    const { user, loading: authLoading } = useAuth();
+    const { user } = useAuth();
     const [conn, setConn] = useState<DbConnection | null>(null);
     const [showReconnectModal, setShowReconnectModal] = useState(false);
     const [isReconnecting, setIsReconnecting] = useState(false);
     const [reconnectFailed, setReconnectFailed] = useState(false);
     const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const failureTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const intentionalDisconnectRef = useRef(false);
 
     const connect = async (isAutoReconnect = false) => {
         if (isAutoReconnect) {
@@ -67,6 +68,12 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                 .onDisconnect(() => {
                     console.warn('Disconnected from SpacetimeDB');
                     setConn(null);
+
+                    if (intentionalDisconnectRef.current) {
+                        intentionalDisconnectRef.current = false;
+                        return;
+                    }
+
                     setShowReconnectModal(true);
                     setIsReconnecting(true);
                     setReconnectFailed(false);
@@ -117,11 +124,10 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     };
 
     useEffect(() => {
-        if (authLoading) return;
-
         const connectionPromise = connect();
 
         return () => {
+            intentionalDisconnectRef.current = true;
             if (reconnectTimeoutRef.current) {
                 clearTimeout(reconnectTimeoutRef.current);
             }
@@ -129,11 +135,15 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                 clearTimeout(failureTimeoutRef.current);
             }
             connectionPromise.then((connection) => {
-                connection?.disconnect();
+                if (connection) {
+                    connection.disconnect();
+                } else {
+                    intentionalDisconnectRef.current = false;
+                }
                 setConn(null);
             });
         };
-    }, [user?.uid, authLoading]);
+    }, [user?.uid]);
 
     if (!conn?.identity && !showReconnectModal) {
         return <LoadingDots />;

@@ -14,7 +14,6 @@ import { auth } from '../firebase/config';
 
 interface AuthContextType {
     user: User | null;
-    loading: boolean;
     signIn: (email: string, password: string) => Promise<void>;
     signUp: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
@@ -39,12 +38,10 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
             setUser(firebaseUser);
-            setLoading(false);
         });
 
         return unsubscribe;
@@ -78,7 +75,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const value: AuthContextType = {
         user,
-        loading,
         signIn,
         signUp,
         signOut,
