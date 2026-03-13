@@ -62,40 +62,6 @@ public enum CharacterEventType
     Backspace
 }
 
-[Type]
-public enum PlayerColor
-{
-    Dracula,
-    Monokai,
-    Nord,
-    TokyoNight,
-    GruvboxDark,
-    CatppuccinMocha,
-    GitHubLight,
-    SolarizedLight,
-    OneLight,
-    CatppuccinLatte,
-    GruvboxLight,
-    RosePineDawn,
-    Pico8,
-    Endesga,
-    Sweetie16
-}
-
-[Table(Name = "playertheme", Public = true)]
-public partial struct PlayerTheme
-{
-    [PrimaryKey]
-    public Identity Owner;
-    public string BackgroundColor;
-    public string TextColor;
-    public string BorderColor;
-    public int BorderWidth;
-    public float BorderRadius;
-    public string AccentColor;
-    public string Font;
-    public int FontWeight;
-}
 
 public struct Quote
 {
@@ -199,7 +165,6 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         public bool IsBot;
         public BotConfig? BotConfig;
-        public PlayerColor Color;
         public bool IsAnonymous;
         public long LastGameDate;
     }
@@ -381,7 +346,6 @@ public static partial class Module
         public int Placement;
         public string JoinCode;
         public double Wpm;
-        public PlayerColor PlayerColor;
         [Default(0)]
         public int HighestProgress;
     }
@@ -438,7 +402,6 @@ public static partial class Module
                     TypingRate = typingRate,
                     ErrorRate = errorRate
                 },
-                Color = GenerateRandomColor(ctx.Rng),
                 IsAnonymous = false,
                 LastGameDate = 0
             });
@@ -474,12 +437,6 @@ public static partial class Module
         return mean + stdDev * randStdNormal;
     }
 
-    private static PlayerColor GenerateRandomColor(Random rng)
-    {
-        var colors = Enum.GetValues<PlayerColor>();
-        return colors[rng.Next(colors.Length)];
-    }
-
     [Reducer(ReducerKind.ClientConnected)]
     public static void clientConnected(ReducerContext ctx)
     {
@@ -502,7 +459,6 @@ public static partial class Module
                 TotalTimeSpentMs = 0,
                 IsBot = false,
                 BotConfig = null,
-                Color = PlayerColor.CatppuccinMocha,
                 IsAnonymous = true,
                 LastGameDate = 0
             });
@@ -571,63 +527,6 @@ public static partial class Module
             updatedPlayer.Name = trimmedName;
             ctx.Db.player.Identity.Update(updatedPlayer);
             Log.Info($"Updated player name for {ctx.Sender} to {trimmedName}");
-        }
-    }
-
-    [Reducer]
-    public static void setPlayerColor(ReducerContext ctx, PlayerColor color)
-    {
-        var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
-
-        if (existingPlayer != null)
-        {
-            var updatedPlayer = existingPlayer.Value;
-            updatedPlayer.Color = color;
-            ctx.Db.player.Identity.Update(updatedPlayer);
-            Log.Info($"Updated player color for {ctx.Sender} to {color}");
-        }
-    }
-
-    [Reducer]
-    public static void setPlayerTheme(ReducerContext ctx, string backgroundColor, string textColor, string borderColor, int borderWidth, float borderRadius, string accentColor, string font, int fontWeight)
-    {
-        if (backgroundColor.Length > 50 || textColor.Length > 50 || borderColor.Length > 50 || accentColor.Length > 50)
-        {
-            Log.Warn($"Color value too long from {ctx.Sender}");
-            return;
-        }
-
-        if (font.Length > 200)
-        {
-            Log.Warn($"Font value too long from {ctx.Sender}");
-            return;
-        }
-
-        borderWidth = Math.Clamp(borderWidth, 0, 10);
-        borderRadius = Math.Clamp(borderRadius, 0, 50);
-        fontWeight = Math.Clamp(fontWeight, 100, 900);
-
-        var existing = ctx.Db.playertheme.Owner.Find(ctx.Sender);
-        var theme = new PlayerTheme
-        {
-            Owner = ctx.Sender,
-            BackgroundColor = backgroundColor,
-            TextColor = textColor,
-            BorderColor = borderColor,
-            BorderWidth = borderWidth,
-            BorderRadius = borderRadius,
-            AccentColor = accentColor,
-            Font = font,
-            FontWeight = fontWeight
-        };
-
-        if (existing != null)
-        {
-            ctx.Db.playertheme.Owner.Update(theme);
-        }
-        else
-        {
-            ctx.Db.playertheme.Insert(theme);
         }
     }
 
@@ -818,7 +717,6 @@ public static partial class Module
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
-        var playerColor = player?.Color ?? PlayerColor.CatppuccinMocha;
         var playerPublicId = player?.PlayerId ?? "";
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
@@ -836,8 +734,7 @@ public static partial class Module
             CharacterHistory = new byte[0],
             Time = 0,
             Placement = -1,
-            JoinCode = joinCode,
-            PlayerColor = playerColor
+            JoinCode = joinCode
         });
     }
 
@@ -898,8 +795,7 @@ public static partial class Module
                     CharacterHistory = new byte[0],
                     Time = 0,
                     Placement = -1,
-                    JoinCode = "",
-                    PlayerColor = selectedBot.Color
+                    JoinCode = ""
                 });
 
                 Log.Info($"Added bot {selectedBot.Name} (ELO: {GetBotElo(ctx, selectedBot.Identity, game.Value.GameMode)}) to game {args.GameId} (target ELO: {targetElo})");
@@ -1230,7 +1126,6 @@ public static partial class Module
                 var playerName = player?.Name ?? "Unknown";
                 var playerLevel = player?.Level ?? 1;
                 var isAnonymous = player?.IsAnonymous ?? true;
-                var playerColor = player?.Color ?? PlayerColor.CatppuccinMocha;
                 var playerPublicId = player?.PlayerId ?? "";
 
                 ctx.Db.playerprogress.Insert(new PlayerProgress
@@ -1248,8 +1143,7 @@ public static partial class Module
                     CharacterHistory = new byte[0],
                     Time = 0,
                     Placement = -1,
-                    JoinCode = gameId,
-                    PlayerColor = playerColor
+                    JoinCode = gameId
                 });
 
                 Log.Info($"Added player {progress.PlayerId} to rematch game {newGame.Id} with join code {gameId}");

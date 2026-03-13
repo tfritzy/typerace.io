@@ -1,4 +1,19 @@
-import { type PlayerColor } from "../types/stdb";
+export type ThemeTag =
+    | 'Dracula'
+    | 'Monokai'
+    | 'Nord'
+    | 'TokyoNight'
+    | 'GruvboxDark'
+    | 'CatppuccinMocha'
+    | 'GitHubLight'
+    | 'SolarizedLight'
+    | 'OneLight'
+    | 'CatppuccinLatte'
+    | 'GruvboxLight'
+    | 'RosePineDawn'
+    | 'Pico8'
+    | 'Endesga'
+    | 'Sweetie16';
 
 export interface GoogleFont {
     name: string;
@@ -185,8 +200,8 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
     };
 }
 
-const DEFAULT_DARK_THEME_TAG: PlayerColor['tag'] = 'GruvboxDark';
-const DEFAULT_LIGHT_THEME_TAG: PlayerColor['tag'] = 'GruvboxLight';
+const DEFAULT_DARK_THEME_TAG: ThemeTag = 'GruvboxDark';
+const DEFAULT_LIGHT_THEME_TAG: ThemeTag = 'GruvboxLight';
 
 const DEFAULT_THEME_SETTINGS: ThemeSettings = {
     backgroundColor: '#282828',
@@ -197,7 +212,7 @@ const DEFAULT_THEME_SETTINGS: ThemeSettings = {
     fontWeight: 400,
 };
 
-export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
+export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
     Dracula: {
         name: 'Dracula',
         backgroundColor: '#282a36',
@@ -350,20 +365,20 @@ export const THEME_PRESETS: Record<PlayerColor['tag'], ThemePreset> = {
     },
 };
 
-export const THEMES: Record<PlayerColor['tag'], ResolvedTheme> = Object.fromEntries(
+export const THEMES: Record<ThemeTag, ResolvedTheme> = Object.fromEntries(
     Object.entries(THEME_PRESETS).map(([key, preset]) => [
         key,
         resolveTheme(preset, preset.name, preset.previewColors),
     ])
-) as Record<PlayerColor['tag'], ResolvedTheme>;
+) as Record<ThemeTag, ResolvedTheme>;
 
 export function resolveCustomTheme(settings: ThemeSettings): ResolvedTheme {
     return resolveTheme(settings, 'Custom', [settings.backgroundColor, settings.accentColor]);
 }
 
-export function getThemeConfig(color: PlayerColor): ThemeConfig {
-    if (color.tag in THEMES) {
-        return THEMES[color.tag];
+export function getThemeConfig(tag: ThemeTag): ThemeConfig {
+    if (tag in THEMES) {
+        return THEMES[tag];
     }
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     return prefersDark ? THEMES[DEFAULT_DARK_THEME_TAG] : THEMES[DEFAULT_LIGHT_THEME_TAG];
@@ -397,7 +412,7 @@ export function applyTheme(colorTag: string): void {
         const custom = getCustomThemeSettings();
         theme = custom ? resolveCustomTheme(custom) : THEMES[DEFAULT_DARK_THEME_TAG];
     } else if (colorTag in THEMES) {
-        theme = THEMES[colorTag as PlayerColor['tag']];
+        theme = THEMES[colorTag as ThemeTag];
     } else {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         theme = prefersDark ? THEMES[DEFAULT_DARK_THEME_TAG] : THEMES[DEFAULT_LIGHT_THEME_TAG];

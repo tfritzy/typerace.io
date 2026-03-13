@@ -47,12 +47,8 @@ import JoinPrivateGame from "./join_private_game_reducer";
 export { JoinPrivateGame };
 import Rematch from "./rematch_reducer";
 export { Rematch };
-import SetPlayerColor from "./set_player_color_reducer";
-export { SetPlayerColor };
 import SetPlayerName from "./set_player_name_reducer";
 export { SetPlayerName };
-import SetPlayerTheme from "./set_player_theme_reducer";
-export { SetPlayerTheme };
 import StartCountdown from "./start_countdown_reducer";
 export { StartCountdown };
 import StartGame from "./start_game_reducer";
@@ -95,8 +91,6 @@ import PlayerRow from "./player_table";
 export { PlayerRow };
 import PlayerprogressRow from "./playerprogress_table";
 export { PlayerprogressRow };
-import PlayerthemeRow from "./playertheme_table";
-export { PlayerthemeRow };
 import XpgainRow from "./xpgain_table";
 export { XpgainRow };
 
@@ -135,12 +129,8 @@ import PersonalRecord from "./personal_record_type";
 export { PersonalRecord };
 import Player from "./player_type";
 export { Player };
-import PlayerColor from "./player_color_type";
-export { PlayerColor };
 import PlayerProgress from "./player_progress_type";
 export { PlayerProgress };
-import PlayerTheme from "./player_theme_type";
-export { PlayerTheme };
 import XpGain from "./xp_gain_type";
 export { XpGain };
 import XpGainCleaner from "./xp_gain_cleaner_type";
@@ -364,17 +354,6 @@ const tablesSchema = __schema(
     ],
   }, PlayerprogressRow),
   __table({
-    name: 'playertheme',
-    indexes: [
-      { name: 'Owner', algorithm: 'btree', columns: [
-        'owner',
-      ] },
-    ],
-    constraints: [
-      { name: 'playertheme_Owner_key', constraint: 'unique', columns: ['owner'] },
-    ],
-  }, PlayerthemeRow),
-  __table({
     name: 'xpgain',
     indexes: [
       { name: 'Id', algorithm: 'btree', columns: [
@@ -401,9 +380,7 @@ const reducersSchema = __reducers(
   __reducerSchema("joinGame", JoinGame),
   __reducerSchema("joinPrivateGame", JoinPrivateGame),
   __reducerSchema("rematch", Rematch),
-  __reducerSchema("setPlayerColor", SetPlayerColor),
   __reducerSchema("setPlayerName", SetPlayerName),
-  __reducerSchema("setPlayerTheme", SetPlayerTheme),
   __reducerSchema("StartCountdown", StartCountdown),
   __reducerSchema("StartGame", StartGame),
   __reducerSchema("startPrivateGame", StartPrivateGame),
