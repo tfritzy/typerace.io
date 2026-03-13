@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import {
     THEME_PRESETS,
@@ -176,7 +176,7 @@ export const ThemeShowcaseModal = ({ open, onClose }: ThemeShowcaseModalProps) =
         if (initial === 'custom') {
             const custom = getCustomThemeSettings();
             if (custom) {
-                for (const [, t] of allThemes) {
+                for (const t of allThemes.values()) {
                     if (
                         t.settings.backgroundColor === custom.backgroundColor &&
                         t.settings.accentColor === custom.accentColor &&
@@ -189,20 +189,13 @@ export const ThemeShowcaseModal = ({ open, onClose }: ThemeShowcaseModalProps) =
         return initial;
     });
 
-    const handleThemeSelect = useCallback(
-        (tag: string) => {
-            setSelectedTheme(tag);
-            applyTheme(tag);
-        },
-        []
-    );
-
-    const handleClose = useCallback(() => {
-        onClose();
-    }, [onClose]);
+    const handleThemeSelect = (tag: string) => {
+        setSelectedTheme(tag);
+        applyTheme(tag);
+    };
 
     return (
-        <Dialog open={open} onOpenChange={(open) => { if (!open) handleClose(); }}>
+        <Dialog open={open} onOpenChange={(open) => { if (!open) onClose(); }}>
             <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
                 <DialogTitle className="sr-only">Theme Settings</DialogTitle>
                 <div className="px-6 pt-6 pb-3 border-b border-border shrink-0">
