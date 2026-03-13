@@ -224,7 +224,7 @@ export const ThemeShowcaseModal = ({ onClose }: ThemeShowcaseModalProps) => {
                     ) return tag;
                 }
             }
-            return 'CatppuccinMocha';
+            return 'GruvboxDark';
         }
         return initial;
     });
