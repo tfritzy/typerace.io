@@ -25,22 +25,22 @@ const DARK_THEMES: ShowcaseTheme[] = [
     { tag: 'CatppuccinMocha', name: 'Catppuccin Mocha', settings: THEME_PRESETS.CatppuccinMocha, previewColors: THEME_PRESETS.CatppuccinMocha.previewColors },
     {
         tag: 'OneDark', name: 'One Dark',
-        settings: { backgroundColor: '#282c34', textColor: '#abb2bf', borderColor: 'rgba(171, 178, 191, 0.1)', accentColor: '#61afef', font: 'Inter', fontWeight: 400 },
+        settings: { backgroundColor: '#282c34', textColor: '#abb2bf', borderColor: 'rgba(171, 178, 191, 0.1)', accentColor: '#61afef' },
         previewColors: ['#282c34', '#61afef', '#c678dd', '#98c379'],
     },
     {
         tag: 'RosePine', name: 'Rosé Pine',
-        settings: { backgroundColor: '#191724', textColor: '#e0def4', borderColor: 'rgba(224, 222, 244, 0.1)', accentColor: '#c4a7e7', font: 'Inter', fontWeight: 400 },
+        settings: { backgroundColor: '#191724', textColor: '#e0def4', borderColor: 'rgba(224, 222, 244, 0.1)', accentColor: '#c4a7e7' },
         previewColors: ['#191724', '#c4a7e7', '#ebbcba', '#9ccfd8'],
     },
     {
         tag: 'AyuDark', name: 'Ayu Dark',
-        settings: { backgroundColor: '#0d1017', textColor: '#bfbdb6', borderColor: 'rgba(191, 189, 182, 0.1)', accentColor: '#e6b450', font: 'Inter', fontWeight: 400 },
+        settings: { backgroundColor: '#0d1017', textColor: '#bfbdb6', borderColor: 'rgba(191, 189, 182, 0.1)', accentColor: '#e6b450' },
         previewColors: ['#0d1017', '#e6b450', '#39bae6', '#aad94c'],
     },
     {
         tag: 'Kanagawa', name: 'Kanagawa',
-        settings: { backgroundColor: '#1f1f28', textColor: '#dcd7ba', borderColor: 'rgba(220, 215, 186, 0.1)', accentColor: '#7e9cd8', font: 'Inter', fontWeight: 400 },
+        settings: { backgroundColor: '#1f1f28', textColor: '#dcd7ba', borderColor: 'rgba(220, 215, 186, 0.1)', accentColor: '#7e9cd8' },
         previewColors: ['#1f1f28', '#7e9cd8', '#957fb8', '#98bb6c'],
     },
     { tag: 'Pico8', name: 'PICO-8', settings: THEME_PRESETS.Pico8, previewColors: THEME_PRESETS.Pico8.previewColors },
@@ -57,37 +57,37 @@ const LIGHT_THEMES: ShowcaseTheme[] = [
     { tag: 'RosePineDawn', name: 'Rosé Pine Dawn', settings: THEME_PRESETS.RosePineDawn, previewColors: THEME_PRESETS.RosePineDawn.previewColors },
     {
         tag: 'AyuLight', name: 'Ayu Light',
-        settings: { backgroundColor: '#fcfcfc', textColor: '#5c6166', borderColor: 'rgba(92, 97, 102, 0.25)', accentColor: '#ff9940', font: 'Inter', fontWeight: 400 },
+        settings: { backgroundColor: '#fcfcfc', textColor: '#5c6166', borderColor: 'rgba(92, 97, 102, 0.25)', accentColor: '#ff9940' },
         previewColors: ['#fcfcfc', '#ff9940', '#399ee6', '#86b300'],
     },
     {
         tag: 'NordLight', name: 'Nord Light',
-        settings: { backgroundColor: '#eceff4', textColor: '#2e3440', borderColor: 'rgba(46, 52, 64, 0.2)', accentColor: '#5e81ac', font: 'Inter', fontWeight: 400 },
+        settings: { backgroundColor: '#eceff4', textColor: '#2e3440', borderColor: 'rgba(46, 52, 64, 0.2)', accentColor: '#5e81ac' },
         previewColors: ['#eceff4', '#5e81ac', '#88c0d0', '#a3be8c'],
     },
     {
         tag: 'TokyoNightLight', name: 'Tokyo Night Light',
-        settings: { backgroundColor: '#d5d6db', textColor: '#343b58', borderColor: 'rgba(52, 59, 88, 0.25)', accentColor: '#34548a', font: 'Inter', fontWeight: 400 },
+        settings: { backgroundColor: '#d5d6db', textColor: '#343b58', borderColor: 'rgba(52, 59, 88, 0.25)', accentColor: '#34548a' },
         previewColors: ['#d5d6db', '#34548a', '#5a4a78', '#33635c'],
     },
     {
         tag: 'MaterialLight', name: 'Material Light',
-        settings: { backgroundColor: '#fafafa', textColor: '#546e7a', borderColor: 'rgba(84, 110, 122, 0.25)', accentColor: '#6182b8', font: 'Inter', fontWeight: 400 },
+        settings: { backgroundColor: '#fafafa', textColor: '#546e7a', borderColor: 'rgba(84, 110, 122, 0.25)', accentColor: '#6182b8' },
         previewColors: ['#fafafa', '#6182b8', '#7c4dff', '#91b859'],
     },
     {
         tag: 'Paper', name: 'Paper',
-        settings: { backgroundColor: '#f2eede', textColor: '#4d453e', borderColor: 'rgba(77, 69, 62, 0.2)', accentColor: '#d73737', font: 'Inter', fontWeight: 400 },
+        settings: { backgroundColor: '#f2eede', textColor: '#4d453e', borderColor: 'rgba(77, 69, 62, 0.2)', accentColor: '#d73737' },
         previewColors: ['#f2eede', '#d73737', '#6684e1', '#60ac39'],
     },
     {
         tag: 'QuietLight', name: 'Quiet Light',
-        settings: { backgroundColor: '#f5f5f5', textColor: '#333333', borderColor: 'rgba(51, 51, 51, 0.2)', accentColor: '#4078f2', font: 'Inter', fontWeight: 400 },
+        settings: { backgroundColor: '#f5f5f5', textColor: '#333333', borderColor: 'rgba(51, 51, 51, 0.2)', accentColor: '#4078f2' },
         previewColors: ['#f5f5f5', '#4078f2', '#7c4dff', '#2aa198'],
     },
     {
         tag: 'EverforestLight', name: 'Everforest Light',
-        settings: { backgroundColor: '#fdf6e3', textColor: '#5c6a72', borderColor: 'rgba(92, 106, 114, 0.25)', accentColor: '#8da101', font: 'Inter', fontWeight: 400 },
+        settings: { backgroundColor: '#fdf6e3', textColor: '#5c6a72', borderColor: 'rgba(92, 106, 114, 0.25)', accentColor: '#8da101' },
         previewColors: ['#fdf6e3', '#8da101', '#35a77c', '#f85552'],
     },
 ];
@@ -127,10 +127,7 @@ function ThemeCard({
                         borderRadius: `6px`,
                     }}
                 >
-                    <div
-                        className="text-xs leading-relaxed"
-                        style={{ fontFamily: resolved.font }}
-                    >
+                    <div className="text-xs leading-relaxed font-mono">
                         <span style={{ color: resolved.colors.accent }}>the quick </span>
                         <span style={{ color: resolved.colors.textUntyped }}>brown fox</span>
                     </div>

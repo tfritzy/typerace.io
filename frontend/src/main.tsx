@@ -4,10 +4,9 @@ import "./index.css";
 import App from "./App.tsx";
 import { AuthProvider } from "./firebase/AuthContext.tsx";
 import { SpacetimeProvider } from "./contexts/SpacetimeContext.tsx";
-import { getInitialTheme, applyTheme, loadGoogleFont } from "./utils/themes.ts";
+import { getInitialTheme, applyTheme } from "./utils/themes.ts";
 
 applyTheme(getInitialTheme());
-loadGoogleFont('JetBrains Mono');
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

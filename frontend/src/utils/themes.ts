@@ -15,61 +15,11 @@ export type ThemeTag =
     | 'Endesga'
     | 'Sweetie16';
 
-export interface GoogleFont {
-    name: string;
-    category: 'sans-serif' | 'serif' | 'monospace' | 'display';
-    weights: number[];
-}
-
-export const GOOGLE_FONTS: GoogleFont[] = [
-    { name: 'Fira Code', category: 'monospace', weights: [400, 500, 700] },
-    { name: 'JetBrains Mono', category: 'monospace', weights: [200, 400, 500, 700] },
-    { name: 'Source Code Pro', category: 'monospace', weights: [200, 400, 500, 700] },
-    { name: 'IBM Plex Mono', category: 'monospace', weights: [200, 400, 500, 700] },
-    { name: 'Space Mono', category: 'monospace', weights: [400, 700] },
-    { name: 'Inconsolata', category: 'monospace', weights: [200, 400, 500, 700] },
-    { name: 'System UI', category: 'sans-serif', weights: [200, 400, 500, 700] },
-    { name: 'Inter', category: 'sans-serif', weights: [200, 400, 500, 700] },
-    { name: 'Pixelify Sans', category: 'display', weights: [400, 500, 600, 700] },
-    { name: 'VT323', category: 'display', weights: [400] },
-    { name: 'Jersey 15', category: 'display', weights: [400] },
-];
-
-const loadedFonts = new Set<string>();
-
-export function loadGoogleFont(fontName: string, weight?: number): void {
-    if (fontName === 'System UI') return;
-    const font = GOOGLE_FONTS.find(f => f.name === fontName);
-    if (!font) return;
-    const weights = weight ? [weight] : font.weights;
-    const key = `${fontName}:${weights.join(',')}`;
-    if (loadedFonts.has(key)) return;
-    loadedFonts.add(key);
-    const family = fontName.replace(/ /g, '+');
-    const wghtParam = weights.join(';');
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = `https://fonts.googleapis.com/css2?family=${family}:wght@${wghtParam}&display=swap`;
-    document.head.appendChild(link);
-}
-
-export function fontNameToCss(name: string): string {
-    if (name === 'System UI') return 'system-ui, sans-serif';
-    const font = GOOGLE_FONTS.find(f => f.name === name);
-    if (!font) return `'${name}', sans-serif`;
-    const fallback = font.category === 'monospace' ? 'monospace'
-                   : font.category === 'serif' ? 'serif'
-                   : 'sans-serif';
-    return `'${name}', ${fallback}`;
-}
-
 export interface ThemeSettings {
     backgroundColor: string;
     textColor: string;
     borderColor: string;
     accentColor: string;
-    font: string;
-    fontWeight: number;
 }
 
 export interface ThemePreset extends ThemeSettings {
@@ -80,9 +30,6 @@ export interface ThemePreset extends ThemeSettings {
 export interface ResolvedTheme {
     name: string;
     mode: 'light' | 'dark';
-    fontName: string;
-    font: string;
-    fontWeight: number;
     colors: {
         background: string;
         foreground: string;
@@ -163,9 +110,6 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
     return {
         name,
         mode: isDark ? 'dark' : 'light',
-        fontName: settings.font,
-        font: fontNameToCss(settings.font),
-        fontWeight: settings.fontWeight,
         colors: {
             background,
             foreground: settings.textColor,
@@ -208,8 +152,6 @@ const DEFAULT_THEME_SETTINGS: ThemeSettings = {
     textColor: '#ebdbb2',
     borderColor: 'rgba(235, 219, 178, 0.1)',
     accentColor: '#fabd2f',
-    font: 'JetBrains Mono',
-    fontWeight: 400,
 };
 
 export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
@@ -219,8 +161,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#f8f8f2',
         borderColor: 'rgba(248, 248, 242, 0.1)',
         accentColor: '#bd93f9',
-        font: 'JetBrains Mono',
-        fontWeight: 400,
         previewColors: ['#282a36', '#bd93f9', '#ff79c6', '#50fa7b'],
     },
     Monokai: {
@@ -229,8 +169,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#f8f8f2',
         borderColor: 'rgba(248, 248, 242, 0.1)',
         accentColor: '#a6e22e',
-        font: 'JetBrains Mono',
-        fontWeight: 400,
         previewColors: ['#272822', '#a6e22e', '#f92672', '#66d9ef'],
     },
     Nord: {
@@ -239,8 +177,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#eceff4',
         borderColor: 'rgba(236, 239, 244, 0.1)',
         accentColor: '#88c0d0',
-        font: 'JetBrains Mono',
-        fontWeight: 400,
         previewColors: ['#2e3440', '#88c0d0', '#81a1c1', '#5e81ac'],
     },
     TokyoNight: {
@@ -249,8 +185,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#a9b1d6',
         borderColor: 'rgba(169, 177, 214, 0.1)',
         accentColor: '#7aa2f7',
-        font: 'JetBrains Mono',
-        fontWeight: 400,
         previewColors: ['#1a1b26', '#7aa2f7', '#bb9af7', '#7dcfff'],
     },
     GruvboxDark: {
@@ -259,8 +193,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#ebdbb2',
         borderColor: 'rgba(235, 219, 178, 0.1)',
         accentColor: '#fabd2f',
-        font: 'JetBrains Mono',
-        fontWeight: 400,
         previewColors: ['#282828', '#fabd2f', '#b8bb26', '#fb4934'],
     },
     CatppuccinMocha: {
@@ -269,8 +201,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#cdd6f4',
         borderColor: 'rgba(205, 214, 244, 0.1)',
         accentColor: '#cba6f7',
-        font: 'JetBrains Mono',
-        fontWeight: 400,
         previewColors: ['#1e1e2e', '#cba6f7', '#89b4fa', '#a6e3a1'],
     },
     GitHubLight: {
@@ -279,8 +209,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#1f2328',
         borderColor: 'rgba(31, 35, 40, 0.25)',
         accentColor: '#0969da',
-        font: 'JetBrains Mono',
-        fontWeight: 400,
         previewColors: ['#ffffff', '#0969da', '#1a7f37', '#d1242f'],
     },
     SolarizedLight: {
@@ -289,8 +217,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#657b83',
         borderColor: 'rgba(101, 123, 131, 0.25)',
         accentColor: '#268bd2',
-        font: 'JetBrains Mono',
-        fontWeight: 400,
         previewColors: ['#fdf6e3', '#268bd2', '#2aa198', '#b58900'],
     },
     OneLight: {
@@ -299,8 +225,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#383a42',
         borderColor: 'rgba(56, 58, 66, 0.25)',
         accentColor: '#4078f2',
-        font: 'JetBrains Mono',
-        fontWeight: 400,
         previewColors: ['#fafafa', '#4078f2', '#50a14f', '#e45649'],
     },
     CatppuccinLatte: {
@@ -309,8 +233,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#4c4f69',
         borderColor: 'rgba(76, 79, 105, 0.25)',
         accentColor: '#8839ef',
-        font: 'JetBrains Mono',
-        fontWeight: 400,
         previewColors: ['#eff1f5', '#8839ef', '#1e66f5', '#40a02b'],
     },
     GruvboxLight: {
@@ -319,8 +241,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#3c3836',
         borderColor: 'rgba(60, 56, 54, 0.25)',
         accentColor: '#b57614',
-        font: 'JetBrains Mono',
-        fontWeight: 400,
         previewColors: ['#fbf1c7', '#b57614', '#79740e', '#9d0006'],
     },
     RosePineDawn: {
@@ -329,8 +249,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#575279',
         borderColor: 'rgba(87, 82, 121, 0.25)',
         accentColor: '#907aa9',
-        font: 'JetBrains Mono',
-        fontWeight: 400,
         previewColors: ['#faf4ed', '#907aa9', '#d7827e', '#56949f'],
     },
     Pico8: {
@@ -339,8 +257,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#FFF1E8',
         borderColor: 'rgba(255, 241, 232, 0.20)',
         accentColor: '#29ADFF',
-        font: 'Pixelify Sans',
-        fontWeight: 700,
         previewColors: ['#1D2B53', '#FFF1E8', '#29ADFF', '#FF77A8'],
     },
     Endesga: {
@@ -349,8 +265,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#c5dbd4',
         borderColor: 'rgba(197, 219, 212, 0.20)',
         accentColor: '#f77622',
-        font: 'VT323',
-        fontWeight: 700,
         previewColors: ['#10141f', '#c5dbd4', '#f77622', '#e43b44'],
     },
     Sweetie16: {
@@ -359,8 +273,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         textColor: '#f4f4f4',
         borderColor: 'rgba(244, 244, 244, 0.20)',
         accentColor: '#b13e53',
-        font: 'Jersey 15',
-        fontWeight: 700,
         previewColors: ['#1a1c2c', '#f4f4f4', '#b13e53', '#41a6f6'],
     },
 };
@@ -430,7 +342,6 @@ export function applyCustomTheme(settings: ThemeSettings): void {
 }
 
 function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
-    loadGoogleFont(theme.fontName, theme.fontWeight);
     const root = document.documentElement;
     const fg = hexToRgb(theme.colors.foreground);
 
@@ -475,9 +386,6 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     root.style.setProperty('--avatar-color-2', theme.avatarColors[1]);
     root.style.setProperty('--avatar-color-3', theme.avatarColors[2]);
 
-    root.style.setProperty('--font-family', theme.font);
-    root.style.setProperty('--font-family-mono', theme.font);
-    root.style.setProperty('--font-weight', String(theme.fontWeight));
     root.style.setProperty('--border-width', '1px');
     root.style.setProperty('--radius', '8px');
 

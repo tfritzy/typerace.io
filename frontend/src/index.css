@@ -46,7 +46,7 @@
 
 @layer base {
   .font-mono {
-    font-family: var(--font-family-mono, "JetBrains Mono"), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-weight: 200;
   }
 }
@@ -126,9 +126,9 @@ html {
 
   --max-content-width: 1000px;
 
-  font-family: var(--font-family, system-ui, sans-serif);
+  font-family: system-ui, sans-serif;
   line-height: 1.5;
-  font-weight: var(--font-weight, 400);
+  font-weight: 400;
 
   background-color: var(--background);
 
