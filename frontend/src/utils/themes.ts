@@ -468,14 +468,6 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
 
     root.dataset.mode = theme.mode;
 
-    if (theme.mode === 'light') {
-        root.style.setProperty('--box-shadow', '0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04)');
-        root.style.setProperty('--box-shadow-focus', '0 8px 20px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04)');
-    } else {
-        root.style.setProperty('--box-shadow', '0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1)');
-        root.style.setProperty('--box-shadow-focus', '0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.1)');
-    }
-
     try {
         localStorage.setItem('selectedTheme', tag);
     } catch (_e) {

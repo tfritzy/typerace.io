@@ -121,6 +121,7 @@
           var acCon=(0.299*p(t.ac)[0]+0.587*p(t.ac)[1]+0.114*p(t.ac)[2])/255>0.5?'#000000':'#ffffff';
           var ioOp=dk?0.25:0.45;
           var r=document.documentElement.style;
+          document.documentElement.dataset.mode = dk ? 'dark' : 'light';
           r.setProperty('--background',t.bg);
           r.setProperty('--foreground',t.fg);
           r.setProperty('--card',card);
