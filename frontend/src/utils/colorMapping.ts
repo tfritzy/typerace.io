@@ -1,4 +1,4 @@
-import { getThemeConfig, applyTheme, type ThemeConfig, type ThemeTag } from "./themes";
+import { getThemeConfig, type ThemeTag } from "./themes";
 
 export interface ColorConfig {
     primary: string;
@@ -22,9 +22,3 @@ export function getColorConfig(tag: ThemeTag): ColorConfig {
         gradient: theme.gradient,
     };
 }
-
-export function setAccentColor(tag: ThemeTag): void {
-    applyTheme(tag);
-}
-
-export { type ThemeConfig };
