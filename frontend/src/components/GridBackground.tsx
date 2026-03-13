@@ -3,7 +3,7 @@ import { useMemo } from "react";
 const CELL_SIZE = 10;
 const GAP = 3;
 const STEP = CELL_SIZE + GAP;
-const ROWS = 40;
+const ROWS = 20;
 const COLS = Math.ceil(3840 / STEP);
 
 function seededRandom(seed: number): () => number {
