@@ -64,18 +64,17 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
     return (
         <>
             <div className="hidden md:flex items-center justify-center gap-1 flex-wrap">
-                <LanguageDropdown />
-                <span className="mx-2 text-border-hover select-none">|</span>
                 <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label="Public Match" />
                 <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label="Private Lobby" />
                 <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label="Practice Mode" />
                 <span className="mx-2 text-border-hover select-none">|</span>
                 <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label="Random Words" />
                 <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label="Quotes" disabled={!quotesAvailableForLanguage} />
+                <span className="mx-2 text-border-hover select-none">|</span>
+                <LanguageDropdown />
             </div>
 
             <div className="md:hidden flex items-center justify-center gap-2">
-                <LanguageDropdown />
                 <button
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-secondary text-secondary-foreground transition-all duration-200"
                     onClick={() => setIsDrawerOpen(true)}
@@ -86,6 +85,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     <span>{gameType} · {contentType === "Quotes" ? "Quotes" : "Random Words"}</span>
                     <ChevronDown size={16} />
                 </button>
+                <LanguageDropdown />
             </div>
 
             {isDrawerOpen && (
