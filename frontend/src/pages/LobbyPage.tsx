@@ -93,7 +93,7 @@ export const LobbyPage = () => {
             />
           </div>
         </div>
-        <div className="flex-[5]" />
+                <div className="flex-[6]" />
       </div>
       <Footer />
     </div>
