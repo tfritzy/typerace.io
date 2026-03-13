@@ -49,6 +49,10 @@
     font-family: var(--font-family-mono, "JetBrains Mono"), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-weight: 200;
   }
+
+  .type-box {
+    font-family: var(--font-family-mono, "JetBrains Mono"), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
 }
 
 html {

@@ -475,7 +475,7 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     root.style.setProperty('--avatar-color-2', theme.avatarColors[1]);
     root.style.setProperty('--avatar-color-3', theme.avatarColors[2]);
 
-    root.style.setProperty('--font-family', theme.font);
+    root.style.setProperty('--font-family', 'system-ui, sans-serif');
     root.style.setProperty('--font-family-mono', theme.font);
     root.style.setProperty('--font-weight', String(theme.fontWeight));
     root.style.setProperty('--border-width', '1px');
