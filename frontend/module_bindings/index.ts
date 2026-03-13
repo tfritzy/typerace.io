@@ -129,6 +129,8 @@ import PersonalRecord from "./personal_record_type";
 export { PersonalRecord };
 import Player from "./player_type";
 export { Player };
+import PlayerColor from "./player_color_type";
+export { PlayerColor };
 import PlayerProgress from "./player_progress_type";
 export { PlayerProgress };
 import XpGain from "./xp_gain_type";

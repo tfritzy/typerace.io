@@ -62,6 +62,26 @@ public enum CharacterEventType
     Backspace
 }
 
+[Type]
+public enum PlayerColor
+{
+    Dracula,
+    Monokai,
+    Nord,
+    TokyoNight,
+    GruvboxDark,
+    CatppuccinMocha,
+    GitHubLight,
+    SolarizedLight,
+    OneLight,
+    CatppuccinLatte,
+    GruvboxLight,
+    RosePineDawn,
+    Pico8,
+    Endesga,
+    Sweetie16
+}
+
 
 public struct Quote
 {
@@ -165,6 +185,7 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         public bool IsBot;
         public BotConfig? BotConfig;
+        public PlayerColor Color;
         public bool IsAnonymous;
         public long LastGameDate;
     }
@@ -346,6 +367,7 @@ public static partial class Module
         public int Placement;
         public string JoinCode;
         public double Wpm;
+        public PlayerColor PlayerColor;
         [Default(0)]
         public int HighestProgress;
     }
@@ -402,6 +424,7 @@ public static partial class Module
                     TypingRate = typingRate,
                     ErrorRate = errorRate
                 },
+                Color = GenerateRandomColor(ctx.Rng),
                 IsAnonymous = false,
                 LastGameDate = 0
             });
@@ -437,6 +460,12 @@ public static partial class Module
         return mean + stdDev * randStdNormal;
     }
 
+    private static PlayerColor GenerateRandomColor(Random rng)
+    {
+        var colors = Enum.GetValues<PlayerColor>();
+        return colors[rng.Next(colors.Length)];
+    }
+
     [Reducer(ReducerKind.ClientConnected)]
     public static void clientConnected(ReducerContext ctx)
     {
@@ -459,6 +488,7 @@ public static partial class Module
                 TotalTimeSpentMs = 0,
                 IsBot = false,
                 BotConfig = null,
+                Color = PlayerColor.CatppuccinMocha,
                 IsAnonymous = true,
                 LastGameDate = 0
             });
@@ -717,6 +747,7 @@ public static partial class Module
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
+        var playerColor = player?.Color ?? PlayerColor.CatppuccinMocha;
         var playerPublicId = player?.PlayerId ?? "";
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
@@ -734,7 +765,8 @@ public static partial class Module
             CharacterHistory = new byte[0],
             Time = 0,
             Placement = -1,
-            JoinCode = joinCode
+            JoinCode = joinCode,
+            PlayerColor = playerColor
         });
     }
 
@@ -795,7 +827,8 @@ public static partial class Module
                     CharacterHistory = new byte[0],
                     Time = 0,
                     Placement = -1,
-                    JoinCode = ""
+                    JoinCode = "",
+                    PlayerColor = selectedBot.Color
                 });
 
                 Log.Info($"Added bot {selectedBot.Name} (ELO: {GetBotElo(ctx, selectedBot.Identity, game.Value.GameMode)}) to game {args.GameId} (target ELO: {targetElo})");
@@ -1126,6 +1159,7 @@ public static partial class Module
                 var playerName = player?.Name ?? "Unknown";
                 var playerLevel = player?.Level ?? 1;
                 var isAnonymous = player?.IsAnonymous ?? true;
+                var playerColor = player?.Color ?? PlayerColor.CatppuccinMocha;
                 var playerPublicId = player?.PlayerId ?? "";
 
                 ctx.Db.playerprogress.Insert(new PlayerProgress
@@ -1143,7 +1177,8 @@ public static partial class Module
                     CharacterHistory = new byte[0],
                     Time = 0,
                     Placement = -1,
-                    JoinCode = gameId
+                    JoinCode = gameId,
+                    PlayerColor = playerColor
                 });
 
                 Log.Info($"Added player {progress.PlayerId} to rematch game {newGame.Id} with join code {gameId}");
