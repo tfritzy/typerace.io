@@ -4,6 +4,7 @@ const CELL_SIZE = 10;
 const GAP = 3;
 const STEP = CELL_SIZE + GAP;
 const ROWS = 40;
+const COLS = Math.ceil(3840 / STEP);
 
 function seededRandom(seed: number): () => number {
   let s = seed;
@@ -17,13 +18,12 @@ export const GridBackground = () => {
   const cells = useMemo(() => {
     const rand = seededRandom(42);
     const result: { col: number; row: number }[] = [];
-    const cols = Math.ceil(2000 / STEP);
 
     for (let row = 0; row < ROWS; row++) {
       const rowFromBottom = ROWS - 1 - row;
       const density = Math.pow(rowFromBottom / (ROWS - 1), 2.5);
 
-      for (let col = 0; col < cols; col++) {
+      for (let col = 0; col < COLS; col++) {
         if (rand() < density) {
           result.push({ col, row });
         }
@@ -34,9 +34,9 @@ export const GridBackground = () => {
 
   return (
     <div className="grid-background">
-      {cells.map((cell, i) => (
+      {cells.map((cell) => (
         <div
-          key={i}
+          key={`${cell.col}-${cell.row}`}
           className="grid-background-cell"
           style={{
             left: cell.col * STEP,
