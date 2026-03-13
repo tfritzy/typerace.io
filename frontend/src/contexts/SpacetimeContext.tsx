@@ -22,7 +22,7 @@ export const useDatabase = () => {
 };
 
 export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [conn, setConn] = useState<DbConnection | null>(null);
     const [showReconnectModal, setShowReconnectModal] = useState(false);
     const [isReconnecting, setIsReconnecting] = useState(false);
@@ -117,6 +117,8 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     };
 
     useEffect(() => {
+        if (authLoading) return;
+
         const connectionPromise = connect();
 
         return () => {
@@ -131,7 +133,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                 setConn(null);
             });
         };
-    }, [user?.uid]);
+    }, [user?.uid, authLoading]);
 
     if (!conn?.identity && !showReconnectModal) {
         return <LoadingDots />;
