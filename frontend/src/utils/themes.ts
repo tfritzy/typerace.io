@@ -5,12 +5,10 @@ export type ThemeTag =
     | 'TokyoNight'
     | 'GruvboxDark'
     | 'CatppuccinMocha'
-    | 'GitHubLight'
-    | 'SolarizedLight'
-    | 'OneLight'
-    | 'CatppuccinLatte'
-    | 'GruvboxLight'
-    | 'RosePineDawn'
+    | 'OneDark'
+    | 'RosePine'
+    | 'AyuDark'
+    | 'Kanagawa'
     | 'Pico8'
     | 'Endesga'
     | 'Sweetie16';
@@ -144,8 +142,7 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
     };
 }
 
-const DEFAULT_DARK_THEME_TAG: ThemeTag = 'GruvboxDark';
-const DEFAULT_LIGHT_THEME_TAG: ThemeTag = 'GruvboxLight';
+const DEFAULT_THEME_TAG: ThemeTag = 'GruvboxDark';
 
 const DEFAULT_THEME_SETTINGS: ThemeSettings = {
     backgroundColor: '#282828',
@@ -203,53 +200,37 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
         accentColor: '#cba6f7',
         previewColors: ['#1e1e2e', '#cba6f7', '#89b4fa', '#a6e3a1'],
     },
-    GitHubLight: {
-        name: 'GitHub Light',
-        backgroundColor: '#ffffff',
-        textColor: '#1f2328',
-        borderColor: 'rgba(31, 35, 40, 0.25)',
-        accentColor: '#0969da',
-        previewColors: ['#ffffff', '#0969da', '#1a7f37', '#d1242f'],
+    OneDark: {
+        name: 'One Dark',
+        backgroundColor: '#282c34',
+        textColor: '#abb2bf',
+        borderColor: 'rgba(171, 178, 191, 0.1)',
+        accentColor: '#61afef',
+        previewColors: ['#282c34', '#61afef', '#c678dd', '#98c379'],
     },
-    SolarizedLight: {
-        name: 'Solarized Light',
-        backgroundColor: '#fdf6e3',
-        textColor: '#657b83',
-        borderColor: 'rgba(101, 123, 131, 0.25)',
-        accentColor: '#268bd2',
-        previewColors: ['#fdf6e3', '#268bd2', '#2aa198', '#b58900'],
+    RosePine: {
+        name: 'Rosé Pine',
+        backgroundColor: '#191724',
+        textColor: '#e0def4',
+        borderColor: 'rgba(224, 222, 244, 0.1)',
+        accentColor: '#c4a7e7',
+        previewColors: ['#191724', '#c4a7e7', '#ebbcba', '#9ccfd8'],
     },
-    OneLight: {
-        name: 'One Light',
-        backgroundColor: '#fafafa',
-        textColor: '#383a42',
-        borderColor: 'rgba(56, 58, 66, 0.25)',
-        accentColor: '#4078f2',
-        previewColors: ['#fafafa', '#4078f2', '#50a14f', '#e45649'],
+    AyuDark: {
+        name: 'Ayu Dark',
+        backgroundColor: '#0d1017',
+        textColor: '#bfbdb6',
+        borderColor: 'rgba(191, 189, 182, 0.1)',
+        accentColor: '#e6b450',
+        previewColors: ['#0d1017', '#e6b450', '#39bae6', '#aad94c'],
     },
-    CatppuccinLatte: {
-        name: 'Catppuccin Latte',
-        backgroundColor: '#eff1f5',
-        textColor: '#4c4f69',
-        borderColor: 'rgba(76, 79, 105, 0.25)',
-        accentColor: '#8839ef',
-        previewColors: ['#eff1f5', '#8839ef', '#1e66f5', '#40a02b'],
-    },
-    GruvboxLight: {
-        name: 'Gruvbox Light',
-        backgroundColor: '#fbf1c7',
-        textColor: '#3c3836',
-        borderColor: 'rgba(60, 56, 54, 0.25)',
-        accentColor: '#b57614',
-        previewColors: ['#fbf1c7', '#b57614', '#79740e', '#9d0006'],
-    },
-    RosePineDawn: {
-        name: 'Rosé Pine Dawn',
-        backgroundColor: '#faf4ed',
-        textColor: '#575279',
-        borderColor: 'rgba(87, 82, 121, 0.25)',
-        accentColor: '#907aa9',
-        previewColors: ['#faf4ed', '#907aa9', '#d7827e', '#56949f'],
+    Kanagawa: {
+        name: 'Kanagawa',
+        backgroundColor: '#1f1f28',
+        textColor: '#dcd7ba',
+        borderColor: 'rgba(220, 215, 186, 0.1)',
+        accentColor: '#7e9cd8',
+        previewColors: ['#1f1f28', '#7e9cd8', '#957fb8', '#98bb6c'],
     },
     Pico8: {
         name: 'PICO-8',
@@ -292,8 +273,7 @@ export function getThemeConfig(tag: ThemeTag): ThemeConfig {
     if (tag in THEMES) {
         return THEMES[tag];
     }
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return prefersDark ? THEMES[DEFAULT_DARK_THEME_TAG] : THEMES[DEFAULT_LIGHT_THEME_TAG];
+    return THEMES[DEFAULT_THEME_TAG];
 }
 
 export function getInitialTheme(): string {
@@ -305,8 +285,7 @@ export function getInitialTheme(): string {
     } catch (_e) {
     }
 
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return prefersDark ? DEFAULT_DARK_THEME_TAG : DEFAULT_LIGHT_THEME_TAG;
+    return DEFAULT_THEME_TAG;
 }
 
 export function getCustomThemeSettings(): ThemeSettings | null {
@@ -322,12 +301,11 @@ export function applyTheme(colorTag: string): void {
     let theme: ResolvedTheme;
     if (colorTag === 'custom') {
         const custom = getCustomThemeSettings();
-        theme = custom ? resolveCustomTheme(custom) : THEMES[DEFAULT_DARK_THEME_TAG];
+        theme = custom ? resolveCustomTheme(custom) : THEMES[DEFAULT_THEME_TAG];
     } else if (colorTag in THEMES) {
         theme = THEMES[colorTag as ThemeTag];
     } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        theme = prefersDark ? THEMES[DEFAULT_DARK_THEME_TAG] : THEMES[DEFAULT_LIGHT_THEME_TAG];
+        theme = THEMES[DEFAULT_THEME_TAG];
     }
     applyResolvedTheme(theme, colorTag);
 }
