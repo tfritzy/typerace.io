@@ -79,7 +79,13 @@ export const GamePage = () => {
       if (pp.gameId.toString() === gameId) {
         setGamePlayerProgress((prev) => prev.filter((p) => p.id !== pp.id));
         if (conn.identity && pp.playerId.isEqual(conn.identity)) {
-          navigate("/", { replace: true });
+          setTimeout(() => {
+            const stillExists = Array.from(conn.db.playerprogress.iter())
+              .some(p => p.gameId.toString() === gameId && p.playerId.isEqual(conn.identity!));
+            if (!stillExists) {
+              navigate("/", { replace: true });
+            }
+          }, 200);
         }
       }
     };
