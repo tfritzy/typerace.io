@@ -12,11 +12,11 @@ import {
 } from 'firebase/auth';
 import { auth } from '../firebase/config';
 
-const AUTH_FLAG_KEY = 'typerace:authenticated';
+const ANON_TOKEN_KEY = 'typerace:anonymous_token';
 
-function hasAuthFlag(): boolean {
+function hasAnonymousToken(): boolean {
     try {
-        return localStorage.getItem(AUTH_FLAG_KEY) === 'true';
+        return localStorage.getItem(ANON_TOKEN_KEY) !== null;
     } catch {
         return false;
     }
@@ -49,7 +49,7 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(() => hasAuthFlag());
+    const [loading, setLoading] = useState(() => !hasAnonymousToken());
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -57,9 +57,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             setLoading(false);
             try {
                 if (firebaseUser && !firebaseUser.isAnonymous) {
-                    localStorage.setItem(AUTH_FLAG_KEY, 'true');
-                } else {
-                    localStorage.removeItem(AUTH_FLAG_KEY);
+                    localStorage.removeItem(ANON_TOKEN_KEY);
                 }
             } catch {
             }
@@ -77,10 +75,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
 
     const signOut = async () => {
-        try {
-            localStorage.removeItem(AUTH_FLAG_KEY);
-        } catch {
-        }
         await firebaseSignOut(auth);
     };
 
