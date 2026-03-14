@@ -1140,12 +1140,6 @@ public static partial class Module
             return;
         }
 
-        if (game.Value.State != GameState.Lobby)
-        {
-            Log.Info($"Cannot kick player from game {gameId} - game is not in lobby state");
-            return;
-        }
-
         if (game.Value.Owner != ctx.Sender)
         {
             Log.Info($"Player {ctx.Sender} is not the owner of private game {gameId}");

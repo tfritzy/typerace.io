@@ -175,7 +175,7 @@ export const GamePage = () => {
   const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
   const isInLobby = game.state?.tag === "Lobby";
   const isLobby = game.gameType?.tag === "Private" && isInLobby;
-  const isOwnerInLobby = isLobby && currentPlayerId && game.owner?.isEqual(currentPlayerId);
+  const isPrivateOwner = game.gameType?.tag === "Private" && currentPlayerId && game.owner?.isEqual(currentPlayerId);
   const isCountdown = game.state?.tag === "Countdown";
   const isDisabled = isInLobby || isCountdown;
 
@@ -236,7 +236,7 @@ export const GamePage = () => {
                     placement={pp.placement}
                     isBot={pp.isBot}
                     isAnonymous={pp.isAnonymous}
-                    onKick={isOwnerInLobby && !isCurrentPlayer ? () => handleKickPlayer(pp.playerId) : undefined}
+                    onKick={isPrivateOwner && !isCurrentPlayer ? () => handleKickPlayer(pp.playerId) : undefined}
                   />
                 </div>
               );
