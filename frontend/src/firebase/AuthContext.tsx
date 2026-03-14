@@ -12,16 +12,6 @@ import {
 } from 'firebase/auth';
 import { auth } from '../firebase/config';
 
-const AUTH_FLAG_KEY = 'typerace:authenticated';
-
-function hasAuthFlag(): boolean {
-    try {
-        return localStorage.getItem(AUTH_FLAG_KEY) === 'true';
-    } catch {
-        return false;
-    }
-}
-
 interface AuthContextType {
     user: User | null;
     loading: boolean;
@@ -49,20 +39,12 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(() => hasAuthFlag());
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
             setUser(firebaseUser);
             setLoading(false);
-            try {
-                if (firebaseUser && !firebaseUser.isAnonymous) {
-                    localStorage.setItem(AUTH_FLAG_KEY, 'true');
-                } else {
-                    localStorage.removeItem(AUTH_FLAG_KEY);
-                }
-            } catch {
-            }
         });
 
         return unsubscribe;
@@ -77,10 +59,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
 
     const signOut = async () => {
-        try {
-            localStorage.removeItem(AUTH_FLAG_KEY);
-        } catch {
-        }
         await firebaseSignOut(auth);
     };
 
