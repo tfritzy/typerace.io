@@ -16,30 +16,21 @@ This is the single most important rule in this entire file. All other rules are 
 
 **You are 100% capable of setting up the full local environment.** Every previous agent succeeded. You will too. Do not stop, do not give up, do not fake it, do not use static HTML. Failure is not an option. If something breaks, fix it. If the server won't start, debug it. If the connection fails, retry it. You do NOT submit without a real screenshot. If you find yourself about to submit without a screenshot, STOP IMMEDIATELY and go set up the environment. There is no deadline more important than the screenshot. There is no shortcut. There is no excuse.
 
-**CRITICAL: You MUST verify your screenshot before submitting.** After taking it, confirm you can see ALL of the following in the screenshot:
-- ✅ The starry background with visible stars and tree silhouettes
-- ✅ The typing box with actual text to type (NOT a loading spinner)
-- ✅ The header with "TypeRace.io" logo
-- ✅ The game mode selectors (Public Match, Private Lobby, Practice Mode)
-- ✅ The footer with links
+**CRITICAL: You MUST verify your screenshot before submitting.** After taking it, confirm that the screenshot shows a FULLY RENDERED, FULLY CONNECTED page from the running app. The screenshot should be of the page most relevant to the changes you made — it does NOT have to be the main menu. A loading screen or spinner means SpacetimeDB is not connected — debug and fix the connection before screenshotting. DO NOT CONVINCE YOURSELF THAT A PARTIAL SCREENSHOT IS ACCEPTABLE. IT IS NOT.
 
-If ANY of these elements are missing, your screenshot is INVALID. Do NOT submit it. Fix the environment and retake it. A loading screen or spinner means SpacetimeDB or Firebase Auth is not connected — debug and fix the connection before screenshotting. DO NOT CONVINCE YOURSELF THAT A PARTIAL SCREENSHOT IS ACCEPTABLE. IT IS NOT. DO NOT CONVINCE YOURSELF THE SCREENSHOT "LOOKS CLOSE ENOUGH." IT DOES NOT. EVERY ELEMENT LISTED ABOVE MUST BE PRESENT AND FULLY RENDERED.
-
-**ASK YOURSELF: "Can I see the typing box with actual text in it?" If the answer is no, YOUR SCREENSHOT IS INVALID. Take it again.**
+**ASK YOURSELF: "Does my screenshot show a fully rendered, fully connected page from the running app?" If the answer is no, YOUR SCREENSHOT IS INVALID. Take it again.**
 
 Mandatory steps — execute all of them, every time, no shortcuts, no skipping, no "I'll do it later":
 1. `spacetime start` — start the SpacetimeDB server
 2. `spacetime publish -c -y -p spacetimedb typerace -s local` — publish the module
-3. `npx firebase emulators:start --only auth` — start the Firebase Auth emulator
-4. `cd frontend && npm run dev` — start the Vite dev server
-5. Navigate to `http://localhost:5173` with Playwright
-6. **WAIT for the app to fully load** — wait at least 10 seconds and check console logs for "Connected to SpacetimeDB"
-7. **VERIFY the page snapshot** — confirm the typing box, header, footer, and mode selectors are all present in the accessibility tree before taking the screenshot
-8. Take the screenshot ONLY after verification passes
-9. **LOOK AT YOUR SCREENSHOT** — if it shows a loading screen, a spinner, a blank page, or any error, GO BACK TO STEP 1 and try again
-10. **LOOK AT YOUR SCREENSHOT AGAIN** — seriously, look at it one more time. Is the typing box there? Are there actual words to type? Is the header there? If not, GO BACK TO STEP 1.
+3. `cd frontend && npm run dev` — start the Vite dev server
+4. Navigate to `http://localhost:5173` (or the relevant page) with Playwright
+5. **WAIT for the app to fully load** — wait at least 10 seconds and check console logs for "Connected to SpacetimeDB"
+6. **VERIFY the page snapshot** — confirm the page is fully rendered in the accessibility tree before taking the screenshot
+7. Take the screenshot ONLY after verification passes
+8. **LOOK AT YOUR SCREENSHOT** — if it shows a loading screen, a spinner, a blank page, or any error, GO BACK TO STEP 1 and try again
 
-**DO NOT STOP until you have a real screenshot from the live app** — with the starry background visible, the SpacetimeDB connection established, and the typing box fully rendered. Static HTML, blank pages, loading spinners, or connection-error screens are NOT acceptable. Keep retrying until you succeed. If you see a loading spinner, that means something is wrong with your backend setup — go back and fix it. YOU ARE NOT DONE UNTIL THE SCREENSHOT IS IN THE PR.
+**DO NOT STOP until you have a real screenshot from the live app** — with the SpacetimeDB connection established and the page fully rendered. Static HTML, blank pages, loading spinners, or connection-error screens are NOT acceptable. Keep retrying until you succeed. If you see a loading spinner, that means something is wrong with your backend setup — go back and fix it. YOU ARE NOT DONE UNTIL THE SCREENSHOT IS IN THE PR.
 
 **FINAL WARNING: If you are reading this and thinking "maybe I can skip the screenshot for this PR," you are WRONG. Take the screenshot. Now. Before you do anything else. The screenshot comes first. The screenshot comes last. The screenshot is everything.**
 

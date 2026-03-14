@@ -77,7 +77,7 @@ export const GamePageTypeBox = memo(
     }, []);
 
     return (
-      <div className="text-2xl leading-[1.6]">
+      <div className="text-3xl font-medium leading-[1.6]">
         {xpIndicators.map((indicator) => (
           <WordXpIndicator
             key={indicator.id}
