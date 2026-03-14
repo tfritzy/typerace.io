@@ -21,6 +21,8 @@ export const useDatabase = () => {
     return context.conn;
 };
 
+const ANON_TOKEN_KEY = 'typerace:anonymous_token';
+
 export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     const { user, loading: authLoading } = useAuth();
     const [conn, setConn] = useState<DbConnection | null>(null);
@@ -44,12 +46,20 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
             if (user) {
                 const idToken = await user.getIdToken();
                 builder = builder.withToken(idToken);
+            } else {
+                const savedToken = localStorage.getItem(ANON_TOKEN_KEY);
+                if (savedToken) {
+                    builder = builder.withToken(savedToken);
+                }
             }
 
             const connection = builder
-                .onConnect((conn) => {
+                .onConnect((conn, _identity, token) => {
                     console.log('Connected to SpacetimeDB');
                     conn.reducers.syncAnonymousStatus({ isAnonymous: !user });
+                    if (!user && token) {
+                        localStorage.setItem(ANON_TOKEN_KEY, token);
+                    }
                     setConn(conn);
                     setShowReconnectModal(false);
                     setIsReconnecting(false);
@@ -118,6 +128,10 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
 
     useEffect(() => {
         if (authLoading) return;
+
+        if (user) {
+            localStorage.removeItem(ANON_TOKEN_KEY);
+        }
 
         const connectionPromise = connect();
 
