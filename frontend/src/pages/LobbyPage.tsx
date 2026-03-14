@@ -92,8 +92,9 @@ export const LobbyPage = () => {
                 value={customPhrase}
                 onChange={(e) => setCustomPhrase(e.target.value)}
                 placeholder="Custom phrase (optional)"
+                aria-label="Custom phrase"
                 maxLength={500}
-                className="w-full px-4 py-3 rounded-lg bg-transparent border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-border-hover resize-none transition-colors duration-200"
+                className="w-full px-4 py-3 rounded-lg bg-transparent border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-border-hover focus-visible:ring-2 focus-visible:ring-accent-primary resize-none transition-colors duration-200"
                 rows={2}
               />
             </div>
