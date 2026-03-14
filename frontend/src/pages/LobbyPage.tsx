@@ -38,6 +38,7 @@ export const LobbyPage = () => {
   const { lang } = useParams<{ lang?: string }>();
   const [selectedMode, setSelectedMode] = useState<GameMode>(() => getInitialMode(lang));
   const [gameType, setGameType] = useState<GameTypeValue>(getInitialGameType);
+  const [customPhrase, setCustomPhrase] = useState("");
   const typeBoxRef = useRef<TypeBoxRef>(null);
   const { findGame } = useFindGame();
   const currentLang = getLanguageFromSlug(lang);
@@ -65,9 +66,11 @@ export const LobbyPage = () => {
     return getRandomStartupPhrase(selectedMode.tag);
   }, [selectedMode.tag]);
 
+  const showCustomPhrase = gameType === "Private" || gameType === "Practice";
+
   const handlePhraseComplete = useCallback(() => {
-    findGame(selectedMode, gameType);
-  }, [findGame, selectedMode, gameType]);
+    findGame(selectedMode, gameType, showCustomPhrase ? customPhrase : "");
+  }, [findGame, selectedMode, gameType, customPhrase, showCustomPhrase]);
 
   return (
     <div className="relative h-full flex flex-col">
@@ -83,6 +86,18 @@ export const LobbyPage = () => {
               resetOnComplete={true}
             />
           </div>
+          {showCustomPhrase && (
+            <div className="mt-4">
+              <textarea
+                value={customPhrase}
+                onChange={(e) => setCustomPhrase(e.target.value)}
+                placeholder="Custom phrase (optional)"
+                maxLength={500}
+                className="w-full px-4 py-3 rounded-lg bg-transparent border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:border-border-hover resize-none transition-colors duration-200"
+                rows={2}
+              />
+            </div>
+          )}
           <div className="mt-6">
             <GameOptionsSelector
               selectedMode={selectedMode}

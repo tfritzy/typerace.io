@@ -561,9 +561,20 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void joinGame(ReducerContext ctx, GameMode gameMode, string joinCode, GameType gameType)
+    public static void joinGame(ReducerContext ctx, GameMode gameMode, string joinCode, GameType gameType, string customPhrase)
     {
         Log.Info($"Player {ctx.Sender} looking for game.");
+
+        if (customPhrase.Length > 0 && gameType == GameType.Public)
+        {
+            throw new Exception("Custom phrases are only allowed for Private and Practice games.");
+        }
+
+        if (customPhrase.Length > 500)
+        {
+            throw new Exception("Custom phrase must be 500 characters or fewer.");
+        }
+
         var foundGame = FindLobbyGame(ctx, gameMode, gameType);
 
         if (foundGame != null)
@@ -598,7 +609,7 @@ public static partial class Module
         }
         else
         {
-            var newGame = InsertGame(ctx, gameMode, gameType);
+            var newGame = InsertGame(ctx, gameMode, gameType, customPhrase);
 
             Log.Info($"Player {ctx.Sender} created and joined game {newGame.Id}");
             InsertPlayerProgress(ctx, newGame.Id, joinCode);
@@ -703,12 +714,20 @@ public static partial class Module
         };
     }
 
-    private static Game InsertGame(ReducerContext ctx, GameMode gameMode, GameType gameType)
+    private static Game InsertGame(ReducerContext ctx, GameMode gameMode, GameType gameType, string customPhrase = "")
     {
         long countdownDurationMicros = GetCountdownDuration(gameType);
         long countdownDurationMs = countdownDurationMicros / 1000;
 
-        var phrase = PhraseGenerator.GeneratePhraseForMode(gameMode, ctx.Rng);
+        Phrase phrase;
+        if (customPhrase.Length > 0)
+        {
+            phrase = new Phrase(PhraseGenerator.SanitizeText(customPhrase));
+        }
+        else
+        {
+            phrase = PhraseGenerator.GeneratePhraseForMode(gameMode, ctx.Rng);
+        }
 
         return ctx.Db.game.Insert(new Game
         {

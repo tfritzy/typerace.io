@@ -66,7 +66,7 @@ export const useFindGame = () => {
     };
   }, [conn, showToast]);
 
-  const findGame = useCallback((mode: GameMode, gameType: GameTypeValue) => {
+  const findGame = useCallback((mode: GameMode, gameType: GameTypeValue, customPhrase: string = "") => {
     if (!conn || isSearching) return;
 
     setIsSearching(true);
@@ -81,7 +81,8 @@ export const useFindGame = () => {
     conn.reducers.joinGame({
       gameMode: mode,
       joinCode: newJoinCode,
-      gameType: gameTypeEnum as any
+      gameType: gameTypeEnum as any,
+      customPhrase
     });
   }, [conn, isSearching]);
 
