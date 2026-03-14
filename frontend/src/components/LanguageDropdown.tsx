@@ -39,7 +39,7 @@ export function LanguageDropdown() {
                 <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
             </button>
             <div
-                className={`absolute top-full left-0 mt-1 rounded-xl border border-border bg-card p-1.5 min-w-[160px] max-h-[50vh] overflow-y-auto z-50 transition-all duration-150 ${
+                className={`absolute top-full left-0 mt-1 rounded-xl border border-border bg-card p-1.5 min-w-[160px] max-h-52 overflow-y-auto z-50 transition-all duration-150 ${
                     isOpen
                         ? "opacity-100 visible"
                         : "opacity-0 invisible pointer-events-none"
