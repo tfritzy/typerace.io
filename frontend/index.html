@@ -83,12 +83,10 @@
             TokyoNight:{bg:'#1a1b26',fg:'#a9b1d6',ac:'#7aa2f7',bc:'rgba(169,177,214,0.1)',bw:1,br:8},
             GruvboxDark:{bg:'#282828',fg:'#ebdbb2',ac:'#fabd2f',bc:'rgba(235,219,178,0.1)',bw:1,br:8},
             CatppuccinMocha:{bg:'#1e1e2e',fg:'#cdd6f4',ac:'#cba6f7',bc:'rgba(205,214,244,0.1)',bw:1,br:8},
-            GitHubLight:{bg:'#ffffff',fg:'#1f2328',ac:'#0969da',bc:'rgba(31,35,40,0.25)',bw:1,br:8},
-            SolarizedLight:{bg:'#fdf6e3',fg:'#657b83',ac:'#268bd2',bc:'rgba(101,123,131,0.25)',bw:1,br:8},
-            OneLight:{bg:'#fafafa',fg:'#383a42',ac:'#4078f2',bc:'rgba(56,58,66,0.25)',bw:1,br:8},
-            CatppuccinLatte:{bg:'#eff1f5',fg:'#4c4f69',ac:'#8839ef',bc:'rgba(76,79,105,0.25)',bw:1,br:8},
-            GruvboxLight:{bg:'#fbf1c7',fg:'#3c3836',ac:'#b57614',bc:'rgba(60,56,54,0.25)',bw:1,br:8},
-            RosePineDawn:{bg:'#faf4ed',fg:'#575279',ac:'#907aa9',bc:'rgba(87,82,121,0.25)',bw:1,br:8},
+            OneDark:{bg:'#282c34',fg:'#abb2bf',ac:'#61afef',bc:'rgba(171,178,191,0.1)',bw:1,br:8},
+            RosePine:{bg:'#191724',fg:'#e0def4',ac:'#c4a7e7',bc:'rgba(224,222,244,0.1)',bw:1,br:8},
+            AyuDark:{bg:'#0d1017',fg:'#bfbdb6',ac:'#e6b450',bc:'rgba(191,189,182,0.1)',bw:1,br:8},
+            Kanagawa:{bg:'#1f1f28',fg:'#dcd7ba',ac:'#7e9cd8',bc:'rgba(220,215,186,0.1)',bw:1,br:8},
             Pico8:{bg:'#1D2B53',fg:'#FFF1E8',ac:'#29ADFF',bc:'rgba(255,241,232,0.20)',bw:2,br:0},
             Endesga:{bg:'#10141f',fg:'#c5dbd4',ac:'#f77622',bc:'rgba(197,219,212,0.20)',bw:2,br:0},
             Sweetie16:{bg:'#1a1c2c',fg:'#f4f4f4',ac:'#b13e53',bc:'rgba(244,244,244,0.20)',bw:2,br:0}
@@ -105,8 +103,7 @@
             } catch(_){}
           }
           if (!t) {
-            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            t = prefersDark ? themes.CatppuccinMocha : themes.GitHubLight;
+            t = themes.GruvboxDark;
           }
           function p(h){h=h.replace('#','');return[parseInt(h.substring(0,2),16),parseInt(h.substring(2,4),16),parseInt(h.substring(4,6),16)];}
           function cl(v){return Math.max(0,Math.min(255,Math.round(v)));}
