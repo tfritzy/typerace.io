@@ -13,7 +13,6 @@ import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
-import { X } from "lucide-react";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -237,15 +236,8 @@ export const GamePage = () => {
                     placement={pp.placement}
                     isBot={pp.isBot}
                     isAnonymous={pp.isAnonymous}
+                    onKick={isOwnerInLobby && !isCurrentPlayer ? () => handleKickPlayer(pp.playerId) : undefined}
                   />
-                  {isOwnerInLobby && !isCurrentPlayer && (
-                    <button
-                      onClick={() => handleKickPlayer(pp.playerId)}
-                      className="absolute top-2 right-2 p-1 text-muted-foreground hover:text-foreground transition-colors duration-200 cursor-pointer"
-                    >
-                      <X size={16} />
-                    </button>
-                  )}
                 </div>
               );
             })}

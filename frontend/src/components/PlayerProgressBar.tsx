@@ -1,5 +1,5 @@
 import { PlayerAvatar } from './PlayerAvatar';
-import { Bot } from 'lucide-react';
+import { Bot, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { memo } from 'react';
 
@@ -16,6 +16,7 @@ type PlayerProgressBarProps = {
     placement?: number;
     isBot?: boolean;
     isAnonymous?: boolean;
+    onKick?: () => void;
 };
 
 export const PlayerProgressBar = memo(({
@@ -31,6 +32,7 @@ export const PlayerProgressBar = memo(({
     placement,
     isBot = false,
     isAnonymous = false,
+    onKick,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
     const progressGradient = 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))';
@@ -108,6 +110,14 @@ export const PlayerProgressBar = memo(({
                     />
                 </div>
             </div>
+            {onKick && (
+                <button
+                    onClick={onKick}
+                    className="shrink-0 p-1 text-muted-foreground hover:text-foreground transition-colors duration-200 cursor-pointer"
+                >
+                    <X size={16} />
+                </button>
+            )}
         </div>
     );
 });
