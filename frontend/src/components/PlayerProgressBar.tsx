@@ -39,7 +39,7 @@ export const PlayerProgressBar = memo(({
 
     return (
         <div
-            className={`w-full flex items-center gap-5 transition-all duration-500 relative ${isLoading
+            className={`w-full flex items-center gap-5 transition-all duration-500 ${isLoading
                 ? 'opacity-20'
                 : 'opacity-100 animate-[slideInFromLeft_0.5s_ease-out]'
                 }`}
@@ -113,7 +113,7 @@ export const PlayerProgressBar = memo(({
             {onKick && (
                 <button
                     onClick={onKick}
-                    className="absolute -right-2 -top-2 p-0.5 rounded-full bg-card text-muted-foreground hover:text-foreground transition-colors duration-200 cursor-pointer"
+                    className="absolute right-2 top-2 p-0.5 rounded-full bg-card text-muted-foreground hover:text-foreground transition-colors duration-200 cursor-pointer"
                     aria-label="Kick player"
                 >
                     <X size={14} />
