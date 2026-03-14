@@ -12,6 +12,7 @@ import { useAuth } from "../firebase/AuthContext";
 import { Select } from "../components/Select";
 import { RecentGames } from "../components/RecentGames";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { LoadingDots } from "../components/LoadingDots";
 
 type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
@@ -23,6 +24,7 @@ export const ProfilePage = () => {
     const [selectedMode, setSelectedMode] = useState<string>('all');
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('all');
     const [isEditNameModalOpen, setIsEditNameModalOpen] = useState(false);
+    const [isProfileLoading, setIsProfileLoading] = useState(true);
     const { signOut } = useAuth();
     const navigate = useNavigate();
 
@@ -30,16 +32,19 @@ export const ProfilePage = () => {
 
     useEffect(() => {
         if (!conn || !playerId) return;
+        setIsProfileLoading(true);
 
         const handlePlayerInsert = (_ctx: any, player: Player) => {
             if (player.playerId === playerId) {
                 setViewedPlayer(player);
+                setIsProfileLoading(false);
             }
         };
 
         const handlePlayerUpdate = (_ctx: any, _oldPlayer: Player, newPlayer: Player) => {
             if (newPlayer.playerId === playerId) {
                 setViewedPlayer(newPlayer);
+                setIsProfileLoading(false);
             }
         };
 
@@ -47,11 +52,6 @@ export const ProfilePage = () => {
         conn.db.player.onUpdate(handlePlayerUpdate);
 
         const subscription = conn.subscriptionBuilder()
-            .onApplied(() => {
-                const allPlayers = Array.from(conn.db.player.iter());
-                const p = allPlayers.find(player => player.playerId === playerId);
-                if (p) setViewedPlayer(p);
-            })
             .subscribe([`SELECT * FROM player WHERE PlayerId = '${playerId}'`]);
 
         return () => {
@@ -161,6 +161,19 @@ export const ProfilePage = () => {
 
         return Array.from(modesSet).sort();
     }, [gameRecords, viewedPlayer]);
+
+    if (isProfileLoading) {
+        return (
+            <div className="h-full flex flex-col" role="status" aria-label="Loading profile">
+                <Header hideAvatar={true} />
+                <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
+                    <div className="content-container flex-1 flex items-center justify-center">
+                        <LoadingDots showLogo={false} />
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="h-full flex flex-col">

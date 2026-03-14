@@ -1,7 +1,11 @@
 import { Logo } from "./Logo";
 import { useEffect, useRef } from "react";
 
-export const LoadingDots = () => {
+type LoadingDotsProps = {
+    showLogo?: boolean;
+};
+
+export const LoadingDots = ({ showLogo = true }: LoadingDotsProps) => {
     const spinnerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -22,8 +26,8 @@ export const LoadingDots = () => {
                     }
                 `}
             </style>
-            <div className="w-full max-w-[1000px] mx-auto flex justify-between items-center h-16">
-                <Logo />
+            <div className={`w-full max-w-[1000px] mx-auto flex items-center h-16 ${showLogo ? 'justify-between' : 'justify-center'}`}>
+                {showLogo && <Logo />}
                 <div
                     ref={spinnerRef}
                     className="fixed top-1/2 left-1/2 -ml-4 -mt-4 w-8 h-8 border-[3px] border-border border-t-muted-foreground rounded-full"
