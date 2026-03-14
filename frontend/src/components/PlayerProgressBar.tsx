@@ -114,6 +114,7 @@ export const PlayerProgressBar = memo(({
                 <button
                     onClick={onKick}
                     className="absolute -right-2 -top-2 p-0.5 rounded-full bg-card text-muted-foreground hover:text-foreground transition-colors duration-200 cursor-pointer"
+                    aria-label="Kick player"
                 >
                     <X size={14} />
                 </button>
