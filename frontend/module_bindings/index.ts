@@ -45,6 +45,8 @@ import JoinGame from "./join_game_reducer";
 export { JoinGame };
 import JoinPrivateGame from "./join_private_game_reducer";
 export { JoinPrivateGame };
+import KickPlayer from "./kick_player_reducer";
+export { KickPlayer };
 import Rematch from "./rematch_reducer";
 export { Rematch };
 import SetPlayerName from "./set_player_name_reducer";
@@ -381,6 +383,7 @@ const reducersSchema = __reducers(
   __reducerSchema("FillGameWithBots", FillGameWithBots),
   __reducerSchema("joinGame", JoinGame),
   __reducerSchema("joinPrivateGame", JoinPrivateGame),
+  __reducerSchema("kickPlayer", KickPlayer),
   __reducerSchema("rematch", Rematch),
   __reducerSchema("setPlayerName", SetPlayerName),
   __reducerSchema("StartCountdown", StartCountdown),
