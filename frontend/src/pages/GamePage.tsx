@@ -318,7 +318,7 @@ export const GamePage = () => {
           )}
         </div>
       </div>
-      {otherPlayerProgress.map((pp) => (
+      {!(hasFinished || hasCompletedRace) && !isLobby && otherPlayerProgress.map((pp) => (
         <GhostCursor
           key={pp.id.toString()}
           charIndex={pp.progressIndex}
