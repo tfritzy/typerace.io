@@ -14,7 +14,7 @@ import {
     TimeScale,
     Filler,
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 
 ChartJS.register(
@@ -204,7 +204,7 @@ export const SiteStatsPage = () => {
     };
 
     const getGamesPerDayData = () => {
-        return processGameModeData(modeCount => modeCount.finishedGames, 'area');
+        return processGameModeData(modeCount => modeCount.finishedGames, 'bar');
     };
 
     const getPlayersPerDayData = () => {
@@ -310,7 +310,7 @@ export const SiteStatsPage = () => {
     const nonLonelyGamesData = getNonLonelyGamesData();
     const completionRateData = getCompletionRateData();
 
-    const stackedAreaChartOptions = {
+    const stackedChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -496,7 +496,7 @@ export const SiteStatsPage = () => {
                     <section className="mb-8 box box-shadow rounded-lg p-6">
                         <h2 className="text-xl font-semibold mb-4 text-foreground">Games Played Per Day by Game Mode</h2>
                         <div className="h-[300px]">
-                            <Line data={gamesPerDayData} options={stackedAreaChartOptions} />
+                            <Bar data={gamesPerDayData} options={stackedChartOptions} />
                         </div>
                     </section>
 
