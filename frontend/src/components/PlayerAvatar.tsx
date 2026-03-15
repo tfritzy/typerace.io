@@ -1,6 +1,7 @@
 import Avatar from "boring-avatars";
 import { Crown, Award } from 'lucide-react';
 import { memo, useState, useEffect, useCallback } from "react";
+import { getPlayerAvatarColors } from "../utils/colorMapping";
 
 type PlayerAvatarProps = {
     size: number;
@@ -8,6 +9,7 @@ type PlayerAvatarProps = {
     isHighlighted?: boolean;
     isLoading?: boolean;
     placement?: number;
+    playerColorTag?: string;
 };
 
 function getAvatarColorsFromCSS(): string[] {
@@ -23,18 +25,21 @@ export const PlayerAvatar = memo(({
     size,
     identity,
     isLoading = false,
-    placement
+    placement,
+    playerColorTag
 }: PlayerAvatarProps) => {
-    const [avatarColors, setAvatarColors] = useState(getAvatarColorsFromCSS);
+    const [fallbackColors, setFallbackColors] = useState(getAvatarColorsFromCSS);
 
     const onThemeChange = useCallback(() => {
-        setAvatarColors(getAvatarColorsFromCSS());
+        setFallbackColors(getAvatarColorsFromCSS());
     }, []);
 
     useEffect(() => {
         window.addEventListener('themechange', onThemeChange);
         return () => window.removeEventListener('themechange', onThemeChange);
     }, [onThemeChange]);
+
+    const avatarColors = playerColorTag ? getPlayerAvatarColors(playerColorTag) : fallbackColors;
 
     const getCrownColor = (place: number) => {
         if (place === 1) return 'var(--medal-gold)';

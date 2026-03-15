@@ -65,21 +65,12 @@ public enum CharacterEventType
 [Type]
 public enum PlayerColor
 {
-    Dracula,
-    Monokai,
-    Nord,
-    TokyoNight,
-    GruvboxDark,
-    CatppuccinMocha,
-    GitHubLight,
-    SolarizedLight,
-    OneLight,
-    CatppuccinLatte,
-    GruvboxLight,
-    RosePineDawn,
-    Pico8,
-    Endesga,
-    Sweetie16
+    Coral,
+    Teal,
+    Purple,
+    Green,
+    Gold,
+    Blue
 }
 
 
@@ -488,7 +479,7 @@ public static partial class Module
                 TotalTimeSpentMs = 0,
                 IsBot = false,
                 BotConfig = null,
-                Color = PlayerColor.CatppuccinMocha,
+                Color = GenerateRandomColor(ctx.Rng),
                 IsAnonymous = true,
                 LastGameDate = 0
             });
@@ -747,7 +738,6 @@ public static partial class Module
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
-        var playerColor = player?.Color ?? PlayerColor.CatppuccinMocha;
         var playerPublicId = player?.PlayerId ?? "";
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
@@ -766,7 +756,7 @@ public static partial class Module
             Time = 0,
             Placement = -1,
             JoinCode = joinCode,
-            PlayerColor = playerColor
+            PlayerColor = GenerateRandomColor(ctx.Rng)
         });
     }
 
@@ -828,7 +818,7 @@ public static partial class Module
                     Time = 0,
                     Placement = -1,
                     JoinCode = "",
-                    PlayerColor = selectedBot.Color
+                    PlayerColor = GenerateRandomColor(ctx.Rng)
                 });
 
                 Log.Info($"Added bot {selectedBot.Name} (ELO: {GetBotElo(ctx, selectedBot.Identity, game.Value.GameMode)}) to game {args.GameId} (target ELO: {targetElo})");
@@ -1199,7 +1189,6 @@ public static partial class Module
                 var playerName = player?.Name ?? "Unknown";
                 var playerLevel = player?.Level ?? 1;
                 var isAnonymous = player?.IsAnonymous ?? true;
-                var playerColor = player?.Color ?? PlayerColor.CatppuccinMocha;
                 var playerPublicId = player?.PlayerId ?? "";
 
                 ctx.Db.playerprogress.Insert(new PlayerProgress
@@ -1218,7 +1207,7 @@ public static partial class Module
                     Time = 0,
                     Placement = -1,
                     JoinCode = gameId,
-                    PlayerColor = playerColor
+                    PlayerColor = GenerateRandomColor(ctx.Rng)
                 });
 
                 Log.Info($"Added player {progress.PlayerId} to rematch game {newGame.Id} with join code {gameId}");
