@@ -243,7 +243,7 @@ export const GamePage = () => {
                     isBot={pp.isBot}
                     isAnonymous={pp.isAnonymous}
                     onKick={isPrivateGameOwner && !isCurrentPlayer ? () => handleKickPlayer(pp.playerId) : undefined}
-                    playerColorTag={pp.playerColor?.tag}
+                    playerColorTag={isCurrentPlayer ? undefined : pp.playerColor?.tag}
                   />
                 </div>
               );
