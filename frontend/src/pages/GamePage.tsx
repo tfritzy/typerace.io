@@ -13,6 +13,7 @@ import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { getMaxPlayerCount } from "../utils/modes";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -178,7 +179,8 @@ export const GamePage = () => {
   }
 
   const currentPlayerId = conn?.identity;
-  const maxPlayers = game.gameType?.tag === "Practice" ? 1 : game.gameType?.tag === "Public" ? 3 : gamePlayerProgress.length;
+  const gameTypeTag = game.gameType?.tag ?? "Public";
+  const maxPlayers = gameTypeTag === "Private" ? gamePlayerProgress.length : getMaxPlayerCount(gameTypeTag);
   const totalSlots = Math.max(maxPlayers, gamePlayerProgress.length);
   const isInLobby = game.state?.tag === "Lobby";
   const isLobby = game.gameType?.tag === "Private" && isInLobby;
