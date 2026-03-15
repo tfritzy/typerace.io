@@ -37,8 +37,9 @@ export const PlayerProgressBar = memo(({
     playerColor,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
-    const progressGradient = playerColor
-        ? `linear-gradient(to right, ${playerColor}99, ${playerColor})`
+    const validColor = playerColor && /^#[0-9A-Fa-f]{6}$/.test(playerColor) ? playerColor : undefined;
+    const progressGradient = validColor
+        ? `linear-gradient(to right, ${validColor}99, ${validColor})`
         : 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))';
 
     return (
