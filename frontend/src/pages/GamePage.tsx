@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useMemo } from "react";
 import {
   type Game,
   type PlayerProgress,
@@ -14,6 +14,8 @@ import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import { getMaxPlayerCount } from "../utils/modes";
+import type { GhostCursorData } from "../components/TypeBox";
+import { getPlayerColorHex } from "../utils/colorMapping";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -174,11 +176,22 @@ export const GamePage = () => {
     conn.reducers.kickPlayer({ gameId, targetPlayerId });
   }, [conn, gameId]);
 
+  const currentPlayerId = conn?.identity;
+
+  const ghostCursors: GhostCursorData[] = useMemo(() => {
+    if (!currentPlayerId || !game?.phrase) return [];
+    return gamePlayerProgress
+      .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length)
+      .map((pp) => ({
+        position: pp.progressIndex,
+        color: getPlayerColorHex(pp.playerColor?.tag ?? ''),
+      }));
+  }, [gamePlayerProgress, currentPlayerId, game?.phrase]);
+
   if (!game) {
     return null;
   }
 
-  const currentPlayerId = conn?.identity;
   const gameTypeTag = game.gameType?.tag ?? "Public";
   const maxPlayers = gameTypeTag === "Private" ? gamePlayerProgress.length : getMaxPlayerCount(gameTypeTag);
   const totalSlots = Math.max(maxPlayers, gamePlayerProgress.length);
@@ -305,6 +318,7 @@ export const GamePage = () => {
               disabled={isDisabled}
               initialProgress={initialProgress}
               isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
+              ghostCursors={ghostCursors}
             />
           )}
         </div>

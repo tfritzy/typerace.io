@@ -1,0 +1,71 @@
+import { memo, useLayoutEffect, useRef, type RefObject } from "react";
+
+type GhostCursorProps = {
+    targetRef: RefObject<HTMLElement | null>;
+    lerp?: number;
+    color: string;
+};
+
+export const GhostCursor = memo(({ targetRef, lerp = 0.15, color }: GhostCursorProps) => {
+    const followerRef = useRef<HTMLDivElement>(null);
+    const position = useRef({ x: 0, y: 0 });
+    const target = useRef({ x: 0, y: 0 });
+    const initialized = useRef(false);
+
+    useLayoutEffect(() => {
+        if (!targetRef?.current || !followerRef.current) return;
+
+        const updateTarget = () => {
+            if (!targetRef?.current || !followerRef.current) return;
+            const targetRect = targetRef.current.getBoundingClientRect();
+
+            const newTarget = {
+                x: targetRect.left,
+                y: targetRect.bottom - 2,
+            };
+
+            target.current = newTarget;
+
+            if (!initialized.current) {
+                position.current = { ...target.current };
+                initialized.current = true;
+                followerRef.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`;
+            }
+        };
+
+        const animate = () => {
+            updateTarget();
+
+            position.current.x += (target.current.x - position.current.x) * lerp;
+            position.current.y += (target.current.y - position.current.y) * lerp;
+
+            if (followerRef.current) {
+                followerRef.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`;
+            }
+
+            rafId = requestAnimationFrame(animate);
+        };
+
+        updateTarget();
+
+        let rafId = requestAnimationFrame(animate);
+
+        window.addEventListener("scroll", updateTarget);
+        window.addEventListener("resize", updateTarget);
+
+        return () => {
+            cancelAnimationFrame(rafId);
+            window.removeEventListener("scroll", updateTarget);
+            window.removeEventListener("resize", updateTarget);
+            initialized.current = false;
+        };
+    }, [targetRef, lerp]);
+
+    return (
+        <div
+            ref={followerRef}
+            className="fixed top-0 left-0 pointer-events-none"
+            style={{ width: '10px', height: '2px', backgroundColor: color }}
+        />
+    );
+});
