@@ -14,8 +14,25 @@ import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import type { GhostCursor } from "../components/TypeBox";
+import { THEME_PRESETS } from "../utils/themes";
 
-const GHOST_CURSOR_COLORS = ['#e06c75', '#56b6c2', '#d19a66', '#c678dd', '#98c379'];
+const PLAYER_COLOR_TO_ACCENT: Record<string, string> = {
+  Dracula: THEME_PRESETS.Dracula.accentColor,
+  Monokai: THEME_PRESETS.Monokai.accentColor,
+  Nord: THEME_PRESETS.Nord.accentColor,
+  TokyoNight: THEME_PRESETS.TokyoNight.accentColor,
+  GruvboxDark: THEME_PRESETS.GruvboxDark.accentColor,
+  CatppuccinMocha: THEME_PRESETS.CatppuccinMocha.accentColor,
+  Pico8: THEME_PRESETS.Pico8.accentColor,
+  Endesga: THEME_PRESETS.Endesga.accentColor,
+  Sweetie16: THEME_PRESETS.Sweetie16.accentColor,
+  GitHubLight: '#0969da',
+  SolarizedLight: '#b58900',
+  OneLight: '#526fff',
+  CatppuccinLatte: '#8839ef',
+  GruvboxLight: '#d65d0e',
+  RosePineDawn: '#907aa9',
+};
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -183,11 +200,11 @@ export const GamePage = () => {
     return gamePlayerProgress
       .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length)
       .map((pp) => {
-        const hexString = pp.playerId.toHexString();
-        const hashCode = hexString.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const colorTag = pp.playerColor?.tag;
+        const color = (colorTag && PLAYER_COLOR_TO_ACCENT[colorTag]) || '#cba6f7';
         return {
           position: pp.progressIndex,
-          color: GHOST_CURSOR_COLORS[hashCode % GHOST_CURSOR_COLORS.length],
+          color,
         };
       });
   }, [gamePlayerProgress, currentPlayerId, game?.phrase]);

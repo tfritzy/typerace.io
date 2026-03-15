@@ -747,7 +747,7 @@ public static partial class Module
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
-        var playerColor = player?.Color ?? PlayerColor.CatppuccinMocha;
+        var playerColor = GenerateRandomColor(ctx.Rng);
         var playerPublicId = player?.PlayerId ?? "";
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
@@ -1199,7 +1199,7 @@ public static partial class Module
                 var playerName = player?.Name ?? "Unknown";
                 var playerLevel = player?.Level ?? 1;
                 var isAnonymous = player?.IsAnonymous ?? true;
-                var playerColor = player?.Color ?? PlayerColor.CatppuccinMocha;
+                var playerColor = GenerateRandomColor(ctx.Rng);
                 var playerPublicId = player?.PlayerId ?? "";
 
                 ctx.Db.playerprogress.Insert(new PlayerProgress
