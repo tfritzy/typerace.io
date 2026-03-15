@@ -200,10 +200,14 @@ export const GamePage = () => {
     if (!currentPlayerId || !game.phrase) return [];
     return gamePlayerProgress
       .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length)
-      .map((pp, index) => ({
-        position: pp.progressIndex,
-        color: GHOST_CURSOR_COLORS[index % GHOST_CURSOR_COLORS.length],
-      }));
+      .map((pp) => {
+        const hexString = pp.playerId.toHexString();
+        const hashCode = hexString.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        return {
+          position: pp.progressIndex,
+          color: GHOST_CURSOR_COLORS[hashCode % GHOST_CURSOR_COLORS.length],
+        };
+      });
   }, [gamePlayerProgress, currentPlayerId, game.phrase]);
 
   return (
