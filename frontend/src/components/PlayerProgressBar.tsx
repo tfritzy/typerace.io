@@ -38,6 +38,7 @@ export const PlayerProgressBar = memo(({
     const progressGradient = 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))';
 
     return (
+        <div className="box w-full rounded-lg px-4 py-3 sm:px-8 sm:py-6 relative">
         <div
             className={`w-full flex items-center gap-5 transition-all duration-500 ${isLoading
                 ? 'opacity-20'
@@ -119,6 +120,7 @@ export const PlayerProgressBar = memo(({
                     <X size={14} />
                 </button>
             )}
+        </div>
         </div>
     );
 });
