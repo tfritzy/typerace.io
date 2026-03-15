@@ -178,8 +178,7 @@ export const GamePage = () => {
   }
 
   const currentPlayerId = conn?.identity;
-  const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 6;
-  const totalSlots = Math.max(maxPlayers, gamePlayerProgress.length);
+  const totalSlots = gamePlayerProgress.length;
   const isInLobby = game.state?.tag === "Lobby";
   const isLobby = game.gameType?.tag === "Private" && isInLobby;
   const isPrivateGameOwner = game.gameType?.tag === "Private" && currentPlayerId && game.owner?.isEqual(currentPlayerId);
