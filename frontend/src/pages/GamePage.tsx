@@ -178,7 +178,7 @@ export const GamePage = () => {
   }
 
   const currentPlayerId = conn?.identity;
-  const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
+  const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 6;
   const totalSlots = Math.max(maxPlayers, gamePlayerProgress.length);
   const isInLobby = game.state?.tag === "Lobby";
   const isLobby = game.gameType?.tag === "Private" && isInLobby;
