@@ -14,7 +14,7 @@ import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import { getMaxPlayerCount } from "../utils/modes";
-import type { GhostCursorData } from "../components/TypeBox";
+import { GhostCursor } from "../components/GhostCursor";
 import { getPlayerColorHex } from "../utils/colorMapping";
 
 export const GamePage = () => {
@@ -178,14 +178,10 @@ export const GamePage = () => {
 
   const currentPlayerId = conn?.identity;
 
-  const ghostCursors: GhostCursorData[] = useMemo(() => {
+  const otherPlayerProgress = useMemo(() => {
     if (!currentPlayerId || !game?.phrase) return [];
     return gamePlayerProgress
-      .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length)
-      .map((pp) => ({
-        position: pp.progressIndex,
-        color: getPlayerColorHex(pp.playerColor?.tag ?? ''),
-      }));
+      .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length);
   }, [gamePlayerProgress, currentPlayerId, game?.phrase]);
 
   if (!game) {
@@ -308,18 +304,27 @@ export const GamePage = () => {
               isOwner={currentPlayerId ? game.owner?.isEqual(currentPlayerId) ?? false : false}
             />
           ) : (
-            <GamePageTypeBox
-              key={gameId}
-              phrase={game.phrase}
-              attribution={game.attribution}
-              gameId={gameId!}
-              conn={conn}
-              onFinish={handleFinish}
-              disabled={isDisabled}
-              initialProgress={initialProgress}
-              isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
-              ghostCursors={ghostCursors}
-            />
+            <>
+              <GamePageTypeBox
+                key={gameId}
+                phrase={game.phrase}
+                attribution={game.attribution}
+                gameId={gameId!}
+                conn={conn}
+                onFinish={handleFinish}
+                disabled={isDisabled}
+                initialProgress={initialProgress}
+                isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
+              />
+              {otherPlayerProgress.map((pp) => (
+                <GhostCursor
+                  key={pp.id.toString()}
+                  charIndex={pp.progressIndex}
+                  color={getPlayerColorHex(pp.playerColor?.tag ?? '')}
+                  lerp={0.15}
+                />
+              ))}
+            </>
           )}
         </div>
       </div>

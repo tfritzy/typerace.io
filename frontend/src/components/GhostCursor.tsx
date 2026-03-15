@@ -1,23 +1,26 @@
-import { memo, useLayoutEffect, useRef, type RefObject } from "react";
+import { memo, useEffect, useRef } from "react";
 
 type GhostCursorProps = {
-    targetRef: RefObject<HTMLElement | null>;
+    charIndex: number;
     lerp?: number;
     color: string;
 };
 
-export const GhostCursor = memo(({ targetRef, lerp = 0.15, color }: GhostCursorProps) => {
+export const GhostCursor = memo(({ charIndex, lerp = 0.15, color }: GhostCursorProps) => {
     const followerRef = useRef<HTMLDivElement>(null);
     const position = useRef({ x: 0, y: 0 });
     const target = useRef({ x: 0, y: 0 });
     const initialized = useRef(false);
+    const charIndexRef = useRef(charIndex);
+    charIndexRef.current = charIndex;
 
-    useLayoutEffect(() => {
-        if (!targetRef?.current || !followerRef.current) return;
+    useEffect(() => {
+        if (!followerRef.current) return;
 
         const updateTarget = () => {
-            if (!targetRef?.current || !followerRef.current) return;
-            const targetRect = targetRef.current.getBoundingClientRect();
+            const targetEl = document.querySelector(`[data-char-index="${charIndexRef.current}"]`);
+            if (!targetEl || !followerRef.current) return;
+            const targetRect = targetEl.getBoundingClientRect();
 
             const newTarget = {
                 x: targetRect.left,
@@ -59,7 +62,7 @@ export const GhostCursor = memo(({ targetRef, lerp = 0.15, color }: GhostCursorP
             window.removeEventListener("resize", updateTarget);
             initialized.current = false;
         };
-    }, [targetRef, lerp]);
+    }, [lerp]);
 
     return (
         <div

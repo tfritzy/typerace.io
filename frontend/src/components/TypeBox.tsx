@@ -4,15 +4,8 @@ import React, {
   useState,
   useImperativeHandle,
   forwardRef,
-  useMemo,
 } from "react";
 import { Cursor } from "./Cursor";
-import { GhostCursor as GhostCursorComponent } from "./GhostCursor";
-
-export type GhostCursorData = {
-  position: number;
-  color: string;
-};
 
 type TypeBoxProps = {
   phrase: string;
@@ -28,7 +21,6 @@ type TypeBoxProps = {
   resetOnComplete?: boolean;
   disabled?: boolean;
   initialProgress?: number;
-  ghostCursors?: GhostCursorData[];
 };
 
 export type TypeBoxRef = {
@@ -48,7 +40,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       resetOnComplete = false,
       disabled = false,
       initialProgress = 0,
-      ghostCursors,
     },
     ref
   ) => {
@@ -248,22 +239,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       }
     }, []);
 
-    const ghostCursorRefs = useRef<Map<string, { current: HTMLSpanElement | null }>>(new Map());
-
-    const stableGhostKeys = useMemo(() => {
-      if (!ghostCursors) return [];
-      return ghostCursors.map((gc, i) => `ghost-${i}-${gc.color}`);
-    }, [ghostCursors]);
-
-    const getGhostRef = useCallback((key: string) => {
-      let ref = ghostCursorRefs.current.get(key);
-      if (!ref) {
-        ref = { current: null };
-        ghostCursorRefs.current.set(key, ref);
-      }
-      return ref;
-    }, []);
-
     const renderText = () => {
       const chars = phrase.split("");
 
@@ -296,29 +271,13 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
         const isError = isTyped && !isCorrect;
 
-        const ghostCursorTargets: React.ReactNode[] = [];
-        if (ghostCursors) {
-          ghostCursors.forEach((gc, gcIndex) => {
-            if (gc.position === i) {
-              const key = stableGhostKeys[gcIndex];
-              const ref = getGhostRef(key);
-              ghostCursorTargets.push(
-                <span
-                  key={key}
-                  ref={(el) => { ref.current = el; }}
-                />
-              );
-            }
-          });
-        }
-
         return (
           <span
             key={i}
+            data-char-index={i}
             className={`transition-all duration-150 ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
           >
             {isCursor && <span id="target" ref={targetRef} />}
-            {ghostCursorTargets}
             {char}
           </span>
         );
@@ -351,18 +310,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               fadeDelay={500}
               visible={focused && !isComplete}
             />
-
-            {ghostCursors?.map((gc, i) => {
-              const key = stableGhostKeys[i];
-              return (
-                <GhostCursorComponent
-                  key={key}
-                  targetRef={getGhostRef(key) as React.RefObject<HTMLElement | null>}
-                  lerp={0.15}
-                  color={gc.color}
-                />
-              );
-            })}
 
             <textarea
               ref={inputRef}
