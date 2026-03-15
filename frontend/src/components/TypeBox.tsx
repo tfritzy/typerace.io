@@ -7,6 +7,11 @@ import React, {
 } from "react";
 import { Cursor } from "./Cursor";
 
+export type GhostCursor = {
+  position: number;
+  color: string;
+};
+
 type TypeBoxProps = {
   phrase: string;
   attribution?: string;
@@ -21,6 +26,7 @@ type TypeBoxProps = {
   resetOnComplete?: boolean;
   disabled?: boolean;
   initialProgress?: number;
+  ghostCursors?: GhostCursor[];
 };
 
 export type TypeBoxRef = {
@@ -40,6 +46,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       resetOnComplete = false,
       disabled = false,
       initialProgress = 0,
+      ghostCursors,
     },
     ref
   ) => {
@@ -252,6 +259,17 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
       }
 
+      const ghostCursorMap = new Map<number, GhostCursor[]>();
+      if (ghostCursors) {
+        for (const gc of ghostCursors) {
+          if (gc.position >= 0 && gc.position < chars.length) {
+            const existing = ghostCursorMap.get(gc.position) || [];
+            existing.push(gc);
+            ghostCursorMap.set(gc.position, existing);
+          }
+        }
+      }
+
       return chars.map((char, i) => {
         const isTyped = i < input.length;
         const isCorrect = input[i] === char;
@@ -269,10 +287,23 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           colorClass = 'text-foreground';
         }
 
+        const isError = isTyped && !isCorrect;
+        const cursorsAtPosition = ghostCursorMap.get(i);
+        const ghostStyle: React.CSSProperties | undefined =
+          cursorsAtPosition && !isError
+            ? {
+                textDecorationLine: 'underline',
+                textDecorationColor: cursorsAtPosition[0].color,
+                textDecorationThickness: '2px',
+                textUnderlineOffset: '4px',
+              }
+            : undefined;
+
         return (
           <span
             key={i}
-            className={`transition-all duration-150 ${colorClass} ${isTyped && !isCorrect ? "underline decoration-2 decoration-destructive" : ""}`}
+            className={`transition-all duration-150 ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
+            style={ghostStyle}
           >
             {isCursor && <span id="target" ref={targetRef} />}
             {char}

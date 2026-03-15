@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useMemo } from "react";
 import {
   type Game,
   type PlayerProgress,
@@ -13,6 +13,9 @@ import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import type { GhostCursor } from "../components/TypeBox";
+
+const GHOST_CURSOR_COLORS = ['#e06c75', '#56b6c2', '#d19a66', '#c678dd', '#98c379'];
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -193,6 +196,16 @@ export const GamePage = () => {
     ? currentPlayerProgress.progressIndex >= game.phrase.length
     : false;
 
+  const ghostCursors: GhostCursor[] = useMemo(() => {
+    if (!currentPlayerId || !game.phrase) return [];
+    return gamePlayerProgress
+      .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length)
+      .map((pp, index) => ({
+        position: pp.progressIndex,
+        color: GHOST_CURSOR_COLORS[index % GHOST_CURSOR_COLORS.length],
+      }));
+  }, [gamePlayerProgress, currentPlayerId, game.phrase]);
+
   return (
     <div className="relative h-full flex flex-col">
       <Header />
@@ -301,6 +314,7 @@ export const GamePage = () => {
               disabled={isDisabled}
               initialProgress={initialProgress}
               isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
+              ghostCursors={ghostCursors}
             />
           )}
         </div>
