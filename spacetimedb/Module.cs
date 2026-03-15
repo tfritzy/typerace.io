@@ -680,7 +680,13 @@ public static partial class Module
 
     private static int GetMaxPlayerCount(GameType gameType)
     {
-        return gameType == GameType.Practice ? 1 : 3;
+        return gameType switch
+        {
+            GameType.Practice => 1,
+            GameType.Public => 3,
+            GameType.Private => 6,
+            _ => 3
+        };
     }
 
     private static long GetCountdownDuration(GameType gameType)

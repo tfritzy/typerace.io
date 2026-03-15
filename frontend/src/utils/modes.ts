@@ -218,6 +218,15 @@ const languageStartupPhrases: Record<Language, string[]> = {
   ],
 };
 
+export function getMaxPlayerCount(gameTypeTag: string): number {
+  switch (gameTypeTag) {
+    case "Practice": return 1;
+    case "Public": return 3;
+    case "Private": return 6;
+    default: return 3;
+  }
+}
+
 export function getRandomStartupPhrase(gameModeTag: string): string {
   const language = getLanguageFromMode(gameModeTag);
   const phrases = languageStartupPhrases[language] || languageStartupPhrases[Language.English];

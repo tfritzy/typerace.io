@@ -13,6 +13,7 @@ import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { getMaxPlayerCount } from "../utils/modes";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -178,7 +179,9 @@ export const GamePage = () => {
   }
 
   const currentPlayerId = conn?.identity;
-  const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
+  const gameTypeTag = game.gameType?.tag ?? "Public";
+  const maxPlayers = gameTypeTag === "Private" ? gamePlayerProgress.length : getMaxPlayerCount(gameTypeTag);
+  const totalSlots = Math.max(maxPlayers, gamePlayerProgress.length);
   const isInLobby = game.state?.tag === "Lobby";
   const isLobby = game.gameType?.tag === "Private" && isInLobby;
   const isPrivateGameOwner = game.gameType?.tag === "Private" && currentPlayerId && game.owner?.isEqual(currentPlayerId);
@@ -201,8 +204,8 @@ export const GamePage = () => {
 
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4">
         <div className="content-container w-full my-auto">
-          <div className="mb-3 space-y-3">
-            {Array.from({ length: maxPlayers }).map((_, index) => {
+          <div className={`mb-3 grid gap-3 ${totalSlots > 3 ? 'sm:grid-cols-2' : ''}`}>
+            {Array.from({ length: totalSlots }).map((_, index) => {
               const pp = gamePlayerProgress[index];
               const isCurrentPlayer =
                 pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
