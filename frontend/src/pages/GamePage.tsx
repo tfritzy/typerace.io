@@ -304,30 +304,28 @@ export const GamePage = () => {
               isOwner={currentPlayerId ? game.owner?.isEqual(currentPlayerId) ?? false : false}
             />
           ) : (
-            <>
-              <GamePageTypeBox
-                key={gameId}
-                phrase={game.phrase}
-                attribution={game.attribution}
-                gameId={gameId!}
-                conn={conn}
-                onFinish={handleFinish}
-                disabled={isDisabled}
-                initialProgress={initialProgress}
-                isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
-              />
-              {otherPlayerProgress.map((pp) => (
-                <GhostCursor
-                  key={pp.id.toString()}
-                  charIndex={pp.progressIndex}
-                  color={getPlayerColorHex(pp.playerColor?.tag ?? '')}
-                  lerp={0.15}
-                />
-              ))}
-            </>
+            <GamePageTypeBox
+              key={gameId}
+              phrase={game.phrase}
+              attribution={game.attribution}
+              gameId={gameId!}
+              conn={conn}
+              onFinish={handleFinish}
+              disabled={isDisabled}
+              initialProgress={initialProgress}
+              isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
+            />
           )}
         </div>
       </div>
+      {otherPlayerProgress.map((pp) => (
+        <GhostCursor
+          key={pp.id.toString()}
+          charIndex={pp.progressIndex}
+          color={getPlayerColorHex(pp.playerColor?.tag ?? '')}
+          lerp={0.15}
+        />
+      ))}
     </div>
   );
 };
