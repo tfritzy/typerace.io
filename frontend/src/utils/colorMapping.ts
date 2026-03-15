@@ -54,7 +54,7 @@ function hexToHsl(hex: string): [number, number, number] {
 }
 
 function hslToHex(h: number, s: number, l: number): string {
-    const hNorm = ((h % 360) + 360) % 360 / 360;
+    const hNorm = (((h % 360) + 360) % 360) / 360;
     const a = s * Math.min(l, 1 - l);
     const f = (n: number) => {
         const k = (n + hNorm * 12) % 12;
