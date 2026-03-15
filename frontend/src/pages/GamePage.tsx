@@ -14,25 +14,7 @@ import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import type { GhostCursorData } from "../components/TypeBox";
-import { THEME_PRESETS } from "../utils/themes";
-
-const PLAYER_COLOR_TO_ACCENT: Record<string, string> = {
-  Dracula: THEME_PRESETS.Dracula.accentColor,
-  Monokai: THEME_PRESETS.Monokai.accentColor,
-  Nord: THEME_PRESETS.Nord.accentColor,
-  TokyoNight: THEME_PRESETS.TokyoNight.accentColor,
-  GruvboxDark: THEME_PRESETS.GruvboxDark.accentColor,
-  CatppuccinMocha: THEME_PRESETS.CatppuccinMocha.accentColor,
-  Pico8: THEME_PRESETS.Pico8.accentColor,
-  Endesga: THEME_PRESETS.Endesga.accentColor,
-  Sweetie16: THEME_PRESETS.Sweetie16.accentColor,
-  GitHubLight: '#0969da',
-  SolarizedLight: '#b58900',
-  OneLight: '#526fff',
-  CatppuccinLatte: '#8839ef',
-  GruvboxLight: '#d65d0e',
-  RosePineDawn: '#907aa9',
-};
+import { getPlayerColorHex } from "../utils/colorMapping";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -195,20 +177,15 @@ export const GamePage = () => {
 
   const currentPlayerId = conn?.identity;
 
-  const getPlayerColor = useCallback((pp: PlayerProgress): string | undefined => {
-    const colorTag = pp.playerColor?.tag;
-    return colorTag ? PLAYER_COLOR_TO_ACCENT[colorTag] : undefined;
-  }, []);
-
   const ghostCursors: GhostCursorData[] = useMemo(() => {
     if (!currentPlayerId || !game?.phrase) return [];
     return gamePlayerProgress
       .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length)
       .map((pp) => ({
         position: pp.progressIndex,
-        color: getPlayerColor(pp) || '#cba6f7',
+        color: getPlayerColorHex(pp.playerColor?.tag ?? ''),
       }));
-  }, [gamePlayerProgress, currentPlayerId, game?.phrase, getPlayerColor]);
+  }, [gamePlayerProgress, currentPlayerId, game?.phrase]);
 
   if (!game) {
     return null;
@@ -279,7 +256,7 @@ export const GamePage = () => {
                     isBot={pp.isBot}
                     isAnonymous={pp.isAnonymous}
                     onKick={isPrivateGameOwner && !isCurrentPlayer ? () => handleKickPlayer(pp.playerId) : undefined}
-                    playerColor={getPlayerColor(pp)}
+                    playerColorTag={isCurrentPlayer ? undefined : pp.playerColor?.tag}
                   />
                 </div>
               );

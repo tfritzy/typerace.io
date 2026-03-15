@@ -1,7 +1,8 @@
 import { PlayerAvatar } from './PlayerAvatar';
 import { Bot, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
+import { getPlayerProgressGradient } from '../utils/colorMapping';
 
 type PlayerProgressBarProps = {
     name: string;
@@ -17,7 +18,7 @@ type PlayerProgressBarProps = {
     isBot?: boolean;
     isAnonymous?: boolean;
     onKick?: () => void;
-    playerColor?: string;
+    playerColorTag?: string;
 };
 
 export const PlayerProgressBar = memo(({
@@ -34,13 +35,15 @@ export const PlayerProgressBar = memo(({
     isBot = false,
     isAnonymous = false,
     onKick,
-    playerColor,
+    playerColorTag,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
-    const validColor = playerColor && /^#[0-9A-Fa-f]{6}$/.test(playerColor) ? playerColor : undefined;
-    const progressGradient = validColor
-        ? `linear-gradient(to right, ${validColor}99, ${validColor})`
-        : 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))';
+    const progressGradient = useMemo(
+        () => playerColorTag
+            ? getPlayerProgressGradient(playerColorTag)
+            : 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))',
+        [playerColorTag]
+    );
 
     return (
         <div className="box w-full rounded-lg px-4 py-3 sm:px-8 sm:py-6 relative">
@@ -58,6 +61,7 @@ export const PlayerProgressBar = memo(({
                     isHighlighted={isCurrentPlayer}
                     isLoading={isLoading}
                     placement={placement}
+                    playerColorTag={playerColorTag}
                 />
             ) : (
                 <Link key="avatar-link" to={`/profile/${playerPublicId}`} className="shrink-0">
@@ -68,6 +72,7 @@ export const PlayerProgressBar = memo(({
                         isHighlighted={isCurrentPlayer}
                         isLoading={isLoading}
                         placement={placement}
+                        playerColorTag={playerColorTag}
                     />
                 </Link>
             )}
@@ -111,7 +116,7 @@ export const PlayerProgressBar = memo(({
                         style={{
                             width: `${Math.min(100, progressPercentage)}%`,
                             background: progressGradient,
-                            opacity: isCurrentPlayer ? 1 : 0.6
+                            opacity: isCurrentPlayer ? 1 : 0.35
                         }}
                     />
                 </div>
