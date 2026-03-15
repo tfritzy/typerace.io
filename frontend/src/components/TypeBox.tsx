@@ -7,8 +7,9 @@ import React, {
   useMemo,
 } from "react";
 import { Cursor } from "./Cursor";
+import { GhostCursor as GhostCursorComponent } from "./GhostCursor";
 
-export type GhostCursor = {
+export type GhostCursorData = {
   position: number;
   color: string;
 };
@@ -27,7 +28,7 @@ type TypeBoxProps = {
   resetOnComplete?: boolean;
   disabled?: boolean;
   initialProgress?: number;
-  ghostCursors?: GhostCursor[];
+  ghostCursors?: GhostCursorData[];
 };
 
 export type TypeBoxRef = {
@@ -354,12 +355,10 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             {ghostCursors?.map((gc, i) => {
               const key = stableGhostKeys[i];
               return (
-                <Cursor
+                <GhostCursorComponent
                   key={key}
                   targetRef={getGhostRef(key) as React.RefObject<HTMLElement | null>}
                   lerp={0.15}
-                  fadeDelay={Infinity}
-                  visible={true}
                   color={gc.color}
                 />
               );

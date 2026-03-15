@@ -1,19 +1,16 @@
-import { memo, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { memo, useLayoutEffect, useRef, type RefObject } from "react";
 
-type CursorProps = {
+type GhostCursorProps = {
     targetRef: RefObject<HTMLElement | null>;
     lerp?: number;
-    fadeDelay?: number;
-    visible?: boolean;
+    color: string;
 };
 
-export const Cursor = memo(({ targetRef, lerp = .2, fadeDelay = 2000, visible = true }: CursorProps) => {
+export const GhostCursor = memo(({ targetRef, lerp = 0.15, color }: GhostCursorProps) => {
     const followerRef = useRef<HTMLDivElement>(null);
     const position = useRef({ x: 0, y: 0 });
     const target = useRef({ x: 0, y: 0 });
     const initialized = useRef(false);
-    const lastMoveTime = useRef(Date.now());
-    const [isBlinking, setIsBlinking] = useState(false);
 
     useLayoutEffect(() => {
         if (!targetRef?.current || !followerRef.current) return;
@@ -21,17 +18,11 @@ export const Cursor = memo(({ targetRef, lerp = .2, fadeDelay = 2000, visible = 
         const updateTarget = () => {
             if (!targetRef?.current || !followerRef.current) return;
             const targetRect = targetRef.current.getBoundingClientRect();
-            const followerRect = followerRef.current.getBoundingClientRect();
 
             const newTarget = {
-                x: targetRect.left - followerRect.width / 2,
-                y: targetRect.top + (targetRect.height - followerRect.height) / 2,
+                x: targetRect.left,
+                y: targetRect.bottom - 2,
             };
-
-            if (newTarget.x !== target.current.x || newTarget.y !== target.current.y) {
-                lastMoveTime.current = Date.now();
-                setIsBlinking(false);
-            }
 
             target.current = newTarget;
 
@@ -59,32 +50,22 @@ export const Cursor = memo(({ targetRef, lerp = .2, fadeDelay = 2000, visible = 
 
         let rafId = requestAnimationFrame(animate);
 
-        const fadeInterval = setInterval(() => {
-            const timeSinceMove = Date.now() - lastMoveTime.current;
-            if (timeSinceMove >= fadeDelay) {
-                setIsBlinking(true);
-            }
-        }, 100);
-
         window.addEventListener("scroll", updateTarget);
         window.addEventListener("resize", updateTarget);
 
         return () => {
             cancelAnimationFrame(rafId);
-            clearInterval(fadeInterval);
             window.removeEventListener("scroll", updateTarget);
             window.removeEventListener("resize", updateTarget);
             initialized.current = false;
         };
-    }, [targetRef, lerp, fadeDelay]);
+    }, [targetRef, lerp]);
 
     return (
         <div
             ref={followerRef}
-            className={`max-w-0 h-8 -translate-y-px fixed -top-0.5 left-0 ${isBlinking && visible ? 'animate-blink' : ''}`}
-            style={{ opacity: visible ? 1 : 0 }}
-        >
-            <div className="h-full rounded-full border-r-2 border-r-accent" />
-        </div>
+            className="fixed top-0 left-0 pointer-events-none"
+            style={{ width: '10px', height: '2px', backgroundColor: color }}
+        />
     );
 });

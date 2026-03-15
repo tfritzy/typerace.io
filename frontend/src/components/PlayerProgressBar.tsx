@@ -17,6 +17,7 @@ type PlayerProgressBarProps = {
     isBot?: boolean;
     isAnonymous?: boolean;
     onKick?: () => void;
+    playerColor?: string;
 };
 
 export const PlayerProgressBar = memo(({
@@ -33,9 +34,12 @@ export const PlayerProgressBar = memo(({
     isBot = false,
     isAnonymous = false,
     onKick,
+    playerColor,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
-    const progressGradient = 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))';
+    const progressGradient = playerColor
+        ? `linear-gradient(to right, ${playerColor}99, ${playerColor})`
+        : 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))';
 
     return (
         <div className="box w-full rounded-lg px-4 py-3 sm:px-8 sm:py-6 relative">
@@ -106,7 +110,7 @@ export const PlayerProgressBar = memo(({
                         style={{
                             width: `${Math.min(100, progressPercentage)}%`,
                             background: progressGradient,
-                            opacity: isCurrentPlayer ? 1 : 0.35
+                            opacity: isCurrentPlayer ? 1 : 0.6
                         }}
                     />
                 </div>

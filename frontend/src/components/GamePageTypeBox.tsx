@@ -1,5 +1,5 @@
 import { memo, useCallback, useRef, useState } from "react";
-import { TypeBox, type TypeBoxRef, type GhostCursor } from "./TypeBox";
+import { TypeBox, type TypeBoxRef, type GhostCursorData } from "./TypeBox";
 import type { DbConnection } from "../../module_bindings";
 import { WordXpIndicator } from "./WordXpIndicator";
 
@@ -18,7 +18,7 @@ type GamePageTypeBoxProps = {
   disabled?: boolean;
   initialProgress?: number;
   isAnonymous?: boolean;
-  ghostCursors?: GhostCursor[];
+  ghostCursors?: GhostCursorData[];
 };
 
 export const GamePageTypeBox = memo(

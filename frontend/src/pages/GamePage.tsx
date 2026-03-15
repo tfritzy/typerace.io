@@ -13,7 +13,7 @@ import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
-import type { GhostCursor } from "../components/TypeBox";
+import type { GhostCursorData } from "../components/TypeBox";
 import { THEME_PRESETS } from "../utils/themes";
 
 const PLAYER_COLOR_TO_ACCENT: Record<string, string> = {
@@ -195,19 +195,20 @@ export const GamePage = () => {
 
   const currentPlayerId = conn?.identity;
 
-  const ghostCursors: GhostCursor[] = useMemo(() => {
+  const getPlayerColor = useCallback((pp: PlayerProgress): string | undefined => {
+    const colorTag = pp.playerColor?.tag;
+    return colorTag ? PLAYER_COLOR_TO_ACCENT[colorTag] : undefined;
+  }, []);
+
+  const ghostCursors: GhostCursorData[] = useMemo(() => {
     if (!currentPlayerId || !game?.phrase) return [];
     return gamePlayerProgress
       .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length)
-      .map((pp) => {
-        const colorTag = pp.playerColor?.tag;
-        const color = (colorTag && PLAYER_COLOR_TO_ACCENT[colorTag]) || '#cba6f7';
-        return {
-          position: pp.progressIndex,
-          color,
-        };
-      });
-  }, [gamePlayerProgress, currentPlayerId, game?.phrase]);
+      .map((pp) => ({
+        position: pp.progressIndex,
+        color: getPlayerColor(pp) || '#cba6f7',
+      }));
+  }, [gamePlayerProgress, currentPlayerId, game?.phrase, getPlayerColor]);
 
   if (!game) {
     return null;
@@ -278,6 +279,7 @@ export const GamePage = () => {
                     isBot={pp.isBot}
                     isAnonymous={pp.isAnonymous}
                     onKick={isPrivateGameOwner && !isCurrentPlayer ? () => handleKickPlayer(pp.playerId) : undefined}
+                    playerColor={getPlayerColor(pp)}
                   />
                 </div>
               );
