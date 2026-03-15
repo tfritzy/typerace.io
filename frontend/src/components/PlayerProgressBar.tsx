@@ -1,7 +1,7 @@
 import { PlayerAvatar } from './PlayerAvatar';
 import { Bot, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { getPlayerProgressGradient } from '../utils/colorMapping';
 
 type PlayerProgressBarProps = {
@@ -38,9 +38,12 @@ export const PlayerProgressBar = memo(({
     playerColorTag,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
-    const progressGradient = playerColorTag
-        ? getPlayerProgressGradient(playerColorTag)
-        : 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))';
+    const progressGradient = useMemo(
+        () => playerColorTag
+            ? getPlayerProgressGradient(playerColorTag)
+            : 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))',
+        [playerColorTag]
+    );
 
     return (
         <div className="box w-full rounded-lg px-4 py-3 sm:px-8 sm:py-6 relative">

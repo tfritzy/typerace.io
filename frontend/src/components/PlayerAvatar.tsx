@@ -1,6 +1,6 @@
 import Avatar from "boring-avatars";
 import { Crown, Award } from 'lucide-react';
-import { memo, useState, useEffect, useCallback } from "react";
+import { memo, useState, useEffect, useCallback, useMemo } from "react";
 import { getPlayerAvatarColors } from "../utils/colorMapping";
 
 type PlayerAvatarProps = {
@@ -39,7 +39,10 @@ export const PlayerAvatar = memo(({
         return () => window.removeEventListener('themechange', onThemeChange);
     }, [onThemeChange]);
 
-    const avatarColors = playerColorTag ? getPlayerAvatarColors(playerColorTag) : fallbackColors;
+    const avatarColors = useMemo(
+        () => playerColorTag ? getPlayerAvatarColors(playerColorTag) : fallbackColors,
+        [playerColorTag, fallbackColors]
+    );
 
     const getCrownColor = (place: number) => {
         if (place === 1) return 'var(--medal-gold)';
