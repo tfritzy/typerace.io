@@ -13,12 +13,22 @@ export const GhostCursor = memo(({ charIndex, lerp = 0.15, color }: GhostCursorP
     const initialized = useRef(false);
     const charIndexRef = useRef(charIndex);
     charIndexRef.current = charIndex;
+    const cachedIndex = useRef(-1);
+    const cachedEl = useRef<Element | null>(null);
 
     useEffect(() => {
         if (!followerRef.current) return;
 
+        const findTarget = () => {
+            if (cachedIndex.current !== charIndexRef.current) {
+                cachedIndex.current = charIndexRef.current;
+                cachedEl.current = document.querySelector(`[data-char-index="${charIndexRef.current}"]`);
+            }
+            return cachedEl.current;
+        };
+
         const updateTarget = () => {
-            const targetEl = document.querySelector(`[data-char-index="${charIndexRef.current}"]`);
+            const targetEl = findTarget();
             if (!targetEl || !followerRef.current) return;
             const targetRect = targetEl.getBoundingClientRect();
 
@@ -61,6 +71,8 @@ export const GhostCursor = memo(({ charIndex, lerp = 0.15, color }: GhostCursorP
             window.removeEventListener("scroll", updateTarget);
             window.removeEventListener("resize", updateTarget);
             initialized.current = false;
+            cachedIndex.current = -1;
+            cachedEl.current = null;
         };
     }, [lerp]);
 
