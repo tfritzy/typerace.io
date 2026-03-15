@@ -75,10 +75,26 @@ export const GamePage = () => {
       }
     };
 
+    const handleProgressDelete = (_ctx: any, pp: PlayerProgress) => {
+      if (pp.gameId.toString() === gameId) {
+        setGamePlayerProgress((prev) => prev.filter((p) => p.id !== pp.id));
+        if (conn.identity && pp.playerId.isEqual(conn.identity)) {
+          setTimeout(() => {
+            const stillExists = Array.from(conn.db.playerprogress.iter())
+              .some(p => p.gameId.toString() === gameId && p.playerId.isEqual(conn.identity!));
+            if (!stillExists) {
+              navigate("/", { replace: true });
+            }
+          }, 200);
+        }
+      }
+    };
+
     conn.db.game.onInsert(handleGameInsert);
     conn.db.game.onUpdate(handleGameUpdate);
     conn.db.playerprogress.onInsert(handleProgressInsert);
     conn.db.playerprogress.onUpdate(handleProgressUpdate);
+    conn.db.playerprogress.onDelete(handleProgressDelete);
 
     const progressQuery = `SELECT * FROM playerprogress WHERE GameId = '${gameId}'`;
     const gameQuery = `SELECT * FROM game WHERE Id = '${gameId}'`;
@@ -106,6 +122,7 @@ export const GamePage = () => {
     return () => {
       conn.db.playerprogress.removeOnInsert(handleProgressInsert);
       conn.db.playerprogress.removeOnUpdate(handleProgressUpdate);
+      conn.db.playerprogress.removeOnDelete(handleProgressDelete);
       conn.db.game.removeOnInsert(handleGameInsert);
       conn.db.game.removeOnUpdate(handleGameUpdate);
       pageSubscription.unsubscribe();
@@ -151,6 +168,11 @@ export const GamePage = () => {
     setHasFinished(true);
   }, []);
 
+  const handleKickPlayer = useCallback((targetPlayerId: PlayerProgress["playerId"]) => {
+    if (!conn || !gameId) return;
+    conn.reducers.kickPlayer({ gameId, targetPlayerId });
+  }, [conn, gameId]);
+
   if (!game) {
     return null;
   }
@@ -159,6 +181,7 @@ export const GamePage = () => {
   const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
   const isInLobby = game.state?.tag === "Lobby";
   const isLobby = game.gameType?.tag === "Private" && isInLobby;
+  const isPrivateGameOwner = game.gameType?.tag === "Private" && currentPlayerId && game.owner?.isEqual(currentPlayerId);
   const isCountdown = game.state?.tag === "Countdown";
   const isDisabled = isInLobby || isCountdown;
 
@@ -189,7 +212,7 @@ export const GamePage = () => {
                   return null;
                 }
                 return (
-                  <div key={`loading-${index}`} className="box w-full rounded-lg px-4 py-3 sm:px-8 sm:py-6">
+                  <div key={`loading-${index}`}>
                     <PlayerProgressBar
                       name="Waiting for player..."
                       level={1}
@@ -205,7 +228,7 @@ export const GamePage = () => {
               }
 
               return (
-                <div key={pp.id.toString()} className="box w-full rounded-lg px-4 py-3 sm:px-8 sm:py-6 relative">
+                <div key={pp.id.toString()}>
                   <PlayerProgressBar
                     key={pp.id.toString()}
                     name={pp.playerName}
@@ -219,6 +242,7 @@ export const GamePage = () => {
                     placement={pp.placement}
                     isBot={pp.isBot}
                     isAnonymous={pp.isAnonymous}
+                    onKick={isPrivateGameOwner && !isCurrentPlayer ? () => handleKickPlayer(pp.playerId) : undefined}
                   />
                 </div>
               );
