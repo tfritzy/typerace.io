@@ -85,7 +85,7 @@ export const Cursor = memo(({ targetRef, lerp = .2, fadeDelay = 2000, visible = 
             className={`max-w-0 h-8 -translate-y-px fixed -top-0.5 left-0 ${isBlinking && visible ? 'animate-blink' : ''}`}
             style={{ opacity: visible ? 1 : 0 }}
         >
-            <div className={`h-full rounded-full border-r-2 ${color ? '' : 'border-r-accent'}`} style={color ? { borderColor: color } : undefined} />
+            <div className="h-full rounded-full border-r-2" style={{ borderColor: color || 'var(--color-accent)' }} />
         </div>
     );
 });
