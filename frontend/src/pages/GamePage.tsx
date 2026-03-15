@@ -176,11 +176,26 @@ export const GamePage = () => {
     conn.reducers.kickPlayer({ gameId, targetPlayerId });
   }, [conn, gameId]);
 
+  const currentPlayerId = conn?.identity;
+
+  const ghostCursors: GhostCursor[] = useMemo(() => {
+    if (!currentPlayerId || !game?.phrase) return [];
+    return gamePlayerProgress
+      .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length)
+      .map((pp) => {
+        const hexString = pp.playerId.toHexString();
+        const hashCode = hexString.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        return {
+          position: pp.progressIndex,
+          color: GHOST_CURSOR_COLORS[hashCode % GHOST_CURSOR_COLORS.length],
+        };
+      });
+  }, [gamePlayerProgress, currentPlayerId, game?.phrase]);
+
   if (!game) {
     return null;
   }
 
-  const currentPlayerId = conn?.identity;
   const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
   const isInLobby = game.state?.tag === "Lobby";
   const isLobby = game.gameType?.tag === "Private" && isInLobby;
@@ -195,20 +210,6 @@ export const GamePage = () => {
   const hasCompletedRace = currentPlayerProgress
     ? currentPlayerProgress.progressIndex >= game.phrase.length
     : false;
-
-  const ghostCursors: GhostCursor[] = useMemo(() => {
-    if (!currentPlayerId || !game.phrase) return [];
-    return gamePlayerProgress
-      .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length)
-      .map((pp) => {
-        const hexString = pp.playerId.toHexString();
-        const hashCode = hexString.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        return {
-          position: pp.progressIndex,
-          color: GHOST_CURSOR_COLORS[hashCode % GHOST_CURSOR_COLORS.length],
-        };
-      });
-  }, [gamePlayerProgress, currentPlayerId, game.phrase]);
 
   return (
     <div className="relative h-full flex flex-col">
