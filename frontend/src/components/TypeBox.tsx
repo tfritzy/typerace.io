@@ -247,12 +247,21 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       }
     }, []);
 
-    const ghostCursorRefs = useRef<Map<string, HTMLSpanElement | null>>(new Map());
+    const ghostCursorRefs = useRef<Map<string, { current: HTMLSpanElement | null }>>(new Map());
 
     const stableGhostKeys = useMemo(() => {
       if (!ghostCursors) return [];
       return ghostCursors.map((gc, i) => `ghost-${i}-${gc.color}`);
     }, [ghostCursors]);
+
+    const getGhostRef = useCallback((key: string) => {
+      let ref = ghostCursorRefs.current.get(key);
+      if (!ref) {
+        ref = { current: null };
+        ghostCursorRefs.current.set(key, ref);
+      }
+      return ref;
+    }, []);
 
     const renderText = () => {
       const chars = phrase.split("");
@@ -264,15 +273,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
         if (phrase[i] === " ") {
           lastCompletedWordEnd = i + 1;
-        }
-      }
-
-      const ghostPositions = new Set<number>();
-      if (ghostCursors) {
-        for (const gc of ghostCursors) {
-          if (gc.position >= 0 && gc.position < chars.length) {
-            ghostPositions.add(gc.position);
-          }
         }
       }
 
@@ -299,12 +299,12 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         if (ghostCursors) {
           ghostCursors.forEach((gc, gcIndex) => {
             if (gc.position === i) {
+              const key = stableGhostKeys[gcIndex];
+              const ref = getGhostRef(key);
               ghostCursorTargets.push(
                 <span
-                  key={stableGhostKeys[gcIndex]}
-                  ref={(el) => {
-                    ghostCursorRefs.current.set(stableGhostKeys[gcIndex], el);
-                  }}
+                  key={key}
+                  ref={(el) => { ref.current = el; }}
                 />
               );
             }
@@ -356,7 +356,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               return (
                 <Cursor
                   key={key}
-                  targetRef={{ current: ghostCursorRefs.current.get(key) ?? null } as React.RefObject<HTMLElement | null>}
+                  targetRef={getGhostRef(key) as React.RefObject<HTMLElement | null>}
                   lerp={0.15}
                   fadeDelay={Infinity}
                   visible={true}
