@@ -134,6 +134,17 @@ public static partial class Module
     private const long PRACTICE_GAME_COUNTDOWN_START_DELAY_MICROSECONDS = 1_000_000;
     private const int EVENT_SIZE_BYTES = 3;
     private const ushort MAX_DECISECONDS = ushort.MaxValue;
+    private const long BOT_RECOGNITION_DELAY_MIN_MICROSECONDS = 100_000;
+    private const long BOT_RECOGNITION_DELAY_RANGE_MICROSECONDS = 300_000;
+    private const long BOT_HESITATION_DELAY_MIN_MICROSECONDS = 400_000;
+    private const long BOT_HESITATION_DELAY_RANGE_MICROSECONDS = 600_000;
+    private const long BOT_MIN_KEYSTROKE_DELAY_MICROSECONDS = 50_000;
+    private const double BOT_BURST_PROBABILITY = 0.10;
+    private const double BOT_HESITATION_PROBABILITY = 0.04;
+    private const double BOT_BURST_SPEED_MULTIPLIER = 0.65;
+    private const double BOT_BACKSPACE_SPEED_MULTIPLIER = 0.6;
+    private const double BOT_RECOVERY_DELAY_MIN_MULTIPLIER = 0.5;
+    private const double BOT_RECOVERY_DELAY_RANGE_MULTIPLIER = 0.5;
 
     private static byte[] EncodeCharacterEvent(long gameStartMicros, long eventMicros, CharacterEventType eventType)
     {
@@ -927,18 +938,39 @@ public static partial class Module
 
                 if (shouldError)
                 {
+                    var phrase = game.Value.Phrase;
+                    var progressIndex = progress.Value.ProgressIndex;
+
+                    int wordStart = progressIndex;
+                    while (wordStart > 0 && phrase[wordStart - 1] != ' ')
+                    {
+                        wordStart--;
+                    }
+                    int charsToDelete = progressIndex - wordStart;
+
                     var updatedProgress = progress.Value;
                     AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, CharacterEventType.Incorrect);
-                    AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, CharacterEventType.Backspace);
+
+                    long recognitionDelay = BOT_RECOGNITION_DELAY_MIN_MICROSECONDS + (long)(ctx.Rng.NextDouble() * BOT_RECOGNITION_DELAY_RANGE_MICROSECONDS);
+                    long backspaceInterval = (long)(botConfig.TypingRate * BOT_BACKSPACE_SPEED_MULTIPLIER);
+
+                    for (int i = 0; i <= charsToDelete; i++)
+                    {
+                        long eventTime = ctx.Timestamp.MicrosecondsSinceUnixEpoch + recognitionDelay + i * backspaceInterval;
+                        AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, eventTime, CharacterEventType.Backspace);
+                    }
+
+                    updatedProgress.ProgressIndex = wordStart;
                     ctx.Db.playerprogress.Id.Update(updatedProgress);
 
-                    var errorDelay = new TimeDuration { Microseconds = (long)(botConfig.TypingRate * 0.5) };
+                    long totalBackspaceTime = recognitionDelay + (charsToDelete + 1) * backspaceInterval;
+                    long recoveryDelay = (long)(botConfig.TypingRate * (BOT_RECOVERY_DELAY_MIN_MULTIPLIER + ctx.Rng.NextDouble() * BOT_RECOVERY_DELAY_RANGE_MULTIPLIER));
                     ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
                     {
                         ScheduledId = 0,
                         PlayerProgressId = args.PlayerProgressId,
                         PhraseLength = args.PhraseLength,
-                        ScheduledAt = new ScheduleAt.Time(ctx.Timestamp + errorDelay)
+                        ScheduledAt = new ScheduleAt.Time(ctx.Timestamp + new TimeDuration { Microseconds = totalBackspaceTime + recoveryDelay })
                     });
                 }
                 else
@@ -948,18 +980,50 @@ public static partial class Module
 
                     if (newIndex < args.PhraseLength)
                     {
-                        var delay = new TimeDuration { Microseconds = GenerateBotDelayWithVariance(ctx.Rng, botConfig.TypingRate) };
+                        bool justTypedSpace = progress.Value.ProgressIndex < game.Value.Phrase.Length &&
+                                              game.Value.Phrase[progress.Value.ProgressIndex] == ' ';
+
+                        var delay = GenerateRealisticBotDelay(ctx.Rng, botConfig.TypingRate, justTypedSpace);
                         ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
                         {
                             ScheduledId = 0,
                             PlayerProgressId = args.PlayerProgressId,
                             PhraseLength = args.PhraseLength,
-                            ScheduledAt = new ScheduleAt.Time(ctx.Timestamp + delay)
+                            ScheduledAt = new ScheduleAt.Time(ctx.Timestamp + new TimeDuration { Microseconds = delay })
                         });
                     }
                 }
             }
         }
+    }
+
+    private static long GenerateRealisticBotDelay(Random rng, double baseTypingRate, bool justTypedSpace)
+    {
+        bool inBurst = rng.NextDouble() < BOT_BURST_PROBABILITY;
+        bool hesitate = !inBurst && rng.NextDouble() < BOT_HESITATION_PROBABILITY;
+
+        double rate = baseTypingRate;
+
+        if (inBurst)
+        {
+            rate *= BOT_BURST_SPEED_MULTIPLIER;
+        }
+
+        if (justTypedSpace)
+        {
+            rate *= 1.5 + rng.NextDouble() * 1.0;
+        }
+
+        var variance = 0.2;
+        var randomFactor = 1.0 + (rng.NextDouble() * 2.0 - 1.0) * variance;
+        long delay = (long)(rate * randomFactor);
+
+        if (hesitate)
+        {
+            delay += BOT_HESITATION_DELAY_MIN_MICROSECONDS + (long)(rng.NextDouble() * BOT_HESITATION_DELAY_RANGE_MICROSECONDS);
+        }
+
+        return Math.Max(delay, BOT_MIN_KEYSTROKE_DELAY_MICROSECONDS);
     }
 
     private static long GenerateBotDelayWithVariance(Random rng, double baseTypingRate)
