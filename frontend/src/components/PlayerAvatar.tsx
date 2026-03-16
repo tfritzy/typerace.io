@@ -113,7 +113,7 @@ export const PlayerAvatar = memo(({
             ) : photoUrl && !imageFailed ? (
                 <img
                     src={photoUrl}
-                    alt=""
+                    alt="Profile photo"
                     width={size}
                     height={size}
                     className="rounded-full object-cover"

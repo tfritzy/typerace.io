@@ -538,16 +538,6 @@ public static partial class Module
             }
 
             ctx.Db.player.Identity.Update(updatedPlayer);
-
-            foreach (var progress in ctx.Db.playerprogress.PlayerId.Filter(ctx.Sender))
-            {
-                var updatedProgress = progress;
-                updatedProgress.IsAnonymous = isAnonymous;
-                updatedProgress.PlayerName = updatedPlayer.Name;
-                updatedProgress.PlayerPhotoUrl = updatedPlayer.PhotoUrl;
-                ctx.Db.playerprogress.Id.Update(updatedProgress);
-            }
-
             Log.Info($"Updated anonymous status for {ctx.Sender} to {isAnonymous}");
         }
     }
