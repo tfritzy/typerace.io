@@ -25,6 +25,7 @@ function getAvatarColorsFromCSS(): string[] {
 export const PlayerAvatar = memo(({
     size,
     identity,
+    isHighlighted = false,
     isLoading = false,
     placement,
     playerColorTag,
@@ -64,21 +65,45 @@ export const PlayerAvatar = memo(({
         return null;
     };
 
-    const getBorderColor = (place: number) => {
-        if (place === 1) return 'var(--medal-gold)';
-        if (place === 2) return 'var(--medal-silver)';
-        if (place === 3) return 'var(--medal-bronze)';
-        return null;
-    };
-
     const crownColor = placement ? getCrownColor(placement) : null;
     const medalColor = placement ? getMedalColor(placement) : null;
-    const borderColor = placement ? getBorderColor(placement) : null;
+    const ringColor = isHighlighted ? 'var(--accent-primary)' : avatarColors[2];
+
+    let avatarContent;
+    if (isLoading) {
+        avatarContent = (
+            <div
+                className="bg-muted rounded-full"
+                style={{ width: size, height: size }}
+            />
+        );
+    } else if (photoUrl && !imageFailed) {
+        avatarContent = (
+            <img
+                src={photoUrl}
+                alt="Profile photo"
+                width={size}
+                height={size}
+                className="rounded-full object-cover"
+                onError={() => setImageFailed(true)}
+                referrerPolicy="no-referrer"
+            />
+        );
+    } else {
+        avatarContent = (
+            <Avatar
+                size={size}
+                name={identity}
+                variant="beam"
+                colors={avatarColors}
+            />
+        );
+    }
 
     return (
         <div
             className={`relative shrink-0 border-2 rounded-full ${isLoading ? 'border-dashed' : ''}`}
-            style={{ borderColor: borderColor || avatarColors[2] }}
+            style={{ borderColor: ringColor }}
         >
             {crownColor && (
                 <div
@@ -105,29 +130,7 @@ export const PlayerAvatar = memo(({
                     />
                 </div>
             )}
-            {isLoading ? (
-                <div
-                    className="bg-muted rounded-full"
-                    style={{ width: size, height: size }}
-                />
-            ) : photoUrl && !imageFailed ? (
-                <img
-                    src={photoUrl}
-                    alt="Profile photo"
-                    width={size}
-                    height={size}
-                    className="rounded-full object-cover"
-                    onError={() => setImageFailed(true)}
-                    referrerPolicy="no-referrer"
-                />
-            ) : (
-                <Avatar
-                    size={size}
-                    name={identity}
-                    variant="beam"
-                    colors={avatarColors}
-                />
-            )}
+            {avatarContent}
         </div>
     );
 });

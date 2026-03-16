@@ -202,6 +202,7 @@ public static partial class Module
         public BotConfig? BotConfig;
         public PlayerColor Color;
         public bool IsAnonymous;
+        [Default("")]
         public string? PhotoUrl;
         public long LastGameDate;
     }
@@ -377,6 +378,7 @@ public static partial class Module
         public int ProgressIndex;
         public bool IsBot;
         public bool IsAnonymous;
+        [Default("")]
         public string? PlayerPhotoUrl;
         public long CreatedAt;
         public byte[] CharacterHistory;

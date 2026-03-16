@@ -177,7 +177,7 @@ export const ProfilePage = () => {
                             <PlayerAvatar
                                 size={80}
                                 identity={viewedPlayer.identity.toHexString()}
-                                isHighlighted={true}
+                                isHighlighted={!!isOwnProfile}
                                 photoUrl={viewedPlayer.photoUrl}
                             />
 
