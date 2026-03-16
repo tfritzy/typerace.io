@@ -10,6 +10,8 @@ import type { ChartOptions } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import type { PlayerProgress } from '../types/stdb';
 import { getAggWpmBySecond } from '../utils/wpmCalculator';
+import { getPlayerColorHex } from '../utils/colorMapping';
+import { useDatabase } from '../contexts/SpacetimeContext';
 
 ChartJS.register(
     LinearScale,
@@ -28,15 +30,8 @@ export const AllPlayersWpmChart = ({
     allPlayerProgress,
     raceStartTimestamp
 }: AllPlayersWpmChartProps) => {
+    const conn = useDatabase();
     const style = getComputedStyle(document.documentElement);
-    const playerColors = [
-        style.getPropertyValue('--accent-primary').trim(),
-        style.getPropertyValue('--chart-1').trim(),
-        style.getPropertyValue('--chart-2').trim(),
-        style.getPropertyValue('--chart-3').trim(),
-        style.getPropertyValue('--chart-4').trim(),
-        style.getPropertyValue('--chart-5').trim(),
-    ];
 
     const resolvedColors = {
         gridLine: style.getPropertyValue('--grid-line').trim(),
@@ -46,11 +41,16 @@ export const AllPlayersWpmChart = ({
         input: style.getPropertyValue('--input').trim(),
         border: style.getPropertyValue('--border').trim(),
     };
-    const datasets = allPlayerProgress.map((playerProgress, index) => {
+    const datasets = allPlayerProgress.map((playerProgress) => {
         const wpmData = getAggWpmBySecond(
             playerProgress.characterHistory,
             raceStartTimestamp
         );
+        const currentPlayerId = conn?.identity;
+        const isCurrentPlayer = currentPlayerId && playerProgress.playerId.isEqual(currentPlayerId);
+        const lineColor = isCurrentPlayer
+            ? style.getPropertyValue('--accent-primary').trim()
+            : getPlayerColorHex(playerProgress.playerColor?.tag ?? '');
 
         return {
             label: playerProgress.playerName,
@@ -58,8 +58,8 @@ export const AllPlayersWpmChart = ({
                 x: second,
                 y: wpm
             })),
-            borderColor: playerColors[index % playerColors.length],
-            backgroundColor: playerColors[index % playerColors.length],
+            borderColor: lineColor,
+            backgroundColor: lineColor,
             pointRadius: 0,
             pointHoverRadius: 8,
             pointHitRadius: 20,
