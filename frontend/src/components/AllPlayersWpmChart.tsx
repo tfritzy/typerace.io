@@ -11,6 +11,7 @@ import { Line } from 'react-chartjs-2';
 import type { PlayerProgress } from '../types/stdb';
 import { getAggWpmBySecond } from '../utils/wpmCalculator';
 import { getPlayerColorHex } from '../utils/colorMapping';
+import { useDatabase } from '../contexts/SpacetimeContext';
 
 ChartJS.register(
     LinearScale,
@@ -29,6 +30,7 @@ export const AllPlayersWpmChart = ({
     allPlayerProgress,
     raceStartTimestamp
 }: AllPlayersWpmChartProps) => {
+    const conn = useDatabase();
     const style = getComputedStyle(document.documentElement);
 
     const resolvedColors = {
@@ -44,6 +46,11 @@ export const AllPlayersWpmChart = ({
             playerProgress.characterHistory,
             raceStartTimestamp
         );
+        const currentPlayerId = conn?.identity;
+        const isCurrentPlayer = currentPlayerId && playerProgress.playerId.isEqual(currentPlayerId);
+        const lineColor = isCurrentPlayer
+            ? style.getPropertyValue('--accent-primary').trim()
+            : getPlayerColorHex(playerProgress.playerColor?.tag ?? '');
 
         return {
             label: playerProgress.playerName,
@@ -51,8 +58,8 @@ export const AllPlayersWpmChart = ({
                 x: second,
                 y: wpm
             })),
-            borderColor: getPlayerColorHex(playerProgress.playerColor?.tag ?? ''),
-            backgroundColor: getPlayerColorHex(playerProgress.playerColor?.tag ?? ''),
+            borderColor: lineColor,
+            backgroundColor: lineColor,
             pointRadius: 0,
             pointHoverRadius: 8,
             pointHitRadius: 20,
