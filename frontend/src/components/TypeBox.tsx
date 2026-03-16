@@ -269,10 +269,13 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           colorClass = 'text-foreground';
         }
 
+        const isError = isTyped && !isCorrect;
+
         return (
           <span
             key={i}
-            className={`transition-all duration-150 ${colorClass} ${isTyped && !isCorrect ? "underline decoration-2 decoration-destructive" : ""}`}
+            data-char-index={i}
+            className={`transition-all duration-150 ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
           >
             {isCursor && <span id="target" ref={targetRef} />}
             {char}
