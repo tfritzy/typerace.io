@@ -19,6 +19,7 @@ type PlayerProgressBarProps = {
     isAnonymous?: boolean;
     onKick?: () => void;
     playerColorTag?: string;
+    photoUrl?: string | null;
 };
 
 export const PlayerProgressBar = memo(({
@@ -36,6 +37,7 @@ export const PlayerProgressBar = memo(({
     isAnonymous = false,
     onKick,
     playerColorTag,
+    photoUrl,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
     const progressGradient = useMemo(
@@ -62,6 +64,7 @@ export const PlayerProgressBar = memo(({
                     isLoading={isLoading}
                     placement={placement}
                     playerColorTag={playerColorTag}
+                    photoUrl={photoUrl}
                 />
             ) : (
                 <Link key="avatar-link" to={`/profile/${playerPublicId}`} className="shrink-0">
@@ -73,6 +76,7 @@ export const PlayerProgressBar = memo(({
                         isLoading={isLoading}
                         placement={placement}
                         playerColorTag={playerColorTag}
+                        photoUrl={photoUrl}
                     />
                 </Link>
             )}

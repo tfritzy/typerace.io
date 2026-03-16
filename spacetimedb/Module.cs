@@ -202,6 +202,7 @@ public static partial class Module
         public BotConfig? BotConfig;
         public PlayerColor Color;
         public bool IsAnonymous;
+        public string? PhotoUrl;
         public long LastGameDate;
     }
 
@@ -376,6 +377,7 @@ public static partial class Module
         public int ProgressIndex;
         public bool IsBot;
         public bool IsAnonymous;
+        public string? PlayerPhotoUrl;
         public long CreatedAt;
         public byte[] CharacterHistory;
         public long Time;
@@ -505,6 +507,7 @@ public static partial class Module
                 BotConfig = null,
                 Color = GenerateRandomColor(ctx.Rng),
                 IsAnonymous = true,
+                PhotoUrl = null,
                 LastGameDate = 0
             });
             Log.Info($"Created player record for new client {ctx.Sender}");
@@ -517,7 +520,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void syncAnonymousStatus(ReducerContext ctx, bool isAnonymous)
+    public static void syncAnonymousStatus(ReducerContext ctx, bool isAnonymous, string? photoUrl)
     {
         var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
 
@@ -525,6 +528,7 @@ public static partial class Module
         {
             var updatedPlayer = existingPlayer.Value;
             updatedPlayer.IsAnonymous = isAnonymous;
+            updatedPlayer.PhotoUrl = isAnonymous ? null : photoUrl;
 
             if (!isAnonymous && updatedPlayer.Name.StartsWith("Anonymous "))
             {
@@ -534,6 +538,16 @@ public static partial class Module
             }
 
             ctx.Db.player.Identity.Update(updatedPlayer);
+
+            foreach (var progress in ctx.Db.playerprogress.PlayerId.Filter(ctx.Sender))
+            {
+                var updatedProgress = progress;
+                updatedProgress.IsAnonymous = isAnonymous;
+                updatedProgress.PlayerName = updatedPlayer.Name;
+                updatedProgress.PlayerPhotoUrl = updatedPlayer.PhotoUrl;
+                ctx.Db.playerprogress.Id.Update(updatedProgress);
+            }
+
             Log.Info($"Updated anonymous status for {ctx.Sender} to {isAnonymous}");
         }
     }
@@ -769,6 +783,7 @@ public static partial class Module
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
         var playerPublicId = player?.PlayerId ?? "";
+        var playerPhotoUrl = player?.PhotoUrl;
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
         {
@@ -781,6 +796,7 @@ public static partial class Module
             ProgressIndex = 0,
             IsBot = false,
             IsAnonymous = isAnonymous,
+            PlayerPhotoUrl = playerPhotoUrl,
             CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
             CharacterHistory = new byte[0],
             Time = 0,
@@ -843,6 +859,7 @@ public static partial class Module
                     ProgressIndex = 0,
                     IsBot = true,
                     IsAnonymous = false,
+                    PlayerPhotoUrl = selectedBot.PhotoUrl,
                     CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
                     CharacterHistory = new byte[0],
                     Time = 0,
@@ -1273,6 +1290,7 @@ public static partial class Module
                 var playerLevel = player?.Level ?? 1;
                 var isAnonymous = player?.IsAnonymous ?? true;
                 var playerPublicId = player?.PlayerId ?? "";
+                var playerPhotoUrl = player?.PhotoUrl;
 
                 ctx.Db.playerprogress.Insert(new PlayerProgress
                 {
@@ -1285,6 +1303,7 @@ public static partial class Module
                     ProgressIndex = 0,
                     IsBot = false,
                     IsAnonymous = isAnonymous,
+                    PlayerPhotoUrl = playerPhotoUrl,
                     CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
                     CharacterHistory = new byte[0],
                     Time = 0,

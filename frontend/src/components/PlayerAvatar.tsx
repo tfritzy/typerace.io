@@ -10,6 +10,7 @@ type PlayerAvatarProps = {
     isLoading?: boolean;
     placement?: number;
     playerColorTag?: string;
+    photoUrl?: string | null;
 };
 
 function getAvatarColorsFromCSS(): string[] {
@@ -26,9 +27,11 @@ export const PlayerAvatar = memo(({
     identity,
     isLoading = false,
     placement,
-    playerColorTag
+    playerColorTag,
+    photoUrl
 }: PlayerAvatarProps) => {
     const [fallbackColors, setFallbackColors] = useState(getAvatarColorsFromCSS);
+    const [imageFailed, setImageFailed] = useState(false);
 
     const onThemeChange = useCallback(() => {
         setFallbackColors(getAvatarColorsFromCSS());
@@ -38,6 +41,10 @@ export const PlayerAvatar = memo(({
         window.addEventListener('themechange', onThemeChange);
         return () => window.removeEventListener('themechange', onThemeChange);
     }, [onThemeChange]);
+
+    useEffect(() => {
+        setImageFailed(false);
+    }, [photoUrl]);
 
     const avatarColors = useMemo(
         () => playerColorTag ? getPlayerAvatarColors(playerColorTag) : fallbackColors,
@@ -102,6 +109,16 @@ export const PlayerAvatar = memo(({
                 <div
                     className="bg-muted rounded-full"
                     style={{ width: size, height: size }}
+                />
+            ) : photoUrl && !imageFailed ? (
+                <img
+                    src={photoUrl}
+                    alt=""
+                    width={size}
+                    height={size}
+                    className="rounded-full object-cover"
+                    onError={() => setImageFailed(true)}
+                    referrerPolicy="no-referrer"
                 />
             ) : (
                 <Avatar

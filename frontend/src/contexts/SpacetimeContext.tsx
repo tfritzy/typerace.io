@@ -49,7 +49,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
             const connection = builder
                 .onConnect((conn) => {
                     console.log('Connected to SpacetimeDB');
-                    conn.reducers.syncAnonymousStatus({ isAnonymous: !user });
+                    conn.reducers.syncAnonymousStatus({ isAnonymous: !user, photoUrl: user?.photoURL ?? undefined });
                     setConn(conn);
                     setShowReconnectModal(false);
                     setIsReconnecting(false);

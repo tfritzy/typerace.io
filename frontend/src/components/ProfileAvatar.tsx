@@ -125,11 +125,12 @@ export const ProfileAvatar = memo(() => {
           className="flex items-center gap-4 rounded-lg cursor-pointer hover:bg-muted transition-colors"
         >
           <div className="relative" ref={avatarRef}>
-            <PlayerAvatar
-              size={40}
-              identity={identityHash}
-              isHighlighted={false}
-            />
+              <PlayerAvatar
+                size={40}
+                identity={identityHash}
+                isHighlighted={false}
+                photoUrl={myPlayer.photoUrl}
+              />
           </div>
 
           <div className="hidden sm:flex flex-col items-start gap-1.5 min-w-50">
@@ -224,6 +225,7 @@ export const ProfileAvatar = memo(() => {
           size={40}
           identity={identityHash}
           isHighlighted={true}
+          photoUrl={myPlayer.photoUrl}
         />
       </div>
 

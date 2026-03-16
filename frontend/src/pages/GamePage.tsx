@@ -256,6 +256,7 @@ export const GamePage = () => {
                     isAnonymous={pp.isAnonymous}
                     onKick={isPrivateGameOwner && !isCurrentPlayer ? () => handleKickPlayer(pp.playerId) : undefined}
                     playerColorTag={isCurrentPlayer ? undefined : pp.playerColor?.tag}
+                    photoUrl={pp.playerPhotoUrl}
                   />
                 </div>
               );

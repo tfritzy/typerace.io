@@ -40,6 +40,7 @@ export const AllPlayersResults = ({
                                 <PlayerAvatar
                                     size={24}
                                     identity={pp.playerId.toHexString()}
+                                    photoUrl={pp.playerPhotoUrl}
                                 />
                                 {pp.playerName}
                             </button>
