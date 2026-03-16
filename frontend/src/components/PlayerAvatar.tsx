@@ -13,6 +13,8 @@ type PlayerAvatarProps = {
     photoUrl?: string | null;
 };
 
+const DEFAULT_RING_COLOR_INDEX = 2;
+
 function getAvatarColorsFromCSS(): string[] {
     const style = getComputedStyle(document.documentElement);
     return [
@@ -67,7 +69,8 @@ export const PlayerAvatar = memo(({
 
     const crownColor = placement ? getCrownColor(placement) : null;
     const medalColor = placement ? getMedalColor(placement) : null;
-    const ringColor = isHighlighted ? 'var(--accent-primary)' : avatarColors[2];
+    const defaultRingColor = avatarColors[DEFAULT_RING_COLOR_INDEX] || 'var(--accent-primary)';
+    const ringColor = isHighlighted ? 'var(--accent-primary)' : defaultRingColor;
 
     let avatarContent;
     if (isLoading) {

@@ -37,13 +37,13 @@ export const AllPlayersResults = ({
                                 onClick={() => setSelectedPlayerId(pp.playerId.toHexString())}
                                 className={`px-3 py-2 border rounded-md text-[13px] font-semibold cursor-pointer transition-all duration-200 tracking-wide flex items-center gap-2 border-border ${isSelected ? 'bg-secondary text-secondary-foreground' : 'bg-transparent text-muted-foreground'}`}
                             >
-                                <PlayerAvatar
-                                    size={24}
-                                    identity={pp.playerId.toHexString()}
-                                    isHighlighted={pp.playerId.toHexString() === initialSelectedPlayerId}
-                                    playerColorTag={pp.playerColor.tag}
-                                    photoUrl={pp.playerPhotoUrl}
-                                />
+                                    <PlayerAvatar
+                                        size={24}
+                                        identity={pp.playerId.toHexString()}
+                                        isHighlighted={pp.playerId.toHexString() === initialSelectedPlayerId}
+                                        playerColorTag={pp.playerColor?.tag}
+                                        photoUrl={pp.playerPhotoUrl}
+                                    />
                                 {pp.playerName}
                             </button>
                         );
