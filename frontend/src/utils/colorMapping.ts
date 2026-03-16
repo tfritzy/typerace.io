@@ -25,24 +25,11 @@ export function getColorConfig(tag: ThemeTag): ColorConfig {
 
 const PLAYER_COLOR_HEX: Record<string, string> = {
     Coral: '#E06C75',
-    Red: '#E06C75',
-    Orange: '#E06C75',
-    Rose: '#E06C75',
     Teal: '#56B6C2',
-    Cyan: '#56B6C2',
     Purple: '#C678DD',
-    Violet: '#C678DD',
-    Indigo: '#C678DD',
-    Fuchsia: '#C678DD',
-    Pink: '#C678DD',
     Green: '#98C379',
-    Lime: '#98C379',
-    Emerald: '#98C379',
     Gold: '#E5C07B',
-    Amber: '#E5C07B',
-    Yellow: '#E5C07B',
     Blue: '#61AFEF',
-    Sky: '#61AFEF',
 };
 
 export function getPlayerColorHex(playerColorTag: string): string {

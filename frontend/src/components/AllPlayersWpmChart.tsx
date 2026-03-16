@@ -10,7 +10,6 @@ import type { ChartOptions } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import type { PlayerProgress } from '../types/stdb';
 import { getAggWpmBySecond } from '../utils/wpmCalculator';
-import { getPlayerColorHex } from '../utils/colorMapping';
 
 ChartJS.register(
     LinearScale,
@@ -30,6 +29,14 @@ export const AllPlayersWpmChart = ({
     raceStartTimestamp
 }: AllPlayersWpmChartProps) => {
     const style = getComputedStyle(document.documentElement);
+    const playerColors = [
+        style.getPropertyValue('--accent-primary').trim(),
+        style.getPropertyValue('--chart-1').trim(),
+        style.getPropertyValue('--chart-2').trim(),
+        style.getPropertyValue('--chart-3').trim(),
+        style.getPropertyValue('--chart-4').trim(),
+        style.getPropertyValue('--chart-5').trim(),
+    ];
 
     const resolvedColors = {
         gridLine: style.getPropertyValue('--grid-line').trim(),
@@ -39,7 +46,7 @@ export const AllPlayersWpmChart = ({
         input: style.getPropertyValue('--input').trim(),
         border: style.getPropertyValue('--border').trim(),
     };
-    const datasets = allPlayerProgress.map((playerProgress) => {
+    const datasets = allPlayerProgress.map((playerProgress, index) => {
         const wpmData = getAggWpmBySecond(
             playerProgress.characterHistory,
             raceStartTimestamp
@@ -51,8 +58,8 @@ export const AllPlayersWpmChart = ({
                 x: second,
                 y: wpm
             })),
-            borderColor: getPlayerColorHex(playerProgress.playerColor?.tag ?? ''),
-            backgroundColor: getPlayerColorHex(playerProgress.playerColor?.tag ?? ''),
+            borderColor: playerColors[index % playerColors.length],
+            backgroundColor: playerColors[index % playerColors.length],
             pointRadius: 0,
             pointHoverRadius: 8,
             pointHitRadius: 20,
