@@ -79,8 +79,8 @@ export const GhostCursor = memo(({ charIndex, lerp = 0.15, color }: GhostCursorP
     return (
         <div
             ref={followerRef}
-            className="fixed top-0 left-0 pointer-events-none"
-            style={{ width: '10px', height: '2px', backgroundColor: color }}
+            className="fixed top-0 left-0 pointer-events-none opacity-20 w-[10px] h-[2px]"
+            style={{ backgroundColor: color }}
         />
     );
 });

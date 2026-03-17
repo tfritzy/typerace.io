@@ -65,25 +65,23 @@ public enum CharacterEventType
 [Type]
 public enum PlayerColor
 {
-    Coral,
     Red,
     Orange,
-    Rose,
-    Teal,
-    Cyan,
-    Purple,
-    Violet,
-    Indigo,
-    Fuchsia,
-    Pink,
-    Green,
-    Lime,
-    Emerald,
-    Gold,
     Amber,
     Yellow,
+    Lime,
+    Green,
+    Emerald,
+    Teal,
+    Cyan,
+    Sky,
     Blue,
-    Sky
+    Indigo,
+    Violet,
+    Purple,
+    Fuchsia,
+    Pink,
+    Rose
 }
 
 
