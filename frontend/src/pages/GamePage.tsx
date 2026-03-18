@@ -144,12 +144,11 @@ export const GamePage = () => {
     );
 
     if (currentPlayerProgress && game.phrase) {
-      const hasCompletedRace = currentPlayerProgress.progressIndex >= game.phrase.length;
-      setHasFinished(hasCompletedRace);
+      if (currentPlayerProgress.progressIndex >= game.phrase.length) {
+        setHasFinished(true);
+      }
     } else if (gamePlayerProgress.length > 0 && !currentPlayerProgress) {
       setHasFinished(true);
-    } else {
-      setHasFinished(false);
     }
   }, [conn, game, gamePlayerProgress]);
 
