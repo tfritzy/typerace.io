@@ -3,6 +3,7 @@ import { type GameMode } from "../types/stdb";
 import { ChevronDown, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
 import { getContentTypeFromMode, type ContentTypeValue, type LanguageInfo } from "../utils/modes";
 import { LanguageDropdown } from "./LanguageDropdown";
+import { getTranslations } from "../utils/translations";
 
 export type GameTypeValue = "Public" | "Private" | "Practice";
 
@@ -43,6 +44,13 @@ function ModeButton({ isSelected, onClick, icon, label, disabled }: ModeButtonPr
 export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setGameType, currentLang }: GameOptionsSelectorProps) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [contentType, setContentType] = useState<ContentTypeValue>(() => getContentTypeFromMode(selectedMode.tag));
+    const t = getTranslations();
+
+    const gameTypeLabel = (type: GameTypeValue): string => {
+        if (type === "Public") return t.publicMatch;
+        if (type === "Private") return t.privateLobby;
+        return t.practiceMode;
+    };
 
     const selectedLanguage = currentLang;
 
@@ -64,12 +72,12 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
     return (
         <>
             <div className="hidden md:flex items-center justify-center gap-1 flex-wrap">
-                <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label="Public Match" />
-                <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label="Private Lobby" />
-                <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label="Practice Mode" />
+                <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label={t.publicMatch} />
+                <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label={t.privateLobby} />
+                <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label={t.practiceMode} />
                 <span className="mx-2 text-border-hover select-none">|</span>
-                <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label="Random Words" />
-                <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label="Quotes" disabled={!quotesAvailableForLanguage} />
+                <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
+                <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label={t.quotes} disabled={!quotesAvailableForLanguage} />
                 <span className="mx-2 text-border-hover select-none">|</span>
                 <LanguageDropdown />
             </div>
@@ -82,7 +90,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     {gameType === "Public" && <Globe size={16} />}
                     {gameType === "Private" && <Lock size={16} />}
                     {gameType === "Practice" && <Target size={16} />}
-                    <span>{gameType} · {contentType === "Quotes" ? "Quotes" : "Random Words"}</span>
+                    <span>{gameTypeLabel(gameType)} · {contentType === "Quotes" ? t.quotes : t.randomWords}</span>
                     <ChevronDown size={16} />
                 </button>
                 <LanguageDropdown />
@@ -97,7 +105,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     <div className="fixed inset-x-0 bottom-0 z-50 md:hidden animate-slideUp">
                         <div className="bg-card border-t border-border rounded-t-2xl max-h-[70vh] overflow-y-auto">
                             <div className="sticky top-0 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
-                                <h3 className="text-foreground text-lg font-medium">Game Options</h3>
+                                <h3 className="text-foreground text-lg font-medium">{t.gameOptions}</h3>
                                 <button
                                     onClick={() => setIsDrawerOpen(false)}
                                     className="text-muted-foreground hover:text-foreground transition-colors"
@@ -106,16 +114,16 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                 </button>
                             </div>
                             <div className="p-4 pb-8">
-                                <h3 className="text-secondary-foreground text-sm font-medium mb-3 uppercase tracking-wider">Match Type</h3>
+                                <h3 className="text-secondary-foreground text-sm font-medium mb-3 uppercase tracking-wider">{t.matchType}</h3>
                                 <div className="flex flex-wrap gap-2 mb-6">
-                                    <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label="Public Match" />
-                                    <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label="Private Lobby" />
-                                    <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label="Practice Mode" />
+                                    <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label={t.publicMatch} />
+                                    <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label={t.privateLobby} />
+                                    <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label={t.practiceMode} />
                                 </div>
-                                <h3 className="text-secondary-foreground text-sm font-medium mb-3 uppercase tracking-wider">Mode</h3>
+                                <h3 className="text-secondary-foreground text-sm font-medium mb-3 uppercase tracking-wider">{t.mode}</h3>
                                 <div className="flex flex-wrap gap-2 mb-6">
-                                    <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label="Random Words" />
-                                    <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label="Quotes" disabled={!quotesAvailableForLanguage} />
+                                    <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
+                                    <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label={t.quotes} disabled={!quotesAvailableForLanguage} />
                                 </div>
                             </div>
                         </div>
