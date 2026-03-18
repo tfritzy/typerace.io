@@ -5,6 +5,7 @@ import { type GameMode } from "../types/stdb";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { useFindGame } from "../hooks/useFindGame";
 import { getLangHome } from "../utils/modes";
+import { getTranslations } from "../utils/translations";
 
 type ActionBarProps = {
   mode?: GameMode;
@@ -17,6 +18,7 @@ type ActionBarProps = {
 export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: ActionBarProps) => {
   const navigate = useNavigate();
   const { findGame } = useFindGame();
+  const t = getTranslations();
 
   const canRematch = !rematchDisabled;
 
@@ -53,7 +55,7 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
         onClick={() => navigate(getLangHome())}
         className="box rounded-lg px-8 py-4 bg-transparent text-foreground text-base font-semibold cursor-pointer opacity-80 flex-1"
       >
-        Main Menu <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">M</span>
+        {t.mainMenu} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">M</span>
       </button>
       {gameId && gameType === "Private" && (
         <div className="relative flex-1 group">
@@ -63,11 +65,11 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
             className={`box rounded-lg px-8 py-4 bg-transparent text-foreground text-base font-semibold w-full ${canRematch ? 'cursor-pointer opacity-80' : 'cursor-not-allowed opacity-40'
               }`}
           >
-            Rematch <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">R</span>
+            {t.rematch} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">R</span>
           </button>
           {!canRematch && (
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-foreground text-sm rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
-              Only the game owner can start a rematch
+              {t.ownerRematchOnly}
               <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/90"></div>
             </div>
           )}
@@ -78,7 +80,7 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
           onClick={handlePlayAgain}
           className="box rounded-lg px-8 py-4 bg-transparent text-foreground text-base font-semibold cursor-pointer opacity-80 flex-1"
         >
-          Play Again <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">P</span>
+          {t.playAgain} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">P</span>
         </button>
       )}
     </div>

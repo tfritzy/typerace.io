@@ -2,9 +2,11 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Palette } from "lucide-react";
 import { ThemeShowcaseModal } from "./ThemeShowcaseModal";
+import { getTranslations } from "../utils/translations";
 
 export const Footer = () => {
     const [showThemeModal, setShowThemeModal] = useState(false);
+    const t = getTranslations();
 
     return (
         <footer className="py-4 px-4">
@@ -17,7 +19,7 @@ export const Footer = () => {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
-                        <span>Site stats</span>
+                        <span>{t.siteStats}</span>
                     </Link>
                     <span className="opacity-50">|</span >
                     <a
@@ -39,7 +41,7 @@ export const Footer = () => {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
-                        <span>Privacy policy</span>
+                        <span>{t.privacyPolicy}</span>
                     </Link>
                     <span className="opacity-50">|</span >
                     <button
@@ -47,7 +49,7 @@ export const Footer = () => {
                         className="flex items-center gap-1.5 hover:text-foreground/60 transition-colors cursor-pointer bg-transparent border-0 p-0 text-sm text-muted-foreground"
                     >
                         <Palette className="w-4 h-4" />
-                        <span>Theme</span>
+                        <span>{t.theme}</span>
                     </button>
                 </div>
             </div>

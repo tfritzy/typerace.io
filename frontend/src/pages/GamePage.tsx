@@ -16,6 +16,7 @@ import { useDatabase } from "../contexts/SpacetimeContext";
 import { getMaxPlayerCount } from "../utils/modes";
 import { GhostCursor } from "../components/GhostCursor";
 import { getPlayerColorHex } from "../utils/colorMapping";
+import { getTranslations } from "../utils/translations";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -196,6 +197,7 @@ export const GamePage = () => {
   const isPrivateGameOwner = game.gameType?.tag === "Private" && currentPlayerId && game.owner?.isEqual(currentPlayerId);
   const isCountdown = game.state?.tag === "Countdown";
   const isDisabled = isInLobby || isCountdown;
+  const t = getTranslations();
 
   const currentPlayerProgress = gamePlayerProgress.find(
     (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
@@ -226,7 +228,7 @@ export const GamePage = () => {
                 return (
                   <div key={`loading-${index}`}>
                     <PlayerProgressBar
-                      name="Waiting for player..."
+                      name={t.waitingForPlayer}
                       level={1}
                       progressIndex={0}
                       phraseLength={game.phrase.length}

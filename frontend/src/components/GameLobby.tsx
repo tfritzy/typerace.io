@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Check, Clipboard } from "lucide-react";
 import type { DbConnection } from "../../module_bindings";
+import { getTranslations } from "../utils/translations";
 
 type GameLobbyProps = {
   gameId: string;
@@ -10,6 +11,7 @@ type GameLobbyProps = {
 
 export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
   const [linkCopied, setLinkCopied] = useState(false);
+  const t = getTranslations();
 
   const handleStartGame = useCallback(() => {
     if (!conn || !gameId || !isOwner) return;
@@ -29,10 +31,10 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
     <div className="box w-full px-8 py-12 min-h-[430px] flex flex-col justify-center gap-6">
       <div className="text-center space-y-4">
         <h2 className="text-xl font-semibold text-secondary-foreground">
-          {isOwner ? "Waiting for players..." : "Waiting for owner to start..."}
+          {isOwner ? t.waitingForPlayers : t.waitingForOwner}
         </h2>
         <p className="text-sm text-muted-foreground">
-          Share this link with friends to invite them to this race
+          {t.shareLink}
         </p>
       </div>
 
@@ -45,7 +47,7 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
             <div
               className={`text-[10px] uppercase tracking-wider mb-1.5 font-semibold transition-colors duration-200 ${linkCopied ? 'text-accent-primary' : 'text-muted-foreground'}`}
             >
-              {linkCopied ? 'Copied!' : 'Game Link'}
+              {linkCopied ? t.copied : t.gameLink}
             </div>
             <div className="font-mono text-sm text-secondary-foreground overflow-hidden text-ellipsis whitespace-nowrap">
               {gameUrl}
@@ -64,7 +66,7 @@ export const GameLobby = ({ gameId, conn, isOwner }: GameLobbyProps) => {
           onClick={handleStartGame}
           className="box bg-transparent text-foreground px-6 py-3 text-base font-semibold cursor-pointer transition-all duration-200 hover:border-border-hover hover:-translate-y-px"
         >
-          Start Game
+          {t.startGame}
         </button>
       )}
     </div>
