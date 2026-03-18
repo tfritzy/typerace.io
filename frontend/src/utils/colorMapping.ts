@@ -79,11 +79,11 @@ function hslToHex(h: number, s: number, l: number): string {
 
 export function getPlayerAvatarColors(playerColorTag: string): string[] {
     const hex = getPlayerColorHex(playerColorTag);
-    const [h, s, l] = hexToHsl(hex);
+    const [h] = hexToHsl(hex);
     return [
-        hslToHex(h, s, l),
-        hslToHex(h + 20, Math.min(1, s * 0.85), Math.max(0.25, l - 0.12)),
-        hslToHex(h - 15, Math.min(1, s * 0.7), Math.max(0.18, l - 0.22)),
+        hex,
+        hslToHex(h, 0.15, 0.22),
+        hslToHex(h, 0.08, 0.15),
     ];
 }
 
