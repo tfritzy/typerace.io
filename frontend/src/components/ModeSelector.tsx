@@ -46,6 +46,12 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
     const [contentType, setContentType] = useState<ContentTypeValue>(() => getContentTypeFromMode(selectedMode.tag));
     const t = getTranslations();
 
+    const gameTypeLabel = (type: GameTypeValue): string => {
+        if (type === "Public") return t.publicMatch;
+        if (type === "Private") return t.privateLobby;
+        return t.practiceMode;
+    };
+
     const selectedLanguage = currentLang;
 
     const quotesAvailableForLanguage = selectedLanguage.quotesMode !== null;
@@ -84,7 +90,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                     {gameType === "Public" && <Globe size={16} />}
                     {gameType === "Private" && <Lock size={16} />}
                     {gameType === "Practice" && <Target size={16} />}
-                    <span>{gameType === "Public" ? t.publicMatch : gameType === "Private" ? t.privateLobby : t.practiceMode} · {contentType === "Quotes" ? t.quotes : t.randomWords}</span>
+                    <span>{gameTypeLabel(gameType)} · {contentType === "Quotes" ? t.quotes : t.randomWords}</span>
                     <ChevronDown size={16} />
                 </button>
                 <LanguageDropdown />
