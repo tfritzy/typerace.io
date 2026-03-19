@@ -6,7 +6,6 @@ import { getPlayerAvatarColors } from "../utils/colorMapping";
 type PlayerAvatarProps = {
     size: number;
     identity: string;
-    isHighlighted?: boolean;
     isLoading?: boolean;
     placement?: number;
     playerColorTag?: string;
@@ -27,7 +26,6 @@ function getAvatarColorsFromCSS(): string[] {
 export const PlayerAvatar = memo(({
     size,
     identity,
-    isHighlighted = false,
     isLoading = false,
     placement,
     playerColorTag,
@@ -70,7 +68,6 @@ export const PlayerAvatar = memo(({
     const crownColor = placement ? getCrownColor(placement) : null;
     const medalColor = placement ? getMedalColor(placement) : null;
     const defaultRingColor = avatarColors[DEFAULT_RING_COLOR_INDEX] || 'var(--accent-primary)';
-    const ringColor = isHighlighted ? 'var(--accent-primary)' : defaultRingColor;
 
     let avatarContent;
     if (isLoading) {
@@ -106,7 +103,7 @@ export const PlayerAvatar = memo(({
     return (
         <div
             className={`relative shrink-0 border-2 rounded-full ${isLoading ? 'border-dashed' : ''}`}
-            style={{ borderColor: ringColor }}
+            style={{ borderColor: defaultRingColor }}
         >
             {crownColor && (
                 <div

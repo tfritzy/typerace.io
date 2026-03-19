@@ -128,7 +128,6 @@ export const ProfileAvatar = memo(() => {
               <PlayerAvatar
                 size={40}
                 identity={identityHash}
-                isHighlighted={false}
                 photoUrl={myPlayer.photoUrl}
               />
           </div>
@@ -224,7 +223,6 @@ export const ProfileAvatar = memo(() => {
         <PlayerAvatar
           size={40}
           identity={identityHash}
-          isHighlighted={true}
           photoUrl={myPlayer.photoUrl}
         />
       </div>
