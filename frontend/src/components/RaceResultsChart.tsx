@@ -27,6 +27,8 @@ ChartJS.register(
     Legend
 );
 
+const RAW_LINE_OPACITY_HEX = '99';
+
 interface RaceResultsChartProps {
     playerProgress: PlayerProgress;
     raceStartTimestamp: bigint;
@@ -41,9 +43,11 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, useP
     const maxDataIndex = Math.max(rawWpmData.length - 1, aggWpmData.length - 1, errorCountsData.length - 1);
 
     const style = getComputedStyle(document.documentElement);
-    const playerColor = getPlayerColorHex(playerProgress.playerColor?.tag ?? '');
-    const primaryColor = usePlayerColor ? playerColor : style.getPropertyValue('--accent-primary').trim();
-    const rawLineColor = usePlayerColor ? `${playerColor}99` : style.getPropertyValue('--muted-foreground').trim();
+    const playerColorTag = playerProgress.playerColor?.tag;
+    const shouldUsePlayerColor = usePlayerColor && Boolean(playerColorTag);
+    const playerColor = playerColorTag ? getPlayerColorHex(playerColorTag) : '';
+    const primaryColor = shouldUsePlayerColor ? playerColor : style.getPropertyValue('--accent-primary').trim();
+    const rawLineColor = shouldUsePlayerColor ? `${playerColor}${RAW_LINE_OPACITY_HEX}` : style.getPropertyValue('--muted-foreground').trim();
     const secondaryColor = style.getPropertyValue('--muted-foreground').trim();
     const errorColor = style.getPropertyValue('--destructive').trim();
     const gridLineColor = style.getPropertyValue('--grid-line').trim();
