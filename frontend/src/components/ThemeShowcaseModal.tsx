@@ -29,43 +29,24 @@ function ThemeCard({
             }`}
         >
             <div
-                className="p-3"
-                style={{
-                    background: resolved.colors.background,
-                    borderRadius: `8px 8px 0 0`,
-                }}
-            >
-                <div
-                    className="p-2 mb-2"
-                    style={{
-                        background: resolved.colors.card,
-                        border: `1px solid ${resolved.colors.border}`,
-                        borderRadius: `6px`,
-                    }}
-                >
-                    <div className="text-xs leading-relaxed font-mono">
-                        <span style={{ color: resolved.colors.accent }}>the quick </span>
-                        <span style={{ color: resolved.colors.textUntyped }}>brown fox</span>
-                    </div>
-                </div>
-                <div className="flex gap-1 mt-2">
-                    {resolved.previewColors.slice(1).map((color) => (
-                        <div
-                            key={color}
-                            className="h-1.5 flex-1 rounded-full"
-                            style={{ background: color }}
-                        />
-                    ))}
-                </div>
-            </div>
-            <div
-                className="px-3 py-2 text-xs font-medium"
+                className="px-3 py-2"
                 style={{
                     background: resolved.colors.card,
-                    color: resolved.colors.foreground,
+                    color: resolved.colors.accent,
                 }}
             >
-                {THEME_PRESETS[tag].name}
+                <div className="text-xs font-medium font-mono">
+                    {THEME_PRESETS[tag].name}
+                </div>
+            </div>
+            <div className="flex">
+                {resolved.previewColors.slice(1).map((color) => (
+                    <div
+                        key={color}
+                        className="h-1.5 flex-1"
+                        style={{ background: color }}
+                    />
+                ))}
             </div>
         </button>
     );
