@@ -14,6 +14,7 @@ import { Chart } from 'react-chartjs-2';
 import { memo } from 'react';
 import type { PlayerProgress } from '../types/stdb';
 import { getRawWpmBySecond, getAggWpmBySecond, getErrorCountsBySecond } from '../utils/wpmCalculator';
+import { getPlayerColorHex } from '../utils/colorMapping';
 
 ChartJS.register(
     LinearScale,
@@ -29,9 +30,10 @@ ChartJS.register(
 interface RaceResultsChartProps {
     playerProgress: PlayerProgress;
     raceStartTimestamp: bigint;
+    usePlayerColor?: boolean;
 }
 
-export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp }: RaceResultsChartProps) => {
+export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp, usePlayerColor = false }: RaceResultsChartProps) => {
     const rawWpmData = getRawWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
     const aggWpmData = getAggWpmBySecond(playerProgress.characterHistory, raceStartTimestamp);
     const errorCountsData = getErrorCountsBySecond(playerProgress.characterHistory, raceStartTimestamp);
@@ -39,7 +41,9 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp }: Ra
     const maxDataIndex = Math.max(rawWpmData.length - 1, aggWpmData.length - 1, errorCountsData.length - 1);
 
     const style = getComputedStyle(document.documentElement);
-    const primaryColor = style.getPropertyValue('--accent-primary').trim();
+    const playerColor = getPlayerColorHex(playerProgress.playerColor?.tag ?? '');
+    const primaryColor = usePlayerColor ? playerColor : style.getPropertyValue('--accent-primary').trim();
+    const rawLineColor = usePlayerColor ? `${playerColor}99` : style.getPropertyValue('--muted-foreground').trim();
     const secondaryColor = style.getPropertyValue('--muted-foreground').trim();
     const errorColor = style.getPropertyValue('--destructive').trim();
     const gridLineColor = style.getPropertyValue('--grid-line').trim();
@@ -72,7 +76,7 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp }: Ra
                     x: index,
                     y: wpm
                 })),
-                borderColor: secondaryColor,
+                borderColor: rawLineColor,
                 pointRadius: 0,
                 pointHoverRadius: 8,
                 pointHitRadius: 20,
