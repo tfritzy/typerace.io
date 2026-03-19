@@ -110,11 +110,19 @@ export const GamePage = () => {
       );
     }
 
+    let gameNotFoundTimeout: ReturnType<typeof setTimeout> | null = null;
+
     const pageSubscription = conn.subscriptionBuilder()
       .onApplied(() => {
         const currentGame = conn.db.game.id.find(gameId);
         if (currentGame) {
           setGame(currentGame);
+        } else {
+          gameNotFoundTimeout = setTimeout(() => {
+            if (!conn.db.game.id.find(gameId)) {
+              navigate("/", { replace: true });
+            }
+          }, 2000);
         }
 
         const currentGameProgress = Array.from(conn.db.playerprogress.iter())
@@ -124,6 +132,9 @@ export const GamePage = () => {
       .subscribe(subscriptionQueries);
 
     return () => {
+      if (gameNotFoundTimeout) {
+        clearTimeout(gameNotFoundTimeout);
+      }
       conn.db.playerprogress.removeOnInsert(handleProgressInsert);
       conn.db.playerprogress.removeOnUpdate(handleProgressUpdate);
       conn.db.playerprogress.removeOnDelete(handleProgressDelete);
