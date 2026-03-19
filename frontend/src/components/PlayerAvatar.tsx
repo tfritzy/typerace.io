@@ -185,17 +185,17 @@ export const PlayerAvatar = memo(({
                 </div>
             )}
 
-            {placement !== undefined && placement > 0 && (
+            {placement !== undefined && placement > 0 && config && (
                 <div
                     className="absolute -bottom-1.5 -right-1.5 z-10 flex items-center justify-center rounded-full"
                     style={{
                         width: size * 0.4,
                         height: size * 0.4,
-                        backgroundColor: config!.badgeColor,
+                        backgroundColor: config.badgeColor,
                         border: '2px solid var(--background)',
                         fontSize: size * 0.2,
                         fontWeight: 800,
-                        color: config!.badgeTextColor,
+                        color: config.badgeTextColor,
                         lineHeight: 1,
                     }}
                 >
