@@ -29,6 +29,13 @@ export const ProfilePage = () => {
     const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.identity);
 
     useEffect(() => {
+        if (viewedPlayer) {
+            document.title = `${viewedPlayer.name} - TypeRace.io`;
+        }
+        return () => { document.title = "typerace.io - PvP typing"; };
+    }, [viewedPlayer]);
+
+    useEffect(() => {
         if (!conn || !playerId) return;
         setViewedPlayer(null);
 
@@ -170,7 +177,7 @@ export const ProfilePage = () => {
         <div className="h-full flex flex-col">
             <Header hideAvatar={true} />
 
-            <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
+            <main className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
                 <div className="content-container">
                     <div className="box box-shadow rounded-xl p-4 sm:p-8 mb-8 relative">
                         <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6">
@@ -322,7 +329,7 @@ export const ProfilePage = () => {
                         </div>
                     )}
                 </div>
-            </div>
+            </main>
 
             {isEditNameModalOpen && viewedPlayer && (
                 <EditNameModal
