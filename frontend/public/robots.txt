@@ -14,6 +14,8 @@ Allow: /hi$
 Allow: /nl$
 Allow: /sv$
 Allow: /tr$
+Allow: /privacy-policy$
+Allow: /stats$
 Disallow: /game/
 Disallow: /profile/
 

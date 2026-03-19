@@ -1,10 +1,16 @@
+import { useEffect } from "react";
 import { Header } from "../components/Header";
 
 export const PrivacyPolicyPage = () => {
+    useEffect(() => {
+        document.title = "Privacy Policy - TypeRace.io";
+        return () => { document.title = "typerace.io - PvP typing"; };
+    }, []);
+
     return (
         <div className="relative h-full flex flex-col overflow-hidden">
             <Header />
-            <div className="flex-1 overflow-y-auto p-4">
+            <main className="flex-1 overflow-y-auto p-4">
                 <div className="content-container">
                     <div className="box p-8 my-8 text-foreground">
                         <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
@@ -170,7 +176,7 @@ export const PrivacyPolicyPage = () => {
                         </section>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     );
 };

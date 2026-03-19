@@ -57,6 +57,11 @@ export const SiteStatsPage = () => {
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('1month');
 
     useEffect(() => {
+        document.title = "Site Statistics - TypeRace.io";
+        return () => { document.title = "typerace.io - PvP typing"; };
+    }, []);
+
+    useEffect(() => {
         if (!conn) return;
 
         const handleStatsInsert = (_ctx: any, stats: GlobalStats) => {
@@ -472,7 +477,7 @@ export const SiteStatsPage = () => {
     return (
         <div className="h-full flex flex-col">
             <Header />
-            <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
+            <main className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
                 <div className="content-container">
                     <h1 className="text-3xl font-bold mb-6 text-foreground">Site Statistics</h1>
 
@@ -527,7 +532,7 @@ export const SiteStatsPage = () => {
                         </div>
                     </section>
                 </div>
-            </div>
+            </main>
         </div>
     );
 };
