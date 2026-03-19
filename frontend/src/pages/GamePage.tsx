@@ -118,6 +118,9 @@ export const GamePage = () => {
         if (currentGame) {
           setGame(currentGame);
         } else {
+          if (gameNotFoundTimeout) {
+            clearTimeout(gameNotFoundTimeout);
+          }
           gameNotFoundTimeout = setTimeout(() => {
             if (!conn.db.game.id.find(gameId)) {
               navigate("/", { replace: true });
