@@ -15,7 +15,6 @@
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.4",
     "@tailwindcss/vite": "^4.1.17",
-    "@types/three": "^0.183.1",
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/xterm": "^5.5.0",
     "boring-avatars": "^2.0.4",
@@ -32,8 +31,7 @@
     "react-router-dom": "^7.9.5",
     "spacetimedb": "^1.10.0",
     "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^4.1.17",
-    "three": "^0.183.2"
+    "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

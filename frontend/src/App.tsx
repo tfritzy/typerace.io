@@ -5,6 +5,7 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { SiteStatsPage } from "./pages/SiteStatsPage";
 import { GamesPage } from "./pages/GamesPage";
+import { WordDefensePage } from "./pages/WordDefensePage";
 import { ToastProvider } from "./hooks/useToast";
 import { ToastContainer } from "./components/Toast";
 
@@ -21,6 +22,7 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/stats" element={<SiteStatsPage />} />
           <Route path="/games" element={<GamesPage />} />
+          <Route path="/games/word-defense" element={<WordDefensePage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <ToastContainer />
