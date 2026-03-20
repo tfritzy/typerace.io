@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useCallback, useState, useMemo } from "react";
+import { useEffect, useCallback, useState, useMemo, useRef } from "react";
 import {
   type Game,
   type PlayerProgress,
@@ -110,22 +110,11 @@ export const GamePage = () => {
       );
     }
 
-    let gameNotFoundTimeout: ReturnType<typeof setTimeout> | null = null;
-
     const pageSubscription = conn.subscriptionBuilder()
       .onApplied(() => {
         const currentGame = conn.db.game.id.find(gameId);
         if (currentGame) {
           setGame(currentGame);
-        } else {
-          if (gameNotFoundTimeout) {
-            clearTimeout(gameNotFoundTimeout);
-          }
-          gameNotFoundTimeout = setTimeout(() => {
-            if (!conn.db.game.id.find(gameId)) {
-              navigate("/", { replace: true });
-            }
-          }, 2000);
         }
 
         const currentGameProgress = Array.from(conn.db.playerprogress.iter())
@@ -135,9 +124,6 @@ export const GamePage = () => {
       .subscribe(subscriptionQueries);
 
     return () => {
-      if (gameNotFoundTimeout) {
-        clearTimeout(gameNotFoundTimeout);
-      }
       conn.db.playerprogress.removeOnInsert(handleProgressInsert);
       conn.db.playerprogress.removeOnUpdate(handleProgressUpdate);
       conn.db.playerprogress.removeOnDelete(handleProgressDelete);
@@ -197,6 +183,29 @@ export const GamePage = () => {
     return gamePlayerProgress
       .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length);
   }, [gamePlayerProgress, currentPlayerId, game?.phrase]);
+
+  const gameNotFoundRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (game) {
+      if (gameNotFoundRef.current) {
+        clearTimeout(gameNotFoundRef.current);
+        gameNotFoundRef.current = null;
+      }
+      return;
+    }
+
+    gameNotFoundRef.current = setTimeout(() => {
+      navigate("/", { replace: true });
+    }, 5000);
+
+    return () => {
+      if (gameNotFoundRef.current) {
+        clearTimeout(gameNotFoundRef.current);
+        gameNotFoundRef.current = null;
+      }
+    };
+  }, [game, navigate]);
 
   if (!game) {
     return null;
