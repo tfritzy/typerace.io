@@ -44,7 +44,6 @@ const PLAYER_COLOR_HEX: Record<string, string> = {
     Blue: '#61AFEF',
     Sky: '#0EA5E9',
 };
-
 export function getPlayerColorHex(playerColorTag: string): string {
     return PLAYER_COLOR_HEX[playerColorTag] ?? '#61AFEF';
 }

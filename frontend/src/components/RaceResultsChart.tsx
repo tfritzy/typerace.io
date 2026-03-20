@@ -14,6 +14,7 @@ import { Chart } from 'react-chartjs-2';
 import { memo } from 'react';
 import type { PlayerProgress } from '../types/stdb';
 import { getRawWpmBySecond, getAggWpmBySecond, getErrorCountsBySecond } from '../utils/wpmCalculator';
+import { getPlayerColorHex } from '../utils/colorMapping';
 
 ChartJS.register(
     LinearScale,
@@ -25,6 +26,8 @@ ChartJS.register(
     Tooltip,
     Legend
 );
+
+const RAW_LINE_OPACITY_HEX = '99';
 
 interface RaceResultsChartProps {
     playerProgress: PlayerProgress;
@@ -39,7 +42,8 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp }: Ra
     const maxDataIndex = Math.max(rawWpmData.length - 1, aggWpmData.length - 1, errorCountsData.length - 1);
 
     const style = getComputedStyle(document.documentElement);
-    const primaryColor = style.getPropertyValue('--accent-primary').trim();
+    const primaryColor = getPlayerColorHex(playerProgress.playerColor?.tag ?? '');
+    const rawLineColor = `${primaryColor}${RAW_LINE_OPACITY_HEX}`;
     const secondaryColor = style.getPropertyValue('--muted-foreground').trim();
     const errorColor = style.getPropertyValue('--destructive').trim();
     const gridLineColor = style.getPropertyValue('--grid-line').trim();
@@ -72,7 +76,7 @@ export const RaceResultsChart = memo(({ playerProgress, raceStartTimestamp }: Ra
                     x: index,
                     y: wpm
                 })),
-                borderColor: secondaryColor,
+                borderColor: rawLineColor,
                 pointRadius: 0,
                 pointHoverRadius: 8,
                 pointHitRadius: 20,
