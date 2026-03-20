@@ -50,7 +50,7 @@ export const WebGPUCanvas = () => {
 
     gpu.device.queue.writeTexture(
       { texture: gpu.texture },
-      pixels,
+      pixels as unknown as ArrayBuffer,
       { bytesPerRow: TERRAIN_WIDTH * 4, rowsPerImage: TERRAIN_HEIGHT },
       { width: TERRAIN_WIDTH, height: TERRAIN_HEIGHT }
     );
@@ -136,7 +136,7 @@ export const WebGPUCanvas = () => {
       });
       device.queue.writeTexture(
         { texture },
-        pixels,
+        pixels as unknown as ArrayBuffer,
         { bytesPerRow: TERRAIN_WIDTH * 4, rowsPerImage: TERRAIN_HEIGHT },
         { width: TERRAIN_WIDTH, height: TERRAIN_HEIGHT }
       );
