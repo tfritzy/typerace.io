@@ -195,9 +195,11 @@ export const GamePage = () => {
       return;
     }
 
-    gameNotFoundRef.current = setTimeout(() => {
-      navigate("/", { replace: true });
-    }, 5000);
+    if (!gameNotFoundRef.current) {
+      gameNotFoundRef.current = setTimeout(() => {
+        navigate("/", { replace: true });
+      }, 5000);
+    }
 
     return () => {
       if (gameNotFoundRef.current) {
