@@ -184,6 +184,16 @@ export const GamePage = () => {
       .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length);
   }, [gamePlayerProgress, currentPlayerId, game?.phrase]);
 
+  useEffect(() => {
+    if (game) return;
+
+    const timeout = setTimeout(() => {
+      navigate("/", { replace: true });
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, [game, navigate]);
+
   if (!game) {
     return null;
   }
