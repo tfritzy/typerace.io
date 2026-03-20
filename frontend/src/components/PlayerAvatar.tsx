@@ -1,5 +1,5 @@
 import Avatar from "boring-avatars";
-import { Crown, Award } from 'lucide-react';
+import { Crown } from 'lucide-react';
 import { memo, useState, useEffect, useCallback, useMemo } from "react";
 import { getPlayerAvatarColors } from "../utils/colorMapping";
 
@@ -86,16 +86,21 @@ export const PlayerAvatar = memo(({
                     />
                 </div>
             )}
-            {medalColor && (
+            {medalColor && placement && (
                 <div
-                    className="absolute -bottom-1 right-1 z-10 drop-shadow-[0_0px_3px_rgba(0,0,0,0.15)] dark:drop-shadow-[0_0px_3px_rgba(0,0,0,0.4)]"
+                    className="absolute -bottom-1.5 -right-1.5 z-10 flex items-center justify-center rounded-full"
+                    style={{
+                        width: size * 0.4,
+                        height: size * 0.4,
+                        backgroundColor: medalColor,
+                        border: '2px solid var(--background)',
+                        fontSize: size * 0.2,
+                        fontWeight: 800,
+                        color: placement > 3 ? '#fff' : '#1a1a2e',
+                        lineHeight: 1,
+                    }}
                 >
-                    <Award
-                        size={size * 0.35}
-                        fill={medalColor}
-                        stroke='none'
-                        strokeWidth={2}
-                    />
+                    {placement}
                 </div>
             )}
             {isLoading ? (
