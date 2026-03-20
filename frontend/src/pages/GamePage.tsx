@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useCallback, useState, useMemo, useRef } from "react";
+import { useEffect, useCallback, useState, useMemo } from "react";
 import {
   type Game,
   type PlayerProgress,
@@ -184,29 +184,14 @@ export const GamePage = () => {
       .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length);
   }, [gamePlayerProgress, currentPlayerId, game?.phrase]);
 
-  const gameNotFoundRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   useEffect(() => {
-    if (game) {
-      if (gameNotFoundRef.current) {
-        clearTimeout(gameNotFoundRef.current);
-        gameNotFoundRef.current = null;
-      }
-      return;
-    }
+    if (game) return;
 
-    if (!gameNotFoundRef.current) {
-      gameNotFoundRef.current = setTimeout(() => {
-        navigate("/", { replace: true });
-      }, 5000);
-    }
+    const timeout = setTimeout(() => {
+      navigate("/", { replace: true });
+    }, 3000);
 
-    return () => {
-      if (gameNotFoundRef.current) {
-        clearTimeout(gameNotFoundRef.current);
-        gameNotFoundRef.current = null;
-      }
-    };
+    return () => clearTimeout(timeout);
   }, [game, navigate]);
 
   if (!game) {
