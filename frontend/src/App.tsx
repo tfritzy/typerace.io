@@ -4,6 +4,7 @@ import { GamePage } from "./pages/GamePage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { SiteStatsPage } from "./pages/SiteStatsPage";
+import { GamesPage } from "./pages/GamesPage";
 import { ToastProvider } from "./hooks/useToast";
 import { ToastContainer } from "./components/Toast";
 
@@ -19,6 +20,7 @@ function App() {
           <Route path="/profile/:playerId" element={<ProfilePage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/stats" element={<SiteStatsPage />} />
+          <Route path="/games" element={<GamesPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <ToastContainer />
