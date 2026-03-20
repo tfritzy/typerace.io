@@ -20,19 +20,8 @@ export const WordDefensePage = () => {
             Word Defense
           </h1>
 
-          <div className="box p-6 mb-6">
+          <div className="box p-6">
             <WebGPUCanvas />
-          </div>
-
-          <div className="box p-8 mb-8 text-foreground">
-            <h2 className="text-2xl font-semibold mb-4">How to Play</h2>
-            <p className="leading-relaxed">
-              Word Defense is a wave-based typing defense game. Enemies approach
-              from the air while your characters defend from the ground. Type
-              the words above enemies to fire at them. Survive each day, collect
-              gold from fallen enemies, and upgrade your weapons and equipment
-              between rounds.
-            </p>
           </div>
         </div>
       </main>
