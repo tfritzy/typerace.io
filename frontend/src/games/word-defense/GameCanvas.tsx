@@ -7,9 +7,10 @@ const EARTH_CY = CANVAS_HEIGHT / 2;
 const EARTH_RADIUS = 200;
 const SPAWN_INTERVAL_MIN = 1500;
 const SPAWN_INTERVAL_MAX = 3500;
-const MAX_DELTA_TIME = 0.1;
 const METEOR_CLEANUP_MARGIN = 200;
 const IMPACT_RADIUS_SCALE = 1 / 20;
+const METEOR_COLOR: [number, number, number] = [107, 90, 62];
+const METEOR_ANGULAR_SEGMENTS = 32;
 
 interface SceneObject {
   x: number;
@@ -20,26 +21,41 @@ interface SceneObject {
   imageData: ImageData;
 }
 
-interface Meteor {
-  x: number;
-  y: number;
+interface Meteor extends SceneObject {
   vx: number;
   vy: number;
   radius: number;
-  rotation: number;
-  rotationSpeed: number;
-  vertices: { x: number; y: number }[];
 }
 
-function createMeteorVertices(radius: number): { x: number; y: number }[] {
-  const vertexCount = 7 + Math.floor(Math.random() * 4);
-  const vertices: { x: number; y: number }[] = [];
-  for (let i = 0; i < vertexCount; i++) {
-    const angle = (i / vertexCount) * Math.PI * 2;
-    const r = radius * (0.65 + Math.random() * 0.7);
-    vertices.push({ x: Math.cos(angle) * r, y: Math.sin(angle) * r });
+function createMeteorBitmap(
+  radius: number
+): Pick<SceneObject, "data" | "imageData" | "width" | "height"> {
+  const intRadius = Math.ceil(radius);
+  const diameter = intRadius * 2;
+  const data = new Uint8Array(diameter * diameter);
+  const noiseTable = Array.from(
+    { length: METEOR_ANGULAR_SEGMENTS },
+    () => 0.65 + Math.random() * 0.7
+  );
+
+  for (let py = 0; py < diameter; py++) {
+    for (let px = 0; px < diameter; px++) {
+      const dx = px - intRadius;
+      const dy = py - intRadius;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const angle = Math.atan2(dy, dx);
+      const t = (angle + Math.PI) / (2 * Math.PI);
+      const noiseIndex =
+        Math.floor(t * METEOR_ANGULAR_SEGMENTS) % METEOR_ANGULAR_SEGMENTS;
+      if (dist <= radius * noiseTable[noiseIndex]) {
+        data[py * diameter + px] = 1;
+      }
+    }
   }
-  return vertices;
+
+  const imageData = new ImageData(diameter, diameter);
+  rebuildImageData(data, imageData, diameter, diameter, METEOR_COLOR);
+  return { data, imageData, width: diameter, height: diameter };
 }
 
 function spawnMeteor(): Meteor {
@@ -73,20 +89,25 @@ function spawnMeteor(): Meteor {
 
   const radius = 8 + Math.random() * 42;
   const speed = 150 - radius * 1.5;
+  const vx = (tdx / tdist) * speed;
+  const vy = (tdy / tdist) * speed;
+
+  const bitmap = createMeteorBitmap(radius);
 
   return {
-    x,
-    y,
-    vx: (tdx / tdist) * speed,
-    vy: (tdy / tdist) * speed,
+    x: x - bitmap.width / 2,
+    y: y - bitmap.height / 2,
+    vx,
+    vy,
     radius,
-    rotation: Math.random() * Math.PI * 2,
-    rotationSpeed: (Math.random() - 0.5) * 3,
-    vertices: createMeteorVertices(radius),
+    ...bitmap,
   };
 }
 
 function checkMeteorHitsPlanet(planet: SceneObject, meteor: Meteor): boolean {
+  const cx = meteor.x + meteor.radius;
+  const cy = meteor.y + meteor.radius;
+
   const sampleOffsets = [
     { ox: 0, oy: 0 },
     { ox: meteor.radius * 0.7, oy: 0 },
@@ -100,8 +121,8 @@ function checkMeteorHitsPlanet(planet: SceneObject, meteor: Meteor): boolean {
   ];
 
   for (const { ox, oy } of sampleOffsets) {
-    const px = Math.floor(meteor.x + ox - planet.x);
-    const py = Math.floor(meteor.y + oy - planet.y);
+    const px = Math.floor(cx + ox - planet.x);
+    const py = Math.floor(cy + oy - planet.y);
     if (px >= 0 && px < planet.width && py >= 0 && py < planet.height) {
       if (planet.data[py * planet.width + px]) {
         return true;
@@ -225,21 +246,7 @@ export const GameCanvas = () => {
     }
 
     for (const meteor of meteorsRef.current) {
-      ctx.save();
-      ctx.translate(meteor.x, meteor.y);
-      ctx.rotate(meteor.rotation);
-      ctx.beginPath();
-      ctx.moveTo(meteor.vertices[0].x, meteor.vertices[0].y);
-      for (let i = 1; i < meteor.vertices.length; i++) {
-        ctx.lineTo(meteor.vertices[i].x, meteor.vertices[i].y);
-      }
-      ctx.closePath();
-      ctx.fillStyle = "#6B5A3E";
-      ctx.fill();
-      ctx.strokeStyle = "#3D3427";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.restore();
+      ctx.putImageData(meteor.imageData, meteor.x, meteor.y);
     }
   }, []);
 
@@ -273,7 +280,7 @@ export const GameCanvas = () => {
     let nextSpawn = 2000;
 
     function loop(timestamp: number) {
-      const dt = Math.min((timestamp - lastTime) / 1000, MAX_DELTA_TIME);
+      const dt = (timestamp - lastTime) / 1000;
       if (lastTime > 0) {
         spawnTimer += dt * 1000;
         if (spawnTimer >= nextSpawn) {
@@ -291,13 +298,15 @@ export const GameCanvas = () => {
           const meteor = meteors[i];
           meteor.x += meteor.vx * dt;
           meteor.y += meteor.vy * dt;
-          meteor.rotation += meteor.rotationSpeed * dt;
+
+          const cx = meteor.x + meteor.radius;
+          const cy = meteor.y + meteor.radius;
 
           if (
-            meteor.x < -METEOR_CLEANUP_MARGIN ||
-            meteor.x > CANVAS_WIDTH + METEOR_CLEANUP_MARGIN ||
-            meteor.y < -METEOR_CLEANUP_MARGIN ||
-            meteor.y > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
+            cx < -METEOR_CLEANUP_MARGIN ||
+            cx > CANVAS_WIDTH + METEOR_CLEANUP_MARGIN ||
+            cy < -METEOR_CLEANUP_MARGIN ||
+            cy > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
           ) {
             meteors.splice(i, 1);
             continue;
@@ -310,8 +319,8 @@ export const GameCanvas = () => {
             );
             destroyCircle(
               planet,
-              meteor.x,
-              meteor.y,
+              cx,
+              cy,
               destroyRadius,
               colorRef.current
             );
