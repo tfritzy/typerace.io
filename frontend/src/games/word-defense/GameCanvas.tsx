@@ -84,7 +84,7 @@ function destroyCircle(
   const minY = Math.max(0, Math.floor(localY - radius));
   const maxY = Math.min(obj.height - 1, Math.ceil(localY + radius));
 
-  if (minX > obj.width || maxX < 0 || minY > obj.height || maxY < 0) {
+  if (minX >= obj.width || maxX < 0 || minY >= obj.height || maxY < 0) {
     return false;
   }
 
@@ -187,8 +187,8 @@ export const GameCanvas = () => {
 
   const handlePointerEvent = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
-      if (e.buttons === 0 && e.type !== "pointerdown") return;
       e.preventDefault();
+      if (e.buttons === 0 && e.type !== "pointerdown") return;
       const rect = e.currentTarget.getBoundingClientRect();
       handleHit(e.clientX - rect.left, e.clientY - rect.top);
     },
