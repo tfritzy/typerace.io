@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 
 export const WebGPUCanvas = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
 
-    let animationId: number;
     let destroyed = false;
 
     const init = async () => {
@@ -29,6 +30,10 @@ export const WebGPUCanvas = () => {
         setError("Failed to get WebGPU context.");
         return;
       }
+
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = container.clientWidth * dpr;
+      canvas.height = container.clientHeight * dpr;
 
       const format = navigator.gpu.getPreferredCanvasFormat();
       context.configure({ device, format, alphaMode: "premultiplied" });
@@ -121,8 +126,6 @@ export const WebGPUCanvas = () => {
         renderPass.draw(6);
         renderPass.end();
         device.queue.submit([commandEncoder.finish()]);
-
-        animationId = requestAnimationFrame(render);
       };
 
       render();
@@ -132,7 +135,6 @@ export const WebGPUCanvas = () => {
 
     return () => {
       destroyed = true;
-      if (animationId) cancelAnimationFrame(animationId);
     };
   }, []);
 
@@ -145,12 +147,11 @@ export const WebGPUCanvas = () => {
   }
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={800}
-      height={400}
-      className="w-full rounded-lg"
-      style={{ height: "400px" }}
-    />
+    <div ref={containerRef} className="w-full rounded-lg overflow-hidden" style={{ height: "400px" }}>
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full"
+      />
+    </div>
   );
 };
