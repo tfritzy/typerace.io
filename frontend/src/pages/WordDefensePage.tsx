@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
-import { WebGPUCanvas } from "../components/WebGPUCanvas";
+import { TerrainCanvas } from "../components/TerrainCanvas";
 
 export const WordDefensePage = () => {
   useEffect(() => {
@@ -21,7 +21,7 @@ export const WordDefensePage = () => {
           </h1>
 
           <div className="box p-6">
-            <WebGPUCanvas />
+            <TerrainCanvas />
           </div>
         </div>
       </main>
