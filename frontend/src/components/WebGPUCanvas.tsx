@@ -93,8 +93,13 @@ export const WebGPUCanvas = () => {
         return;
       }
 
-      const device = await adapter.requestDevice();
       if (destroyed) return;
+
+      const device = await adapter.requestDevice();
+      if (destroyed) {
+        device.destroy();
+        return;
+      }
 
       const context = canvas.getContext("webgpu");
       if (!context) {
@@ -137,8 +142,8 @@ export const WebGPUCanvas = () => {
       );
 
       const sampler = device.createSampler({
-        magFilter: "nearest",
-        minFilter: "nearest",
+        magFilter: "linear",
+        minFilter: "linear",
       });
 
       const shaderModule = device.createShaderModule({
