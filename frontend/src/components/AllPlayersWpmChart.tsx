@@ -10,7 +10,7 @@ import type { ChartOptions } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import type { PlayerProgress } from '../types/stdb';
 import { getAggWpmBySecond } from '../utils/wpmCalculator';
-import { getPlayerChartLineColors } from '../utils/colorMapping';
+import { getPlayerColorHex } from '../utils/colorMapping';
 import { useDatabase } from '../contexts/SpacetimeContext';
 
 ChartJS.register(
@@ -48,10 +48,9 @@ export const AllPlayersWpmChart = ({
         );
         const currentPlayerId = conn?.identity;
         const isCurrentPlayer = currentPlayerId && playerProgress.playerId.isEqual(currentPlayerId);
-        const { aggregate: playerLineColor } = getPlayerChartLineColors(playerProgress.playerColor?.tag);
         const lineColor = isCurrentPlayer
             ? style.getPropertyValue('--accent-primary').trim()
-            : playerLineColor;
+            : getPlayerColorHex(playerProgress.playerColor?.tag ?? '');
 
         return {
             label: playerProgress.playerName,
