@@ -4,8 +4,8 @@ import { GamePage } from "./pages/GamePage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { SiteStatsPage } from "./pages/SiteStatsPage";
-import { GamesPage } from "./pages/GamesPage";
-import { WordDefensePage } from "./pages/WordDefensePage";
+import { GamesPage } from "./games/GamesPage";
+import { WordDefensePage } from "./games/word-defense/WordDefensePage";
 import { ToastProvider } from "./hooks/useToast";
 import { ToastContainer } from "./components/Toast";
 
