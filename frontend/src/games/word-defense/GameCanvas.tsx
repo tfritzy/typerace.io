@@ -9,6 +9,7 @@ const SPAWN_INTERVAL_MIN = 1500;
 const SPAWN_INTERVAL_MAX = 3500;
 const MAX_DELTA_TIME = 0.1;
 const METEOR_CLEANUP_MARGIN = 200;
+const IMPACT_RADIUS_SCALE = 1 / 20;
 
 interface SceneObject {
   x: number;
@@ -303,11 +304,15 @@ export const GameCanvas = () => {
           }
 
           if (planet && checkMeteorHitsPlanet(planet, meteor)) {
+            const destroyRadius = Math.max(
+              meteor.radius * 1.2,
+              meteor.radius * meteor.radius * IMPACT_RADIUS_SCALE
+            );
             destroyCircle(
               planet,
               meteor.x,
               meteor.y,
-              meteor.radius * 1.2,
+              destroyRadius,
               colorRef.current
             );
             meteors.splice(i, 1);
