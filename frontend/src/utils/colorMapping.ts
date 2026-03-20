@@ -44,9 +44,18 @@ const PLAYER_COLOR_HEX: Record<string, string> = {
     Blue: '#61AFEF',
     Sky: '#0EA5E9',
 };
+const RAW_LINE_OPACITY_HEX = '99';
 
 export function getPlayerColorHex(playerColorTag: string): string {
     return PLAYER_COLOR_HEX[playerColorTag] ?? '#61AFEF';
+}
+
+export function getPlayerChartLineColors(playerColorTag?: string): { aggregate: string; raw: string } {
+    const aggregate = getPlayerColorHex(playerColorTag ?? '');
+    return {
+        aggregate,
+        raw: `${aggregate}${RAW_LINE_OPACITY_HEX}`,
+    };
 }
 
 function hexToHsl(hex: string): [number, number, number] {
