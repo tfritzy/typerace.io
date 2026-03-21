@@ -1,3 +1,5 @@
+import type { Container, Sprite, Text, Graphics } from "pixi.js";
+
 export interface SceneObject {
   x: number;
   y: number;
@@ -43,3 +45,17 @@ export interface WaveConfig {
 }
 
 export type WavePhase = "active" | "complete";
+
+export interface MeteorObject {
+  data: Meteor;
+  container: Container;
+  sprite: Sprite;
+  untypedText: Text;
+  typedText: Text;
+}
+
+export interface TurretVisuals {
+  containers: (Container | null)[];
+  emptySlotGfx: (Graphics | null)[];
+  hitAreas: Graphics[];
+}

@@ -3,8 +3,7 @@ import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
   TOTAL_TURRET_SLOTS, INITIAL_TURRET_COUNT,
-  TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH, TURRET_BASE_RADIUS,
-  BULLET_SPEED, BULLET_RENDER_RADIUS,
+  BULLET_SPEED,
 } from "./constants";
 
 export function createTurretSlots(): TurretSlot[] {
@@ -145,41 +144,4 @@ export function updateBullets(
   return hits;
 }
 
-export function renderTurrets(ctx: CanvasRenderingContext2D, slots: TurretSlot[]) {
-  for (const slot of slots) {
-    if (slot.filled) {
-      ctx.save();
-      ctx.translate(slot.x, slot.y);
-      ctx.rotate(slot.angle);
 
-      ctx.fillStyle = "#6b7280";
-      ctx.fillRect(0, -TURRET_BARREL_WIDTH / 2, TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH);
-
-      ctx.beginPath();
-      ctx.arc(0, 0, TURRET_BASE_RADIUS, 0, Math.PI * 2);
-      ctx.fillStyle = "#9ca3af";
-      ctx.fill();
-
-      ctx.restore();
-    } else {
-      ctx.beginPath();
-      ctx.arc(slot.x, slot.y, 2, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
-      ctx.fill();
-    }
-  }
-}
-
-export function renderBullets(ctx: CanvasRenderingContext2D, bullets: Bullet[]) {
-  ctx.fillStyle = "#ffffff";
-  ctx.shadowColor = "rgba(255, 255, 255, 0.8)";
-  ctx.shadowBlur = 6;
-
-  for (const bullet of bullets) {
-    ctx.beginPath();
-    ctx.arc(bullet.x, bullet.y, BULLET_RENDER_RADIUS, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  ctx.shadowBlur = 0;
-}
