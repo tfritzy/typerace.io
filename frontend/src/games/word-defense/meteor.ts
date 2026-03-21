@@ -5,7 +5,7 @@ import {
   METEOR_COLOR, METEOR_NOISE_FREQ,
   METEOR_CORE_RADIUS, METEOR_LUMP_HEIGHT,
   BULLET_CARVE_RADIUS, MIN_SPLIT_PIXELS,
-  METEOR_SPEED_SIZE_FACTOR, ACTIVE_WAVE_ZOOM,
+  ACTIVE_WAVE_ZOOM,
 } from "./constants";
 import { valueNoise } from "./noise";
 import { rebuildImageData, updateBitmap, carveCircle } from "./bitmap";
@@ -85,7 +85,7 @@ export function spawnMeteor(langCode: string, usedWords: Set<string>, waveConfig
   const tdist = Math.sqrt(tdx * tdx + tdy * tdy);
 
   const radius = waveConfig.meteorRadiusMin + Math.random() * (waveConfig.meteorRadiusMax - waveConfig.meteorRadiusMin);
-  const speed = waveConfig.meteorSpeed - radius * METEOR_SPEED_SIZE_FACTOR;
+  const speed = waveConfig.meteorSpeed;
   const vx = (tdx / tdist) * speed;
   const vy = (tdy / tdist) * speed;
 

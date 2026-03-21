@@ -29,7 +29,6 @@ export const BULLET_CARVE_RADIUS = 12;
 export const MIN_SPLIT_PIXELS = 50;
 
 export const BASE_METEOR_SPEED = 8;
-export const METEOR_SPEED_SIZE_FACTOR = 0.1;
 export const METEOR_SPEED_WAVE_INCREMENT = 2;
 export const GRAVITY_STRENGTH = 3000;
 export const PLANET_ROTATION_SPEED = 0.08;
@@ -46,7 +45,7 @@ export const BETWEEN_WAVE_FOCUS_Y = CANVAS_HEIGHT * 0.35;
 export const CAMERA_LERP_SPEED = 3;
 export const SLOT_INTERACTIVE_RADIUS = 12;
 export const SLOT_HIT_BUFFER = 4;
-export const TURRET_DESTROY_RADIUS_MULTIPLIER = 1.5;
+
 export const SLOT_SURFACE_INWARD = 5;
 export const SLOT_SURFACE_CHECK_RADIUS = 6;
 export const SLOT_SURFACE_THRESHOLD = 5;

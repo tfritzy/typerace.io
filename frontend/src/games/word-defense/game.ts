@@ -17,7 +17,6 @@ import {
   WAVE_SPAWN_INTERVAL_REDUCTION,
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
-  TURRET_DESTROY_RADIUS_MULTIPLIER,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
@@ -441,14 +440,13 @@ export class WordDefenseGame {
         const localCy = relX * rsin + relY * rcos + EARTH_CY;
         destroyCircle(this.planetObj, localCx, localCy, destroyRadius, PLANET_COLOR);
 
-        const turretDestroyRadius = destroyRadius * TURRET_DESTROY_RADIUS_MULTIPLIER;
-        const tdr2 = turretDestroyRadius * turretDestroyRadius;
+        const dr2 = destroyRadius * destroyRadius;
         for (let si = 0; si < this.slots.length; si++) {
           const slot = this.slots[si];
           if (slot.destroyed) continue;
           const sdx = slot.x - cx;
           const sdy = slot.y - cy;
-          if (sdx * sdx + sdy * sdy <= tdr2) {
+          if (sdx * sdx + sdy * sdy <= dr2) {
             slot.filled = false;
             slot.destroyed = true;
             rebuildSlotVisual(si, this.slots, this.turretVisuals, this.planetContainer);
