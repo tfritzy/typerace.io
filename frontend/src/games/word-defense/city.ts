@@ -3,19 +3,20 @@ import {
   CITY_MAX_HEIGHT,
   CITY_EMBED_DEPTH,
 } from "./constants";
-import { noiseHash, valueNoise } from "./noise";
+import { valueNoise } from "./noise";
+
+const CITY_INDEX = 2;
 
 export function stampCities(
-  data: Uint32Array,
+  data: Uint8Array,
   size: number,
   planetRadius: number,
   cityAngles: number[],
-  cityPacked: number,
 ): number {
   let total = 0;
   const center = size / 2;
   for (const angle of cityAngles) {
-    total += stampCity(data, size, center, planetRadius, angle, cityPacked);
+    total += stampCity(data, size, center, planetRadius, angle);
   }
   return total;
 }
@@ -52,12 +53,11 @@ function cityHeight(tangent: number, seed: number): number {
 }
 
 function stampCity(
-  data: Uint32Array,
+  data: Uint8Array,
   size: number,
   center: number,
   radius: number,
   angle: number,
-  cityPacked: number,
 ): number {
   const outX = Math.cos(angle);
   const outY = Math.sin(angle);
@@ -79,7 +79,7 @@ function stampCity(
   for (let py = minPy; py <= maxPy; py++) {
     for (let px = minPx; px <= maxPx; px++) {
       const idx = py * size + px;
-      if (data[idx] === cityPacked) continue;
+      if (data[idx] === CITY_INDEX) continue;
 
       const dx = px - center;
       const dy = py - center;
@@ -94,7 +94,7 @@ function stampCity(
         Math.sqrt(Math.max(0, radius * radius - tangent * tangent)) - radius;
 
       if (r >= surfaceR - CITY_EMBED_DEPTH && r < surfaceR + h) {
-        data[idx] = cityPacked;
+        data[idx] = CITY_INDEX;
         pixelCount++;
       }
     }
@@ -103,10 +103,10 @@ function stampCity(
   return pixelCount;
 }
 
-export function countCityPixels(data: Uint32Array, cityPacked: number): number {
+export function countCityPixels(data: Uint8Array): number {
   let count = 0;
   for (let i = 0; i < data.length; i++) {
-    if (data[i] === cityPacked) count++;
+    if (data[i] === CITY_INDEX) count++;
   }
   return count;
 }

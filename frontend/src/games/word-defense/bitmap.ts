@@ -1,22 +1,29 @@
-import type { SceneObject } from "./types";
+import type { Palette, SceneObject } from "./types";
 import { valueNoise } from "./noise";
 
-export function packColor(r: number, g: number, b: number): number {
-  return (255 << 24) | (b << 16) | (g << 8) | r;
-}
-
 export function rebuildImageData(
-  data: Uint32Array,
+  data: Uint8Array,
   imageData: ImageData,
   width: number,
   height: number,
+  palette: Palette,
 ) {
-  const buf = new ArrayBuffer(width * height * 4);
-  const u32 = new Uint32Array(buf);
+  const pixels = imageData.data;
   for (let i = 0; i < width * height; i++) {
-    u32[i] = data[i];
+    const v = data[i];
+    if (v) {
+      const c = palette[v];
+      pixels[i * 4] = c[0];
+      pixels[i * 4 + 1] = c[1];
+      pixels[i * 4 + 2] = c[2];
+      pixels[i * 4 + 3] = 255;
+    } else {
+      pixels[i * 4] = 0;
+      pixels[i * 4 + 1] = 0;
+      pixels[i * 4 + 2] = 0;
+      pixels[i * 4 + 3] = 0;
+    }
   }
-  new Uint8ClampedArray(imageData.data.buffer).set(new Uint8ClampedArray(buf));
 }
 
 export function updateBitmap(obj: SceneObject) {
@@ -115,7 +122,7 @@ export function destroyCircle(
   }
 
   if (changed) {
-    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height);
+    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, obj.palette);
     updateBitmap(obj);
   }
   return changed;

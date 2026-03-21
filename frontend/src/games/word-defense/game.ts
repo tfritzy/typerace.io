@@ -19,7 +19,7 @@ import {
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
-import { createPlanet, cityPacked as CITY_PACKED } from "./planet";
+import { createPlanet } from "./planet";
 import { countCityPixels } from "./city";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact } from "./meteor";
 import { createTurretSlots, updateTurretPositions, findTurretsWithLineOfSight, fireBullet, isSlotGroundIntact } from "./turret";
@@ -543,7 +543,7 @@ export class WordDefenseGame {
   }
 
   private updateLife() {
-    const remaining = countCityPixels(this.planetObj.data, CITY_PACKED);
+    const remaining = countCityPixels(this.planetObj.data);
     this.life = this.initialCityPixels > 0
       ? Math.round((remaining / this.initialCityPixels) * 100)
       : 0;

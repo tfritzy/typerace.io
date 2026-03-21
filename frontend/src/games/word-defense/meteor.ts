@@ -1,4 +1,4 @@
-import type { Meteor, SceneObject, WaveConfig } from "./types";
+import type { Meteor, SceneObject, WaveConfig, Palette } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
@@ -8,17 +8,18 @@ import {
   ACTIVE_WAVE_ZOOM,
 } from "./constants";
 import { valueNoise } from "./noise";
-import { rebuildImageData, updateBitmap, carveCircle, packColor } from "./bitmap";
+import { rebuildImageData, updateBitmap, carveCircle } from "./bitmap";
 import { getRandomWord } from "../../utils/wordLists";
 
-const meteorPacked = packColor(METEOR_COLOR[0], METEOR_COLOR[1], METEOR_COLOR[2]);
+const METEOR_INDEX = 1;
+const meteorPalette: Palette = [[0, 0, 0], METEOR_COLOR];
 
 function createMeteorBitmap(
   radius: number
-): Pick<SceneObject, "data" | "imageData" | "width" | "height" | "bitmap"> {
+): Pick<SceneObject, "data" | "palette" | "imageData" | "width" | "height" | "bitmap"> {
   const intRadius = Math.ceil(radius);
   const diameter = intRadius * 2;
-  const data = new Uint32Array(diameter * diameter);
+  const data = new Uint8Array(diameter * diameter);
   const seedX = Math.random() * 1000;
   const seedY = Math.random() * 1000;
   const noiseFreq = METEOR_NOISE_FREQ / intRadius;
@@ -29,23 +30,23 @@ function createMeteorBitmap(
       const dy = py - intRadius;
       const dist = Math.sqrt(dx * dx + dy * dy) / intRadius;
       if (dist <= METEOR_CORE_RADIUS) {
-        data[py * diameter + px] = meteorPacked;
+        data[py * diameter + px] = METEOR_INDEX;
         continue;
       }
       const n = valueNoise(px * noiseFreq + seedX, py * noiseFreq + seedY);
       if (dist <= METEOR_CORE_RADIUS + n * METEOR_LUMP_HEIGHT) {
-        data[py * diameter + px] = meteorPacked;
+        data[py * diameter + px] = METEOR_INDEX;
       }
     }
   }
 
   const imageData = new ImageData(diameter, diameter);
-  rebuildImageData(data, imageData, diameter, diameter);
+  rebuildImageData(data, imageData, diameter, diameter, meteorPalette);
   const bitmap = document.createElement("canvas");
   bitmap.width = diameter;
   bitmap.height = diameter;
   bitmap.getContext("2d")!.putImageData(imageData, 0, 0);
-  return { data, imageData, width: diameter, height: diameter, bitmap };
+  return { data, palette: meteorPalette, imageData, width: diameter, height: diameter, bitmap };
 }
 
 export function spawnMeteor(langCode: string, usedWords: Set<string>, waveConfig: WaveConfig): Meteor {
@@ -133,7 +134,7 @@ export function getActiveWords(meteors: Meteor[]): Set<string> {
   return words;
 }
 
-function findConnectedComponents(data: Uint32Array, width: number, height: number): number[][] {
+function findConnectedComponents(data: Uint8Array, width: number, height: number): number[][] {
   const visited = new Uint8Array(width * height);
   const components: number[][] = [];
 
@@ -196,16 +197,16 @@ function createMeteorFromComponent(
 
   const newWidth = maxX - minX + 1;
   const newHeight = maxY - minY + 1;
-  const newData = new Uint32Array(newWidth * newHeight);
+  const newData = new Uint8Array(newWidth * newHeight);
 
   for (const idx of pixelIndices) {
     const x = idx % original.width - minX;
     const y = Math.floor(idx / original.width) - minY;
-    newData[y * newWidth + x] = meteorPacked;
+    newData[y * newWidth + x] = METEOR_INDEX;
   }
 
   const imageData = new ImageData(newWidth, newHeight);
-  rebuildImageData(newData, imageData, newWidth, newHeight);
+  rebuildImageData(newData, imageData, newWidth, newHeight, meteorPalette);
   const bitmap = document.createElement("canvas");
   bitmap.width = newWidth;
   bitmap.height = newHeight;
@@ -225,6 +226,7 @@ function createMeteorFromComponent(
     width: newWidth,
     height: newHeight,
     data: newData,
+    palette: meteorPalette,
     imageData,
     bitmap,
   };
@@ -255,7 +257,7 @@ export function handleBulletImpact(
         }
       }
     }
-    rebuildImageData(meteor.data, meteor.imageData, meteor.width, meteor.height);
+    rebuildImageData(meteor.data, meteor.imageData, meteor.width, meteor.height, meteor.palette);
     updateBitmap(meteor);
     return [meteor];
   }

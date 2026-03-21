@@ -1,11 +1,14 @@
 import type { Container, Sprite, Text, Graphics } from "pixi.js";
 
+export type Palette = [number, number, number][];
+
 export interface SceneObject {
   x: number;
   y: number;
   width: number;
   height: number;
-  data: Uint32Array;
+  data: Uint8Array;
+  palette: Palette;
   imageData: ImageData;
   bitmap: HTMLCanvasElement;
 }
