@@ -18,3 +18,25 @@ export function valueNoise(x: number, y: number): number {
   return (v00 * (1 - sx) + v10 * sx) * (1 - sy) +
     (v01 * (1 - sx) + v11 * sx) * sy;
 }
+
+export function fractalNoise(
+  x: number,
+  y: number,
+  octaves: number,
+  lacunarity: number,
+  persistence: number
+): number {
+  let value = 0;
+  let amplitude = 1;
+  let frequency = 1;
+  let maxValue = 0;
+
+  for (let i = 0; i < octaves; i++) {
+    value += valueNoise(x * frequency, y * frequency) * amplitude;
+    maxValue += amplitude;
+    amplitude *= persistence;
+    frequency *= lacunarity;
+  }
+
+  return value / maxValue;
+}

@@ -8,6 +8,7 @@ export interface SceneObject {
   data: Uint8Array;
   imageData: ImageData;
   bitmap: HTMLCanvasElement;
+  colors?: Uint8Array;
 }
 
 export interface Meteor extends SceneObject {

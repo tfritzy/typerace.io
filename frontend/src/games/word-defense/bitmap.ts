@@ -5,14 +5,21 @@ export function rebuildImageData(
   imageData: ImageData,
   width: number,
   height: number,
-  color: [number, number, number]
+  color: [number, number, number],
+  colors?: Uint8Array
 ) {
   const pixels = imageData.data;
   for (let i = 0; i < width * height; i++) {
     if (data[i]) {
-      pixels[i * 4] = color[0];
-      pixels[i * 4 + 1] = color[1];
-      pixels[i * 4 + 2] = color[2];
+      if (colors) {
+        pixels[i * 4] = colors[i * 3];
+        pixels[i * 4 + 1] = colors[i * 3 + 1];
+        pixels[i * 4 + 2] = colors[i * 3 + 2];
+      } else {
+        pixels[i * 4] = color[0];
+        pixels[i * 4 + 1] = color[1];
+        pixels[i * 4 + 2] = color[2];
+      }
       pixels[i * 4 + 3] = 255;
     } else {
       pixels[i * 4] = 0;
@@ -73,7 +80,7 @@ export function destroyCircle(
 ): boolean {
   const changed = carveCircle(obj, hitX, hitY, radius);
   if (changed) {
-    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, color);
+    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, color, obj.colors);
     updateBitmap(obj);
   }
   return changed;
