@@ -39,30 +39,36 @@ function stampCity(
   for (let i = 0; i < totalWidth; i++) {
     const t = (i - CITY_HALF_WIDTH) / CITY_HALF_WIDTH;
     const envelope = Math.max(0, 1 - t * t);
-    const moundBase = envelope * envelope * CITY_MAX_HEIGHT * 0.5;
-    const n1 = noiseHash(i + seed, seed) * 0.6 + 0.4;
-    heights[i] = moundBase * n1;
+    const moundBase = envelope * envelope * CITY_MAX_HEIGHT * 0.55;
+    const n1 = noiseHash(i + seed, seed) * 0.3 + 0.7;
+    heights[i] = Math.max(1, moundBase * n1);
   }
 
-  const towerCount = 4 + Math.floor(noiseHash(seed, seed + 7) * 4);
+  const towerCount = 5 + Math.floor(noiseHash(seed, seed + 7) * 5);
   for (let ti = 0; ti < towerCount; ti++) {
-    const tPos = Math.floor(CITY_HALF_WIDTH * 0.6 * (noiseHash(seed + ti * 3, seed + ti * 5) * 2 - 1) + CITY_HALF_WIDTH);
-    if (tPos < 2 || tPos >= totalWidth - 2) continue;
+    const tPos = Math.floor(CITY_HALF_WIDTH * 0.7 * (noiseHash(seed + ti * 3, seed + ti * 5) * 2 - 1) + CITY_HALF_WIDTH);
+    if (tPos < 1 || tPos >= totalWidth - 1) continue;
     const t = (tPos - CITY_HALF_WIDTH) / CITY_HALF_WIDTH;
     const envelope = Math.max(0, 1 - t * t);
-    const towerHeight = CITY_MAX_HEIGHT * (0.6 + 0.4 * noiseHash(seed + ti * 11, seed + ti * 13)) * envelope;
-    const towerWidth = 1 + Math.floor(noiseHash(seed + ti * 17, seed + ti * 19) * 2);
-    for (let w = 0; w < towerWidth && tPos + w < totalWidth; w++) {
-      heights[tPos + w] = Math.max(heights[tPos + w], towerHeight);
+    const baseHeight = heights[tPos];
+    const maxExtra = CITY_MAX_HEIGHT * envelope - baseHeight;
+    if (maxExtra <= 0) continue;
+    const towerHeight = baseHeight + maxExtra * (0.4 + 0.5 * noiseHash(seed + ti * 11, seed + ti * 13));
+    heights[tPos] = Math.max(heights[tPos], towerHeight);
+  }
+
+  for (let i = 1; i < totalWidth - 1; i++) {
+    const prev = heights[i - 1];
+    const next = heights[i + 1];
+    const minNeighbor = Math.min(prev, next);
+    if (heights[i] < minNeighbor) {
+      heights[i] = minNeighbor;
     }
   }
 
   let pixelCount = 0;
 
   for (let i = 0; i < totalWidth; i++) {
-    const isGap = noiseHash(i + seed * 3, seed + 99) < 0.08;
-    if (isGap) continue;
-
     const colHeight = Math.floor(heights[i]);
     if (colHeight < 1) continue;
 
@@ -79,8 +85,8 @@ function stampCity(
       }
     }
 
-    if (colHeight > CITY_MAX_HEIGHT * 0.5 && noiseHash(i + seed * 7, seed + 200) < 0.35) {
-      const spireHeight = 2 + Math.floor(noiseHash(i + seed * 9, seed + 300) * 5);
+    if (colHeight > CITY_MAX_HEIGHT * 0.6 && noiseHash(i + seed * 7, seed + 200) < 0.25) {
+      const spireHeight = 1 + Math.floor(noiseHash(i + seed * 9, seed + 300) * 3);
       for (let r = colHeight; r < colHeight + spireHeight; r++) {
         const px = Math.round(center + outX * (radius + r) + tanX * tangentOffset);
         const py = Math.round(center + outY * (radius + r) + tanY * tangentOffset);
