@@ -1,7 +1,7 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { getRandomWord } from "../../utils/wordLists";
 import { getLanguageFromSlug } from "../../utils/modes";
-import type { SceneObject, Meteor, TurretSlot, Bullet } from "./types";
+import type { SceneObject, Meteor, TurretSlot, Bullet, WaveConfig, WavePhase } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
@@ -9,6 +9,11 @@ import {
   METEOR_CLEANUP_MARGIN, IMPACT_RADIUS_SCALE,
   WORD_FONT, WORD_FONT_SIZE,
   WORD_TYPED_ALPHA, WORD_UNTYPED_ALPHA, WORD_OFFSET_Y,
+  BASE_METEOR_SPEED,
+  BASE_METEORS_PER_WAVE, METEORS_PER_WAVE_INCREMENT,
+  BASE_METEOR_RADIUS_MIN, BASE_METEOR_RADIUS_MAX,
+  WAVE_RADIUS_GROWTH, MAX_METEOR_RADIUS,
+  WAVE_SPAWN_INTERVAL_REDUCTION,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
@@ -23,6 +28,19 @@ function getCurrentLangCode(): string {
   return getLanguageFromSlug(slug ?? undefined).htmlLang;
 }
 
+function createWaveConfig(waveNumber: number): WaveConfig {
+  const spawnFactor = Math.pow(WAVE_SPAWN_INTERVAL_REDUCTION, waveNumber - 1);
+  return {
+    waveNumber,
+    totalMeteors: BASE_METEORS_PER_WAVE + (waveNumber - 1) * METEORS_PER_WAVE_INCREMENT,
+    spawnIntervalMin: SPAWN_INTERVAL_MIN * spawnFactor,
+    spawnIntervalMax: SPAWN_INTERVAL_MAX * spawnFactor,
+    meteorRadiusMin: Math.min(BASE_METEOR_RADIUS_MIN + (waveNumber - 1) * WAVE_RADIUS_GROWTH, MAX_METEOR_RADIUS - 5),
+    meteorRadiusMax: Math.min(BASE_METEOR_RADIUS_MAX + (waveNumber - 1) * WAVE_RADIUS_GROWTH, MAX_METEOR_RADIUS),
+    meteorSpeed: BASE_METEOR_SPEED + (waveNumber - 1) * 8,
+  };
+}
+
 export const GameCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -32,6 +50,11 @@ export const GameCanvas = () => {
   const bulletsRef = useRef<Bullet[]>([]);
   const colorRef = useRef<[number, number, number]>([230, 169, 25]);
   const langCodeRef = useRef(getCurrentLangCode());
+  const waveConfigRef = useRef<WaveConfig>(createWaveConfig(1));
+  const wavePhaseRef = useRef<WavePhase>("active");
+  const meteorsSpawnedRef = useRef(0);
+  const [wavePhase, setWavePhase] = useState<WavePhase>("active");
+  const [waveNumber, setWaveNumber] = useState(1);
 
   const render = useCallback(() => {
     const ctx = ctxRef.current;
@@ -77,6 +100,13 @@ export const GameCanvas = () => {
 
     ctx.globalAlpha = 1.0;
     ctx.shadowBlur = 0;
+
+    ctx.font = "bold 24px monospace";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#ffffff";
+    ctx.globalAlpha = 0.7;
+    ctx.fillText(`Wave ${waveConfigRef.current.waveNumber}`, 20, 36);
+    ctx.globalAlpha = 1.0;
   }, []);
 
   useEffect(() => {
@@ -115,14 +145,30 @@ export const GameCanvas = () => {
     function loop(timestamp: number) {
       const dt = (timestamp - lastTime) / 1000;
       if (lastTime > 0) {
-        spawnTimer += dt * 1000;
-        if (spawnTimer >= nextSpawn) {
-          const usedWords = getActiveWords(meteorsRef.current);
-          meteorsRef.current.push(spawnMeteor(langCode, usedWords));
-          spawnTimer = 0;
-          nextSpawn =
-            SPAWN_INTERVAL_MIN +
-            Math.random() * (SPAWN_INTERVAL_MAX - SPAWN_INTERVAL_MIN);
+        const waveConfig = waveConfigRef.current;
+        const isActive = wavePhaseRef.current === "active";
+
+        if (isActive && meteorsSpawnedRef.current < waveConfig.totalMeteors) {
+          spawnTimer += dt * 1000;
+          if (spawnTimer >= nextSpawn) {
+            const usedWords = getActiveWords(meteorsRef.current);
+            meteorsRef.current.push(spawnMeteor(langCode, usedWords, waveConfig));
+            meteorsSpawnedRef.current++;
+            spawnTimer = 0;
+            nextSpawn =
+              waveConfig.spawnIntervalMin +
+              Math.random() * (waveConfig.spawnIntervalMax - waveConfig.spawnIntervalMin);
+          }
+        }
+
+        if (
+          isActive &&
+          meteorsSpawnedRef.current >= waveConfig.totalMeteors &&
+          meteorsRef.current.length === 0 &&
+          bulletsRef.current.length === 0
+        ) {
+          wavePhaseRef.current = "complete";
+          setWavePhase("complete");
         }
 
         const planet = objectsRef.current[0];
@@ -232,11 +278,45 @@ export const GameCanvas = () => {
     };
   }, [render]);
 
+  const startNextWave = useCallback(() => {
+    const next = waveConfigRef.current.waveNumber + 1;
+    waveConfigRef.current = createWaveConfig(next);
+    wavePhaseRef.current = "active";
+    meteorsSpawnedRef.current = 0;
+    setWavePhase("active");
+    setWaveNumber(next);
+  }, []);
+
   return (
-    <canvas
-      ref={canvasRef}
-      className="w-full rounded-lg"
-      style={{ aspectRatio: "16/9" }}
-    />
+    <div className="relative" style={{ aspectRatio: "16/9" }}>
+      <canvas
+        ref={canvasRef}
+        className="w-full rounded-lg"
+        style={{ aspectRatio: "16/9" }}
+      />
+      {wavePhase === "complete" && (
+        <div className="absolute inset-0 flex items-center justify-center rounded-lg"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}>
+          <div className="text-center">
+            <h2 className="text-4xl font-bold text-white mb-2">
+              Wave {waveNumber} Complete!
+            </h2>
+            <p className="text-lg text-gray-300 mb-6">
+              Prepare for wave {waveNumber + 1}
+            </p>
+            <button
+              onClick={startNextWave}
+              className="px-8 py-3 text-lg font-bold rounded-lg text-white cursor-pointer"
+              style={{
+                backgroundColor: "var(--accent-primary)",
+                border: "none",
+              }}
+            >
+              Start Next Wave
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };

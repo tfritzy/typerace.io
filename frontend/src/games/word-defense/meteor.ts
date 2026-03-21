@@ -1,10 +1,11 @@
-import type { Meteor, SceneObject } from "./types";
+import type { Meteor, SceneObject, WaveConfig } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
   METEOR_COLOR, METEOR_NOISE_FREQ,
   METEOR_CORE_RADIUS, METEOR_LUMP_HEIGHT,
   BULLET_CARVE_RADIUS, MIN_SPLIT_PIXELS,
+  METEOR_SPEED_SIZE_FACTOR,
 } from "./constants";
 import { valueNoise } from "./noise";
 import { rebuildImageData, updateBitmap, carveCircle } from "./bitmap";
@@ -45,7 +46,7 @@ function createMeteorBitmap(
   return { data, imageData, width: diameter, height: diameter, bitmap };
 }
 
-export function spawnMeteor(langCode: string, usedWords: Set<string>): Meteor {
+export function spawnMeteor(langCode: string, usedWords: Set<string>, waveConfig: WaveConfig): Meteor {
   const side = Math.floor(Math.random() * 4);
   const margin = 60;
   let x: number, y: number;
@@ -74,8 +75,8 @@ export function spawnMeteor(langCode: string, usedWords: Set<string>): Meteor {
   const tdy = EARTH_CY + perpY * aimOffset - y;
   const tdist = Math.sqrt(tdx * tdx + tdy * tdy);
 
-  const radius = 15 + Math.random() * 20;
-  const speed = 150 - radius * 1.5;
+  const radius = waveConfig.meteorRadiusMin + Math.random() * (waveConfig.meteorRadiusMax - waveConfig.meteorRadiusMin);
+  const speed = waveConfig.meteorSpeed - radius * METEOR_SPEED_SIZE_FACTOR;
   const vx = (tdx / tdist) * speed;
   const vy = (tdy / tdist) * speed;
 

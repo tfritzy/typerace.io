@@ -30,3 +30,15 @@ export interface Bullet {
   vy: number;
   target: Meteor;
 }
+
+export interface WaveConfig {
+  waveNumber: number;
+  totalMeteors: number;
+  spawnIntervalMin: number;
+  spawnIntervalMax: number;
+  meteorRadiusMin: number;
+  meteorRadiusMax: number;
+  meteorSpeed: number;
+}
+
+export type WavePhase = "active" | "complete";
