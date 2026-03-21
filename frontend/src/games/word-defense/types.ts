@@ -5,7 +5,7 @@ export interface SceneObject {
   y: number;
   width: number;
   height: number;
-  data: Uint8Array;
+  data: Uint32Array;
   imageData: ImageData;
   bitmap: HTMLCanvasElement;
 }

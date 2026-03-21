@@ -1,29 +1,22 @@
 import type { SceneObject } from "./types";
 import { valueNoise } from "./noise";
 
+export function packColor(r: number, g: number, b: number): number {
+  return (255 << 24) | (b << 16) | (g << 8) | r;
+}
+
 export function rebuildImageData(
-  data: Uint8Array,
+  data: Uint32Array,
   imageData: ImageData,
   width: number,
   height: number,
-  color: [number, number, number],
-  cityColor?: [number, number, number]
 ) {
-  const pixels = imageData.data;
+  const buf = new ArrayBuffer(width * height * 4);
+  const u32 = new Uint32Array(buf);
   for (let i = 0; i < width * height; i++) {
-    if (data[i]) {
-      const c = (cityColor && data[i] === 2) ? cityColor : color;
-      pixels[i * 4] = c[0];
-      pixels[i * 4 + 1] = c[1];
-      pixels[i * 4 + 2] = c[2];
-      pixels[i * 4 + 3] = 255;
-    } else {
-      pixels[i * 4] = 0;
-      pixels[i * 4 + 1] = 0;
-      pixels[i * 4 + 2] = 0;
-      pixels[i * 4 + 3] = 0;
-    }
+    u32[i] = data[i];
   }
+  new Uint8ClampedArray(imageData.data.buffer).set(new Uint8ClampedArray(buf));
 }
 
 export function updateBitmap(obj: SceneObject) {
@@ -72,8 +65,6 @@ export function destroyCircle(
   hitX: number,
   hitY: number,
   radius: number,
-  color: [number, number, number],
-  cityColor?: [number, number, number]
 ): boolean {
   const localX = hitX - obj.x;
   const localY = hitY - obj.y;
@@ -124,7 +115,7 @@ export function destroyCircle(
   }
 
   if (changed) {
-    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, color, cityColor);
+    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height);
     updateBitmap(obj);
   }
   return changed;

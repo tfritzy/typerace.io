@@ -8,15 +8,17 @@ import {
   ACTIVE_WAVE_ZOOM,
 } from "./constants";
 import { valueNoise } from "./noise";
-import { rebuildImageData, updateBitmap, carveCircle } from "./bitmap";
+import { rebuildImageData, updateBitmap, carveCircle, packColor } from "./bitmap";
 import { getRandomWord } from "../../utils/wordLists";
+
+const meteorPacked = packColor(METEOR_COLOR[0], METEOR_COLOR[1], METEOR_COLOR[2]);
 
 function createMeteorBitmap(
   radius: number
 ): Pick<SceneObject, "data" | "imageData" | "width" | "height" | "bitmap"> {
   const intRadius = Math.ceil(radius);
   const diameter = intRadius * 2;
-  const data = new Uint8Array(diameter * diameter);
+  const data = new Uint32Array(diameter * diameter);
   const seedX = Math.random() * 1000;
   const seedY = Math.random() * 1000;
   const noiseFreq = METEOR_NOISE_FREQ / intRadius;
@@ -27,18 +29,18 @@ function createMeteorBitmap(
       const dy = py - intRadius;
       const dist = Math.sqrt(dx * dx + dy * dy) / intRadius;
       if (dist <= METEOR_CORE_RADIUS) {
-        data[py * diameter + px] = 1;
+        data[py * diameter + px] = meteorPacked;
         continue;
       }
       const n = valueNoise(px * noiseFreq + seedX, py * noiseFreq + seedY);
       if (dist <= METEOR_CORE_RADIUS + n * METEOR_LUMP_HEIGHT) {
-        data[py * diameter + px] = 1;
+        data[py * diameter + px] = meteorPacked;
       }
     }
   }
 
   const imageData = new ImageData(diameter, diameter);
-  rebuildImageData(data, imageData, diameter, diameter, METEOR_COLOR);
+  rebuildImageData(data, imageData, diameter, diameter);
   const bitmap = document.createElement("canvas");
   bitmap.width = diameter;
   bitmap.height = diameter;
@@ -131,7 +133,7 @@ export function getActiveWords(meteors: Meteor[]): Set<string> {
   return words;
 }
 
-function findConnectedComponents(data: Uint8Array, width: number, height: number): number[][] {
+function findConnectedComponents(data: Uint32Array, width: number, height: number): number[][] {
   const visited = new Uint8Array(width * height);
   const components: number[][] = [];
 
@@ -194,16 +196,16 @@ function createMeteorFromComponent(
 
   const newWidth = maxX - minX + 1;
   const newHeight = maxY - minY + 1;
-  const newData = new Uint8Array(newWidth * newHeight);
+  const newData = new Uint32Array(newWidth * newHeight);
 
   for (const idx of pixelIndices) {
     const x = idx % original.width - minX;
     const y = Math.floor(idx / original.width) - minY;
-    newData[y * newWidth + x] = 1;
+    newData[y * newWidth + x] = meteorPacked;
   }
 
   const imageData = new ImageData(newWidth, newHeight);
-  rebuildImageData(newData, imageData, newWidth, newHeight, METEOR_COLOR);
+  rebuildImageData(newData, imageData, newWidth, newHeight);
   const bitmap = document.createElement("canvas");
   bitmap.width = newWidth;
   bitmap.height = newHeight;
@@ -253,7 +255,7 @@ export function handleBulletImpact(
         }
       }
     }
-    rebuildImageData(meteor.data, meteor.imageData, meteor.width, meteor.height, METEOR_COLOR);
+    rebuildImageData(meteor.data, meteor.imageData, meteor.width, meteor.height);
     updateBitmap(meteor);
     return [meteor];
   }

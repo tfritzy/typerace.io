@@ -5,7 +5,7 @@ import type { Meteor, TurretSlot, Bullet, WaveConfig, WavePhase, MeteorObject, S
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
-  PLANET_COLOR, CITY_COLOR, CITY_COUNT,
+  CITY_COUNT,
   SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_MAX,
   METEOR_CLEANUP_MARGIN, IMPACT_RADIUS_SCALE,
   WORD_FONT_SIZE,
@@ -19,7 +19,7 @@ import {
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
-import { createPlanet } from "./planet";
+import { createPlanet, cityPacked as CITY_PACKED } from "./planet";
 import { countCityPixels } from "./city";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact } from "./meteor";
 import { createTurretSlots, updateTurretPositions, findTurretsWithLineOfSight, fireBullet, isSlotGroundIntact } from "./turret";
@@ -126,7 +126,7 @@ export class WordDefenseGame {
     const cityAngles = Array.from({ length: CITY_COUNT }, (_, i) =>
       (i / CITY_COUNT) * Math.PI * 2 - Math.PI / 2,
     );
-    const { planet, initialCityPixels } = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS, PLANET_COLOR, cityAngles);
+    const { planet, initialCityPixels } = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS, cityAngles);
     this.planetObj = planet;
     this.initialCityPixels = initialCityPixels;
     this.planetContainer = new Container();
@@ -503,7 +503,7 @@ export class WordDefenseGame {
         const rsin = Math.sin(-this.planetRotation);
         const localCx = relX * rcos - relY * rsin + EARTH_CX;
         const localCy = relX * rsin + relY * rcos + EARTH_CY;
-        destroyCircle(this.planetObj, localCx, localCy, destroyRadius, PLANET_COLOR, CITY_COLOR);
+        destroyCircle(this.planetObj, localCx, localCy, destroyRadius);
         this.updateLife();
 
         const dr2 = destroyRadius * destroyRadius;
@@ -543,7 +543,7 @@ export class WordDefenseGame {
   }
 
   private updateLife() {
-    const remaining = countCityPixels(this.planetObj.data);
+    const remaining = countCityPixels(this.planetObj.data, CITY_PACKED);
     this.life = this.initialCityPixels > 0
       ? Math.round((remaining / this.initialCityPixels) * 100)
       : 0;
