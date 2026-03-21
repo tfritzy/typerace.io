@@ -1,9 +1,10 @@
-import type { Bullet, Meteor, TurretSlot } from "./types";
+import type { Bullet, Meteor, SceneObject, TurretSlot } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
   TOTAL_TURRET_SLOTS, INITIAL_TURRET_COUNT,
   BULLET_SPEED,
+  SLOT_SURFACE_INWARD, SLOT_SURFACE_CHECK_RADIUS, SLOT_SURFACE_THRESHOLD,
 } from "./constants";
 
 export function createTurretSlots(): TurretSlot[] {
@@ -20,6 +21,7 @@ export function createTurretSlots(): TurretSlot[] {
       x,
       y,
       filled: i % filledInterval === 0,
+      destroyed: false,
     });
   }
 
@@ -61,7 +63,7 @@ export function findTurretsWithLineOfSight(
 ): TurretSlot[] {
   const result: TurretSlot[] = [];
   for (const slot of slots) {
-    if (slot.filled && hasLineOfSight(slot, targetX, targetY)) {
+    if (slot.filled && !slot.destroyed && hasLineOfSight(slot, targetX, targetY)) {
       result.push(slot);
     }
   }
@@ -144,4 +146,25 @@ export function updateBullets(
   return hits;
 }
 
+export function isSlotGroundIntact(planet: SceneObject, slot: TurretSlot): boolean {
+  const checkX = Math.cos(slot.baseAngle) * (EARTH_RADIUS - SLOT_SURFACE_INWARD) + EARTH_RADIUS;
+  const checkY = Math.sin(slot.baseAngle) * (EARTH_RADIUS - SLOT_SURFACE_INWARD) + EARTH_RADIUS;
+  const r = SLOT_SURFACE_CHECK_RADIUS;
+  const r2 = r * r;
+  let solidCount = 0;
 
+  for (let dy = -r; dy <= r; dy++) {
+    for (let dx = -r; dx <= r; dx++) {
+      if (dx * dx + dy * dy > r2) continue;
+      const px = Math.floor(checkX + dx);
+      const py = Math.floor(checkY + dy);
+      if (px >= 0 && px < planet.width && py >= 0 && py < planet.height) {
+        if (planet.data[py * planet.width + px] !== 0) {
+          solidCount++;
+        }
+      }
+    }
+  }
+
+  return solidCount >= SLOT_SURFACE_THRESHOLD;
+}

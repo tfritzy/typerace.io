@@ -24,6 +24,7 @@ export interface TurretSlot {
   x: number;
   y: number;
   filled: boolean;
+  destroyed: boolean;
 }
 
 export interface Bullet {
