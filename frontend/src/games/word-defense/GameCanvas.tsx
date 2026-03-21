@@ -1,4 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
+import { getRandomWord } from "../../utils/wordLists";
+import { getLanguageFromSlug } from "../../utils/modes";
 
 const CANVAS_WIDTH = 1920;
 const CANVAS_HEIGHT = 1080;
@@ -10,7 +12,14 @@ const SPAWN_INTERVAL_MAX = 3500;
 const METEOR_CLEANUP_MARGIN = 200;
 const IMPACT_RADIUS_SCALE = 1 / 20;
 const METEOR_COLOR: [number, number, number] = [107, 90, 62];
-const METEOR_ANGULAR_SEGMENTS = 32;
+const METEOR_NOISE_FREQ = 1.5;
+const METEOR_CORE_RADIUS = 0.45;
+const METEOR_LUMP_HEIGHT = 0.55;
+const WORD_FONT_SIZE = 28;
+const WORD_FONT = `bold ${WORD_FONT_SIZE}px monospace`;
+const WORD_TYPED_ALPHA = 1.0;
+const WORD_UNTYPED_ALPHA = 0.35;
+const WORD_OFFSET_Y = 10;
 
 interface SceneObject {
   x: number;
@@ -19,35 +28,66 @@ interface SceneObject {
   height: number;
   data: Uint8Array;
   imageData: ImageData;
+  bitmap: HTMLCanvasElement;
 }
 
 interface Meteor extends SceneObject {
   vx: number;
   vy: number;
   radius: number;
+  word: string;
+  typedCount: number;
+}
+
+function noiseHash(x: number, y: number): number {
+  let h = (x * 374761393 + y * 668265263) | 0;
+  h = ((h ^ (h >> 13)) * 1274126177) | 0;
+  return ((h ^ (h >> 16)) & 0xff) / 255;
+}
+
+function valueNoise(x: number, y: number): number {
+  const ix = Math.floor(x);
+  const iy = Math.floor(y);
+  const fx = x - ix;
+  const fy = y - iy;
+  const sx = fx * fx * (3 - 2 * fx);
+  const sy = fy * fy * (3 - 2 * fy);
+  const v00 = noiseHash(ix, iy);
+  const v10 = noiseHash(ix + 1, iy);
+  const v01 = noiseHash(ix, iy + 1);
+  const v11 = noiseHash(ix + 1, iy + 1);
+  return (v00 * (1 - sx) + v10 * sx) * (1 - sy) +
+    (v01 * (1 - sx) + v11 * sx) * sy;
+}
+
+function updateBitmap(obj: SceneObject) {
+  obj.bitmap.width = obj.width;
+  obj.bitmap.height = obj.height;
+  const bctx = obj.bitmap.getContext("2d")!;
+  bctx.putImageData(obj.imageData, 0, 0);
 }
 
 function createMeteorBitmap(
   radius: number
-): Pick<SceneObject, "data" | "imageData" | "width" | "height"> {
+): Pick<SceneObject, "data" | "imageData" | "width" | "height" | "bitmap"> {
   const intRadius = Math.ceil(radius);
   const diameter = intRadius * 2;
   const data = new Uint8Array(diameter * diameter);
-  const noiseTable = Array.from(
-    { length: METEOR_ANGULAR_SEGMENTS },
-    () => 0.65 + Math.random() * 0.7
-  );
+  const seedX = Math.random() * 1000;
+  const seedY = Math.random() * 1000;
+  const noiseFreq = METEOR_NOISE_FREQ / intRadius;
 
   for (let py = 0; py < diameter; py++) {
     for (let px = 0; px < diameter; px++) {
       const dx = px - intRadius;
       const dy = py - intRadius;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const angle = Math.atan2(dy, dx);
-      const t = (angle + Math.PI) / (2 * Math.PI);
-      const noiseIndex =
-        Math.floor(t * METEOR_ANGULAR_SEGMENTS) % METEOR_ANGULAR_SEGMENTS;
-      if (dist <= radius * noiseTable[noiseIndex]) {
+      const dist = Math.sqrt(dx * dx + dy * dy) / intRadius;
+      if (dist <= METEOR_CORE_RADIUS) {
+        data[py * diameter + px] = 1;
+        continue;
+      }
+      const n = valueNoise(px * noiseFreq + seedX, py * noiseFreq + seedY);
+      if (dist <= METEOR_CORE_RADIUS + n * METEOR_LUMP_HEIGHT) {
         data[py * diameter + px] = 1;
       }
     }
@@ -55,10 +95,14 @@ function createMeteorBitmap(
 
   const imageData = new ImageData(diameter, diameter);
   rebuildImageData(data, imageData, diameter, diameter, METEOR_COLOR);
-  return { data, imageData, width: diameter, height: diameter };
+  const bitmap = document.createElement("canvas");
+  bitmap.width = diameter;
+  bitmap.height = diameter;
+  bitmap.getContext("2d")!.putImageData(imageData, 0, 0);
+  return { data, imageData, width: diameter, height: diameter, bitmap };
 }
 
-function spawnMeteor(): Meteor {
+function spawnMeteor(langCode: string, usedWords: Set<string>): Meteor {
   const side = Math.floor(Math.random() * 4);
   const margin = 60;
   let x: number, y: number;
@@ -93,6 +137,7 @@ function spawnMeteor(): Meteor {
   const vy = (tdy / tdist) * speed;
 
   const bitmap = createMeteorBitmap(radius);
+  const word = getRandomWord(langCode, usedWords);
 
   return {
     x: x - bitmap.width / 2,
@@ -100,6 +145,8 @@ function spawnMeteor(): Meteor {
     vx,
     vy,
     radius,
+    word,
+    typedCount: 0,
     ...bitmap,
   };
 }
@@ -154,6 +201,10 @@ function createPlanet(
 
   const imageData = new ImageData(diameter, diameter);
   rebuildImageData(data, imageData, diameter, diameter, color);
+  const bitmap = document.createElement("canvas");
+  bitmap.width = diameter;
+  bitmap.height = diameter;
+  bitmap.getContext("2d")!.putImageData(imageData, 0, 0);
 
   return {
     x: cx - radius,
@@ -162,6 +213,7 @@ function createPlanet(
     height: diameter,
     data,
     imageData,
+    bitmap,
   };
 }
 
@@ -223,9 +275,21 @@ function destroyCircle(
 
   if (changed) {
     rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, color);
+    updateBitmap(obj);
   }
 
   return changed;
+}
+
+function getActiveWords(meteors: Meteor[]): Set<string> {
+  const words = new Set<string>();
+  for (const m of meteors) words.add(m.word);
+  return words;
+}
+
+function getCurrentLangCode(): string {
+  const slug = localStorage.getItem("typerace_lang_slug");
+  return getLanguageFromSlug(slug ?? undefined).htmlLang;
 }
 
 export const GameCanvas = () => {
@@ -234,6 +298,7 @@ export const GameCanvas = () => {
   const objectsRef = useRef<SceneObject[]>([]);
   const meteorsRef = useRef<Meteor[]>([]);
   const colorRef = useRef<[number, number, number]>([230, 169, 25]);
+  const langCodeRef = useRef(getCurrentLangCode());
 
   const render = useCallback(() => {
     const ctx = ctxRef.current;
@@ -242,12 +307,39 @@ export const GameCanvas = () => {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     for (const obj of objectsRef.current) {
-      ctx.putImageData(obj.imageData, obj.x, obj.y);
+      ctx.drawImage(obj.bitmap, Math.round(obj.x), Math.round(obj.y));
     }
 
     for (const meteor of meteorsRef.current) {
-      ctx.putImageData(meteor.imageData, meteor.x, meteor.y);
+      ctx.drawImage(meteor.bitmap, Math.round(meteor.x), Math.round(meteor.y));
     }
+
+    ctx.font = WORD_FONT;
+    ctx.textAlign = "center";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+    ctx.shadowBlur = 4;
+
+    for (const meteor of meteorsRef.current) {
+      const wordX = meteor.x + meteor.radius;
+      const wordY = meteor.y + meteor.radius * 2 + WORD_OFFSET_Y + WORD_FONT_SIZE;
+      const typedCount = meteor.typedCount;
+
+      ctx.globalAlpha = WORD_UNTYPED_ALPHA;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(meteor.word, wordX, wordY);
+
+      if (typedCount > 0) {
+        const typed = meteor.word.slice(0, typedCount);
+        const fullWidth = ctx.measureText(meteor.word).width;
+        ctx.textAlign = "left";
+        ctx.globalAlpha = WORD_TYPED_ALPHA;
+        ctx.fillText(typed, wordX - fullWidth / 2, wordY);
+        ctx.textAlign = "center";
+      }
+    }
+
+    ctx.globalAlpha = 1.0;
+    ctx.shadowBlur = 0;
   }, []);
 
   useEffect(() => {
@@ -274,6 +366,8 @@ export const GameCanvas = () => {
     ];
     meteorsRef.current = [];
 
+    const langCode = langCodeRef.current;
+
     let animFrame: number;
     let lastTime = 0;
     let spawnTimer = 0;
@@ -284,7 +378,8 @@ export const GameCanvas = () => {
       if (lastTime > 0) {
         spawnTimer += dt * 1000;
         if (spawnTimer >= nextSpawn) {
-          meteorsRef.current.push(spawnMeteor());
+          const usedWords = getActiveWords(meteorsRef.current);
+          meteorsRef.current.push(spawnMeteor(langCode, usedWords));
           spawnTimer = 0;
           nextSpawn =
             SPAWN_INTERVAL_MIN +
@@ -302,17 +397,16 @@ export const GameCanvas = () => {
           const cx = meteor.x + meteor.radius;
           const cy = meteor.y + meteor.radius;
 
+          let removed = false;
+
           if (
             cx < -METEOR_CLEANUP_MARGIN ||
             cx > CANVAS_WIDTH + METEOR_CLEANUP_MARGIN ||
             cy < -METEOR_CLEANUP_MARGIN ||
             cy > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
           ) {
-            meteors.splice(i, 1);
-            continue;
-          }
-
-          if (planet && checkMeteorHitsPlanet(planet, meteor)) {
+            removed = true;
+          } else if (planet && checkMeteorHitsPlanet(planet, meteor)) {
             const destroyRadius = Math.max(
               meteor.radius * 1.2,
               meteor.radius * meteor.radius * IMPACT_RADIUS_SCALE
@@ -324,6 +418,10 @@ export const GameCanvas = () => {
               destroyRadius,
               colorRef.current
             );
+            removed = true;
+          }
+
+          if (removed) {
             meteors.splice(i, 1);
           }
         }
@@ -333,10 +431,34 @@ export const GameCanvas = () => {
       animFrame = requestAnimationFrame(loop);
     }
 
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key.length !== 1) return;
+
+      const key = e.key;
+      const meteors = meteorsRef.current;
+
+      for (const meteor of meteors) {
+        const nextChar = meteor.word[meteor.typedCount];
+        if (key === nextChar) {
+          meteor.typedCount++;
+          if (meteor.typedCount >= meteor.word.length) {
+            const usedWords = getActiveWords(meteors);
+            meteor.word = getRandomWord(langCode, usedWords);
+            meteor.typedCount = 0;
+          }
+        } else if (meteor.typedCount > 0 && key !== nextChar) {
+          meteor.typedCount = 0;
+        }
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
     animFrame = requestAnimationFrame(loop);
 
     return () => {
       cancelAnimationFrame(animFrame);
+      document.removeEventListener("keydown", onKeyDown);
       ctxRef.current = null;
       objectsRef.current = [];
       meteorsRef.current = [];
