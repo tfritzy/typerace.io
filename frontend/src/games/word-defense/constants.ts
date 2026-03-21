@@ -41,3 +41,4 @@ export const WAVE_SPAWN_INTERVAL_REDUCTION = 0.9;
 export const BETWEEN_WAVE_ZOOM = 2.0;
 export const CAMERA_LERP_SPEED = 3;
 export const SLOT_INTERACTIVE_RADIUS = 12;
+export const SLOT_HIT_BUFFER = 4;

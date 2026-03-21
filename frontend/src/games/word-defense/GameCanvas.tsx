@@ -15,7 +15,7 @@ import {
   WAVE_RADIUS_GROWTH, MAX_METEOR_RADIUS,
   WAVE_SPAWN_INTERVAL_REDUCTION,
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
-  BETWEEN_WAVE_ZOOM, CAMERA_LERP_SPEED, SLOT_INTERACTIVE_RADIUS,
+  BETWEEN_WAVE_ZOOM, CAMERA_LERP_SPEED, SLOT_INTERACTIVE_RADIUS, SLOT_HIT_BUFFER,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
@@ -337,7 +337,7 @@ export const GameCanvas = () => {
     };
 
     const findSlotAt = (worldX: number, worldY: number): TurretSlot | null => {
-      const hitRadius = SLOT_INTERACTIVE_RADIUS + 4;
+      const hitRadius = SLOT_INTERACTIVE_RADIUS + SLOT_HIT_BUFFER;
       const hitRadiusSq = hitRadius * hitRadius;
       for (const slot of turretSlotsRef.current) {
         const dx = slot.x - worldX;

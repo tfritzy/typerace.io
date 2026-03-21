@@ -181,15 +181,18 @@ export function renderTurrets(
       }
     } else {
       if (interactive) {
+        const circleAlpha = isSelected ? 0.8 : isHovered ? 0.5 : 0.3;
+        const plusAlpha = isSelected ? 0.7 : isHovered ? 0.4 : 0.2;
+
         ctx.beginPath();
         ctx.arc(slot.x, slot.y, SLOT_INTERACTIVE_RADIUS, 0, Math.PI * 2);
-        ctx.strokeStyle = isSelected ? "rgba(255, 255, 255, 0.8)" : isHovered ? "rgba(255, 255, 255, 0.5)" : "rgba(255, 255, 255, 0.3)";
+        ctx.strokeStyle = `rgba(255, 255, 255, ${circleAlpha})`;
         ctx.lineWidth = isSelected ? 2 : 1.5;
         ctx.setLineDash([3, 3]);
         ctx.stroke();
         ctx.setLineDash([]);
 
-        ctx.strokeStyle = isSelected ? "rgba(255, 255, 255, 0.7)" : isHovered ? "rgba(255, 255, 255, 0.4)" : "rgba(255, 255, 255, 0.2)";
+        ctx.strokeStyle = `rgba(255, 255, 255, ${plusAlpha})`;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(slot.x - 4, slot.y);
