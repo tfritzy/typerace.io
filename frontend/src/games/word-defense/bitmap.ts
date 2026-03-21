@@ -76,7 +76,7 @@ export function destroyCircle(
   const localY = hitY - obj.y;
   let changed = false;
 
-  const outerRadius = radius * 1.3;
+  const outerRadius = radius * 1.4;
   const minX = Math.max(0, Math.floor(localX - outerRadius));
   const maxX = Math.min(obj.width - 1, Math.ceil(localX + outerRadius));
   const minY = Math.max(0, Math.floor(localY - outerRadius));
@@ -97,7 +97,7 @@ export function destroyCircle(
       const dy = y - localY;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      const edgeNoise = valueNoise(x * 0.3 + noiseSeed, y * 0.3) * 0.35;
+      const edgeNoise = (valueNoise(x * 0.3 + noiseSeed, y * 0.3) - 0.5) * 0.7;
       const effectiveRadius = radius * (1 + edgeNoise);
 
       if (dist <= effectiveRadius) {
