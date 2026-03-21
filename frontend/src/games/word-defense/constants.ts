@@ -3,6 +3,7 @@ export const CANVAS_HEIGHT = 1080;
 export const EARTH_CX = CANVAS_WIDTH / 2;
 export const EARTH_CY = CANVAS_HEIGHT / 2;
 export const EARTH_RADIUS = 200;
+export const PLANET_COLOR: [number, number, number] = [100, 180, 100];
 export const SPAWN_INTERVAL_MIN = 2500;
 export const SPAWN_INTERVAL_MAX = 5000;
 export const METEOR_CLEANUP_MARGIN = 200;
