@@ -2,7 +2,7 @@ import type { SceneObject } from "./types";
 import type { Palette } from "./types";
 import {
   CRATER_CARVE_RATIO, CRATER_FLOOR_RATIO, CRATER_RIM_RATIO,
-  CRATER_EJECTA_RATIO,
+  CRATER_EJECTA_RATIO, CRATER_WALL_RIM_THRESHOLD,
 } from "./constants";
 import { valueNoise } from "./noise";
 
@@ -134,7 +134,7 @@ export function carveCrater(
         changed = true;
       } else if (dist <= rimR) {
         const t = (dist - floorR) / (rimR - floorR);
-        obj.data[i] = t < 0.7 ? wallIndex : rimIndex;
+        obj.data[i] = t < CRATER_WALL_RIM_THRESHOLD ? wallIndex : rimIndex;
         changed = true;
       } else if (dist <= ejectaR) {
         obj.data[i] = ejectaIndex;

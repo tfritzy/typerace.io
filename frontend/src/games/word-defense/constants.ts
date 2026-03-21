@@ -16,6 +16,7 @@ export const CRATER_CARVE_RATIO = 0.35;
 export const CRATER_FLOOR_RATIO = 0.75;
 export const CRATER_RIM_RATIO = 1.1;
 export const CRATER_EJECTA_RATIO = 1.4;
+export const CRATER_WALL_RIM_THRESHOLD = 0.7;
 export const METEOR_COLOR: [number, number, number] = [107, 90, 62];
 export const METEOR_NOISE_FREQ = 1.5;
 export const METEOR_CORE_RADIUS = 0.45;
