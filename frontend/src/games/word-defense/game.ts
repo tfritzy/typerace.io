@@ -383,14 +383,26 @@ export class WordDefenseGame {
           const meteorIdx = this.meteors.indexOf(bullet.target);
           if (meteorIdx !== -1) {
             const usedWords = getActiveWords(this.meteors);
-            const result = handleBulletImpact(bullet.target, bullet.x, bullet.y, this.langCode, usedWords);
-            this.credits += result.pixelsDestroyed;
+            let pixelsBefore = 0;
+            for (let i = 0; i < bullet.target.data.length; i++) {
+              if (bullet.target.data[i]) pixelsBefore++;
+            }
 
-            if (result.meteors.length === 0) {
+            const result = handleBulletImpact(bullet.target, bullet.x, bullet.y, this.langCode, usedWords);
+
+            let pixelsAfter = 0;
+            for (const m of result) {
+              for (let i = 0; i < m.data.length; i++) {
+                if (m.data[i]) pixelsAfter++;
+              }
+            }
+            this.credits += pixelsBefore - pixelsAfter;
+
+            if (result.length === 0) {
               this.removeMeteorAt(meteorIdx);
-            } else if (result.meteors.length > 1 || result.meteors[0] !== bullet.target) {
+            } else if (result.length > 1 || result[0] !== bullet.target) {
               this.removeMeteorAt(meteorIdx);
-              for (const newMeteor of result.meteors) {
+              for (const newMeteor of result) {
                 this.addMeteor(newMeteor);
               }
             } else {

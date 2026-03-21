@@ -228,36 +228,20 @@ function createMeteorFromComponent(
   };
 }
 
-export interface BulletImpactResult {
-  meteors: Meteor[];
-  pixelsDestroyed: number;
-}
-
 export function handleBulletImpact(
   meteor: Meteor,
   hitX: number,
   hitY: number,
   langCode: string,
   usedWords: Set<string>
-): BulletImpactResult {
-  let pixelsBefore = 0;
-  for (let i = 0; i < meteor.data.length; i++) {
-    if (meteor.data[i]) pixelsBefore++;
-  }
-
+): Meteor[] {
   carveCircle(meteor, hitX, hitY, BULLET_CARVE_RADIUS);
 
   const components = findConnectedComponents(meteor.data, meteor.width, meteor.height);
   const validComponents = components.filter(c => c.length >= MIN_SPLIT_PIXELS);
 
-  let pixelsAfter = 0;
-  for (const comp of validComponents) {
-    pixelsAfter += comp.length;
-  }
-  const pixelsDestroyed = pixelsBefore - pixelsAfter;
-
   if (validComponents.length === 0) {
-    return { meteors: [], pixelsDestroyed };
+    return [];
   }
 
   if (validComponents.length === 1) {
@@ -271,13 +255,10 @@ export function handleBulletImpact(
     }
     rebuildImageData(meteor.data, meteor.imageData, meteor.width, meteor.height, METEOR_COLOR);
     updateBitmap(meteor);
-    return { meteors: [meteor], pixelsDestroyed };
+    return [meteor];
   }
 
-  return {
-    meteors: validComponents.map(comp =>
-      createMeteorFromComponent(meteor, comp, langCode, usedWords)
-    ),
-    pixelsDestroyed,
-  };
+  return validComponents.map(comp =>
+    createMeteorFromComponent(meteor, comp, langCode, usedWords)
+  );
 }
