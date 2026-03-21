@@ -16,7 +16,7 @@ import {
   WAVE_RADIUS_GROWTH, MAX_METEOR_RADIUS,
   WAVE_SPAWN_INTERVAL_REDUCTION,
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
-  BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED, SLOT_INTERACTIVE_RADIUS,
+  BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED, SLOT_INTERACTIVE_RADIUS, SLOT_HIT_BUFFER,
   TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH, TURRET_BASE_RADIUS,
   BULLET_RENDER_RADIUS,
 } from "./constants";
@@ -148,7 +148,7 @@ export const GameCanvas = () => {
         const g = new Graphics();
         g.eventMode = "static";
         g.cursor = "pointer";
-        g.hitArea = new Circle(0, 0, SLOT_INTERACTIVE_RADIUS + 4);
+        g.hitArea = new Circle(0, 0, SLOT_INTERACTIVE_RADIUS + SLOT_HIT_BUFFER);
         g.position.set(slot.x, slot.y);
         g.visible = false;
 
@@ -235,9 +235,10 @@ export const GameCanvas = () => {
             const cos = Math.cos(slot.angle);
             const sin = Math.sin(slot.angle);
             const hw = TURRET_BARREL_WIDTH / 2;
+            const nhw = -hw;
             turretGfx.poly([
-              slot.x - sin * (-hw), slot.y + cos * (-hw),
-              slot.x + cos * TURRET_BARREL_LENGTH - sin * (-hw), slot.y + sin * TURRET_BARREL_LENGTH + cos * (-hw),
+              slot.x - sin * nhw, slot.y + cos * nhw,
+              slot.x + cos * TURRET_BARREL_LENGTH - sin * nhw, slot.y + sin * TURRET_BARREL_LENGTH + cos * nhw,
               slot.x + cos * TURRET_BARREL_LENGTH - sin * hw, slot.y + sin * TURRET_BARREL_LENGTH + cos * hw,
               slot.x - sin * hw, slot.y + cos * hw,
             ], true);
@@ -397,7 +398,9 @@ export const GameCanvas = () => {
           } else {
             const display = meteorDisplays.get(hit.target);
             if (display) {
+              const oldTexture = display.sprite.texture;
               display.sprite.texture = Texture.from({ resource: hit.target.bitmap, alphaMode: "premultiply-alpha-on-upload" });
+              oldTexture.destroy();
             }
           }
         }

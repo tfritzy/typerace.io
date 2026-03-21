@@ -42,3 +42,4 @@ export const BETWEEN_WAVE_ZOOM = 1.9;
 export const BETWEEN_WAVE_FOCUS_Y = CANVAS_HEIGHT * 0.55;
 export const CAMERA_LERP_SPEED = 3;
 export const SLOT_INTERACTIVE_RADIUS = 12;
+export const SLOT_HIT_BUFFER = 4;
