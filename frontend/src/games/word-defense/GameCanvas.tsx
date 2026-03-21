@@ -163,6 +163,7 @@ export const GameCanvas = () => {
 
     let destroyed = false;
     let pixiApp: Application | null = null;
+    let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
     (async () => {
       const app = new Application();
@@ -379,6 +380,7 @@ export const GameCanvas = () => {
         }
       }
 
+      keydownHandler = onKeyDown;
       document.addEventListener("keydown", onKeyDown);
 
       app.ticker.add((ticker) => {
@@ -578,14 +580,11 @@ export const GameCanvas = () => {
 
         waveLabel.text = `Wave ${waveConfig.waveNumber}`;
       });
-
-      return () => {
-        document.removeEventListener("keydown", onKeyDown);
-      };
     })();
 
     return () => {
       destroyed = true;
+      if (keydownHandler) document.removeEventListener("keydown", keydownHandler);
       if (pixiApp) {
         pixiApp.destroy(true, { children: true });
       }
