@@ -3,9 +3,7 @@ import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
   TOTAL_TURRET_SLOTS, INITIAL_TURRET_COUNT,
-  TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH, TURRET_BASE_RADIUS,
-  BULLET_SPEED, BULLET_RENDER_RADIUS,
-  SLOT_INTERACTIVE_RADIUS,
+  BULLET_SPEED,
 } from "./constants";
 
 export function createTurretSlots(): TurretSlot[] {
@@ -146,80 +144,4 @@ export function updateBullets(
   return hits;
 }
 
-export function renderTurrets(
-  ctx: CanvasRenderingContext2D,
-  slots: TurretSlot[],
-  interactive: boolean = false,
-  selectedSlot: TurretSlot | null = null,
-  hoveredSlot: TurretSlot | null = null,
-) {
-  for (const slot of slots) {
-    const isSelected = slot === selectedSlot;
-    const isHovered = slot === hoveredSlot;
 
-    if (slot.filled) {
-      ctx.save();
-      ctx.translate(slot.x, slot.y);
-      ctx.rotate(slot.angle);
-
-      ctx.fillStyle = "#6b7280";
-      ctx.fillRect(0, -TURRET_BARREL_WIDTH / 2, TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH);
-
-      ctx.beginPath();
-      ctx.arc(0, 0, TURRET_BASE_RADIUS, 0, Math.PI * 2);
-      ctx.fillStyle = "#9ca3af";
-      ctx.fill();
-
-      ctx.restore();
-
-      if (interactive && (isSelected || isHovered)) {
-        ctx.beginPath();
-        ctx.arc(slot.x, slot.y, TURRET_BASE_RADIUS + 5, 0, Math.PI * 2);
-        ctx.strokeStyle = isSelected ? "rgba(255, 255, 255, 0.8)" : "rgba(255, 255, 255, 0.4)";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      }
-    } else {
-      if (interactive) {
-        const circleAlpha = isSelected ? 0.8 : isHovered ? 0.5 : 0.3;
-        const plusAlpha = isSelected ? 0.7 : isHovered ? 0.4 : 0.2;
-
-        ctx.beginPath();
-        ctx.arc(slot.x, slot.y, SLOT_INTERACTIVE_RADIUS, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 255, 255, ${circleAlpha})`;
-        ctx.lineWidth = isSelected ? 2 : 1.5;
-        ctx.setLineDash([3, 3]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        ctx.strokeStyle = `rgba(255, 255, 255, ${plusAlpha})`;
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(slot.x - 4, slot.y);
-        ctx.lineTo(slot.x + 4, slot.y);
-        ctx.moveTo(slot.x, slot.y - 4);
-        ctx.lineTo(slot.x, slot.y + 4);
-        ctx.stroke();
-      } else {
-        ctx.beginPath();
-        ctx.arc(slot.x, slot.y, 2, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
-        ctx.fill();
-      }
-    }
-  }
-}
-
-export function renderBullets(ctx: CanvasRenderingContext2D, bullets: Bullet[]) {
-  ctx.fillStyle = "#ffffff";
-  ctx.shadowColor = "rgba(255, 255, 255, 0.8)";
-  ctx.shadowBlur = 6;
-
-  for (const bullet of bullets) {
-    ctx.beginPath();
-    ctx.arc(bullet.x, bullet.y, BULLET_RENDER_RADIUS, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  ctx.shadowBlur = 0;
-}
