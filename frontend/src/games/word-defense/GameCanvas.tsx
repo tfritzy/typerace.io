@@ -14,7 +14,7 @@ import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact } from "./meteor";
 import {
-  createTurretSlots, findNearestFilledTurret, fireBullet,
+  createTurretSlots, findTurretsWithLineOfSight, fireBullet,
   updateBullets, renderTurrets, renderBullets,
 } from "./turret";
 
@@ -198,12 +198,14 @@ export const GameCanvas = () => {
         if (key === nextChar) {
           meteor.typedCount++;
           if (meteor.typedCount >= meteor.word.length) {
-            const turret = findNearestFilledTurret(
+            const meteorCx = meteor.x + meteor.width / 2;
+            const meteorCy = meteor.y + meteor.height / 2;
+            const turretsWithLos = findTurretsWithLineOfSight(
               turretSlotsRef.current,
-              meteor.x + meteor.width / 2,
-              meteor.y + meteor.height / 2
+              meteorCx,
+              meteorCy
             );
-            if (turret) {
+            for (const turret of turretsWithLos) {
               bulletsRef.current.push(fireBullet(turret, meteor));
             }
             const usedWords = getActiveWords(meteors);

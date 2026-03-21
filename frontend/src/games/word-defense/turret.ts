@@ -1,5 +1,6 @@
 import type { Bullet, Meteor, TurretSlot } from "./types";
 import {
+  CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
   TOTAL_TURRET_SLOTS, INITIAL_TURRET_COUNT,
   TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH, TURRET_BASE_RADIUS,
@@ -25,32 +26,70 @@ export function createTurretSlots(): TurretSlot[] {
   return slots;
 }
 
-export function findNearestFilledTurret(
+function hasLineOfSight(turret: TurretSlot, targetX: number, targetY: number): boolean {
+  const dx = targetX - turret.x;
+  const dy = targetY - turret.y;
+  const segLenSq = dx * dx + dy * dy;
+
+  const toCenterX = EARTH_CX - turret.x;
+  const toCenterY = EARTH_CY - turret.y;
+
+  let t = (toCenterX * dx + toCenterY * dy) / segLenSq;
+  t = Math.max(0.05, Math.min(1, t));
+
+  const closestX = turret.x + t * dx;
+  const closestY = turret.y + t * dy;
+
+  const distSq = (closestX - EARTH_CX) ** 2 + (closestY - EARTH_CY) ** 2;
+  const threshold = EARTH_RADIUS - 5;
+  return distSq >= threshold * threshold;
+}
+
+export function findTurretsWithLineOfSight(
   slots: TurretSlot[],
   targetX: number,
   targetY: number
-): TurretSlot | null {
-  let nearest: TurretSlot | null = null;
-  let nearestDist = Infinity;
-
+): TurretSlot[] {
+  const result: TurretSlot[] = [];
   for (const slot of slots) {
-    if (!slot.filled) continue;
-    const dx = slot.x - targetX;
-    const dy = slot.y - targetY;
-    const dist = dx * dx + dy * dy;
-    if (dist < nearestDist) {
-      nearestDist = dist;
-      nearest = slot;
+    if (slot.filled && hasLineOfSight(slot, targetX, targetY)) {
+      result.push(slot);
     }
   }
-
-  return nearest;
+  return result;
 }
 
 export function fireBullet(turret: TurretSlot, target: Meteor): Bullet {
+  const targetCx = target.x + target.width / 2;
+  const targetCy = target.y + target.height / 2;
+
+  const dx = targetCx - turret.x;
+  const dy = targetCy - turret.y;
+  const a = BULLET_SPEED * BULLET_SPEED - (target.vx * target.vx + target.vy * target.vy);
+  const b = -2 * (dx * target.vx + dy * target.vy);
+  const c = -(dx * dx + dy * dy);
+
+  let t = 0;
+  const discriminant = b * b - 4 * a * c;
+  if (discriminant >= 0 && Math.abs(a) > 0.001) {
+    const sqrtD = Math.sqrt(discriminant);
+    const t1 = (-b - sqrtD) / (2 * a);
+    const t2 = (-b + sqrtD) / (2 * a);
+    t = t1 > 0 ? t1 : t2 > 0 ? t2 : 0;
+  }
+
+  const predX = targetCx + target.vx * t;
+  const predY = targetCy + target.vy * t;
+
+  const pdx = predX - turret.x;
+  const pdy = predY - turret.y;
+  const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
+
   return {
     x: turret.x,
     y: turret.y,
+    vx: (pdx / pdist) * BULLET_SPEED,
+    vy: (pdy / pdist) * BULLET_SPEED,
     target,
   };
 }
@@ -64,6 +103,17 @@ export function updateBullets(
 
   for (let i = bullets.length - 1; i >= 0; i--) {
     const bullet = bullets[i];
+
+    bullet.x += bullet.vx * dt;
+    bullet.y += bullet.vy * dt;
+
+    if (
+      bullet.x < -50 || bullet.x > CANVAS_WIDTH + 50 ||
+      bullet.y < -50 || bullet.y > CANVAS_HEIGHT + 50
+    ) {
+      bullets.splice(i, 1);
+      continue;
+    }
 
     if (!meteors.includes(bullet.target)) {
       bullets.splice(i, 1);
@@ -79,9 +129,6 @@ export function updateBullets(
     if (dist < bullet.target.radius * 0.8) {
       hits.push({ x: bullet.x, y: bullet.y, target: bullet.target });
       bullets.splice(i, 1);
-    } else {
-      bullet.x += (dx / dist) * BULLET_SPEED * dt;
-      bullet.y += (dy / dist) * BULLET_SPEED * dt;
     }
   }
 

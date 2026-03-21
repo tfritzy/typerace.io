@@ -26,5 +26,7 @@ export interface TurretSlot {
 export interface Bullet {
   x: number;
   y: number;
+  vx: number;
+  vy: number;
   target: Meteor;
 }

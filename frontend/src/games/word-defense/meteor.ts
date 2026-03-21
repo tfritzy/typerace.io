@@ -74,7 +74,7 @@ export function spawnMeteor(langCode: string, usedWords: Set<string>): Meteor {
   const tdy = EARTH_CY + perpY * aimOffset - y;
   const tdist = Math.sqrt(tdx * tdx + tdy * tdy);
 
-  const radius = 8 + Math.random() * 42;
+  const radius = 15 + Math.random() * 20;
   const speed = 150 - radius * 1.5;
   const vx = (tdx / tdist) * speed;
   const vy = (tdy / tdist) * speed;
