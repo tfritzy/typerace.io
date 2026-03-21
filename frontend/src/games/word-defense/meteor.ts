@@ -11,14 +11,6 @@ import { valueNoise } from "./noise";
 import { rebuildImageData, updateBitmap, carveCircle } from "./bitmap";
 import { getRandomWord } from "../../utils/wordLists";
 
-function buildMeteorPalette(): [number, number, number][] {
-  const palette: [number, number, number][] = new Array(256).fill(null).map(() => [0, 0, 0] as [number, number, number]);
-  palette[1] = METEOR_COLOR;
-  return palette;
-}
-
-const METEOR_PALETTE = buildMeteorPalette();
-
 function createMeteorBitmap(
   radius: number
 ): Pick<SceneObject, "data" | "imageData" | "width" | "height" | "bitmap"> {
@@ -46,12 +38,12 @@ function createMeteorBitmap(
   }
 
   const imageData = new ImageData(diameter, diameter);
-  rebuildImageData(data, imageData, diameter, diameter, METEOR_PALETTE);
+  rebuildImageData(data, imageData, diameter, diameter, METEOR_COLOR);
   const bitmap = document.createElement("canvas");
   bitmap.width = diameter;
   bitmap.height = diameter;
   bitmap.getContext("2d")!.putImageData(imageData, 0, 0);
-  return { data, palette: METEOR_PALETTE, imageData, width: diameter, height: diameter, bitmap };
+  return { data, imageData, width: diameter, height: diameter, bitmap };
 }
 
 export function spawnMeteor(langCode: string, usedWords: Set<string>, waveConfig: WaveConfig): Meteor {
@@ -211,7 +203,7 @@ function createMeteorFromComponent(
   }
 
   const imageData = new ImageData(newWidth, newHeight);
-  rebuildImageData(newData, imageData, newWidth, newHeight, METEOR_PALETTE);
+  rebuildImageData(newData, imageData, newWidth, newHeight, METEOR_COLOR);
   const bitmap = document.createElement("canvas");
   bitmap.width = newWidth;
   bitmap.height = newHeight;
@@ -231,7 +223,6 @@ function createMeteorFromComponent(
     width: newWidth,
     height: newHeight,
     data: newData,
-    palette: METEOR_PALETTE,
     imageData,
     bitmap,
   };
@@ -262,7 +253,7 @@ export function handleBulletImpact(
         }
       }
     }
-    rebuildImageData(meteor.data, meteor.imageData, meteor.width, meteor.height, METEOR_PALETTE);
+    rebuildImageData(meteor.data, meteor.imageData, meteor.width, meteor.height, METEOR_COLOR);
     updateBitmap(meteor);
     return [meteor];
   }

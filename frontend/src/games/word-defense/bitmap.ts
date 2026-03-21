@@ -1,9 +1,4 @@
 import type { SceneObject } from "./types";
-import type { Palette } from "./types";
-import {
-  CRATER_CARVE_RATIO, CRATER_FLOOR_RATIO, CRATER_RIM_RATIO,
-  CRATER_EJECTA_RATIO, CRATER_WALL_RIM_THRESHOLD,
-} from "./constants";
 import { valueNoise } from "./noise";
 
 export function rebuildImageData(
@@ -11,12 +6,11 @@ export function rebuildImageData(
   imageData: ImageData,
   width: number,
   height: number,
-  palette: Palette
+  color: [number, number, number]
 ) {
   const pixels = imageData.data;
   for (let i = 0; i < width * height; i++) {
     if (data[i]) {
-      const color = palette[data[i]];
       pixels[i * 4] = color[0];
       pixels[i * 4 + 1] = color[1];
       pixels[i * 4 + 2] = color[2];
@@ -75,31 +69,14 @@ export function destroyCircle(
   obj: SceneObject,
   hitX: number,
   hitY: number,
-  radius: number
-): boolean {
-  const changed = carveCircle(obj, hitX, hitY, radius);
-  if (changed) {
-    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, obj.palette);
-    updateBitmap(obj);
-  }
-  return changed;
-}
-
-export function carveCrater(
-  obj: SceneObject,
-  hitX: number,
-  hitY: number,
   radius: number,
-  floorIndex: number,
-  wallIndex: number,
-  rimIndex: number,
-  ejectaIndex: number
+  color: [number, number, number]
 ): boolean {
   const localX = hitX - obj.x;
   const localY = hitY - obj.y;
   let changed = false;
 
-  const outerRadius = radius * CRATER_EJECTA_RATIO;
+  const outerRadius = radius * 1.3;
   const minX = Math.max(0, Math.floor(localX - outerRadius));
   const maxX = Math.min(obj.width - 1, Math.ceil(localX + outerRadius));
   const minY = Math.max(0, Math.floor(localY - outerRadius));
@@ -109,44 +86,30 @@ export function carveCrater(
     return false;
   }
 
-  const carveR = radius * CRATER_CARVE_RATIO;
-  const floorR = radius * CRATER_FLOOR_RATIO;
-  const rimR = radius * CRATER_RIM_RATIO;
-  const ejectaR = radius * CRATER_EJECTA_RATIO;
   const noiseSeed = localX * 7.3 + localY * 13.7;
 
   for (let y = minY; y <= maxY; y++) {
     for (let x = minX; x <= maxX; x++) {
+      const i = y * obj.width + x;
+      if (!obj.data[i]) continue;
+
       const dx = x - localX;
       const dy = y - localY;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      const i = y * obj.width + x;
 
-      if (!obj.data[i]) continue;
+      const edgeNoise = valueNoise(x * 0.3 + noiseSeed, y * 0.3) * 0.35;
+      const effectiveRadius = radius * (1 + edgeNoise);
 
-      const rimNoise = valueNoise(x * 0.3 + noiseSeed, y * 0.3) * 0.2;
-
-      if (dist <= carveR * (1 + rimNoise * 0.5)) {
+      if (dist <= effectiveRadius) {
         obj.data[i] = 0;
-        changed = true;
-      } else if (dist <= floorR) {
-        obj.data[i] = floorIndex;
-        changed = true;
-      } else if (dist <= rimR) {
-        const t = (dist - floorR) / (rimR - floorR);
-        obj.data[i] = t < CRATER_WALL_RIM_THRESHOLD ? wallIndex : rimIndex;
-        changed = true;
-      } else if (dist <= ejectaR) {
-        obj.data[i] = ejectaIndex;
         changed = true;
       }
     }
   }
 
   if (changed) {
-    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, obj.palette);
+    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, color);
     updateBitmap(obj);
   }
-
   return changed;
 }

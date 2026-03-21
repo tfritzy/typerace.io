@@ -5,6 +5,7 @@ import type { Meteor, TurretSlot, Bullet, WaveConfig, WavePhase, MeteorObject, S
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
+  PLANET_COLOR,
   SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_MAX,
   METEOR_CLEANUP_MARGIN, IMPACT_RADIUS_SCALE,
   WORD_FONT_SIZE,
@@ -17,8 +18,8 @@ import {
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
 } from "./constants";
-import { carveCrater } from "./bitmap";
-import { createPlanet, PLANET_CRATER_FLOOR, PLANET_CRATER_WALL, PLANET_CRATER_RIM, PLANET_CRATER_EJECTA } from "./planet";
+import { destroyCircle } from "./bitmap";
+import { createPlanet } from "./planet";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact } from "./meteor";
 import { createTurretSlots, updateTurretPositions, findTurretsWithLineOfSight, fireBullet, isSlotGroundIntact } from "./turret";
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
@@ -114,7 +115,7 @@ export class WordDefenseGame {
     this.hud = new Container();
     this.app.stage.addChild(this.hud);
 
-    this.planetObj = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS);
+    this.planetObj = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS, PLANET_COLOR);
     this.planetContainer = new Container();
     this.planetContainer.position.set(EARTH_CX, EARTH_CY);
     this.world.addChild(this.planetContainer);
@@ -437,7 +438,7 @@ export class WordDefenseGame {
         const rsin = Math.sin(-this.planetRotation);
         const localCx = relX * rcos - relY * rsin + EARTH_CX;
         const localCy = relX * rsin + relY * rcos + EARTH_CY;
-        carveCrater(this.planetObj, localCx, localCy, destroyRadius, PLANET_CRATER_FLOOR, PLANET_CRATER_WALL, PLANET_CRATER_RIM, PLANET_CRATER_EJECTA);
+        destroyCircle(this.planetObj, localCx, localCy, destroyRadius, PLANET_COLOR);
 
         const dr2 = destroyRadius * destroyRadius;
         for (let si = 0; si < this.slots.length; si++) {
