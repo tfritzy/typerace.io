@@ -1,4 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
+import { getRandomWord } from "./wordLists";
+import { getLanguageFromSlug } from "../../utils/modes";
 
 const CANVAS_WIDTH = 1920;
 const CANVAS_HEIGHT = 1080;
@@ -11,6 +13,10 @@ const METEOR_CLEANUP_MARGIN = 200;
 const IMPACT_RADIUS_SCALE = 1 / 20;
 const METEOR_COLOR: [number, number, number] = [107, 90, 62];
 const METEOR_ANGULAR_SEGMENTS = 32;
+const WORD_FONT = "bold 28px monospace";
+const WORD_TYPED_ALPHA = 1.0;
+const WORD_UNTYPED_ALPHA = 0.35;
+const WORD_OFFSET_Y = 10;
 
 interface SceneObject {
   x: number;
@@ -25,6 +31,7 @@ interface Meteor extends SceneObject {
   vx: number;
   vy: number;
   radius: number;
+  word: string;
 }
 
 function createMeteorBitmap(
@@ -58,7 +65,7 @@ function createMeteorBitmap(
   return { data, imageData, width: diameter, height: diameter };
 }
 
-function spawnMeteor(): Meteor {
+function spawnMeteor(langCode: string, usedWords: Set<string>): Meteor {
   const side = Math.floor(Math.random() * 4);
   const margin = 60;
   let x: number, y: number;
@@ -93,6 +100,7 @@ function spawnMeteor(): Meteor {
   const vy = (tdy / tdist) * speed;
 
   const bitmap = createMeteorBitmap(radius);
+  const word = getRandomWord(langCode, usedWords);
 
   return {
     x: x - bitmap.width / 2,
@@ -100,6 +108,7 @@ function spawnMeteor(): Meteor {
     vx,
     vy,
     radius,
+    word,
     ...bitmap,
   };
 }
@@ -228,12 +237,26 @@ function destroyCircle(
   return changed;
 }
 
+function getActiveWords(meteors: Meteor[]): Set<string> {
+  const words = new Set<string>();
+  for (const m of meteors) words.add(m.word);
+  return words;
+}
+
+function getCurrentLangCode(): string {
+  const slug = localStorage.getItem("typerace_lang_slug") ?? undefined;
+  return getLanguageFromSlug(slug).htmlLang;
+}
+
 export const GameCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const objectsRef = useRef<SceneObject[]>([]);
   const meteorsRef = useRef<Meteor[]>([]);
   const colorRef = useRef<[number, number, number]>([230, 169, 25]);
+  const activeMeteorRef = useRef<Meteor | null>(null);
+  const typedCountRef = useRef(0);
+  const langCodeRef = useRef(getCurrentLangCode());
 
   const render = useCallback(() => {
     const ctx = ctxRef.current;
@@ -248,6 +271,34 @@ export const GameCanvas = () => {
     for (const meteor of meteorsRef.current) {
       ctx.putImageData(meteor.imageData, meteor.x, meteor.y);
     }
+
+    ctx.font = WORD_FONT;
+    ctx.textAlign = "center";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+    ctx.shadowBlur = 4;
+
+    for (const meteor of meteorsRef.current) {
+      const wordX = meteor.x + meteor.radius;
+      const wordY = meteor.y + meteor.radius * 2 + WORD_OFFSET_Y + 28;
+      const isActive = meteor === activeMeteorRef.current;
+      const typedCount = isActive ? typedCountRef.current : 0;
+
+      ctx.globalAlpha = WORD_UNTYPED_ALPHA;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(meteor.word, wordX, wordY);
+
+      if (typedCount > 0) {
+        const typed = meteor.word.slice(0, typedCount);
+        const fullWidth = ctx.measureText(meteor.word).width;
+        ctx.textAlign = "left";
+        ctx.globalAlpha = WORD_TYPED_ALPHA;
+        ctx.fillText(typed, wordX - fullWidth / 2, wordY);
+        ctx.textAlign = "center";
+      }
+    }
+
+    ctx.globalAlpha = 1.0;
+    ctx.shadowBlur = 0;
   }, []);
 
   useEffect(() => {
@@ -273,6 +324,10 @@ export const GameCanvas = () => {
       createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS, colorRef.current),
     ];
     meteorsRef.current = [];
+    activeMeteorRef.current = null;
+    typedCountRef.current = 0;
+
+    const langCode = langCodeRef.current;
 
     let animFrame: number;
     let lastTime = 0;
@@ -284,7 +339,8 @@ export const GameCanvas = () => {
       if (lastTime > 0) {
         spawnTimer += dt * 1000;
         if (spawnTimer >= nextSpawn) {
-          meteorsRef.current.push(spawnMeteor());
+          const usedWords = getActiveWords(meteorsRef.current);
+          meteorsRef.current.push(spawnMeteor(langCode, usedWords));
           spawnTimer = 0;
           nextSpawn =
             SPAWN_INTERVAL_MIN +
@@ -302,17 +358,16 @@ export const GameCanvas = () => {
           const cx = meteor.x + meteor.radius;
           const cy = meteor.y + meteor.radius;
 
+          let removed = false;
+
           if (
             cx < -METEOR_CLEANUP_MARGIN ||
             cx > CANVAS_WIDTH + METEOR_CLEANUP_MARGIN ||
             cy < -METEOR_CLEANUP_MARGIN ||
             cy > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
           ) {
-            meteors.splice(i, 1);
-            continue;
-          }
-
-          if (planet && checkMeteorHitsPlanet(planet, meteor)) {
+            removed = true;
+          } else if (planet && checkMeteorHitsPlanet(planet, meteor)) {
             const destroyRadius = Math.max(
               meteor.radius * 1.2,
               meteor.radius * meteor.radius * IMPACT_RADIUS_SCALE
@@ -324,6 +379,14 @@ export const GameCanvas = () => {
               destroyRadius,
               colorRef.current
             );
+            removed = true;
+          }
+
+          if (removed) {
+            if (activeMeteorRef.current === meteor) {
+              activeMeteorRef.current = null;
+              typedCountRef.current = 0;
+            }
             meteors.splice(i, 1);
           }
         }
@@ -333,13 +396,52 @@ export const GameCanvas = () => {
       animFrame = requestAnimationFrame(loop);
     }
 
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key.length !== 1) return;
+
+      const key = e.key;
+      const meteors = meteorsRef.current;
+
+      if (!activeMeteorRef.current) {
+        for (const meteor of meteors) {
+          if (meteor.word[0] === key) {
+            activeMeteorRef.current = meteor;
+            typedCountRef.current = 1;
+            return;
+          }
+        }
+        return;
+      }
+
+      const active = activeMeteorRef.current;
+      const nextChar = active.word[typedCountRef.current];
+
+      if (key === nextChar) {
+        typedCountRef.current++;
+        if (typedCountRef.current >= active.word.length) {
+          const usedWords = getActiveWords(meteors);
+          active.word = getRandomWord(langCode, usedWords);
+          activeMeteorRef.current = null;
+          typedCountRef.current = 0;
+        }
+      } else {
+        activeMeteorRef.current = null;
+        typedCountRef.current = 0;
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
     animFrame = requestAnimationFrame(loop);
 
     return () => {
       cancelAnimationFrame(animFrame);
+      document.removeEventListener("keydown", onKeyDown);
       ctxRef.current = null;
       objectsRef.current = [];
       meteorsRef.current = [];
+      activeMeteorRef.current = null;
+      typedCountRef.current = 0;
     };
   }, [render]);
 
