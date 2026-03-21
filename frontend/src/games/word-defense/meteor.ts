@@ -95,30 +95,23 @@ export function spawnMeteor(langCode: string, usedWords: Set<string>, waveConfig
   };
 }
 
-export function checkMeteorHitsPlanet(planet: SceneObject, meteor: Meteor): boolean {
+export function checkMeteorHitsPlanet(planet: SceneObject, meteor: Meteor, planetRotation: number): boolean {
   const cx = meteor.x + meteor.width / 2;
   const cy = meteor.y + meteor.height / 2;
 
-  const sampleOffsets = [
-    { ox: 0, oy: 0 },
-    { ox: meteor.radius * 0.7, oy: 0 },
-    { ox: -meteor.radius * 0.7, oy: 0 },
-    { ox: 0, oy: meteor.radius * 0.7 },
-    { ox: 0, oy: -meteor.radius * 0.7 },
-    { ox: meteor.radius * 0.5, oy: meteor.radius * 0.5 },
-    { ox: -meteor.radius * 0.5, oy: meteor.radius * 0.5 },
-    { ox: meteor.radius * 0.5, oy: -meteor.radius * 0.5 },
-    { ox: -meteor.radius * 0.5, oy: -meteor.radius * 0.5 },
-  ];
+  const planetCx = planet.x + planet.width / 2;
+  const planetCy = planet.y + planet.height / 2;
+  const relX = cx - planetCx;
+  const relY = cy - planetCy;
+  const cos = Math.cos(-planetRotation);
+  const sin = Math.sin(-planetRotation);
+  const rotX = relX * cos - relY * sin;
+  const rotY = relX * sin + relY * cos;
 
-  for (const { ox, oy } of sampleOffsets) {
-    const px = Math.floor(cx + ox - planet.x);
-    const py = Math.floor(cy + oy - planet.y);
-    if (px >= 0 && px < planet.width && py >= 0 && py < planet.height) {
-      if (planet.data[py * planet.width + px]) {
-        return true;
-      }
-    }
+  const px = Math.floor(rotX + planet.width / 2);
+  const py = Math.floor(rotY + planet.height / 2);
+  if (px >= 0 && px < planet.width && py >= 0 && py < planet.height) {
+    return planet.data[py * planet.width + px] !== 0;
   }
   return false;
 }
