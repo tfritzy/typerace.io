@@ -56,6 +56,7 @@ export class WordDefenseGame {
   private waveLabel!: Text;
   private startButton!: Container;
   private startButtonText!: Text;
+  private creditsLabel!: Text;
 
   private slots: TurretSlot[] = [];
   private turretVisuals!: TurretVisuals;
@@ -74,6 +75,7 @@ export class WordDefenseGame {
   private planetRotation = 0;
   private cameraZoom = ACTIVE_WAVE_ZOOM;
   private cameraY = EARTH_CY;
+  private credits = 0;
   private selectedSlot: TurretSlot | null = null;
   private hoveredSlot: TurretSlot | null = null;
 
@@ -158,6 +160,15 @@ export class WordDefenseGame {
     this.waveLabel.position.set(20, 12);
     this.waveLabel.alpha = 0.7;
     this.hud.addChild(this.waveLabel);
+
+    this.creditsLabel = new Text({
+      text: "Credits: 0",
+      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 24, fill: 0xffffff },
+    });
+    this.creditsLabel.anchor.set(1, 0);
+    this.creditsLabel.position.set(CANVAS_WIDTH - 20, 12);
+    this.creditsLabel.alpha = 0.7;
+    this.hud.addChild(this.creditsLabel);
 
     this.buildStartButton();
   }
@@ -266,6 +277,7 @@ export class WordDefenseGame {
     this.syncMeteorDisplays();
 
     this.waveLabel.text = `Wave ${this.waveConfig.waveNumber}`;
+    this.creditsLabel.text = `Credits: ${this.credits}`;
   }
 
   private updateSpawning(dt: number, isActive: boolean) {
@@ -371,7 +383,20 @@ export class WordDefenseGame {
           const meteorIdx = this.meteors.indexOf(bullet.target);
           if (meteorIdx !== -1) {
             const usedWords = getActiveWords(this.meteors);
+            let pixelsBefore = 0;
+            for (let i = 0; i < bullet.target.data.length; i++) {
+              if (bullet.target.data[i]) pixelsBefore++;
+            }
+
             const result = handleBulletImpact(bullet.target, bullet.x, bullet.y, this.langCode, usedWords);
+
+            let pixelsAfter = 0;
+            for (const m of result) {
+              for (let i = 0; i < m.data.length; i++) {
+                if (m.data[i]) pixelsAfter++;
+              }
+            }
+            this.credits += pixelsBefore - pixelsAfter;
 
             if (result.length === 0) {
               this.removeMeteorAt(meteorIdx);
