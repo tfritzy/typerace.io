@@ -12,8 +12,9 @@ const SPAWN_INTERVAL_MAX = 3500;
 const METEOR_CLEANUP_MARGIN = 200;
 const IMPACT_RADIUS_SCALE = 1 / 20;
 const METEOR_COLOR: [number, number, number] = [107, 90, 62];
-const METEOR_NOISE_SCALE = 3.5;
-const METEOR_EDGE_THRESHOLD = 0.38;
+const METEOR_NOISE_FREQ = 1.5;
+const METEOR_CORE_RADIUS = 0.45;
+const METEOR_LUMP_HEIGHT = 0.55;
 const WORD_FONT_SIZE = 28;
 const WORD_FONT = `bold ${WORD_FONT_SIZE}px monospace`;
 const WORD_TYPED_ALPHA = 1.0;
@@ -73,17 +74,19 @@ function createMeteorBitmap(
   const data = new Uint8Array(diameter * diameter);
   const seedX = Math.random() * 1000;
   const seedY = Math.random() * 1000;
-  const noiseScale = METEOR_NOISE_SCALE / intRadius;
+  const noiseFreq = METEOR_NOISE_FREQ / intRadius;
 
   for (let py = 0; py < diameter; py++) {
     for (let px = 0; px < diameter; px++) {
       const dx = px - intRadius;
       const dy = py - intRadius;
       const dist = Math.sqrt(dx * dx + dy * dy) / intRadius;
-      if (dist > 1.3) continue;
-      const n = valueNoise(px * noiseScale + seedX, py * noiseScale + seedY);
-      const falloff = Math.max(0, 1 - dist * dist);
-      if (n * falloff > METEOR_EDGE_THRESHOLD) {
+      if (dist <= METEOR_CORE_RADIUS) {
+        data[py * diameter + px] = 1;
+        continue;
+      }
+      const n = valueNoise(px * noiseFreq + seedX, py * noiseFreq + seedY);
+      if (dist <= METEOR_CORE_RADIUS + n * METEOR_LUMP_HEIGHT) {
         data[py * diameter + px] = 1;
       }
     }
