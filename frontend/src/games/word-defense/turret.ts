@@ -147,8 +147,8 @@ export function updateBullets(
 }
 
 export function isSlotGroundIntact(planet: SceneObject, slot: TurretSlot): boolean {
-  const checkX = Math.cos(slot.baseAngle) * (EARTH_RADIUS - SLOT_SURFACE_INWARD) + planet.width / 2;
-  const checkY = Math.sin(slot.baseAngle) * (EARTH_RADIUS - SLOT_SURFACE_INWARD) + planet.height / 2;
+  const checkX = Math.cos(slot.baseAngle) * (EARTH_RADIUS - SLOT_SURFACE_INWARD) + EARTH_RADIUS;
+  const checkY = Math.sin(slot.baseAngle) * (EARTH_RADIUS - SLOT_SURFACE_INWARD) + EARTH_RADIUS;
   const r = SLOT_SURFACE_CHECK_RADIUS;
   const r2 = r * r;
   let solidCount = 0;
