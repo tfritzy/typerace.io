@@ -10,18 +10,19 @@ import {
   METEOR_CLEANUP_MARGIN, IMPACT_RADIUS_SCALE,
   WORD_FONT_SIZE,
   WORD_OFFSET_Y,
-  BASE_METEOR_SPEED,
+  BASE_METEOR_SPEED, METEOR_SPEED_WAVE_INCREMENT,
   BASE_METEORS_PER_WAVE, METEORS_PER_WAVE_INCREMENT,
   BASE_METEOR_RADIUS_MIN, BASE_METEOR_RADIUS_MAX,
   WAVE_RADIUS_GROWTH, MAX_METEOR_RADIUS,
   WAVE_SPAWN_INTERVAL_REDUCTION,
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
-  BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
+  ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
+  TURRET_DESTROY_RADIUS_MULTIPLIER,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact } from "./meteor";
-import { createTurretSlots, updateTurretPositions, findTurretsWithLineOfSight, fireBullet } from "./turret";
+import { createTurretSlots, updateTurretPositions, findTurretsWithLineOfSight, fireBullet, isSlotGroundIntact } from "./turret";
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
 import { createMeteorObject, createBulletGraphics } from "./meteorRendering";
 
@@ -39,7 +40,7 @@ function createWaveConfig(waveNumber: number): WaveConfig {
     spawnIntervalMax: SPAWN_INTERVAL_MAX * spawnFactor,
     meteorRadiusMin: Math.min(BASE_METEOR_RADIUS_MIN + (waveNumber - 1) * WAVE_RADIUS_GROWTH, MAX_METEOR_RADIUS - 5),
     meteorRadiusMax: Math.min(BASE_METEOR_RADIUS_MAX + (waveNumber - 1) * WAVE_RADIUS_GROWTH, MAX_METEOR_RADIUS),
-    meteorSpeed: BASE_METEOR_SPEED + (waveNumber - 1) * 8,
+    meteorSpeed: BASE_METEOR_SPEED + (waveNumber - 1) * METEOR_SPEED_WAVE_INCREMENT,
   };
 }
 
@@ -72,7 +73,7 @@ export class WordDefenseGame {
   private spawnTimer = 0;
   private nextSpawn = 2000;
   private planetRotation = 0;
-  private cameraZoom = 1;
+  private cameraZoom = ACTIVE_WAVE_ZOOM;
   private cameraY = EARTH_CY;
   private selectedSlot: TurretSlot | null = null;
   private hoveredSlot: TurretSlot | null = null;
@@ -297,7 +298,7 @@ export class WordDefenseGame {
   }
 
   private updateCamera(dt: number, isActive: boolean) {
-    const targetZoom = isActive ? 1 : BETWEEN_WAVE_ZOOM;
+    const targetZoom = isActive ? ACTIVE_WAVE_ZOOM : BETWEEN_WAVE_ZOOM;
     this.cameraZoom += (targetZoom - this.cameraZoom) * CAMERA_LERP_SPEED * dt;
 
     const targetY = isActive ? EARTH_CY : BETWEEN_WAVE_FOCUS_Y;
@@ -320,9 +321,13 @@ export class WordDefenseGame {
   private updateSlotVisuals() {
     const isComplete = this.phase === "complete";
     for (let i = 0; i < this.slots.length; i++) {
+      const slot = this.slots[i];
+      if (slot.destroyed) {
+        this.turretVisuals.hitAreas[i].visible = false;
+        continue;
+      }
       this.turretVisuals.hitAreas[i].visible = isComplete;
       if (isComplete) {
-        const slot = this.slots[i];
         if (!slot.filled) {
           drawSlotInteractive(this.turretVisuals.hitAreas[i], slot === this.selectedSlot, slot === this.hoveredSlot);
         }
@@ -350,8 +355,8 @@ export class WordDefenseGame {
       let removeBullet = false;
 
       if (
-        bullet.x < -50 || bullet.x > CANVAS_WIDTH + 50 ||
-        bullet.y < -50 || bullet.y > CANVAS_HEIGHT + 50
+        bullet.x < -METEOR_CLEANUP_MARGIN || bullet.x > CANVAS_WIDTH + METEOR_CLEANUP_MARGIN ||
+        bullet.y < -METEOR_CLEANUP_MARGIN || bullet.y > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
       ) {
         removeBullet = true;
       } else if (!this.meteors.includes(bullet.target)) {
@@ -436,22 +441,39 @@ export class WordDefenseGame {
         const localCy = relX * rsin + relY * rcos + EARTH_CY;
         destroyCircle(this.planetObj, localCx, localCy, destroyRadius, PLANET_COLOR);
 
-        const dr2 = destroyRadius * destroyRadius;
+        const turretDestroyRadius = destroyRadius * TURRET_DESTROY_RADIUS_MULTIPLIER;
+        const tdr2 = turretDestroyRadius * turretDestroyRadius;
         for (let si = 0; si < this.slots.length; si++) {
           const slot = this.slots[si];
+          if (slot.destroyed) continue;
           const sdx = slot.x - cx;
           const sdy = slot.y - cy;
-          if (sdx * sdx + sdy * sdy <= dr2) {
+          if (sdx * sdx + sdy * sdy <= tdr2) {
             slot.filled = false;
+            slot.destroyed = true;
             rebuildSlotVisual(si, this.slots, this.turretVisuals, this.planetContainer);
           }
         }
+
+        this.checkAllSlotSurfaces();
 
         removed = true;
       }
 
       if (removed) {
         this.removeMeteorAt(i);
+      }
+    }
+  }
+
+  private checkAllSlotSurfaces() {
+    for (let si = 0; si < this.slots.length; si++) {
+      const slot = this.slots[si];
+      if (slot.destroyed) continue;
+      if (!isSlotGroundIntact(this.planetObj, slot)) {
+        slot.filled = false;
+        slot.destroyed = true;
+        rebuildSlotVisual(si, this.slots, this.turretVisuals, this.planetContainer);
       }
     }
   }

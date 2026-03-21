@@ -5,7 +5,7 @@ import {
   METEOR_COLOR, METEOR_NOISE_FREQ,
   METEOR_CORE_RADIUS, METEOR_LUMP_HEIGHT,
   BULLET_CARVE_RADIUS, MIN_SPLIT_PIXELS,
-  METEOR_SPEED_SIZE_FACTOR,
+  METEOR_SPEED_SIZE_FACTOR, ACTIVE_WAVE_ZOOM,
 } from "./constants";
 import { valueNoise } from "./noise";
 import { rebuildImageData, updateBitmap, carveCircle } from "./bitmap";
@@ -48,20 +48,29 @@ function createMeteorBitmap(
 
 export function spawnMeteor(langCode: string, usedWords: Set<string>, waveConfig: WaveConfig): Meteor {
   const side = Math.floor(Math.random() * 4);
-  const margin = 60;
+  const margin = 20;
+  const viewHalfW = CANVAS_WIDTH / (2 * ACTIVE_WAVE_ZOOM);
+  const viewHalfH = CANVAS_HEIGHT / (2 * ACTIVE_WAVE_ZOOM);
+  const spawnLeft = EARTH_CX - viewHalfW - margin;
+  const spawnRight = EARTH_CX + viewHalfW + margin;
+  const spawnTop = EARTH_CY - viewHalfH - margin;
+  const spawnBottom = EARTH_CY + viewHalfH + margin;
+  const spawnW = spawnRight - spawnLeft;
+  const spawnH = spawnBottom - spawnTop;
+
   let x: number, y: number;
   if (side === 0) {
-    x = Math.random() * CANVAS_WIDTH;
-    y = -margin;
+    x = spawnLeft + Math.random() * spawnW;
+    y = spawnTop;
   } else if (side === 1) {
-    x = CANVAS_WIDTH + margin;
-    y = Math.random() * CANVAS_HEIGHT;
+    x = spawnRight;
+    y = spawnTop + Math.random() * spawnH;
   } else if (side === 2) {
-    x = Math.random() * CANVAS_WIDTH;
-    y = CANVAS_HEIGHT + margin;
+    x = spawnLeft + Math.random() * spawnW;
+    y = spawnBottom;
   } else {
-    x = -margin;
-    y = Math.random() * CANVAS_HEIGHT;
+    x = spawnLeft;
+    y = spawnTop + Math.random() * spawnH;
   }
 
   const dx = EARTH_CX - x;

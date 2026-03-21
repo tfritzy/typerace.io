@@ -108,6 +108,21 @@ export function rebuildSlotVisual(
   parent: Container,
 ) {
   const slot = slots[index];
+
+  if (slot.destroyed) {
+    if (visuals.containers[index]) {
+      visuals.containers[index]!.destroy({ children: true });
+      visuals.containers[index] = null;
+    }
+    if (visuals.emptySlotGfx[index]) {
+      visuals.emptySlotGfx[index]!.destroy();
+      visuals.emptySlotGfx[index] = null;
+    }
+    visuals.hitAreas[index].visible = false;
+    visuals.hitAreas[index].eventMode = "none";
+    return;
+  }
+
   if (slot.filled && !visuals.containers[index]) {
     if (visuals.emptySlotGfx[index]) {
       visuals.emptySlotGfx[index]!.destroy();
