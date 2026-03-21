@@ -2,11 +2,9 @@ import {
   CITY_DATA_VALUE,
   CITY_HALF_WIDTH,
   CITY_MAX_HEIGHT,
-  CITY_MIN_HEIGHT,
   CITY_EMBED_DEPTH,
-  CITY_MIN_BUILDINGS,
-  CITY_BUILDING_COUNT_VARIANCE,
 } from "./constants";
+import { noiseHash } from "./noise";
 
 export function stampCities(
   data: Uint8Array,
@@ -34,26 +32,58 @@ function stampCity(
   const tanX = -Math.sin(angle);
   const tanY = Math.cos(angle);
 
-  const numBuildings = CITY_MIN_BUILDINGS + Math.floor(Math.random() * CITY_BUILDING_COUNT_VARIANCE);
+  const seed = Math.floor(angle * 1000) + 42;
+  const totalWidth = CITY_HALF_WIDTH * 2;
+  const heights = new Float64Array(totalWidth);
+
+  for (let i = 0; i < totalWidth; i++) {
+    const t = (i - CITY_HALF_WIDTH) / CITY_HALF_WIDTH;
+    const envelope = Math.max(0, 1 - t * t);
+    const moundBase = envelope * envelope * CITY_MAX_HEIGHT * 0.5;
+    const n1 = noiseHash(i + seed, seed) * 0.6 + 0.4;
+    heights[i] = moundBase * n1;
+  }
+
+  const towerCount = 4 + Math.floor(noiseHash(seed, seed + 7) * 4);
+  for (let ti = 0; ti < towerCount; ti++) {
+    const tPos = Math.floor(CITY_HALF_WIDTH * 0.6 * (noiseHash(seed + ti * 3, seed + ti * 5) * 2 - 1) + CITY_HALF_WIDTH);
+    if (tPos < 2 || tPos >= totalWidth - 2) continue;
+    const t = (tPos - CITY_HALF_WIDTH) / CITY_HALF_WIDTH;
+    const envelope = Math.max(0, 1 - t * t);
+    const towerHeight = CITY_MAX_HEIGHT * (0.6 + 0.4 * noiseHash(seed + ti * 11, seed + ti * 13)) * envelope;
+    const towerWidth = 1 + Math.floor(noiseHash(seed + ti * 17, seed + ti * 19) * 2);
+    for (let w = 0; w < towerWidth && tPos + w < totalWidth; w++) {
+      heights[tPos + w] = Math.max(heights[tPos + w], towerHeight);
+    }
+  }
 
   let pixelCount = 0;
-  let x = -CITY_HALF_WIDTH;
 
-  for (let b = 0; b < numBuildings && x < CITY_HALF_WIDTH; b++) {
-    const bw = 2 + Math.floor(Math.random() * 3);
-    const gap = Math.random() < 0.3 ? 1 : 0;
-    const normalizedPos = (x + bw / 2) / CITY_HALF_WIDTH;
-    const envelope = Math.max(0, 1 - normalizedPos * normalizedPos);
-    const height = Math.floor(
-      CITY_MIN_HEIGHT + envelope * (CITY_MAX_HEIGHT - CITY_MIN_HEIGHT) * (0.4 + 0.6 * Math.random()),
-    );
+  for (let i = 0; i < totalWidth; i++) {
+    const isGap = noiseHash(i + seed * 3, seed + 99) < 0.08;
+    if (isGap) continue;
 
-    for (let t = 0; t < bw; t++) {
-      for (let r = -CITY_EMBED_DEPTH; r < height; r++) {
-        const tangentOffset = x + t;
+    const colHeight = Math.floor(heights[i]);
+    if (colHeight < 1) continue;
+
+    const tangentOffset = i - CITY_HALF_WIDTH;
+    for (let r = -CITY_EMBED_DEPTH; r < colHeight; r++) {
+      const px = Math.round(center + outX * (radius + r) + tanX * tangentOffset);
+      const py = Math.round(center + outY * (radius + r) + tanY * tangentOffset);
+
+      if (px >= 0 && px < size && py >= 0 && py < size) {
+        if (data[py * size + px] !== CITY_DATA_VALUE) {
+          data[py * size + px] = CITY_DATA_VALUE;
+          pixelCount++;
+        }
+      }
+    }
+
+    if (colHeight > CITY_MAX_HEIGHT * 0.5 && noiseHash(i + seed * 7, seed + 200) < 0.35) {
+      const spireHeight = 2 + Math.floor(noiseHash(i + seed * 9, seed + 300) * 5);
+      for (let r = colHeight; r < colHeight + spireHeight; r++) {
         const px = Math.round(center + outX * (radius + r) + tanX * tangentOffset);
         const py = Math.round(center + outY * (radius + r) + tanY * tangentOffset);
-
         if (px >= 0 && px < size && py >= 0 && py < size) {
           if (data[py * size + px] !== CITY_DATA_VALUE) {
             data[py * size + px] = CITY_DATA_VALUE;
@@ -62,8 +92,6 @@ function stampCity(
         }
       }
     }
-
-    x += bw + gap;
   }
 
   return pixelCount;
