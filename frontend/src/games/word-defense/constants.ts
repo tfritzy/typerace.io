@@ -55,4 +55,4 @@ export const CITY_COUNT = 6;
 export const CITY_MARGIN = 30;
 export const CITY_HALF_WIDTH = 35;
 export const CITY_MAX_HEIGHT = 25;
-export const CITY_EMBED_DEPTH = 8;
+export const CITY_EMBED_DEPTH = 1;
