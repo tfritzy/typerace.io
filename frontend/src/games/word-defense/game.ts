@@ -363,6 +363,15 @@ export class WordDefenseGame {
       bullet.x += bullet.vx * dt;
       bullet.y += bullet.vy * dt;
 
+      const bgdx = EARTH_CX - bullet.x;
+      const bgdy = EARTH_CY - bullet.y;
+      const bgDist = Math.sqrt(bgdx * bgdx + bgdy * bgdy);
+      if (bgDist > 1) {
+        const bAccel = GRAVITY_STRENGTH / Math.max(bgDist, EARTH_RADIUS);
+        bullet.vx += (bgdx / bgDist) * bAccel * dt;
+        bullet.vy += (bgdy / bgDist) * bAccel * dt;
+      }
+
       let removeBullet = false;
 
       if (
