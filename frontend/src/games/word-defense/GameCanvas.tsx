@@ -15,6 +15,7 @@ import {
   WAVE_RADIUS_GROWTH, MAX_METEOR_RADIUS,
   WAVE_SPAWN_INTERVAL_REDUCTION,
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
+  BETWEEN_WAVE_ZOOM, CAMERA_LERP_SPEED, SLOT_INTERACTIVE_RADIUS,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
@@ -52,6 +53,9 @@ export const GameCanvas = () => {
   const colorRef = useRef<[number, number, number]>([230, 169, 25]);
   const langCodeRef = useRef(getCurrentLangCode());
   const planetRotationRef = useRef(0);
+  const cameraZoomRef = useRef(1);
+  const selectedSlotRef = useRef<TurretSlot | null>(null);
+  const hoveredSlotRef = useRef<TurretSlot | null>(null);
   const waveConfigRef = useRef<WaveConfig>(createWaveConfig(1));
   const wavePhaseRef = useRef<WavePhase>("active");
   const meteorsSpawnedRef = useRef(0);
@@ -64,6 +68,14 @@ export const GameCanvas = () => {
 
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
+    const zoom = cameraZoomRef.current;
+    const isComplete = wavePhaseRef.current === "complete";
+
+    ctx.save();
+    ctx.translate(EARTH_CX, EARTH_CY);
+    ctx.scale(zoom, zoom);
+    ctx.translate(-EARTH_CX, -EARTH_CY);
+
     const planet = objectsRef.current[0];
     if (planet) {
       ctx.save();
@@ -73,7 +85,13 @@ export const GameCanvas = () => {
       ctx.restore();
     }
 
-    renderTurrets(ctx, turretSlotsRef.current);
+    renderTurrets(
+      ctx,
+      turretSlotsRef.current,
+      isComplete,
+      selectedSlotRef.current,
+      hoveredSlotRef.current,
+    );
 
     for (const meteor of meteorsRef.current) {
       ctx.drawImage(meteor.bitmap, Math.round(meteor.x), Math.round(meteor.y));
@@ -107,6 +125,8 @@ export const GameCanvas = () => {
 
     ctx.globalAlpha = 1.0;
     ctx.shadowBlur = 0;
+
+    ctx.restore();
 
     ctx.font = "bold 24px monospace";
     ctx.textAlign = "left";
@@ -181,7 +201,12 @@ export const GameCanvas = () => {
         const planet = objectsRef.current[0];
         const meteors = meteorsRef.current;
 
-        planetRotationRef.current += PLANET_ROTATION_SPEED * dt;
+        const targetZoom = isActive ? 1 : BETWEEN_WAVE_ZOOM;
+        cameraZoomRef.current += (targetZoom - cameraZoomRef.current) * CAMERA_LERP_SPEED * dt;
+
+        if (isActive) {
+          planetRotationRef.current += PLANET_ROTATION_SPEED * dt;
+        }
         updateTurretPositions(turretSlotsRef.current, planetRotationRef.current);
 
         const hits = updateBullets(bulletsRef.current, meteors, dt);
@@ -300,12 +325,59 @@ export const GameCanvas = () => {
       }
     }
 
+    const screenToWorld = (screenX: number, screenY: number): [number, number] => {
+      const rect = canvas.getBoundingClientRect();
+      const canvasX = (screenX - rect.left) * (CANVAS_WIDTH / rect.width);
+      const canvasY = (screenY - rect.top) * (CANVAS_HEIGHT / rect.height);
+      const zoom = cameraZoomRef.current;
+      return [
+        (canvasX - EARTH_CX) / zoom + EARTH_CX,
+        (canvasY - EARTH_CY) / zoom + EARTH_CY,
+      ];
+    };
+
+    const findSlotAt = (worldX: number, worldY: number): TurretSlot | null => {
+      const hitRadius = SLOT_INTERACTIVE_RADIUS + 4;
+      const hitRadiusSq = hitRadius * hitRadius;
+      for (const slot of turretSlotsRef.current) {
+        const dx = slot.x - worldX;
+        const dy = slot.y - worldY;
+        if (dx * dx + dy * dy <= hitRadiusSq) {
+          return slot;
+        }
+      }
+      return null;
+    };
+
+    const onCanvasClick = (e: MouseEvent) => {
+      if (wavePhaseRef.current !== "complete") return;
+      const [worldX, worldY] = screenToWorld(e.clientX, e.clientY);
+      const slot = findSlotAt(worldX, worldY);
+      selectedSlotRef.current = selectedSlotRef.current === slot ? null : slot;
+    };
+
+    const onCanvasMouseMove = (e: MouseEvent) => {
+      if (wavePhaseRef.current !== "complete") {
+        hoveredSlotRef.current = null;
+        canvas.style.cursor = "default";
+        return;
+      }
+      const [worldX, worldY] = screenToWorld(e.clientX, e.clientY);
+      const slot = findSlotAt(worldX, worldY);
+      hoveredSlotRef.current = slot;
+      canvas.style.cursor = slot ? "pointer" : "default";
+    };
+
     document.addEventListener("keydown", onKeyDown);
+    canvas.addEventListener("click", onCanvasClick);
+    canvas.addEventListener("mousemove", onCanvasMouseMove);
     animFrame = requestAnimationFrame(loop);
 
     return () => {
       cancelAnimationFrame(animFrame);
       document.removeEventListener("keydown", onKeyDown);
+      canvas.removeEventListener("click", onCanvasClick);
+      canvas.removeEventListener("mousemove", onCanvasMouseMove);
       ctxRef.current = null;
       objectsRef.current = [];
       meteorsRef.current = [];
@@ -319,6 +391,8 @@ export const GameCanvas = () => {
     waveConfigRef.current = createWaveConfig(next);
     wavePhaseRef.current = "active";
     meteorsSpawnedRef.current = 0;
+    selectedSlotRef.current = null;
+    hoveredSlotRef.current = null;
     setWavePhase("active");
     setWaveNumber(next);
   }, []);
@@ -331,27 +405,16 @@ export const GameCanvas = () => {
         style={{ aspectRatio: "16/9" }}
       />
       {wavePhase === "complete" && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-lg"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}>
-          <div className="text-center">
-            <h2 className="text-4xl font-bold text-white mb-2">
-              Wave {waveNumber} Complete!
-            </h2>
-            <p className="text-lg text-gray-300 mb-6">
-              Prepare for wave {waveNumber + 1}
-            </p>
-            <button
-              onClick={startNextWave}
-              className="px-8 py-3 text-lg font-bold rounded-lg text-white cursor-pointer"
-              style={{
-                backgroundColor: "var(--accent-primary)",
-                border: "none",
-              }}
-            >
-              Start Next Wave
-            </button>
-          </div>
-        </div>
+        <button
+          onClick={startNextWave}
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-2 text-sm font-bold rounded-lg text-white cursor-pointer"
+          style={{
+            backgroundColor: "var(--accent-primary)",
+            border: "none",
+          }}
+        >
+          Start Wave {waveNumber + 1}
+        </button>
       )}
     </div>
   );

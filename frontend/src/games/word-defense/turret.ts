@@ -5,6 +5,7 @@ import {
   TOTAL_TURRET_SLOTS, INITIAL_TURRET_COUNT,
   TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH, TURRET_BASE_RADIUS,
   BULLET_SPEED, BULLET_RENDER_RADIUS,
+  SLOT_INTERACTIVE_RADIUS,
 } from "./constants";
 
 export function createTurretSlots(): TurretSlot[] {
@@ -145,8 +146,17 @@ export function updateBullets(
   return hits;
 }
 
-export function renderTurrets(ctx: CanvasRenderingContext2D, slots: TurretSlot[]) {
+export function renderTurrets(
+  ctx: CanvasRenderingContext2D,
+  slots: TurretSlot[],
+  interactive: boolean = false,
+  selectedSlot: TurretSlot | null = null,
+  hoveredSlot: TurretSlot | null = null,
+) {
   for (const slot of slots) {
+    const isSelected = slot === selectedSlot;
+    const isHovered = slot === hoveredSlot;
+
     if (slot.filled) {
       ctx.save();
       ctx.translate(slot.x, slot.y);
@@ -161,11 +171,38 @@ export function renderTurrets(ctx: CanvasRenderingContext2D, slots: TurretSlot[]
       ctx.fill();
 
       ctx.restore();
+
+      if (interactive && (isSelected || isHovered)) {
+        ctx.beginPath();
+        ctx.arc(slot.x, slot.y, TURRET_BASE_RADIUS + 5, 0, Math.PI * 2);
+        ctx.strokeStyle = isSelected ? "rgba(255, 255, 255, 0.8)" : "rgba(255, 255, 255, 0.4)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
     } else {
-      ctx.beginPath();
-      ctx.arc(slot.x, slot.y, 2, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
-      ctx.fill();
+      if (interactive) {
+        ctx.beginPath();
+        ctx.arc(slot.x, slot.y, SLOT_INTERACTIVE_RADIUS, 0, Math.PI * 2);
+        ctx.strokeStyle = isSelected ? "rgba(255, 255, 255, 0.8)" : isHovered ? "rgba(255, 255, 255, 0.5)" : "rgba(255, 255, 255, 0.3)";
+        ctx.lineWidth = isSelected ? 2 : 1.5;
+        ctx.setLineDash([3, 3]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.strokeStyle = isSelected ? "rgba(255, 255, 255, 0.7)" : isHovered ? "rgba(255, 255, 255, 0.4)" : "rgba(255, 255, 255, 0.2)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(slot.x - 4, slot.y);
+        ctx.lineTo(slot.x + 4, slot.y);
+        ctx.moveTo(slot.x, slot.y - 4);
+        ctx.lineTo(slot.x, slot.y + 4);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.arc(slot.x, slot.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
+        ctx.fill();
+      }
     }
   }
 }

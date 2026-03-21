@@ -38,3 +38,6 @@ export const BASE_METEOR_RADIUS_MAX = 18;
 export const WAVE_RADIUS_GROWTH = 3;
 export const MAX_METEOR_RADIUS = 45;
 export const WAVE_SPAWN_INTERVAL_REDUCTION = 0.9;
+export const BETWEEN_WAVE_ZOOM = 2.0;
+export const CAMERA_LERP_SPEED = 3;
+export const SLOT_INTERACTIVE_RADIUS = 12;
