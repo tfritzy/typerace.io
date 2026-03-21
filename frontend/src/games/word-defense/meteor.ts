@@ -27,12 +27,12 @@ function createMeteorBitmap(
       const dy = py - intRadius;
       const dist = Math.sqrt(dx * dx + dy * dy) / intRadius;
       if (dist <= METEOR_CORE_RADIUS) {
-        data[py * diameter + px] = 1;
+        data[py * diameter + px] = 255;
         continue;
       }
       const n = valueNoise(px * noiseFreq + seedX, py * noiseFreq + seedY);
       if (dist <= METEOR_CORE_RADIUS + n * METEOR_LUMP_HEIGHT) {
-        data[py * diameter + px] = 1;
+        data[py * diameter + px] = 255;
       }
     }
   }
@@ -199,7 +199,7 @@ function createMeteorFromComponent(
   for (const idx of pixelIndices) {
     const x = idx % original.width - minX;
     const y = Math.floor(idx / original.width) - minY;
-    newData[y * newWidth + x] = 1;
+    newData[y * newWidth + x] = 255;
   }
 
   const imageData = new ImageData(newWidth, newHeight);

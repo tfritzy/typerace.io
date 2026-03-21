@@ -16,32 +16,10 @@ export function rebuildImageData(
   const pixels = imageData.data;
   for (let i = 0; i < width * height; i++) {
     if (data[i]) {
-      pixels[i * 4] = color[0];
-      pixels[i * 4 + 1] = color[1];
-      pixels[i * 4 + 2] = color[2];
-      pixels[i * 4 + 3] = 255;
-    } else {
-      pixels[i * 4] = 0;
-      pixels[i * 4 + 1] = 0;
-      pixels[i * 4 + 2] = 0;
-      pixels[i * 4 + 3] = 0;
-    }
-  }
-}
-
-export function rebuildImageDataFromColors(
-  data: Uint8Array,
-  colors: Uint8Array,
-  imageData: ImageData,
-  width: number,
-  height: number
-) {
-  const pixels = imageData.data;
-  for (let i = 0; i < width * height; i++) {
-    if (data[i]) {
-      pixels[i * 4] = colors[i * 3];
-      pixels[i * 4 + 1] = colors[i * 3 + 1];
-      pixels[i * 4 + 2] = colors[i * 3 + 2];
+      const scale = data[i] / 255;
+      pixels[i * 4] = Math.round(color[0] * scale);
+      pixels[i * 4 + 1] = Math.round(color[1] * scale);
+      pixels[i * 4 + 2] = Math.round(color[2] * scale);
       pixels[i * 4 + 3] = 255;
     } else {
       pixels[i * 4] = 0;
@@ -116,11 +94,9 @@ export function carveCrater(
   obj: SceneObject,
   hitX: number,
   hitY: number,
-  radius: number
+  radius: number,
+  color: [number, number, number]
 ): boolean {
-  const colors = obj.colors;
-  if (!colors) return false;
-
   const localX = hitX - obj.x;
   const localY = hitY - obj.y;
   let changed = false;
@@ -159,33 +135,27 @@ export function carveCrater(
         const t = (dist - carveR) / (floorR - carveR);
         const floorNoise = valueNoise(x * 0.15 + noiseSeed, y * 0.15 + 50) * 0.15;
         const darken = CRATER_FLOOR_DARKEN + t * 0.15 + floorNoise;
-        colors[i * 3] = clampByte(colors[i * 3] * darken);
-        colors[i * 3 + 1] = clampByte(colors[i * 3 + 1] * darken);
-        colors[i * 3 + 2] = clampByte(colors[i * 3 + 2] * darken);
+        obj.data[i] = clampByte(obj.data[i] * darken);
         changed = true;
       } else if (dist <= rimR) {
         const t = (dist - floorR) / (rimR - floorR);
         const rimDetailNoise = valueNoise(x * 0.2 + noiseSeed + 200, y * 0.2) * 0.1;
         const factor = CRATER_FLOOR_DARKEN + 0.15 + t * (CRATER_RIM_BRIGHTEN - CRATER_FLOOR_DARKEN - 0.15) + rimDetailNoise;
-        colors[i * 3] = clampByte(colors[i * 3] * factor);
-        colors[i * 3 + 1] = clampByte(colors[i * 3 + 1] * factor);
-        colors[i * 3 + 2] = clampByte(colors[i * 3 + 2] * factor);
+        obj.data[i] = clampByte(obj.data[i] * factor);
         changed = true;
       } else if (dist <= ejectaR) {
         const t = (dist - rimR) / (ejectaR - rimR);
         const ejectaNoise = valueNoise(x * 0.25 + noiseSeed + 400, y * 0.25 + 100) * 0.1;
         const factor = CRATER_RIM_BRIGHTEN + t * (CRATER_EJECTA_DARKEN - CRATER_RIM_BRIGHTEN) + ejectaNoise;
         const blendFactor = 1 + (factor - 1) * (1 - t);
-        colors[i * 3] = clampByte(colors[i * 3] * blendFactor);
-        colors[i * 3 + 1] = clampByte(colors[i * 3 + 1] * blendFactor);
-        colors[i * 3 + 2] = clampByte(colors[i * 3 + 2] * blendFactor);
+        obj.data[i] = clampByte(obj.data[i] * blendFactor);
         changed = true;
       }
     }
   }
 
   if (changed) {
-    rebuildImageDataFromColors(obj.data, colors, obj.imageData, obj.width, obj.height);
+    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, color);
     updateBitmap(obj);
   }
 

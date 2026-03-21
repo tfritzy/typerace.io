@@ -438,7 +438,7 @@ export class WordDefenseGame {
         const rsin = Math.sin(-this.planetRotation);
         const localCx = relX * rcos - relY * rsin + EARTH_CX;
         const localCy = relX * rsin + relY * rcos + EARTH_CY;
-        carveCrater(this.planetObj, localCx, localCy, destroyRadius);
+        carveCrater(this.planetObj, localCx, localCy, destroyRadius, PLANET_COLOR);
 
         const dr2 = destroyRadius * destroyRadius;
         for (let si = 0; si < this.slots.length; si++) {
