@@ -13,7 +13,8 @@ const METEOR_CLEANUP_MARGIN = 200;
 const IMPACT_RADIUS_SCALE = 1 / 20;
 const METEOR_COLOR: [number, number, number] = [107, 90, 62];
 const METEOR_ANGULAR_SEGMENTS = 32;
-const WORD_FONT = "bold 28px monospace";
+const WORD_FONT_SIZE = 28;
+const WORD_FONT = `bold ${WORD_FONT_SIZE}px monospace`;
 const WORD_TYPED_ALPHA = 1.0;
 const WORD_UNTYPED_ALPHA = 0.35;
 const WORD_OFFSET_Y = 10;
@@ -244,8 +245,8 @@ function getActiveWords(meteors: Meteor[]): Set<string> {
 }
 
 function getCurrentLangCode(): string {
-  const slug = localStorage.getItem("typerace_lang_slug") ?? undefined;
-  return getLanguageFromSlug(slug).htmlLang;
+  const slug = localStorage.getItem("typerace_lang_slug");
+  return getLanguageFromSlug(slug ?? undefined).htmlLang;
 }
 
 export const GameCanvas = () => {
@@ -279,7 +280,7 @@ export const GameCanvas = () => {
 
     for (const meteor of meteorsRef.current) {
       const wordX = meteor.x + meteor.radius;
-      const wordY = meteor.y + meteor.radius * 2 + WORD_OFFSET_Y + 28;
+      const wordY = meteor.y + meteor.radius * 2 + WORD_OFFSET_Y + WORD_FONT_SIZE;
       const isActive = meteor === activeMeteorRef.current;
       const typedCount = isActive ? typedCountRef.current : 0;
 
