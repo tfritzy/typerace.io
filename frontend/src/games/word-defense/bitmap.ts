@@ -1,8 +1,8 @@
 import type { SceneObject } from "./types";
+import type { Palette } from "./types";
 import {
   CRATER_CARVE_RATIO, CRATER_FLOOR_RATIO, CRATER_RIM_RATIO,
-  CRATER_EJECTA_RATIO, CRATER_FLOOR_DARKEN, CRATER_RIM_BRIGHTEN,
-  CRATER_EJECTA_DARKEN,
+  CRATER_EJECTA_RATIO,
 } from "./constants";
 import { valueNoise } from "./noise";
 
@@ -11,15 +11,15 @@ export function rebuildImageData(
   imageData: ImageData,
   width: number,
   height: number,
-  color: [number, number, number]
+  palette: Palette
 ) {
   const pixels = imageData.data;
   for (let i = 0; i < width * height; i++) {
     if (data[i]) {
-      const scale = data[i] / 255;
-      pixels[i * 4] = Math.round(color[0] * scale);
-      pixels[i * 4 + 1] = Math.round(color[1] * scale);
-      pixels[i * 4 + 2] = Math.round(color[2] * scale);
+      const color = palette[data[i]];
+      pixels[i * 4] = color[0];
+      pixels[i * 4 + 1] = color[1];
+      pixels[i * 4 + 2] = color[2];
       pixels[i * 4 + 3] = 255;
     } else {
       pixels[i * 4] = 0;
@@ -75,19 +75,14 @@ export function destroyCircle(
   obj: SceneObject,
   hitX: number,
   hitY: number,
-  radius: number,
-  color: [number, number, number]
+  radius: number
 ): boolean {
   const changed = carveCircle(obj, hitX, hitY, radius);
   if (changed) {
-    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, color);
+    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, obj.palette);
     updateBitmap(obj);
   }
   return changed;
-}
-
-function clampByte(v: number): number {
-  return v < 0 ? 0 : v > 255 ? 255 : Math.round(v);
 }
 
 export function carveCrater(
@@ -95,7 +90,10 @@ export function carveCrater(
   hitX: number,
   hitY: number,
   radius: number,
-  color: [number, number, number]
+  floorIndex: number,
+  wallIndex: number,
+  rimIndex: number,
+  ejectaIndex: number
 ): boolean {
   const localX = hitX - obj.x;
   const localY = hitY - obj.y;
@@ -132,30 +130,21 @@ export function carveCrater(
         obj.data[i] = 0;
         changed = true;
       } else if (dist <= floorR) {
-        const t = (dist - carveR) / (floorR - carveR);
-        const floorNoise = valueNoise(x * 0.15 + noiseSeed, y * 0.15 + 50) * 0.15;
-        const darken = CRATER_FLOOR_DARKEN + t * 0.15 + floorNoise;
-        obj.data[i] = clampByte(obj.data[i] * darken);
+        obj.data[i] = floorIndex;
         changed = true;
       } else if (dist <= rimR) {
         const t = (dist - floorR) / (rimR - floorR);
-        const rimDetailNoise = valueNoise(x * 0.2 + noiseSeed + 200, y * 0.2) * 0.1;
-        const factor = CRATER_FLOOR_DARKEN + 0.15 + t * (CRATER_RIM_BRIGHTEN - CRATER_FLOOR_DARKEN - 0.15) + rimDetailNoise;
-        obj.data[i] = clampByte(obj.data[i] * factor);
+        obj.data[i] = t < 0.7 ? wallIndex : rimIndex;
         changed = true;
       } else if (dist <= ejectaR) {
-        const t = (dist - rimR) / (ejectaR - rimR);
-        const ejectaNoise = valueNoise(x * 0.25 + noiseSeed + 400, y * 0.25 + 100) * 0.1;
-        const factor = CRATER_RIM_BRIGHTEN + t * (CRATER_EJECTA_DARKEN - CRATER_RIM_BRIGHTEN) + ejectaNoise;
-        const blendFactor = 1 + (factor - 1) * (1 - t);
-        obj.data[i] = clampByte(obj.data[i] * blendFactor);
+        obj.data[i] = ejectaIndex;
         changed = true;
       }
     }
   }
 
   if (changed) {
-    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, color);
+    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, obj.palette);
     updateBitmap(obj);
   }
 
