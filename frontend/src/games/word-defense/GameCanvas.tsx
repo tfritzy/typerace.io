@@ -18,6 +18,8 @@ export const GameCanvas = () => {
         return;
       }
       gameRef.current = game;
+    }).catch((err) => {
+      console.error("Failed to initialize Word Defense:", err);
     });
 
     return () => {
