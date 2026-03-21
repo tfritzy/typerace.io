@@ -55,7 +55,7 @@ export const GameCanvas = () => {
   const planetRotationRef = useRef(0);
   const cameraZoomRef = useRef(1);
   const cameraYRef = useRef(EARTH_CY);
-  const transformInvRef = useRef(new DOMMatrix());
+  const cameraMatrixRef = useRef(new DOMMatrix());
   const selectedSlotRef = useRef<TurretSlot | null>(null);
   const hoveredSlotRef = useRef<TurretSlot | null>(null);
   const waveConfigRef = useRef<WaveConfig>(createWaveConfig(1));
@@ -77,7 +77,7 @@ export const GameCanvas = () => {
     ctx.translate(EARTH_CX, cameraYRef.current);
     ctx.scale(zoom, zoom);
     ctx.translate(-EARTH_CX, -EARTH_CY);
-    transformInvRef.current = ctx.getTransform().inverse();
+    cameraMatrixRef.current = ctx.getTransform();
 
     const planet = objectsRef.current[0];
     if (planet) {
@@ -331,31 +331,29 @@ export const GameCanvas = () => {
       }
     }
 
-    const screenToWorld = (screenX: number, screenY: number): [number, number] => {
+    const hitTestSlot = (e: MouseEvent): TurretSlot | null => {
       const rect = canvas.getBoundingClientRect();
-      const canvasX = (screenX - rect.left) * (CANVAS_WIDTH / rect.width);
-      const canvasY = (screenY - rect.top) * (CANVAS_HEIGHT / rect.height);
-      const pt = transformInvRef.current.transformPoint(new DOMPoint(canvasX, canvasY));
-      return [pt.x, pt.y];
-    };
-
-    const findSlotAt = (worldX: number, worldY: number): TurretSlot | null => {
+      const x = (e.clientX - rect.left) * (CANVAS_WIDTH / rect.width);
+      const y = (e.clientY - rect.top) * (CANVAS_HEIGHT / rect.height);
+      ctx.save();
+      ctx.setTransform(cameraMatrixRef.current);
       const hitRadius = SLOT_INTERACTIVE_RADIUS + SLOT_HIT_BUFFER;
-      const hitRadiusSq = hitRadius * hitRadius;
+      let found: TurretSlot | null = null;
       for (const slot of turretSlotsRef.current) {
-        const dx = slot.x - worldX;
-        const dy = slot.y - worldY;
-        if (dx * dx + dy * dy <= hitRadiusSq) {
-          return slot;
+        ctx.beginPath();
+        ctx.arc(slot.x, slot.y, hitRadius, 0, Math.PI * 2);
+        if (ctx.isPointInPath(x, y)) {
+          found = slot;
+          break;
         }
       }
-      return null;
+      ctx.restore();
+      return found;
     };
 
     const onCanvasClick = (e: MouseEvent) => {
       if (wavePhaseRef.current !== "complete") return;
-      const [worldX, worldY] = screenToWorld(e.clientX, e.clientY);
-      const slot = findSlotAt(worldX, worldY);
+      const slot = hitTestSlot(e);
       selectedSlotRef.current = selectedSlotRef.current === slot ? null : slot;
     };
 
@@ -365,8 +363,7 @@ export const GameCanvas = () => {
         canvas.style.cursor = "default";
         return;
       }
-      const [worldX, worldY] = screenToWorld(e.clientX, e.clientY);
-      const slot = findSlotAt(worldX, worldY);
+      const slot = hitTestSlot(e);
       hoveredSlotRef.current = slot;
       canvas.style.cursor = slot ? "pointer" : "default";
     };
