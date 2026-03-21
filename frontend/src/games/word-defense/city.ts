@@ -4,8 +4,7 @@ import {
   CITY_EMBED_DEPTH,
 } from "./constants";
 import { valueNoise } from "./noise";
-
-const CITY_INDEX = 2;
+import { CITY_INDEX } from "./planet";
 
 export function stampCities(
   data: Uint8Array,
