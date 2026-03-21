@@ -49,3 +49,8 @@ export const SLOT_HIT_BUFFER = 4;
 export const SLOT_SURFACE_INWARD = 5;
 export const SLOT_SURFACE_CHECK_RADIUS = 6;
 export const SLOT_SURFACE_THRESHOLD = 5;
+
+export const CITY_COLOR: [number, number, number] = [140, 170, 210];
+export const CITY_COUNT = 6;
+export const CITY_MARGIN = 25;
+export const CITY_DATA_VALUE = 2;

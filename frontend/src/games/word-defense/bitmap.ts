@@ -6,14 +6,16 @@ export function rebuildImageData(
   imageData: ImageData,
   width: number,
   height: number,
-  color: [number, number, number]
+  color: [number, number, number],
+  cityColor?: [number, number, number]
 ) {
   const pixels = imageData.data;
   for (let i = 0; i < width * height; i++) {
     if (data[i]) {
-      pixels[i * 4] = color[0];
-      pixels[i * 4 + 1] = color[1];
-      pixels[i * 4 + 2] = color[2];
+      const c = (cityColor && data[i] === 2) ? cityColor : color;
+      pixels[i * 4] = c[0];
+      pixels[i * 4 + 1] = c[1];
+      pixels[i * 4 + 2] = c[2];
       pixels[i * 4 + 3] = 255;
     } else {
       pixels[i * 4] = 0;
@@ -70,7 +72,8 @@ export function destroyCircle(
   hitX: number,
   hitY: number,
   radius: number,
-  color: [number, number, number]
+  color: [number, number, number],
+  cityColor?: [number, number, number]
 ): boolean {
   const localX = hitX - obj.x;
   const localY = hitY - obj.y;
@@ -121,7 +124,7 @@ export function destroyCircle(
   }
 
   if (changed) {
-    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, color);
+    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, color, cityColor);
     updateBitmap(obj);
   }
   return changed;

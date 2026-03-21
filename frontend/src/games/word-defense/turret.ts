@@ -5,25 +5,34 @@ import {
   TOTAL_TURRET_SLOTS, INITIAL_TURRET_COUNT,
   GRAVITY_STRENGTH,
   SLOT_SURFACE_INWARD, SLOT_SURFACE_CHECK_RADIUS, SLOT_SURFACE_THRESHOLD,
+  CITY_COUNT,
 } from "./constants";
 export { fireBullet } from "./aiming";
 
 export function createTurretSlots(): TurretSlot[] {
   const slots: TurretSlot[] = [];
-  const filledInterval = TOTAL_TURRET_SLOTS / INITIAL_TURRET_COUNT;
+  const cityInterval = TOTAL_TURRET_SLOTS / CITY_COUNT;
 
   for (let i = 0; i < TOTAL_TURRET_SLOTS; i++) {
     const angle = (i / TOTAL_TURRET_SLOTS) * Math.PI * 2 - Math.PI / 2;
     const x = EARTH_CX + Math.cos(angle) * EARTH_RADIUS;
     const y = EARTH_CY + Math.sin(angle) * EARTH_RADIUS;
+    const isCity = i % cityInterval === 0;
     slots.push({
       baseAngle: angle,
       angle,
       x,
       y,
-      filled: i % filledInterval === 0,
+      filled: false,
       destroyed: false,
+      isCity,
     });
+  }
+
+  const nonCitySlots = slots.filter(s => !s.isCity);
+  for (let i = 0; i < INITIAL_TURRET_COUNT; i++) {
+    const idx = Math.floor(i * nonCitySlots.length / INITIAL_TURRET_COUNT);
+    nonCitySlots[idx].filled = true;
   }
 
   return slots;
@@ -122,8 +131,9 @@ export function updateBullets(
 }
 
 export function isSlotGroundIntact(planet: SceneObject, slot: TurretSlot): boolean {
-  const checkX = Math.cos(slot.baseAngle) * (EARTH_RADIUS - SLOT_SURFACE_INWARD) + EARTH_RADIUS;
-  const checkY = Math.sin(slot.baseAngle) * (EARTH_RADIUS - SLOT_SURFACE_INWARD) + EARTH_RADIUS;
+  const center = planet.width / 2;
+  const checkX = Math.cos(slot.baseAngle) * (EARTH_RADIUS - SLOT_SURFACE_INWARD) + center;
+  const checkY = Math.sin(slot.baseAngle) * (EARTH_RADIUS - SLOT_SURFACE_INWARD) + center;
   const r = SLOT_SURFACE_CHECK_RADIUS;
   const r2 = r * r;
   let solidCount = 0;

@@ -25,6 +25,7 @@ export interface TurretSlot {
   y: number;
   filled: boolean;
   destroyed: boolean;
+  isCity: boolean;
 }
 
 export interface Bullet {

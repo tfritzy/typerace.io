@@ -5,7 +5,7 @@ import type { Meteor, TurretSlot, Bullet, WaveConfig, WavePhase, MeteorObject, S
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
-  PLANET_COLOR,
+  PLANET_COLOR, CITY_COLOR, CITY_COUNT,
   SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_MAX,
   METEOR_CLEANUP_MARGIN, IMPACT_RADIUS_SCALE,
   WORD_FONT_SIZE,
@@ -20,6 +20,7 @@ import {
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
+import { countCityPixels } from "./city";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact } from "./meteor";
 import { createTurretSlots, updateTurretPositions, findTurretsWithLineOfSight, fireBullet, isSlotGroundIntact } from "./turret";
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
@@ -57,6 +58,8 @@ export class WordDefenseGame {
   private startButton!: Container;
   private startButtonText!: Text;
   private creditsLabel!: Text;
+  private lifeLabel!: Text;
+  private gameOverText!: Text;
 
   private slots: TurretSlot[] = [];
   private turretVisuals!: TurretVisuals;
@@ -76,6 +79,9 @@ export class WordDefenseGame {
   private cameraZoom = ACTIVE_WAVE_ZOOM;
   private cameraY = EARTH_CY;
   private credits = 0;
+  private initialCityPixels = 0;
+  private life = 100;
+  private gameOver = false;
   private selectedSlot: TurretSlot | null = null;
   private hoveredSlot: TurretSlot | null = null;
 
@@ -117,7 +123,12 @@ export class WordDefenseGame {
     this.hud = new Container();
     this.app.stage.addChild(this.hud);
 
-    this.planetObj = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS, PLANET_COLOR);
+    const cityAngles = Array.from({ length: CITY_COUNT }, (_, i) =>
+      (i / CITY_COUNT) * Math.PI * 2 - Math.PI / 2,
+    );
+    const { planet, initialCityPixels } = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS, PLANET_COLOR, cityAngles);
+    this.planetObj = planet;
+    this.initialCityPixels = initialCityPixels;
     this.planetContainer = new Container();
     this.planetContainer.position.set(EARTH_CX, EARTH_CY);
     this.world.addChild(this.planetContainer);
@@ -170,6 +181,23 @@ export class WordDefenseGame {
     this.creditsLabel.alpha = 0.7;
     this.hud.addChild(this.creditsLabel);
 
+    this.lifeLabel = new Text({
+      text: "Life: 100%",
+      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 24, fill: 0xffffff },
+    });
+    this.lifeLabel.position.set(20, 42);
+    this.lifeLabel.alpha = 0.7;
+    this.hud.addChild(this.lifeLabel);
+
+    this.gameOverText = new Text({
+      text: "GAME OVER",
+      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 64, fill: 0xff4444 },
+    });
+    this.gameOverText.anchor.set(0.5);
+    this.gameOverText.position.set(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+    this.gameOverText.visible = false;
+    this.hud.addChild(this.gameOverText);
+
     this.buildStartButton();
   }
 
@@ -201,6 +229,7 @@ export class WordDefenseGame {
   }
 
   private onKeyDown(e: KeyboardEvent) {
+    if (this.gameOver) return;
     if (e.ctrlKey || e.altKey || e.metaKey) return;
     if (e.key.length !== 1) return;
 
@@ -265,6 +294,7 @@ export class WordDefenseGame {
   }
 
   private update(dt: number) {
+    if (this.gameOver) return;
     const isActive = this.phase === "active";
 
     this.updateSpawning(dt, isActive);
@@ -278,6 +308,7 @@ export class WordDefenseGame {
 
     this.waveLabel.text = `Wave ${this.waveConfig.waveNumber}`;
     this.creditsLabel.text = `Credits: ${this.credits}`;
+    this.lifeLabel.text = `Life: ${this.life}%`;
   }
 
   private updateSpawning(dt: number, isActive: boolean) {
@@ -472,12 +503,13 @@ export class WordDefenseGame {
         const rsin = Math.sin(-this.planetRotation);
         const localCx = relX * rcos - relY * rsin + EARTH_CX;
         const localCy = relX * rsin + relY * rcos + EARTH_CY;
-        destroyCircle(this.planetObj, localCx, localCy, destroyRadius, PLANET_COLOR);
+        destroyCircle(this.planetObj, localCx, localCy, destroyRadius, PLANET_COLOR, CITY_COLOR);
+        this.updateLife();
 
         const dr2 = destroyRadius * destroyRadius;
         for (let si = 0; si < this.slots.length; si++) {
           const slot = this.slots[si];
-          if (slot.destroyed) continue;
+          if (slot.destroyed || slot.isCity) continue;
           const sdx = slot.x - cx;
           const sdy = slot.y - cy;
           if (sdx * sdx + sdy * sdy <= dr2) {
@@ -501,12 +533,24 @@ export class WordDefenseGame {
   private checkAllSlotSurfaces() {
     for (let si = 0; si < this.slots.length; si++) {
       const slot = this.slots[si];
-      if (slot.destroyed) continue;
+      if (slot.destroyed || slot.isCity) continue;
       if (!isSlotGroundIntact(this.planetObj, slot)) {
         slot.filled = false;
         slot.destroyed = true;
         rebuildSlotVisual(si, this.slots, this.turretVisuals, this.planetContainer);
       }
+    }
+  }
+
+  private updateLife() {
+    const remaining = countCityPixels(this.planetObj.data);
+    this.life = this.initialCityPixels > 0
+      ? Math.round((remaining / this.initialCityPixels) * 100)
+      : 0;
+
+    if (remaining <= 0) {
+      this.gameOver = true;
+      this.gameOverText.visible = true;
     }
   }
 
