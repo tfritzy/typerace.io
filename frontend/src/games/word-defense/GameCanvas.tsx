@@ -15,7 +15,7 @@ import {
   WAVE_RADIUS_GROWTH, MAX_METEOR_RADIUS,
   WAVE_SPAWN_INTERVAL_REDUCTION,
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
-  BETWEEN_WAVE_ZOOM, CAMERA_LERP_SPEED, SLOT_INTERACTIVE_RADIUS, SLOT_HIT_BUFFER,
+  BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED, SLOT_INTERACTIVE_RADIUS, SLOT_HIT_BUFFER,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
@@ -54,6 +54,8 @@ export const GameCanvas = () => {
   const langCodeRef = useRef(getCurrentLangCode());
   const planetRotationRef = useRef(0);
   const cameraZoomRef = useRef(1);
+  const cameraYRef = useRef(EARTH_CY);
+  const transformInvRef = useRef(new DOMMatrix());
   const selectedSlotRef = useRef<TurretSlot | null>(null);
   const hoveredSlotRef = useRef<TurretSlot | null>(null);
   const waveConfigRef = useRef<WaveConfig>(createWaveConfig(1));
@@ -72,9 +74,10 @@ export const GameCanvas = () => {
     const isComplete = wavePhaseRef.current === "complete";
 
     ctx.save();
-    ctx.translate(EARTH_CX, EARTH_CY);
+    ctx.translate(EARTH_CX, cameraYRef.current);
     ctx.scale(zoom, zoom);
     ctx.translate(-EARTH_CX, -EARTH_CY);
+    transformInvRef.current = ctx.getTransform().inverse();
 
     const planet = objectsRef.current[0];
     if (planet) {
@@ -204,6 +207,9 @@ export const GameCanvas = () => {
         const targetZoom = isActive ? 1 : BETWEEN_WAVE_ZOOM;
         cameraZoomRef.current += (targetZoom - cameraZoomRef.current) * CAMERA_LERP_SPEED * dt;
 
+        const targetY = isActive ? EARTH_CY : BETWEEN_WAVE_FOCUS_Y;
+        cameraYRef.current += (targetY - cameraYRef.current) * CAMERA_LERP_SPEED * dt;
+
         if (isActive) {
           planetRotationRef.current += PLANET_ROTATION_SPEED * dt;
         }
@@ -329,11 +335,8 @@ export const GameCanvas = () => {
       const rect = canvas.getBoundingClientRect();
       const canvasX = (screenX - rect.left) * (CANVAS_WIDTH / rect.width);
       const canvasY = (screenY - rect.top) * (CANVAS_HEIGHT / rect.height);
-      const zoom = cameraZoomRef.current;
-      return [
-        (canvasX - EARTH_CX) / zoom + EARTH_CX,
-        (canvasY - EARTH_CY) / zoom + EARTH_CY,
-      ];
+      const pt = transformInvRef.current.transformPoint(new DOMPoint(canvasX, canvasY));
+      return [pt.x, pt.y];
     };
 
     const findSlotAt = (worldX: number, worldY: number): TurretSlot | null => {
