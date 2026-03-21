@@ -1,8 +1,8 @@
-import type { Meteor, SceneObject, WaveConfig, Palette } from "./types";
+import type { Meteor, SceneObject, WaveConfig } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
-  METEOR_COLOR, METEOR_NOISE_FREQ,
+  METEOR_NOISE_FREQ,
   METEOR_CORE_RADIUS, METEOR_LUMP_HEIGHT,
   BULLET_CARVE_RADIUS, MIN_SPLIT_PIXELS,
   ACTIVE_WAVE_ZOOM,
@@ -10,13 +10,11 @@ import {
 import { valueNoise } from "./noise";
 import { rebuildImageData, updateBitmap, carveCircle } from "./bitmap";
 import { getRandomWord } from "../../utils/wordLists";
-
-const METEOR_INDEX = 1;
-const meteorPalette: Palette = [[0, 0, 0], METEOR_COLOR];
+import { METEOR_INDEX } from "./palette";
 
 function createMeteorBitmap(
   radius: number
-): Pick<SceneObject, "data" | "palette" | "imageData" | "width" | "height" | "bitmap"> {
+): Pick<SceneObject, "data" | "imageData" | "width" | "height" | "bitmap"> {
   const intRadius = Math.ceil(radius);
   const diameter = intRadius * 2;
   const data = new Uint8Array(diameter * diameter);
@@ -41,12 +39,12 @@ function createMeteorBitmap(
   }
 
   const imageData = new ImageData(diameter, diameter);
-  rebuildImageData(data, imageData, diameter, diameter, meteorPalette);
+  rebuildImageData(data, imageData, diameter, diameter);
   const bitmap = document.createElement("canvas");
   bitmap.width = diameter;
   bitmap.height = diameter;
   bitmap.getContext("2d")!.putImageData(imageData, 0, 0);
-  return { data, palette: meteorPalette, imageData, width: diameter, height: diameter, bitmap };
+  return { data, imageData, width: diameter, height: diameter, bitmap };
 }
 
 export function spawnMeteor(langCode: string, usedWords: Set<string>, waveConfig: WaveConfig): Meteor {
@@ -206,7 +204,7 @@ function createMeteorFromComponent(
   }
 
   const imageData = new ImageData(newWidth, newHeight);
-  rebuildImageData(newData, imageData, newWidth, newHeight, meteorPalette);
+  rebuildImageData(newData, imageData, newWidth, newHeight);
   const bitmap = document.createElement("canvas");
   bitmap.width = newWidth;
   bitmap.height = newHeight;
@@ -226,7 +224,6 @@ function createMeteorFromComponent(
     width: newWidth,
     height: newHeight,
     data: newData,
-    palette: meteorPalette,
     imageData,
     bitmap,
   };
@@ -257,7 +254,7 @@ export function handleBulletImpact(
         }
       }
     }
-    rebuildImageData(meteor.data, meteor.imageData, meteor.width, meteor.height, meteor.palette);
+    rebuildImageData(meteor.data, meteor.imageData, meteor.width, meteor.height);
     updateBitmap(meteor);
     return [meteor];
   }

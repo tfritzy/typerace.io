@@ -1,13 +1,14 @@
-import type { Palette, SceneObject } from "./types";
+import type { SceneObject } from "./types";
 import { valueNoise } from "./noise";
+import { getPalette } from "./palette";
 
 export function rebuildImageData(
   data: Uint8Array,
   imageData: ImageData,
   width: number,
   height: number,
-  palette: Palette,
 ) {
+  const palette = getPalette();
   const pixels = imageData.data;
   for (let i = 0; i < width * height; i++) {
     const v = data[i];
@@ -122,7 +123,7 @@ export function destroyCircle(
   }
 
   if (changed) {
-    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, obj.palette);
+    rebuildImageData(obj.data, obj.imageData, obj.width, obj.height);
     updateBitmap(obj);
   }
   return changed;

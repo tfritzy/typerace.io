@@ -1,24 +1,12 @@
+import type { SceneObject } from "./types";
 import {
   CITY_HALF_WIDTH,
   CITY_MAX_HEIGHT,
   CITY_EMBED_DEPTH,
 } from "./constants";
 import { valueNoise } from "./noise";
-import { CITY_INDEX } from "./planet";
-
-export function stampCities(
-  data: Uint8Array,
-  size: number,
-  planetRadius: number,
-  cityAngles: number[],
-): number {
-  let total = 0;
-  const center = size / 2;
-  for (const angle of cityAngles) {
-    total += stampCity(data, size, center, planetRadius, angle);
-  }
-  return total;
-}
+import { CITY_INDEX } from "./palette";
+import { rebuildImageData } from "./bitmap";
 
 function cityHeight(tangent: number, seed: number): number {
   const t = tangent / CITY_HALF_WIDTH;
@@ -51,13 +39,12 @@ function cityHeight(tangent: number, seed: number): number {
   return baseH + towerH + spireH;
 }
 
-function stampCity(
-  data: Uint8Array,
-  size: number,
-  center: number,
-  radius: number,
+function createCityObject(
+  planetCx: number,
+  planetCy: number,
+  planetRadius: number,
   angle: number,
-): number {
+): SceneObject {
   const outX = Math.cos(angle);
   const outY = Math.sin(angle);
   const tanX = -Math.sin(angle);
@@ -65,47 +52,75 @@ function stampCity(
 
   const seed = Math.floor(angle * 1000) + 42;
 
-  let pixelCount = 0;
   const maxOutward = CITY_MAX_HEIGHT + 5;
   const extent = maxOutward + CITY_HALF_WIDTH + CITY_EMBED_DEPTH;
-  const cityCx = center + outX * radius;
-  const cityCy = center + outY * radius;
-  const minPx = Math.max(0, Math.floor(cityCx - extent));
-  const maxPx = Math.min(size - 1, Math.ceil(cityCx + extent));
-  const minPy = Math.max(0, Math.floor(cityCy - extent));
-  const maxPy = Math.min(size - 1, Math.ceil(cityCy + extent));
+  const bboxSize = Math.ceil(extent * 2) + 2;
 
-  for (let py = minPy; py <= maxPy; py++) {
-    for (let px = minPx; px <= maxPx; px++) {
-      const idx = py * size + px;
-      if (data[idx] === CITY_INDEX) continue;
+  const surfaceCx = planetCx + outX * planetRadius;
+  const surfaceCy = planetCy + outY * planetRadius;
 
-      const dx = px - center;
-      const dy = py - center;
+  const objX = surfaceCx - bboxSize / 2;
+  const objY = surfaceCy - bboxSize / 2;
+
+  const data = new Uint8Array(bboxSize * bboxSize);
+  let pixelCount = 0;
+
+  for (let py = 0; py < bboxSize; py++) {
+    for (let px = 0; px < bboxSize; px++) {
+      const worldX = objX + px;
+      const worldY = objY + py;
+      const dx = worldX - planetCx;
+      const dy = worldY - planetCy;
       const radial = dx * outX + dy * outY;
       const tangent = dx * tanX + dy * tanY;
 
       const h = cityHeight(tangent, seed);
       if (h <= 0) continue;
 
-      const r = radial - radius;
+      const r = radial - planetRadius;
       const surfaceR =
-        Math.sqrt(Math.max(0, radius * radius - tangent * tangent)) - radius;
+        Math.sqrt(Math.max(0, planetRadius * planetRadius - tangent * tangent)) - planetRadius;
 
       if (r >= surfaceR - CITY_EMBED_DEPTH && r < surfaceR + h) {
-        data[idx] = CITY_INDEX;
+        data[py * bboxSize + px] = CITY_INDEX;
         pixelCount++;
       }
     }
   }
 
-  return pixelCount;
+  const imageData = new ImageData(bboxSize, bboxSize);
+  rebuildImageData(data, imageData, bboxSize, bboxSize);
+  const bitmap = document.createElement("canvas");
+  bitmap.width = bboxSize;
+  bitmap.height = bboxSize;
+  bitmap.getContext("2d")!.putImageData(imageData, 0, 0);
+
+  return {
+    x: objX,
+    y: objY,
+    width: bboxSize,
+    height: bboxSize,
+    data,
+    imageData,
+    bitmap,
+  };
 }
 
-export function countCityPixels(data: Uint8Array): number {
+export function createCityObjects(
+  planetCx: number,
+  planetCy: number,
+  planetRadius: number,
+  cityAngles: number[],
+): SceneObject[] {
+  return cityAngles.map(angle =>
+    createCityObject(planetCx, planetCy, planetRadius, angle)
+  );
+}
+
+export function countCityPixels(city: SceneObject): number {
   let count = 0;
-  for (let i = 0; i < data.length; i++) {
-    if (data[i] === CITY_INDEX) count++;
+  for (let i = 0; i < city.data.length; i++) {
+    if (city.data[i] !== 0) count++;
   }
   return count;
 }

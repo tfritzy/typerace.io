@@ -1,23 +1,15 @@
-import type { SceneObject, Palette } from "./types";
+import type { SceneObject } from "./types";
 import { rebuildImageData } from "./bitmap";
-import { CITY_MARGIN, PLANET_COLOR, CITY_COLOR } from "./constants";
-import { stampCities } from "./city";
-
-export const PLANET_INDEX = 1;
-export const CITY_INDEX = 2;
-
-const planetPalette: Palette = [
-  [0, 0, 0],
-  PLANET_COLOR,
-  CITY_COLOR,
-];
+import { CITY_MARGIN, CITY_COUNT } from "./constants";
+import { PLANET_INDEX } from "./palette";
+import { createCityObjects } from "./city";
 
 export function createPlanet(
   cx: number,
   cy: number,
   radius: number,
-  cityAngles: number[]
-): { planet: SceneObject; initialCityPixels: number } {
+  cityCount: number,
+): { planet: SceneObject; cities: SceneObject[] } {
   const margin = CITY_MARGIN;
   const size = (radius + margin) * 2;
   const center = size / 2;
@@ -34,26 +26,28 @@ export function createPlanet(
     }
   }
 
-  const initialCityPixels = stampCities(data, size, radius, cityAngles);
-
   const imageData = new ImageData(size, size);
-  rebuildImageData(data, imageData, size, size, planetPalette);
+  rebuildImageData(data, imageData, size, size);
   const bitmap = document.createElement("canvas");
   bitmap.width = size;
   bitmap.height = size;
   bitmap.getContext("2d")!.putImageData(imageData, 0, 0);
 
-  return {
-    planet: {
-      x: cx - center,
-      y: cy - center,
-      width: size,
-      height: size,
-      data,
-      palette: planetPalette,
-      imageData,
-      bitmap,
-    },
-    initialCityPixels,
+  const planet: SceneObject = {
+    x: cx - center,
+    y: cy - center,
+    width: size,
+    height: size,
+    data,
+    imageData,
+    bitmap,
   };
+
+  const cityAngles = Array.from({ length: cityCount }, (_, i) =>
+    (i / cityCount) * Math.PI * 2 - Math.PI / 2,
+  );
+
+  const cities = createCityObjects(cx, cy, radius, cityAngles);
+
+  return { planet, cities };
 }

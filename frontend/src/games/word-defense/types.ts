@@ -8,7 +8,6 @@ export interface SceneObject {
   width: number;
   height: number;
   data: Uint8Array;
-  palette: Palette;
   imageData: ImageData;
   bitmap: HTMLCanvasElement;
 }

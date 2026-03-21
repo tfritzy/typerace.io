@@ -18,13 +18,14 @@ import {
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
 } from "./constants";
-import { destroyCircle } from "./bitmap";
+import { destroyCircle, carveCircle, rebuildImageData, updateBitmap } from "./bitmap";
 import { createPlanet } from "./planet";
 import { countCityPixels } from "./city";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact } from "./meteor";
 import { createTurretSlots, updateTurretPositions, findTurretsWithLineOfSight, fireBullet, isSlotGroundIntact } from "./turret";
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
 import { createMeteorObject, createBulletGraphics } from "./meteorRendering";
+import { buildPalette } from "./palette";
 
 function getLangCode(): string {
   const slug = localStorage.getItem("typerace_lang_slug");
@@ -51,6 +52,9 @@ export class WordDefenseGame {
   private planetContainer!: Container;
   private planetObj!: SceneObject;
   private planetTexture!: Texture;
+  private cityObjects: SceneObject[] = [];
+  private cityTextures: Texture[] = [];
+  private citySprites: Sprite[] = [];
   private meteorLayer!: Container;
   private bulletLayer!: Container;
   private highlightGfx!: Graphics;
@@ -117,18 +121,21 @@ export class WordDefenseGame {
   }
 
   private buildScene() {
+    buildPalette();
+
     this.world = new Container();
     this.app.stage.addChild(this.world);
 
     this.hud = new Container();
     this.app.stage.addChild(this.hud);
 
-    const cityAngles = Array.from({ length: CITY_COUNT }, (_, i) =>
-      (i / CITY_COUNT) * Math.PI * 2 - Math.PI / 2,
-    );
-    const { planet, initialCityPixels } = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS, cityAngles);
+    const { planet, cities } = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS, CITY_COUNT);
     this.planetObj = planet;
-    this.initialCityPixels = initialCityPixels;
+    this.cityObjects = cities;
+    this.initialCityPixels = 0;
+    for (const city of cities) {
+      this.initialCityPixels += countCityPixels(city);
+    }
     this.planetContainer = new Container();
     this.planetContainer.position.set(EARTH_CX, EARTH_CY);
     this.world.addChild(this.planetContainer);
@@ -138,11 +145,21 @@ export class WordDefenseGame {
     planetSprite.anchor.set(0.5);
     this.planetContainer.addChild(planetSprite);
 
+    for (const city of this.cityObjects) {
+      const tex = Texture.from({ resource: city.bitmap, alphaMode: "premultiply-alpha-on-upload" });
+      this.cityTextures.push(tex);
+      const sprite = new Sprite(tex);
+      sprite.position.set(city.x - this.planetObj.x - this.planetObj.width / 2, city.y - this.planetObj.y - this.planetObj.height / 2);
+      this.planetContainer.addChild(sprite);
+      this.citySprites.push(sprite);
+    }
+
     this.slots = createTurretSlots();
     this.turretVisuals = buildTurretVisuals(this.slots, this.planetContainer);
 
     for (let i = 0; i < this.slots.length; i++) {
       const slot = this.slots[i];
+      if (slot.isCity) continue;
       const hitArea = this.turretVisuals.hitAreas[i];
       hitArea.on("pointertap", () => {
         this.selectedSlot = this.selectedSlot === slot ? null : slot;
@@ -364,7 +381,7 @@ export class WordDefenseGame {
     const isComplete = this.phase === "complete";
     for (let i = 0; i < this.slots.length; i++) {
       const slot = this.slots[i];
-      if (slot.destroyed) {
+      if (slot.destroyed || slot.isCity) {
         this.turretVisuals.hitAreas[i].visible = false;
         continue;
       }
@@ -504,6 +521,15 @@ export class WordDefenseGame {
         const localCx = relX * rcos - relY * rsin + EARTH_CX;
         const localCy = relX * rsin + relY * rcos + EARTH_CY;
         destroyCircle(this.planetObj, localCx, localCy, destroyRadius);
+
+        for (let ci = 0; ci < this.cityObjects.length; ci++) {
+          const city = this.cityObjects[ci];
+          if (carveCircle(city, localCx, localCy, destroyRadius)) {
+            rebuildImageData(city.data, city.imageData, city.width, city.height);
+            updateBitmap(city);
+            this.cityTextures[ci].source.update();
+          }
+        }
         this.updateLife();
 
         const dr2 = destroyRadius * destroyRadius;
@@ -543,7 +569,10 @@ export class WordDefenseGame {
   }
 
   private updateLife() {
-    const remaining = countCityPixels(this.planetObj.data);
+    let remaining = 0;
+    for (const city of this.cityObjects) {
+      remaining += countCityPixels(city);
+    }
     this.life = this.initialCityPixels > 0
       ? Math.round((remaining / this.initialCityPixels) * 100)
       : 0;
