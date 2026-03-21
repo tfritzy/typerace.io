@@ -3,7 +3,7 @@ import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
   TOTAL_TURRET_SLOTS, INITIAL_TURRET_COUNT,
-  BULLET_SPEED,
+  BULLET_SPEED, GRAVITY_STRENGTH,
   SLOT_SURFACE_INWARD, SLOT_SURFACE_CHECK_RADIUS, SLOT_SURFACE_THRESHOLD,
 } from "./constants";
 
@@ -70,37 +70,76 @@ export function findTurretsWithLineOfSight(
   return result;
 }
 
+function applyGravityStep(
+  x: number, y: number, vx: number, vy: number, stepDt: number
+): { x: number; y: number; vx: number; vy: number } {
+  x += vx * stepDt;
+  y += vy * stepDt;
+  const gx = EARTH_CX - x;
+  const gy = EARTH_CY - y;
+  const gd = Math.sqrt(gx * gx + gy * gy);
+  if (gd > 1) {
+    const accel = GRAVITY_STRENGTH / Math.max(gd, EARTH_RADIUS);
+    vx += (gx / gd) * accel * stepDt;
+    vy += (gy / gd) * accel * stepDt;
+  }
+  return { x, y, vx, vy };
+}
+
+function simulatePosition(
+  x: number, y: number, vx: number, vy: number, totalTime: number
+): { x: number; y: number } {
+  const steps = Math.max(Math.ceil(totalTime * 60), 1);
+  const stepDt = totalTime / steps;
+  for (let s = 0; s < steps; s++) {
+    ({ x, y, vx, vy } = applyGravityStep(x, y, vx, vy, stepDt));
+  }
+  return { x, y };
+}
+
 export function fireBullet(turret: TurretSlot, target: Meteor): Bullet {
   const targetCx = target.x + target.width / 2;
   const targetCy = target.y + target.height / 2;
 
   const dx = targetCx - turret.x;
   const dy = targetCy - turret.y;
-  const a = BULLET_SPEED * BULLET_SPEED - (target.vx * target.vx + target.vy * target.vy);
-  const b = -2 * (dx * target.vx + dy * target.vy);
-  const c = -(dx * dx + dy * dy);
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  let t = dist / BULLET_SPEED;
 
-  let t = 0;
-  const discriminant = b * b - 4 * a * c;
-  if (discriminant >= 0 && Math.abs(a) > 0.001) {
-    const sqrtD = Math.sqrt(discriminant);
-    const t1 = (-b - sqrtD) / (2 * a);
-    const t2 = (-b + sqrtD) / (2 * a);
-    t = t1 > 0 ? t1 : t2 > 0 ? t2 : 0;
+  for (let iter = 0; iter < 4; iter++) {
+    const pred = simulatePosition(targetCx, targetCy, target.vx, target.vy, t);
+    const pdx = pred.x - turret.x;
+    const pdy = pred.y - turret.y;
+    t = Math.sqrt(pdx * pdx + pdy * pdy) / BULLET_SPEED;
   }
 
-  const predX = targetCx + target.vx * t;
-  const predY = targetCy + target.vy * t;
+  const meteorPred = simulatePosition(targetCx, targetCy, target.vx, target.vy, t);
 
-  const pdx = predX - turret.x;
-  const pdy = predY - turret.y;
-  const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
+  let aimX = meteorPred.x;
+  let aimY = meteorPred.y;
+
+  for (let iter = 0; iter < 4; iter++) {
+    const adx = aimX - turret.x;
+    const ady = aimY - turret.y;
+    const aDist = Math.sqrt(adx * adx + ady * ady);
+    const bvx = (adx / aDist) * BULLET_SPEED;
+    const bvy = (ady / aDist) * BULLET_SPEED;
+
+    const bulletEnd = simulatePosition(turret.x, turret.y, bvx, bvy, t);
+
+    aimX += meteorPred.x - bulletEnd.x;
+    aimY += meteorPred.y - bulletEnd.y;
+  }
+
+  const finalDx = aimX - turret.x;
+  const finalDy = aimY - turret.y;
+  const finalDist = Math.sqrt(finalDx * finalDx + finalDy * finalDy);
 
   return {
     x: turret.x,
     y: turret.y,
-    vx: (pdx / pdist) * BULLET_SPEED,
-    vy: (pdy / pdist) * BULLET_SPEED,
+    vx: (finalDx / finalDist) * BULLET_SPEED,
+    vy: (finalDy / finalDist) * BULLET_SPEED,
     target,
   };
 }
@@ -117,6 +156,15 @@ export function updateBullets(
 
     bullet.x += bullet.vx * dt;
     bullet.y += bullet.vy * dt;
+
+    const bgdx = EARTH_CX - bullet.x;
+    const bgdy = EARTH_CY - bullet.y;
+    const bgDist = Math.sqrt(bgdx * bgdx + bgdy * bgdy);
+    if (bgDist > 1) {
+      const bAccel = GRAVITY_STRENGTH / Math.max(bgDist, EARTH_RADIUS);
+      bullet.vx += (bgdx / bgDist) * bAccel * dt;
+      bullet.vy += (bgdy / bgDist) * bAccel * dt;
+    }
 
     if (
       bullet.x < -50 || bullet.x > CANVAS_WIDTH + 50 ||
