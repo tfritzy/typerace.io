@@ -1,4 +1,12 @@
-import { CITY_DATA_VALUE } from "./constants";
+import {
+  CITY_DATA_VALUE,
+  CITY_HALF_WIDTH,
+  CITY_MAX_HEIGHT,
+  CITY_MIN_HEIGHT,
+  CITY_EMBED_DEPTH,
+  CITY_MIN_BUILDINGS,
+  CITY_BUILDING_COUNT_VARIANCE,
+} from "./constants";
 
 export function stampCities(
   data: Uint8Array,
@@ -26,26 +34,22 @@ function stampCity(
   const tanX = -Math.sin(angle);
   const tanY = Math.cos(angle);
 
-  const cityHalfWidth = 18;
-  const numBuildings = 8 + Math.floor(Math.random() * 5);
-  const maxHeight = 20;
-  const minHeight = 3;
-  const embedDepth = 3;
+  const numBuildings = CITY_MIN_BUILDINGS + Math.floor(Math.random() * CITY_BUILDING_COUNT_VARIANCE);
 
   let pixelCount = 0;
-  let x = -cityHalfWidth;
+  let x = -CITY_HALF_WIDTH;
 
-  for (let b = 0; b < numBuildings && x < cityHalfWidth; b++) {
+  for (let b = 0; b < numBuildings && x < CITY_HALF_WIDTH; b++) {
     const bw = 2 + Math.floor(Math.random() * 3);
     const gap = Math.random() < 0.3 ? 1 : 0;
-    const normalizedPos = (x + bw / 2) / cityHalfWidth;
+    const normalizedPos = (x + bw / 2) / CITY_HALF_WIDTH;
     const envelope = Math.max(0, 1 - normalizedPos * normalizedPos);
     const height = Math.floor(
-      minHeight + envelope * (maxHeight - minHeight) * (0.4 + 0.6 * Math.random()),
+      CITY_MIN_HEIGHT + envelope * (CITY_MAX_HEIGHT - CITY_MIN_HEIGHT) * (0.4 + 0.6 * Math.random()),
     );
 
     for (let t = 0; t < bw; t++) {
-      for (let r = -embedDepth; r < height; r++) {
+      for (let r = -CITY_EMBED_DEPTH; r < height; r++) {
         const tangentOffset = x + t;
         const px = Math.round(center + outX * (radius + r) + tanX * tangentOffset);
         const py = Math.round(center + outY * (radius + r) + tanY * tangentOffset);
