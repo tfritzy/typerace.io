@@ -29,6 +29,8 @@ export const MIN_SPLIT_PIXELS = 50;
 
 export const BASE_METEOR_SPEED = 60;
 export const METEOR_SPEED_SIZE_FACTOR = 0.5;
+export const GRAVITY_STRENGTH = 3000;
+export const PLANET_ROTATION_SPEED = 0.08;
 export const BASE_METEORS_PER_WAVE = 5;
 export const METEORS_PER_WAVE_INCREMENT = 3;
 export const BASE_METEOR_RADIUS_MIN = 10;

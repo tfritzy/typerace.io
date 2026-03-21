@@ -16,6 +16,7 @@ export function createTurretSlots(): TurretSlot[] {
     const x = EARTH_CX + Math.cos(angle) * EARTH_RADIUS;
     const y = EARTH_CY + Math.sin(angle) * EARTH_RADIUS;
     slots.push({
+      baseAngle: angle,
       angle,
       x,
       y,
@@ -24,6 +25,15 @@ export function createTurretSlots(): TurretSlot[] {
   }
 
   return slots;
+}
+
+export function updateTurretPositions(slots: TurretSlot[], rotation: number) {
+  for (const slot of slots) {
+    const totalAngle = slot.baseAngle + rotation;
+    slot.angle = totalAngle;
+    slot.x = EARTH_CX + Math.cos(totalAngle) * EARTH_RADIUS;
+    slot.y = EARTH_CY + Math.sin(totalAngle) * EARTH_RADIUS;
+  }
 }
 
 function hasLineOfSight(turret: TurretSlot, targetX: number, targetY: number): boolean {

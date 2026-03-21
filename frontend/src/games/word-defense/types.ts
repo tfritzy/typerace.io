@@ -17,6 +17,7 @@ export interface Meteor extends SceneObject {
 }
 
 export interface TurretSlot {
+  baseAngle: number;
   angle: number;
   x: number;
   y: number;

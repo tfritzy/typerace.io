@@ -14,12 +14,13 @@ import {
   BASE_METEOR_RADIUS_MIN, BASE_METEOR_RADIUS_MAX,
   WAVE_RADIUS_GROWTH, MAX_METEOR_RADIUS,
   WAVE_SPAWN_INTERVAL_REDUCTION,
+  GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact } from "./meteor";
 import {
-  createTurretSlots, findTurretsWithLineOfSight, fireBullet,
+  createTurretSlots, updateTurretPositions, findTurretsWithLineOfSight, fireBullet,
   updateBullets, renderTurrets, renderBullets,
 } from "./turret";
 
@@ -50,6 +51,7 @@ export const GameCanvas = () => {
   const bulletsRef = useRef<Bullet[]>([]);
   const colorRef = useRef<[number, number, number]>([230, 169, 25]);
   const langCodeRef = useRef(getCurrentLangCode());
+  const planetRotationRef = useRef(0);
   const waveConfigRef = useRef<WaveConfig>(createWaveConfig(1));
   const wavePhaseRef = useRef<WavePhase>("active");
   const meteorsSpawnedRef = useRef(0);
@@ -62,8 +64,13 @@ export const GameCanvas = () => {
 
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    for (const obj of objectsRef.current) {
-      ctx.drawImage(obj.bitmap, Math.round(obj.x), Math.round(obj.y));
+    const planet = objectsRef.current[0];
+    if (planet) {
+      ctx.save();
+      ctx.translate(EARTH_CX, EARTH_CY);
+      ctx.rotate(planetRotationRef.current);
+      ctx.drawImage(planet.bitmap, -EARTH_RADIUS, -EARTH_RADIUS);
+      ctx.restore();
     }
 
     renderTurrets(ctx, turretSlotsRef.current);
@@ -174,6 +181,9 @@ export const GameCanvas = () => {
         const planet = objectsRef.current[0];
         const meteors = meteorsRef.current;
 
+        planetRotationRef.current += PLANET_ROTATION_SPEED * dt;
+        updateTurretPositions(turretSlotsRef.current, planetRotationRef.current);
+
         const hits = updateBullets(bulletsRef.current, meteors, dt);
         for (const hit of hits) {
           const meteorIdx = meteors.indexOf(hit.target);
@@ -198,6 +208,15 @@ export const GameCanvas = () => {
           const cx = meteor.x + meteor.width / 2;
           const cy = meteor.y + meteor.height / 2;
 
+          const gdx = EARTH_CX - cx;
+          const gdy = EARTH_CY - cy;
+          const gDist = Math.sqrt(gdx * gdx + gdy * gdy);
+          if (gDist > 1) {
+            const accel = GRAVITY_STRENGTH / Math.max(gDist, EARTH_RADIUS);
+            meteor.vx += (gdx / gDist) * accel * dt;
+            meteor.vy += (gdy / gDist) * accel * dt;
+          }
+
           let removed = false;
 
           if (
@@ -207,18 +226,35 @@ export const GameCanvas = () => {
             cy > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
           ) {
             removed = true;
-          } else if (planet && checkMeteorHitsPlanet(planet, meteor)) {
+          } else if (planet && checkMeteorHitsPlanet(planet, meteor, planetRotationRef.current)) {
             const destroyRadius = Math.max(
               meteor.radius * 1.2,
               meteor.radius * meteor.radius * IMPACT_RADIUS_SCALE
             );
+
+            const relX = cx - EARTH_CX;
+            const relY = cy - EARTH_CY;
+            const rcos = Math.cos(-planetRotationRef.current);
+            const rsin = Math.sin(-planetRotationRef.current);
+            const localCx = relX * rcos - relY * rsin + EARTH_CX;
+            const localCy = relX * rsin + relY * rcos + EARTH_CY;
             destroyCircle(
               planet,
-              cx,
-              cy,
+              localCx,
+              localCy,
               destroyRadius,
               colorRef.current
             );
+
+            const dr2 = destroyRadius * destroyRadius;
+            for (const slot of turretSlotsRef.current) {
+              const sdx = slot.x - cx;
+              const sdy = slot.y - cy;
+              if (sdx * sdx + sdy * sdy <= dr2) {
+                slot.filled = false;
+              }
+            }
+
             removed = true;
           }
 
