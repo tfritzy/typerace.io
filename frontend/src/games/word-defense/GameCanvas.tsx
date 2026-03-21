@@ -12,7 +12,8 @@ const SPAWN_INTERVAL_MAX = 3500;
 const METEOR_CLEANUP_MARGIN = 200;
 const IMPACT_RADIUS_SCALE = 1 / 20;
 const METEOR_COLOR: [number, number, number] = [107, 90, 62];
-const METEOR_ANGULAR_SEGMENTS = 32;
+const METEOR_NOISE_SCALE = 3.5;
+const METEOR_EDGE_THRESHOLD = 0.38;
 const WORD_FONT_SIZE = 28;
 const WORD_FONT = `bold ${WORD_FONT_SIZE}px monospace`;
 const WORD_TYPED_ALPHA = 1.0;
@@ -26,6 +27,7 @@ interface SceneObject {
   height: number;
   data: Uint8Array;
   imageData: ImageData;
+  bitmap: HTMLCanvasElement;
 }
 
 interface Meteor extends SceneObject {
@@ -35,27 +37,53 @@ interface Meteor extends SceneObject {
   word: string;
 }
 
+function noiseHash(x: number, y: number): number {
+  let h = (x * 374761393 + y * 668265263) | 0;
+  h = ((h ^ (h >> 13)) * 1274126177) | 0;
+  return ((h ^ (h >> 16)) & 0xff) / 255;
+}
+
+function valueNoise(x: number, y: number): number {
+  const ix = Math.floor(x);
+  const iy = Math.floor(y);
+  const fx = x - ix;
+  const fy = y - iy;
+  const sx = fx * fx * (3 - 2 * fx);
+  const sy = fy * fy * (3 - 2 * fy);
+  const v00 = noiseHash(ix, iy);
+  const v10 = noiseHash(ix + 1, iy);
+  const v01 = noiseHash(ix, iy + 1);
+  const v11 = noiseHash(ix + 1, iy + 1);
+  return (v00 * (1 - sx) + v10 * sx) * (1 - sy) +
+    (v01 * (1 - sx) + v11 * sx) * sy;
+}
+
+function updateBitmap(obj: SceneObject) {
+  obj.bitmap.width = obj.width;
+  obj.bitmap.height = obj.height;
+  const bctx = obj.bitmap.getContext("2d")!;
+  bctx.putImageData(obj.imageData, 0, 0);
+}
+
 function createMeteorBitmap(
   radius: number
-): Pick<SceneObject, "data" | "imageData" | "width" | "height"> {
+): Pick<SceneObject, "data" | "imageData" | "width" | "height" | "bitmap"> {
   const intRadius = Math.ceil(radius);
   const diameter = intRadius * 2;
   const data = new Uint8Array(diameter * diameter);
-  const noiseTable = Array.from(
-    { length: METEOR_ANGULAR_SEGMENTS },
-    () => 0.65 + Math.random() * 0.7
-  );
+  const seedX = Math.random() * 1000;
+  const seedY = Math.random() * 1000;
+  const noiseScale = METEOR_NOISE_SCALE / intRadius;
 
   for (let py = 0; py < diameter; py++) {
     for (let px = 0; px < diameter; px++) {
       const dx = px - intRadius;
       const dy = py - intRadius;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const angle = Math.atan2(dy, dx);
-      const t = (angle + Math.PI) / (2 * Math.PI);
-      const noiseIndex =
-        Math.floor(t * METEOR_ANGULAR_SEGMENTS) % METEOR_ANGULAR_SEGMENTS;
-      if (dist <= radius * noiseTable[noiseIndex]) {
+      const dist = Math.sqrt(dx * dx + dy * dy) / intRadius;
+      if (dist > 1.3) continue;
+      const n = valueNoise(px * noiseScale + seedX, py * noiseScale + seedY);
+      const falloff = Math.max(0, 1 - dist * dist);
+      if (n * falloff > METEOR_EDGE_THRESHOLD) {
         data[py * diameter + px] = 1;
       }
     }
@@ -63,7 +91,11 @@ function createMeteorBitmap(
 
   const imageData = new ImageData(diameter, diameter);
   rebuildImageData(data, imageData, diameter, diameter, METEOR_COLOR);
-  return { data, imageData, width: diameter, height: diameter };
+  const bitmap = document.createElement("canvas");
+  bitmap.width = diameter;
+  bitmap.height = diameter;
+  bitmap.getContext("2d")!.putImageData(imageData, 0, 0);
+  return { data, imageData, width: diameter, height: diameter, bitmap };
 }
 
 function spawnMeteor(langCode: string, usedWords: Set<string>): Meteor {
@@ -164,6 +196,10 @@ function createPlanet(
 
   const imageData = new ImageData(diameter, diameter);
   rebuildImageData(data, imageData, diameter, diameter, color);
+  const bitmap = document.createElement("canvas");
+  bitmap.width = diameter;
+  bitmap.height = diameter;
+  bitmap.getContext("2d")!.putImageData(imageData, 0, 0);
 
   return {
     x: cx - radius,
@@ -172,6 +208,7 @@ function createPlanet(
     height: diameter,
     data,
     imageData,
+    bitmap,
   };
 }
 
@@ -233,6 +270,7 @@ function destroyCircle(
 
   if (changed) {
     rebuildImageData(obj.data, obj.imageData, obj.width, obj.height, color);
+    updateBitmap(obj);
   }
 
   return changed;
@@ -266,11 +304,11 @@ export const GameCanvas = () => {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     for (const obj of objectsRef.current) {
-      ctx.putImageData(obj.imageData, obj.x, obj.y);
+      ctx.drawImage(obj.bitmap, Math.round(obj.x), Math.round(obj.y));
     }
 
     for (const meteor of meteorsRef.current) {
-      ctx.putImageData(meteor.imageData, meteor.x, meteor.y);
+      ctx.drawImage(meteor.bitmap, Math.round(meteor.x), Math.round(meteor.y));
     }
 
     ctx.font = WORD_FONT;
