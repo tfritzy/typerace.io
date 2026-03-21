@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import { Application, Container, Sprite, Graphics, Text, Texture, TextStyle, Circle } from "pixi.js";
 import { getRandomWord } from "../../utils/wordLists";
 import { getLanguageFromSlug } from "../../utils/modes";
-import type { SceneObject, Meteor, TurretSlot, Bullet, WaveConfig, WavePhase } from "./types";
+import type { Meteor, TurretSlot, Bullet, WaveConfig, WavePhase } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
@@ -16,7 +16,8 @@ import {
   WAVE_RADIUS_GROWTH, MAX_METEOR_RADIUS,
   WAVE_SPAWN_INTERVAL_REDUCTION,
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
-  BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED, SLOT_INTERACTIVE_RADIUS, SLOT_HIT_BUFFER,
+  BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
+  SLOT_INTERACTIVE_RADIUS, SLOT_HIT_BUFFER,
   TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH, TURRET_BASE_RADIUS,
   BULLET_RENDER_RADIUS,
 } from "./constants";
@@ -25,7 +26,6 @@ import { createPlanet } from "./planet";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact } from "./meteor";
 import {
   createTurretSlots, updateTurretPositions, findTurretsWithLineOfSight, fireBullet,
-  updateBullets,
 } from "./turret";
 
 function getCurrentLangCode(): string {
@@ -46,31 +46,108 @@ function createWaveConfig(waveNumber: number): WaveConfig {
   };
 }
 
-interface MeteorDisplay {
+function createTurretGraphics(slot: TurretSlot): Container {
+  const container = new Container();
+  container.position.set(
+    Math.cos(slot.baseAngle) * EARTH_RADIUS,
+    Math.sin(slot.baseAngle) * EARTH_RADIUS,
+  );
+
+  const barrel = new Graphics();
+  barrel.rect(0, -TURRET_BARREL_WIDTH / 2, TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH);
+  barrel.fill(0x6b7280);
+  barrel.rotation = slot.baseAngle;
+  container.addChild(barrel);
+
+  const base = new Graphics();
+  base.circle(0, 0, TURRET_BASE_RADIUS);
+  base.fill(0x9ca3af);
+  container.addChild(base);
+
+  return container;
+}
+
+function createEmptySlotGraphics(): Graphics {
+  const g = new Graphics();
+  g.circle(0, 0, 2);
+  g.fill({ color: 0xffffff, alpha: 0.15 });
+  return g;
+}
+
+function createSlotHitArea(slot: TurretSlot): Graphics {
+  const g = new Graphics();
+  g.eventMode = "static";
+  g.cursor = "pointer";
+  g.hitArea = new Circle(0, 0, SLOT_INTERACTIVE_RADIUS + SLOT_HIT_BUFFER);
+  g.position.set(
+    Math.cos(slot.baseAngle) * EARTH_RADIUS,
+    Math.sin(slot.baseAngle) * EARTH_RADIUS,
+  );
+  g.visible = false;
+  return g;
+}
+
+function drawSlotInteractive(g: Graphics, isSelected: boolean, isHovered: boolean) {
+  g.clear();
+  const circleAlpha = isSelected ? 0.8 : isHovered ? 0.5 : 0.3;
+  const plusAlpha = isSelected ? 0.7 : isHovered ? 0.4 : 0.2;
+
+  g.circle(0, 0, SLOT_INTERACTIVE_RADIUS);
+  g.stroke({ color: 0xffffff, alpha: circleAlpha, width: isSelected ? 2 : 1.5 });
+
+  g.moveTo(-4, 0);
+  g.lineTo(4, 0);
+  g.moveTo(0, -4);
+  g.lineTo(0, 4);
+  g.stroke({ color: 0xffffff, alpha: plusAlpha, width: 1.5 });
+}
+
+function drawHighlightRing(gfx: Graphics, x: number, y: number, isSelected: boolean) {
+  gfx.circle(x, y, TURRET_BASE_RADIUS + 5);
+  gfx.stroke({
+    color: 0xffffff,
+    alpha: isSelected ? 0.8 : 0.4,
+    width: 2,
+  });
+}
+
+interface MeteorObject {
+  data: Meteor;
+  container: Container;
   sprite: Sprite;
   untypedText: Text;
   typedText: Text;
 }
 
+function createMeteorObject(meteor: Meteor, untypedStyle: TextStyle, typedStyle: TextStyle): MeteorObject {
+  const container = new Container();
+  container.position.set(meteor.x + meteor.width / 2, meteor.y + meteor.height / 2);
+
+  const tex = Texture.from({ resource: meteor.bitmap, alphaMode: "premultiply-alpha-on-upload" });
+  const sprite = new Sprite(tex);
+  sprite.anchor.set(0.5);
+  container.addChild(sprite);
+
+  const untypedText = new Text({ text: meteor.word, style: untypedStyle });
+  untypedText.anchor.set(0.5, 0);
+  untypedText.position.set(0, meteor.height / 2 + WORD_OFFSET_Y + WORD_FONT_SIZE);
+  untypedText.alpha = WORD_UNTYPED_ALPHA;
+  container.addChild(untypedText);
+
+  const typedText = new Text({ text: "", style: typedStyle });
+  typedText.anchor.set(0, 0);
+  typedText.alpha = WORD_TYPED_ALPHA;
+  typedText.visible = false;
+  container.addChild(typedText);
+
+  return { data: meteor, container, sprite, untypedText, typedText };
+}
+
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const appRef = useRef<Application | null>(null);
-  const objectsRef = useRef<SceneObject[]>([]);
-  const meteorsRef = useRef<Meteor[]>([]);
-  const turretSlotsRef = useRef<TurretSlot[]>([]);
-  const bulletsRef = useRef<Bullet[]>([]);
-  const colorRef = useRef<[number, number, number]>([230, 169, 25]);
-  const langCodeRef = useRef(getCurrentLangCode());
-  const planetRotationRef = useRef(0);
-  const cameraZoomRef = useRef(1);
-  const cameraYRef = useRef(EARTH_CY);
-  const selectedSlotRef = useRef<TurretSlot | null>(null);
-  const hoveredSlotRef = useRef<TurretSlot | null>(null);
-  const waveConfigRef = useRef<WaveConfig>(createWaveConfig(1));
-  const wavePhaseRef = useRef<WavePhase>("active");
-  const meteorsSpawnedRef = useRef(0);
   const [wavePhase, setWavePhase] = useState<WavePhase>("active");
   const [waveNumber, setWaveNumber] = useState(1);
+  const startNextWaveRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -82,13 +159,10 @@ export const GameCanvas = () => {
     const cr = parseInt(accentColor.slice(1, 3), 16);
     const cg = parseInt(accentColor.slice(3, 5), 16);
     const cb = parseInt(accentColor.slice(5, 7), 16);
-    colorRef.current = [cr, cg, cb];
+    const planetColor: [number, number, number] = [cr, cg, cb];
 
     let destroyed = false;
-    let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
     let pixiApp: Application | null = null;
-
-    const meteorDisplays = new Map<Meteor, MeteorDisplay>();
 
     (async () => {
       const app = new Application();
@@ -102,7 +176,6 @@ export const GameCanvas = () => {
       });
       if (destroyed) { app.destroy(true); return; }
       pixiApp = app;
-      appRef.current = app;
 
       app.canvas.style.width = "100%";
       app.canvas.style.height = "auto";
@@ -116,62 +189,68 @@ export const GameCanvas = () => {
       const hud = new Container();
       app.stage.addChild(hud);
 
-      const planet = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS, colorRef.current);
-      objectsRef.current = [planet];
-
+      const planetObj = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS, planetColor);
       const planetContainer = new Container();
       planetContainer.position.set(EARTH_CX, EARTH_CY);
       world.addChild(planetContainer);
 
-      const planetTexture = Texture.from({ resource: planet.bitmap, alphaMode: "premultiply-alpha-on-upload" });
+      const planetTexture = Texture.from({ resource: planetObj.bitmap, alphaMode: "premultiply-alpha-on-upload" });
       const planetSprite = new Sprite(planetTexture);
       planetSprite.anchor.set(0.5);
       planetContainer.addChild(planetSprite);
 
-      const turretGfx = new Graphics();
-      world.addChild(turretGfx);
-
-      const bulletGfx = new Graphics();
-      world.addChild(bulletGfx);
-
-      const meteorContainer = new Container();
-      world.addChild(meteorContainer);
-
-      const wordContainer = new Container();
-      world.addChild(wordContainer);
-
       const slots = createTurretSlots();
-      turretSlotsRef.current = slots;
+      const turretContainers: (Container | null)[] = [];
+      const emptySlotGfx: (Graphics | null)[] = [];
+      const slotHitAreas: Graphics[] = [];
 
-      const slotGfxList: Graphics[] = [];
       for (const slot of slots) {
-        const g = new Graphics();
-        g.eventMode = "static";
-        g.cursor = "pointer";
-        g.hitArea = new Circle(0, 0, SLOT_INTERACTIVE_RADIUS + SLOT_HIT_BUFFER);
-        g.position.set(slot.x, slot.y);
-        g.visible = false;
+        if (slot.filled) {
+          const tc = createTurretGraphics(slot);
+          planetContainer.addChild(tc);
+          turretContainers.push(tc);
+          emptySlotGfx.push(null);
+        } else {
+          const eg = createEmptySlotGraphics();
+          eg.position.set(
+            Math.cos(slot.baseAngle) * EARTH_RADIUS,
+            Math.sin(slot.baseAngle) * EARTH_RADIUS,
+          );
+          planetContainer.addChild(eg);
+          turretContainers.push(null);
+          emptySlotGfx.push(eg);
+        }
 
-        g.on("pointertap", () => {
-          selectedSlotRef.current = selectedSlotRef.current === slot ? null : slot;
-        });
-        g.on("pointerover", () => {
-          hoveredSlotRef.current = slot;
-        });
-        g.on("pointerout", () => {
-          if (hoveredSlotRef.current === slot) hoveredSlotRef.current = null;
-        });
-
-        world.addChild(g);
-        slotGfxList.push(g);
+        const hitArea = createSlotHitArea(slot);
+        planetContainer.addChild(hitArea);
+        slotHitAreas.push(hitArea);
       }
 
-      meteorsRef.current = [];
-      bulletsRef.current = [];
+      const highlightGfx = new Graphics();
+      world.addChild(highlightGfx);
 
-      const langCode = langCodeRef.current;
+      const meteorLayer = new Container();
+      world.addChild(meteorLayer);
+
+      const bulletLayer = new Container();
+      world.addChild(bulletLayer);
+
+      const langCode = getCurrentLangCode();
+      let waveConfig = createWaveConfig(1);
+      let phase: WavePhase = "active";
+      let meteorsSpawned = 0;
       let spawnTimer = 0;
       let nextSpawn = 2000;
+      let planetRotation = 0;
+      let cameraZoom = 1;
+      let cameraY = EARTH_CY;
+      let selectedSlot: TurretSlot | null = null;
+      let hoveredSlot: TurretSlot | null = null;
+
+      const meteors: Meteor[] = [];
+      const meteorObjects: MeteorObject[] = [];
+      const bullets: Bullet[] = [];
+      const bulletGfxList: Graphics[] = [];
 
       const untypedStyle = new TextStyle({
         fontFamily: "monospace",
@@ -188,116 +267,97 @@ export const GameCanvas = () => {
         dropShadow: { color: "rgba(0, 0, 0, 0.9)", blur: 4, distance: 0 },
       });
 
-      const waveLabel = new Text({ text: "Wave 1", style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 24, fill: 0xffffff } });
+      const waveLabel = new Text({
+        text: "Wave 1",
+        style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 24, fill: 0xffffff },
+      });
       waveLabel.position.set(20, 12);
       waveLabel.alpha = 0.7;
       hud.addChild(waveLabel);
 
-      function addMeteorDisplay(meteor: Meteor) {
-        const tex = Texture.from({ resource: meteor.bitmap, alphaMode: "premultiply-alpha-on-upload" });
-        const sprite = new Sprite(tex);
-        sprite.position.set(meteor.x, meteor.y);
-        meteorContainer.addChild(sprite);
-
-        const untypedText = new Text({ text: meteor.word, style: untypedStyle });
-        untypedText.anchor.set(0.5, 0);
-        untypedText.alpha = WORD_UNTYPED_ALPHA;
-        wordContainer.addChild(untypedText);
-
-        const typedText = new Text({ text: "", style: typedStyle });
-        typedText.anchor.set(0, 0);
-        typedText.alpha = WORD_TYPED_ALPHA;
-        wordContainer.addChild(typedText);
-
-        meteorDisplays.set(meteor, { sprite, untypedText, typedText });
+      for (let i = 0; i < slots.length; i++) {
+        const slot = slots[i];
+        const hitArea = slotHitAreas[i];
+        hitArea.on("pointertap", () => {
+          selectedSlot = selectedSlot === slot ? null : slot;
+        });
+        hitArea.on("pointerover", () => {
+          hoveredSlot = slot;
+        });
+        hitArea.on("pointerout", () => {
+          if (hoveredSlot === slot) hoveredSlot = null;
+        });
       }
 
-      function removeMeteorDisplay(meteor: Meteor) {
-        const display = meteorDisplays.get(meteor);
-        if (!display) return;
-        display.sprite.destroy();
-        display.untypedText.destroy();
-        display.typedText.destroy();
-        meteorDisplays.delete(meteor);
+      function addMeteor(meteor: Meteor) {
+        meteors.push(meteor);
+        const mo = createMeteorObject(meteor, untypedStyle, typedStyle);
+        meteorObjects.push(mo);
+        meteorLayer.addChild(mo.container);
       }
 
-      function drawTurrets() {
-        turretGfx.clear();
-        const isComplete = wavePhaseRef.current === "complete";
+      function removeMeteorAt(index: number) {
+        const mo = meteorObjects[index];
+        mo.container.destroy({ children: true });
+        meteors.splice(index, 1);
+        meteorObjects.splice(index, 1);
+      }
 
-        for (let i = 0; i < slots.length; i++) {
-          const slot = slots[i];
-          const g = slotGfxList[i];
-          g.position.set(slot.x, slot.y);
-          g.visible = isComplete;
+      function addBullet(bullet: Bullet) {
+        bullets.push(bullet);
+        const g = new Graphics();
+        g.circle(0, 0, BULLET_RENDER_RADIUS);
+        g.fill(0xffffff);
+        g.position.set(bullet.x, bullet.y);
+        bulletLayer.addChild(g);
+        bulletGfxList.push(g);
+      }
 
-          if (slot.filled) {
-            const cos = Math.cos(slot.angle);
-            const sin = Math.sin(slot.angle);
-            const hw = TURRET_BARREL_WIDTH / 2;
-            const nhw = -hw;
-            turretGfx.poly([
-              slot.x - sin * nhw, slot.y + cos * nhw,
-              slot.x + cos * TURRET_BARREL_LENGTH - sin * nhw, slot.y + sin * TURRET_BARREL_LENGTH + cos * nhw,
-              slot.x + cos * TURRET_BARREL_LENGTH - sin * hw, slot.y + sin * TURRET_BARREL_LENGTH + cos * hw,
-              slot.x - sin * hw, slot.y + cos * hw,
-            ], true);
-            turretGfx.fill(0x6b7280);
+      function removeBulletAt(index: number) {
+        bulletGfxList[index].destroy();
+        bullets.splice(index, 1);
+        bulletGfxList.splice(index, 1);
+      }
 
-            turretGfx.circle(slot.x, slot.y, TURRET_BASE_RADIUS);
-            turretGfx.fill(0x9ca3af);
-
-            if (isComplete) {
-              const isSelected = slot === selectedSlotRef.current;
-              const isHovered = slot === hoveredSlotRef.current;
-              if (isSelected || isHovered) {
-                turretGfx.circle(slot.x, slot.y, TURRET_BASE_RADIUS + 5);
-                turretGfx.stroke({
-                  color: 0xffffff,
-                  alpha: isSelected ? 0.8 : 0.4,
-                  width: 2,
-                });
-              }
-            }
-          } else {
-            if (isComplete) {
-              const isSelected = slot === selectedSlotRef.current;
-              const isHovered = slot === hoveredSlotRef.current;
-              const circleAlpha = isSelected ? 0.8 : isHovered ? 0.5 : 0.3;
-              const plusAlpha = isSelected ? 0.7 : isHovered ? 0.4 : 0.2;
-
-              g.clear();
-              g.circle(0, 0, SLOT_INTERACTIVE_RADIUS);
-              g.stroke({ color: 0xffffff, alpha: circleAlpha, width: isSelected ? 2 : 1.5 });
-
-              g.moveTo(-4, 0);
-              g.lineTo(4, 0);
-              g.moveTo(0, -4);
-              g.lineTo(0, 4);
-              g.stroke({ color: 0xffffff, alpha: plusAlpha, width: 1.5 });
-            } else {
-              turretGfx.circle(slot.x, slot.y, 2);
-              turretGfx.fill({ color: 0xffffff, alpha: 0.15 });
-            }
+      function rebuildSlotVisuals(index: number) {
+        const slot = slots[index];
+        if (slot.filled && !turretContainers[index]) {
+          if (emptySlotGfx[index]) {
+            emptySlotGfx[index]!.destroy();
+            emptySlotGfx[index] = null;
           }
+          const tc = createTurretGraphics(slot);
+          planetContainer.addChild(tc);
+          turretContainers[index] = tc;
+        } else if (!slot.filled && turretContainers[index]) {
+          turretContainers[index]!.destroy({ children: true });
+          turretContainers[index] = null;
+          const eg = createEmptySlotGraphics();
+          eg.position.set(
+            Math.cos(slot.baseAngle) * EARTH_RADIUS,
+            Math.sin(slot.baseAngle) * EARTH_RADIUS,
+          );
+          planetContainer.addChild(eg);
+          emptySlotGfx[index] = eg;
         }
       }
 
-      function drawBullets() {
-        bulletGfx.clear();
-        for (const bullet of bulletsRef.current) {
-          bulletGfx.circle(bullet.x, bullet.y, BULLET_RENDER_RADIUS);
-          bulletGfx.fill(0xffffff);
-        }
-      }
+      startNextWaveRef.current = () => {
+        const next = waveConfig.waveNumber + 1;
+        waveConfig = createWaveConfig(next);
+        phase = "active";
+        meteorsSpawned = 0;
+        selectedSlot = null;
+        hoveredSlot = null;
+        setWavePhase("active");
+        setWaveNumber(next);
+      };
 
       function onKeyDown(e: KeyboardEvent) {
         if (e.ctrlKey || e.altKey || e.metaKey) return;
         if (e.key.length !== 1) return;
 
         const key = e.key;
-        const meteors = meteorsRef.current;
-
         for (const meteor of meteors) {
           const nextChar = meteor.word[meteor.typedCount];
           if (key === nextChar) {
@@ -305,13 +365,9 @@ export const GameCanvas = () => {
             if (meteor.typedCount >= meteor.word.length) {
               const meteorCx = meteor.x + meteor.width / 2;
               const meteorCy = meteor.y + meteor.height / 2;
-              const turretsWithLos = findTurretsWithLineOfSight(
-                turretSlotsRef.current,
-                meteorCx,
-                meteorCy
-              );
+              const turretsWithLos = findTurretsWithLineOfSight(slots, meteorCx, meteorCy);
               for (const turret of turretsWithLos) {
-                bulletsRef.current.push(fireBullet(turret, meteor));
+                addBullet(fireBullet(turret, meteor));
               }
               const usedWords = getActiveWords(meteors);
               meteor.word = getRandomWord(langCode, usedWords);
@@ -323,22 +379,18 @@ export const GameCanvas = () => {
         }
       }
 
-      keydownHandler = onKeyDown;
       document.addEventListener("keydown", onKeyDown);
 
       app.ticker.add((ticker) => {
         const dt = ticker.deltaMS / 1000;
-        const waveConfig = waveConfigRef.current;
-        const isActive = wavePhaseRef.current === "active";
+        const isActive = phase === "active";
 
-        if (isActive && meteorsSpawnedRef.current < waveConfig.totalMeteors) {
+        if (isActive && meteorsSpawned < waveConfig.totalMeteors) {
           spawnTimer += dt * 1000;
           if (spawnTimer >= nextSpawn) {
-            const usedWords = getActiveWords(meteorsRef.current);
-            const meteor = spawnMeteor(langCode, usedWords, waveConfig);
-            meteorsRef.current.push(meteor);
-            addMeteorDisplay(meteor);
-            meteorsSpawnedRef.current++;
+            const usedWords = getActiveWords(meteors);
+            addMeteor(spawnMeteor(langCode, usedWords, waveConfig));
+            meteorsSpawned++;
             spawnTimer = 0;
             nextSpawn =
               waveConfig.spawnIntervalMin +
@@ -348,60 +400,102 @@ export const GameCanvas = () => {
 
         if (
           isActive &&
-          meteorsSpawnedRef.current >= waveConfig.totalMeteors &&
-          meteorsRef.current.length === 0 &&
-          bulletsRef.current.length === 0
+          meteorsSpawned >= waveConfig.totalMeteors &&
+          meteors.length === 0 &&
+          bullets.length === 0
         ) {
-          wavePhaseRef.current = "complete";
+          phase = "complete";
           setWavePhase("complete");
         }
 
-        const planetObj = objectsRef.current[0];
-        const meteors = meteorsRef.current;
-
         const targetZoom = isActive ? 1 : BETWEEN_WAVE_ZOOM;
-        cameraZoomRef.current += (targetZoom - cameraZoomRef.current) * CAMERA_LERP_SPEED * dt;
+        cameraZoom += (targetZoom - cameraZoom) * CAMERA_LERP_SPEED * dt;
 
         const targetY = isActive ? EARTH_CY : BETWEEN_WAVE_FOCUS_Y;
-        cameraYRef.current += (targetY - cameraYRef.current) * CAMERA_LERP_SPEED * dt;
+        cameraY += (targetY - cameraY) * CAMERA_LERP_SPEED * dt;
 
-        world.scale.set(cameraZoomRef.current);
+        world.scale.set(cameraZoom);
         world.pivot.set(EARTH_CX, EARTH_CY);
-        world.position.set(EARTH_CX, cameraYRef.current);
+        world.position.set(EARTH_CX, cameraY);
 
         if (isActive) {
-          planetRotationRef.current += PLANET_ROTATION_SPEED * dt;
+          planetRotation += PLANET_ROTATION_SPEED * dt;
         }
-        updateTurretPositions(slots, planetRotationRef.current);
-
-        planetContainer.rotation = planetRotationRef.current;
+        updateTurretPositions(slots, planetRotation);
+        planetContainer.rotation = planetRotation;
         planetTexture.source.update();
 
-        const hits = updateBullets(bulletsRef.current, meteors, dt);
-        for (const hit of hits) {
-          const meteorIdx = meteors.indexOf(hit.target);
-          if (meteorIdx === -1) continue;
-
-          const usedWords = getActiveWords(meteors);
-          const result = handleBulletImpact(hit.target, hit.x, hit.y, langCode, usedWords);
-
-          if (result.length === 0) {
-            removeMeteorDisplay(hit.target);
-            meteors.splice(meteorIdx, 1);
-          } else if (result.length > 1 || result[0] !== hit.target) {
-            removeMeteorDisplay(hit.target);
-            meteors.splice(meteorIdx, 1);
-            for (const newMeteor of result) {
-              meteors.push(newMeteor);
-              addMeteorDisplay(newMeteor);
+        const isComplete = phase === "complete";
+        for (let i = 0; i < slots.length; i++) {
+          slotHitAreas[i].visible = isComplete;
+          if (isComplete) {
+            const slot = slots[i];
+            if (!slot.filled) {
+              drawSlotInteractive(slotHitAreas[i], slot === selectedSlot, slot === hoveredSlot);
             }
+          }
+        }
+
+        highlightGfx.clear();
+        if (isComplete) {
+          for (const slot of slots) {
+            const isSelected = slot === selectedSlot;
+            const isHovered = slot === hoveredSlot;
+            if (slot.filled && (isSelected || isHovered)) {
+              drawHighlightRing(highlightGfx, slot.x, slot.y, isSelected);
+            }
+          }
+        }
+
+        for (let i = bullets.length - 1; i >= 0; i--) {
+          const bullet = bullets[i];
+          bullet.x += bullet.vx * dt;
+          bullet.y += bullet.vy * dt;
+
+          let removeBullet = false;
+
+          if (
+            bullet.x < -50 || bullet.x > CANVAS_WIDTH + 50 ||
+            bullet.y < -50 || bullet.y > CANVAS_HEIGHT + 50
+          ) {
+            removeBullet = true;
+          } else if (!meteors.includes(bullet.target)) {
+            removeBullet = true;
           } else {
-            const display = meteorDisplays.get(hit.target);
-            if (display) {
-              const oldTexture = display.sprite.texture;
-              display.sprite.texture = Texture.from({ resource: hit.target.bitmap, alphaMode: "premultiply-alpha-on-upload" });
-              oldTexture.destroy();
+            const targetCx = bullet.target.x + bullet.target.width / 2;
+            const targetCy = bullet.target.y + bullet.target.height / 2;
+            const bdx = targetCx - bullet.x;
+            const bdy = targetCy - bullet.y;
+            const bDist = Math.sqrt(bdx * bdx + bdy * bdy);
+
+            if (bDist < bullet.target.radius * 0.8) {
+              const meteorIdx = meteors.indexOf(bullet.target);
+              if (meteorIdx !== -1) {
+                const usedWords = getActiveWords(meteors);
+                const result = handleBulletImpact(bullet.target, bullet.x, bullet.y, langCode, usedWords);
+
+                if (result.length === 0) {
+                  removeMeteorAt(meteorIdx);
+                } else if (result.length > 1 || result[0] !== bullet.target) {
+                  removeMeteorAt(meteorIdx);
+                  for (const newMeteor of result) {
+                    addMeteor(newMeteor);
+                  }
+                } else {
+                  const mo = meteorObjects[meteorIdx];
+                  const oldTexture = mo.sprite.texture;
+                  mo.sprite.texture = Texture.from({ resource: bullet.target.bitmap, alphaMode: "premultiply-alpha-on-upload" });
+                  oldTexture.destroy();
+                }
+              }
+              removeBullet = true;
             }
+          }
+
+          if (removeBullet) {
+            removeBulletAt(i);
+          } else {
+            bulletGfxList[i].position.set(bullet.x, bullet.y);
           }
         }
 
@@ -431,32 +525,28 @@ export const GameCanvas = () => {
             cy > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
           ) {
             removed = true;
-          } else if (planetObj && checkMeteorHitsPlanet(planetObj, meteor, planetRotationRef.current)) {
+          } else if (checkMeteorHitsPlanet(planetObj, meteor, planetRotation)) {
             const destroyRadius = Math.max(
               meteor.radius * 1.2,
-              meteor.radius * meteor.radius * IMPACT_RADIUS_SCALE
+              meteor.radius * meteor.radius * IMPACT_RADIUS_SCALE,
             );
 
             const relX = cx - EARTH_CX;
             const relY = cy - EARTH_CY;
-            const rcos = Math.cos(-planetRotationRef.current);
-            const rsin = Math.sin(-planetRotationRef.current);
+            const rcos = Math.cos(-planetRotation);
+            const rsin = Math.sin(-planetRotation);
             const localCx = relX * rcos - relY * rsin + EARTH_CX;
             const localCy = relX * rsin + relY * rcos + EARTH_CY;
-            destroyCircle(
-              planetObj,
-              localCx,
-              localCy,
-              destroyRadius,
-              colorRef.current
-            );
+            destroyCircle(planetObj, localCx, localCy, destroyRadius, planetColor);
 
             const dr2 = destroyRadius * destroyRadius;
-            for (const slot of turretSlotsRef.current) {
+            for (let si = 0; si < slots.length; si++) {
+              const slot = slots[si];
               const sdx = slot.x - cx;
               const sdy = slot.y - cy;
               if (sdx * sdx + sdy * sdy <= dr2) {
                 slot.filled = false;
+                rebuildSlotVisuals(si);
               }
             }
 
@@ -464,66 +554,46 @@ export const GameCanvas = () => {
           }
 
           if (removed) {
-            removeMeteorDisplay(meteor);
-            meteors.splice(i, 1);
+            removeMeteorAt(i);
           }
         }
 
-        for (const meteor of meteors) {
-          const display = meteorDisplays.get(meteor);
-          if (!display) continue;
-          display.sprite.position.set(meteor.x, meteor.y);
+        for (let i = 0; i < meteors.length; i++) {
+          const meteor = meteors[i];
+          const mo = meteorObjects[i];
+          mo.container.position.set(meteor.x + meteor.width / 2, meteor.y + meteor.height / 2);
 
-          const wordX = meteor.x + meteor.width / 2;
-          const wordY = meteor.y + meteor.height + WORD_OFFSET_Y + WORD_FONT_SIZE;
-
-          display.untypedText.text = meteor.word;
-          display.untypedText.position.set(wordX, wordY);
-          display.untypedText.alpha = WORD_UNTYPED_ALPHA;
+          mo.untypedText.text = meteor.word;
 
           if (meteor.typedCount > 0) {
             const typed = meteor.word.slice(0, meteor.typedCount);
-            display.typedText.text = typed;
-            display.typedText.visible = true;
-            display.typedText.alpha = WORD_TYPED_ALPHA;
-
-            const fullWidth = display.untypedText.width;
-            display.typedText.position.set(wordX - fullWidth / 2, wordY);
+            mo.typedText.text = typed;
+            mo.typedText.visible = true;
+            const fullWidth = mo.untypedText.width;
+            mo.typedText.position.set(-fullWidth / 2, meteor.height / 2 + WORD_OFFSET_Y + WORD_FONT_SIZE);
           } else {
-            display.typedText.visible = false;
+            mo.typedText.visible = false;
           }
         }
 
         waveLabel.text = `Wave ${waveConfig.waveNumber}`;
-
-        drawTurrets();
-        drawBullets();
       });
+
+      return () => {
+        document.removeEventListener("keydown", onKeyDown);
+      };
     })();
 
     return () => {
       destroyed = true;
-      if (keydownHandler) document.removeEventListener("keydown", keydownHandler);
       if (pixiApp) {
         pixiApp.destroy(true, { children: true });
       }
-      appRef.current = null;
-      objectsRef.current = [];
-      meteorsRef.current = [];
-      turretSlotsRef.current = [];
-      bulletsRef.current = [];
     };
   }, []);
 
   const startNextWave = useCallback(() => {
-    const next = waveConfigRef.current.waveNumber + 1;
-    waveConfigRef.current = createWaveConfig(next);
-    wavePhaseRef.current = "active";
-    meteorsSpawnedRef.current = 0;
-    selectedSlotRef.current = null;
-    hoveredSlotRef.current = null;
-    setWavePhase("active");
-    setWaveNumber(next);
+    startNextWaveRef.current?.();
   }, []);
 
   return (
