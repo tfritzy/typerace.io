@@ -2,7 +2,7 @@ import type { Meteor, SceneObject, WaveConfig } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
-  METEOR_COLOR, METEOR_NOISE_FREQ,
+  METEOR_NOISE_FREQ,
   METEOR_CORE_RADIUS, METEOR_LUMP_HEIGHT,
   BULLET_CARVE_RADIUS, MIN_SPLIT_PIXELS,
   ACTIVE_WAVE_ZOOM,
@@ -10,6 +10,7 @@ import {
 import { valueNoise } from "./noise";
 import { rebuildImageData, updateBitmap, carveCircle } from "./bitmap";
 import { getRandomWord } from "../../utils/wordLists";
+import { ACCENT_DARK_INDEX } from "./palette";
 
 function createMeteorBitmap(
   radius: number
@@ -27,18 +28,18 @@ function createMeteorBitmap(
       const dy = py - intRadius;
       const dist = Math.sqrt(dx * dx + dy * dy) / intRadius;
       if (dist <= METEOR_CORE_RADIUS) {
-        data[py * diameter + px] = 1;
+        data[py * diameter + px] = ACCENT_DARK_INDEX;
         continue;
       }
       const n = valueNoise(px * noiseFreq + seedX, py * noiseFreq + seedY);
       if (dist <= METEOR_CORE_RADIUS + n * METEOR_LUMP_HEIGHT) {
-        data[py * diameter + px] = 1;
+        data[py * diameter + px] = ACCENT_DARK_INDEX;
       }
     }
   }
 
   const imageData = new ImageData(diameter, diameter);
-  rebuildImageData(data, imageData, diameter, diameter, METEOR_COLOR);
+  rebuildImageData(data, imageData, diameter, diameter);
   const bitmap = document.createElement("canvas");
   bitmap.width = diameter;
   bitmap.height = diameter;
@@ -199,11 +200,11 @@ function createMeteorFromComponent(
   for (const idx of pixelIndices) {
     const x = idx % original.width - minX;
     const y = Math.floor(idx / original.width) - minY;
-    newData[y * newWidth + x] = 1;
+    newData[y * newWidth + x] = ACCENT_DARK_INDEX;
   }
 
   const imageData = new ImageData(newWidth, newHeight);
-  rebuildImageData(newData, imageData, newWidth, newHeight, METEOR_COLOR);
+  rebuildImageData(newData, imageData, newWidth, newHeight);
   const bitmap = document.createElement("canvas");
   bitmap.width = newWidth;
   bitmap.height = newHeight;
@@ -253,7 +254,7 @@ export function handleBulletImpact(
         }
       }
     }
-    rebuildImageData(meteor.data, meteor.imageData, meteor.width, meteor.height, METEOR_COLOR);
+    rebuildImageData(meteor.data, meteor.imageData, meteor.width, meteor.height);
     updateBitmap(meteor);
     return [meteor];
   }

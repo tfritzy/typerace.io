@@ -20,7 +20,7 @@ export const WordDefensePage = () => {
             Word Defense
           </h1>
 
-          <div className="box p-6">
+          <div>
             <GameCanvas />
           </div>
         </div>

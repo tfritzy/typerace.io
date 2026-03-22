@@ -1,4 +1,6 @@
-import type { Container, Sprite, Text, Graphics } from "pixi.js";
+import type { Container, Sprite, Text, Graphics, Texture } from "pixi.js";
+
+export type Palette = [number, number, number][];
 
 export interface SceneObject {
   x: number;
@@ -8,6 +10,12 @@ export interface SceneObject {
   data: Uint8Array;
   imageData: ImageData;
   bitmap: HTMLCanvasElement;
+}
+
+export interface CityEntry {
+  object: SceneObject;
+  texture: Texture;
+  sprite: Sprite;
 }
 
 export interface Meteor extends SceneObject {
@@ -25,6 +33,7 @@ export interface TurretSlot {
   y: number;
   filled: boolean;
   destroyed: boolean;
+  isCity: boolean;
 }
 
 export interface Bullet {
