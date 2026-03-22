@@ -59,9 +59,9 @@ export function findAvailableTurrets(
   return result;
 }
 
-export function checkBulletHitsMeteor(bullet: Bullet, meteor: Meteor): boolean {
-  const localX = Math.floor(bullet.x - meteor.x);
-  const localY = Math.floor(bullet.y - meteor.y);
+export function checkProjectileHitsMeteor(projectile: { x: number; y: number }, meteor: Meteor): boolean {
+  const localX = Math.floor(projectile.x - meteor.x);
+  const localY = Math.floor(projectile.y - meteor.y);
   if (localX < 0 || localX >= meteor.width || localY < 0 || localY >= meteor.height) {
     return false;
   }
@@ -103,7 +103,7 @@ export function updateBullets(
       continue;
     }
 
-    if (checkBulletHitsMeteor(bullet, bullet.target)) {
+    if (checkProjectileHitsMeteor(bullet, bullet.target)) {
       hits.push({ x: bullet.x, y: bullet.y, target: bullet.target });
       bullets.splice(i, 1);
     }

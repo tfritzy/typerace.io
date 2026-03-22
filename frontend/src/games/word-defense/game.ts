@@ -17,15 +17,15 @@ import {
   WAVE_SPAWN_INTERVAL_REDUCTION,
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
-  MISSILE_EXPLOSION_RADIUS,
+  MISSILE_EXPLOSION_RADIUS, BULLET_CARVE_RADIUS,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
-import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact, handleMissileExplosion } from "./meteor";
-import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBullet, isSlotGroundIntact, checkBulletHitsMeteor } from "./turret";
+import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleProjectileImpact } from "./meteor";
+import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBullet, isSlotGroundIntact, checkProjectileHitsMeteor } from "./turret";
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
 import { createMeteorObject, createBulletGraphics, createMissileGraphics } from "./meteorRendering";
-import { fireMissile, updateMissile, checkMissileHitsMeteor } from "./missile";
+import { fireMissile, updateMissile } from "./missile";
 import { buildPalette, getBackgroundColor, ACCENT_INDEX } from "./palette";
 import { GameHud } from "./hud";
 import { clampToRange } from "../../utils/math";
@@ -355,6 +355,40 @@ export class WordDefenseGame {
     }
   }
 
+  private applyProjectileDamage(meteorIdx: number, hitX: number, hitY: number, carveRadius: number) {
+    const meteor = this.meteors[meteorIdx];
+    const usedWords = getActiveWords(this.meteors);
+
+    let pixelsBefore = 0;
+    for (let p = 0; p < meteor.data.length; p++) {
+      if (meteor.data[p]) pixelsBefore++;
+    }
+
+    const result = handleProjectileImpact(meteor, hitX, hitY, carveRadius, this.langCode, usedWords);
+
+    let pixelsAfter = 0;
+    for (const m of result) {
+      for (let p = 0; p < m.data.length; p++) {
+        if (m.data[p]) pixelsAfter++;
+      }
+    }
+    this.credits += pixelsBefore - pixelsAfter;
+
+    if (result.length === 0) {
+      this.removeMeteorAt(meteorIdx);
+    } else if (result.length > 1 || result[0] !== meteor) {
+      this.removeMeteorAt(meteorIdx);
+      for (const newMeteor of result) {
+        this.addMeteor(newMeteor);
+      }
+    } else {
+      const mo = this.meteorObjects[meteorIdx];
+      const oldTexture = mo.sprite.texture;
+      mo.sprite.texture = Texture.from({ resource: meteor.bitmap, alphaMode: "premultiply-alpha-on-upload" });
+      oldTexture.destroy();
+    }
+  }
+
   private updateBullets(dt: number) {
     for (let i = this.bullets.length - 1; i >= 0; i--) {
       const bullet = this.bullets[i];
@@ -377,42 +411,14 @@ export class WordDefenseGame {
         bullet.y < -METEOR_CLEANUP_MARGIN || bullet.y > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
       ) {
         removeBullet = true;
-      } else if (!this.meteors.includes(bullet.target)) {
-        removeBullet = true;
-      } else if (checkBulletHitsMeteor(bullet, bullet.target)) {
-          const meteorIdx = this.meteors.indexOf(bullet.target);
-          if (meteorIdx !== -1) {
-            const usedWords = getActiveWords(this.meteors);
-            let pixelsBefore = 0;
-            for (let i = 0; i < bullet.target.data.length; i++) {
-              if (bullet.target.data[i]) pixelsBefore++;
-            }
-
-            const result = handleBulletImpact(bullet.target, bullet.x, bullet.y, this.langCode, usedWords);
-
-            let pixelsAfter = 0;
-            for (const m of result) {
-              for (let i = 0; i < m.data.length; i++) {
-                if (m.data[i]) pixelsAfter++;
-              }
-            }
-            this.credits += pixelsBefore - pixelsAfter;
-
-            if (result.length === 0) {
-              this.removeMeteorAt(meteorIdx);
-            } else if (result.length > 1 || result[0] !== bullet.target) {
-              this.removeMeteorAt(meteorIdx);
-              for (const newMeteor of result) {
-                this.addMeteor(newMeteor);
-              }
-            } else {
-              const mo = this.meteorObjects[meteorIdx];
-              const oldTexture = mo.sprite.texture;
-              mo.sprite.texture = Texture.from({ resource: bullet.target.bitmap, alphaMode: "premultiply-alpha-on-upload" });
-              oldTexture.destroy();
-            }
+      } else {
+        for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
+          if (checkProjectileHitsMeteor(bullet, this.meteors[mi])) {
+            this.applyProjectileDamage(mi, bullet.x, bullet.y, BULLET_CARVE_RADIUS);
+            removeBullet = true;
+            break;
           }
-          removeBullet = true;
+        }
       }
 
       if (removeBullet) {
@@ -423,57 +429,17 @@ export class WordDefenseGame {
     }
   }
 
-  private detonateMissile(missile: Missile) {
-    const usedWords = getActiveWords(this.meteors);
-    for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
-      const meteor = this.meteors[mi];
-      const mcx = meteor.x + meteor.width / 2;
-      const mcy = meteor.y + meteor.height / 2;
-      const dx = missile.x - mcx;
-      const dy = missile.y - mcy;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist > meteor.radius + MISSILE_EXPLOSION_RADIUS) continue;
-
-      let pixelsBefore = 0;
-      for (let p = 0; p < meteor.data.length; p++) {
-        if (meteor.data[p]) pixelsBefore++;
-      }
-
-      const result = handleMissileExplosion(meteor, missile.x, missile.y, MISSILE_EXPLOSION_RADIUS, this.langCode, usedWords);
-
-      let pixelsAfter = 0;
-      for (const m of result) {
-        for (let p = 0; p < m.data.length; p++) {
-          if (m.data[p]) pixelsAfter++;
-        }
-      }
-      this.credits += pixelsBefore - pixelsAfter;
-
-      if (result.length === 0) {
-        this.removeMeteorAt(mi);
-      } else if (result.length > 1 || result[0] !== meteor) {
-        this.removeMeteorAt(mi);
-        for (const newMeteor of result) {
-          this.addMeteor(newMeteor);
-        }
-      } else {
-        const mo = this.meteorObjects[mi];
-        const oldTexture = mo.sprite.texture;
-        mo.sprite.texture = Texture.from({ resource: meteor.bitmap, alphaMode: "premultiply-alpha-on-upload" });
-        oldTexture.destroy();
-      }
-    }
-  }
-
   private updateMissiles(dt: number) {
     for (let i = this.missiles.length - 1; i >= 0; i--) {
       const missile = this.missiles[i];
 
       let shouldDetonate = false;
 
-      if (this.meteors.includes(missile.target) && checkMissileHitsMeteor(missile, missile.target)) {
-        shouldDetonate = true;
+      for (const meteor of this.meteors) {
+        if (checkProjectileHitsMeteor(missile, meteor)) {
+          shouldDetonate = true;
+          break;
+        }
       }
 
       const expired = updateMissile(missile, dt);
@@ -482,7 +448,17 @@ export class WordDefenseGame {
       }
 
       if (shouldDetonate) {
-        this.detonateMissile(missile);
+        for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
+          const meteor = this.meteors[mi];
+          const mcx = meteor.x + meteor.width / 2;
+          const mcy = meteor.y + meteor.height / 2;
+          const dx = missile.x - mcx;
+          const dy = missile.y - mcy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist <= meteor.radius + MISSILE_EXPLOSION_RADIUS) {
+            this.applyProjectileDamage(mi, missile.x, missile.y, MISSILE_EXPLOSION_RADIUS);
+          }
+        }
         this.removeMissileAt(i);
       } else {
         this.missileGfxList[i].position.set(missile.x, missile.y);

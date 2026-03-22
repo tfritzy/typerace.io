@@ -160,12 +160,3 @@ export function updateMissile(missile: Missile, dt: number): boolean {
 
   return false;
 }
-
-export function checkMissileHitsMeteor(missile: Missile, meteor: Meteor): boolean {
-  const localX = Math.floor(missile.x - meteor.x);
-  const localY = Math.floor(missile.y - meteor.y);
-  if (localX < 0 || localX >= meteor.width || localY < 0 || localY >= meteor.height) {
-    return false;
-  }
-  return meteor.data[localY * meteor.width + localX] !== 0;
-}
