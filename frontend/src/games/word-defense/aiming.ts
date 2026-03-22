@@ -45,8 +45,8 @@ function simulatePosition(
 }
 
 export function fireBullet(turret: TurretSlot, target: Meteor): Bullet | null {
-  const targetCx = target.x + target.width / 2;
-  const targetCy = target.y + target.height / 2;
+  const targetCx = target.x;
+  const targetCy = target.y;
 
   const dx = targetCx - turret.x;
   const dy = targetCy - turret.y;

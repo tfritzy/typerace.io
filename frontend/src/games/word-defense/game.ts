@@ -460,10 +460,8 @@ export class WordDefenseGame {
       if (shouldDetonate) {
         for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
           const meteor = this.meteors[mi];
-          const mcx = meteor.x + meteor.width / 2;
-          const mcy = meteor.y + meteor.height / 2;
-          const dx = missile.x - mcx;
-          const dy = missile.y - mcy;
+          const dx = missile.x - meteor.x;
+          const dy = missile.y - meteor.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist <= meteor.radius + MISSILE_EXPLOSION_RADIUS) {
             this.damageMeteor(mi, MISSILE_DAMAGE);
@@ -483,11 +481,8 @@ export class WordDefenseGame {
       meteor.x += meteor.vx * dt;
       meteor.y += meteor.vy * dt;
 
-      const cx = meteor.x + meteor.width / 2;
-      const cy = meteor.y + meteor.height / 2;
-
-      const gdx = EARTH_CX - cx;
-      const gdy = EARTH_CY - cy;
+      const gdx = EARTH_CX - meteor.x;
+      const gdy = EARTH_CY - meteor.y;
       const gDist = Math.sqrt(gdx * gdx + gdy * gdy);
       if (gDist > 1) {
         const accel = GRAVITY_STRENGTH / Math.max(gDist, EARTH_RADIUS);
@@ -498,10 +493,10 @@ export class WordDefenseGame {
       let removed = false;
 
       if (
-        cx < -METEOR_CLEANUP_MARGIN ||
-        cx > CANVAS_WIDTH + METEOR_CLEANUP_MARGIN ||
-        cy < -METEOR_CLEANUP_MARGIN ||
-        cy > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
+        meteor.x < -METEOR_CLEANUP_MARGIN ||
+        meteor.x > CANVAS_WIDTH + METEOR_CLEANUP_MARGIN ||
+        meteor.y < -METEOR_CLEANUP_MARGIN ||
+        meteor.y > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
       ) {
         removed = true;
       } else if (checkMeteorHitsPlanet(this.planetObj, meteor, this.planetRotation)) {
@@ -510,8 +505,8 @@ export class WordDefenseGame {
           meteor.radius * meteor.radius * IMPACT_RADIUS_SCALE,
         );
 
-        const relX = cx - EARTH_CX;
-        const relY = cy - EARTH_CY;
+        const relX = meteor.x - EARTH_CX;
+        const relY = meteor.y - EARTH_CY;
         const rcos = Math.cos(-this.planetRotation);
         const rsin = Math.sin(-this.planetRotation);
         const localCx = relX * rcos - relY * rsin + EARTH_CX;
@@ -528,8 +523,8 @@ export class WordDefenseGame {
         for (let si = 0; si < this.slots.length; si++) {
           const slot = this.slots[si];
           if (slot.destroyed) continue;
-          const sdx = slot.x - cx;
-          const sdy = slot.y - cy;
+          const sdx = slot.x - meteor.x;
+          const sdy = slot.y - meteor.y;
           if (sdx * sdx + sdy * sdy <= dr2) {
             slot.filled = false;
             slot.destroyed = true;
@@ -564,24 +559,22 @@ export class WordDefenseGame {
     for (let i = 0; i < this.meteors.length; i++) {
       const meteor = this.meteors[i];
       const mo = this.meteorObjects[i];
-      const containerX = meteor.x + meteor.width / 2;
-      const containerY = meteor.y + meteor.height / 2;
-      mo.container.position.set(containerX, containerY);
+      mo.container.position.set(meteor.x, meteor.y);
 
       mo.untypedText.text = meteor.word;
 
-      const naturalLocalY = meteor.height / 2 + WORD_OFFSET_Y + WORD_FONT_SIZE;
+      const naturalLocalY = meteor.radius + WORD_OFFSET_Y + WORD_FONT_SIZE;
       const scaledW = mo.untypedText.width * this.cameraZoom;
       const scaledH = mo.untypedText.height * this.cameraZoom;
 
-      const screenX = (containerX - EARTH_CX) * this.cameraZoom + EARTH_CX;
-      const screenY = (containerY + naturalLocalY - EARTH_CY) * this.cameraZoom + this.cameraY;
+      const screenX = (meteor.x - EARTH_CX) * this.cameraZoom + EARTH_CX;
+      const screenY = (meteor.y + naturalLocalY - EARTH_CY) * this.cameraZoom + this.cameraY;
 
       const clampedScreenX = clampToRange(screenX, LABEL_SCREEN_PADDING + scaledW / 2, CANVAS_WIDTH - LABEL_SCREEN_PADDING - scaledW / 2);
       const clampedScreenY = clampToRange(screenY, LABEL_SCREEN_PADDING, CANVAS_HEIGHT - LABEL_SCREEN_PADDING - scaledH);
 
-      const clampedLocalX = (clampedScreenX - EARTH_CX) / this.cameraZoom + EARTH_CX - containerX;
-      const clampedLocalY = (clampedScreenY - this.cameraY) / this.cameraZoom + EARTH_CY - containerY;
+      const clampedLocalX = (clampedScreenX - EARTH_CX) / this.cameraZoom + EARTH_CX - meteor.x;
+      const clampedLocalY = (clampedScreenY - this.cameraY) / this.cameraZoom + EARTH_CY - meteor.y;
 
       mo.untypedText.position.set(clampedLocalX, clampedLocalY);
 
@@ -593,6 +586,15 @@ export class WordDefenseGame {
         mo.typedText.position.set(clampedLocalX - fullWidth / 2, clampedLocalY);
       } else {
         mo.typedText.visible = false;
+      }
+
+      const healthFraction = meteor.health / meteor.maxHealth;
+      const barWidth = meteor.radius * 2;
+      mo.healthBar.clear();
+      if (healthFraction < 1) {
+        const filledWidth = barWidth * healthFraction;
+        mo.healthBar.rect(-barWidth / 2, -meteor.radius - 4, filledWidth, 2);
+        mo.healthBar.fill(0xffffff);
       }
     }
   }

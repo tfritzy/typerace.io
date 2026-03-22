@@ -4,16 +4,19 @@ import { WORD_FONT_SIZE, WORD_OFFSET_Y, WORD_UNTYPED_ALPHA, WORD_TYPED_ALPHA, BU
 
 export function createMeteorObject(meteor: Meteor, untypedStyle: TextStyle, typedStyle: TextStyle): MeteorObject {
   const container = new Container();
-  container.position.set(meteor.x + meteor.width / 2, meteor.y + meteor.height / 2);
+  container.position.set(meteor.x, meteor.y);
 
   const tex = Texture.from({ resource: meteor.bitmap, transparent: true });
   const sprite = new Sprite(tex);
   sprite.anchor.set(0.5);
   container.addChild(sprite);
 
+  const healthBar = new Graphics();
+  container.addChild(healthBar);
+
   const untypedText = new Text({ text: meteor.word, style: untypedStyle });
   untypedText.anchor.set(0.5, 0);
-  untypedText.position.set(0, meteor.height / 2 + WORD_OFFSET_Y + WORD_FONT_SIZE);
+  untypedText.position.set(0, meteor.radius + WORD_OFFSET_Y + WORD_FONT_SIZE);
   untypedText.alpha = WORD_UNTYPED_ALPHA;
   container.addChild(untypedText);
 
@@ -23,7 +26,7 @@ export function createMeteorObject(meteor: Meteor, untypedStyle: TextStyle, type
   typedText.visible = false;
   container.addChild(typedText);
 
-  return { data: meteor, container, sprite, untypedText, typedText };
+  return { data: meteor, container, sprite, untypedText, typedText, healthBar };
 }
 
 export function createBulletGraphics(): Graphics {

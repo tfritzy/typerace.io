@@ -61,10 +61,8 @@ export function findAvailableTurrets(
 }
 
 export function checkProjectileHitsMeteor(projectile: { x: number; y: number }, meteor: Meteor): boolean {
-  const cx = meteor.x + meteor.width / 2;
-  const cy = meteor.y + meteor.height / 2;
-  const dx = projectile.x - cx;
-  const dy = projectile.y - cy;
+  const dx = projectile.x - meteor.x;
+  const dy = projectile.y - meteor.y;
   return dx * dx + dy * dy <= meteor.radius * meteor.radius;
 }
 

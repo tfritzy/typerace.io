@@ -11,9 +11,7 @@ import { rebuildImageData } from "./bitmap";
 import { getRandomWord } from "../../utils/wordLists";
 import { ACCENT_DARK_INDEX } from "./palette";
 
-function createMeteorBitmap(
-  radius: number
-): { width: number; height: number; bitmap: HTMLCanvasElement } {
+function createMeteorBitmap(radius: number): HTMLCanvasElement {
   const intRadius = Math.ceil(radius);
   const diameter = intRadius * 2;
   const data = new Uint8Array(diameter * diameter);
@@ -43,7 +41,7 @@ function createMeteorBitmap(
   bitmap.width = diameter;
   bitmap.height = diameter;
   bitmap.getContext("2d")!.putImageData(imageData, 0, 0);
-  return { width: diameter, height: diameter, bitmap };
+  return bitmap;
 }
 
 export function spawnMeteor(langCode: string, usedWords: Set<string>, waveConfig: WaveConfig): Meteor {
@@ -89,32 +87,27 @@ export function spawnMeteor(langCode: string, usedWords: Set<string>, waveConfig
   const vx = (tdx / tdist) * speed;
   const vy = (tdy / tdist) * speed;
 
-  const bmp = createMeteorBitmap(radius);
-  const word = getRandomWord(langCode, usedWords);
   const health = Math.ceil(radius);
 
   return {
-    x: x - bmp.width / 2,
-    y: y - bmp.height / 2,
+    x,
+    y,
     vx,
     vy,
     radius,
-    word,
+    word: getRandomWord(langCode, usedWords),
     typedCount: 0,
     health,
     maxHealth: health,
-    ...bmp,
+    bitmap: createMeteorBitmap(radius),
   };
 }
 
 export function checkMeteorHitsPlanet(planet: SceneObject, meteor: Meteor, planetRotation: number): boolean {
-  const cx = meteor.x + meteor.width / 2;
-  const cy = meteor.y + meteor.height / 2;
-
   const planetCx = planet.x + planet.width / 2;
   const planetCy = planet.y + planet.height / 2;
-  const relX = cx - planetCx;
-  const relY = cy - planetCy;
+  const relX = meteor.x - planetCx;
+  const relY = meteor.y - planetCy;
   const cos = Math.cos(-planetRotation);
   const sin = Math.sin(-planetRotation);
   const rotX = relX * cos - relY * sin;

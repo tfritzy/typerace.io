@@ -15,16 +15,14 @@ export interface SceneObject {
 export interface Meteor {
   x: number;
   y: number;
-  width: number;
-  height: number;
-  bitmap: HTMLCanvasElement;
   vx: number;
   vy: number;
   radius: number;
-  word: string;
-  typedCount: number;
   health: number;
   maxHealth: number;
+  word: string;
+  typedCount: number;
+  bitmap: HTMLCanvasElement;
 }
 
 export enum TurretType {
@@ -80,6 +78,7 @@ export interface MeteorObject {
   sprite: Sprite;
   untypedText: Text;
   typedText: Text;
+  healthBar: Graphics;
 }
 
 export interface TurretVisuals {
