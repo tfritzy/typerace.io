@@ -27,12 +27,7 @@ import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBul
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
 import { createMeteorObject, createBulletGraphics } from "./meteorRendering";
 import { buildPalette, getBackgroundColor } from "./palette";
-
-function clampToScreen(pos: number, leadingOffset: number, size: number, canvasSize: number): number {
-  const min = LABEL_SCREEN_PADDING + leadingOffset;
-  const max = canvasSize - LABEL_SCREEN_PADDING - size + leadingOffset;
-  return Math.max(min, Math.min(pos, max));
-}
+import { clampToRange } from "../../utils/math";
 
 function getLangCode(): string {
   const slug = localStorage.getItem("typerace_lang_slug");
@@ -597,8 +592,8 @@ export class WordDefenseGame {
       const screenX = (containerX - EARTH_CX) * this.cameraZoom + EARTH_CX;
       const screenY = (containerY + naturalLocalY - EARTH_CY) * this.cameraZoom + this.cameraY;
 
-      const clampedScreenX = clampToScreen(screenX, scaledW / 2, scaledW, CANVAS_WIDTH);
-      const clampedScreenY = clampToScreen(screenY, 0, scaledH, CANVAS_HEIGHT);
+      const clampedScreenX = clampToRange(screenX, LABEL_SCREEN_PADDING + scaledW / 2, CANVAS_WIDTH - LABEL_SCREEN_PADDING - scaledW / 2);
+      const clampedScreenY = clampToRange(screenY, LABEL_SCREEN_PADDING, CANVAS_HEIGHT - LABEL_SCREEN_PADDING - scaledH);
 
       const clampedLocalX = (clampedScreenX - EARTH_CX) / this.cameraZoom + EARTH_CX - containerX;
       const clampedLocalY = (clampedScreenY - this.cameraY) / this.cameraZoom + EARTH_CY - containerY;
