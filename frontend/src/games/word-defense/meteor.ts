@@ -2,47 +2,9 @@ import type { Meteor, SceneObject, WaveConfig } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
-  METEOR_NOISE_FREQ,
-  METEOR_CORE_RADIUS, METEOR_LUMP_HEIGHT,
   ACTIVE_WAVE_ZOOM,
 } from "./constants";
-import { valueNoise } from "./noise";
-import { rebuildImageData } from "./bitmap";
 import { getRandomWord } from "../../utils/wordLists";
-import { ACCENT_DARK_INDEX } from "./palette";
-
-function createMeteorBitmap(radius: number): HTMLCanvasElement {
-  const intRadius = Math.ceil(radius);
-  const diameter = intRadius * 2;
-  const data = new Uint8Array(diameter * diameter);
-  const seedX = Math.random() * 1000;
-  const seedY = Math.random() * 1000;
-  const noiseFreq = METEOR_NOISE_FREQ / intRadius;
-
-  for (let py = 0; py < diameter; py++) {
-    for (let px = 0; px < diameter; px++) {
-      const dx = px - intRadius;
-      const dy = py - intRadius;
-      const dist = Math.sqrt(dx * dx + dy * dy) / intRadius;
-      if (dist <= METEOR_CORE_RADIUS) {
-        data[py * diameter + px] = ACCENT_DARK_INDEX;
-        continue;
-      }
-      const n = valueNoise(px * noiseFreq + seedX, py * noiseFreq + seedY);
-      if (dist <= METEOR_CORE_RADIUS + n * METEOR_LUMP_HEIGHT) {
-        data[py * diameter + px] = ACCENT_DARK_INDEX;
-      }
-    }
-  }
-
-  const imageData = new ImageData(diameter, diameter);
-  rebuildImageData(data, imageData, diameter, diameter);
-  const bitmap = document.createElement("canvas");
-  bitmap.width = diameter;
-  bitmap.height = diameter;
-  bitmap.getContext("2d")!.putImageData(imageData, 0, 0);
-  return bitmap;
-}
 
 export function spawnMeteor(langCode: string, usedWords: Set<string>, waveConfig: WaveConfig): Meteor {
   const side = Math.floor(Math.random() * 4);
@@ -99,7 +61,6 @@ export function spawnMeteor(langCode: string, usedWords: Set<string>, waveConfig
     typedCount: 0,
     health,
     maxHealth: health,
-    bitmap: createMeteorBitmap(radius),
   };
 }
 

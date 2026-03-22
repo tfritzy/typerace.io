@@ -22,7 +22,6 @@ export interface Meteor {
   maxHealth: number;
   word: string;
   typedCount: number;
-  bitmap: HTMLCanvasElement;
 }
 
 export enum TurretType {
