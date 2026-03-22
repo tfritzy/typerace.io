@@ -1,11 +1,10 @@
-import { Application, Container, Sprite, Graphics, Text, Texture, TextStyle } from "pixi.js";
+import { Application, Container, Sprite, Graphics, Texture, TextStyle } from "pixi.js";
 
 import { getLanguageFromSlug } from "../../utils/modes";
-import type { Meteor, TurretSlot, Bullet, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals, CityEntry } from "./types";
+import type { Meteor, TurretSlot, Bullet, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
-  CITY_COUNT,
   SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_MAX,
   METEOR_CLEANUP_MARGIN, IMPACT_RADIUS_SCALE,
   WORD_FONT_SIZE,
@@ -19,14 +18,14 @@ import {
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
 } from "./constants";
-import { destroyCircle, carveCircle, rebuildImageData, updateBitmap } from "./bitmap";
+import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
-import { countCityPixels } from "./city";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact } from "./meteor";
 import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBullet, isSlotGroundIntact, checkBulletHitsMeteor } from "./turret";
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
 import { createMeteorObject, createBulletGraphics } from "./meteorRendering";
-import { buildPalette, getBackgroundColor } from "./palette";
+import { buildPalette, getBackgroundColor, ACCENT_INDEX } from "./palette";
+import { GameHud } from "./hud";
 import { clampToRange } from "../../utils/math";
 
 function getLangCode(): string {
@@ -50,20 +49,13 @@ function createWaveConfig(waveNumber: number): WaveConfig {
 export class WordDefenseGame {
   private app: Application;
   private world!: Container;
-  private hud!: Container;
   private planetContainer!: Container;
   private planetObj!: SceneObject;
   private planetTexture!: Texture;
-  private cities: CityEntry[] = [];
   private meteorLayer!: Container;
   private bulletLayer!: Container;
   private highlightGfx!: Graphics;
-  private waveLabel!: Text;
-  private startButton!: Container;
-  private startButtonText!: Text;
-  private creditsLabel!: Text;
-  private lifeLabel!: Text;
-  private gameOverText!: Text;
+  private hud!: GameHud;
 
   private slots: TurretSlot[] = [];
   private turretVisuals!: TurretVisuals;
@@ -83,8 +75,8 @@ export class WordDefenseGame {
   private cameraZoom = ACTIVE_WAVE_ZOOM;
   private cameraY = EARTH_CY;
   private credits = 0;
-  private initialCityPixels = 0;
-  private life = 100;
+  private initialHabitablePixels = 0;
+  private habitablePixels = 0;
   private gameOver = false;
   private selectedSlot: TurretSlot | null = null;
   private hoveredSlot: TurretSlot | null = null;
@@ -126,15 +118,13 @@ export class WordDefenseGame {
     this.world = new Container();
     this.app.stage.addChild(this.world);
 
-    this.hud = new Container();
-    this.app.stage.addChild(this.hud);
+    this.hud = new GameHud(() => this.startNextWave());
+    this.app.stage.addChild(this.hud.container);
 
-    const { planet, cities: cityObjects } = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS, CITY_COUNT);
+    const { planet, habitablePixels } = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS);
     this.planetObj = planet;
-    this.initialCityPixels = 0;
-    for (const city of cityObjects) {
-      this.initialCityPixels += countCityPixels(city);
-    }
+    this.initialHabitablePixels = habitablePixels;
+    this.habitablePixels = habitablePixels;
     this.planetContainer = new Container();
     this.planetContainer.position.set(EARTH_CX, EARTH_CY);
     this.world.addChild(this.planetContainer);
@@ -144,20 +134,11 @@ export class WordDefenseGame {
     planetSprite.anchor.set(0.5);
     this.planetContainer.addChild(planetSprite);
 
-    for (const cityObj of cityObjects) {
-      const texture = Texture.from({ resource: cityObj.bitmap, transparent: true });
-      const sprite = new Sprite(texture);
-      sprite.position.set(cityObj.x - this.planetObj.x - this.planetObj.width / 2, cityObj.y - this.planetObj.y - this.planetObj.height / 2);
-      this.planetContainer.addChild(sprite);
-      this.cities.push({ object: cityObj, texture, sprite });
-    }
-
     this.slots = createTurretSlots();
     this.turretVisuals = buildTurretVisuals(this.slots, this.planetContainer);
 
     for (let i = 0; i < this.slots.length; i++) {
       const slot = this.slots[i];
-      if (slot.isCity) continue;
       const hitArea = this.turretVisuals.hitAreas[i];
       hitArea.on("pointertap", () => {
         this.selectedSlot = this.selectedSlot === slot ? null : slot;
@@ -179,64 +160,7 @@ export class WordDefenseGame {
     this.bulletLayer = new Container();
     this.world.addChild(this.bulletLayer);
 
-    this.waveLabel = new Text({
-      text: "Wave 1",
-      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 24, fill: 0xffffff },
-    });
-    this.waveLabel.position.set(20, 12);
-    this.waveLabel.alpha = 0.7;
-    this.hud.addChild(this.waveLabel);
-
-    this.creditsLabel = new Text({
-      text: "Credits: 0",
-      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 24, fill: 0xffffff },
-    });
-    this.creditsLabel.anchor.set(1, 0);
-    this.creditsLabel.position.set(CANVAS_WIDTH - 20, 12);
-    this.creditsLabel.alpha = 0.7;
-    this.hud.addChild(this.creditsLabel);
-
-    this.lifeLabel = new Text({
-      text: "Life: 100%",
-      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 24, fill: 0xffffff },
-    });
-    this.lifeLabel.position.set(20, 42);
-    this.lifeLabel.alpha = 0.7;
-    this.hud.addChild(this.lifeLabel);
-
-    this.gameOverText = new Text({
-      text: "GAME OVER",
-      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 64, fill: 0xff4444 },
-    });
-    this.gameOverText.anchor.set(0.5);
-    this.gameOverText.position.set(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
-    this.gameOverText.visible = false;
-    this.hud.addChild(this.gameOverText);
-
-    this.buildStartButton();
-  }
-
-  private buildStartButton() {
-    this.startButton = new Container();
-    this.startButton.position.set(CANVAS_WIDTH / 2, CANVAS_HEIGHT - 60);
-    this.startButton.visible = false;
-    this.startButton.eventMode = "static";
-    this.startButton.cursor = "pointer";
-    this.startButton.on("pointertap", () => this.startNextWave());
-
-    const bg = new Graphics();
-    bg.roundRect(-90, -20, 180, 40, 8);
-    bg.fill(0x3b82f6);
-    this.startButton.addChild(bg);
-
-    this.startButtonText = new Text({
-      text: "Start Wave 2",
-      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 16, fill: 0xffffff },
-    });
-    this.startButtonText.anchor.set(0.5);
-    this.startButton.addChild(this.startButtonText);
-
-    this.hud.addChild(this.startButton);
+    this.hud.updateHabitability(1);
   }
 
   private setupInput() {
@@ -278,7 +202,7 @@ export class WordDefenseGame {
     this.meteorsSpawned = 0;
     this.selectedSlot = null;
     this.hoveredSlot = null;
-    this.startButton.visible = false;
+    this.hud.hideStartButton();
   }
 
   private addMeteor(meteor: Meteor) {
@@ -322,9 +246,12 @@ export class WordDefenseGame {
     this.updateMeteors(dt);
     this.syncMeteorDisplays();
 
-    this.waveLabel.text = `Wave ${this.waveConfig.waveNumber}`;
-    this.creditsLabel.text = `Credits: ${this.credits}`;
-    this.lifeLabel.text = `Life: ${this.life}%`;
+    this.hud.updateWave(this.waveConfig.waveNumber);
+    this.hud.updateCredits(this.credits);
+    const fraction = this.initialHabitablePixels > 0
+      ? this.habitablePixels / this.initialHabitablePixels
+      : 0;
+    this.hud.updateHabitability(fraction);
   }
 
   private updateSpawning(dt: number, isActive: boolean) {
@@ -350,8 +277,7 @@ export class WordDefenseGame {
       this.bullets.length === 0
     ) {
       this.phase = "complete";
-      this.startButtonText.text = `Start Wave ${this.waveConfig.waveNumber + 1}`;
-      this.startButton.visible = true;
+      this.hud.showStartButton(this.waveConfig.waveNumber + 1);
     }
   }
 
@@ -380,7 +306,7 @@ export class WordDefenseGame {
     const isComplete = this.phase === "complete";
     for (let i = 0; i < this.slots.length; i++) {
       const slot = this.slots[i];
-      if (slot.destroyed || slot.isCity) {
+      if (slot.destroyed) {
         this.turretVisuals.hitAreas[i].visible = false;
         continue;
       }
@@ -511,21 +437,18 @@ export class WordDefenseGame {
         const rsin = Math.sin(-this.planetRotation);
         const localCx = relX * rcos - relY * rsin + EARTH_CX;
         const localCy = relX * rsin + relY * rcos + EARTH_CY;
-        destroyCircle(this.planetObj, localCx, localCy, destroyRadius);
+        const destroyed = destroyCircle(this.planetObj, localCx, localCy, destroyRadius, ACCENT_INDEX);
+        this.habitablePixels = Math.max(0, this.habitablePixels - destroyed);
 
-        for (const entry of this.cities) {
-          if (carveCircle(entry.object, localCx, localCy, destroyRadius)) {
-            rebuildImageData(entry.object.data, entry.object.imageData, entry.object.width, entry.object.height);
-            updateBitmap(entry.object);
-            entry.texture.source.update();
-          }
+        if (this.habitablePixels <= 0) {
+          this.gameOver = true;
+          this.hud.showGameOver();
         }
-        this.updateLife();
 
         const dr2 = destroyRadius * destroyRadius;
         for (let si = 0; si < this.slots.length; si++) {
           const slot = this.slots[si];
-          if (slot.destroyed || slot.isCity) continue;
+          if (slot.destroyed) continue;
           const sdx = slot.x - cx;
           const sdy = slot.y - cy;
           if (sdx * sdx + sdy * sdy <= dr2) {
@@ -549,27 +472,12 @@ export class WordDefenseGame {
   private checkAllSlotSurfaces() {
     for (let si = 0; si < this.slots.length; si++) {
       const slot = this.slots[si];
-      if (slot.destroyed || slot.isCity) continue;
+      if (slot.destroyed) continue;
       if (!isSlotGroundIntact(this.planetObj, slot)) {
         slot.filled = false;
         slot.destroyed = true;
         rebuildSlotVisual(si, this.slots, this.turretVisuals, this.planetContainer);
       }
-    }
-  }
-
-  private updateLife() {
-    let remaining = 0;
-    for (const entry of this.cities) {
-      remaining += countCityPixels(entry.object);
-    }
-    this.life = this.initialCityPixels > 0
-      ? Math.round((remaining / this.initialCityPixels) * 100)
-      : 0;
-
-    if (remaining <= 0) {
-      this.gameOver = true;
-      this.gameOverText.visible = true;
     }
   }
 

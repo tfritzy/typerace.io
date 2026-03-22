@@ -5,19 +5,16 @@ import {
   TOTAL_TURRET_SLOTS, INITIAL_TURRET_COUNT,
   GRAVITY_STRENGTH,
   SLOT_SURFACE_INWARD, SLOT_SURFACE_CHECK_RADIUS, SLOT_SURFACE_THRESHOLD,
-  CITY_COUNT,
 } from "./constants";
 export { fireBullet } from "./aiming";
 
 export function createTurretSlots(): TurretSlot[] {
   const slots: TurretSlot[] = [];
-  const cityInterval = TOTAL_TURRET_SLOTS / CITY_COUNT;
 
   for (let i = 0; i < TOTAL_TURRET_SLOTS; i++) {
     const angle = (i / TOTAL_TURRET_SLOTS) * Math.PI * 2 - Math.PI / 2;
     const x = EARTH_CX + Math.cos(angle) * EARTH_RADIUS;
     const y = EARTH_CY + Math.sin(angle) * EARTH_RADIUS;
-    const isCity = i % cityInterval === 0;
     slots.push({
       baseAngle: angle,
       angle,
@@ -25,14 +22,12 @@ export function createTurretSlots(): TurretSlot[] {
       y,
       filled: false,
       destroyed: false,
-      isCity,
     });
   }
 
-  const nonCitySlots = slots.filter(s => !s.isCity);
   for (let i = 0; i < INITIAL_TURRET_COUNT; i++) {
-    const idx = Math.floor(i * nonCitySlots.length / INITIAL_TURRET_COUNT);
-    nonCitySlots[idx].filled = true;
+    const idx = Math.floor(i * slots.length / INITIAL_TURRET_COUNT);
+    slots[idx].filled = true;
   }
 
   return slots;
