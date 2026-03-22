@@ -92,6 +92,9 @@ export class WordDefenseGame {
   private untypedStyle: TextStyle;
   private typedStyle: TextStyle;
   private keydownHandler: (e: KeyboardEvent) => void;
+  private mobileInput: HTMLInputElement | null = null;
+  private mobileInputHandler: ((e: Event) => void) | null = null;
+  private canvasTapHandler: (() => void) | null = null;
 
   constructor(app: Application) {
     this.app = app;
@@ -243,14 +246,61 @@ export class WordDefenseGame {
 
   private setupInput() {
     document.addEventListener("keydown", this.keydownHandler);
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.autocapitalize = "none";
+    input.autocomplete = "off";
+    input.setAttribute("autocorrect", "off");
+    input.setAttribute("spellcheck", "false");
+    input.style.position = "absolute";
+    input.style.top = "0";
+    input.style.left = "0";
+    input.style.width = "100%";
+    input.style.height = "100%";
+    input.style.opacity = "0";
+    input.style.zIndex = "10";
+    input.style.pointerEvents = "none";
+    input.style.fontSize = "16px";
+
+    const canvas = this.app.canvas;
+    const parent = canvas.parentElement;
+    if (parent) {
+      parent.style.position = "relative";
+      parent.appendChild(input);
+    }
+
+    this.mobileInputHandler = () => {
+      const val = input.value;
+      if (val.length > 0) {
+        const key = val[val.length - 1];
+        this.handleKey(key);
+        input.value = "";
+      }
+    };
+    input.addEventListener("input", this.mobileInputHandler);
+
+    this.canvasTapHandler = () => {
+      input.style.pointerEvents = "auto";
+      input.focus();
+      input.style.pointerEvents = "none";
+    };
+    canvas.addEventListener("pointerdown", this.canvasTapHandler);
+
+    this.mobileInput = input;
   }
 
   private onKeyDown(e: KeyboardEvent) {
     if (this.gameOver) return;
     if (e.ctrlKey || e.altKey || e.metaKey) return;
     if (e.key.length !== 1) return;
+    this.handleKey(e.key);
+  }
 
-    const key = e.key;
+  private handleKey(key: string) {
+    if (this.gameOver) return;
+    if (key.length !== 1) return;
+
     for (const meteor of this.meteors) {
       const nextChar = meteor.word[meteor.typedCount];
       if (key === nextChar) {
@@ -605,6 +655,15 @@ export class WordDefenseGame {
 
   destroy() {
     document.removeEventListener("keydown", this.keydownHandler);
+    if (this.canvasTapHandler) {
+      this.app.canvas.removeEventListener("pointerdown", this.canvasTapHandler);
+    }
+    if (this.mobileInput) {
+      if (this.mobileInputHandler) {
+        this.mobileInput.removeEventListener("input", this.mobileInputHandler);
+      }
+      this.mobileInput.remove();
+    }
     this.app.destroy(true, { children: true });
   }
 }
