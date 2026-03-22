@@ -17,7 +17,7 @@ export const WORD_UNTYPED_ALPHA = 0.35;
 export const WORD_OFFSET_Y = 10;
 
 export const TOTAL_TURRET_SLOTS = 36;
-export const INITIAL_TURRET_COUNT = 12;
+export const INITIAL_TURRET_COUNT = 1;
 export const TURRET_BARREL_LENGTH = 16;
 export const TURRET_BARREL_WIDTH = 6;
 export const TURRET_BASE_RADIUS = 5;

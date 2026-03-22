@@ -22,7 +22,7 @@ import { destroyCircle, carveCircle, rebuildImageData, updateBitmap } from "./bi
 import { createPlanet } from "./planet";
 import { countCityPixels } from "./city";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact } from "./meteor";
-import { createTurretSlots, updateTurretPositions, findTurretsWithLineOfSight, fireBullet, isSlotGroundIntact } from "./turret";
+import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBullet, isSlotGroundIntact, checkBulletHitsMeteor } from "./turret";
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
 import { createMeteorObject, createBulletGraphics } from "./meteorRendering";
 import { buildPalette, getBackgroundColor } from "./palette";
@@ -257,10 +257,8 @@ export class WordDefenseGame {
       if (key === nextChar) {
         meteor.typedCount++;
         if (meteor.typedCount >= meteor.word.length) {
-          const meteorCx = meteor.x + meteor.width / 2;
-          const meteorCy = meteor.y + meteor.height / 2;
-          const turretsWithLos = findTurretsWithLineOfSight(this.slots, meteorCx, meteorCy);
-          for (const turret of turretsWithLos) {
+          const availableTurrets = findAvailableTurrets(this.slots);
+          for (const turret of availableTurrets) {
             this.addBullet(fireBullet(turret, meteor));
           }
           const usedWords = getActiveWords(this.meteors);
@@ -430,14 +428,7 @@ export class WordDefenseGame {
         removeBullet = true;
       } else if (!this.meteors.includes(bullet.target)) {
         removeBullet = true;
-      } else {
-        const targetCx = bullet.target.x + bullet.target.width / 2;
-        const targetCy = bullet.target.y + bullet.target.height / 2;
-        const bdx = targetCx - bullet.x;
-        const bdy = targetCy - bullet.y;
-        const bDist = Math.sqrt(bdx * bdx + bdy * bdy);
-
-        if (bDist < bullet.target.radius * 0.8) {
+      } else if (checkBulletHitsMeteor(bullet, bullet.target)) {
           const meteorIdx = this.meteors.indexOf(bullet.target);
           if (meteorIdx !== -1) {
             const usedWords = getActiveWords(this.meteors);
@@ -471,7 +462,6 @@ export class WordDefenseGame {
             }
           }
           removeBullet = true;
-        }
       }
 
       if (removeBullet) {

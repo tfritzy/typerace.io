@@ -47,37 +47,25 @@ export function updateTurretPositions(slots: TurretSlot[], rotation: number) {
   }
 }
 
-function hasLineOfSight(turret: TurretSlot, targetX: number, targetY: number): boolean {
-  const dx = targetX - turret.x;
-  const dy = targetY - turret.y;
-  const segLenSq = dx * dx + dy * dy;
-
-  const toCenterX = EARTH_CX - turret.x;
-  const toCenterY = EARTH_CY - turret.y;
-
-  let t = (toCenterX * dx + toCenterY * dy) / segLenSq;
-  t = Math.max(0.05, Math.min(1, t));
-
-  const closestX = turret.x + t * dx;
-  const closestY = turret.y + t * dy;
-
-  const distSq = (closestX - EARTH_CX) ** 2 + (closestY - EARTH_CY) ** 2;
-  const threshold = EARTH_RADIUS - 5;
-  return distSq >= threshold * threshold;
-}
-
-export function findTurretsWithLineOfSight(
+export function findAvailableTurrets(
   slots: TurretSlot[],
-  targetX: number,
-  targetY: number
 ): TurretSlot[] {
   const result: TurretSlot[] = [];
   for (const slot of slots) {
-    if (slot.filled && !slot.destroyed && hasLineOfSight(slot, targetX, targetY)) {
+    if (slot.filled && !slot.destroyed) {
       result.push(slot);
     }
   }
   return result;
+}
+
+export function checkBulletHitsMeteor(bullet: Bullet, meteor: Meteor): boolean {
+  const localX = Math.floor(bullet.x - meteor.x);
+  const localY = Math.floor(bullet.y - meteor.y);
+  if (localX < 0 || localX >= meteor.width || localY < 0 || localY >= meteor.height) {
+    return false;
+  }
+  return meteor.data[localY * meteor.width + localX] !== 0;
 }
 
 export function updateBullets(
@@ -115,13 +103,7 @@ export function updateBullets(
       continue;
     }
 
-    const targetCx = bullet.target.x + bullet.target.width / 2;
-    const targetCy = bullet.target.y + bullet.target.height / 2;
-    const dx = targetCx - bullet.x;
-    const dy = targetCy - bullet.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    if (dist < bullet.target.radius * 0.8) {
+    if (checkBulletHitsMeteor(bullet, bullet.target)) {
       hits.push({ x: bullet.x, y: bullet.y, target: bullet.target });
       bullets.splice(i, 1);
     }
