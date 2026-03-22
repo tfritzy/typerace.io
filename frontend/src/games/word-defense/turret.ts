@@ -32,7 +32,7 @@ export function createTurretSlots(): TurretSlot[] {
     slots[idx].filled = true;
   }
 
-  const missileIdx = Math.floor(slots.length / 2);
+  const missileIdx = Math.floor(slots.length / (2 * INITIAL_TURRET_COUNT));
   slots[missileIdx].filled = true;
   slots[missileIdx].turretType = TurretType.Missile;
 
