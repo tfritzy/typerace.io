@@ -25,7 +25,7 @@ import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact 
 import { createTurretSlots, updateTurretPositions, findTurretsWithLineOfSight, fireBullet, isSlotGroundIntact } from "./turret";
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
 import { createMeteorObject, createBulletGraphics } from "./meteorRendering";
-import { buildPalette } from "./palette";
+import { buildPalette, getBackgroundColor } from "./palette";
 
 function getLangCode(): string {
   const slug = localStorage.getItem("typerace_lang_slug");
@@ -92,9 +92,6 @@ export class WordDefenseGame {
   private untypedStyle: TextStyle;
   private typedStyle: TextStyle;
   private keydownHandler: (e: KeyboardEvent) => void;
-  private mobileInput: HTMLInputElement | null = null;
-  private mobileInputHandler: ((e: Event) => void) | null = null;
-  private canvasTapHandler: ((e: Event) => void) | null = null;
 
   constructor(app: Application) {
     this.app = app;
@@ -246,56 +243,6 @@ export class WordDefenseGame {
 
   private setupInput() {
     document.addEventListener("keydown", this.keydownHandler);
-
-    const input = document.createElement("input");
-    input.type = "text";
-    input.inputMode = "text";
-    input.autocapitalize = "none";
-    input.autocomplete = "off";
-    input.setAttribute("autocorrect", "off");
-    input.setAttribute("spellcheck", "false");
-    input.setAttribute("enterkeyhint", "done");
-    input.style.position = "absolute";
-    input.style.bottom = "0";
-    input.style.left = "50%";
-    input.style.transform = "translateX(-50%)";
-    input.style.width = "1px";
-    input.style.height = "1px";
-    input.style.opacity = "0.01";
-    input.style.zIndex = "20";
-    input.style.fontSize = "16px";
-    input.style.caretColor = "transparent";
-    input.style.border = "none";
-    input.style.outline = "none";
-    input.style.background = "transparent";
-    input.style.color = "transparent";
-    input.style.padding = "0";
-
-    const canvas = this.app.canvas;
-    const parent = canvas.parentElement;
-    if (parent) {
-      parent.style.position = "relative";
-      parent.appendChild(input);
-    }
-
-    this.mobileInputHandler = (e: Event) => {
-      const inputEvent = e as InputEvent;
-      const char = inputEvent.data;
-      if (char && char.length === 1) {
-        this.handleKey(char);
-      }
-      input.value = "";
-    };
-    input.addEventListener("input", this.mobileInputHandler);
-
-    this.canvasTapHandler = (e: Event) => {
-      e.preventDefault();
-      input.focus({ preventScroll: true });
-    };
-    canvas.addEventListener("touchstart", this.canvasTapHandler, { passive: false });
-    canvas.addEventListener("pointerdown", this.canvasTapHandler);
-
-    this.mobileInput = input;
   }
 
   private onKeyDown(e: KeyboardEvent) {
@@ -663,26 +610,17 @@ export class WordDefenseGame {
 
   destroy() {
     document.removeEventListener("keydown", this.keydownHandler);
-    if (this.canvasTapHandler) {
-      this.app.canvas.removeEventListener("touchstart", this.canvasTapHandler);
-      this.app.canvas.removeEventListener("pointerdown", this.canvasTapHandler);
-    }
-    if (this.mobileInput) {
-      if (this.mobileInputHandler) {
-        this.mobileInput.removeEventListener("input", this.mobileInputHandler);
-      }
-      this.mobileInput.remove();
-    }
     this.app.destroy(true, { children: true });
   }
 }
 
 export async function createWordDefenseGame(container: HTMLElement): Promise<WordDefenseGame> {
+  buildPalette();
   const app = new Application();
   await app.init({
     width: CANVAS_WIDTH,
     height: CANVAS_HEIGHT,
-    backgroundAlpha: 0,
+    background: getBackgroundColor(),
     antialias: true,
     resolution: 1,
     preserveDrawingBuffer: true,
@@ -691,7 +629,6 @@ export async function createWordDefenseGame(container: HTMLElement): Promise<Wor
   app.canvas.style.width = "100%";
   app.canvas.style.height = "auto";
   app.canvas.style.aspectRatio = "16/9";
-  app.canvas.classList.add("rounded-lg");
   container.appendChild(app.canvas);
 
   return new WordDefenseGame(app);
