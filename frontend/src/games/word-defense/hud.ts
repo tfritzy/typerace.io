@@ -50,7 +50,7 @@ export class GameHud {
     this.container.addChild(this.habitabilityLabel);
 
     this.habitabilityBarBg = new Graphics();
-    this.habitabilityBarBg.roundRect(20, 60, 200, 10, 3);
+    this.habitabilityBarBg.rect(20, 60, 200, 10);
     this.habitabilityBarBg.fill({ color: 0xffffff, alpha: 0.06 });
     this.habitabilityBarBg.stroke({ color: accentColor, alpha: 0.3, width: 1 });
     this.container.addChild(this.habitabilityBarBg);
@@ -111,13 +111,13 @@ export class GameHud {
 
     this.habitabilityBarFill.clear();
     if (fillWidth > 0) {
-      this.habitabilityBarFill.roundRect(20, 60, fillWidth, 10, 3);
+      this.habitabilityBarFill.rect(20, 60, fillWidth, 10);
       this.habitabilityBarFill.fill({ color: barColor, alpha: 0.85 });
     }
 
     this.habitabilityBarGlow.clear();
     if (fillWidth > 0) {
-      this.habitabilityBarGlow.roundRect(20, 59, fillWidth, 12, 3);
+      this.habitabilityBarGlow.rect(20, 59, fillWidth, 12);
       this.habitabilityBarGlow.fill({ color: barColor, alpha: 0.15 });
     }
 
