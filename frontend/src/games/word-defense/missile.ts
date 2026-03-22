@@ -2,9 +2,11 @@ import type { Missile, Meteor, TurretSlot } from "./types";
 import {
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
   GRAVITY_STRENGTH,
-  MISSILE_INITIAL_SPEED, MISSILE_MAX_SPEED, MISSILE_ACCEL_DURATION,
+  MISSILE_INITIAL_SPEED, MISSILE_MAX_SPEED, MISSILE_MIN_MAX_SPEED,
+  MISSILE_ACCEL_DURATION,
   MISSILE_FUSE_BUFFER,
   CANVAS_WIDTH, CANVAS_HEIGHT, METEOR_CLEANUP_MARGIN,
+  MAX_FIRING_HALF_ANGLE,
 } from "./constants";
 
 interface SimState {
@@ -13,6 +15,9 @@ interface SimState {
   vx: number;
   vy: number;
 }
+
+const MIN_FIRING_COS = Math.cos(MAX_FIRING_HALF_ANGLE);
+const MISSILE_SPEED_STEPS = 6;
 
 function applyGravityStep(s: SimState, stepDt: number): void {
   s.x += s.vx * stepDt;
@@ -39,24 +44,24 @@ function simulateMeteorPosition(
   return { x: sim.x, y: sim.y };
 }
 
-function getMissileSpeedAtTime(age: number): number {
-  if (age >= MISSILE_ACCEL_DURATION) return MISSILE_MAX_SPEED;
+function getMissileSpeedAtTime(age: number, maxSpeed: number): number {
+  if (age >= MISSILE_ACCEL_DURATION) return maxSpeed;
   const t = age / MISSILE_ACCEL_DURATION;
   const eased = t * t;
-  return MISSILE_INITIAL_SPEED + (MISSILE_MAX_SPEED - MISSILE_INITIAL_SPEED) * eased;
+  return MISSILE_INITIAL_SPEED + (maxSpeed - MISSILE_INITIAL_SPEED) * eased;
 }
 
-function estimateMissileFlightTime(turretX: number, turretY: number, targetX: number, targetY: number): number {
+function estimateMissileFlightTime(turretX: number, turretY: number, targetX: number, targetY: number, maxSpeed: number): number {
   const dx = targetX - turretX;
   const dy = targetY - turretY;
   const dist = Math.sqrt(dx * dx + dy * dy);
 
-  const avgSpeed = (MISSILE_INITIAL_SPEED + MISSILE_MAX_SPEED) / 2;
+  const avgSpeed = (MISSILE_INITIAL_SPEED + maxSpeed) / 2;
   return dist / avgSpeed;
 }
 
 function simulateMissilePosition(
-  startX: number, startY: number, angle: number, totalTime: number
+  startX: number, startY: number, angle: number, totalTime: number, maxSpeed: number
 ): { x: number; y: number } {
   const steps = Math.max(Math.ceil(totalTime * 60), 1);
   const stepDt = totalTime / steps;
@@ -65,7 +70,7 @@ function simulateMissilePosition(
   let age = 0;
 
   for (let s = 0; s < steps; s++) {
-    const speed = getMissileSpeedAtTime(age);
+    const speed = getMissileSpeedAtTime(age, maxSpeed);
     x += Math.cos(angle) * speed * stepDt;
     y += Math.sin(angle) * speed * stepDt;
     age += stepDt;
@@ -74,11 +79,20 @@ function simulateMissilePosition(
   return { x, y };
 }
 
-export function fireMissile(turret: TurretSlot, target: Meteor): Missile | null {
+function isWithinFiringCone(launchAngle: number, turretX: number, turretY: number): boolean {
+  const outX = turretX - EARTH_CX;
+  const outY = turretY - EARTH_CY;
+  const dot = Math.cos(launchAngle) * outX + Math.sin(launchAngle) * outY;
+  const outMag = Math.sqrt(outX * outX + outY * outY);
+  if (outMag < 1e-6) return false;
+  return dot / outMag >= MIN_FIRING_COS;
+}
+
+function tryFireMissileWithMaxSpeed(turret: TurretSlot, target: Meteor, maxSpeed: number): Missile | null {
   const targetCx = target.x + target.width / 2;
   const targetCy = target.y + target.height / 2;
 
-  let flightTime = estimateMissileFlightTime(turret.x, turret.y, targetCx, targetCy);
+  let flightTime = estimateMissileFlightTime(turret.x, turret.y, targetCx, targetCy, maxSpeed);
 
   for (let iter = 0; iter < 6; iter++) {
     const pred = simulateMeteorPosition(targetCx, targetCy, target.vx, target.vy, flightTime);
@@ -86,13 +100,13 @@ export function fireMissile(turret: TurretSlot, target: Meteor): Missile | null 
     let bestAngle = Math.atan2(pred.y - turret.y, pred.x - turret.x);
 
     for (let a = 0; a < 3; a++) {
-      const missileEnd = simulateMissilePosition(turret.x, turret.y, bestAngle, flightTime);
+      const missileEnd = simulateMissilePosition(turret.x, turret.y, bestAngle, flightTime, maxSpeed);
       const errX = pred.x - missileEnd.x;
       const errY = pred.y - missileEnd.y;
       bestAngle = Math.atan2(pred.y - turret.y + errY, pred.x - turret.x + errX);
     }
 
-    const missileEnd = simulateMissilePosition(turret.x, turret.y, bestAngle, flightTime);
+    const missileEnd = simulateMissilePosition(turret.x, turret.y, bestAngle, flightTime, maxSpeed);
     const dx = pred.x - missileEnd.x;
     const dy = pred.y - missileEnd.y;
     const endDist = Math.sqrt(dx * dx + dy * dy);
@@ -102,7 +116,7 @@ export function fireMissile(turret: TurretSlot, target: Meteor): Missile | null 
     const newDx = pred.x - turret.x;
     const newDy = pred.y - turret.y;
     const newDist = Math.sqrt(newDx * newDx + newDy * newDy);
-    const avgSpeed = (MISSILE_INITIAL_SPEED + MISSILE_MAX_SPEED) / 2;
+    const avgSpeed = (MISSILE_INITIAL_SPEED + maxSpeed) / 2;
     flightTime = newDist / avgSpeed;
   }
 
@@ -110,7 +124,7 @@ export function fireMissile(turret: TurretSlot, target: Meteor): Missile | null 
   let launchAngle = Math.atan2(meteorPred.y - turret.y, meteorPred.x - turret.x);
 
   for (let iter = 0; iter < 4; iter++) {
-    const missileEnd = simulateMissilePosition(turret.x, turret.y, launchAngle, flightTime);
+    const missileEnd = simulateMissilePosition(turret.x, turret.y, launchAngle, flightTime, maxSpeed);
     const errX = meteorPred.x - missileEnd.x;
     const errY = meteorPred.y - missileEnd.y;
     launchAngle = Math.atan2(
@@ -122,9 +136,7 @@ export function fireMissile(turret: TurretSlot, target: Meteor): Missile | null 
   const fuseTime = flightTime + MISSILE_FUSE_BUFFER;
   const initialSpeed = MISSILE_INITIAL_SPEED;
 
-  const outX = turret.x - EARTH_CX;
-  const outY = turret.y - EARTH_CY;
-  if (Math.cos(launchAngle) * outX + Math.sin(launchAngle) * outY <= 0) return null;
+  if (!isWithinFiringCone(launchAngle, turret.x, turret.y)) return null;
 
   return {
     x: turret.x,
@@ -136,7 +148,17 @@ export function fireMissile(turret: TurretSlot, target: Meteor): Missile | null 
     fuseTime,
     launchAngle,
     speed: initialSpeed,
+    maxSpeed,
   };
+}
+
+export function fireMissile(turret: TurretSlot, target: Meteor): Missile | null {
+  for (let i = 0; i < MISSILE_SPEED_STEPS; i++) {
+    const maxSpeed = MISSILE_MAX_SPEED - (MISSILE_MAX_SPEED - MISSILE_MIN_MAX_SPEED) * (i / (MISSILE_SPEED_STEPS - 1));
+    const result = tryFireMissileWithMaxSpeed(turret, target, maxSpeed);
+    if (result) return result;
+  }
+  return null;
 }
 
 export function updateMissile(missile: Missile, dt: number): boolean {
@@ -146,7 +168,7 @@ export function updateMissile(missile: Missile, dt: number): boolean {
     return true;
   }
 
-  missile.speed = getMissileSpeedAtTime(missile.age);
+  missile.speed = getMissileSpeedAtTime(missile.age, missile.maxSpeed);
   missile.vx = Math.cos(missile.launchAngle) * missile.speed;
   missile.vy = Math.sin(missile.launchAngle) * missile.speed;
 

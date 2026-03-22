@@ -51,11 +51,15 @@ export const SLOT_SURFACE_THRESHOLD = 5;
 
 export const MISSILE_INITIAL_SPEED = 40;
 export const MISSILE_MAX_SPEED = 300;
+export const MISSILE_MIN_MAX_SPEED = MISSILE_INITIAL_SPEED * 2;
 export const MISSILE_ACCEL_DURATION = 2.0;
 export const MISSILE_EXPLOSION_RADIUS = 35;
 export const MISSILE_RENDER_LENGTH = 12;
 export const MISSILE_RENDER_WIDTH = 4;
 export const MISSILE_FUSE_BUFFER = 0.4;
+
+export const MAX_FIRING_HALF_ANGLE = Math.PI / 4;
+export const BULLET_MIN_SPEED = BULLET_SPEED * 0.5;
 
 export const AUTO_TYPE_ENABLED = true;
 export const AUTO_TYPE_INTERVAL = 1.0;

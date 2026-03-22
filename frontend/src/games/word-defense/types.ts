@@ -53,6 +53,7 @@ export interface Missile {
   fuseTime: number;
   launchAngle: number;
   speed: number;
+  maxSpeed: number;
 }
 
 export interface WaveConfig {

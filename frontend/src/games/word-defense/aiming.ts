@@ -1,7 +1,8 @@
 import type { Bullet, Meteor, TurretSlot } from "./types";
 import {
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
-  BULLET_SPEED, GRAVITY_STRENGTH,
+  BULLET_SPEED, BULLET_MIN_SPEED, GRAVITY_STRENGTH,
+  MAX_FIRING_HALF_ANGLE,
 } from "./constants";
 
 interface SimState {
@@ -13,6 +14,9 @@ interface SimState {
 
 const _sim: SimState = { x: 0, y: 0, vx: 0, vy: 0 };
 const _result: { x: number; y: number } = { x: 0, y: 0 };
+
+const MIN_FIRING_COS = Math.cos(MAX_FIRING_HALF_ANGLE);
+const BULLET_SPEED_STEPS = 6;
 
 function applyGravityStep(s: SimState, stepDt: number): void {
   s.x += s.vx * stepDt;
@@ -44,20 +48,30 @@ function simulatePosition(
   return _result;
 }
 
-export function fireBullet(turret: TurretSlot, target: Meteor): Bullet | null {
+function isWithinFiringCone(vx: number, vy: number, turretX: number, turretY: number): boolean {
+  const outX = turretX - EARTH_CX;
+  const outY = turretY - EARTH_CY;
+  const dot = vx * outX + vy * outY;
+  const vMag = Math.sqrt(vx * vx + vy * vy);
+  const outMag = Math.sqrt(outX * outX + outY * outY);
+  if (vMag < 1e-6 || outMag < 1e-6) return false;
+  return dot / (vMag * outMag) >= MIN_FIRING_COS;
+}
+
+function tryFireBulletAtSpeed(turret: TurretSlot, target: Meteor, speed: number): Bullet | null {
   const targetCx = target.x + target.width / 2;
   const targetCy = target.y + target.height / 2;
 
   const dx = targetCx - turret.x;
   const dy = targetCy - turret.y;
   const dist = Math.sqrt(dx * dx + dy * dy);
-  let t = dist / BULLET_SPEED;
+  let t = dist / speed;
 
   for (let iter = 0; iter < 4; iter++) {
     const pred = simulatePosition(targetCx, targetCy, target.vx, target.vy, t);
     const pdx = pred.x - turret.x;
     const pdy = pred.y - turret.y;
-    t = Math.sqrt(pdx * pdx + pdy * pdy) / BULLET_SPEED;
+    t = Math.sqrt(pdx * pdx + pdy * pdy) / speed;
   }
 
   const meteorPred = simulatePosition(targetCx, targetCy, target.vx, target.vy, t);
@@ -71,8 +85,8 @@ export function fireBullet(turret: TurretSlot, target: Meteor): Bullet | null {
     const adx = aimX - turret.x;
     const ady = aimY - turret.y;
     const aDist = Math.sqrt(adx * adx + ady * ady);
-    const bvx = (adx / aDist) * BULLET_SPEED;
-    const bvy = (ady / aDist) * BULLET_SPEED;
+    const bvx = (adx / aDist) * speed;
+    const bvy = (ady / aDist) * speed;
 
     const bulletEnd = simulatePosition(turret.x, turret.y, bvx, bvy, t);
 
@@ -84,12 +98,10 @@ export function fireBullet(turret: TurretSlot, target: Meteor): Bullet | null {
   const finalDy = aimY - turret.y;
   const finalDist = Math.sqrt(finalDx * finalDx + finalDy * finalDy);
 
-  const vx = (finalDx / finalDist) * BULLET_SPEED;
-  const vy = (finalDy / finalDist) * BULLET_SPEED;
+  const vx = (finalDx / finalDist) * speed;
+  const vy = (finalDy / finalDist) * speed;
 
-  const outX = turret.x - EARTH_CX;
-  const outY = turret.y - EARTH_CY;
-  if (vx * outX + vy * outY <= 0) return null;
+  if (!isWithinFiringCone(vx, vy, turret.x, turret.y)) return null;
 
   return {
     x: turret.x,
@@ -98,4 +110,13 @@ export function fireBullet(turret: TurretSlot, target: Meteor): Bullet | null {
     vy,
     target,
   };
+}
+
+export function fireBullet(turret: TurretSlot, target: Meteor): Bullet | null {
+  for (let i = 0; i < BULLET_SPEED_STEPS; i++) {
+    const speed = BULLET_SPEED - (BULLET_SPEED - BULLET_MIN_SPEED) * (i / (BULLET_SPEED_STEPS - 1));
+    const result = tryFireBulletAtSpeed(turret, target, speed);
+    if (result) return result;
+  }
+  return null;
 }
