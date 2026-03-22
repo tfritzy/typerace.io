@@ -28,6 +28,12 @@ import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlig
 import { createMeteorObject, createBulletGraphics } from "./meteorRendering";
 import { buildPalette, getBackgroundColor } from "./palette";
 
+function clampToScreen(pos: number, leadingOffset: number, size: number, canvasSize: number): number {
+  const min = LABEL_SCREEN_PADDING + leadingOffset;
+  const max = canvasSize - LABEL_SCREEN_PADDING - size + leadingOffset;
+  return Math.max(min, Math.min(pos, max));
+}
+
 function getLangCode(): string {
   const slug = localStorage.getItem("typerace_lang_slug");
   return getLanguageFromSlug(slug ?? undefined).htmlLang;
@@ -585,29 +591,17 @@ export class WordDefenseGame {
       mo.untypedText.text = meteor.word;
 
       const naturalLocalY = meteor.height / 2 + WORD_OFFSET_Y + WORD_FONT_SIZE;
+      const scaledW = mo.untypedText.width * this.cameraZoom;
+      const scaledH = mo.untypedText.height * this.cameraZoom;
 
-      const labelWorldX = containerX;
-      const labelWorldY = containerY + naturalLocalY;
-      let labelScreenX = (labelWorldX - EARTH_CX) * this.cameraZoom + EARTH_CX;
-      let labelScreenY = (labelWorldY - EARTH_CY) * this.cameraZoom + this.cameraY;
+      const screenX = (containerX - EARTH_CX) * this.cameraZoom + EARTH_CX;
+      const screenY = (containerY + naturalLocalY - EARTH_CY) * this.cameraZoom + this.cameraY;
 
-      const halfW = (mo.untypedText.width * this.cameraZoom) / 2;
-      const labelScreenH = mo.untypedText.height * this.cameraZoom;
+      const clampedScreenX = clampToScreen(screenX, scaledW / 2, scaledW, CANVAS_WIDTH);
+      const clampedScreenY = clampToScreen(screenY, 0, scaledH, CANVAS_HEIGHT);
 
-      if (labelScreenX - halfW < LABEL_SCREEN_PADDING) {
-        labelScreenX = LABEL_SCREEN_PADDING + halfW;
-      } else if (labelScreenX + halfW > CANVAS_WIDTH - LABEL_SCREEN_PADDING) {
-        labelScreenX = CANVAS_WIDTH - LABEL_SCREEN_PADDING - halfW;
-      }
-
-      if (labelScreenY < LABEL_SCREEN_PADDING) {
-        labelScreenY = LABEL_SCREEN_PADDING;
-      } else if (labelScreenY + labelScreenH > CANVAS_HEIGHT - LABEL_SCREEN_PADDING) {
-        labelScreenY = CANVAS_HEIGHT - LABEL_SCREEN_PADDING - labelScreenH;
-      }
-
-      const clampedLocalX = (labelScreenX - EARTH_CX) / this.cameraZoom + EARTH_CX - containerX;
-      const clampedLocalY = (labelScreenY - this.cameraY) / this.cameraZoom + EARTH_CY - containerY;
+      const clampedLocalX = (clampedScreenX - EARTH_CX) / this.cameraZoom + EARTH_CX - containerX;
+      const clampedLocalY = (clampedScreenY - this.cameraY) / this.cameraZoom + EARTH_CY - containerY;
 
       mo.untypedText.position.set(clampedLocalX, clampedLocalY);
 
