@@ -1,5 +1,5 @@
 import { Application, Container, Sprite, Graphics, Text, Texture, TextStyle } from "pixi.js";
-import { getRandomWord } from "../../utils/wordLists";
+
 import { getLanguageFromSlug } from "../../utils/modes";
 import type { Meteor, TurretSlot, Bullet, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals, CityEntry } from "./types";
 import {
@@ -263,8 +263,6 @@ export class WordDefenseGame {
           for (const turret of availableTurrets) {
             this.addBullet(fireBullet(turret, meteor));
           }
-          const usedWords = getActiveWords(this.meteors);
-          meteor.word = getRandomWord(this.langCode, usedWords);
           meteor.typedCount = 0;
         }
       } else if (meteor.typedCount > 0 && key !== nextChar) {
