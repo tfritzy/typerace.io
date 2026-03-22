@@ -16,7 +16,7 @@ import {
   BASE_METEOR_RADIUS_MIN, BASE_METEOR_RADIUS_MAX,
   WAVE_RADIUS_GROWTH, MAX_METEOR_RADIUS,
   WAVE_SPAWN_INTERVAL_REDUCTION,
-  GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
+  PLANET_ROTATION_SPEED,
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
   MISSILE_EXPLOSION_RADIUS, BULLET_CARVE_RADIUS,
   AUTO_TYPE_ENABLED, AUTO_TYPE_INTERVAL,
@@ -428,15 +428,6 @@ export class WordDefenseGame {
       bullet.x += bullet.vx * dt;
       bullet.y += bullet.vy * dt;
 
-      const bgdx = EARTH_CX - bullet.x;
-      const bgdy = EARTH_CY - bullet.y;
-      const bgDist = Math.sqrt(bgdx * bgdx + bgdy * bgdy);
-      if (bgDist > 1) {
-        const bAccel = GRAVITY_STRENGTH / Math.max(bgDist, EARTH_RADIUS);
-        bullet.vx += (bgdx / bgDist) * bAccel * dt;
-        bullet.vy += (bgdy / bgDist) * bAccel * dt;
-      }
-
       let removeBullet = false;
 
       if (
@@ -508,15 +499,6 @@ export class WordDefenseGame {
 
       const cx = meteor.x + meteor.width / 2;
       const cy = meteor.y + meteor.height / 2;
-
-      const gdx = EARTH_CX - cx;
-      const gdy = EARTH_CY - cy;
-      const gDist = Math.sqrt(gdx * gdx + gdy * gdy);
-      if (gDist > 1) {
-        const accel = GRAVITY_STRENGTH / Math.max(gDist, EARTH_RADIUS);
-        meteor.vx += (gdx / gDist) * accel * dt;
-        meteor.vy += (gdy / gDist) * accel * dt;
-      }
 
       let removed = false;
 

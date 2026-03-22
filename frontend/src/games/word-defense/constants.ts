@@ -27,7 +27,7 @@ export const BULLET_RENDER_RADIUS = 3;
 export const BULLET_CARVE_RADIUS = 12;
 export const MIN_SPLIT_PIXELS = 50;
 
-export const BASE_METEOR_SPEED = 12;
+export const BASE_METEOR_SPEED = 24;
 export const METEOR_SPEED_WAVE_INCREMENT = 2;
 export const GRAVITY_STRENGTH = 3000;
 export const PLANET_ROTATION_SPEED = 0.08;
