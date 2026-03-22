@@ -27,6 +27,7 @@ export interface TurretSlot {
   y: number;
   filled: boolean;
   destroyed: boolean;
+  isMissileTurret: boolean;
 }
 
 export interface Bullet {
@@ -35,6 +36,18 @@ export interface Bullet {
   vx: number;
   vy: number;
   target: Meteor;
+}
+
+export interface Missile {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  target: Meteor;
+  age: number;
+  fuseTime: number;
+  launchAngle: number;
+  speed: number;
 }
 
 export interface WaveConfig {

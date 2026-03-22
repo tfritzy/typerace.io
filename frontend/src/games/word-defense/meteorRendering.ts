@@ -1,6 +1,6 @@
 import { Container, Sprite, Text, Texture, TextStyle, Graphics } from "pixi.js";
 import type { Meteor, MeteorObject } from "./types";
-import { WORD_FONT_SIZE, WORD_OFFSET_Y, WORD_UNTYPED_ALPHA, WORD_TYPED_ALPHA, BULLET_RENDER_RADIUS } from "./constants";
+import { WORD_FONT_SIZE, WORD_OFFSET_Y, WORD_UNTYPED_ALPHA, WORD_TYPED_ALPHA, BULLET_RENDER_RADIUS, MISSILE_RENDER_LENGTH, MISSILE_RENDER_WIDTH } from "./constants";
 
 export function createMeteorObject(meteor: Meteor, untypedStyle: TextStyle, typedStyle: TextStyle): MeteorObject {
   const container = new Container();
@@ -30,5 +30,19 @@ export function createBulletGraphics(): Graphics {
   const g = new Graphics();
   g.circle(0, 0, BULLET_RENDER_RADIUS);
   g.fill(0xffffff);
+  return g;
+}
+
+export function createMissileGraphics(): Graphics {
+  const g = new Graphics();
+  const halfLen = MISSILE_RENDER_LENGTH / 2;
+  const halfW = MISSILE_RENDER_WIDTH / 2;
+  g.moveTo(halfLen, 0);
+  g.lineTo(-halfLen, -halfW);
+  g.lineTo(-halfLen, halfW);
+  g.closePath();
+  g.fill(0xff6633);
+  g.circle(-halfLen, 0, halfW * 0.8);
+  g.fill(0xffaa00);
   return g;
 }

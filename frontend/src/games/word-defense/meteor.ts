@@ -263,3 +263,39 @@ export function handleBulletImpact(
     createMeteorFromComponent(meteor, comp, langCode, usedWords)
   );
 }
+
+export function handleMissileExplosion(
+  meteor: Meteor,
+  hitX: number,
+  hitY: number,
+  explosionRadius: number,
+  langCode: string,
+  usedWords: Set<string>
+): Meteor[] {
+  carveCircle(meteor, hitX, hitY, explosionRadius);
+
+  const components = findConnectedComponents(meteor.data, meteor.width, meteor.height);
+  const validComponents = components.filter(c => c.length >= MIN_SPLIT_PIXELS);
+
+  if (validComponents.length === 0) {
+    return [];
+  }
+
+  if (validComponents.length === 1) {
+    if (components.length > 1) {
+      const validSet = new Set(validComponents[0]);
+      for (let i = 0; i < meteor.data.length; i++) {
+        if (meteor.data[i] && !validSet.has(i)) {
+          meteor.data[i] = 0;
+        }
+      }
+    }
+    rebuildImageData(meteor.data, meteor.imageData, meteor.width, meteor.height);
+    updateBitmap(meteor);
+    return [meteor];
+  }
+
+  return validComponents.map(comp =>
+    createMeteorFromComponent(meteor, comp, langCode, usedWords)
+  );
+}

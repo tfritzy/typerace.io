@@ -22,6 +22,7 @@ export function createTurretSlots(): TurretSlot[] {
       y,
       filled: false,
       destroyed: false,
+      isMissileTurret: false,
     });
   }
 
@@ -29,6 +30,10 @@ export function createTurretSlots(): TurretSlot[] {
     const idx = Math.floor(i * slots.length / INITIAL_TURRET_COUNT);
     slots[idx].filled = true;
   }
+
+  const missileIdx = Math.floor(slots.length / 2);
+  slots[missileIdx].filled = true;
+  slots[missileIdx].isMissileTurret = true;
 
   return slots;
 }
