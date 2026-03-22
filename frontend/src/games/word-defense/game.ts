@@ -10,6 +10,7 @@ import {
   METEOR_CLEANUP_MARGIN, IMPACT_RADIUS_SCALE,
   WORD_FONT_SIZE,
   WORD_OFFSET_Y,
+  LABEL_SCREEN_PADDING,
   BASE_METEOR_SPEED, METEOR_SPEED_WAVE_INCREMENT,
   BASE_METEORS_PER_WAVE, METEORS_PER_WAVE_INCREMENT,
   BASE_METEOR_RADIUS_MIN, BASE_METEOR_RADIUS_MAX,
@@ -577,16 +578,46 @@ export class WordDefenseGame {
     for (let i = 0; i < this.meteors.length; i++) {
       const meteor = this.meteors[i];
       const mo = this.meteorObjects[i];
-      mo.container.position.set(meteor.x + meteor.width / 2, meteor.y + meteor.height / 2);
+      const containerX = meteor.x + meteor.width / 2;
+      const containerY = meteor.y + meteor.height / 2;
+      mo.container.position.set(containerX, containerY);
 
       mo.untypedText.text = meteor.word;
+
+      const naturalLocalX = 0;
+      const naturalLocalY = meteor.height / 2 + WORD_OFFSET_Y + WORD_FONT_SIZE;
+
+      const labelWorldX = containerX + naturalLocalX;
+      const labelWorldY = containerY + naturalLocalY;
+      let labelScreenX = (labelWorldX - EARTH_CX) * this.cameraZoom + EARTH_CX;
+      let labelScreenY = (labelWorldY - EARTH_CY) * this.cameraZoom + this.cameraY;
+
+      const halfW = (mo.untypedText.width * this.cameraZoom) / 2;
+      const labelScreenH = mo.untypedText.height * this.cameraZoom;
+
+      if (labelScreenX - halfW < LABEL_SCREEN_PADDING) {
+        labelScreenX = LABEL_SCREEN_PADDING + halfW;
+      } else if (labelScreenX + halfW > CANVAS_WIDTH - LABEL_SCREEN_PADDING) {
+        labelScreenX = CANVAS_WIDTH - LABEL_SCREEN_PADDING - halfW;
+      }
+
+      if (labelScreenY < LABEL_SCREEN_PADDING) {
+        labelScreenY = LABEL_SCREEN_PADDING;
+      } else if (labelScreenY + labelScreenH > CANVAS_HEIGHT - LABEL_SCREEN_PADDING) {
+        labelScreenY = CANVAS_HEIGHT - LABEL_SCREEN_PADDING - labelScreenH;
+      }
+
+      const clampedLocalX = (labelScreenX - EARTH_CX) / this.cameraZoom + EARTH_CX - containerX;
+      const clampedLocalY = (labelScreenY - this.cameraY) / this.cameraZoom + EARTH_CY - containerY;
+
+      mo.untypedText.position.set(clampedLocalX, clampedLocalY);
 
       if (meteor.typedCount > 0) {
         const typed = meteor.word.slice(0, meteor.typedCount);
         mo.typedText.text = typed;
         mo.typedText.visible = true;
         const fullWidth = mo.untypedText.width;
-        mo.typedText.position.set(-fullWidth / 2, meteor.height / 2 + WORD_OFFSET_Y + WORD_FONT_SIZE);
+        mo.typedText.position.set(clampedLocalX - fullWidth / 2, clampedLocalY);
       } else {
         mo.typedText.visible = false;
       }
