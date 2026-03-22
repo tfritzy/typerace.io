@@ -120,7 +120,7 @@ export function createCityObjects(
 export function countCityPixels(city: SceneObject): number {
   let count = 0;
   for (let i = 0; i < city.data.length; i++) {
-    if (city.data[i] !== 0) count++;
+    if (city.data[i] === CITY_INDEX) count++;
   }
   return count;
 }
