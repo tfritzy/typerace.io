@@ -24,8 +24,8 @@ export const TURRET_BARREL_WIDTH = 6;
 export const TURRET_BASE_RADIUS = 5;
 export const BULLET_SPEED = 267;
 export const BULLET_RENDER_RADIUS = 3;
-export const BULLET_CARVE_RADIUS = 12;
-export const MIN_SPLIT_PIXELS = 50;
+export const BULLET_DAMAGE = 10;
+export const MISSILE_DAMAGE = 30;
 
 export const BASE_METEOR_SPEED = 12;
 export const METEOR_SPEED_WAVE_INCREMENT = 2;
