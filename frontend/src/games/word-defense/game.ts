@@ -1,7 +1,8 @@
 import { Application, Container, Sprite, Graphics, Texture, TextStyle } from "pixi.js";
 
 import { getLanguageFromSlug } from "../../utils/modes";
-import type { Meteor, TurretSlot, Bullet, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
+import { TurretType } from "./types";
+import type { Meteor, TurretSlot, Bullet, Missile, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
@@ -17,13 +18,16 @@ import {
   WAVE_SPAWN_INTERVAL_REDUCTION,
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
+  MISSILE_EXPLOSION_RADIUS, BULLET_CARVE_RADIUS,
+  AUTO_TYPE_ENABLED, AUTO_TYPE_INTERVAL,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
-import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleBulletImpact } from "./meteor";
-import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBullet, isSlotGroundIntact, checkBulletHitsMeteor } from "./turret";
+import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords, handleProjectileImpact } from "./meteor";
+import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBullet, isSlotGroundIntact, checkProjectileHitsMeteor } from "./turret";
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
-import { createMeteorObject, createBulletGraphics } from "./meteorRendering";
+import { createMeteorObject, createBulletGraphics, createMissileGraphics } from "./meteorRendering";
+import { fireMissile, updateMissile } from "./missile";
 import { buildPalette, getBackgroundColor, ACCENT_INDEX } from "./palette";
 import { GameHud } from "./hud";
 import { clampToRange } from "../../utils/math";
@@ -64,6 +68,8 @@ export class WordDefenseGame {
   private meteorObjects: MeteorObject[] = [];
   private bullets: Bullet[] = [];
   private bulletGfxList: Graphics[] = [];
+  private missiles: Missile[] = [];
+  private missileGfxList: Graphics[] = [];
 
   private langCode: string;
   private waveConfig: WaveConfig;
@@ -84,6 +90,7 @@ export class WordDefenseGame {
   private untypedStyle: TextStyle;
   private typedStyle: TextStyle;
   private keydownHandler: (e: KeyboardEvent) => void;
+  private autoTypeTimer = 0;
 
   constructor(app: Application) {
     this.app = app;
@@ -185,13 +192,46 @@ export class WordDefenseGame {
         if (meteor.typedCount >= meteor.word.length) {
           const availableTurrets = findAvailableTurrets(this.slots);
           for (const turret of availableTurrets) {
-            this.addBullet(fireBullet(turret, meteor));
+            if (turret.turretType === TurretType.Missile) {
+              const missile = fireMissile(turret, meteor);
+              if (missile) this.addMissile(missile);
+            } else {
+              const bullet = fireBullet(turret, meteor);
+              if (bullet) this.addBullet(bullet);
+            }
           }
           meteor.typedCount = 0;
         }
       } else if (meteor.typedCount > 0 && key !== nextChar) {
         meteor.typedCount = 0;
       }
+    }
+  }
+
+  private updateAutoType(dt: number) {
+    if (!AUTO_TYPE_ENABLED || this.meteors.length === 0) return;
+
+    this.autoTypeTimer += dt;
+    if (this.autoTypeTimer < AUTO_TYPE_INTERVAL) return;
+    this.autoTypeTimer = 0;
+
+    let nearest: Meteor | null = null;
+    let nearestDist = Infinity;
+    for (const meteor of this.meteors) {
+      const dx = meteor.x - EARTH_CX;
+      const dy = meteor.y - EARTH_CY;
+      const dist = dx * dx + dy * dy;
+      if (dist < nearestDist) {
+        nearestDist = dist;
+        nearest = meteor;
+      }
+    }
+
+    if (!nearest) return;
+
+    const nextChar = nearest.word[nearest.typedCount];
+    if (nextChar) {
+      this.handleKey(nextChar);
     }
   }
 
@@ -233,16 +273,33 @@ export class WordDefenseGame {
     this.bulletGfxList.splice(index, 1);
   }
 
+  private addMissile(missile: Missile) {
+    this.missiles.push(missile);
+    const g = createMissileGraphics();
+    g.position.set(missile.x, missile.y);
+    g.rotation = missile.launchAngle;
+    this.bulletLayer.addChild(g);
+    this.missileGfxList.push(g);
+  }
+
+  private removeMissileAt(index: number) {
+    this.missileGfxList[index].destroy();
+    this.missiles.splice(index, 1);
+    this.missileGfxList.splice(index, 1);
+  }
+
   private update(dt: number) {
     if (this.gameOver) return;
     const isActive = this.phase === "active";
 
+    this.updateAutoType(dt);
     this.updateSpawning(dt, isActive);
     this.checkWaveComplete(isActive);
     this.updateCamera(dt, isActive);
     this.updatePlanet(dt, isActive);
     this.updateSlotVisuals();
     this.updateBullets(dt);
+    this.updateMissiles(dt);
     this.updateMeteors(dt);
     this.syncMeteorDisplays();
 
@@ -274,7 +331,8 @@ export class WordDefenseGame {
       isActive &&
       this.meteorsSpawned >= this.waveConfig.totalMeteors &&
       this.meteors.length === 0 &&
-      this.bullets.length === 0
+      this.bullets.length === 0 &&
+      this.missiles.length === 0
     ) {
       this.phase = "complete";
       this.hud.showStartButton(this.waveConfig.waveNumber + 1);
@@ -330,6 +388,40 @@ export class WordDefenseGame {
     }
   }
 
+  private applyProjectileDamage(meteorIdx: number, hitX: number, hitY: number, carveRadius: number) {
+    const meteor = this.meteors[meteorIdx];
+    const usedWords = getActiveWords(this.meteors);
+
+    let pixelsBefore = 0;
+    for (let p = 0; p < meteor.data.length; p++) {
+      if (meteor.data[p]) pixelsBefore++;
+    }
+
+    const result = handleProjectileImpact(meteor, hitX, hitY, carveRadius, this.langCode, usedWords);
+
+    let pixelsAfter = 0;
+    for (const m of result) {
+      for (let p = 0; p < m.data.length; p++) {
+        if (m.data[p]) pixelsAfter++;
+      }
+    }
+    this.credits += pixelsBefore - pixelsAfter;
+
+    if (result.length === 0) {
+      this.removeMeteorAt(meteorIdx);
+    } else if (result.length > 1 || result[0] !== meteor) {
+      this.removeMeteorAt(meteorIdx);
+      for (const newMeteor of result) {
+        this.addMeteor(newMeteor);
+      }
+    } else {
+      const mo = this.meteorObjects[meteorIdx];
+      const oldTexture = mo.sprite.texture;
+      mo.sprite.texture = Texture.from({ resource: meteor.bitmap, alphaMode: "premultiply-alpha-on-upload" });
+      oldTexture.destroy();
+    }
+  }
+
   private updateBullets(dt: number) {
     for (let i = this.bullets.length - 1; i >= 0; i--) {
       const bullet = this.bullets[i];
@@ -352,48 +444,58 @@ export class WordDefenseGame {
         bullet.y < -METEOR_CLEANUP_MARGIN || bullet.y > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
       ) {
         removeBullet = true;
-      } else if (!this.meteors.includes(bullet.target)) {
-        removeBullet = true;
-      } else if (checkBulletHitsMeteor(bullet, bullet.target)) {
-          const meteorIdx = this.meteors.indexOf(bullet.target);
-          if (meteorIdx !== -1) {
-            const usedWords = getActiveWords(this.meteors);
-            let pixelsBefore = 0;
-            for (let i = 0; i < bullet.target.data.length; i++) {
-              if (bullet.target.data[i]) pixelsBefore++;
-            }
-
-            const result = handleBulletImpact(bullet.target, bullet.x, bullet.y, this.langCode, usedWords);
-
-            let pixelsAfter = 0;
-            for (const m of result) {
-              for (let i = 0; i < m.data.length; i++) {
-                if (m.data[i]) pixelsAfter++;
-              }
-            }
-            this.credits += pixelsBefore - pixelsAfter;
-
-            if (result.length === 0) {
-              this.removeMeteorAt(meteorIdx);
-            } else if (result.length > 1 || result[0] !== bullet.target) {
-              this.removeMeteorAt(meteorIdx);
-              for (const newMeteor of result) {
-                this.addMeteor(newMeteor);
-              }
-            } else {
-              const mo = this.meteorObjects[meteorIdx];
-              const oldTexture = mo.sprite.texture;
-              mo.sprite.texture = Texture.from({ resource: bullet.target.bitmap, alphaMode: "premultiply-alpha-on-upload" });
-              oldTexture.destroy();
-            }
+      } else {
+        for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
+          if (checkProjectileHitsMeteor(bullet, this.meteors[mi])) {
+            this.applyProjectileDamage(mi, bullet.x, bullet.y, BULLET_CARVE_RADIUS);
+            removeBullet = true;
+            break;
           }
-          removeBullet = true;
+        }
       }
 
       if (removeBullet) {
         this.removeBulletAt(i);
       } else {
         this.bulletGfxList[i].position.set(bullet.x, bullet.y);
+      }
+    }
+  }
+
+  private updateMissiles(dt: number) {
+    for (let i = this.missiles.length - 1; i >= 0; i--) {
+      const missile = this.missiles[i];
+
+      let shouldDetonate = false;
+
+      for (const meteor of this.meteors) {
+        if (checkProjectileHitsMeteor(missile, meteor)) {
+          shouldDetonate = true;
+          break;
+        }
+      }
+
+      const expired = updateMissile(missile, dt);
+      if (expired) {
+        shouldDetonate = true;
+      }
+
+      if (shouldDetonate) {
+        for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
+          const meteor = this.meteors[mi];
+          const mcx = meteor.x + meteor.width / 2;
+          const mcy = meteor.y + meteor.height / 2;
+          const dx = missile.x - mcx;
+          const dy = missile.y - mcy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist <= meteor.radius + MISSILE_EXPLOSION_RADIUS) {
+            this.applyProjectileDamage(mi, missile.x, missile.y, MISSILE_EXPLOSION_RADIUS);
+          }
+        }
+        this.removeMissileAt(i);
+      } else {
+        this.missileGfxList[i].position.set(missile.x, missile.y);
+        this.missileGfxList[i].rotation = missile.launchAngle;
       }
     }
   }

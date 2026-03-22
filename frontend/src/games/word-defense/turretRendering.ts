@@ -1,9 +1,11 @@
 import { Container, Graphics, Circle } from "pixi.js";
+import { TurretType } from "./types";
 import type { TurretSlot, TurretVisuals } from "./types";
 import {
   EARTH_RADIUS,
   TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH, TURRET_BASE_RADIUS,
   SLOT_INTERACTIVE_RADIUS, SLOT_HIT_BUFFER,
+  MISSILE_RENDER_LENGTH,
 } from "./constants";
 
 export function createTurretContainer(slot: TurretSlot): Container {
@@ -13,16 +15,29 @@ export function createTurretContainer(slot: TurretSlot): Container {
     Math.sin(slot.baseAngle) * EARTH_RADIUS,
   );
 
-  const barrel = new Graphics();
-  barrel.rect(0, -TURRET_BARREL_WIDTH / 2, TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH);
-  barrel.fill(0x6b7280);
-  barrel.rotation = slot.baseAngle;
-  container.addChild(barrel);
+  if (slot.turretType === TurretType.Missile) {
+    const barrel = new Graphics();
+    barrel.rect(0, -TURRET_BARREL_WIDTH / 2, MISSILE_RENDER_LENGTH + 4, TURRET_BARREL_WIDTH + 2);
+    barrel.fill(0x8b4513);
+    barrel.rotation = slot.baseAngle;
+    container.addChild(barrel);
 
-  const base = new Graphics();
-  base.circle(0, 0, TURRET_BASE_RADIUS);
-  base.fill(0x9ca3af);
-  container.addChild(base);
+    const base = new Graphics();
+    base.circle(0, 0, TURRET_BASE_RADIUS + 2);
+    base.fill(0xcc5500);
+    container.addChild(base);
+  } else {
+    const barrel = new Graphics();
+    barrel.rect(0, -TURRET_BARREL_WIDTH / 2, TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH);
+    barrel.fill(0x6b7280);
+    barrel.rotation = slot.baseAngle;
+    container.addChild(barrel);
+
+    const base = new Graphics();
+    base.circle(0, 0, TURRET_BASE_RADIUS);
+    base.fill(0x9ca3af);
+    container.addChild(base);
+  }
 
   return container;
 }

@@ -20,6 +20,11 @@ export interface Meteor extends SceneObject {
   typedCount: number;
 }
 
+export enum TurretType {
+  Bullet,
+  Missile,
+}
+
 export interface TurretSlot {
   baseAngle: number;
   angle: number;
@@ -27,6 +32,7 @@ export interface TurretSlot {
   y: number;
   filled: boolean;
   destroyed: boolean;
+  turretType: TurretType;
 }
 
 export interface Bullet {
@@ -35,6 +41,18 @@ export interface Bullet {
   vx: number;
   vy: number;
   target: Meteor;
+}
+
+export interface Missile {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  target: Meteor;
+  age: number;
+  fuseTime: number;
+  launchAngle: number;
+  speed: number;
 }
 
 export interface WaveConfig {

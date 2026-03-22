@@ -49,3 +49,13 @@ export const SLOT_SURFACE_INWARD = 5;
 export const SLOT_SURFACE_CHECK_RADIUS = 6;
 export const SLOT_SURFACE_THRESHOLD = 5;
 
+export const MISSILE_INITIAL_SPEED = 40;
+export const MISSILE_MAX_SPEED = 300;
+export const MISSILE_ACCEL_DURATION = 2.0;
+export const MISSILE_EXPLOSION_RADIUS = 35;
+export const MISSILE_RENDER_LENGTH = 12;
+export const MISSILE_RENDER_WIDTH = 4;
+export const MISSILE_FUSE_BUFFER = 0.4;
+
+export const AUTO_TYPE_ENABLED = true;
+export const AUTO_TYPE_INTERVAL = 1.0;

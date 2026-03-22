@@ -4,7 +4,7 @@ import {
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
   METEOR_NOISE_FREQ,
   METEOR_CORE_RADIUS, METEOR_LUMP_HEIGHT,
-  BULLET_CARVE_RADIUS, MIN_SPLIT_PIXELS,
+  MIN_SPLIT_PIXELS,
   ACTIVE_WAVE_ZOOM,
 } from "./constants";
 import { valueNoise } from "./noise";
@@ -229,14 +229,15 @@ function createMeteorFromComponent(
   };
 }
 
-export function handleBulletImpact(
+export function handleProjectileImpact(
   meteor: Meteor,
   hitX: number,
   hitY: number,
+  carveRadius: number,
   langCode: string,
   usedWords: Set<string>
 ): Meteor[] {
-  carveCircle(meteor, hitX, hitY, BULLET_CARVE_RADIUS);
+  carveCircle(meteor, hitX, hitY, carveRadius);
 
   const components = findConnectedComponents(meteor.data, meteor.width, meteor.height);
   const validComponents = components.filter(c => c.length >= MIN_SPLIT_PIXELS);
