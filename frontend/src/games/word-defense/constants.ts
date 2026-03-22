@@ -49,3 +49,8 @@ export const SLOT_SURFACE_CHECK_RADIUS = 6;
 export const SLOT_SURFACE_THRESHOLD = 5;
 
 export const LIFE_RING_DEPTH = 3;
+
+export const HABITABILITY_BAR_X = 20;
+export const HABITABILITY_BAR_Y = 48;
+export const HABITABILITY_BAR_WIDTH = 200;
+export const HABITABILITY_BAR_HEIGHT = 14;

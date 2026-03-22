@@ -16,6 +16,7 @@ import {
   WAVE_SPAWN_INTERVAL_REDUCTION,
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
+  HABITABILITY_BAR_X, HABITABILITY_BAR_Y, HABITABILITY_BAR_WIDTH, HABITABILITY_BAR_HEIGHT,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
@@ -182,23 +183,17 @@ export class WordDefenseGame {
     this.creditsLabel.alpha = 0.7;
     this.hud.addChild(this.creditsLabel);
 
-    const barWidth = 200;
-    const barHeight = 14;
-    const barX = 20;
-    const barY = 48;
-
     this.habitabilityLabel = new Text({
       text: "Planet Habitability",
       style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 14, fill: 0xffffff },
     });
-    this.habitabilityLabel.position.set(barX, barY - 16);
+    this.habitabilityLabel.position.set(HABITABILITY_BAR_X, HABITABILITY_BAR_Y - 16);
     this.habitabilityLabel.alpha = 0.7;
     this.hud.addChild(this.habitabilityLabel);
 
     this.habitabilityBarBg = new Graphics();
-    this.habitabilityBarBg.roundRect(barX, barY, barWidth, barHeight, 4);
+    this.habitabilityBarBg.roundRect(HABITABILITY_BAR_X, HABITABILITY_BAR_Y, HABITABILITY_BAR_WIDTH, HABITABILITY_BAR_HEIGHT, 4);
     this.habitabilityBarBg.fill({ color: 0xffffff, alpha: 0.1 });
-    this.habitabilityBarBg.roundRect(barX, barY, barWidth, barHeight, 4);
     this.habitabilityBarBg.stroke({ color: 0xffffff, alpha: 0.25, width: 1 });
     this.hud.addChild(this.habitabilityBarBg);
 
@@ -560,14 +555,10 @@ export class WordDefenseGame {
   }
 
   private drawHabitabilityBar() {
-    const barWidth = 200;
-    const barHeight = 14;
-    const barX = 20;
-    const barY = 48;
     const fraction = this.initialHabitablePixels > 0
       ? this.habitablePixels / this.initialHabitablePixels
       : 0;
-    const fillWidth = Math.max(0, barWidth * fraction);
+    const fillWidth = Math.max(0, HABITABILITY_BAR_WIDTH * fraction);
 
     let fillColor: number;
     if (fraction > 0.5) {
@@ -586,7 +577,7 @@ export class WordDefenseGame {
 
     this.habitabilityBarFill.clear();
     if (fillWidth > 0) {
-      this.habitabilityBarFill.roundRect(barX, barY, fillWidth, barHeight, 4);
+      this.habitabilityBarFill.roundRect(HABITABILITY_BAR_X, HABITABILITY_BAR_Y, fillWidth, HABITABILITY_BAR_HEIGHT, 4);
       this.habitabilityBarFill.fill(fillColor);
     }
 
