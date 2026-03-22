@@ -19,6 +19,7 @@ import {
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
   MISSILE_EXPLOSION_RADIUS, BULLET_CARVE_RADIUS,
+  AUTO_TYPE_ENABLED, AUTO_TYPE_INTERVAL,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
@@ -89,6 +90,7 @@ export class WordDefenseGame {
   private untypedStyle: TextStyle;
   private typedStyle: TextStyle;
   private keydownHandler: (e: KeyboardEvent) => void;
+  private autoTypeTimer = 0;
 
   constructor(app: Application) {
     this.app = app;
@@ -204,6 +206,33 @@ export class WordDefenseGame {
     }
   }
 
+  private updateAutoType(dt: number) {
+    if (!AUTO_TYPE_ENABLED || this.meteors.length === 0) return;
+
+    this.autoTypeTimer += dt;
+    if (this.autoTypeTimer < AUTO_TYPE_INTERVAL) return;
+    this.autoTypeTimer = 0;
+
+    let nearest: Meteor | null = null;
+    let nearestDist = Infinity;
+    for (const meteor of this.meteors) {
+      const dx = meteor.x - EARTH_CX;
+      const dy = meteor.y - EARTH_CY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < nearestDist) {
+        nearestDist = dist;
+        nearest = meteor;
+      }
+    }
+
+    if (!nearest) return;
+
+    const nextChar = nearest.word[nearest.typedCount];
+    if (nextChar) {
+      this.handleKey(nextChar);
+    }
+  }
+
   private startNextWave() {
     const next = this.waveConfig.waveNumber + 1;
     this.waveConfig = createWaveConfig(next);
@@ -261,6 +290,7 @@ export class WordDefenseGame {
     if (this.gameOver) return;
     const isActive = this.phase === "active";
 
+    this.updateAutoType(dt);
     this.updateSpawning(dt, isActive);
     this.checkWaveComplete(isActive);
     this.updateCamera(dt, isActive);
