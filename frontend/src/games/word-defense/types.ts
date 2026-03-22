@@ -12,10 +12,14 @@ export interface SceneObject {
   bitmap: HTMLCanvasElement;
 }
 
-export interface Meteor extends SceneObject {
+export interface Meteor {
+  x: number;
+  y: number;
   vx: number;
   vy: number;
   radius: number;
+  health: number;
+  maxHealth: number;
   word: string;
   typedCount: number;
 }
@@ -73,6 +77,7 @@ export interface MeteorObject {
   sprite: Sprite;
   untypedText: Text;
   typedText: Text;
+  healthBar: Graphics;
 }
 
 export interface TurretVisuals {
