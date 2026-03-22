@@ -5,7 +5,7 @@ import {
   CITY_EMBED_DEPTH,
 } from "./constants";
 import { valueNoise } from "./noise";
-import { CITY_INDEX } from "./palette";
+import { ACCENT_INDEX } from "./palette";
 import { rebuildImageData } from "./bitmap";
 
 function cityHeight(tangent: number, seed: number): number {
@@ -82,7 +82,7 @@ function createCityObject(
         Math.sqrt(Math.max(0, planetRadius * planetRadius - tangent * tangent)) - planetRadius;
 
       if (r >= surfaceR - CITY_EMBED_DEPTH && r < surfaceR + h) {
-        data[py * bboxSize + px] = CITY_INDEX;
+        data[py * bboxSize + px] = ACCENT_INDEX;
         pixelCount++;
       }
     }
@@ -120,7 +120,7 @@ export function createCityObjects(
 export function countCityPixels(city: SceneObject): number {
   let count = 0;
   for (let i = 0; i < city.data.length; i++) {
-    if (city.data[i] === CITY_INDEX) count++;
+    if (city.data[i] === ACCENT_INDEX) count++;
   }
   return count;
 }

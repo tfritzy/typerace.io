@@ -1,7 +1,7 @@
 import { Application, Container, Sprite, Graphics, Text, Texture, TextStyle } from "pixi.js";
 import { getRandomWord } from "../../utils/wordLists";
 import { getLanguageFromSlug } from "../../utils/modes";
-import type { Meteor, TurretSlot, Bullet, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
+import type { Meteor, TurretSlot, Bullet, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals, CityEntry } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
@@ -52,9 +52,7 @@ export class WordDefenseGame {
   private planetContainer!: Container;
   private planetObj!: SceneObject;
   private planetTexture!: Texture;
-  private cityObjects: SceneObject[] = [];
-  private cityTextures: Texture[] = [];
-  private citySprites: Sprite[] = [];
+  private cities: CityEntry[] = [];
   private meteorLayer!: Container;
   private bulletLayer!: Container;
   private highlightGfx!: Graphics;
@@ -129,11 +127,10 @@ export class WordDefenseGame {
     this.hud = new Container();
     this.app.stage.addChild(this.hud);
 
-    const { planet, cities } = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS, CITY_COUNT);
+    const { planet, cities: cityObjects } = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS, CITY_COUNT);
     this.planetObj = planet;
-    this.cityObjects = cities;
     this.initialCityPixels = 0;
-    for (const city of cities) {
+    for (const city of cityObjects) {
       this.initialCityPixels += countCityPixels(city);
     }
     this.planetContainer = new Container();
@@ -145,13 +142,12 @@ export class WordDefenseGame {
     planetSprite.anchor.set(0.5);
     this.planetContainer.addChild(planetSprite);
 
-    for (const city of this.cityObjects) {
-      const tex = Texture.from({ resource: city.bitmap, transparent: true });
-      this.cityTextures.push(tex);
-      const sprite = new Sprite(tex);
-      sprite.position.set(city.x - this.planetObj.x - this.planetObj.width / 2, city.y - this.planetObj.y - this.planetObj.height / 2);
+    for (const cityObj of cityObjects) {
+      const texture = Texture.from({ resource: cityObj.bitmap, transparent: true });
+      const sprite = new Sprite(texture);
+      sprite.position.set(cityObj.x - this.planetObj.x - this.planetObj.width / 2, cityObj.y - this.planetObj.y - this.planetObj.height / 2);
       this.planetContainer.addChild(sprite);
-      this.citySprites.push(sprite);
+      this.cities.push({ object: cityObj, texture, sprite });
     }
 
     this.slots = createTurretSlots();
@@ -527,12 +523,11 @@ export class WordDefenseGame {
         const localCy = relX * rsin + relY * rcos + EARTH_CY;
         destroyCircle(this.planetObj, localCx, localCy, destroyRadius);
 
-        for (let ci = 0; ci < this.cityObjects.length; ci++) {
-          const city = this.cityObjects[ci];
-          if (carveCircle(city, localCx, localCy, destroyRadius)) {
-            rebuildImageData(city.data, city.imageData, city.width, city.height);
-            updateBitmap(city);
-            this.cityTextures[ci].source.update();
+        for (const entry of this.cities) {
+          if (carveCircle(entry.object, localCx, localCy, destroyRadius)) {
+            rebuildImageData(entry.object.data, entry.object.imageData, entry.object.width, entry.object.height);
+            updateBitmap(entry.object);
+            entry.texture.source.update();
           }
         }
         this.updateLife();
@@ -575,8 +570,8 @@ export class WordDefenseGame {
 
   private updateLife() {
     let remaining = 0;
-    for (const city of this.cityObjects) {
-      remaining += countCityPixels(city);
+    for (const entry of this.cities) {
+      remaining += countCityPixels(entry.object);
     }
     this.life = this.initialCityPixels > 0
       ? Math.round((remaining / this.initialCityPixels) * 100)

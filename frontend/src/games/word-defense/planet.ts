@@ -1,7 +1,7 @@
 import type { SceneObject } from "./types";
 import { rebuildImageData } from "./bitmap";
 import { CITY_MARGIN } from "./constants";
-import { PLANET_INDEX } from "./palette";
+import { CARD_INDEX } from "./palette";
 import { createCityObjects } from "./city";
 
 export function createPlanet(
@@ -21,7 +21,7 @@ export function createPlanet(
       const dx = x - center;
       const dy = y - center;
       if (dx * dx + dy * dy <= r2) {
-        data[y * size + x] = PLANET_INDEX;
+        data[y * size + x] = CARD_INDEX;
       }
     }
   }

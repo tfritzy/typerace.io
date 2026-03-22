@@ -10,7 +10,7 @@ import {
 import { valueNoise } from "./noise";
 import { rebuildImageData, updateBitmap, carveCircle } from "./bitmap";
 import { getRandomWord } from "../../utils/wordLists";
-import { METEOR_INDEX } from "./palette";
+import { ACCENT_DARK_INDEX } from "./palette";
 
 function createMeteorBitmap(
   radius: number
@@ -28,12 +28,12 @@ function createMeteorBitmap(
       const dy = py - intRadius;
       const dist = Math.sqrt(dx * dx + dy * dy) / intRadius;
       if (dist <= METEOR_CORE_RADIUS) {
-        data[py * diameter + px] = METEOR_INDEX;
+        data[py * diameter + px] = ACCENT_DARK_INDEX;
         continue;
       }
       const n = valueNoise(px * noiseFreq + seedX, py * noiseFreq + seedY);
       if (dist <= METEOR_CORE_RADIUS + n * METEOR_LUMP_HEIGHT) {
-        data[py * diameter + px] = METEOR_INDEX;
+        data[py * diameter + px] = ACCENT_DARK_INDEX;
       }
     }
   }
@@ -200,7 +200,7 @@ function createMeteorFromComponent(
   for (const idx of pixelIndices) {
     const x = idx % original.width - minX;
     const y = Math.floor(idx / original.width) - minY;
-    newData[y * newWidth + x] = METEOR_INDEX;
+    newData[y * newWidth + x] = ACCENT_DARK_INDEX;
   }
 
   const imageData = new ImageData(newWidth, newHeight);
