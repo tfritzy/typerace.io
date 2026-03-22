@@ -74,7 +74,7 @@ function simulateMissilePosition(
   return { x, y };
 }
 
-export function fireMissile(turret: TurretSlot, target: Meteor): Missile {
+export function fireMissile(turret: TurretSlot, target: Meteor): Missile | null {
   const targetCx = target.x + target.width / 2;
   const targetCy = target.y + target.height / 2;
 
@@ -121,6 +121,10 @@ export function fireMissile(turret: TurretSlot, target: Meteor): Missile {
 
   const fuseTime = flightTime + MISSILE_FUSE_BUFFER;
   const initialSpeed = MISSILE_INITIAL_SPEED;
+
+  const outX = turret.x - EARTH_CX;
+  const outY = turret.y - EARTH_CY;
+  if (Math.cos(launchAngle) * outX + Math.sin(launchAngle) * outY <= 0) return null;
 
   return {
     x: turret.x,

@@ -44,7 +44,7 @@ function simulatePosition(
   return _result;
 }
 
-export function fireBullet(turret: TurretSlot, target: Meteor): Bullet {
+export function fireBullet(turret: TurretSlot, target: Meteor): Bullet | null {
   const targetCx = target.x + target.width / 2;
   const targetCy = target.y + target.height / 2;
 
@@ -84,11 +84,18 @@ export function fireBullet(turret: TurretSlot, target: Meteor): Bullet {
   const finalDy = aimY - turret.y;
   const finalDist = Math.sqrt(finalDx * finalDx + finalDy * finalDy);
 
+  const vx = (finalDx / finalDist) * BULLET_SPEED;
+  const vy = (finalDy / finalDist) * BULLET_SPEED;
+
+  const outX = turret.x - EARTH_CX;
+  const outY = turret.y - EARTH_CY;
+  if (vx * outX + vy * outY <= 0) return null;
+
   return {
     x: turret.x,
     y: turret.y,
-    vx: (finalDx / finalDist) * BULLET_SPEED,
-    vy: (finalDy / finalDist) * BULLET_SPEED,
+    vx,
+    vy,
     target,
   };
 }

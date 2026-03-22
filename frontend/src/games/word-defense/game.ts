@@ -193,9 +193,11 @@ export class WordDefenseGame {
           const availableTurrets = findAvailableTurrets(this.slots);
           for (const turret of availableTurrets) {
             if (turret.turretType === TurretType.Missile) {
-              this.addMissile(fireMissile(turret, meteor));
+              const missile = fireMissile(turret, meteor);
+              if (missile) this.addMissile(missile);
             } else {
-              this.addBullet(fireBullet(turret, meteor));
+              const bullet = fireBullet(turret, meteor);
+              if (bullet) this.addBullet(bullet);
             }
           }
           meteor.typedCount = 0;
