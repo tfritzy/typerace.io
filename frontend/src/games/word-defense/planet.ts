@@ -1,7 +1,7 @@
 import type { SceneObject } from "./types";
 import { rebuildImageData } from "./bitmap";
-import { LIFE_RING_DEPTH } from "./constants";
 import { CARD_INDEX, ACCENT_INDEX } from "./palette";
+import { valueNoise } from "./noise";
 
 export function createPlanet(
   cx: number,
@@ -13,8 +13,6 @@ export function createPlanet(
   const center = size / 2;
   const data = new Uint8Array(size * size);
   const r2 = radius * radius;
-  const innerR = radius - LIFE_RING_DEPTH;
-  const innerR2 = innerR * innerR;
   let habitablePixels = 0;
 
   for (let y = 0; y < size; y++) {
@@ -23,7 +21,12 @@ export function createPlanet(
       const dy = y - center;
       const dist2 = dx * dx + dy * dy;
       if (dist2 <= r2) {
-        if (dist2 > innerR2) {
+        const dist = Math.sqrt(dist2);
+        const angle = Math.atan2(dy, dx);
+        const n1 = valueNoise(angle * 3.0 + 100, 42.0);
+        const n2 = valueNoise(angle * 7.0 + 200, 73.0) * 0.5;
+        const depth = 1 + (n1 + n2) / 1.5 * 2;
+        if (dist > radius - depth) {
           data[y * size + x] = ACCENT_INDEX;
           habitablePixels++;
         } else {

@@ -1,4 +1,4 @@
-import { Application, Container, Sprite, Graphics, Text, Texture, TextStyle } from "pixi.js";
+import { Application, Container, Sprite, Graphics, Texture, TextStyle } from "pixi.js";
 import { getRandomWord } from "../../utils/wordLists";
 import { getLanguageFromSlug } from "../../utils/modes";
 import type { Meteor, TurretSlot, Bullet, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
@@ -16,7 +16,6 @@ import {
   WAVE_SPAWN_INTERVAL_REDUCTION,
   GRAVITY_STRENGTH, PLANET_ROTATION_SPEED,
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
-  HABITABILITY_BAR_X, HABITABILITY_BAR_Y, HABITABILITY_BAR_WIDTH, HABITABILITY_BAR_HEIGHT,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
@@ -25,6 +24,7 @@ import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBul
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
 import { createMeteorObject, createBulletGraphics } from "./meteorRendering";
 import { buildPalette, getBackgroundColor, ACCENT_INDEX } from "./palette";
+import { GameHud } from "./hud";
 
 function getLangCode(): string {
   const slug = localStorage.getItem("typerace_lang_slug");
@@ -47,21 +47,13 @@ function createWaveConfig(waveNumber: number): WaveConfig {
 export class WordDefenseGame {
   private app: Application;
   private world!: Container;
-  private hud!: Container;
   private planetContainer!: Container;
   private planetObj!: SceneObject;
   private planetTexture!: Texture;
   private meteorLayer!: Container;
   private bulletLayer!: Container;
   private highlightGfx!: Graphics;
-  private waveLabel!: Text;
-  private startButton!: Container;
-  private startButtonText!: Text;
-  private creditsLabel!: Text;
-  private habitabilityBarBg!: Graphics;
-  private habitabilityBarFill!: Graphics;
-  private habitabilityLabel!: Text;
-  private gameOverText!: Text;
+  private hud!: GameHud;
 
   private slots: TurretSlot[] = [];
   private turretVisuals!: TurretVisuals;
@@ -124,8 +116,8 @@ export class WordDefenseGame {
     this.world = new Container();
     this.app.stage.addChild(this.world);
 
-    this.hud = new Container();
-    this.app.stage.addChild(this.hud);
+    this.hud = new GameHud(() => this.startNextWave());
+    this.app.stage.addChild(this.hud.container);
 
     const { planet, habitablePixels } = createPlanet(EARTH_CX, EARTH_CY, EARTH_RADIUS);
     this.planetObj = planet;
@@ -166,74 +158,7 @@ export class WordDefenseGame {
     this.bulletLayer = new Container();
     this.world.addChild(this.bulletLayer);
 
-    this.waveLabel = new Text({
-      text: "Wave 1",
-      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 24, fill: 0xffffff },
-    });
-    this.waveLabel.position.set(20, 12);
-    this.waveLabel.alpha = 0.7;
-    this.hud.addChild(this.waveLabel);
-
-    this.creditsLabel = new Text({
-      text: "Credits: 0",
-      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 24, fill: 0xffffff },
-    });
-    this.creditsLabel.anchor.set(1, 0);
-    this.creditsLabel.position.set(CANVAS_WIDTH - 20, 12);
-    this.creditsLabel.alpha = 0.7;
-    this.hud.addChild(this.creditsLabel);
-
-    this.habitabilityLabel = new Text({
-      text: "Planet Habitability",
-      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 14, fill: 0xffffff },
-    });
-    this.habitabilityLabel.position.set(HABITABILITY_BAR_X, HABITABILITY_BAR_Y - 16);
-    this.habitabilityLabel.alpha = 0.7;
-    this.hud.addChild(this.habitabilityLabel);
-
-    this.habitabilityBarBg = new Graphics();
-    this.habitabilityBarBg.roundRect(HABITABILITY_BAR_X, HABITABILITY_BAR_Y, HABITABILITY_BAR_WIDTH, HABITABILITY_BAR_HEIGHT, 4);
-    this.habitabilityBarBg.fill({ color: 0xffffff, alpha: 0.1 });
-    this.habitabilityBarBg.stroke({ color: 0xffffff, alpha: 0.25, width: 1 });
-    this.hud.addChild(this.habitabilityBarBg);
-
-    this.habitabilityBarFill = new Graphics();
-    this.hud.addChild(this.habitabilityBarFill);
-    this.drawHabitabilityBar();
-
-    this.gameOverText = new Text({
-      text: "GAME OVER",
-      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 64, fill: 0xff4444 },
-    });
-    this.gameOverText.anchor.set(0.5);
-    this.gameOverText.position.set(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
-    this.gameOverText.visible = false;
-    this.hud.addChild(this.gameOverText);
-
-    this.buildStartButton();
-  }
-
-  private buildStartButton() {
-    this.startButton = new Container();
-    this.startButton.position.set(CANVAS_WIDTH / 2, CANVAS_HEIGHT - 60);
-    this.startButton.visible = false;
-    this.startButton.eventMode = "static";
-    this.startButton.cursor = "pointer";
-    this.startButton.on("pointertap", () => this.startNextWave());
-
-    const bg = new Graphics();
-    bg.roundRect(-90, -20, 180, 40, 8);
-    bg.fill(0x3b82f6);
-    this.startButton.addChild(bg);
-
-    this.startButtonText = new Text({
-      text: "Start Wave 2",
-      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 16, fill: 0xffffff },
-    });
-    this.startButtonText.anchor.set(0.5);
-    this.startButton.addChild(this.startButtonText);
-
-    this.hud.addChild(this.startButton);
+    this.hud.updateHabitability(1);
   }
 
   private setupInput() {
@@ -277,7 +202,7 @@ export class WordDefenseGame {
     this.meteorsSpawned = 0;
     this.selectedSlot = null;
     this.hoveredSlot = null;
-    this.startButton.visible = false;
+    this.hud.hideStartButton();
   }
 
   private addMeteor(meteor: Meteor) {
@@ -321,9 +246,12 @@ export class WordDefenseGame {
     this.updateMeteors(dt);
     this.syncMeteorDisplays();
 
-    this.waveLabel.text = `Wave ${this.waveConfig.waveNumber}`;
-    this.creditsLabel.text = `Credits: ${this.credits}`;
-    this.drawHabitabilityBar();
+    this.hud.updateWave(this.waveConfig.waveNumber);
+    this.hud.updateCredits(this.credits);
+    const fraction = this.initialHabitablePixels > 0
+      ? this.habitablePixels / this.initialHabitablePixels
+      : 0;
+    this.hud.updateHabitability(fraction);
   }
 
   private updateSpawning(dt: number, isActive: boolean) {
@@ -349,8 +277,7 @@ export class WordDefenseGame {
       this.bullets.length === 0
     ) {
       this.phase = "complete";
-      this.startButtonText.text = `Start Wave ${this.waveConfig.waveNumber + 1}`;
-      this.startButton.visible = true;
+      this.hud.showStartButton(this.waveConfig.waveNumber + 1);
     }
   }
 
@@ -515,7 +442,7 @@ export class WordDefenseGame {
 
         if (this.habitablePixels <= 0) {
           this.gameOver = true;
-          this.gameOverText.visible = true;
+          this.hud.showGameOver();
         }
 
         const dr2 = destroyRadius * destroyRadius;
@@ -552,37 +479,6 @@ export class WordDefenseGame {
         rebuildSlotVisual(si, this.slots, this.turretVisuals, this.planetContainer);
       }
     }
-  }
-
-  private drawHabitabilityBar() {
-    const fraction = this.initialHabitablePixels > 0
-      ? this.habitablePixels / this.initialHabitablePixels
-      : 0;
-    const fillWidth = Math.max(0, HABITABILITY_BAR_WIDTH * fraction);
-
-    let fillColor: number;
-    if (fraction > 0.5) {
-      const t = (fraction - 0.5) * 2;
-      const r = Math.round(255 * (1 - t) + 34 * t);
-      const g = Math.round(197 * (1 - t) + 197 * t);
-      const b = Math.round(94 * (1 - t) + 94 * t);
-      fillColor = (r << 16) | (g << 8) | b;
-    } else {
-      const t = fraction * 2;
-      const r = Math.round(239 * (1 - t) + 255 * t);
-      const g = Math.round(68 * (1 - t) + 197 * t);
-      const b = Math.round(68 * (1 - t) + 94 * t);
-      fillColor = (r << 16) | (g << 8) | b;
-    }
-
-    this.habitabilityBarFill.clear();
-    if (fillWidth > 0) {
-      this.habitabilityBarFill.roundRect(HABITABILITY_BAR_X, HABITABILITY_BAR_Y, fillWidth, HABITABILITY_BAR_HEIGHT, 4);
-      this.habitabilityBarFill.fill(fillColor);
-    }
-
-    const pct = Math.round(fraction * 100);
-    this.habitabilityLabel.text = `Planet Habitability ${pct}%`;
   }
 
   private syncMeteorDisplays() {
