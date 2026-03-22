@@ -229,9 +229,8 @@ export class WordDefenseGame {
 
     if (!nearest) return;
 
-    const nextChar = nearest.word[nearest.typedCount];
-    if (nextChar) {
-      this.handleKey(nextChar);
+    for (let i = nearest.typedCount; i < nearest.word.length; i++) {
+      this.handleKey(nearest.word[i]);
     }
   }
 
