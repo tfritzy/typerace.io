@@ -1,19 +1,63 @@
 import { Container, Sprite, Text, Texture, TextStyle, Graphics } from "pixi.js";
 import type { Meteor, MeteorObject } from "./types";
-import { WORD_FONT_SIZE, WORD_OFFSET_Y, WORD_UNTYPED_ALPHA, WORD_TYPED_ALPHA, BULLET_RENDER_RADIUS, MISSILE_RENDER_LENGTH, MISSILE_RENDER_WIDTH } from "./constants";
+import {
+  WORD_FONT_SIZE, WORD_OFFSET_Y, WORD_UNTYPED_ALPHA, WORD_TYPED_ALPHA,
+  BULLET_RENDER_RADIUS, MISSILE_RENDER_LENGTH, MISSILE_RENDER_WIDTH,
+  METEOR_NOISE_FREQ, METEOR_CORE_RADIUS, METEOR_LUMP_HEIGHT,
+} from "./constants";
+import { valueNoise } from "./noise";
+import { rebuildImageData } from "./bitmap";
+import { ACCENT_DARK_INDEX } from "./palette";
+
+function createMeteorBitmap(radius: number): HTMLCanvasElement {
+  const intRadius = Math.ceil(radius);
+  const diameter = intRadius * 2;
+  const data = new Uint8Array(diameter * diameter);
+  const seedX = Math.random() * 1000;
+  const seedY = Math.random() * 1000;
+  const noiseFreq = METEOR_NOISE_FREQ / intRadius;
+
+  for (let py = 0; py < diameter; py++) {
+    for (let px = 0; px < diameter; px++) {
+      const dx = px - intRadius;
+      const dy = py - intRadius;
+      const dist = Math.sqrt(dx * dx + dy * dy) / intRadius;
+      if (dist <= METEOR_CORE_RADIUS) {
+        data[py * diameter + px] = ACCENT_DARK_INDEX;
+        continue;
+      }
+      const n = valueNoise(px * noiseFreq + seedX, py * noiseFreq + seedY);
+      if (dist <= METEOR_CORE_RADIUS + n * METEOR_LUMP_HEIGHT) {
+        data[py * diameter + px] = ACCENT_DARK_INDEX;
+      }
+    }
+  }
+
+  const imageData = new ImageData(diameter, diameter);
+  rebuildImageData(data, imageData, diameter, diameter);
+  const bitmap = document.createElement("canvas");
+  bitmap.width = diameter;
+  bitmap.height = diameter;
+  bitmap.getContext("2d")!.putImageData(imageData, 0, 0);
+  return bitmap;
+}
 
 export function createMeteorObject(meteor: Meteor, untypedStyle: TextStyle, typedStyle: TextStyle): MeteorObject {
   const container = new Container();
-  container.position.set(meteor.x + meteor.width / 2, meteor.y + meteor.height / 2);
+  container.position.set(meteor.x, meteor.y);
 
-  const tex = Texture.from({ resource: meteor.bitmap, transparent: true });
+  const bitmap = createMeteorBitmap(meteor.radius);
+  const tex = Texture.from({ resource: bitmap, transparent: true });
   const sprite = new Sprite(tex);
   sprite.anchor.set(0.5);
   container.addChild(sprite);
 
+  const healthBar = new Graphics();
+  container.addChild(healthBar);
+
   const untypedText = new Text({ text: meteor.word, style: untypedStyle });
   untypedText.anchor.set(0.5, 0);
-  untypedText.position.set(0, meteor.height / 2 + WORD_OFFSET_Y + WORD_FONT_SIZE);
+  untypedText.position.set(0, meteor.radius + WORD_OFFSET_Y + WORD_FONT_SIZE);
   untypedText.alpha = WORD_UNTYPED_ALPHA;
   container.addChild(untypedText);
 
@@ -23,7 +67,7 @@ export function createMeteorObject(meteor: Meteor, untypedStyle: TextStyle, type
   typedText.visible = false;
   container.addChild(typedText);
 
-  return { data: meteor, container, sprite, untypedText, typedText };
+  return { data: meteor, container, sprite, untypedText, typedText, healthBar };
 }
 
 export function createBulletGraphics(): Graphics {
