@@ -1,4 +1,5 @@
 import { Container, Graphics, Circle } from "pixi.js";
+import { TurretType } from "./types";
 import type { TurretSlot, TurretVisuals } from "./types";
 import {
   EARTH_RADIUS,
@@ -14,7 +15,7 @@ export function createTurretContainer(slot: TurretSlot): Container {
     Math.sin(slot.baseAngle) * EARTH_RADIUS,
   );
 
-  if (slot.isMissileTurret) {
+  if (slot.turretType === TurretType.Missile) {
     const barrel = new Graphics();
     barrel.rect(0, -TURRET_BARREL_WIDTH / 2, MISSILE_RENDER_LENGTH + 4, TURRET_BARREL_WIDTH + 2);
     barrel.fill(0x8b4513);

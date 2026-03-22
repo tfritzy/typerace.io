@@ -1,6 +1,7 @@
 import { Application, Container, Sprite, Graphics, Texture, TextStyle } from "pixi.js";
 
 import { getLanguageFromSlug } from "../../utils/modes";
+import { TurretType } from "./types";
 import type { Meteor, TurretSlot, Bullet, Missile, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
@@ -189,7 +190,7 @@ export class WordDefenseGame {
         if (meteor.typedCount >= meteor.word.length) {
           const availableTurrets = findAvailableTurrets(this.slots);
           for (const turret of availableTurrets) {
-            if (turret.isMissileTurret) {
+            if (turret.turretType === TurretType.Missile) {
               this.addMissile(fireMissile(turret, meteor));
             } else {
               this.addBullet(fireBullet(turret, meteor));

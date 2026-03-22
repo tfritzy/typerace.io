@@ -1,3 +1,4 @@
+import { TurretType } from "./types";
 import type { Bullet, Meteor, SceneObject, TurretSlot } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
@@ -22,7 +23,7 @@ export function createTurretSlots(): TurretSlot[] {
       y,
       filled: false,
       destroyed: false,
-      isMissileTurret: false,
+      turretType: TurretType.Bullet,
     });
   }
 
@@ -33,7 +34,7 @@ export function createTurretSlots(): TurretSlot[] {
 
   const missileIdx = Math.floor(slots.length / 2);
   slots[missileIdx].filled = true;
-  slots[missileIdx].isMissileTurret = true;
+  slots[missileIdx].turretType = TurretType.Missile;
 
   return slots;
 }
