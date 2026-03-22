@@ -140,13 +140,13 @@ export class WordDefenseGame {
     this.planetContainer.position.set(EARTH_CX, EARTH_CY);
     this.world.addChild(this.planetContainer);
 
-    this.planetTexture = Texture.from({ resource: this.planetObj.bitmap, alphaMode: "premultiply-alpha-on-upload" });
+    this.planetTexture = Texture.from({ resource: this.planetObj.bitmap, transparent: true });
     const planetSprite = new Sprite(this.planetTexture);
     planetSprite.anchor.set(0.5);
     this.planetContainer.addChild(planetSprite);
 
     for (const city of this.cityObjects) {
-      const tex = Texture.from({ resource: city.bitmap, alphaMode: "premultiply-alpha-on-upload" });
+      const tex = Texture.from({ resource: city.bitmap, transparent: true });
       this.cityTextures.push(tex);
       const sprite = new Sprite(tex);
       sprite.position.set(city.x - this.planetObj.x - this.planetObj.width / 2, city.y - this.planetObj.y - this.planetObj.height / 2);

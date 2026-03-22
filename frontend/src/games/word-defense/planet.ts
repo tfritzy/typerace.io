@@ -1,6 +1,6 @@
 import type { SceneObject } from "./types";
 import { rebuildImageData } from "./bitmap";
-import { CITY_MARGIN, CITY_COUNT } from "./constants";
+import { CITY_MARGIN } from "./constants";
 import { PLANET_INDEX } from "./palette";
 import { createCityObjects } from "./city";
 

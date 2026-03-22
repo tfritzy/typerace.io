@@ -6,7 +6,7 @@ export function createMeteorObject(meteor: Meteor, untypedStyle: TextStyle, type
   const container = new Container();
   container.position.set(meteor.x + meteor.width / 2, meteor.y + meteor.height / 2);
 
-  const tex = Texture.from({ resource: meteor.bitmap, alphaMode: "premultiply-alpha-on-upload" });
+  const tex = Texture.from({ resource: meteor.bitmap, transparent: true });
   const sprite = new Sprite(tex);
   sprite.anchor.set(0.5);
   container.addChild(sprite);
