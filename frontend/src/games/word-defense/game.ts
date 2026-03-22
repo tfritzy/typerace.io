@@ -94,7 +94,7 @@ export class WordDefenseGame {
   private keydownHandler: (e: KeyboardEvent) => void;
   private mobileInput: HTMLInputElement | null = null;
   private mobileInputHandler: ((e: Event) => void) | null = null;
-  private canvasTapHandler: (() => void) | null = null;
+  private canvasTapHandler: ((e: Event) => void) | null = null;
 
   constructor(app: Application) {
     this.app = app;
@@ -249,19 +249,27 @@ export class WordDefenseGame {
 
     const input = document.createElement("input");
     input.type = "text";
+    input.inputMode = "text";
     input.autocapitalize = "none";
     input.autocomplete = "off";
     input.setAttribute("autocorrect", "off");
     input.setAttribute("spellcheck", "false");
+    input.setAttribute("enterkeyhint", "done");
     input.style.position = "absolute";
-    input.style.top = "0";
-    input.style.left = "0";
-    input.style.width = "100%";
-    input.style.height = "100%";
-    input.style.opacity = "0";
-    input.style.zIndex = "10";
-    input.style.pointerEvents = "none";
+    input.style.bottom = "0";
+    input.style.left = "50%";
+    input.style.transform = "translateX(-50%)";
+    input.style.width = "1px";
+    input.style.height = "1px";
+    input.style.opacity = "0.01";
+    input.style.zIndex = "20";
     input.style.fontSize = "16px";
+    input.style.caretColor = "transparent";
+    input.style.border = "none";
+    input.style.outline = "none";
+    input.style.background = "transparent";
+    input.style.color = "transparent";
+    input.style.padding = "0";
 
     const canvas = this.app.canvas;
     const parent = canvas.parentElement;
@@ -270,21 +278,21 @@ export class WordDefenseGame {
       parent.appendChild(input);
     }
 
-    this.mobileInputHandler = () => {
-      const val = input.value;
-      if (val.length > 0) {
-        const key = val[val.length - 1];
-        this.handleKey(key);
-        input.value = "";
+    this.mobileInputHandler = (e: Event) => {
+      const inputEvent = e as InputEvent;
+      const char = inputEvent.data;
+      if (char && char.length === 1) {
+        this.handleKey(char);
       }
+      input.value = "";
     };
     input.addEventListener("input", this.mobileInputHandler);
 
-    this.canvasTapHandler = () => {
-      input.style.pointerEvents = "auto";
-      input.focus();
-      input.style.pointerEvents = "none";
+    this.canvasTapHandler = (e: Event) => {
+      e.preventDefault();
+      input.focus({ preventScroll: true });
     };
+    canvas.addEventListener("touchstart", this.canvasTapHandler, { passive: false });
     canvas.addEventListener("pointerdown", this.canvasTapHandler);
 
     this.mobileInput = input;
@@ -656,6 +664,7 @@ export class WordDefenseGame {
   destroy() {
     document.removeEventListener("keydown", this.keydownHandler);
     if (this.canvasTapHandler) {
+      this.app.canvas.removeEventListener("touchstart", this.canvasTapHandler);
       this.app.canvas.removeEventListener("pointerdown", this.canvasTapHandler);
     }
     if (this.mobileInput) {
