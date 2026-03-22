@@ -48,8 +48,4 @@ export const SLOT_SURFACE_INWARD = 5;
 export const SLOT_SURFACE_CHECK_RADIUS = 6;
 export const SLOT_SURFACE_THRESHOLD = 5;
 
-export const CITY_COUNT = 6;
-export const CITY_MARGIN = 30;
-export const CITY_HALF_WIDTH = 35;
-export const CITY_MAX_HEIGHT = 25;
-export const CITY_EMBED_DEPTH = 1;
+export const LIFE_RING_DEPTH = 3;

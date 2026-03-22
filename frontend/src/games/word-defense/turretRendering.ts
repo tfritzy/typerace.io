@@ -81,17 +81,6 @@ export function buildTurretVisuals(slots: TurretSlot[], parent: Container): Turr
   const hitAreas: Graphics[] = [];
 
   for (const slot of slots) {
-    if (slot.isCity) {
-      containers.push(null);
-      emptySlotGfx.push(null);
-      const hitArea = createSlotHitArea(slot);
-      hitArea.visible = false;
-      hitArea.eventMode = "none";
-      parent.addChild(hitArea);
-      hitAreas.push(hitArea);
-      continue;
-    }
-
     if (slot.filled) {
       const tc = createTurretContainer(slot);
       parent.addChild(tc);
@@ -120,7 +109,7 @@ export function rebuildSlotVisual(
 ) {
   const slot = slots[index];
 
-  if (slot.destroyed || slot.isCity) {
+  if (slot.destroyed) {
     if (visuals.containers[index]) {
       visuals.containers[index]!.destroy({ children: true });
       visuals.containers[index] = null;

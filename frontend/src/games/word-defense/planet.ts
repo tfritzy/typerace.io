@@ -1,27 +1,34 @@
 import type { SceneObject } from "./types";
 import { rebuildImageData } from "./bitmap";
-import { CITY_MARGIN } from "./constants";
-import { CARD_INDEX } from "./palette";
-import { createCityObjects } from "./city";
+import { LIFE_RING_DEPTH } from "./constants";
+import { CARD_INDEX, ACCENT_INDEX } from "./palette";
 
 export function createPlanet(
   cx: number,
   cy: number,
   radius: number,
-  cityCount: number,
-): { planet: SceneObject; cities: SceneObject[] } {
-  const margin = CITY_MARGIN;
+): { planet: SceneObject; habitablePixels: number } {
+  const margin = 4;
   const size = (radius + margin) * 2;
   const center = size / 2;
   const data = new Uint8Array(size * size);
   const r2 = radius * radius;
+  const innerR = radius - LIFE_RING_DEPTH;
+  const innerR2 = innerR * innerR;
+  let habitablePixels = 0;
 
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const dx = x - center;
       const dy = y - center;
-      if (dx * dx + dy * dy <= r2) {
-        data[y * size + x] = CARD_INDEX;
+      const dist2 = dx * dx + dy * dy;
+      if (dist2 <= r2) {
+        if (dist2 > innerR2) {
+          data[y * size + x] = ACCENT_INDEX;
+          habitablePixels++;
+        } else {
+          data[y * size + x] = CARD_INDEX;
+        }
       }
     }
   }
@@ -43,11 +50,5 @@ export function createPlanet(
     bitmap,
   };
 
-  const cityAngles = Array.from({ length: cityCount }, (_, i) =>
-    (i / cityCount) * Math.PI * 2 - Math.PI / 2,
-  );
-
-  const cities = createCityObjects(cx, cy, radius, cityAngles);
-
-  return { planet, cities };
+  return { planet, habitablePixels };
 }
