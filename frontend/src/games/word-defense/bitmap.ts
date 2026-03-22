@@ -73,10 +73,11 @@ export function destroyCircle(
   hitX: number,
   hitY: number,
   radius: number,
-): boolean {
+  habitableIndex: number,
+): number {
   const localX = hitX - obj.x;
   const localY = hitY - obj.y;
-  let changed = false;
+  let habitableDestroyed = 0;
 
   const planetCx = obj.width / 2;
   const planetCy = obj.height / 2;
@@ -98,10 +99,12 @@ export function destroyCircle(
   const maxY = Math.min(obj.height - 1, Math.ceil(domeCy + scanMargin));
 
   if (minX >= obj.width || maxX < 0 || minY >= obj.height || maxY < 0) {
-    return false;
+    return 0;
   }
 
   const noiseSeed = localX * 7.3 + localY * 13.7;
+
+  let changed = false;
 
   for (let y = minY; y <= maxY; y++) {
     for (let x = minX; x <= maxX; x++) {
@@ -116,6 +119,9 @@ export function destroyCircle(
       const effectiveRadius = domeRadius * (1 + edgeNoise);
 
       if (dist <= effectiveRadius) {
+        if (obj.data[i] === habitableIndex) {
+          habitableDestroyed++;
+        }
         obj.data[i] = 0;
         changed = true;
       }
@@ -126,5 +132,5 @@ export function destroyCircle(
     rebuildImageData(obj.data, obj.imageData, obj.width, obj.height);
     updateBitmap(obj);
   }
-  return changed;
+  return habitableDestroyed;
 }
