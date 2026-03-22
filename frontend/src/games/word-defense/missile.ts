@@ -84,13 +84,11 @@ export function fireMissile(turret: TurretSlot, target: Meteor): Missile {
     const pred = simulateMeteorPosition(targetCx, targetCy, target.vx, target.vy, flightTime);
 
     let bestAngle = Math.atan2(pred.y - turret.y, pred.x - turret.x);
-    let bestDist = Infinity;
 
     for (let a = 0; a < 3; a++) {
       const missileEnd = simulateMissilePosition(turret.x, turret.y, bestAngle, flightTime);
       const errX = pred.x - missileEnd.x;
       const errY = pred.y - missileEnd.y;
-      bestDist = Math.sqrt(errX * errX + errY * errY);
       bestAngle = Math.atan2(pred.y - turret.y + errY, pred.x - turret.x + errX);
     }
 
