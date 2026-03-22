@@ -52,7 +52,6 @@ export class GameHud {
     this.habitabilityBarBg = new Graphics();
     this.habitabilityBarBg.roundRect(20, 60, 200, 10, 3);
     this.habitabilityBarBg.fill({ color: 0xffffff, alpha: 0.06 });
-    this.habitabilityBarBg.roundRect(20, 60, 200, 10, 3);
     this.habitabilityBarBg.stroke({ color: accentColor, alpha: 0.3, width: 1 });
     this.container.addChild(this.habitabilityBarBg);
 
