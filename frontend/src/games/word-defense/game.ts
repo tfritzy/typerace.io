@@ -584,10 +584,9 @@ export class WordDefenseGame {
 
       mo.untypedText.text = meteor.word;
 
-      const naturalLocalX = 0;
       const naturalLocalY = meteor.height / 2 + WORD_OFFSET_Y + WORD_FONT_SIZE;
 
-      const labelWorldX = containerX + naturalLocalX;
+      const labelWorldX = containerX;
       const labelWorldY = containerY + naturalLocalY;
       let labelScreenX = (labelWorldX - EARTH_CX) * this.cameraZoom + EARTH_CX;
       let labelScreenY = (labelWorldY - EARTH_CY) * this.cameraZoom + this.cameraY;
