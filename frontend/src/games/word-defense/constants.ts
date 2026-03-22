@@ -58,7 +58,6 @@ export const MISSILE_RENDER_LENGTH = 12;
 export const MISSILE_RENDER_WIDTH = 4;
 export const MISSILE_FUSE_BUFFER = 0.4;
 
-export const MAX_FIRING_HALF_ANGLE = Math.PI / 4;
 export const BULLET_MIN_SPEED = BULLET_SPEED * 0.5;
 
 export const AUTO_TYPE_ENABLED = true;

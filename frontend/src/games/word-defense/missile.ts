@@ -6,7 +6,6 @@ import {
   MISSILE_ACCEL_DURATION,
   MISSILE_FUSE_BUFFER,
   CANVAS_WIDTH, CANVAS_HEIGHT, METEOR_CLEANUP_MARGIN,
-  MAX_FIRING_HALF_ANGLE,
 } from "./constants";
 
 interface SimState {
@@ -16,7 +15,6 @@ interface SimState {
   vy: number;
 }
 
-const MIN_FIRING_COS = Math.cos(MAX_FIRING_HALF_ANGLE);
 const MISSILE_SPEED_STEPS = 6;
 
 function applyGravityStep(s: SimState, stepDt: number): void {
@@ -79,15 +77,6 @@ function simulateMissilePosition(
   return { x, y };
 }
 
-function isWithinFiringCone(launchAngle: number, turretX: number, turretY: number): boolean {
-  const outX = turretX - EARTH_CX;
-  const outY = turretY - EARTH_CY;
-  const dot = Math.cos(launchAngle) * outX + Math.sin(launchAngle) * outY;
-  const outMag = Math.sqrt(outX * outX + outY * outY);
-  if (outMag < 1e-6) return false;
-  return dot / outMag >= MIN_FIRING_COS;
-}
-
 function tryFireMissileWithMaxSpeed(turret: TurretSlot, target: Meteor, maxSpeed: number): Missile | null {
   const targetCx = target.x + target.width / 2;
   const targetCy = target.y + target.height / 2;
@@ -136,7 +125,10 @@ function tryFireMissileWithMaxSpeed(turret: TurretSlot, target: Meteor, maxSpeed
   const fuseTime = flightTime + MISSILE_FUSE_BUFFER;
   const initialSpeed = MISSILE_INITIAL_SPEED;
 
-  if (!isWithinFiringCone(launchAngle, turret.x, turret.y)) return null;
+  const outX = turret.x - EARTH_CX;
+  const outY = turret.y - EARTH_CY;
+  const dot = Math.cos(launchAngle) * outX + Math.sin(launchAngle) * outY;
+  if (dot <= 0) return null;
 
   return {
     x: turret.x,

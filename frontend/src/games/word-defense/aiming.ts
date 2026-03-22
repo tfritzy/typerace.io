@@ -2,7 +2,6 @@ import type { Bullet, Meteor, TurretSlot } from "./types";
 import {
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
   BULLET_SPEED, BULLET_MIN_SPEED, GRAVITY_STRENGTH,
-  MAX_FIRING_HALF_ANGLE,
 } from "./constants";
 
 interface SimState {
@@ -15,7 +14,6 @@ interface SimState {
 const _sim: SimState = { x: 0, y: 0, vx: 0, vy: 0 };
 const _result: { x: number; y: number } = { x: 0, y: 0 };
 
-const MIN_FIRING_COS = Math.cos(MAX_FIRING_HALF_ANGLE);
 const BULLET_SPEED_STEPS = 6;
 
 function applyGravityStep(s: SimState, stepDt: number): void {
@@ -46,16 +44,6 @@ function simulatePosition(
   _result.x = _sim.x;
   _result.y = _sim.y;
   return _result;
-}
-
-function isWithinFiringCone(vx: number, vy: number, turretX: number, turretY: number): boolean {
-  const outX = turretX - EARTH_CX;
-  const outY = turretY - EARTH_CY;
-  const dot = vx * outX + vy * outY;
-  const vMag = Math.sqrt(vx * vx + vy * vy);
-  const outMag = Math.sqrt(outX * outX + outY * outY);
-  if (vMag < 1e-6 || outMag < 1e-6) return false;
-  return dot / (vMag * outMag) >= MIN_FIRING_COS;
 }
 
 function tryFireBulletAtSpeed(turret: TurretSlot, target: Meteor, speed: number): Bullet | null {
@@ -101,7 +89,10 @@ function tryFireBulletAtSpeed(turret: TurretSlot, target: Meteor, speed: number)
   const vx = (finalDx / finalDist) * speed;
   const vy = (finalDy / finalDist) * speed;
 
-  if (!isWithinFiringCone(vx, vy, turret.x, turret.y)) return null;
+  const outX = turret.x - EARTH_CX;
+  const outY = turret.y - EARTH_CY;
+  const dot = vx * outX + vy * outY;
+  if (dot <= 0) return null;
 
   return {
     x: turret.x,
