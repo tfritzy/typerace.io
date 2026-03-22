@@ -218,7 +218,7 @@ export class WordDefenseGame {
     for (const meteor of this.meteors) {
       const dx = meteor.x - EARTH_CX;
       const dy = meteor.y - EARTH_CY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const dist = dx * dx + dy * dy;
       if (dist < nearestDist) {
         nearestDist = dist;
         nearest = meteor;
