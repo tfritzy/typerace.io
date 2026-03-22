@@ -15,6 +15,7 @@ export const WORD_FONT = `bold ${WORD_FONT_SIZE}px monospace`;
 export const WORD_TYPED_ALPHA = 1.0;
 export const WORD_UNTYPED_ALPHA = 0.35;
 export const WORD_OFFSET_Y = 10;
+export const LABEL_SCREEN_PADDING = 10;
 
 export const TOTAL_TURRET_SLOTS = 36;
 export const INITIAL_TURRET_COUNT = 1;

@@ -10,6 +10,7 @@ import {
   METEOR_CLEANUP_MARGIN, IMPACT_RADIUS_SCALE,
   WORD_FONT_SIZE,
   WORD_OFFSET_Y,
+  LABEL_SCREEN_PADDING,
   BASE_METEOR_SPEED, METEOR_SPEED_WAVE_INCREMENT,
   BASE_METEORS_PER_WAVE, METEORS_PER_WAVE_INCREMENT,
   BASE_METEOR_RADIUS_MIN, BASE_METEOR_RADIUS_MAX,
@@ -26,6 +27,7 @@ import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBul
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
 import { createMeteorObject, createBulletGraphics } from "./meteorRendering";
 import { buildPalette, getBackgroundColor } from "./palette";
+import { clampToRange } from "../../utils/math";
 
 function getLangCode(): string {
   const slug = localStorage.getItem("typerace_lang_slug");
@@ -577,16 +579,33 @@ export class WordDefenseGame {
     for (let i = 0; i < this.meteors.length; i++) {
       const meteor = this.meteors[i];
       const mo = this.meteorObjects[i];
-      mo.container.position.set(meteor.x + meteor.width / 2, meteor.y + meteor.height / 2);
+      const containerX = meteor.x + meteor.width / 2;
+      const containerY = meteor.y + meteor.height / 2;
+      mo.container.position.set(containerX, containerY);
 
       mo.untypedText.text = meteor.word;
+
+      const naturalLocalY = meteor.height / 2 + WORD_OFFSET_Y + WORD_FONT_SIZE;
+      const scaledW = mo.untypedText.width * this.cameraZoom;
+      const scaledH = mo.untypedText.height * this.cameraZoom;
+
+      const screenX = (containerX - EARTH_CX) * this.cameraZoom + EARTH_CX;
+      const screenY = (containerY + naturalLocalY - EARTH_CY) * this.cameraZoom + this.cameraY;
+
+      const clampedScreenX = clampToRange(screenX, LABEL_SCREEN_PADDING + scaledW / 2, CANVAS_WIDTH - LABEL_SCREEN_PADDING - scaledW / 2);
+      const clampedScreenY = clampToRange(screenY, LABEL_SCREEN_PADDING, CANVAS_HEIGHT - LABEL_SCREEN_PADDING - scaledH);
+
+      const clampedLocalX = (clampedScreenX - EARTH_CX) / this.cameraZoom + EARTH_CX - containerX;
+      const clampedLocalY = (clampedScreenY - this.cameraY) / this.cameraZoom + EARTH_CY - containerY;
+
+      mo.untypedText.position.set(clampedLocalX, clampedLocalY);
 
       if (meteor.typedCount > 0) {
         const typed = meteor.word.slice(0, meteor.typedCount);
         mo.typedText.text = typed;
         mo.typedText.visible = true;
         const fullWidth = mo.untypedText.width;
-        mo.typedText.position.set(-fullWidth / 2, meteor.height / 2 + WORD_OFFSET_Y + WORD_FONT_SIZE);
+        mo.typedText.position.set(clampedLocalX - fullWidth / 2, clampedLocalY);
       } else {
         mo.typedText.visible = false;
       }
