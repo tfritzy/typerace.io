@@ -1,10 +1,8 @@
 import { TurretType } from "./types";
-import type { Bullet, Meteor, SceneObject, TurretSlot } from "./types";
+import type { Meteor, SceneObject, TurretSlot } from "./types";
 import {
-  CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
   TOTAL_TURRET_SLOTS, INITIAL_TURRET_COUNT,
-  GRAVITY_STRENGTH,
   SLOT_SURFACE_INWARD, SLOT_SURFACE_CHECK_RADIUS, SLOT_SURFACE_THRESHOLD,
 } from "./constants";
 export { fireBullet } from "./aiming";
@@ -40,6 +38,10 @@ export function createTurretSlots(): TurretSlot[] {
   slots[laserIdx].filled = true;
   slots[laserIdx].turretType = TurretType.Laser;
 
+  const railgunIdx = Math.floor(slots.length / 4 + slots.length / (2 * INITIAL_TURRET_COUNT));
+  slots[railgunIdx].filled = true;
+  slots[railgunIdx].turretType = TurretType.Railgun;
+
   return slots;
 }
 
@@ -68,50 +70,6 @@ export function checkProjectileHitsMeteor(projectile: { x: number; y: number }, 
   const dx = projectile.x - meteor.x;
   const dy = projectile.y - meteor.y;
   return dx * dx + dy * dy <= meteor.radius * meteor.radius;
-}
-
-export function updateBullets(
-  bullets: Bullet[],
-  meteors: Meteor[],
-  dt: number
-): { x: number; y: number; target: Meteor }[] {
-  const hits: { x: number; y: number; target: Meteor }[] = [];
-
-  for (let i = bullets.length - 1; i >= 0; i--) {
-    const bullet = bullets[i];
-
-    bullet.x += bullet.vx * dt;
-    bullet.y += bullet.vy * dt;
-
-    const bgdx = EARTH_CX - bullet.x;
-    const bgdy = EARTH_CY - bullet.y;
-    const bgDist = Math.sqrt(bgdx * bgdx + bgdy * bgdy);
-    if (bgDist > 1) {
-      const bAccel = GRAVITY_STRENGTH / Math.max(bgDist, EARTH_RADIUS);
-      bullet.vx += (bgdx / bgDist) * bAccel * dt;
-      bullet.vy += (bgdy / bgDist) * bAccel * dt;
-    }
-
-    if (
-      bullet.x < -50 || bullet.x > CANVAS_WIDTH + 50 ||
-      bullet.y < -50 || bullet.y > CANVAS_HEIGHT + 50
-    ) {
-      bullets.splice(i, 1);
-      continue;
-    }
-
-    if (!meteors.includes(bullet.target)) {
-      bullets.splice(i, 1);
-      continue;
-    }
-
-    if (checkProjectileHitsMeteor(bullet, bullet.target)) {
-      hits.push({ x: bullet.x, y: bullet.y, target: bullet.target });
-      bullets.splice(i, 1);
-    }
-  }
-
-  return hits;
 }
 
 export function isSlotGroundIntact(planet: SceneObject, slot: TurretSlot): boolean {

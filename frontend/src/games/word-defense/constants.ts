@@ -57,9 +57,10 @@ export const MISSILE_INITIAL_SPEED = 40;
 export const MISSILE_ACCEL_DURATION = 10.0;
 export const MISSILE_ACCELERATION = 76;
 export const MISSILE_EXPLOSION_RADIUS = 35;
-export const MISSILE_RENDER_LENGTH = 3;
-export const MISSILE_RENDER_WIDTH = 3;
 export const MISSILE_FUSE_BUFFER = 0.4;
+
+export const RAILGUN_DAMAGE = 50;
+export const RAILGUN_SPEED = 800;
 
 export const AUTO_TYPE_ENABLED = false;
 export const AUTO_TYPE_INTERVAL = .2;

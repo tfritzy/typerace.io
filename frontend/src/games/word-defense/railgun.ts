@@ -1,24 +1,24 @@
 import type { Projectile, Meteor, TurretSlot } from "./types";
 import {
   EARTH_CX, EARTH_CY,
-  BULLET_SPEED, BULLET_DAMAGE,
+  RAILGUN_SPEED, RAILGUN_DAMAGE,
 } from "./constants";
 
-export function fireBullet(turret: TurretSlot, target: Meteor): Projectile | null {
+export function fireRailgun(turret: TurretSlot, target: Meteor): Projectile | null {
   const targetCx = target.x;
   const targetCy = target.y;
 
   const dx = targetCx - turret.x;
   const dy = targetCy - turret.y;
   const dist = Math.sqrt(dx * dx + dy * dy);
-  let t = dist / BULLET_SPEED;
+  let t = dist / RAILGUN_SPEED;
 
   for (let iter = 0; iter < 4; iter++) {
     const predX = targetCx + target.vx * t;
     const predY = targetCy + target.vy * t;
     const pdx = predX - turret.x;
     const pdy = predY - turret.y;
-    t = Math.sqrt(pdx * pdx + pdy * pdy) / BULLET_SPEED;
+    t = Math.sqrt(pdx * pdx + pdy * pdy) / RAILGUN_SPEED;
   }
 
   const meteorPredX = targetCx + target.vx * t;
@@ -28,8 +28,8 @@ export function fireBullet(turret: TurretSlot, target: Meteor): Projectile | nul
   const finalDy = meteorPredY - turret.y;
   const finalDist = Math.sqrt(finalDx * finalDx + finalDy * finalDy);
 
-  const vx = (finalDx / finalDist) * BULLET_SPEED;
-  const vy = (finalDy / finalDist) * BULLET_SPEED;
+  const vx = (finalDx / finalDist) * RAILGUN_SPEED;
+  const vy = (finalDy / finalDist) * RAILGUN_SPEED;
 
   const outX = turret.x - EARTH_CX;
   const outY = turret.y - EARTH_CY;
@@ -40,7 +40,7 @@ export function fireBullet(turret: TurretSlot, target: Meteor): Projectile | nul
     y: turret.y,
     vx,
     vy,
-    damage: BULLET_DAMAGE,
+    damage: RAILGUN_DAMAGE,
     target,
     explosionRadius: 0,
     age: 0,

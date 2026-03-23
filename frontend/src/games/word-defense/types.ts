@@ -28,6 +28,7 @@ export enum TurretType {
   Bullet,
   Missile,
   Laser,
+  Railgun,
 }
 
 export interface TurretSlot {
@@ -40,20 +41,14 @@ export interface TurretSlot {
   turretType: TurretType;
 }
 
-export interface Bullet {
+export interface Projectile {
   x: number;
   y: number;
   vx: number;
   vy: number;
+  damage: number;
   target: Meteor;
-}
-
-export interface Missile {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  target: Meteor;
+  explosionRadius: number;
   age: number;
   fuseTime: number;
   launchAngle: number;
