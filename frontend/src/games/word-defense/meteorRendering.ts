@@ -2,9 +2,8 @@ import { Container, Sprite, Text, Texture, TextStyle, Graphics } from "pixi.js";
 import type { Meteor, MeteorObject } from "./types";
 import {
   TARGET_WORD_FONT_SIZE, TARGET_WORD_OFFSET_Y, TARGET_WORD_UNTYPED_ALPHA, TARGET_WORD_TYPED_ALPHA,
-  BULLET_RENDER_RADIUS, MISSILE_RENDER_LENGTH, MISSILE_RENDER_WIDTH,
+  BULLET_RENDER_RADIUS,
   METEOR_NOISE_FREQ, METEOR_CORE_RADIUS, METEOR_LUMP_HEIGHT,
-  RAILGUN_RENDER_LENGTH, RAILGUN_RENDER_WIDTH,
 } from "./constants";
 import { valueNoise } from "./noise";
 import { rebuildImageData } from "./bitmap";
@@ -71,34 +70,9 @@ export function createMeteorObject(meteor: Meteor, untypedStyle: TextStyle, type
   return { data: meteor, container, sprite, untypedText, typedText, healthBar };
 }
 
-export function createBulletGraphics(): Graphics {
+export function createProjectileGraphics(): Graphics {
   const g = new Graphics();
   g.circle(0, 0, BULLET_RENDER_RADIUS);
   g.fill(0xffffff);
-  return g;
-}
-
-export function createMissileGraphics(): Graphics {
-  const g = new Graphics();
-  const halfLen = MISSILE_RENDER_LENGTH / 2;
-  const halfW = MISSILE_RENDER_WIDTH / 2;
-  g.moveTo(halfLen, 0);
-  g.lineTo(-halfLen, -halfW);
-  g.lineTo(-halfLen, halfW);
-  g.closePath();
-  g.fill(0xff6633);
-  g.circle(-halfLen, 0, halfW * 0.8);
-  g.fill(0xffaa00);
-  return g;
-}
-
-export function createRailgunProjectileGraphics(): Graphics {
-  const g = new Graphics();
-  const halfLen = RAILGUN_RENDER_LENGTH / 2;
-  const halfW = RAILGUN_RENDER_WIDTH / 2;
-  g.rect(-halfLen, -halfW, RAILGUN_RENDER_LENGTH, RAILGUN_RENDER_WIDTH);
-  g.fill(0xc084fc);
-  g.rect(-halfLen - 2, -halfW + 1, RAILGUN_RENDER_LENGTH + 4, RAILGUN_RENDER_WIDTH - 2);
-  g.fill({ color: 0xffffff, alpha: 0.6 });
   return g;
 }

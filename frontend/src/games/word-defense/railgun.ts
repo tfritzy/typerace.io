@@ -1,10 +1,10 @@
-import type { RailgunProjectile, Meteor, TurretSlot } from "./types";
+import type { Projectile, Meteor, TurretSlot } from "./types";
 import {
   EARTH_CX, EARTH_CY,
-  RAILGUN_SPEED,
+  RAILGUN_SPEED, RAILGUN_DAMAGE,
 } from "./constants";
 
-export function fireRailgun(turret: TurretSlot, target: Meteor): RailgunProjectile | null {
+export function fireRailgun(turret: TurretSlot, target: Meteor): Projectile | null {
   const targetCx = target.x;
   const targetCy = target.y;
 
@@ -40,6 +40,12 @@ export function fireRailgun(turret: TurretSlot, target: Meteor): RailgunProjecti
     y: turret.y,
     vx,
     vy,
+    damage: RAILGUN_DAMAGE,
     target,
+    explosionRadius: 0,
+    age: 0,
+    fuseTime: Infinity,
+    launchAngle: 0,
+    speed: 0,
   };
 }

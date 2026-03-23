@@ -2,7 +2,7 @@ import { Application, Container, Sprite, Graphics, Texture, TextStyle } from "pi
 
 import { getLanguageFromSlug } from "../../utils/modes";
 import { TurretType } from "./types";
-import type { Meteor, TurretSlot, Bullet, Missile, LaserBeam, RailgunProjectile, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
+import type { Meteor, TurretSlot, Projectile, LaserBeam, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
@@ -18,8 +18,7 @@ import {
   WAVE_SPAWN_INTERVAL_REDUCTION,
   PLANET_ROTATION_SPEED,
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
-  MISSILE_EXPLOSION_RADIUS, BULLET_DAMAGE, MISSILE_DAMAGE, LASER_DAMAGE, LASER_BEAM_WIDTH,
-  RAILGUN_DAMAGE,
+  LASER_DAMAGE, LASER_BEAM_WIDTH,
   AUTO_TYPE_ENABLED, AUTO_TYPE_INTERVAL,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
@@ -27,7 +26,7 @@ import { createPlanet } from "./planet";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords } from "./meteor";
 import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBullet, isSlotGroundIntact, checkProjectileHitsMeteor } from "./turret";
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
-import { createMeteorObject, createBulletGraphics, createMissileGraphics, createRailgunProjectileGraphics } from "./meteorRendering";
+import { createMeteorObject, createProjectileGraphics } from "./meteorRendering";
 import { fireMissile, updateMissile } from "./missile";
 import { fireLaser } from "./laser";
 import { fireRailgun } from "./railgun";
@@ -69,14 +68,10 @@ export class WordDefenseGame {
 
   private meteors: Meteor[] = [];
   private meteorObjects: MeteorObject[] = [];
-  private bullets: Bullet[] = [];
-  private bulletGfxList: Graphics[] = [];
-  private missiles: Missile[] = [];
-  private missileGfxList: Graphics[] = [];
+  private projectiles: Projectile[] = [];
+  private projectileGfxList: Graphics[] = [];
   private laserBeams: LaserBeam[] = [];
   private laserGfxList: Graphics[] = [];
-  private railgunProjectiles: RailgunProjectile[] = [];
-  private railgunGfxList: Graphics[] = [];
 
   private langCode: string;
   private waveConfig: WaveConfig;
@@ -199,22 +194,22 @@ export class WordDefenseGame {
         if (meteor.typedCount >= meteor.word.length) {
           const availableTurrets = findAvailableTurrets(this.slots);
           for (const turret of availableTurrets) {
-            if (turret.turretType === TurretType.Missile) {
-              const missile = fireMissile(turret, meteor);
-              if (missile) this.addMissile(missile);
-            } else if (turret.turretType === TurretType.Laser) {
+            if (turret.turretType === TurretType.Laser) {
               const beam = fireLaser(turret, meteor);
               if (beam) {
                 this.addLaserBeam(beam);
                 const mi = this.meteors.indexOf(meteor);
                 if (mi >= 0) this.damageMeteor(mi, LASER_DAMAGE);
               }
+            } else if (turret.turretType === TurretType.Missile) {
+              const proj = fireMissile(turret, meteor);
+              if (proj) this.addProjectile(proj);
             } else if (turret.turretType === TurretType.Railgun) {
               const proj = fireRailgun(turret, meteor);
-              if (proj) this.addRailgunProjectile(proj);
+              if (proj) this.addProjectile(proj);
             } else {
-              const bullet = fireBullet(turret, meteor);
-              if (bullet) this.addBullet(bullet);
+              const proj = fireBullet(turret, meteor);
+              if (proj) this.addProjectile(proj);
             }
           }
           meteor.typedCount = 0;
@@ -276,33 +271,18 @@ export class WordDefenseGame {
     this.meteorObjects.splice(index, 1);
   }
 
-  private addBullet(bullet: Bullet) {
-    this.bullets.push(bullet);
-    const g = createBulletGraphics();
-    g.position.set(bullet.x, bullet.y);
+  private addProjectile(proj: Projectile) {
+    this.projectiles.push(proj);
+    const g = createProjectileGraphics();
+    g.position.set(proj.x, proj.y);
     this.bulletLayer.addChild(g);
-    this.bulletGfxList.push(g);
+    this.projectileGfxList.push(g);
   }
 
-  private removeBulletAt(index: number) {
-    this.bulletGfxList[index].destroy();
-    this.bullets.splice(index, 1);
-    this.bulletGfxList.splice(index, 1);
-  }
-
-  private addMissile(missile: Missile) {
-    this.missiles.push(missile);
-    const g = createMissileGraphics();
-    g.position.set(missile.x, missile.y);
-    g.rotation = missile.launchAngle;
-    this.bulletLayer.addChild(g);
-    this.missileGfxList.push(g);
-  }
-
-  private removeMissileAt(index: number) {
-    this.missileGfxList[index].destroy();
-    this.missiles.splice(index, 1);
-    this.missileGfxList.splice(index, 1);
+  private removeProjectileAt(index: number) {
+    this.projectileGfxList[index].destroy();
+    this.projectiles.splice(index, 1);
+    this.projectileGfxList.splice(index, 1);
   }
 
   private addLaserBeam(beam: LaserBeam) {
@@ -318,21 +298,6 @@ export class WordDefenseGame {
     this.laserGfxList.splice(index, 1);
   }
 
-  private addRailgunProjectile(proj: RailgunProjectile) {
-    this.railgunProjectiles.push(proj);
-    const g = createRailgunProjectileGraphics();
-    g.position.set(proj.x, proj.y);
-    g.rotation = Math.atan2(proj.vy, proj.vx);
-    this.bulletLayer.addChild(g);
-    this.railgunGfxList.push(g);
-  }
-
-  private removeRailgunProjectileAt(index: number) {
-    this.railgunGfxList[index].destroy();
-    this.railgunProjectiles.splice(index, 1);
-    this.railgunGfxList.splice(index, 1);
-  }
-
   private update(dt: number) {
     if (this.gameOver) return;
     const isActive = this.phase === "active";
@@ -343,10 +308,8 @@ export class WordDefenseGame {
     this.updateCamera(dt, isActive);
     this.updatePlanet(dt, isActive);
     this.updateSlotVisuals();
-    this.updateBullets(dt);
-    this.updateMissiles(dt);
+    this.updateProjectiles(dt);
     this.updateLaserBeams(dt);
-    this.updateRailgunProjectiles(dt);
     this.updateMeteors(dt);
     this.syncMeteorDisplays();
 
@@ -377,10 +340,8 @@ export class WordDefenseGame {
       isActive &&
       this.meteorsSpawned >= this.waveConfig.totalMeteors &&
       this.meteors.length === 0 &&
-      this.bullets.length === 0 &&
-      this.missiles.length === 0 &&
-      this.laserBeams.length === 0 &&
-      this.railgunProjectiles.length === 0
+      this.projectiles.length === 0 &&
+      this.laserBeams.length === 0
     ) {
       this.phase = "complete";
       this.hud.showStartButton(this.waveConfig.waveNumber + 1);
@@ -455,72 +416,60 @@ export class WordDefenseGame {
     }
   }
 
-  private updateBullets(dt: number) {
-    for (let i = this.bullets.length - 1; i >= 0; i--) {
-      const bullet = this.bullets[i];
-      bullet.x += bullet.vx * dt;
-      bullet.y += bullet.vy * dt;
+  private updateProjectiles(dt: number) {
+    for (let i = this.projectiles.length - 1; i >= 0; i--) {
+      const proj = this.projectiles[i];
+      let remove = false;
 
-      let removeBullet = false;
-
-      if (
-        bullet.x < -METEOR_CLEANUP_MARGIN || bullet.x > CANVAS_WIDTH + METEOR_CLEANUP_MARGIN ||
-        bullet.y < -METEOR_CLEANUP_MARGIN || bullet.y > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
-      ) {
-        removeBullet = true;
+      if (proj.explosionRadius > 0) {
+        if (updateMissile(proj, dt)) {
+          this.detonateProjectile(i);
+          continue;
+        }
       } else {
-        for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
-          if (checkProjectileHitsMeteor(bullet, this.meteors[mi])) {
-            this.damageMeteor(mi, BULLET_DAMAGE);
-            removeBullet = true;
-            console.log("hit");
-            break;
-          }
+        proj.x += proj.vx * dt;
+        proj.y += proj.vy * dt;
+
+        if (
+          proj.x < -METEOR_CLEANUP_MARGIN || proj.x > CANVAS_WIDTH + METEOR_CLEANUP_MARGIN ||
+          proj.y < -METEOR_CLEANUP_MARGIN || proj.y > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
+        ) {
+          this.removeProjectileAt(i);
+          continue;
         }
       }
 
-      if (removeBullet) {
-        this.removeBulletAt(i);
-      } else {
-        this.bulletGfxList[i].position.set(bullet.x, bullet.y);
-      }
-    }
-  }
-
-  private updateMissiles(dt: number) {
-    for (let i = this.missiles.length - 1; i >= 0; i--) {
-      const missile = this.missiles[i];
-
-      let shouldDetonate = false;
-
-      for (const meteor of this.meteors) {
-        if (checkProjectileHitsMeteor(missile, meteor)) {
-          shouldDetonate = true;
+      for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
+        if (checkProjectileHitsMeteor(proj, this.meteors[mi])) {
+          if (proj.explosionRadius > 0) {
+            this.detonateProjectile(i);
+          } else {
+            this.damageMeteor(mi, proj.damage);
+            this.removeProjectileAt(i);
+          }
+          remove = true;
           break;
         }
       }
 
-      const expired = updateMissile(missile, dt);
-      if (expired) {
-        shouldDetonate = true;
-      }
-
-      if (shouldDetonate) {
-        for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
-          const meteor = this.meteors[mi];
-          const dx = missile.x - meteor.x;
-          const dy = missile.y - meteor.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist <= meteor.radius + MISSILE_EXPLOSION_RADIUS) {
-            this.damageMeteor(mi, MISSILE_DAMAGE);
-          }
-        }
-        this.removeMissileAt(i);
-      } else {
-        this.missileGfxList[i].position.set(missile.x, missile.y);
-        this.missileGfxList[i].rotation = missile.launchAngle;
+      if (!remove) {
+        this.projectileGfxList[i].position.set(proj.x, proj.y);
       }
     }
+  }
+
+  private detonateProjectile(index: number) {
+    const proj = this.projectiles[index];
+    for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
+      const meteor = this.meteors[mi];
+      const dx = proj.x - meteor.x;
+      const dy = proj.y - meteor.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist <= meteor.radius + proj.explosionRadius) {
+        this.damageMeteor(mi, proj.damage);
+      }
+    }
+    this.removeProjectileAt(index);
   }
 
   private updateLaserBeams(dt: number) {
@@ -537,38 +486,6 @@ export class WordDefenseGame {
         g.moveTo(beam.startX, beam.startY);
         g.lineTo(beam.endX, beam.endY);
         g.stroke({ color: 0xff0000, alpha, width: LASER_BEAM_WIDTH });
-      }
-    }
-  }
-
-  private updateRailgunProjectiles(dt: number) {
-    for (let i = this.railgunProjectiles.length - 1; i >= 0; i--) {
-      const proj = this.railgunProjectiles[i];
-      proj.x += proj.vx * dt;
-      proj.y += proj.vy * dt;
-
-      let removeProj = false;
-
-      if (
-        proj.x < -METEOR_CLEANUP_MARGIN || proj.x > CANVAS_WIDTH + METEOR_CLEANUP_MARGIN ||
-        proj.y < -METEOR_CLEANUP_MARGIN || proj.y > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
-      ) {
-        removeProj = true;
-      } else {
-        for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
-          if (checkProjectileHitsMeteor(proj, this.meteors[mi])) {
-            this.damageMeteor(mi, RAILGUN_DAMAGE);
-            removeProj = true;
-            break;
-          }
-        }
-      }
-
-      if (removeProj) {
-        this.removeRailgunProjectileAt(i);
-      } else {
-        this.railgunGfxList[i].position.set(proj.x, proj.y);
-        this.railgunGfxList[i].rotation = Math.atan2(proj.vy, proj.vx);
       }
     }
   }

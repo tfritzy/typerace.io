@@ -1,10 +1,10 @@
-import type { Bullet, Meteor, TurretSlot } from "./types";
+import type { Projectile, Meteor, TurretSlot } from "./types";
 import {
   EARTH_CX, EARTH_CY,
-  BULLET_SPEED,
+  BULLET_SPEED, BULLET_DAMAGE,
 } from "./constants";
 
-export function fireBullet(turret: TurretSlot, target: Meteor): Bullet | null {
+export function fireBullet(turret: TurretSlot, target: Meteor): Projectile | null {
   const targetCx = target.x;
   const targetCy = target.y;
 
@@ -40,6 +40,12 @@ export function fireBullet(turret: TurretSlot, target: Meteor): Bullet | null {
     y: turret.y,
     vx,
     vy,
+    damage: BULLET_DAMAGE,
     target,
+    explosionRadius: 0,
+    age: 0,
+    fuseTime: Infinity,
+    launchAngle: 0,
+    speed: 0,
   };
 }

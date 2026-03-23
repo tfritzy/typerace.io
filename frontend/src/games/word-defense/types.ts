@@ -41,20 +41,14 @@ export interface TurretSlot {
   turretType: TurretType;
 }
 
-export interface Bullet {
+export interface Projectile {
   x: number;
   y: number;
   vx: number;
   vy: number;
+  damage: number;
   target: Meteor;
-}
-
-export interface Missile {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  target: Meteor;
+  explosionRadius: number;
   age: number;
   fuseTime: number;
   launchAngle: number;
@@ -68,14 +62,6 @@ export interface LaserBeam {
   endY: number;
   age: number;
   duration: number;
-}
-
-export interface RailgunProjectile {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  target: Meteor;
 }
 
 export interface WaveConfig {

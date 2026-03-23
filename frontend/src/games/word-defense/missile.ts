@@ -1,8 +1,8 @@
-import type { Missile, Meteor, TurretSlot } from "./types";
+import type { Projectile, Meteor, TurretSlot } from "./types";
 import {
   EARTH_CX, EARTH_CY,
   MISSILE_INITIAL_SPEED, MISSILE_ACCEL_DURATION, MISSILE_ACCELERATION,
-  MISSILE_FUSE_BUFFER,
+  MISSILE_FUSE_BUFFER, MISSILE_DAMAGE, MISSILE_EXPLOSION_RADIUS,
   CANVAS_WIDTH, CANVAS_HEIGHT, METEOR_CLEANUP_MARGIN,
 } from "./constants";
 
@@ -58,7 +58,7 @@ function simulateMissilePosition(
   return { x, y };
 }
 
-export function fireMissile(turret: TurretSlot, target: Meteor): Missile | null {
+export function fireMissile(turret: TurretSlot, target: Meteor): Projectile | null {
   const targetCx = target.x;
   const targetCy = target.y;
 
@@ -116,7 +116,9 @@ export function fireMissile(turret: TurretSlot, target: Meteor): Missile | null 
     y: turret.y,
     vx: Math.cos(launchAngle) * initialSpeed,
     vy: Math.sin(launchAngle) * initialSpeed,
+    damage: MISSILE_DAMAGE,
     target,
+    explosionRadius: MISSILE_EXPLOSION_RADIUS,
     age: 0,
     fuseTime,
     launchAngle,
@@ -124,23 +126,23 @@ export function fireMissile(turret: TurretSlot, target: Meteor): Missile | null 
   };
 }
 
-export function updateMissile(missile: Missile, dt: number): boolean {
-  missile.age += dt;
+export function updateMissile(proj: Projectile, dt: number): boolean {
+  proj.age += dt;
 
-  if (missile.age >= missile.fuseTime) {
+  if (proj.age >= proj.fuseTime) {
     return true;
   }
 
-  missile.speed = getMissileSpeedAtTime(missile.age);
-  missile.vx = Math.cos(missile.launchAngle) * missile.speed;
-  missile.vy = Math.sin(missile.launchAngle) * missile.speed;
+  proj.speed = getMissileSpeedAtTime(proj.age);
+  proj.vx = Math.cos(proj.launchAngle) * proj.speed;
+  proj.vy = Math.sin(proj.launchAngle) * proj.speed;
 
-  missile.x += missile.vx * dt;
-  missile.y += missile.vy * dt;
+  proj.x += proj.vx * dt;
+  proj.y += proj.vy * dt;
 
   if (
-    missile.x < -METEOR_CLEANUP_MARGIN || missile.x > CANVAS_WIDTH + METEOR_CLEANUP_MARGIN ||
-    missile.y < -METEOR_CLEANUP_MARGIN || missile.y > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
+    proj.x < -METEOR_CLEANUP_MARGIN || proj.x > CANVAS_WIDTH + METEOR_CLEANUP_MARGIN ||
+    proj.y < -METEOR_CLEANUP_MARGIN || proj.y > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
   ) {
     return true;
   }
