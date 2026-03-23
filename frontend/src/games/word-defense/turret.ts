@@ -40,6 +40,10 @@ export function createTurretSlots(): TurretSlot[] {
   slots[laserIdx].filled = true;
   slots[laserIdx].turretType = TurretType.Laser;
 
+  const railgunIdx = Math.floor(slots.length / 2);
+  slots[railgunIdx].filled = true;
+  slots[railgunIdx].turretType = TurretType.Railgun;
+
   return slots;
 }
 

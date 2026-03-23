@@ -28,6 +28,7 @@ export enum TurretType {
   Bullet,
   Missile,
   Laser,
+  Railgun,
 }
 
 export interface TurretSlot {
@@ -67,6 +68,20 @@ export interface LaserBeam {
   endY: number;
   age: number;
   duration: number;
+}
+
+export interface RailgunProjectile {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  target: Meteor;
+}
+
+export interface RailgunCharge {
+  turret: TurretSlot;
+  target: Meteor;
+  elapsed: number;
 }
 
 export interface WaveConfig {

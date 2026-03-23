@@ -37,6 +37,17 @@ export function createTurretContainer(slot: TurretSlot): Container {
     base.circle(0, 0, TURRET_BASE_RADIUS + 1);
     base.fill(0xff2222);
     container.addChild(base);
+  } else if (slot.turretType === TurretType.Railgun) {
+    const barrel = new Graphics();
+    barrel.rect(0, -TURRET_BARREL_WIDTH / 2, TURRET_BARREL_LENGTH + 6, TURRET_BARREL_WIDTH);
+    barrel.fill(0x2266cc);
+    barrel.rotation = slot.baseAngle;
+    container.addChild(barrel);
+
+    const base = new Graphics();
+    base.circle(0, 0, TURRET_BASE_RADIUS + 2);
+    base.fill(0x44aaff);
+    container.addChild(base);
   } else {
     const barrel = new Graphics();
     barrel.rect(0, -TURRET_BARREL_WIDTH / 2, TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH);
