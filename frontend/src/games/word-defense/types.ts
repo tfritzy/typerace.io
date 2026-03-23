@@ -78,12 +78,6 @@ export interface RailgunProjectile {
   target: Meteor;
 }
 
-export interface RailgunCharge {
-  turret: TurretSlot;
-  target: Meteor;
-  elapsed: number;
-}
-
 export interface WaveConfig {
   waveNumber: number;
   totalMeteors: number;
