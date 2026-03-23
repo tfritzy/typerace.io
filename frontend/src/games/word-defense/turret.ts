@@ -36,6 +36,10 @@ export function createTurretSlots(): TurretSlot[] {
   slots[missileIdx].filled = true;
   slots[missileIdx].turretType = TurretType.Missile;
 
+  const laserIdx = Math.floor(slots.length / 2 + slots.length / (2 * INITIAL_TURRET_COUNT));
+  slots[laserIdx].filled = true;
+  slots[laserIdx].turretType = TurretType.Laser;
+
   return slots;
 }
 
