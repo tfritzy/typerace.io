@@ -1,25 +1,42 @@
 import type { Missile, Meteor, TurretSlot } from "./types";
 import {
   EARTH_CX, EARTH_CY,
-  MISSILE_INITIAL_SPEED, MISSILE_MAX_SPEED, MISSILE_ACCEL_DURATION,
+  MISSILE_INITIAL_SPEED, MISSILE_ACCEL_DURATION, MISSILE_ACCELERATION,
   MISSILE_FUSE_BUFFER,
   CANVAS_WIDTH, CANVAS_HEIGHT, METEOR_CLEANUP_MARGIN,
 } from "./constants";
 
 function getMissileSpeedAtTime(age: number): number {
-  if (age >= MISSILE_ACCEL_DURATION) return MISSILE_MAX_SPEED;
-  const t = age / MISSILE_ACCEL_DURATION;
-  const eased = t * t;
-  return MISSILE_INITIAL_SPEED + (MISSILE_MAX_SPEED - MISSILE_INITIAL_SPEED) * eased;
+  const accelTime = Math.min(Math.max(age, 0), MISSILE_ACCEL_DURATION);
+  return MISSILE_INITIAL_SPEED + MISSILE_ACCELERATION * accelTime;
+}
+
+function estimateMissileFlightTimeForDistance(dist: number): number {
+  const safeDist = Math.max(dist, 0);
+
+  if (MISSILE_ACCELERATION <= 0) {
+    return safeDist / Math.max(MISSILE_INITIAL_SPEED, 1e-6);
+  }
+
+  const accelTime = Math.max(MISSILE_ACCEL_DURATION, 0);
+  const speedAfterAccel = MISSILE_INITIAL_SPEED + MISSILE_ACCELERATION * accelTime;
+  const accelDist = MISSILE_INITIAL_SPEED * accelTime
+    + 0.5 * MISSILE_ACCELERATION * accelTime * accelTime;
+
+  if (safeDist <= accelDist) {
+    const disc = Math.max(MISSILE_INITIAL_SPEED * MISSILE_INITIAL_SPEED + 2 * MISSILE_ACCELERATION * safeDist, 0);
+    return (-MISSILE_INITIAL_SPEED + Math.sqrt(disc)) / MISSILE_ACCELERATION;
+  }
+
+  const cruiseDist = safeDist - accelDist;
+  return accelTime + cruiseDist / Math.max(speedAfterAccel, 1e-6);
 }
 
 function estimateMissileFlightTime(turretX: number, turretY: number, targetX: number, targetY: number): number {
   const dx = targetX - turretX;
   const dy = targetY - turretY;
   const dist = Math.sqrt(dx * dx + dy * dy);
-
-  const avgSpeed = (MISSILE_INITIAL_SPEED + MISSILE_MAX_SPEED) / 2;
-  return dist / avgSpeed;
+  return estimateMissileFlightTimeForDistance(dist);
 }
 
 function simulateMissilePosition(
@@ -70,8 +87,7 @@ export function fireMissile(turret: TurretSlot, target: Meteor): Missile | null 
     const newDx = predX - turret.x;
     const newDy = predY - turret.y;
     const newDist = Math.sqrt(newDx * newDx + newDy * newDy);
-    const avgSpeed = (MISSILE_INITIAL_SPEED + MISSILE_MAX_SPEED) / 2;
-    flightTime = newDist / avgSpeed;
+    flightTime = estimateMissileFlightTimeForDistance(newDist);
   }
 
   const meteorPredX = targetCx + target.vx * flightTime;

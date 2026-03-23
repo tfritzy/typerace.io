@@ -10,11 +10,11 @@ export const IMPACT_RADIUS_SCALE = 1 / 40;
 export const METEOR_NOISE_FREQ = 1.5;
 export const METEOR_CORE_RADIUS = 0.45;
 export const METEOR_LUMP_HEIGHT = 0.55;
-export const WORD_FONT_SIZE = 48;
-export const WORD_FONT = `bold ${WORD_FONT_SIZE}px monospace`;
-export const WORD_TYPED_ALPHA = 1.0;
-export const WORD_UNTYPED_ALPHA = 0.35;
-export const WORD_OFFSET_Y = 10;
+export const TARGET_WORD_FONT_SIZE = 24;
+export const WORD_FONT = `bold ${TARGET_WORD_FONT_SIZE}px monospace`;
+export const TARGET_WORD_TYPED_ALPHA = 1.0;
+export const TARGET_WORD_UNTYPED_ALPHA = 0.35;
+export const TARGET_WORD_OFFSET_Y = 6;
 export const LABEL_SCREEN_PADDING = 10;
 
 export const TOTAL_TURRET_SLOTS = 36;
@@ -22,8 +22,8 @@ export const INITIAL_TURRET_COUNT = 4;
 export const TURRET_BARREL_LENGTH = 16;
 export const TURRET_BARREL_WIDTH = 6;
 export const TURRET_BASE_RADIUS = 5;
-export const BULLET_SPEED = 267;
-export const BULLET_RENDER_RADIUS = 3;
+export const BULLET_SPEED = 100;
+export const BULLET_RENDER_RADIUS = 1;
 export const BULLET_DAMAGE = 10;
 export const MISSILE_DAMAGE = 30;
 
@@ -54,12 +54,12 @@ export const LASER_BEAM_DURATION = 0.15;
 export const LASER_BEAM_WIDTH = 2;
 
 export const MISSILE_INITIAL_SPEED = 40;
-export const MISSILE_MAX_SPEED = 300;
-export const MISSILE_ACCEL_DURATION = 2.0;
+export const MISSILE_ACCEL_DURATION = 10.0;
+export const MISSILE_ACCELERATION = 76;
 export const MISSILE_EXPLOSION_RADIUS = 35;
-export const MISSILE_RENDER_LENGTH = 12;
-export const MISSILE_RENDER_WIDTH = 4;
+export const MISSILE_RENDER_LENGTH = 3;
+export const MISSILE_RENDER_WIDTH = 3;
 export const MISSILE_FUSE_BUFFER = 0.4;
 
-export const AUTO_TYPE_ENABLED = true;
-export const AUTO_TYPE_INTERVAL = 1.0;
+export const AUTO_TYPE_ENABLED = false;
+export const AUTO_TYPE_INTERVAL = .2;

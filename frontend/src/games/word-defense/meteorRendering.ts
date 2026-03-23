@@ -1,7 +1,7 @@
 import { Container, Sprite, Text, Texture, TextStyle, Graphics } from "pixi.js";
 import type { Meteor, MeteorObject } from "./types";
 import {
-  WORD_FONT_SIZE, WORD_OFFSET_Y, WORD_UNTYPED_ALPHA, WORD_TYPED_ALPHA,
+  TARGET_WORD_FONT_SIZE, TARGET_WORD_OFFSET_Y, TARGET_WORD_UNTYPED_ALPHA, TARGET_WORD_TYPED_ALPHA,
   BULLET_RENDER_RADIUS, MISSILE_RENDER_LENGTH, MISSILE_RENDER_WIDTH,
   METEOR_NOISE_FREQ, METEOR_CORE_RADIUS, METEOR_LUMP_HEIGHT,
 } from "./constants";
@@ -57,13 +57,13 @@ export function createMeteorObject(meteor: Meteor, untypedStyle: TextStyle, type
 
   const untypedText = new Text({ text: meteor.word, style: untypedStyle });
   untypedText.anchor.set(0.5, 0);
-  untypedText.position.set(0, meteor.radius + WORD_OFFSET_Y + WORD_FONT_SIZE);
-  untypedText.alpha = WORD_UNTYPED_ALPHA;
+  untypedText.position.set(0, meteor.radius + TARGET_WORD_OFFSET_Y + TARGET_WORD_FONT_SIZE);
+  untypedText.alpha = TARGET_WORD_UNTYPED_ALPHA;
   container.addChild(untypedText);
 
   const typedText = new Text({ text: "", style: typedStyle });
   typedText.anchor.set(0, 0);
-  typedText.alpha = WORD_TYPED_ALPHA;
+  typedText.alpha = TARGET_WORD_TYPED_ALPHA;
   typedText.visible = false;
   container.addChild(typedText);
 

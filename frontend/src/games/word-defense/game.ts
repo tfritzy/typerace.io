@@ -8,8 +8,8 @@ import {
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
   SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_MAX,
   METEOR_CLEANUP_MARGIN, IMPACT_RADIUS_SCALE,
-  WORD_FONT_SIZE,
-  WORD_OFFSET_Y,
+  TARGET_WORD_FONT_SIZE,
+  TARGET_WORD_OFFSET_Y,
   LABEL_SCREEN_PADDING,
   BASE_METEOR_SPEED, METEOR_SPEED_WAVE_INCREMENT,
   BASE_METEORS_PER_WAVE, METEORS_PER_WAVE_INCREMENT,
@@ -103,14 +103,14 @@ export class WordDefenseGame {
     this.untypedStyle = new TextStyle({
       fontFamily: "monospace",
       fontWeight: "bold",
-      fontSize: WORD_FONT_SIZE,
+      fontSize: TARGET_WORD_FONT_SIZE,
       fill: 0xffffff,
       dropShadow: { color: "rgba(0, 0, 0, 0.9)", blur: 4, distance: 0 },
     });
     this.typedStyle = new TextStyle({
       fontFamily: "monospace",
       fontWeight: "bold",
-      fontSize: WORD_FONT_SIZE,
+      fontSize: TARGET_WORD_FONT_SIZE,
       fill: 0xffffff,
       dropShadow: { color: "rgba(0, 0, 0, 0.9)", blur: 4, distance: 0 },
     });
@@ -327,7 +327,6 @@ export class WordDefenseGame {
     this.updateMeteors(dt);
     this.syncMeteorDisplays();
 
-    this.hud.updateWave(this.waveConfig.waveNumber);
     this.hud.updateCredits(this.credits);
     const fraction = this.initialHabitablePixels > 0
       ? this.habitablePixels / this.initialHabitablePixels
@@ -442,6 +441,7 @@ export class WordDefenseGame {
           if (checkProjectileHitsMeteor(bullet, this.meteors[mi])) {
             this.damageMeteor(mi, BULLET_DAMAGE);
             removeBullet = true;
+            console.log("hit");
             break;
           }
         }
@@ -588,7 +588,7 @@ export class WordDefenseGame {
 
       mo.untypedText.text = meteor.word;
 
-      const naturalLocalY = meteor.radius + WORD_OFFSET_Y + WORD_FONT_SIZE;
+      const naturalLocalY = meteor.radius + TARGET_WORD_OFFSET_Y + TARGET_WORD_FONT_SIZE;
       const scaledW = mo.untypedText.width * this.cameraZoom;
       const scaledH = mo.untypedText.height * this.cameraZoom;
 

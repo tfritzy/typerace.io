@@ -29,5 +29,5 @@ export const GameCanvas = () => {
     };
   }, []);
 
-  return <div ref={containerRef} style={{ aspectRatio: "16/9" }} />;
+  return <div ref={containerRef} className="w-full h-full" />;
 };

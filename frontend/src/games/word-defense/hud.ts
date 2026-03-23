@@ -9,7 +9,6 @@ function packColor(rgb: [number, number, number]): number {
 export class GameHud {
   readonly container: Container;
 
-  private waveLabel: Text;
   private creditsLabel: Text;
   private habitabilityLabel: Text;
   private habitabilityBarBg: Graphics;
@@ -21,14 +20,6 @@ export class GameHud {
 
   constructor(onStartWave: () => void) {
     this.container = new Container();
-
-    this.waveLabel = new Text({
-      text: "Wave 1",
-      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 24, fill: 0xffffff },
-    });
-    this.waveLabel.position.set(20, 12);
-    this.waveLabel.alpha = 0.7;
-    this.container.addChild(this.waveLabel);
 
     this.creditsLabel = new Text({
       text: "Credits: 0",
@@ -46,7 +37,6 @@ export class GameHud {
       style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 12, fill: accentColor },
     });
     this.habitabilityLabel.position.set(20, 44);
-    this.habitabilityLabel.alpha = 0.85;
     this.container.addChild(this.habitabilityLabel);
 
     this.habitabilityBarBg = new Graphics();
@@ -90,10 +80,6 @@ export class GameHud {
     this.startButton.addChild(this.startButtonText);
 
     this.container.addChild(this.startButton);
-  }
-
-  updateWave(waveNumber: number) {
-    this.waveLabel.text = `Wave ${waveNumber}`;
   }
 
   updateCredits(credits: number) {
