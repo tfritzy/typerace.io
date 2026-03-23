@@ -3,52 +3,78 @@ import { TurretType } from "./types";
 import type { TurretSlot, TurretVisuals } from "./types";
 import {
   EARTH_RADIUS,
-  TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH, TURRET_BASE_RADIUS,
   SLOT_INTERACTIVE_RADIUS, SLOT_HIT_BUFFER,
-  MISSILE_RENDER_LENGTH,
+  TURRET_BASE_RADIUS,
 } from "./constants";
 
 export function createTurretContainer(slot: TurretSlot): Container {
   const container = new Container();
+  const offsetRadius = EARTH_RADIUS + 25;
   container.position.set(
-    Math.cos(slot.baseAngle) * EARTH_RADIUS,
-    Math.sin(slot.baseAngle) * EARTH_RADIUS,
+    Math.cos(slot.baseAngle) * offsetRadius,
+    Math.sin(slot.baseAngle) * offsetRadius,
   );
+  container.rotation = 0;
+
+  let color = 0x94a3b8;
+  if (slot.turretType === TurretType.Missile) color = 0xf59e0b;
+  else if (slot.turretType === TurretType.Laser) color = 0x60a5fa;
+
+  const hex = new Graphics();
+  const hexRadius = 15;
+  for (let i = 0; i < 6; i++) {
+    const angle = (i / 6) * Math.PI * 2 - Math.PI / 2;
+    const x = Math.cos(angle) * hexRadius;
+    const y = Math.sin(angle) * hexRadius;
+    if (i === 0) hex.moveTo(x, y);
+    else hex.lineTo(x, y);
+  }
+  hex.closePath();
+  hex.fill({ color: color, alpha: 0.2 });
+  hex.stroke({ color: color, width: 2, alpha: 0.9 });
+  container.addChild(hex);
+
+  const icon = new Graphics();
+  icon.rotation = -Math.PI / 4;
 
   if (slot.turretType === TurretType.Missile) {
-    const barrel = new Graphics();
-    barrel.rect(0, -TURRET_BARREL_WIDTH / 2, MISSILE_RENDER_LENGTH + 4, TURRET_BARREL_WIDTH + 2);
-    barrel.fill(0x8b4513);
-    barrel.rotation = slot.baseAngle;
-    container.addChild(barrel);
+    // Standard Rod Body
+    icon.rect(-6, -1.5, 10, 3);
+    icon.fill(color);
+    
+    // Pointy Tip
+    icon.moveTo(4, -1.5);
+    icon.lineTo(8, 0);
+    icon.lineTo(4, 1.5);
+    icon.fill(color);
 
-    const base = new Graphics();
-    base.circle(0, 0, TURRET_BASE_RADIUS + 2);
-    base.fill(0xcc5500);
-    container.addChild(base);
+    // Simple Rear Fins
+    icon.moveTo(-2, -1.5);
+    icon.lineTo(-7, -4.5);
+    icon.lineTo(-7, -1.5);
+    icon.fill(color);
+
+    icon.moveTo(-2, 1.5);
+    icon.lineTo(-7, 4.5);
+    icon.lineTo(-7, 1.5);
+    icon.fill(color);
   } else if (slot.turretType === TurretType.Laser) {
-    const barrel = new Graphics();
-    barrel.rect(0, -TURRET_BARREL_WIDTH / 2, TURRET_BARREL_LENGTH + 2, TURRET_BARREL_WIDTH - 1);
-    barrel.fill(0xcc0000);
-    barrel.rotation = slot.baseAngle;
-    container.addChild(barrel);
+    // Clean Laser Aperture + Focal Beam
+    icon.circle(-3, 0, 4.5);
+    icon.stroke({ color: color, width: 2 });
+    
+    icon.circle(-3, 0, 1.5);
+    icon.fill(color);
 
-    const base = new Graphics();
-    base.circle(0, 0, TURRET_BASE_RADIUS + 1);
-    base.fill(0xff2222);
-    container.addChild(base);
+    icon.moveTo(1.5, 0);
+    icon.lineTo(8, 0);
+    icon.stroke({ color: color, width: 2.5 });
   } else {
-    const barrel = new Graphics();
-    barrel.rect(0, -TURRET_BARREL_WIDTH / 2, TURRET_BARREL_LENGTH, TURRET_BARREL_WIDTH);
-    barrel.fill(0x6b7280);
-    barrel.rotation = slot.baseAngle;
-    container.addChild(barrel);
-
-    const base = new Graphics();
-    base.circle(0, 0, TURRET_BASE_RADIUS);
-    base.fill(0x9ca3af);
-    container.addChild(base);
+    icon.circle(0, 0, 3);
+    icon.fill(color);
   }
+
+  container.addChild(icon);
 
   return container;
 }
@@ -135,31 +161,20 @@ export function rebuildSlotVisual(
 ) {
   const slot = slots[index];
 
-  if (slot.destroyed) {
-    if (visuals.containers[index]) {
-      visuals.containers[index]!.destroy({ children: true });
-      visuals.containers[index] = null;
-    }
-    if (visuals.emptySlotGfx[index]) {
-      visuals.emptySlotGfx[index]!.destroy();
-      visuals.emptySlotGfx[index] = null;
-    }
-    visuals.hitAreas[index].visible = false;
-    visuals.hitAreas[index].eventMode = "none";
-    return;
+  if (visuals.containers[index]) {
+    visuals.containers[index]!.destroy({ children: true });
+    visuals.containers[index] = null;
+  }
+  if (visuals.emptySlotGfx[index]) {
+    visuals.emptySlotGfx[index]!.destroy();
+    visuals.emptySlotGfx[index] = null;
   }
 
-  if (slot.filled && !visuals.containers[index]) {
-    if (visuals.emptySlotGfx[index]) {
-      visuals.emptySlotGfx[index]!.destroy();
-      visuals.emptySlotGfx[index] = null;
-    }
+  if (slot.filled) {
     const tc = createTurretContainer(slot);
     parent.addChild(tc);
     visuals.containers[index] = tc;
-  } else if (!slot.filled && visuals.containers[index]) {
-    visuals.containers[index]!.destroy({ children: true });
-    visuals.containers[index] = null;
+  } else {
     const eg = createEmptySlotDot(slot);
     parent.addChild(eg);
     visuals.emptySlotGfx[index] = eg;

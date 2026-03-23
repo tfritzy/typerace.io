@@ -23,11 +23,18 @@ export function createPlanet(
       if (dist2 <= r2) {
         const dist = Math.sqrt(dist2);
         const angle = Math.atan2(dy, dx);
-        const n1 = valueNoise(angle * 3.0 + 100, 42.0);
-        const n2 = valueNoise(angle * 7.0 + 200, 73.0) * 0.5;
-        const n3 = valueNoise(angle * 18.0 + 300, 17.0) * 0.35;
-        const n4 = valueNoise(angle * 40.0 + 500, 91.0) * 0.15;
-        const depth = 1 + (n1 + n2 + n3 + n4) / 2.0 * 3;
+        const n1 = valueNoise(angle * 2.0 + 100, 42.0);
+        const n2 = valueNoise(angle * 5.0 + 200, 73.0) * 0.5;
+        const n3 = valueNoise(angle * 12.0 + 300, 17.0) * 0.35;
+        const n4 = valueNoise(angle * 30.0 + 500, 91.0) * 0.15;
+        let noise = (n1 + n2 + n3 + n4) / 2.0;
+        noise = Math.pow(Math.max(0, noise * 1.8 - 0.5), 2.2);
+        
+        let depth = noise * 5;
+        if (depth > 0) {
+          const fuzz = valueNoise(angle * 120.0 + 800, 31.0) * 0.8;
+          depth += fuzz * (noise * 1.5);
+        }
         if (dist > radius - depth) {
           data[y * size + x] = ACCENT_INDEX;
           habitablePixels++;

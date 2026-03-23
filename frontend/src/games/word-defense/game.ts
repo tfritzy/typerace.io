@@ -381,6 +381,14 @@ export class WordDefenseGame {
     }
     updateTurretPositions(this.slots, this.planetRotation);
     this.planetContainer.rotation = this.planetRotation;
+
+    for (let i = 0; i < this.slots.length; i++) {
+        const tc = this.turretVisuals.containers[i];
+        if (tc) {
+            tc.rotation = -this.planetRotation;
+        }
+    }
+
     this.planetTexture.source.update();
   }
 

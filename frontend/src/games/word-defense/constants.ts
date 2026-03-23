@@ -10,11 +10,11 @@ export const IMPACT_RADIUS_SCALE = 1 / 40;
 export const METEOR_NOISE_FREQ = 1.5;
 export const METEOR_CORE_RADIUS = 0.45;
 export const METEOR_LUMP_HEIGHT = 0.55;
-export const TARGET_WORD_FONT_SIZE = 24;
+export const TARGET_WORD_FONT_SIZE = 20;
 export const WORD_FONT = `bold ${TARGET_WORD_FONT_SIZE}px monospace`;
 export const TARGET_WORD_TYPED_ALPHA = 1.0;
 export const TARGET_WORD_UNTYPED_ALPHA = 0.35;
-export const TARGET_WORD_OFFSET_Y = 6;
+export const TARGET_WORD_OFFSET_Y = 2;
 export const LABEL_SCREEN_PADDING = 10;
 
 export const TOTAL_TURRET_SLOTS = 36;
