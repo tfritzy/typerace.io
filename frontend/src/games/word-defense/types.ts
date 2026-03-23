@@ -29,6 +29,7 @@ export enum TurretType {
   Missile,
   Laser,
   Railgun,
+  NuclearMissile,
 }
 
 export interface TurretSlot {
