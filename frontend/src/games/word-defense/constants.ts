@@ -49,6 +49,10 @@ export const SLOT_SURFACE_INWARD = 5;
 export const SLOT_SURFACE_CHECK_RADIUS = 6;
 export const SLOT_SURFACE_THRESHOLD = 5;
 
+export const LASER_DAMAGE = 15;
+export const LASER_BEAM_DURATION = 0.15;
+export const LASER_BEAM_WIDTH = 2;
+
 export const MISSILE_INITIAL_SPEED = 40;
 export const MISSILE_MAX_SPEED = 300;
 export const MISSILE_ACCEL_DURATION = 2.0;

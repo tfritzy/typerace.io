@@ -27,6 +27,7 @@ export interface Meteor {
 export enum TurretType {
   Bullet,
   Missile,
+  Laser,
 }
 
 export interface TurretSlot {
@@ -57,6 +58,15 @@ export interface Missile {
   fuseTime: number;
   launchAngle: number;
   speed: number;
+}
+
+export interface LaserBeam {
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+  age: number;
+  duration: number;
 }
 
 export interface WaveConfig {

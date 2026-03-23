@@ -2,7 +2,7 @@ import { Application, Container, Sprite, Graphics, Texture, TextStyle } from "pi
 
 import { getLanguageFromSlug } from "../../utils/modes";
 import { TurretType } from "./types";
-import type { Meteor, TurretSlot, Bullet, Missile, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
+import type { Meteor, TurretSlot, Bullet, Missile, LaserBeam, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
@@ -18,7 +18,7 @@ import {
   WAVE_SPAWN_INTERVAL_REDUCTION,
   PLANET_ROTATION_SPEED,
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
-  MISSILE_EXPLOSION_RADIUS, BULLET_DAMAGE, MISSILE_DAMAGE,
+  MISSILE_EXPLOSION_RADIUS, BULLET_DAMAGE, MISSILE_DAMAGE, LASER_DAMAGE, LASER_BEAM_WIDTH,
   AUTO_TYPE_ENABLED, AUTO_TYPE_INTERVAL,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
@@ -28,6 +28,7 @@ import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBul
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
 import { createMeteorObject, createBulletGraphics, createMissileGraphics } from "./meteorRendering";
 import { fireMissile, updateMissile } from "./missile";
+import { fireLaser } from "./laser";
 import { buildPalette, getBackgroundColor, ACCENT_INDEX } from "./palette";
 import { GameHud } from "./hud";
 import { clampToRange } from "../../utils/math";
@@ -70,6 +71,8 @@ export class WordDefenseGame {
   private bulletGfxList: Graphics[] = [];
   private missiles: Missile[] = [];
   private missileGfxList: Graphics[] = [];
+  private laserBeams: LaserBeam[] = [];
+  private laserGfxList: Graphics[] = [];
 
   private langCode: string;
   private waveConfig: WaveConfig;
@@ -195,6 +198,13 @@ export class WordDefenseGame {
             if (turret.turretType === TurretType.Missile) {
               const missile = fireMissile(turret, meteor);
               if (missile) this.addMissile(missile);
+            } else if (turret.turretType === TurretType.Laser) {
+              const beam = fireLaser(turret, meteor);
+              if (beam) {
+                this.addLaserBeam(beam);
+                const mi = this.meteors.indexOf(meteor);
+                if (mi >= 0) this.damageMeteor(mi, LASER_DAMAGE);
+              }
             } else {
               const bullet = fireBullet(turret, meteor);
               if (bullet) this.addBullet(bullet);
@@ -288,6 +298,19 @@ export class WordDefenseGame {
     this.missileGfxList.splice(index, 1);
   }
 
+  private addLaserBeam(beam: LaserBeam) {
+    this.laserBeams.push(beam);
+    const g = new Graphics();
+    this.bulletLayer.addChild(g);
+    this.laserGfxList.push(g);
+  }
+
+  private removeLaserBeamAt(index: number) {
+    this.laserGfxList[index].destroy();
+    this.laserBeams.splice(index, 1);
+    this.laserGfxList.splice(index, 1);
+  }
+
   private update(dt: number) {
     if (this.gameOver) return;
     const isActive = this.phase === "active";
@@ -300,6 +323,7 @@ export class WordDefenseGame {
     this.updateSlotVisuals();
     this.updateBullets(dt);
     this.updateMissiles(dt);
+    this.updateLaserBeams(dt);
     this.updateMeteors(dt);
     this.syncMeteorDisplays();
 
@@ -332,7 +356,8 @@ export class WordDefenseGame {
       this.meteorsSpawned >= this.waveConfig.totalMeteors &&
       this.meteors.length === 0 &&
       this.bullets.length === 0 &&
-      this.missiles.length === 0
+      this.missiles.length === 0 &&
+      this.laserBeams.length === 0
     ) {
       this.phase = "complete";
       this.hud.showStartButton(this.waveConfig.waveNumber + 1);
@@ -462,6 +487,24 @@ export class WordDefenseGame {
       } else {
         this.missileGfxList[i].position.set(missile.x, missile.y);
         this.missileGfxList[i].rotation = missile.launchAngle;
+      }
+    }
+  }
+
+  private updateLaserBeams(dt: number) {
+    for (let i = this.laserBeams.length - 1; i >= 0; i--) {
+      const beam = this.laserBeams[i];
+      beam.age += dt;
+
+      if (beam.age >= beam.duration) {
+        this.removeLaserBeamAt(i);
+      } else {
+        const alpha = 1 - beam.age / beam.duration;
+        const g = this.laserGfxList[i];
+        g.clear();
+        g.moveTo(beam.startX, beam.startY);
+        g.lineTo(beam.endX, beam.endY);
+        g.stroke({ color: 0xff0000, alpha, width: LASER_BEAM_WIDTH });
       }
     }
   }
