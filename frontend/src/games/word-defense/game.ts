@@ -2,7 +2,7 @@ import { Application, Container, Sprite, Graphics, Texture, TextStyle } from "pi
 
 import { getLanguageFromSlug } from "../../utils/modes";
 import { TurretType } from "./types";
-import type { Meteor, TurretSlot, Bullet, Missile, LaserBeam, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
+import type { Meteor, TurretSlot, Bullet, Missile, LaserBeam, RailgunProjectile, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
@@ -19,6 +19,7 @@ import {
   PLANET_ROTATION_SPEED,
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
   MISSILE_EXPLOSION_RADIUS, BULLET_DAMAGE, MISSILE_DAMAGE, LASER_DAMAGE, LASER_BEAM_WIDTH,
+  RAILGUN_DAMAGE,
   AUTO_TYPE_ENABLED, AUTO_TYPE_INTERVAL,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
@@ -26,9 +27,10 @@ import { createPlanet } from "./planet";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords } from "./meteor";
 import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBullet, isSlotGroundIntact, checkProjectileHitsMeteor } from "./turret";
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
-import { createMeteorObject, createBulletGraphics, createMissileGraphics } from "./meteorRendering";
+import { createMeteorObject, createBulletGraphics, createMissileGraphics, createRailgunProjectileGraphics } from "./meteorRendering";
 import { fireMissile, updateMissile } from "./missile";
 import { fireLaser } from "./laser";
+import { fireRailgun } from "./railgun";
 import { buildPalette, getBackgroundColor, ACCENT_INDEX } from "./palette";
 import { GameHud } from "./hud";
 import { clampToRange } from "../../utils/math";
@@ -73,6 +75,8 @@ export class WordDefenseGame {
   private missileGfxList: Graphics[] = [];
   private laserBeams: LaserBeam[] = [];
   private laserGfxList: Graphics[] = [];
+  private railgunProjectiles: RailgunProjectile[] = [];
+  private railgunGfxList: Graphics[] = [];
 
   private langCode: string;
   private waveConfig: WaveConfig;
@@ -205,6 +209,9 @@ export class WordDefenseGame {
                 const mi = this.meteors.indexOf(meteor);
                 if (mi >= 0) this.damageMeteor(mi, LASER_DAMAGE);
               }
+            } else if (turret.turretType === TurretType.Railgun) {
+              const proj = fireRailgun(turret, meteor);
+              if (proj) this.addRailgunProjectile(proj);
             } else {
               const bullet = fireBullet(turret, meteor);
               if (bullet) this.addBullet(bullet);
@@ -311,6 +318,21 @@ export class WordDefenseGame {
     this.laserGfxList.splice(index, 1);
   }
 
+  private addRailgunProjectile(proj: RailgunProjectile) {
+    this.railgunProjectiles.push(proj);
+    const g = createRailgunProjectileGraphics();
+    g.position.set(proj.x, proj.y);
+    g.rotation = Math.atan2(proj.vy, proj.vx);
+    this.bulletLayer.addChild(g);
+    this.railgunGfxList.push(g);
+  }
+
+  private removeRailgunProjectileAt(index: number) {
+    this.railgunGfxList[index].destroy();
+    this.railgunProjectiles.splice(index, 1);
+    this.railgunGfxList.splice(index, 1);
+  }
+
   private update(dt: number) {
     if (this.gameOver) return;
     const isActive = this.phase === "active";
@@ -324,6 +346,7 @@ export class WordDefenseGame {
     this.updateBullets(dt);
     this.updateMissiles(dt);
     this.updateLaserBeams(dt);
+    this.updateRailgunProjectiles(dt);
     this.updateMeteors(dt);
     this.syncMeteorDisplays();
 
@@ -356,7 +379,8 @@ export class WordDefenseGame {
       this.meteors.length === 0 &&
       this.bullets.length === 0 &&
       this.missiles.length === 0 &&
-      this.laserBeams.length === 0
+      this.laserBeams.length === 0 &&
+      this.railgunProjectiles.length === 0
     ) {
       this.phase = "complete";
       this.hud.showStartButton(this.waveConfig.waveNumber + 1);
@@ -513,6 +537,38 @@ export class WordDefenseGame {
         g.moveTo(beam.startX, beam.startY);
         g.lineTo(beam.endX, beam.endY);
         g.stroke({ color: 0xff0000, alpha, width: LASER_BEAM_WIDTH });
+      }
+    }
+  }
+
+  private updateRailgunProjectiles(dt: number) {
+    for (let i = this.railgunProjectiles.length - 1; i >= 0; i--) {
+      const proj = this.railgunProjectiles[i];
+      proj.x += proj.vx * dt;
+      proj.y += proj.vy * dt;
+
+      let removeProj = false;
+
+      if (
+        proj.x < -METEOR_CLEANUP_MARGIN || proj.x > CANVAS_WIDTH + METEOR_CLEANUP_MARGIN ||
+        proj.y < -METEOR_CLEANUP_MARGIN || proj.y > CANVAS_HEIGHT + METEOR_CLEANUP_MARGIN
+      ) {
+        removeProj = true;
+      } else {
+        for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
+          if (checkProjectileHitsMeteor(proj, this.meteors[mi])) {
+            this.damageMeteor(mi, RAILGUN_DAMAGE);
+            removeProj = true;
+            break;
+          }
+        }
+      }
+
+      if (removeProj) {
+        this.removeRailgunProjectileAt(i);
+      } else {
+        this.railgunGfxList[i].position.set(proj.x, proj.y);
+        this.railgunGfxList[i].rotation = Math.atan2(proj.vy, proj.vx);
       }
     }
   }

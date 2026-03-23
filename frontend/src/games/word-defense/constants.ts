@@ -61,5 +61,10 @@ export const MISSILE_RENDER_LENGTH = 3;
 export const MISSILE_RENDER_WIDTH = 3;
 export const MISSILE_FUSE_BUFFER = 0.4;
 
+export const RAILGUN_DAMAGE = 50;
+export const RAILGUN_SPEED = 800;
+export const RAILGUN_RENDER_LENGTH = 14;
+export const RAILGUN_RENDER_WIDTH = 3;
+
 export const AUTO_TYPE_ENABLED = false;
 export const AUTO_TYPE_INTERVAL = .2;
