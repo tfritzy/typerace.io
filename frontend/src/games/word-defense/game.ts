@@ -59,7 +59,7 @@ export class WordDefenseGame {
   private planetObj!: SceneObject;
   private planetTexture!: Texture;
   private meteorLayer!: Container;
-  private bulletLayer!: Container;
+  private projectileLayer!: Container;
   private highlightGfx!: Graphics;
   private hud!: GameHud;
 
@@ -166,8 +166,8 @@ export class WordDefenseGame {
     this.meteorLayer = new Container();
     this.world.addChild(this.meteorLayer);
 
-    this.bulletLayer = new Container();
-    this.world.addChild(this.bulletLayer);
+    this.projectileLayer = new Container();
+    this.world.addChild(this.projectileLayer);
 
     this.hud.updateHabitability(1);
   }
@@ -275,7 +275,7 @@ export class WordDefenseGame {
     this.projectiles.push(proj);
     const g = createProjectileGraphics();
     g.position.set(proj.x, proj.y);
-    this.bulletLayer.addChild(g);
+    this.projectileLayer.addChild(g);
     this.projectileGfxList.push(g);
   }
 
@@ -288,7 +288,7 @@ export class WordDefenseGame {
   private addLaserBeam(beam: LaserBeam) {
     this.laserBeams.push(beam);
     const g = new Graphics();
-    this.bulletLayer.addChild(g);
+    this.projectileLayer.addChild(g);
     this.laserGfxList.push(g);
   }
 
@@ -419,7 +419,6 @@ export class WordDefenseGame {
   private updateProjectiles(dt: number) {
     for (let i = this.projectiles.length - 1; i >= 0; i--) {
       const proj = this.projectiles[i];
-      let remove = false;
 
       if (proj.explosionRadius > 0) {
         if (updateMissile(proj, dt)) {
@@ -439,6 +438,7 @@ export class WordDefenseGame {
         }
       }
 
+      let hit = false;
       for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
         if (checkProjectileHitsMeteor(proj, this.meteors[mi])) {
           if (proj.explosionRadius > 0) {
@@ -447,12 +447,12 @@ export class WordDefenseGame {
             this.damageMeteor(mi, proj.damage);
             this.removeProjectileAt(i);
           }
-          remove = true;
+          hit = true;
           break;
         }
       }
 
-      if (!remove) {
+      if (!hit) {
         this.projectileGfxList[i].position.set(proj.x, proj.y);
       }
     }
