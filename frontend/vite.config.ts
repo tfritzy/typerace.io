@@ -11,6 +11,12 @@ export default defineConfig({
       'react': path.resolve(__dirname, './node_modules/react'),
       'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
       '@': path.resolve(__dirname, './src'),
+      '@pixi/constants': path.resolve(__dirname, './src/pixi-compat/constants.ts'),
+      '@pixi/core': path.resolve(__dirname, './src/pixi-compat/core.ts'),
+      '@pixi/display': path.resolve(__dirname, './src/pixi-compat/display.ts'),
+      '@pixi/math': path.resolve(__dirname, './src/pixi-compat/math.ts'),
+      '@pixi/sprite': path.resolve(__dirname, './src/pixi-compat/sprite.ts'),
+      '@pixi/ticker': path.resolve(__dirname, './src/pixi-compat/ticker.ts'),
     },
   },
 })

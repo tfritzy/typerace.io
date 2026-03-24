@@ -1,10 +1,11 @@
+import { Emitter } from "@pixi/particle-emitter";
 import { Application, Container, Sprite, Graphics, Texture, TextStyle } from "pixi.js";
 
 import { getLanguageFromSlug } from "../../utils/modes";
 import { TurretType } from "./types";
 import type {
   Meteor, TurretSlot, Projectile, LaserBeam, WaveConfig, WavePhase,
-  MeteorObject, SceneObject, TurretVisuals, MeteorDestructionParticle,
+  MeteorObject, SceneObject, TurretVisuals,
 } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
@@ -32,7 +33,7 @@ import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlig
 import {
   createMeteorObject,
   createProjectileGraphics,
-  createMeteorDestructionParticles,
+  createMeteorDestructionEmitterConfig,
 } from "./meteorRendering";
 import { fireMissile, updateMissile } from "./missile";
 import { fireLaser } from "./laser";
@@ -66,7 +67,7 @@ export class WordDefenseGame {
   private planetObj!: SceneObject;
   private planetTexture!: Texture;
   private meteorLayer!: Container;
-  private meteorParticleLayer!: Graphics;
+  private meteorParticleLayer!: Container;
   private projectileLayer!: Container;
   private highlightGfx!: Graphics;
   private hud!: GameHud;
@@ -76,7 +77,7 @@ export class WordDefenseGame {
 
   private meteors: Meteor[] = [];
   private meteorObjects: MeteorObject[] = [];
-  private meteorDestructionParticles: MeteorDestructionParticle[] = [];
+  private meteorDestructionEmitters: Emitter[] = [];
   private projectiles: Projectile[] = [];
   private projectileGfxList: Graphics[] = [];
   private laserBeams: LaserBeam[] = [];
@@ -175,7 +176,7 @@ export class WordDefenseGame {
     this.meteorLayer = new Container();
     this.world.addChild(this.meteorLayer);
 
-    this.meteorParticleLayer = new Graphics();
+    this.meteorParticleLayer = new Container();
     this.world.addChild(this.meteorParticleLayer);
 
     this.projectileLayer = new Container();
@@ -284,7 +285,10 @@ export class WordDefenseGame {
   }
 
   private emitMeteorDestruction(meteor: Meteor) {
-    this.meteorDestructionParticles.push(...createMeteorDestructionParticles(meteor));
+    const emitter = new Emitter(this.meteorParticleLayer, createMeteorDestructionEmitterConfig(meteor));
+    emitter.updateOwnerPos(meteor.x, meteor.y);
+    emitter.emitNow();
+    this.meteorDestructionEmitters.push(emitter);
   }
 
   private addProjectile(proj: Projectile) {
@@ -568,27 +572,14 @@ export class WordDefenseGame {
   }
 
   private updateMeteorDestructionParticles(dt: number) {
-    this.meteorParticleLayer.clear();
+    for (let i = this.meteorDestructionEmitters.length - 1; i >= 0; i--) {
+      const emitter = this.meteorDestructionEmitters[i];
+      emitter.update(dt);
 
-    for (let i = this.meteorDestructionParticles.length - 1; i >= 0; i--) {
-      const particle = this.meteorDestructionParticles[i];
-      particle.life -= dt;
-
-      if (particle.life <= 0) {
-        this.meteorDestructionParticles.splice(i, 1);
-        continue;
+      if (!emitter.emit && emitter.particleCount === 0) {
+        emitter.destroy();
+        this.meteorDestructionEmitters.splice(i, 1);
       }
-
-      particle.x += particle.vx * dt;
-      particle.y += particle.vy * dt;
-      particle.vx *= Math.max(0, 1 - dt * 2.4);
-      particle.vy *= Math.max(0, 1 - dt * 2.4);
-
-      const alpha = particle.life / particle.maxLife;
-      const radius = particle.size * (0.45 + alpha * 0.85);
-
-      this.meteorParticleLayer.circle(particle.x, particle.y, radius);
-      this.meteorParticleLayer.fill({ color: particle.color, alpha: alpha * 0.75 });
     }
   }
 
@@ -650,6 +641,9 @@ export class WordDefenseGame {
 
   destroy() {
     document.removeEventListener("keydown", this.keydownHandler);
+    for (const emitter of this.meteorDestructionEmitters) {
+      emitter.destroy();
+    }
     this.app.destroy(true, { children: true });
   }
 }

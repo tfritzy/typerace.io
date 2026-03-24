@@ -1,5 +1,6 @@
 import { Container, Sprite, Text, Texture, TextStyle, Graphics } from "pixi.js";
-import type { Meteor, MeteorDestructionParticle, MeteorObject } from "./types";
+import type { EmitterConfigV3 } from "@pixi/particle-emitter";
+import type { Meteor, MeteorObject } from "./types";
 import {
   TARGET_WORD_FONT_SIZE, TARGET_WORD_OFFSET_Y, TARGET_WORD_UNTYPED_ALPHA, TARGET_WORD_TYPED_ALPHA,
   BULLET_RENDER_RADIUS,
@@ -80,34 +81,99 @@ export function createProjectileGraphics(): Graphics {
   return g;
 }
 
-export function createMeteorDestructionParticles(meteor: Meteor): MeteorDestructionParticle[] {
+export function createMeteorDestructionEmitterConfig(meteor: Meteor): EmitterConfigV3 {
   const particleCount = Math.max(10, Math.round(meteor.radius * 0.55));
-  const particles: MeteorDestructionParticle[] = [];
-  const colors = [0xffffff, 0xe2e8f0, 0xcbd5e1, 0xfde68a];
+  const spread = 260;
+  const travelAngle = Math.atan2(-meteor.vy, meteor.vx) * 180 / Math.PI;
+  const maxParticleSize = Math.max(1.5, meteor.radius * METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MAX);
+  const minParticleSize = Math.max(1, meteor.radius * METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MIN);
+  const textureWidth = Texture.WHITE.width > 0 ? Texture.WHITE.width : 16;
+  const baseScale = maxParticleSize / textureWidth;
+  const endScale = minParticleSize / textureWidth;
+  const minSpeed = meteor.radius * METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MIN + Math.hypot(meteor.vx, meteor.vy) * 0.2;
+  const maxSpeed = meteor.radius * METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MAX + Math.hypot(meteor.vx, meteor.vy) * 0.35;
 
-  for (let i = 0; i < particleCount; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const directionX = Math.cos(angle);
-    const directionY = Math.sin(angle);
-    const speedScale = METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MIN +
-      Math.random() * (METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MAX - METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MIN);
-    const life = METEOR_DESTRUCTION_PARTICLE_LIFETIME_MIN +
-      Math.random() * (METEOR_DESTRUCTION_PARTICLE_LIFETIME_MAX - METEOR_DESTRUCTION_PARTICLE_LIFETIME_MIN);
-    const sizeScale = METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MIN +
-      Math.random() * (METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MAX - METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MIN);
-    const spawnOffset = meteor.radius * (0.1 + Math.random() * 0.35);
-
-    particles.push({
-      x: meteor.x + directionX * spawnOffset,
-      y: meteor.y + directionY * spawnOffset,
-      vx: meteor.vx * 0.3 + directionX * meteor.radius * speedScale,
-      vy: meteor.vy * 0.3 + directionY * meteor.radius * speedScale,
-      life,
-      maxLife: life,
-      size: Math.max(1.5, meteor.radius * sizeScale),
-      color: colors[Math.floor(Math.random() * colors.length)],
-    });
-  }
-
-  return particles;
+  return {
+    lifetime: {
+      min: METEOR_DESTRUCTION_PARTICLE_LIFETIME_MIN,
+      max: METEOR_DESTRUCTION_PARTICLE_LIFETIME_MAX,
+    },
+    frequency: 1,
+    spawnChance: 1,
+    particlesPerWave: particleCount,
+    emitterLifetime: 0,
+    maxParticles: particleCount,
+    emit: false,
+    pos: {
+      x: 0,
+      y: 0,
+    },
+    addAtBack: false,
+    behaviors: [
+      {
+        type: "alpha",
+        config: {
+          alpha: {
+            list: [
+              { value: 0.95, time: 0 },
+              { value: 0.45, time: 0.45 },
+              { value: 0.05, time: 1 },
+            ],
+          },
+        },
+      },
+      {
+        type: "scale",
+        config: {
+          scale: {
+            list: [
+              { value: baseScale, time: 0 },
+              { value: endScale, time: 1 },
+            ],
+          },
+          minMult: 0.7,
+        },
+      },
+      {
+        type: "color",
+        config: {
+          color: {
+            list: [
+              { value: "ffffff", time: 0 },
+              { value: "e2e8f0", time: 0.5 },
+              { value: "fde68a", time: 1 },
+            ],
+          },
+        },
+      },
+      {
+        type: "moveSpeed",
+        config: {
+          speed: {
+            list: [
+              { value: maxSpeed, time: 0 },
+              { value: minSpeed, time: 0.55 },
+              { value: Math.max(minSpeed * 0.4, 1), time: 1 },
+            ],
+            isStepped: false,
+          },
+          minMult: 0.7,
+        },
+      },
+      {
+        type: "spawnBurst",
+        config: {
+          spacing: spread / particleCount,
+          start: travelAngle - spread / 2,
+          distance: meteor.radius * 0.22,
+        },
+      },
+      {
+        type: "textureSingle",
+        config: {
+          texture: Texture.WHITE,
+        },
+      },
+    ],
+  };
 }
