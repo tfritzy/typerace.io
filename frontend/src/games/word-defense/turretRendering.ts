@@ -20,6 +20,7 @@ export function createTurretContainer(slot: TurretSlot): Container {
   if (slot.turretType === TurretType.Missile) color = 0xf59e0b;
   else if (slot.turretType === TurretType.Laser) color = 0x60a5fa;
   else if (slot.turretType === TurretType.Railgun) color = 0xa855f7;
+  else if (slot.turretType === TurretType.NuclearMissile) color = 0xef4444;
 
   const hex = new Graphics();
   const hexRadius = 15;
@@ -81,6 +82,27 @@ export function createTurretContainer(slot: TurretSlot): Container {
 
     icon.rect(2, -2, 4, 4);
     icon.fill(color);
+  } else if (slot.turretType === TurretType.NuclearMissile) {
+    icon.rect(-7, -2.5, 12, 5);
+    icon.fill(color);
+
+    icon.moveTo(5, -2.5);
+    icon.lineTo(10, 0);
+    icon.lineTo(5, 2.5);
+    icon.fill(color);
+
+    icon.moveTo(-3, -2.5);
+    icon.lineTo(-8, -6);
+    icon.lineTo(-8, -2.5);
+    icon.fill(color);
+
+    icon.moveTo(-3, 2.5);
+    icon.lineTo(-8, 6);
+    icon.lineTo(-8, 2.5);
+    icon.fill(color);
+
+    icon.circle(0, 0, 3);
+    icon.stroke({ color: 0x000000, width: 1.5 });
   } else {
     icon.circle(0, 0, 3);
     icon.fill(color);

@@ -42,6 +42,10 @@ export function createTurretSlots(): TurretSlot[] {
   slots[railgunIdx].filled = true;
   slots[railgunIdx].turretType = TurretType.Railgun;
 
+  const nuclearIdx = Math.floor(3 * slots.length / 4 + slots.length / (2 * INITIAL_TURRET_COUNT));
+  slots[nuclearIdx].filled = true;
+  slots[nuclearIdx].turretType = TurretType.NuclearMissile;
+
   return slots;
 }
 

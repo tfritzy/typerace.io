@@ -3,6 +3,7 @@ import {
   EARTH_CX, EARTH_CY,
   MISSILE_INITIAL_SPEED, MISSILE_ACCEL_DURATION, MISSILE_ACCELERATION,
   MISSILE_FUSE_BUFFER, MISSILE_DAMAGE, MISSILE_EXPLOSION_RADIUS,
+  NUCLEAR_MISSILE_DAMAGE, NUCLEAR_MISSILE_EXPLOSION_RADIUS,
   CANVAS_WIDTH, CANVAS_HEIGHT, METEOR_CLEANUP_MARGIN,
 } from "./constants";
 
@@ -124,6 +125,14 @@ export function fireMissile(turret: TurretSlot, target: Meteor): Projectile | nu
     launchAngle,
     speed: initialSpeed,
   };
+}
+
+export function fireNuclearMissile(turret: TurretSlot, target: Meteor): Projectile | null {
+  const proj = fireMissile(turret, target);
+  if (!proj) return null;
+  proj.damage = NUCLEAR_MISSILE_DAMAGE;
+  proj.explosionRadius = NUCLEAR_MISSILE_EXPLOSION_RADIUS;
+  return proj;
 }
 
 export function updateMissile(proj: Projectile, dt: number): boolean {

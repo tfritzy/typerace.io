@@ -35,7 +35,7 @@ import {
   createProjectileGraphics,
   createMeteorDestructionEmitterConfig,
 } from "./meteorRendering";
-import { fireMissile, updateMissile } from "./missile";
+import { fireMissile, fireNuclearMissile, updateMissile } from "./missile";
 import { fireLaser } from "./laser";
 import { fireRailgun } from "./railgun";
 import { buildPalette, getBackgroundColor, ACCENT_INDEX } from "./palette";
@@ -216,6 +216,9 @@ export class WordDefenseGame {
               }
             } else if (turret.turretType === TurretType.Missile) {
               const proj = fireMissile(turret, meteor);
+              if (proj) this.addProjectile(proj);
+            } else if (turret.turretType === TurretType.NuclearMissile) {
+              const proj = fireNuclearMissile(turret, meteor);
               if (proj) this.addProjectile(proj);
             } else if (turret.turretType === TurretType.Railgun) {
               const proj = fireRailgun(turret, meteor);
