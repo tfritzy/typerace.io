@@ -5,9 +5,6 @@ import {
   TARGET_WORD_FONT_SIZE, TARGET_WORD_OFFSET_Y, TARGET_WORD_UNTYPED_ALPHA, TARGET_WORD_TYPED_ALPHA,
   BULLET_RENDER_RADIUS,
   METEOR_NOISE_FREQ, METEOR_CORE_RADIUS, METEOR_LUMP_HEIGHT,
-  METEOR_DESTRUCTION_PARTICLE_LIFETIME_MIN, METEOR_DESTRUCTION_PARTICLE_LIFETIME_MAX,
-  METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MIN, METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MAX,
-  METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MIN, METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MAX,
 } from "./constants";
 import { valueNoise } from "./noise";
 import { rebuildImageData } from "./bitmap";
@@ -82,21 +79,27 @@ export function createProjectileGraphics(): Graphics {
 }
 
 export function createMeteorDestructionEmitterConfig(meteor: Meteor): EmitterConfigV3 {
+  const lifetimeMin = 0.45;
+  const lifetimeMax = 0.95;
+  const speedScaleMin = 2.2;
+  const speedScaleMax = 5.2;
+  const sizeScaleMin = 0.12;
+  const sizeScaleMax = 0.34;
   const particleCount = Math.max(10, Math.round(meteor.radius * 0.55));
   const spread = 260;
   const travelAngle = Math.atan2(-meteor.vy, meteor.vx) * 180 / Math.PI;
-  const maxParticleSize = Math.max(1.5, meteor.radius * METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MAX);
-  const minParticleSize = Math.max(1, meteor.radius * METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MIN);
+  const maxParticleSize = Math.max(1.5, meteor.radius * sizeScaleMax);
+  const minParticleSize = Math.max(1, meteor.radius * sizeScaleMin);
   const textureWidth = Texture.WHITE.width > 0 ? Texture.WHITE.width : 16;
   const baseScale = maxParticleSize / textureWidth;
   const endScale = minParticleSize / textureWidth;
-  const minSpeed = meteor.radius * METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MIN + Math.hypot(meteor.vx, meteor.vy) * 0.2;
-  const maxSpeed = meteor.radius * METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MAX + Math.hypot(meteor.vx, meteor.vy) * 0.35;
+  const minSpeed = meteor.radius * speedScaleMin + Math.hypot(meteor.vx, meteor.vy) * 0.2;
+  const maxSpeed = meteor.radius * speedScaleMax + Math.hypot(meteor.vx, meteor.vy) * 0.35;
 
   return {
     lifetime: {
-      min: METEOR_DESTRUCTION_PARTICLE_LIFETIME_MIN,
-      max: METEOR_DESTRUCTION_PARTICLE_LIFETIME_MAX,
+      min: lifetimeMin,
+      max: lifetimeMax,
     },
     frequency: 1,
     spawnChance: 1,
