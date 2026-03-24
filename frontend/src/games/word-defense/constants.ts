@@ -62,5 +62,5 @@ export const MISSILE_FUSE_BUFFER = 0.4;
 export const RAILGUN_DAMAGE = 50;
 export const RAILGUN_SPEED = 800;
 
-export const AUTO_TYPE_ENABLED = false;
+export const AUTO_TYPE_ENABLED = true;
 export const AUTO_TYPE_INTERVAL = .2;
