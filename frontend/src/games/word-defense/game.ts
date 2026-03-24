@@ -41,7 +41,6 @@ import { GameHud } from "./hud";
 import { clampToRange } from "../../utils/math";
 import {
   ParticleManager,
-  createMuzzleFlashConfig,
   createBulletImpactConfig,
   createExplosionConfig,
   createMeteorDestructionConfig,
@@ -217,25 +216,21 @@ export class WordDefenseGame {
                 this.addLaserBeam(beam);
                 const mi = this.meteors.indexOf(meteor);
                 if (mi >= 0) this.damageMeteor(mi, LASER_DAMAGE);
-                this.emitMuzzleFlash(turret, Math.atan2(meteor.y - turret.y, meteor.x - turret.x));
               }
             } else if (turret.turretType === TurretType.Missile) {
               const proj = fireMissile(turret, meteor);
               if (proj) {
                 this.addProjectile(proj);
-                this.emitMuzzleFlash(turret, proj.launchAngle);
               }
             } else if (turret.turretType === TurretType.Railgun) {
               const proj = fireRailgun(turret, meteor);
               if (proj) {
                 this.addProjectile(proj);
-                this.emitMuzzleFlash(turret, Math.atan2(proj.vy, proj.vx));
               }
             } else {
               const proj = fireBullet(turret, meteor);
               if (proj) {
                 this.addProjectile(proj);
-                this.emitMuzzleFlash(turret, Math.atan2(proj.vy, proj.vx));
               }
             }
           }
@@ -300,10 +295,6 @@ export class WordDefenseGame {
 
   private emitMeteorDestruction(meteor: Meteor) {
     this.particles.emit(createMeteorDestructionConfig(meteor), meteor.x, meteor.y);
-  }
-
-  private emitMuzzleFlash(turret: TurretSlot, angle: number) {
-    this.particles.emit(createMuzzleFlashConfig(turret.turretType, angle), turret.x, turret.y);
   }
 
   private emitBulletImpact(proj: Projectile) {
