@@ -23,7 +23,13 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@pixi/constants": ["./src/pixi-compat/constants.ts"],
+      "@pixi/core": ["./src/pixi-compat/core.ts"],
+      "@pixi/display": ["./src/pixi-compat/display.ts"],
+      "@pixi/math": ["./src/pixi-compat/math.ts"],
+      "@pixi/sprite": ["./src/pixi-compat/sprite.ts"],
+      "@pixi/ticker": ["./src/pixi-compat/ticker.ts"]
     }
   },
   "include": ["src"]

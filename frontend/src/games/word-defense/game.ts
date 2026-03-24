@@ -1,8 +1,12 @@
+import { Emitter } from "@pixi/particle-emitter";
 import { Application, Container, Sprite, Graphics, Texture, TextStyle } from "pixi.js";
 
 import { getLanguageFromSlug } from "../../utils/modes";
 import { TurretType } from "./types";
-import type { Meteor, TurretSlot, Projectile, LaserBeam, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
+import type {
+  Meteor, TurretSlot, Projectile, LaserBeam, WaveConfig, WavePhase,
+  MeteorObject, SceneObject, TurretVisuals,
+} from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
@@ -26,7 +30,11 @@ import { createPlanet } from "./planet";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords } from "./meteor";
 import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBullet, isSlotGroundIntact, checkProjectileHitsMeteor } from "./turret";
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
-import { createMeteorObject, createProjectileGraphics } from "./meteorRendering";
+import {
+  createMeteorObject,
+  createProjectileGraphics,
+  createMeteorDestructionEmitterConfig,
+} from "./meteorRendering";
 import { fireMissile, updateMissile } from "./missile";
 import { fireLaser } from "./laser";
 import { fireRailgun } from "./railgun";
@@ -59,6 +67,7 @@ export class WordDefenseGame {
   private planetObj!: SceneObject;
   private planetTexture!: Texture;
   private meteorLayer!: Container;
+  private meteorParticleLayer!: Container;
   private projectileLayer!: Container;
   private highlightGfx!: Graphics;
   private hud!: GameHud;
@@ -68,6 +77,7 @@ export class WordDefenseGame {
 
   private meteors: Meteor[] = [];
   private meteorObjects: MeteorObject[] = [];
+  private meteorDestructionEmitters: Emitter[] = [];
   private projectiles: Projectile[] = [];
   private projectileGfxList: Graphics[] = [];
   private laserBeams: LaserBeam[] = [];
@@ -165,6 +175,9 @@ export class WordDefenseGame {
 
     this.meteorLayer = new Container();
     this.world.addChild(this.meteorLayer);
+
+    this.meteorParticleLayer = new Container();
+    this.world.addChild(this.meteorParticleLayer);
 
     this.projectileLayer = new Container();
     this.world.addChild(this.projectileLayer);
@@ -271,6 +284,13 @@ export class WordDefenseGame {
     this.meteorObjects.splice(index, 1);
   }
 
+  private emitMeteorDestruction(meteor: Meteor) {
+    const emitter = new Emitter(this.meteorParticleLayer, createMeteorDestructionEmitterConfig(meteor));
+    emitter.updateOwnerPos(meteor.x, meteor.y);
+    emitter.emitNow();
+    this.meteorDestructionEmitters.push(emitter);
+  }
+
   private addProjectile(proj: Projectile) {
     this.projectiles.push(proj);
     const g = createProjectileGraphics();
@@ -311,6 +331,7 @@ export class WordDefenseGame {
     this.updateProjectiles(dt);
     this.updateLaserBeams(dt);
     this.updateMeteors(dt);
+    this.updateMeteorDestructionParticles(dt);
     this.syncMeteorDisplays();
 
     this.hud.updateCredits(this.credits);
@@ -412,6 +433,7 @@ export class WordDefenseGame {
     this.credits += actualDamage;
 
     if (meteor.health <= 0) {
+      this.emitMeteorDestruction(meteor);
       this.removeMeteorAt(meteorIdx);
     }
   }
@@ -549,6 +571,18 @@ export class WordDefenseGame {
     }
   }
 
+  private updateMeteorDestructionParticles(dt: number) {
+    for (let i = this.meteorDestructionEmitters.length - 1; i >= 0; i--) {
+      const emitter = this.meteorDestructionEmitters[i];
+      emitter.update(dt);
+
+      if (!emitter.emit && emitter.particleCount === 0) {
+        emitter.destroy();
+        this.meteorDestructionEmitters.splice(i, 1);
+      }
+    }
+  }
+
   private checkAllSlotSurfaces() {
     for (let si = 0; si < this.slots.length; si++) {
       const slot = this.slots[si];
@@ -607,6 +641,9 @@ export class WordDefenseGame {
 
   destroy() {
     document.removeEventListener("keydown", this.keydownHandler);
+    for (const emitter of this.meteorDestructionEmitters) {
+      emitter.destroy();
+    }
     this.app.destroy(true, { children: true });
   }
 }
