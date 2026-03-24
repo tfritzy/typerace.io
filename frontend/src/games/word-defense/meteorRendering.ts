@@ -1,9 +1,12 @@
 import { Container, Sprite, Text, Texture, TextStyle, Graphics } from "pixi.js";
-import type { Meteor, MeteorObject } from "./types";
+import type { Meteor, MeteorDestructionParticle, MeteorObject } from "./types";
 import {
   TARGET_WORD_FONT_SIZE, TARGET_WORD_OFFSET_Y, TARGET_WORD_UNTYPED_ALPHA, TARGET_WORD_TYPED_ALPHA,
   BULLET_RENDER_RADIUS,
   METEOR_NOISE_FREQ, METEOR_CORE_RADIUS, METEOR_LUMP_HEIGHT,
+  METEOR_DESTRUCTION_PARTICLE_LIFETIME_MIN, METEOR_DESTRUCTION_PARTICLE_LIFETIME_MAX,
+  METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MIN, METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MAX,
+  METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MIN, METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MAX,
 } from "./constants";
 import { valueNoise } from "./noise";
 import { rebuildImageData } from "./bitmap";
@@ -75,4 +78,36 @@ export function createProjectileGraphics(): Graphics {
   g.circle(0, 0, BULLET_RENDER_RADIUS);
   g.fill(0xffffff);
   return g;
+}
+
+export function createMeteorDestructionParticles(meteor: Meteor): MeteorDestructionParticle[] {
+  const particleCount = Math.max(10, Math.round(meteor.radius * 0.55));
+  const particles: MeteorDestructionParticle[] = [];
+  const colors = [0xffffff, 0xe2e8f0, 0xcbd5e1, 0xfde68a];
+
+  for (let i = 0; i < particleCount; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const directionX = Math.cos(angle);
+    const directionY = Math.sin(angle);
+    const speedScale = METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MIN +
+      Math.random() * (METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MAX - METEOR_DESTRUCTION_PARTICLE_SPEED_SCALE_MIN);
+    const life = METEOR_DESTRUCTION_PARTICLE_LIFETIME_MIN +
+      Math.random() * (METEOR_DESTRUCTION_PARTICLE_LIFETIME_MAX - METEOR_DESTRUCTION_PARTICLE_LIFETIME_MIN);
+    const sizeScale = METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MIN +
+      Math.random() * (METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MAX - METEOR_DESTRUCTION_PARTICLE_SIZE_SCALE_MIN);
+    const spawnOffset = meteor.radius * (0.1 + Math.random() * 0.35);
+
+    particles.push({
+      x: meteor.x + directionX * spawnOffset,
+      y: meteor.y + directionY * spawnOffset,
+      vx: meteor.vx * 0.3 + directionX * meteor.radius * speedScale,
+      vy: meteor.vy * 0.3 + directionY * meteor.radius * speedScale,
+      life,
+      maxLife: life,
+      size: Math.max(1.5, meteor.radius * sizeScale),
+      color: colors[Math.floor(Math.random() * colors.length)],
+    });
+  }
+
+  return particles;
 }

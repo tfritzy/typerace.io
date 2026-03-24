@@ -85,6 +85,17 @@ export interface MeteorObject {
   healthBar: Graphics;
 }
 
+export interface MeteorDestructionParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  size: number;
+  color: number;
+}
+
 export interface TurretVisuals {
   containers: (Container | null)[];
   emptySlotGfx: (Graphics | null)[];

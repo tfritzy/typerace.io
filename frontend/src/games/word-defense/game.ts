@@ -2,7 +2,10 @@ import { Application, Container, Sprite, Graphics, Texture, TextStyle } from "pi
 
 import { getLanguageFromSlug } from "../../utils/modes";
 import { TurretType } from "./types";
-import type { Meteor, TurretSlot, Projectile, LaserBeam, WaveConfig, WavePhase, MeteorObject, SceneObject, TurretVisuals } from "./types";
+import type {
+  Meteor, TurretSlot, Projectile, LaserBeam, WaveConfig, WavePhase,
+  MeteorObject, SceneObject, TurretVisuals, MeteorDestructionParticle,
+} from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
   EARTH_CX, EARTH_CY, EARTH_RADIUS,
@@ -26,7 +29,11 @@ import { createPlanet } from "./planet";
 import { spawnMeteor, checkMeteorHitsPlanet, getActiveWords } from "./meteor";
 import { createTurretSlots, updateTurretPositions, findAvailableTurrets, fireBullet, isSlotGroundIntact, checkProjectileHitsMeteor } from "./turret";
 import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlightRing } from "./turretRendering";
-import { createMeteorObject, createProjectileGraphics } from "./meteorRendering";
+import {
+  createMeteorObject,
+  createProjectileGraphics,
+  createMeteorDestructionParticles,
+} from "./meteorRendering";
 import { fireMissile, updateMissile } from "./missile";
 import { fireLaser } from "./laser";
 import { fireRailgun } from "./railgun";
@@ -59,6 +66,7 @@ export class WordDefenseGame {
   private planetObj!: SceneObject;
   private planetTexture!: Texture;
   private meteorLayer!: Container;
+  private meteorParticleLayer!: Graphics;
   private projectileLayer!: Container;
   private highlightGfx!: Graphics;
   private hud!: GameHud;
@@ -68,6 +76,7 @@ export class WordDefenseGame {
 
   private meteors: Meteor[] = [];
   private meteorObjects: MeteorObject[] = [];
+  private meteorDestructionParticles: MeteorDestructionParticle[] = [];
   private projectiles: Projectile[] = [];
   private projectileGfxList: Graphics[] = [];
   private laserBeams: LaserBeam[] = [];
@@ -165,6 +174,9 @@ export class WordDefenseGame {
 
     this.meteorLayer = new Container();
     this.world.addChild(this.meteorLayer);
+
+    this.meteorParticleLayer = new Graphics();
+    this.world.addChild(this.meteorParticleLayer);
 
     this.projectileLayer = new Container();
     this.world.addChild(this.projectileLayer);
@@ -271,6 +283,10 @@ export class WordDefenseGame {
     this.meteorObjects.splice(index, 1);
   }
 
+  private emitMeteorDestruction(meteor: Meteor) {
+    this.meteorDestructionParticles.push(...createMeteorDestructionParticles(meteor));
+  }
+
   private addProjectile(proj: Projectile) {
     this.projectiles.push(proj);
     const g = createProjectileGraphics();
@@ -311,6 +327,7 @@ export class WordDefenseGame {
     this.updateProjectiles(dt);
     this.updateLaserBeams(dt);
     this.updateMeteors(dt);
+    this.updateMeteorDestructionParticles(dt);
     this.syncMeteorDisplays();
 
     this.hud.updateCredits(this.credits);
@@ -412,6 +429,7 @@ export class WordDefenseGame {
     this.credits += actualDamage;
 
     if (meteor.health <= 0) {
+      this.emitMeteorDestruction(meteor);
       this.removeMeteorAt(meteorIdx);
     }
   }
@@ -546,6 +564,31 @@ export class WordDefenseGame {
       if (removed) {
         this.removeMeteorAt(i);
       }
+    }
+  }
+
+  private updateMeteorDestructionParticles(dt: number) {
+    this.meteorParticleLayer.clear();
+
+    for (let i = this.meteorDestructionParticles.length - 1; i >= 0; i--) {
+      const particle = this.meteorDestructionParticles[i];
+      particle.life -= dt;
+
+      if (particle.life <= 0) {
+        this.meteorDestructionParticles.splice(i, 1);
+        continue;
+      }
+
+      particle.x += particle.vx * dt;
+      particle.y += particle.vy * dt;
+      particle.vx *= Math.max(0, 1 - dt * 2.4);
+      particle.vy *= Math.max(0, 1 - dt * 2.4);
+
+      const alpha = particle.life / particle.maxLife;
+      const radius = particle.size * (0.45 + alpha * 0.85);
+
+      this.meteorParticleLayer.circle(particle.x, particle.y, radius);
+      this.meteorParticleLayer.fill({ color: particle.color, alpha: alpha * 0.75 });
     }
   }
 
