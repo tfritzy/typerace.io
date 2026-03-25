@@ -435,7 +435,7 @@ export class WordDefenseGame {
       const ship: SupplyShip = {
         x: baseX + i * spacing,
         y: -80,
-        targetY: EARTH_CY - EARTH_RADIUS - 120 - i * 40,
+        targetY: EARTH_CY - EARTH_RADIUS - 60 - i * 50,
         phase: "approaching",
         offerings,
         selected: false,
@@ -877,5 +877,6 @@ export async function createWordDefenseGame(container: HTMLElement): Promise<Wor
   app.canvas.style.aspectRatio = "16/9";
   container.appendChild(app.canvas);
 
-  return new WordDefenseGame(app);
+  const game = new WordDefenseGame(app);
+  return game;
 }
