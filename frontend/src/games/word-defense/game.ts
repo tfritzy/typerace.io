@@ -5,6 +5,7 @@ import { TurretType } from "./types";
 import type {
   Meteor, TurretSlot, Projectile, LaserBeam, WaveConfig, WavePhase,
   MeteorObject, SceneObject, TurretVisuals,
+  TurretConfig, SupplyShip, PlacementState,
 } from "./types";
 import {
   CANVAS_WIDTH, CANVAS_HEIGHT,
@@ -23,6 +24,7 @@ import {
   ACTIVE_WAVE_ZOOM, BETWEEN_WAVE_ZOOM, BETWEEN_WAVE_FOCUS_Y, CAMERA_LERP_SPEED,
   LASER_DAMAGE, LASER_BEAM_WIDTH,
   AUTO_TYPE_ENABLED, AUTO_TYPE_INTERVAL,
+  NUCLEAR_MISSILE_EXPLOSION_RADIUS,
 } from "./constants";
 import { destroyCircle } from "./bitmap";
 import { createPlanet } from "./planet";
@@ -34,6 +36,7 @@ import {
   createProjectileGraphics,
 } from "./meteorRendering";
 import { fireMissile, updateMissile } from "./missile";
+import { fireNuclearMissile, updateNuclearMissile } from "./nuclearMissile";
 import { fireLaser } from "./laser";
 import { fireRailgun } from "./railgun";
 import { buildPalette, getDarkBackgroundColor, ACCENT_INDEX } from "./palette";
@@ -45,6 +48,12 @@ import {
   createExplosionConfig,
   createMeteorDestructionConfig,
 } from "./particles";
+import { rollTurretOfferings, rollShipTypes } from "./turretPool";
+import {
+  createShipGraphics, updateShipPosition,
+  createCardUI, createPlacementUI,
+  getScaledDamage,
+} from "./shipUI";
 
 function getLangCode(): string {
   const slug = localStorage.getItem("typerace_lang_slug");
@@ -101,6 +110,14 @@ export class WordDefenseGame {
   private gameOver = false;
   private selectedSlot: TurretSlot | null = null;
   private hoveredSlot: TurretSlot | null = null;
+
+  private supplyShips: SupplyShip[] = [];
+  private shipGraphics: Container[] = [];
+  private shipsResolved = 0;
+  private totalShipsThisWave = 0;
+  private cardOverlay: Container | null = null;
+  private placementState: PlacementState = { mode: "none", turretConfig: null };
+  private placementUI: Container | null = null;
 
   private untypedStyle: TextStyle;
   private typedStyle: TextStyle;
@@ -163,7 +180,11 @@ export class WordDefenseGame {
       const slot = this.slots[i];
       const hitArea = this.turretVisuals.hitAreas[i];
       hitArea.on("pointertap", () => {
-        this.selectedSlot = this.selectedSlot === slot ? null : slot;
+        if (this.placementState.mode === "placing") {
+          this.handleSlotClickDuringPlacement(i);
+        } else {
+          this.selectedSlot = this.selectedSlot === slot ? null : slot;
+        }
       });
       hitArea.on("pointerover", () => {
         this.hoveredSlot = slot;
@@ -210,26 +231,36 @@ export class WordDefenseGame {
         if (meteor.typedCount >= meteor.word.length) {
           const availableTurrets = findAvailableTurrets(this.slots);
           for (const turret of availableTurrets) {
+            const dmgScale = getScaledDamage(1, turret.level);
             if (turret.turretType === TurretType.Laser) {
               const beam = fireLaser(turret, meteor);
               if (beam) {
                 this.addLaserBeam(beam);
                 const mi = this.meteors.indexOf(meteor);
-                if (mi >= 0) this.damageMeteor(mi, LASER_DAMAGE);
+                if (mi >= 0) this.damageMeteor(mi, LASER_DAMAGE * dmgScale);
+              }
+            } else if (turret.turretType === TurretType.NuclearMissile) {
+              const proj = fireNuclearMissile(turret, meteor);
+              if (proj) {
+                proj.damage = Math.round(proj.damage * dmgScale);
+                this.addProjectile(proj);
               }
             } else if (turret.turretType === TurretType.Missile) {
               const proj = fireMissile(turret, meteor);
               if (proj) {
+                proj.damage = Math.round(proj.damage * dmgScale);
                 this.addProjectile(proj);
               }
             } else if (turret.turretType === TurretType.Railgun) {
               const proj = fireRailgun(turret, meteor);
               if (proj) {
+                proj.damage = Math.round(proj.damage * dmgScale);
                 this.addProjectile(proj);
               }
             } else {
               const proj = fireBullet(turret, meteor);
               if (proj) {
+                proj.damage = Math.round(proj.damage * dmgScale);
                 this.addProjectile(proj);
               }
             }
@@ -277,6 +308,9 @@ export class WordDefenseGame {
     this.selectedSlot = null;
     this.hoveredSlot = null;
     this.hud.hideStartButton();
+    this.cleanupShips();
+    this.dismissCardOverlay();
+    this.cancelPlacement();
   }
 
   private addMeteor(meteor: Meteor) {
@@ -348,6 +382,10 @@ export class WordDefenseGame {
     this.particles.update(dt);
     this.syncMeteorDisplays();
 
+    if (this.phase === "shopping" || this.phase === "complete") {
+      this.updateSupplyShips(dt);
+    }
+
     this.hud.updateCredits(this.credits);
     const fraction = this.initialHabitablePixels > 0
       ? this.habitablePixels / this.initialHabitablePixels
@@ -378,9 +416,157 @@ export class WordDefenseGame {
       this.projectiles.length === 0 &&
       this.laserBeams.length === 0
     ) {
-      this.phase = "complete";
-      this.hud.showStartButton(this.waveConfig.waveNumber + 1);
+      this.phase = "shopping";
+      this.spawnSupplyShips();
     }
+  }
+
+  private spawnSupplyShips() {
+    const shipTypes = rollShipTypes(2);
+    this.shipsResolved = 0;
+    this.totalShipsThisWave = shipTypes.length;
+
+    const spacing = 300;
+    const baseX = EARTH_CX - ((shipTypes.length - 1) * spacing) / 2;
+
+    for (let i = 0; i < shipTypes.length; i++) {
+      const shipType = shipTypes[i];
+      const offerings = rollTurretOfferings(shipType.offeringCount);
+      const ship: SupplyShip = {
+        x: baseX + i * spacing,
+        y: -80,
+        targetY: EARTH_CY - EARTH_RADIUS - 120 - i * 40,
+        phase: "approaching",
+        offerings,
+        selected: false,
+      };
+      this.supplyShips.push(ship);
+
+      const gfx = createShipGraphics();
+      gfx.position.set(ship.x, ship.y);
+      gfx.eventMode = "static";
+      gfx.cursor = "pointer";
+      const shipIndex = this.supplyShips.length - 1;
+      gfx.on("pointertap", () => this.onShipClicked(shipIndex));
+      this.world.addChild(gfx);
+      this.shipGraphics.push(gfx);
+    }
+  }
+
+  private updateSupplyShips(dt: number) {
+    for (let i = 0; i < this.supplyShips.length; i++) {
+      const ship = this.supplyShips[i];
+      if (ship.phase === "gone") continue;
+      const done = updateShipPosition(ship, dt);
+      this.shipGraphics[i].position.set(ship.x, ship.y);
+      this.shipGraphics[i].visible = !done;
+    }
+  }
+
+  private onShipClicked(index: number) {
+    const ship = this.supplyShips[index];
+    if (ship.phase !== "hovering" || ship.selected) return;
+    if (this.cardOverlay || this.placementState.mode === "placing") return;
+
+    this.showCardSelection(ship, index);
+  }
+
+  private showCardSelection(ship: SupplyShip, shipIndex: number) {
+    this.cardOverlay = createCardUI(
+      ship.offerings,
+      this.slots,
+      (config: TurretConfig) => {
+        this.dismissCardOverlay();
+        this.beginPlacement(config, shipIndex);
+      },
+      () => {
+        this.dismissCardOverlay();
+        this.resolveShip(shipIndex);
+      },
+    );
+    this.app.stage.addChild(this.cardOverlay);
+  }
+
+  private dismissCardOverlay() {
+    if (this.cardOverlay) {
+      this.cardOverlay.destroy({ children: true });
+      this.cardOverlay = null;
+    }
+  }
+
+  private beginPlacement(config: TurretConfig, shipIndex: number) {
+    this.placementState = { mode: "placing", turretConfig: config };
+
+    this.placementUI = createPlacementUI(config, this.slots);
+    const cancelBtn = this.placementUI.children[1] as Container;
+    cancelBtn.on("pointertap", () => {
+      this.cancelPlacement();
+      this.showCardSelection(this.supplyShips[shipIndex], shipIndex);
+    });
+    this.app.stage.addChild(this.placementUI);
+
+    this.pendingShipIndex = shipIndex;
+  }
+
+  private pendingShipIndex = -1;
+
+  private cancelPlacement() {
+    this.placementState = { mode: "none", turretConfig: null };
+    if (this.placementUI) {
+      this.placementUI.destroy({ children: true });
+      this.placementUI = null;
+    }
+    this.pendingShipIndex = -1;
+  }
+
+  private handleSlotClickDuringPlacement(slotIndex: number) {
+    const slot = this.slots[slotIndex];
+    const config = this.placementState.turretConfig;
+    if (!config || slot.destroyed) return;
+
+    if (!slot.filled) {
+      slot.filled = true;
+      slot.turretType = config.type;
+      slot.level = 1;
+      rebuildSlotVisual(slotIndex, this.slots, this.turretVisuals, this.planetContainer);
+      this.finishPlacement();
+    } else if (slot.turretType === config.type) {
+      slot.level += 1;
+      rebuildSlotVisual(slotIndex, this.slots, this.turretVisuals, this.planetContainer);
+      this.finishPlacement();
+    }
+  }
+
+  private finishPlacement() {
+    const shipIndex = this.pendingShipIndex;
+    this.cancelPlacement();
+    this.resolveShip(shipIndex);
+  }
+
+  private resolveShip(shipIndex: number) {
+    const ship = this.supplyShips[shipIndex];
+    ship.selected = true;
+    ship.phase = "departing";
+    this.shipsResolved++;
+
+    if (this.shipsResolved >= this.totalShipsThisWave) {
+      this.transitionToComplete();
+    }
+  }
+
+  private transitionToComplete() {
+    this.phase = "complete";
+    this.hud.showStartButton(this.waveConfig.waveNumber + 1);
+  }
+
+  private cleanupShips() {
+    for (const gfx of this.shipGraphics) {
+      gfx.destroy({ children: true });
+    }
+    this.shipGraphics = [];
+    this.supplyShips = [];
+    this.shipsResolved = 0;
+    this.totalShipsThisWave = 0;
   }
 
   private updateCamera(dt: number, isActive: boolean) {
@@ -414,14 +600,23 @@ export class WordDefenseGame {
 
   private updateSlotVisuals() {
     const isComplete = this.phase === "complete";
+    const isPlacing = this.placementState.mode === "placing";
+    const showSlots = isComplete || isPlacing;
+
     for (let i = 0; i < this.slots.length; i++) {
       const slot = this.slots[i];
       if (slot.destroyed) {
         this.turretVisuals.hitAreas[i].visible = false;
         continue;
       }
-      this.turretVisuals.hitAreas[i].visible = isComplete;
-      if (isComplete) {
+      this.turretVisuals.hitAreas[i].visible = showSlots;
+      if (isPlacing) {
+        const config = this.placementState.turretConfig;
+        const canPlace = !slot.filled || (slot.turretType === config?.type);
+        if (canPlace && !slot.filled) {
+          drawSlotInteractive(this.turretVisuals.hitAreas[i], false, slot === this.hoveredSlot);
+        }
+      } else if (isComplete) {
         if (!slot.filled) {
           drawSlotInteractive(this.turretVisuals.hitAreas[i], slot === this.selectedSlot, slot === this.hoveredSlot);
         }
@@ -429,7 +624,17 @@ export class WordDefenseGame {
     }
 
     this.highlightGfx.clear();
-    if (isComplete) {
+    if (isPlacing) {
+      const config = this.placementState.turretConfig;
+      for (const slot of this.slots) {
+        if (slot.filled && !slot.destroyed && slot.turretType === config?.type) {
+          const isHovered = slot === this.hoveredSlot;
+          if (isHovered) {
+            drawHighlightRing(this.highlightGfx, slot.x, slot.y, true);
+          }
+        }
+      }
+    } else if (isComplete) {
       for (const slot of this.slots) {
         const isSelected = slot === this.selectedSlot;
         const isHovered = slot === this.hoveredSlot;
@@ -457,7 +662,9 @@ export class WordDefenseGame {
       const proj = this.projectiles[i];
 
       if (proj.explosionRadius > 0) {
-        if (updateMissile(proj, dt)) {
+        const isNuke = proj.explosionRadius >= NUCLEAR_MISSILE_EXPLOSION_RADIUS;
+        const expired = isNuke ? updateNuclearMissile(proj, dt) : updateMissile(proj, dt);
+        if (expired) {
           this.detonateProjectile(i);
           continue;
         }
@@ -646,6 +853,9 @@ export class WordDefenseGame {
   destroy() {
     document.removeEventListener("keydown", this.keydownHandler);
     this.particles.destroy();
+    this.dismissCardOverlay();
+    this.cancelPlacement();
+    this.cleanupShips();
     this.app.destroy(true, { children: true });
   }
 }

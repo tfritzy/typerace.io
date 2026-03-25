@@ -17,7 +17,7 @@ export const TARGET_WORD_UNTYPED_ALPHA = 0.35;
 export const TARGET_WORD_OFFSET_Y = 2;
 export const LABEL_SCREEN_PADDING = 10;
 
-export const TOTAL_TURRET_SLOTS = 36;
+export const TOTAL_TURRET_SLOTS = 12;
 export const INITIAL_TURRET_COUNT = 4;
 export const TURRET_BARREL_LENGTH = 16;
 export const TURRET_BARREL_WIDTH = 6;
@@ -61,6 +61,14 @@ export const MISSILE_FUSE_BUFFER = 0.4;
 
 export const RAILGUN_DAMAGE = 50;
 export const RAILGUN_SPEED = 800;
+
+export const NUCLEAR_MISSILE_DAMAGE = 100;
+export const NUCLEAR_MISSILE_INITIAL_SPEED = 30;
+export const NUCLEAR_MISSILE_ACCELERATION = 60;
+export const NUCLEAR_MISSILE_EXPLOSION_RADIUS = 100;
+export const NUCLEAR_MISSILE_FUSE_BUFFER = 0.5;
+
+export const UPGRADE_SCALING = 1.5;
 
 export const AUTO_TYPE_ENABLED = true;
 export const AUTO_TYPE_INTERVAL = .2;

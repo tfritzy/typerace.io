@@ -29,6 +29,24 @@ export enum TurretType {
   Missile,
   Laser,
   Railgun,
+  NuclearMissile,
+}
+
+export enum TurretRarity {
+  Common,
+  Rare,
+  Epic,
+}
+
+export interface TurretConfig {
+  type: TurretType;
+  name: string;
+  rarity: TurretRarity;
+  damage: number;
+  color: number;
+  description: string;
+  fireRate: string;
+  special: string;
 }
 
 export interface TurretSlot {
@@ -39,6 +57,25 @@ export interface TurretSlot {
   filled: boolean;
   destroyed: boolean;
   turretType: TurretType;
+  level: number;
+}
+
+export type ShipPhase = "approaching" | "hovering" | "departing" | "gone";
+
+export interface SupplyShip {
+  x: number;
+  y: number;
+  targetY: number;
+  phase: ShipPhase;
+  offerings: TurretConfig[];
+  selected: boolean;
+}
+
+export type PlacementMode = "none" | "placing";
+
+export interface PlacementState {
+  mode: PlacementMode;
+  turretConfig: TurretConfig | null;
 }
 
 export interface Projectile {
@@ -74,7 +111,7 @@ export interface WaveConfig {
   meteorSpeed: number;
 }
 
-export type WavePhase = "active" | "complete";
+export type WavePhase = "active" | "shopping" | "complete";
 
 export interface MeteorObject {
   data: Meteor;

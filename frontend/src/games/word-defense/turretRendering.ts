@@ -1,4 +1,4 @@
-import { Container, Graphics, Circle } from "pixi.js";
+import { Container, Graphics, Circle, Text } from "pixi.js";
 import { TurretType } from "./types";
 import type { TurretSlot, TurretVisuals } from "./types";
 import {
@@ -20,6 +20,7 @@ export function createTurretContainer(slot: TurretSlot): Container {
   if (slot.turretType === TurretType.Missile) color = 0xf59e0b;
   else if (slot.turretType === TurretType.Laser) color = 0x60a5fa;
   else if (slot.turretType === TurretType.Railgun) color = 0xa855f7;
+  else if (slot.turretType === TurretType.NuclearMissile) color = 0xef4444;
 
   const hex = new Graphics();
   const hexRadius = 15;
@@ -81,12 +82,29 @@ export function createTurretContainer(slot: TurretSlot): Container {
 
     icon.rect(2, -2, 4, 4);
     icon.fill(color);
+  } else if (slot.turretType === TurretType.NuclearMissile) {
+    icon.circle(0, 0, 5);
+    icon.fill({ color: color, alpha: 0.4 });
+    icon.circle(0, 0, 5);
+    icon.stroke({ color: color, width: 2 });
+    icon.circle(0, 0, 2);
+    icon.fill(color);
   } else {
     icon.circle(0, 0, 3);
     icon.fill(color);
   }
 
   container.addChild(icon);
+
+  if (slot.level > 1) {
+    const lvl = new Text({
+      text: `${slot.level}`,
+      style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 9, fill: 0xffffff },
+    });
+    lvl.anchor.set(0.5);
+    lvl.position.set(0, 11);
+    container.addChild(lvl);
+  }
 
   return container;
 }

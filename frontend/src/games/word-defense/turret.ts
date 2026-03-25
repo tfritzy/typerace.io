@@ -22,6 +22,7 @@ export function createTurretSlots(): TurretSlot[] {
       filled: false,
       destroyed: false,
       turretType: TurretType.Bullet,
+      level: 1,
     });
   }
 
