@@ -300,7 +300,7 @@ export function createMeteorDestructionConfig(meteor: Meteor): EmitterConfigV3 {
         type: "rotation",
         config: {
           minStart: 0,
-          maxStart: 360,
+          maxStart: 0,
           minSpeed: -60,
           maxSpeed: 60,
           accel: 0,
