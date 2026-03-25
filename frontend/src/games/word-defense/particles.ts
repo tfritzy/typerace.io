@@ -236,8 +236,8 @@ export function createMeteorDestructionConfig(meteor: Meteor): EmitterConfigV3 {
   const area = Math.PI * meteor.radius * meteor.radius;
   const particleCount = Math.min(120, Math.max(16, Math.round(area * 0.12)));
   const driftSpeed = meteor.radius * 0.8;
-  const maxSize = Math.max(3, meteor.radius * 0.45);
-  const minSize = Math.max(1.5, meteor.radius * 0.15);
+  const maxSize = Math.max(6, meteor.radius * 0.9);
+  const minSize = Math.max(3, meteor.radius * 0.3);
   const textures = getDebrisTextures();
   const textureWidth = 16;
   const baseScale = maxSize / textureWidth;
@@ -308,7 +308,7 @@ export function createMeteorDestructionConfig(meteor: Meteor): EmitterConfigV3 {
         config: {
           spacing: 360 / particleCount,
           start: 0,
-          distance: meteor.radius * 0.3,
+          distance: meteor.radius * 0.6,
         },
       },
       {
