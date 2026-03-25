@@ -2,7 +2,7 @@ import { Emitter } from "@pixi/particle-emitter";
 import type { EmitterConfigV3 } from "@pixi/particle-emitter";
 import { Container, Texture } from "pixi.js";
 import type { Meteor } from "./types";
-import { MISSILE_EXPLOSION_RADIUS } from "./constants";
+
 import { getPalette, ACCENT_DARK_INDEX } from "./palette";
 
 function createDebrisTexture(size: number): Texture {
@@ -143,21 +143,42 @@ export function createBulletImpactConfig(
   };
 }
 
+let ringTextureCache: Texture | null = null;
+const RING_TEXTURE_SIZE = 64;
+
+function getRingTexture(): Texture {
+  if (!ringTextureCache) {
+    const size = RING_TEXTURE_SIZE;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d")!;
+    const cx = size / 2;
+    const cy = size / 2;
+    const outerRadius = size / 2 - 1;
+    const innerRadius = outerRadius - 3;
+    ctx.beginPath();
+    ctx.arc(cx, cy, outerRadius, 0, Math.PI * 2);
+    ctx.arc(cx, cy, innerRadius, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fillStyle = "white";
+    ctx.fill();
+    ringTextureCache = Texture.from({ resource: canvas, transparent: true });
+  }
+  return ringTextureCache;
+}
+
 export function createExplosionConfig(
   explosionRadius: number,
 ): EmitterConfigV3 {
-  const sizeFactor = explosionRadius / MISSILE_EXPLOSION_RADIUS;
-  const maxParticles = Math.min(100, Math.max(30, Math.round(60 * sizeFactor)));
-  const textureWidth = Texture.WHITE.width > 0 ? Texture.WHITE.width : 16;
-  const startScale = (explosionRadius * 0.4) / textureWidth;
-  const endScale = (explosionRadius * 0.08) / textureWidth;
-  const speed = 100 + explosionRadius * 4;
+  const ringTexture = getRingTexture();
+  const peakScale = (explosionRadius * 2) / RING_TEXTURE_SIZE;
 
   return {
-    lifetime: { min: 0.5, max: 1 },
-    frequency: 0.001,
-    emitterLifetime: 0.1,
-    maxParticles,
+    lifetime: { min: 0.3, max: 0.5 },
+    frequency: 0.04,
+    emitterLifetime: 0.12,
+    maxParticles: 4,
     addAtBack: true,
     pos: { x: 0, y: 0 },
     behaviors: [
@@ -166,18 +187,8 @@ export function createExplosionConfig(
         config: {
           alpha: {
             list: [
-              { value: 0.74, time: 0 },
-              { value: 0, time: 1 },
-            ],
-          },
-        },
-      },
-      {
-        type: "moveSpeed",
-        config: {
-          speed: {
-            list: [
-              { value: speed, time: 0 },
+              { value: 0.9, time: 0 },
+              { value: 0.6, time: 0.4 },
               { value: 0, time: 1 },
             ],
           },
@@ -188,11 +199,12 @@ export function createExplosionConfig(
         config: {
           scale: {
             list: [
-              { value: startScale, time: 0 },
-              { value: endScale, time: 1 },
+              { value: peakScale * 0.05, time: 0 },
+              { value: peakScale, time: 0.5 },
+              { value: peakScale * 1.2, time: 1 },
             ],
           },
-          minMult: 1,
+          minMult: 0.8,
         },
       },
       {
@@ -200,25 +212,17 @@ export function createExplosionConfig(
         config: {
           color: {
             list: [
-              { value: "ffdfa0", time: 0 },
-              { value: "100f0c", time: 1 },
+              { value: "ffffff", time: 0 },
+              { value: "ffcc44", time: 0.3 },
+              { value: "ff6600", time: 0.7 },
+              { value: "331100", time: 1 },
             ],
           },
         },
       },
       {
-        type: "rotation",
-        config: {
-          accel: 0,
-          minSpeed: 0,
-          maxSpeed: 200,
-          minStart: 0,
-          maxStart: 360,
-        },
-      },
-      {
         type: "textureSingle",
-        config: { texture: Texture.WHITE },
+        config: { texture: ringTexture },
       },
       {
         type: "spawnPoint",
