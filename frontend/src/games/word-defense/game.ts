@@ -359,7 +359,7 @@ export class WordDefenseGame {
   private checkWaveComplete(isActive: boolean) {
     if (
       isActive &&
-      this.meteorsSpawned >= this.waveConfig.totalMeteors &&
+      this.meteorsSpawned > 0 &&
       this.meteors.length === 0 &&
       this.projectiles.length === 0 &&
       this.laserBeams.length === 0
