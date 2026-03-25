@@ -85,3 +85,12 @@ export function getBackgroundColor(): number {
   const bg = globalPalette[BACKGROUND_INDEX];
   return (bg[0] << 16) | (bg[1] << 8) | bg[2];
 }
+
+export function getDarkBackgroundColor(): number {
+  const bg = globalPalette[BACKGROUND_INDEX];
+  const factor = 0.3;
+  const r = Math.round(bg[0] * factor);
+  const g = Math.round(bg[1] * factor);
+  const b = Math.round(bg[2] * factor);
+  return (r << 16) | (g << 8) | b;
+}
