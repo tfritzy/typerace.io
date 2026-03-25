@@ -294,7 +294,7 @@ export class WordDefenseGame {
   }
 
   private emitMeteorDestruction(meteor: Meteor) {
-    this.particles.emit(createMeteorDestructionConfig(meteor), meteor.x, meteor.y);
+    this.particles.emitMoving(createMeteorDestructionConfig(meteor), meteor.x, meteor.y, meteor.vx, meteor.vy);
   }
 
   private emitBulletImpact(proj: Projectile) {

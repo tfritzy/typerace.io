@@ -235,9 +235,7 @@ export function createExplosionConfig(
 export function createMeteorDestructionConfig(meteor: Meteor): EmitterConfigV3 {
   const area = Math.PI * meteor.radius * meteor.radius;
   const particleCount = Math.min(120, Math.max(16, Math.round(area * 0.12)));
-  const travelAngle = Math.atan2(-meteor.vy, meteor.vx) * 180 / Math.PI;
-  const meteorSpeed = Math.hypot(meteor.vx, meteor.vy);
-  const driftSpeed = meteor.radius * 0.4;
+  const driftSpeed = meteor.radius * 0.8;
   const maxSize = Math.max(3, meteor.radius * 0.45);
   const minSize = Math.max(1.5, meteor.radius * 0.15);
   const textures = getDebrisTextures();
@@ -246,7 +244,7 @@ export function createMeteorDestructionConfig(meteor: Meteor): EmitterConfigV3 {
   const endScale = minSize / textureWidth;
 
   return {
-    lifetime: { min: 1.5, max: 3.0 },
+    lifetime: { min: 0.8, max: 1.5 },
     frequency: 1,
     spawnChance: 1,
     particlesPerWave: particleCount,
@@ -262,8 +260,7 @@ export function createMeteorDestructionConfig(meteor: Meteor): EmitterConfigV3 {
           alpha: {
             list: [
               { value: 1, time: 0 },
-              { value: 0.9, time: 0.5 },
-              { value: 0.6, time: 0.8 },
+              { value: 0.8, time: 0.4 },
               { value: 0, time: 1 },
             ],
           },
@@ -275,7 +272,7 @@ export function createMeteorDestructionConfig(meteor: Meteor): EmitterConfigV3 {
           scale: {
             list: [
               { value: baseScale, time: 0 },
-              { value: baseScale * 0.8, time: 0.5 },
+              { value: baseScale * 0.7, time: 0.5 },
               { value: endScale, time: 1 },
             ],
           },
@@ -287,31 +284,31 @@ export function createMeteorDestructionConfig(meteor: Meteor): EmitterConfigV3 {
         config: {
           speed: {
             list: [
-              { value: meteorSpeed + driftSpeed, time: 0 },
-              { value: meteorSpeed * 0.5 + driftSpeed * 0.5, time: 0.4 },
-              { value: driftSpeed * 0.2, time: 1 },
+              { value: driftSpeed, time: 0 },
+              { value: driftSpeed * 0.3, time: 0.5 },
+              { value: 0, time: 1 },
             ],
             isStepped: false,
           },
-          minMult: 0.6,
+          minMult: 0.5,
         },
       },
       {
         type: "rotation",
         config: {
           minStart: 0,
-          maxStart: 0,
-          minSpeed: -60,
-          maxSpeed: 60,
+          maxStart: 360,
+          minSpeed: -90,
+          maxSpeed: 90,
           accel: 0,
         },
       },
       {
         type: "spawnBurst",
         config: {
-          spacing: 60 / particleCount,
-          start: travelAngle - 30,
-          distance: meteor.radius * 0.5,
+          spacing: 360 / particleCount,
+          start: 0,
+          distance: meteor.radius * 0.3,
         },
       },
       {
@@ -322,8 +319,17 @@ export function createMeteorDestructionConfig(meteor: Meteor): EmitterConfigV3 {
   };
 }
 
+interface MovingEmitter {
+  emitter: Emitter;
+  vx: number;
+  vy: number;
+  x: number;
+  y: number;
+}
+
 export class ParticleManager {
   private emitters: Emitter[] = [];
+  private movingEmitters: MovingEmitter[] = [];
   readonly container: Container;
 
   constructor() {
@@ -337,6 +343,13 @@ export class ParticleManager {
     this.emitters.push(emitter);
   }
 
+  emitMoving(config: EmitterConfigV3, x: number, y: number, vx: number, vy: number): void {
+    const emitter = new Emitter(this.container, config);
+    emitter.updateOwnerPos(x, y);
+    emitter.emitNow();
+    this.movingEmitters.push({ emitter, vx, vy, x, y });
+  }
+
   update(dt: number): void {
     for (let i = this.emitters.length - 1; i >= 0; i--) {
       const emitter = this.emitters[i];
@@ -347,6 +360,19 @@ export class ParticleManager {
         this.emitters.splice(i, 1);
       }
     }
+
+    for (let i = this.movingEmitters.length - 1; i >= 0; i--) {
+      const me = this.movingEmitters[i];
+      me.x += me.vx * dt;
+      me.y += me.vy * dt;
+      me.emitter.updateOwnerPos(me.x, me.y);
+      me.emitter.update(dt);
+
+      if (!me.emitter.emit && me.emitter.particleCount === 0) {
+        me.emitter.destroy();
+        this.movingEmitters.splice(i, 1);
+      }
+    }
   }
 
   destroy(): void {
@@ -354,5 +380,9 @@ export class ParticleManager {
       emitter.destroy();
     }
     this.emitters.length = 0;
+    for (const me of this.movingEmitters) {
+      me.emitter.destroy();
+    }
+    this.movingEmitters.length = 0;
   }
 }
