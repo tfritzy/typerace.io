@@ -143,26 +143,50 @@ export function createBulletImpactConfig(
   };
 }
 
+let fireballTextureCache: Texture | null = null;
+
+function getFireballTexture(): Texture {
+  if (!fireballTextureCache) {
+    const size = 32;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d")!;
+    const gradient = ctx.createRadialGradient(
+      size / 2, size / 2, 0,
+      size / 2, size / 2, size / 2
+    );
+    gradient.addColorStop(0, "rgba(255,255,255,1)");
+    gradient.addColorStop(0.3, "rgba(255,200,50,0.9)");
+    gradient.addColorStop(0.7, "rgba(255,100,20,0.5)");
+    gradient.addColorStop(1, "rgba(200,50,0,0)");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
+    fireballTextureCache = Texture.from({ resource: canvas, transparent: true });
+  }
+  return fireballTextureCache;
+}
+
 export function createExplosionConfig(
   explosionRadius: number,
 ): EmitterConfigV3 {
   const sizeFactor = explosionRadius / MISSILE_EXPLOSION_RADIUS;
-  const particleCount = Math.max(12, Math.round(16 * sizeFactor));
-  const textureWidth = Texture.WHITE.width > 0 ? Texture.WHITE.width : 16;
-  const maxSize = Math.max(3, explosionRadius * 0.25);
-  const minSize = Math.max(1, explosionRadius * 0.08);
-  const baseScale = maxSize / textureWidth;
-  const endScale = minSize / textureWidth;
-  const speed = 30 + explosionRadius * 1.5;
+  const particleCount = Math.min(80, Math.max(20, Math.round(30 * sizeFactor)));
+  const fireballTexture = getFireballTexture();
+  const textureWidth = 32;
+  const peakSize = explosionRadius * 0.8;
+  const peakScale = peakSize / textureWidth;
+  const endScale = peakScale * 0.3;
+  const expandSpeed = explosionRadius * 2.5;
 
   return {
-    lifetime: { min: 0.25, max: 0.6 },
-    frequency: 1,
+    lifetime: { min: 0.15, max: 0.4 },
+    frequency: 0.02,
     spawnChance: 1,
-    particlesPerWave: particleCount,
-    emitterLifetime: 0,
+    particlesPerWave: Math.max(6, Math.round(particleCount * 0.3)),
+    emitterLifetime: 0.15,
     maxParticles: particleCount,
-    emit: false,
+    emit: true,
     pos: { x: 0, y: 0 },
     addAtBack: false,
     behaviors: [
@@ -171,7 +195,7 @@ export function createExplosionConfig(
         config: {
           alpha: {
             list: [
-              { value: 1, time: 0 },
+              { value: 0.9, time: 0 },
               { value: 0.7, time: 0.3 },
               { value: 0, time: 1 },
             ],
@@ -183,12 +207,12 @@ export function createExplosionConfig(
         config: {
           scale: {
             list: [
-              { value: baseScale * 0.3, time: 0 },
-              { value: baseScale, time: 0.2 },
+              { value: peakScale * 0.2, time: 0 },
+              { value: peakScale, time: 0.3 },
               { value: endScale, time: 1 },
             ],
           },
-          minMult: 0.5,
+          minMult: 0.4,
         },
       },
       {
@@ -197,9 +221,10 @@ export function createExplosionConfig(
           color: {
             list: [
               { value: "ffffff", time: 0 },
-              { value: "fbbf24", time: 0.2 },
-              { value: "f97316", time: 0.5 },
-              { value: "7c2d12", time: 1 },
+              { value: "ffdd44", time: 0.15 },
+              { value: "ff6600", time: 0.4 },
+              { value: "cc2200", time: 0.7 },
+              { value: "441100", time: 1 },
             ],
           },
         },
@@ -209,26 +234,36 @@ export function createExplosionConfig(
         config: {
           speed: {
             list: [
-              { value: speed, time: 0 },
-              { value: speed * 0.4, time: 0.4 },
+              { value: expandSpeed, time: 0 },
+              { value: expandSpeed * 0.3, time: 0.4 },
               { value: 0, time: 1 },
             ],
             isStepped: false,
           },
-          minMult: 0.4,
+          minMult: 0.2,
+        },
+      },
+      {
+        type: "rotation",
+        config: {
+          minStart: 0,
+          maxStart: 360,
+          minSpeed: -90,
+          maxSpeed: 90,
+          accel: 0,
         },
       },
       {
         type: "spawnBurst",
         config: {
-          spacing: 360 / particleCount,
-          start: 0,
-          distance: explosionRadius * 0.15,
+          spacing: 360 / Math.max(6, Math.round(particleCount * 0.3)),
+          start: Math.random() * 360,
+          distance: explosionRadius * 0.05,
         },
       },
       {
         type: "textureSingle",
-        config: { texture: Texture.WHITE },
+        config: { texture: fireballTexture },
       },
     ],
   };
