@@ -1,5 +1,5 @@
 import { Container, Graphics, Text } from "pixi.js";
-import type { TurretConfig, SupplyShip, TurretSlot } from "./types";
+import type { TurretConfig, TurretSlot, SupplyShip } from "./types";
 import { TurretType } from "./types";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, UPGRADE_SCALING } from "./constants";
 import { rarityColor, rarityLabel } from "./turretPool";
@@ -9,19 +9,24 @@ const SHIP_HEIGHT = 30;
 const SHIP_SPEED = 120;
 const SHIP_ARM_LENGTH = 25;
 
-export function createShipGraphics(): Container {
+export function createShipGraphics(isRare: boolean): Container {
   const container = new Container();
+
+  const bodyColor = isRare ? 0x92400e : 0x64748b;
+  const strokeColor = isRare ? 0xf59e0b : 0x94a3b8;
 
   const body = new Graphics();
   body.roundRect(-SHIP_WIDTH / 2, -SHIP_HEIGHT / 2, SHIP_WIDTH, SHIP_HEIGHT, 6);
-  body.fill({ color: 0x64748b, alpha: 0.8 });
-  body.stroke({ color: 0x94a3b8, width: 2 });
+  body.fill({ color: bodyColor, alpha: 0.8 });
+  body.stroke({ color: strokeColor, width: 2 });
   container.addChild(body);
 
+  const cockpitColor = isRare ? 0xf59e0b : 0x60a5fa;
+  const cockpitStroke = isRare ? 0xfbbf24 : 0x93c5fd;
   const cockpit = new Graphics();
   cockpit.roundRect(-10, -SHIP_HEIGHT / 2 - 6, 20, 10, 3);
-  cockpit.fill({ color: 0x60a5fa, alpha: 0.6 });
-  cockpit.stroke({ color: 0x93c5fd, width: 1 });
+  cockpit.fill({ color: cockpitColor, alpha: 0.6 });
+  cockpit.stroke({ color: cockpitStroke, width: 1 });
   container.addChild(cockpit);
 
   const arms = new Graphics();
@@ -30,15 +35,16 @@ export function createShipGraphics(): Container {
     const ax = i * armSpacing * 0.4;
     arms.moveTo(ax, SHIP_HEIGHT / 2);
     arms.lineTo(ax + i * 6, SHIP_HEIGHT / 2 + SHIP_ARM_LENGTH);
-    arms.stroke({ color: 0x94a3b8, width: 2 });
+    arms.stroke({ color: strokeColor, width: 2 });
     arms.circle(ax + i * 6, SHIP_HEIGHT / 2 + SHIP_ARM_LENGTH, 3);
     arms.fill({ color: 0xf59e0b, alpha: 0.7 });
   }
   container.addChild(arms);
 
+  const labelText = isRare ? "RARE" : "SUPPLY";
   const label = new Text({
-    text: "SUPPLY",
-    style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 8, fill: 0xffffff },
+    text: labelText,
+    style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 8, fill: isRare ? 0xfbbf24 : 0xffffff },
   });
   label.anchor.set(0.5);
   label.position.set(0, 0);
@@ -128,7 +134,6 @@ const CARD_GAP = 30;
 
 export function createCardUI(
   offerings: TurretConfig[],
-  existingSlots: TurretSlot[],
   onSelect: (config: TurretConfig) => void,
   onClose: () => void,
 ): Container {
@@ -155,7 +160,7 @@ export function createCardUI(
   for (let i = 0; i < offerings.length; i++) {
     const config = offerings[i];
     const cx = startX + i * (CARD_WIDTH + CARD_GAP) + CARD_WIDTH / 2;
-    const card = createCard(config, cx, cardY, existingSlots, () => onSelect(config));
+    const card = createCard(config, cx, cardY, () => onSelect(config));
     overlay.addChild(card);
   }
 
@@ -184,7 +189,6 @@ function createCard(
   config: TurretConfig,
   cx: number,
   y: number,
-  existingSlots: TurretSlot[],
   onSelect: () => void,
 ): Container {
   const card = new Container();
@@ -274,18 +278,6 @@ function createCard(
     statValue.anchor.set(1, 0);
     statValue.position.set(cardLeft + CARD_WIDTH - 14, sy);
     card.addChild(statValue);
-  }
-
-  const matchingSlots = existingSlots.filter(s => s.filled && !s.destroyed && s.turretType === config.type);
-  if (matchingSlots.length > 0) {
-    const bestLevel = Math.max(...matchingSlots.map(s => s.level));
-    const upgradeHint = new Text({
-      text: `Can upgrade (Lv.${bestLevel} → ${bestLevel + 1})`,
-      style: { fontFamily: "monospace", fontSize: 10, fill: 0x4ade80 },
-    });
-    upgradeHint.anchor.set(0.5, 0);
-    upgradeHint.position.set(0, CARD_HEIGHT - 34);
-    card.addChild(upgradeHint);
   }
 
   const hoverBorder = new Graphics();

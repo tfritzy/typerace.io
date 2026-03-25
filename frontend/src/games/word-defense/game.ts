@@ -1,4 +1,4 @@
-import { Application, Container, Sprite, Graphics, Texture, TextStyle } from "pixi.js";
+import { Application, Container, Sprite, Graphics, Texture, TextStyle, Text } from "pixi.js";
 
 import { getLanguageFromSlug } from "../../utils/modes";
 import { TurretType } from "./types";
@@ -114,10 +114,10 @@ export class WordDefenseGame {
   private supplyShips: SupplyShip[] = [];
   private shipGraphics: Container[] = [];
   private shipsResolved = 0;
-  private totalShipsThisWave = 0;
   private cardOverlay: Container | null = null;
   private placementState: PlacementState = { mode: "none", turretConfig: null };
   private placementUI: Container | null = null;
+  private orLabel: Text | null = null;
 
   private untypedStyle: TextStyle;
   private typedStyle: TextStyle;
@@ -424,14 +424,13 @@ export class WordDefenseGame {
   private spawnSupplyShips() {
     const shipTypes = rollShipTypes(2);
     this.shipsResolved = 0;
-    this.totalShipsThisWave = shipTypes.length;
 
     const spacing = 300;
     const baseX = EARTH_CX - ((shipTypes.length - 1) * spacing) / 2;
 
     for (let i = 0; i < shipTypes.length; i++) {
       const shipType = shipTypes[i];
-      const offerings = rollTurretOfferings(shipType.offeringCount);
+      const offerings = rollTurretOfferings(shipType.offeringCount, shipType.isRare);
       const ship: SupplyShip = {
         x: baseX + i * spacing,
         y: -80,
@@ -439,10 +438,11 @@ export class WordDefenseGame {
         phase: "approaching",
         offerings,
         selected: false,
+        isRare: shipType.isRare,
       };
       this.supplyShips.push(ship);
 
-      const gfx = createShipGraphics();
+      const gfx = createShipGraphics(shipType.isRare);
       gfx.position.set(ship.x, ship.y);
       gfx.eventMode = "static";
       gfx.cursor = "pointer";
@@ -451,15 +451,34 @@ export class WordDefenseGame {
       this.world.addChild(gfx);
       this.shipGraphics.push(gfx);
     }
+
+    if (shipTypes.length === 2) {
+      const midX = EARTH_CX;
+      const avgY = EARTH_CY - EARTH_RADIUS - 85;
+      this.orLabel = new Text({
+        text: "OR",
+        style: { fontFamily: "monospace", fontWeight: "bold", fontSize: 20, fill: 0xffffff },
+      });
+      this.orLabel.anchor.set(0.5);
+      this.orLabel.position.set(midX, avgY);
+      this.orLabel.alpha = 0;
+      this.world.addChild(this.orLabel);
+    }
   }
 
   private updateSupplyShips(dt: number) {
+    let allHovering = true;
     for (let i = 0; i < this.supplyShips.length; i++) {
       const ship = this.supplyShips[i];
       if (ship.phase === "gone") continue;
       const done = updateShipPosition(ship, dt);
       this.shipGraphics[i].position.set(ship.x, ship.y);
       this.shipGraphics[i].visible = !done;
+      if (ship.phase !== "hovering") allHovering = false;
+    }
+
+    if (this.orLabel && allHovering && this.orLabel.alpha < 1) {
+      this.orLabel.alpha = Math.min(1, this.orLabel.alpha + dt * 2);
     }
   }
 
@@ -474,7 +493,6 @@ export class WordDefenseGame {
   private showCardSelection(ship: SupplyShip, shipIndex: number) {
     this.cardOverlay = createCardUI(
       ship.offerings,
-      this.slots,
       (config: TurretConfig) => {
         this.dismissCardOverlay();
         this.beginPlacement(config, shipIndex);
@@ -549,9 +567,20 @@ export class WordDefenseGame {
     ship.phase = "departing";
     this.shipsResolved++;
 
-    if (this.shipsResolved >= this.totalShipsThisWave) {
-      this.transitionToComplete();
+    for (let i = 0; i < this.supplyShips.length; i++) {
+      if (i === shipIndex) continue;
+      const other = this.supplyShips[i];
+      if (other.phase === "hovering" && !other.selected) {
+        other.phase = "departing";
+        other.selected = true;
+      }
     }
+
+    if (this.orLabel) {
+      this.orLabel.visible = false;
+    }
+
+    this.transitionToComplete();
   }
 
   private transitionToComplete() {
@@ -566,7 +595,10 @@ export class WordDefenseGame {
     this.shipGraphics = [];
     this.supplyShips = [];
     this.shipsResolved = 0;
-    this.totalShipsThisWave = 0;
+    if (this.orLabel) {
+      this.orLabel.destroy();
+      this.orLabel = null;
+    }
   }
 
   private updateCamera(dt: number, isActive: boolean) {

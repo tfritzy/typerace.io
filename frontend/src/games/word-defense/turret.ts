@@ -26,11 +26,10 @@ export function createTurretSlots(): TurretSlot[] {
     });
   }
 
-  const turretTypes = [TurretType.Bullet, TurretType.Missile, TurretType.Laser, TurretType.Railgun];
   for (let i = 0; i < INITIAL_TURRET_COUNT; i++) {
     const idx = Math.floor(i * slots.length / INITIAL_TURRET_COUNT);
     slots[idx].filled = true;
-    slots[idx].turretType = turretTypes[i];
+    slots[idx].turretType = TurretType.Bullet;
   }
 
   return slots;

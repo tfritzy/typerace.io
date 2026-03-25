@@ -35,7 +35,6 @@ export enum TurretType {
 export enum TurretRarity {
   Common,
   Rare,
-  Epic,
 }
 
 export interface TurretConfig {
@@ -69,6 +68,7 @@ export interface SupplyShip {
   phase: ShipPhase;
   offerings: TurretConfig[];
   selected: boolean;
+  isRare: boolean;
 }
 
 export type PlacementMode = "none" | "placing";

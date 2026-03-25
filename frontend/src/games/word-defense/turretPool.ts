@@ -44,12 +44,12 @@ export const TURRET_CONFIGS: TurretConfig[] = [
     color: 0xa855f7,
     description: "High-velocity projectile with massive damage.",
     fireRate: "Every word",
-    special: "Speed 800",
+    special: "Speed 400",
   },
   {
     type: TurretType.NuclearMissile,
     name: "Nuclear Silo",
-    rarity: TurretRarity.Epic,
+    rarity: TurretRarity.Rare,
     damage: NUCLEAR_MISSILE_DAMAGE,
     color: 0xef4444,
     description: "Devastates a massive area with nuclear payload.",
@@ -58,11 +58,8 @@ export const TURRET_CONFIGS: TurretConfig[] = [
   },
 ];
 
-const RARITY_WEIGHTS: Record<TurretRarity, number> = {
-  [TurretRarity.Common]: 60,
-  [TurretRarity.Rare]: 30,
-  [TurretRarity.Epic]: 10,
-};
+const COMMON_TURRETS = TURRET_CONFIGS.filter(c => c.rarity === TurretRarity.Common);
+const RARE_TURRETS = TURRET_CONFIGS.filter(c => c.rarity === TurretRarity.Rare);
 
 export function getConfigForType(type: TurretType): TurretConfig {
   const config = TURRET_CONFIGS.find(c => c.type === type);
@@ -72,34 +69,27 @@ export function getConfigForType(type: TurretType): TurretConfig {
   return config;
 }
 
-export function rollTurretOfferings(count: number): TurretConfig[] {
-  const offerings: TurretConfig[] = [];
-  const totalWeight = TURRET_CONFIGS.reduce((sum, c) => sum + RARITY_WEIGHTS[c.rarity], 0);
-
-  for (let i = 0; i < count; i++) {
-    let roll = Math.random() * totalWeight;
-    let chosen = TURRET_CONFIGS[0];
-    for (const config of TURRET_CONFIGS) {
-      roll -= RARITY_WEIGHTS[config.rarity];
-      if (roll <= 0) {
-        chosen = config;
-        break;
-      }
-    }
-    offerings.push(chosen);
+export function rollTurretOfferings(count: number, isRare: boolean): TurretConfig[] {
+  const pool = isRare ? RARE_TURRETS : COMMON_TURRETS;
+  const shuffled = [...pool];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
 
-  return offerings;
+  return shuffled.slice(0, count);
 }
 
 export interface ShipType {
   name: string;
   offeringCount: number;
   weight: number;
+  isRare: boolean;
 }
 
 export const SHIP_TYPES: ShipType[] = [
-  { name: "Supply Frigate", offeringCount: 3, weight: 100 },
+  { name: "Supply Frigate", offeringCount: 2, weight: 75, isRare: false },
+  { name: "Rare Trader", offeringCount: 2, weight: 25, isRare: true },
 ];
 
 export function rollShipTypes(count: number): ShipType[] {
@@ -125,8 +115,7 @@ export function rollShipTypes(count: number): ShipType[] {
 export function rarityColor(rarity: TurretRarity): number {
   switch (rarity) {
     case TurretRarity.Common: return 0x9ca3af;
-    case TurretRarity.Rare: return 0x3b82f6;
-    case TurretRarity.Epic: return 0xa855f7;
+    case TurretRarity.Rare: return 0xf59e0b;
   }
 }
 
@@ -134,6 +123,5 @@ export function rarityLabel(rarity: TurretRarity): string {
   switch (rarity) {
     case TurretRarity.Common: return "Common";
     case TurretRarity.Rare: return "Rare";
-    case TurretRarity.Epic: return "Epic";
   }
 }
