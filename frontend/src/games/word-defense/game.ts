@@ -1,4 +1,3 @@
-import { Emitter } from "@pixi/particle-emitter";
 import { Application, Container, Sprite, Graphics, Texture, TextStyle } from "pixi.js";
 
 import { getLanguageFromSlug } from "../../utils/modes";
@@ -33,7 +32,6 @@ import { buildTurretVisuals, rebuildSlotVisual, drawSlotInteractive, drawHighlig
 import {
   createMeteorObject,
   createProjectileGraphics,
-  createMeteorDestructionEmitterConfig,
 } from "./meteorRendering";
 import { fireMissile, updateMissile } from "./missile";
 import { fireLaser } from "./laser";
@@ -41,6 +39,12 @@ import { fireRailgun } from "./railgun";
 import { buildPalette, getDarkBackgroundColor, ACCENT_INDEX } from "./palette";
 import { GameHud } from "./hud";
 import { clampToRange } from "../../utils/math";
+import {
+  ParticleManager,
+  createBulletImpactConfig,
+  createExplosionConfig,
+  createMeteorDestructionConfig,
+} from "./particles";
 
 function getLangCode(): string {
   const slug = localStorage.getItem("typerace_lang_slug");
@@ -67,17 +71,16 @@ export class WordDefenseGame {
   private planetObj!: SceneObject;
   private planetTexture!: Texture;
   private meteorLayer!: Container;
-  private meteorParticleLayer!: Container;
   private projectileLayer!: Container;
   private highlightGfx!: Graphics;
   private hud!: GameHud;
+  private particles!: ParticleManager;
 
   private slots: TurretSlot[] = [];
   private turretVisuals!: TurretVisuals;
 
   private meteors: Meteor[] = [];
   private meteorObjects: MeteorObject[] = [];
-  private meteorDestructionEmitters: Emitter[] = [];
   private projectiles: Projectile[] = [];
   private projectileGfxList: Graphics[] = [];
   private laserBeams: LaserBeam[] = [];
@@ -176,8 +179,8 @@ export class WordDefenseGame {
     this.meteorLayer = new Container();
     this.world.addChild(this.meteorLayer);
 
-    this.meteorParticleLayer = new Container();
-    this.world.addChild(this.meteorParticleLayer);
+    this.particles = new ParticleManager();
+    this.world.addChild(this.particles.container);
 
     this.projectileLayer = new Container();
     this.world.addChild(this.projectileLayer);
@@ -216,13 +219,19 @@ export class WordDefenseGame {
               }
             } else if (turret.turretType === TurretType.Missile) {
               const proj = fireMissile(turret, meteor);
-              if (proj) this.addProjectile(proj);
+              if (proj) {
+                this.addProjectile(proj);
+              }
             } else if (turret.turretType === TurretType.Railgun) {
               const proj = fireRailgun(turret, meteor);
-              if (proj) this.addProjectile(proj);
+              if (proj) {
+                this.addProjectile(proj);
+              }
             } else {
               const proj = fireBullet(turret, meteor);
-              if (proj) this.addProjectile(proj);
+              if (proj) {
+                this.addProjectile(proj);
+              }
             }
           }
           meteor.typedCount = 0;
@@ -285,10 +294,15 @@ export class WordDefenseGame {
   }
 
   private emitMeteorDestruction(meteor: Meteor) {
-    const emitter = new Emitter(this.meteorParticleLayer, createMeteorDestructionEmitterConfig(meteor));
-    emitter.updateOwnerPos(meteor.x, meteor.y);
-    emitter.emitNow();
-    this.meteorDestructionEmitters.push(emitter);
+    this.particles.emitMoving(createMeteorDestructionConfig(meteor), meteor.x, meteor.y, meteor.vx, meteor.vy);
+  }
+
+  private emitBulletImpact(proj: Projectile) {
+    this.particles.emit(createBulletImpactConfig(proj.damage), proj.x, proj.y);
+  }
+
+  private emitExplosion(proj: Projectile) {
+    this.particles.emit(createExplosionConfig(proj.explosionRadius), proj.x, proj.y);
   }
 
   private addProjectile(proj: Projectile) {
@@ -331,7 +345,7 @@ export class WordDefenseGame {
     this.updateProjectiles(dt);
     this.updateLaserBeams(dt);
     this.updateMeteors(dt);
-    this.updateMeteorDestructionParticles(dt);
+    this.particles.update(dt);
     this.syncMeteorDisplays();
 
     this.hud.updateCredits(this.credits);
@@ -466,6 +480,7 @@ export class WordDefenseGame {
           if (proj.explosionRadius > 0) {
             this.detonateProjectile(i);
           } else {
+            this.emitBulletImpact(proj);
             this.damageMeteor(mi, proj.damage);
             this.removeProjectileAt(i);
           }
@@ -482,6 +497,7 @@ export class WordDefenseGame {
 
   private detonateProjectile(index: number) {
     const proj = this.projectiles[index];
+    this.emitExplosion(proj);
     for (let mi = this.meteors.length - 1; mi >= 0; mi--) {
       const meteor = this.meteors[mi];
       const dx = proj.x - meteor.x;
@@ -571,18 +587,6 @@ export class WordDefenseGame {
     }
   }
 
-  private updateMeteorDestructionParticles(dt: number) {
-    for (let i = this.meteorDestructionEmitters.length - 1; i >= 0; i--) {
-      const emitter = this.meteorDestructionEmitters[i];
-      emitter.update(dt);
-
-      if (!emitter.emit && emitter.particleCount === 0) {
-        emitter.destroy();
-        this.meteorDestructionEmitters.splice(i, 1);
-      }
-    }
-  }
-
   private checkAllSlotSurfaces() {
     for (let si = 0; si < this.slots.length; si++) {
       const slot = this.slots[si];
@@ -641,9 +645,7 @@ export class WordDefenseGame {
 
   destroy() {
     document.removeEventListener("keydown", this.keydownHandler);
-    for (const emitter of this.meteorDestructionEmitters) {
-      emitter.destroy();
-    }
+    this.particles.destroy();
     this.app.destroy(true, { children: true });
   }
 }
