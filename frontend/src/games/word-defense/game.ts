@@ -38,7 +38,7 @@ import {
 import { fireMissile, updateMissile } from "./missile";
 import { fireLaser } from "./laser";
 import { fireRailgun } from "./railgun";
-import { buildPalette, getBackgroundColor, ACCENT_INDEX } from "./palette";
+import { buildPalette, getDarkBackgroundColor, ACCENT_INDEX } from "./palette";
 import { GameHud } from "./hud";
 import { clampToRange } from "../../utils/math";
 
@@ -654,7 +654,7 @@ export async function createWordDefenseGame(container: HTMLElement): Promise<Wor
   await app.init({
     width: CANVAS_WIDTH,
     height: CANVAS_HEIGHT,
-    background: getBackgroundColor(),
+    background: getDarkBackgroundColor(),
     antialias: true,
     resolution: 1,
     preserveDrawingBuffer: true,
