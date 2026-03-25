@@ -8,6 +8,7 @@ import {
 } from "./constants";
 
 const ACCEL_DURATION = 12.0;
+const EPSILON = 1e-6;
 
 function getNukeSpeedAtTime(age: number): number {
   const accelTime = Math.min(Math.max(age, 0), ACCEL_DURATION);
@@ -17,7 +18,7 @@ function getNukeSpeedAtTime(age: number): number {
 function estimateFlightTimeForDistance(dist: number): number {
   const safeDist = Math.max(dist, 0);
   if (NUCLEAR_MISSILE_ACCELERATION <= 0) {
-    return safeDist / Math.max(NUCLEAR_MISSILE_INITIAL_SPEED, 1e-6);
+    return safeDist / Math.max(NUCLEAR_MISSILE_INITIAL_SPEED, EPSILON);
   }
   const accelTime = Math.max(ACCEL_DURATION, 0);
   const speedAfterAccel = NUCLEAR_MISSILE_INITIAL_SPEED + NUCLEAR_MISSILE_ACCELERATION * accelTime;
@@ -27,7 +28,7 @@ function estimateFlightTimeForDistance(dist: number): number {
     return (-NUCLEAR_MISSILE_INITIAL_SPEED + Math.sqrt(disc)) / NUCLEAR_MISSILE_ACCELERATION;
   }
   const cruiseDist = safeDist - accelDist;
-  return accelTime + cruiseDist / Math.max(speedAfterAccel, 1e-6);
+  return accelTime + cruiseDist / Math.max(speedAfterAccel, EPSILON);
 }
 
 function simulatePosition(startX: number, startY: number, angle: number, totalTime: number): { x: number; y: number } {

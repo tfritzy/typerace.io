@@ -65,7 +65,11 @@ const RARITY_WEIGHTS: Record<TurretRarity, number> = {
 };
 
 export function getConfigForType(type: TurretType): TurretConfig {
-  return TURRET_CONFIGS.find(c => c.type === type)!;
+  const config = TURRET_CONFIGS.find(c => c.type === type);
+  if (!config) {
+    return TURRET_CONFIGS[0];
+  }
+  return config;
 }
 
 export function rollTurretOfferings(count: number): TurretConfig[] {

@@ -877,6 +877,5 @@ export async function createWordDefenseGame(container: HTMLElement): Promise<Wor
   app.canvas.style.aspectRatio = "16/9";
   container.appendChild(app.canvas);
 
-  const game = new WordDefenseGame(app);
-  return game;
+  return new WordDefenseGame(app);
 }
