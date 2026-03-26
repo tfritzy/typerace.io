@@ -59,7 +59,6 @@ export function createAsteroid(
   const sprite = new Sprite(texture);
   sprite.anchor.set(0.5);
   sprite.scale.set(ASTEROID_SCALE);
-  sprite.texture.source.style.scaleMode = "nearest";
 
   const { x, y, angle } = pickEdgeSpawn();
   sprite.x = x;

@@ -19,6 +19,10 @@ interface LoadedAssets {
   colorPresets: Record<string, Texture>;
 }
 
+function setNearestNeighbor(sheet: Spritesheet): void {
+  sheet.textureSource.style.scaleMode = "nearest";
+}
+
 export class StarshipDemoGame {
   private app: Application;
   private assets!: LoadedAssets;
@@ -61,9 +65,30 @@ export class StarshipDemoGame {
       ),
     };
 
+    this.applyNearestNeighbor();
     this.buildScene();
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
     this.app.ticker.add(this.tickerCallback);
+  }
+
+  private applyNearestNeighbor(): void {
+    this.assets.background.source.style.scaleMode = "nearest";
+
+    setNearestNeighbor(this.assets.planets);
+    setNearestNeighbor(this.assets.planetsRing);
+    setNearestNeighbor(this.assets.starsParticle);
+    setNearestNeighbor(this.assets.spaceships);
+    setNearestNeighbor(this.assets.spaceshipsColormap);
+
+    for (const sheet of Object.values(this.assets.engines)) {
+      setNearestNeighbor(sheet);
+    }
+    for (const sheet of Object.values(this.assets.asteroids)) {
+      setNearestNeighbor(sheet);
+    }
+    for (const tex of Object.values(this.assets.colorPresets)) {
+      tex.source.style.scaleMode = "nearest";
+    }
   }
 
   private buildScene(): void {
