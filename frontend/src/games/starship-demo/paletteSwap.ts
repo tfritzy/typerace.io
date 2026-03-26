@@ -7,9 +7,6 @@ import {
   type Spritesheet,
 } from "pixi.js";
 
-const SHEET_WIDTH = 320;
-const SHEET_HEIGHT = 326;
-
 const fragment = `
 in vec2 vTextureCoord;
 out vec4 finalColor;
@@ -53,16 +50,19 @@ export function createPaletteSwapFilter(
   const frameData = colormapSheet.data.frames[cmFrameName];
   const frame = frameData.frame;
 
+  const sheetWidth = colormapSheet.textureSource.width;
+  const sheetHeight = colormapSheet.textureSource.height;
+
   presetTexture.source.style.scaleMode = "nearest";
   colormapSheet.textureSource.style.scaleMode = "nearest";
 
   const paletteUniforms = new UniformGroup({
     uCmOffset: {
-      value: new Float32Array([frame.x / SHEET_WIDTH, frame.y / SHEET_HEIGHT]),
+      value: new Float32Array([frame.x / sheetWidth, frame.y / sheetHeight]),
       type: "vec2<f32>",
     },
     uCmScale: {
-      value: new Float32Array([frame.w / SHEET_WIDTH, frame.h / SHEET_HEIGHT]),
+      value: new Float32Array([frame.w / sheetWidth, frame.h / sheetHeight]),
       type: "vec2<f32>",
     },
   });

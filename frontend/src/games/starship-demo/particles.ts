@@ -168,14 +168,17 @@ export class StarParticleManager {
       this.burstEmitters.push(emitter);
     }
 
-    for (let i = this.burstEmitters.length - 1; i >= 0; i--) {
-      const e = this.burstEmitters[i];
+    for (const e of this.burstEmitters) {
       e.update(dt);
+    }
+
+    this.burstEmitters = this.burstEmitters.filter((e) => {
       if (!e.emit && e.particleCount === 0) {
         e.destroy();
-        this.burstEmitters.splice(i, 1);
+        return false;
       }
-    }
+      return true;
+    });
   }
 
   destroy(): void {
