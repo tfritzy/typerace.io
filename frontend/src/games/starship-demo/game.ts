@@ -1,41 +1,33 @@
-import { Application, Assets, Container, type Spritesheet, type Texture } from "pixi.js";
+import { Application, Container, Sprite, AnimatedSprite } from "pixi.js";
 import { MANIFEST, ENGINE_ALIASES, ASTEROID_ALIASES, COLOR_PRESET_ALIASES } from "./manifest";
-import { CANVAS_WIDTH, CANVAS_HEIGHT, SHIP_SPAWN_INTERVAL, ASTEROID_SPAWN_INTERVAL } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, SHIP_SCALE, ASTEROID_SCALE, PLANET_SCALE } from "./constants";
 import { createTiledBackground } from "./background";
-import { createRandomPlanet } from "./planets";
-import { createShip, updateShips, type ShipEntity } from "./ships";
-import { createAsteroid, updateAsteroids, type AsteroidEntity } from "./asteroids";
 import { StarParticleManager } from "./particles";
-
-interface LoadedAssets {
-  background: Texture;
-  planets: Spritesheet;
-  planetsRing: Spritesheet;
-  starsParticle: Spritesheet;
-  spaceships: Spritesheet;
-  spaceshipsColormap: Spritesheet;
-  engines: Record<string, Spritesheet>;
-  asteroids: Record<string, Spritesheet>;
-  colorPresets: Record<string, Texture>;
-}
-
-function setNearestNeighbor(sheet: Spritesheet): void {
-  sheet.textureSource.style.scaleMode = "nearest";
-}
+import { AssetManager } from "./assetManager";
+import {
+  createInitialState,
+  updateState,
+  type GameState,
+  type ShipState,
+  type AsteroidState,
+} from "./state";
+import { applyPaletteSwap } from "./ships";
 
 export class StarshipDemoGame {
   private app: Application;
-  private assets!: LoadedAssets;
+  private assetManager!: AssetManager;
+  state!: GameState;
 
   private shipLayer!: Container;
   private asteroidLayer!: Container;
-
-  private ships: ShipEntity[] = [];
-  private asteroidEntities: AsteroidEntity[] = [];
   private starParticles!: StarParticleManager;
 
-  private shipSpawnTimer = 0;
-  private asteroidSpawnTimer = 0;
+  private shipContainers = new Map<number, Container>();
+  private asteroidSprites = new Map<number, Sprite>();
+
+  private shipFrameNames: string[] = [];
+  private asteroidTextureCounts: Record<string, number> = {};
+
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
   constructor(app: Application) {
@@ -43,66 +35,54 @@ export class StarshipDemoGame {
   }
 
   async init(): Promise<void> {
-    const bundle = MANIFEST.bundles[0];
-    Assets.addBundle(bundle.name, bundle.assets);
-    const raw = await Assets.loadBundle("starship-demo");
+    this.assetManager = await AssetManager.load(
+      MANIFEST,
+      "starship-demo",
+      ENGINE_ALIASES,
+      ASTEROID_ALIASES,
+      COLOR_PRESET_ALIASES
+    );
 
-    this.assets = {
-      background: raw["background"] as Texture,
-      planets: raw["planets"] as Spritesheet,
-      planetsRing: raw["planets-ring"] as Spritesheet,
-      starsParticle: raw["stars-particle"] as Spritesheet,
-      spaceships: raw["spaceships"] as Spritesheet,
-      spaceshipsColormap: raw["spaceships-colormap"] as Spritesheet,
-      engines: Object.fromEntries(
-        ENGINE_ALIASES.map((a) => [a, raw[a] as Spritesheet])
-      ),
-      asteroids: Object.fromEntries(
-        ASTEROID_ALIASES.map((a) => [a, raw[a] as Spritesheet])
-      ),
-      colorPresets: Object.fromEntries(
-        COLOR_PRESET_ALIASES.map((a) => [a, raw[a] as Texture])
-      ),
-    };
+    const assets = this.assetManager.assets;
+    this.shipFrameNames = Object.keys(assets.spaceships.textures);
 
-    this.applyNearestNeighbor();
+    for (const alias of ASTEROID_ALIASES) {
+      this.asteroidTextureCounts[alias] = Object.keys(
+        assets.asteroids[alias].textures
+      ).length;
+    }
+
+    const planetFrames = [
+      ...Object.keys(assets.planets.textures),
+      ...Object.keys(assets.planetsRing.textures),
+    ];
+
+    this.state = createInitialState(planetFrames);
     this.buildScene();
+
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
     this.app.ticker.add(this.tickerCallback);
   }
 
-  private applyNearestNeighbor(): void {
-    this.assets.background.source.style.scaleMode = "nearest";
-
-    setNearestNeighbor(this.assets.planets);
-    setNearestNeighbor(this.assets.planetsRing);
-    setNearestNeighbor(this.assets.starsParticle);
-    setNearestNeighbor(this.assets.spaceships);
-    setNearestNeighbor(this.assets.spaceshipsColormap);
-
-    for (const sheet of Object.values(this.assets.engines)) {
-      setNearestNeighbor(sheet);
-    }
-    for (const sheet of Object.values(this.assets.asteroids)) {
-      setNearestNeighbor(sheet);
-    }
-    for (const tex of Object.values(this.assets.colorPresets)) {
-      tex.source.style.scaleMode = "nearest";
-    }
-  }
-
   private buildScene(): void {
+    const assets = this.assetManager.assets;
     const world = new Container();
     this.app.stage.addChild(world);
 
-    world.addChild(createTiledBackground(this.assets.background));
+    world.addChild(createTiledBackground(assets.background));
 
-    this.starParticles = new StarParticleManager(this.assets.starsParticle);
+    this.starParticles = new StarParticleManager(assets.starsParticle);
     world.addChild(this.starParticles.container);
 
-    world.addChild(
-      createRandomPlanet(this.assets.planets, this.assets.planetsRing)
-    );
+    const planetTexture =
+      assets.planets.textures[this.state.planetFrame] ??
+      assets.planetsRing.textures[this.state.planetFrame];
+    const planet = new Sprite(planetTexture);
+    planet.anchor.set(0.5);
+    planet.scale.set(PLANET_SCALE);
+    planet.x = CANVAS_WIDTH / 2;
+    planet.y = CANVAS_HEIGHT / 2;
+    world.addChild(planet);
 
     this.asteroidLayer = new Container();
     world.addChild(this.asteroidLayer);
@@ -111,40 +91,106 @@ export class StarshipDemoGame {
     world.addChild(this.shipLayer);
   }
 
+  private createShipContainer(ship: ShipState): Container {
+    const assets = this.assetManager.assets;
+
+    const shipTexture = applyPaletteSwap(
+      assets.spaceships.textures[ship.shipFrame],
+      assets.spaceshipsColormap.textures[ship.colormapFrame],
+      assets.colorPresets[ship.presetAlias]
+    );
+
+    const shipSprite = new Sprite(shipTexture);
+    shipSprite.anchor.set(0.5);
+
+    const engineSheet = assets.engines[ship.engineAlias];
+    const engineFrames = engineSheet.animations[ship.engineAlias];
+    const engine = new AnimatedSprite(engineFrames);
+    engine.animationSpeed = 0.15;
+    engine.play();
+    engine.anchor.set(0.5);
+    engine.x = -(shipTexture.width / 2) + 2;
+
+    const container = new Container();
+    container.addChild(engine);
+    container.addChild(shipSprite);
+    container.scale.set(SHIP_SCALE);
+    container.x = ship.x;
+    container.y = ship.y;
+
+    return container;
+  }
+
+  private createAsteroidSprite(asteroid: AsteroidState): Sprite {
+    const assets = this.assetManager.assets;
+    const sheet = assets.asteroids[asteroid.asteroidAlias];
+    const textures = Object.values(sheet.textures);
+    const texture = textures[asteroid.textureIndex % textures.length];
+
+    const sprite = new Sprite(texture);
+    sprite.anchor.set(0.5);
+    sprite.scale.set(ASTEROID_SCALE);
+    sprite.x = asteroid.x;
+    sprite.y = asteroid.y;
+    sprite.rotation = asteroid.rotation;
+
+    return sprite;
+  }
+
   private update(dt: number): void {
     this.starParticles.update(dt);
 
-    this.shipSpawnTimer += dt;
-    if (this.shipSpawnTimer >= SHIP_SPAWN_INTERVAL) {
-      this.shipSpawnTimer = 0;
-      this.spawnShip();
-    }
-
-    this.asteroidSpawnTimer += dt;
-    if (this.asteroidSpawnTimer >= ASTEROID_SPAWN_INTERVAL) {
-      this.asteroidSpawnTimer = 0;
-      this.spawnAsteroid();
-    }
-
-    this.ships = updateShips(this.ships, dt);
-    this.asteroidEntities = updateAsteroids(this.asteroidEntities, dt);
-  }
-
-  private spawnShip(): void {
-    const ship = createShip(
-      this.assets.spaceships,
-      this.assets.spaceshipsColormap,
-      this.assets.engines,
-      this.assets.colorPresets
+    const result = updateState(
+      this.state,
+      dt,
+      this.shipFrameNames,
+      this.asteroidTextureCounts
     );
-    this.shipLayer.addChild(ship.container);
-    this.ships.push(ship);
-  }
 
-  private spawnAsteroid(): void {
-    const asteroid = createAsteroid(this.assets.asteroids);
-    this.asteroidLayer.addChild(asteroid.sprite);
-    this.asteroidEntities.push(asteroid);
+    if (result.newShip) {
+      const container = this.createShipContainer(result.newShip);
+      this.shipLayer.addChild(container);
+      this.shipContainers.set(result.newShip.id, container);
+    }
+
+    if (result.newAsteroid) {
+      const sprite = this.createAsteroidSprite(result.newAsteroid);
+      this.asteroidLayer.addChild(sprite);
+      this.asteroidSprites.set(result.newAsteroid.id, sprite);
+    }
+
+    for (const ship of this.state.ships) {
+      const container = this.shipContainers.get(ship.id);
+      if (container) {
+        container.x = ship.x;
+        container.y = ship.y;
+      }
+    }
+
+    for (const asteroid of this.state.asteroids) {
+      const sprite = this.asteroidSprites.get(asteroid.id);
+      if (sprite) {
+        sprite.x = asteroid.x;
+        sprite.y = asteroid.y;
+        sprite.rotation = asteroid.rotation;
+      }
+    }
+
+    for (const id of result.removedShipIds) {
+      const container = this.shipContainers.get(id);
+      if (container) {
+        container.destroy();
+        this.shipContainers.delete(id);
+      }
+    }
+
+    for (const id of result.removedAsteroidIds) {
+      const sprite = this.asteroidSprites.get(id);
+      if (sprite) {
+        sprite.destroy();
+        this.asteroidSprites.delete(id);
+      }
+    }
   }
 
   destroy(): void {
@@ -153,8 +199,8 @@ export class StarshipDemoGame {
       this.tickerCallback = null;
     }
     this.starParticles.destroy();
-    for (const s of this.ships) s.container.destroy();
-    for (const a of this.asteroidEntities) a.sprite.destroy();
+    for (const c of this.shipContainers.values()) c.destroy();
+    for (const s of this.asteroidSprites.values()) s.destroy();
     this.app.destroy(true);
   }
 }

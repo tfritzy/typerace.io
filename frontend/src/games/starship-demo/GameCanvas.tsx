@@ -21,7 +21,7 @@ export const GameCanvas = () => {
         gameRef.current = game;
       })
       .catch((err) => {
-        console.error("Failed to initialize Starship Demo:", err);
+        console.error("Failed to initialize Planetary Defense:", err);
       });
 
     return () => {

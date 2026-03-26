@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 
@@ -15,6 +15,12 @@ export const GameLayout = ({
   aspectRatio = 16 / 9,
   viewportChromeOffsetPx = 220,
 }: GameLayoutProps) => {
+  useEffect(() => {
+    document.title = `${title} - TypeRace.io`;
+    return () => {
+      document.title = "typerace.io - PvP typing";
+    };
+  }, [title]);
   const maxWidthFromHeight = `calc((100dvh - ${viewportChromeOffsetPx}px) * ${aspectRatio})`;
 
   return (

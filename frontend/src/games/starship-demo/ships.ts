@@ -1,23 +1,6 @@
-import { Container, Texture, Sprite, AnimatedSprite, type Spritesheet } from "pixi.js";
-import {
-  SHIP_SCALE,
-  SHIP_SPEED_MIN,
-  SHIP_SPEED_MAX,
-  CANVAS_WIDTH,
-  CANVAS_HEIGHT,
-} from "./constants";
-import { ENGINE_ALIASES, COLOR_PRESET_ALIASES } from "./manifest";
+import { Texture } from "pixi.js";
 
-export interface ShipEntity {
-  container: Container;
-  vx: number;
-}
-
-function pickRandom<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function textureToCanvas(
+export function textureToCanvas(
   texture: Texture
 ): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
   const frame = texture.frame;
@@ -43,7 +26,7 @@ function textureToCanvas(
   return { canvas, ctx };
 }
 
-function applyPaletteSwap(
+export function applyPaletteSwap(
   shipTexture: Texture,
   colormapTexture: Texture,
   presetTexture: Texture
@@ -73,58 +56,4 @@ function applyPaletteSwap(
   const tex = Texture.from({ resource: canvas });
   tex.source.style.scaleMode = "nearest";
   return tex;
-}
-
-export function createShip(
-  shipsSheet: Spritesheet,
-  colormapSheet: Spritesheet,
-  engineSheets: Record<string, Spritesheet>,
-  presetTextures: Record<string, Texture>
-): ShipEntity {
-  const shipFrameNames = Object.keys(shipsSheet.textures);
-  const frameName = pickRandom(shipFrameNames);
-
-  const cmFrameName = `cm-${frameName.replace("ship-", "")}`;
-  const presetAlias = pickRandom(COLOR_PRESET_ALIASES);
-
-  const shipTexture = applyPaletteSwap(
-    shipsSheet.textures[frameName],
-    colormapSheet.textures[cmFrameName],
-    presetTextures[presetAlias]
-  );
-
-  const shipSprite = new Sprite(shipTexture);
-  shipSprite.anchor.set(0.5);
-
-  const engineAlias = pickRandom(ENGINE_ALIASES);
-  const engineSheet = engineSheets[engineAlias];
-  const engineFrames = engineSheet.animations[engineAlias];
-  const engine = new AnimatedSprite(engineFrames);
-  engine.animationSpeed = 0.15;
-  engine.play();
-  engine.anchor.set(0.5);
-  engine.x = -(shipTexture.width / 2) + 2;
-
-  const container = new Container();
-  container.addChild(engine);
-  container.addChild(shipSprite);
-  container.scale.set(SHIP_SCALE);
-
-  container.x = -100;
-  container.y = 100 + Math.random() * (CANVAS_HEIGHT - 200);
-
-  const speed = SHIP_SPEED_MIN + Math.random() * (SHIP_SPEED_MAX - SHIP_SPEED_MIN);
-
-  return { container, vx: speed };
-}
-
-export function updateShips(ships: ShipEntity[], dt: number): ShipEntity[] {
-  return ships.filter((ship) => {
-    ship.container.x += ship.vx * dt;
-    if (ship.container.x > CANVAS_WIDTH + 200) {
-      ship.container.destroy();
-      return false;
-    }
-    return true;
-  });
 }
