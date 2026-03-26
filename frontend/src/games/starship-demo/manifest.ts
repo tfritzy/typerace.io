@@ -1,54 +1,64 @@
 import type { AssetsManifest } from "pixi.js";
-import { ASSET_BASE } from "./constants";
+
+const BASE = "/pixel_starships_kit";
 
 export const MANIFEST: AssetsManifest = {
   bundles: [
     {
       name: "starship-demo",
       assets: [
-        { alias: "background", src: `${ASSET_BASE}/Backgrounds/Background.png` },
+        { alias: "background", src: `${BASE}/Backgrounds/Background.png` },
 
-        { alias: "planet-sheet", src: `${ASSET_BASE}/Backgrounds/Planet.png` },
-        { alias: "planet-ring-sheet", src: `${ASSET_BASE}/Backgrounds/Planet with ring.png` },
+        { alias: "planets", src: `${BASE}/Backgrounds/planets.json` },
+        { alias: "planets-ring", src: `${BASE}/Backgrounds/planets-ring.json` },
+        { alias: "stars-particle", src: `${BASE}/Backgrounds/stars-particle.json` },
 
-        { alias: "nebula", src: `${ASSET_BASE}/Backgrounds/Nebula.png` },
-        { alias: "stars-particle", src: `${ASSET_BASE}/Backgrounds/Stars Particle.png` },
-        { alias: "sun-1", src: `${ASSET_BASE}/Backgrounds/Sun_1.png` },
-        { alias: "sun-2", src: `${ASSET_BASE}/Backgrounds/Sun_2.png` },
-        { alias: "space-station", src: `${ASSET_BASE}/Backgrounds/Space Station.png` },
+        { alias: "spaceships", src: `${BASE}/SpaceShips/spaceships.json` },
+        { alias: "spaceships-colormap", src: `${BASE}/SpaceShips/spaceships-colormap.json` },
+        { alias: "color-preset-1", src: `${BASE}/SpaceShips/SpaceShip Color Preset 1.png` },
+        { alias: "color-preset-2", src: `${BASE}/SpaceShips/SpaceShip Color Preset 2.png` },
+        { alias: "color-preset-3", src: `${BASE}/SpaceShips/SpaceShip Color Preset 3.png` },
+        { alias: "color-preset-4", src: `${BASE}/SpaceShips/SpaceShip Color Preset 4.png` },
 
-        { alias: "spaceships", src: `${ASSET_BASE}/SpaceShips/Spaceships.png` },
-        { alias: "spaceships-colormap", src: `${ASSET_BASE}/SpaceShips/Spaceships Colormap.png` },
-        { alias: "spaceships-shield", src: `${ASSET_BASE}/SpaceShips/Spaceships Shield.png` },
+        { alias: "engine-1-big", src: `${BASE}/Engines/engine-1-big.json` },
+        { alias: "engine-1-small", src: `${BASE}/Engines/engine-1-small.json` },
+        { alias: "engine-2-big", src: `${BASE}/Engines/engine-2-big.json` },
+        { alias: "engine-2-small", src: `${BASE}/Engines/engine-2-small.json` },
+        { alias: "engine-3-big", src: `${BASE}/Engines/engine-3-big.json` },
+        { alias: "engine-3-small", src: `${BASE}/Engines/engine-3-small.json` },
+        { alias: "engine-4-big", src: `${BASE}/Engines/engine-4-big.json` },
+        { alias: "engine-4-small", src: `${BASE}/Engines/engine-4-small.json` },
 
-        { alias: "engine-1-big", src: `${ASSET_BASE}/Engines/Engine_1_Big.png` },
-        { alias: "engine-1-small", src: `${ASSET_BASE}/Engines/Engine_1_Small.png` },
-        { alias: "engine-2-big", src: `${ASSET_BASE}/Engines/Engine_2_Big.png` },
-        { alias: "engine-2-small", src: `${ASSET_BASE}/Engines/Engine_2_Small.png` },
-        { alias: "engine-3-big", src: `${ASSET_BASE}/Engines/Engine_3_Big.png` },
-        { alias: "engine-3-small", src: `${ASSET_BASE}/Engines/Engine_3_Small.png` },
-        { alias: "engine-4-big", src: `${ASSET_BASE}/Engines/Engine_4_Big.png` },
-        { alias: "engine-4-small", src: `${ASSET_BASE}/Engines/Engine_4_Small.png` },
-
-        { alias: "asteroid-big-brown", src: `${ASSET_BASE}/Asteroids/Asteroid_Big_Brown.png` },
-        { alias: "asteroid-big-white", src: `${ASSET_BASE}/Asteroids/Asteroid_Big_White.png` },
-        { alias: "asteroid-small-brown", src: `${ASSET_BASE}/Asteroids/Asteroid_Small_Brown.png` },
-        { alias: "asteroid-small-white", src: `${ASSET_BASE}/Asteroids/Asteroid_Small_White.png` },
-
-        { alias: "projectile-1", src: `${ASSET_BASE}/Projectiles/Projectile_1.png` },
-        { alias: "projectile-2", src: `${ASSET_BASE}/Projectiles/Projectile_2.png` },
-        { alias: "projectile-3", src: `${ASSET_BASE}/Projectiles/Projectile_3.png` },
-        { alias: "projectile-4", src: `${ASSET_BASE}/Projectiles/Projectile_4.png` },
-        { alias: "projectile-5", src: `${ASSET_BASE}/Projectiles/Projectile_5.png` },
-        { alias: "projectile-6", src: `${ASSET_BASE}/Projectiles/Projectile_6.png` },
-
-        { alias: "explosion-1", src: `${ASSET_BASE}/Projectiles/Projectile_1_Explosion.png` },
-        { alias: "explosion-2", src: `${ASSET_BASE}/Projectiles/Projectile_2_Explosion.png` },
-        { alias: "explosion-3", src: `${ASSET_BASE}/Projectiles/Projectile_3_Explosion.png` },
-        { alias: "explosion-4", src: `${ASSET_BASE}/Projectiles/Projectile_4_Explosion.png` },
-        { alias: "explosion-5", src: `${ASSET_BASE}/Projectiles/Projectile_5_Explosion.png` },
-        { alias: "explosion-6", src: `${ASSET_BASE}/Projectiles/Projectile_6_Explosion.png` },
+        { alias: "asteroids-big-brown", src: `${BASE}/Asteroids/asteroids-big-brown.json` },
+        { alias: "asteroids-big-white", src: `${BASE}/Asteroids/asteroids-big-white.json` },
+        { alias: "asteroids-small-brown", src: `${BASE}/Asteroids/asteroids-small-brown.json` },
+        { alias: "asteroids-small-white", src: `${BASE}/Asteroids/asteroids-small-white.json` },
       ],
     },
   ],
 };
+
+export const ENGINE_ALIASES = [
+  "engine-1-big",
+  "engine-1-small",
+  "engine-2-big",
+  "engine-2-small",
+  "engine-3-big",
+  "engine-3-small",
+  "engine-4-big",
+  "engine-4-small",
+];
+
+export const ASTEROID_ALIASES = [
+  "asteroids-big-brown",
+  "asteroids-big-white",
+  "asteroids-small-brown",
+  "asteroids-small-white",
+];
+
+export const COLOR_PRESET_ALIASES = [
+  "color-preset-1",
+  "color-preset-2",
+  "color-preset-3",
+  "color-preset-4",
+];

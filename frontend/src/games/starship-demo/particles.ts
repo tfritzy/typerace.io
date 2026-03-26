@@ -1,28 +1,11 @@
 import { Emitter } from "@pixi/particle-emitter";
 import type { EmitterConfigV3 } from "@pixi/particle-emitter";
-import { Container, Texture, Rectangle } from "pixi.js";
-import {
-  STAR_PARTICLE_FRAME_SIZE,
-  STAR_PARTICLE_FRAME_COUNT,
-  CANVAS_WIDTH,
-  CANVAS_HEIGHT,
-} from "./constants";
+import { Container, type Spritesheet } from "pixi.js";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 
-export function buildStarParticleTextures(sheet: Texture): Texture[] {
-  const frames: Texture[] = [];
-  const size = STAR_PARTICLE_FRAME_SIZE;
-  for (let i = 0; i < STAR_PARTICLE_FRAME_COUNT; i++) {
-    frames.push(
-      new Texture({
-        source: sheet.source,
-        frame: new Rectangle(0, i * size, size, size),
-      })
-    );
-  }
-  return frames;
-}
+function createStarFieldConfig(starSheet: Spritesheet): EmitterConfigV3 {
+  const firstTexture = Object.values(starSheet.textures)[0];
 
-function createStarFieldConfig(textures: Texture[]): EmitterConfigV3 {
   return {
     lifetime: { min: 3, max: 6 },
     frequency: 0.08,
@@ -40,7 +23,7 @@ function createStarFieldConfig(textures: Texture[]): EmitterConfigV3 {
       },
       {
         type: "textureSingle",
-        config: { texture: textures[0] },
+        config: { texture: firstTexture },
       },
       {
         type: "alpha",
@@ -72,7 +55,9 @@ function createStarFieldConfig(textures: Texture[]): EmitterConfigV3 {
   };
 }
 
-function createStarBurstConfig(textures: Texture[]): EmitterConfigV3 {
+function createStarBurstConfig(starSheet: Spritesheet): EmitterConfigV3 {
+  const textures = Object.values(starSheet.textures);
+
   return {
     lifetime: { min: 0.4, max: 1.2 },
     frequency: 0.01,
@@ -148,16 +133,18 @@ export class StarParticleManager {
   private burstEmitters: Emitter[] = [];
   private burstTimer = 0;
   private burstInterval: number;
-  private starTextures: Texture[];
+  private starSheet: Spritesheet;
   readonly container: Container;
 
-  constructor(starTextures: Texture[]) {
-    this.starTextures = starTextures;
+  constructor(starSheet: Spritesheet) {
+    this.starSheet = starSheet;
     this.container = new Container();
     this.burstInterval = 4 + Math.random() * 3;
 
-    const fieldConfig = createStarFieldConfig(starTextures);
-    this.fieldEmitter = new Emitter(this.container, fieldConfig);
+    this.fieldEmitter = new Emitter(
+      this.container,
+      createStarFieldConfig(starSheet)
+    );
     this.fieldEmitter.emit = true;
   }
 
@@ -169,8 +156,10 @@ export class StarParticleManager {
       this.burstTimer = 0;
       this.burstInterval = 4 + Math.random() * 3;
 
-      const config = createStarBurstConfig(this.starTextures);
-      const emitter = new Emitter(this.container, config);
+      const emitter = new Emitter(
+        this.container,
+        createStarBurstConfig(this.starSheet)
+      );
       emitter.updateOwnerPos(
         Math.random() * CANVAS_WIDTH,
         Math.random() * CANVAS_HEIGHT

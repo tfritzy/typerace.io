@@ -1,0 +1,45 @@
+{
+  "frames": {
+    "asteroids-big-brown-0": {
+      "frame": {
+        "x": 1,
+        "y": 1,
+        "w": 14,
+        "h": 15
+      }
+    },
+    "asteroids-big-brown-1": {
+      "frame": {
+        "x": 18,
+        "y": 1,
+        "w": 17,
+        "h": 15
+      }
+    },
+    "asteroids-big-brown-2": {
+      "frame": {
+        "x": 55,
+        "y": 1,
+        "w": 15,
+        "h": 15
+      }
+    },
+    "asteroids-big-brown-3": {
+      "frame": {
+        "x": 38,
+        "y": 2,
+        "w": 14,
+        "h": 13
+      }
+    }
+  },
+  "meta": {
+    "image": "Asteroid_Big_Brown.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 71,
+      "h": 17
+    },
+    "scale": "1"
+  }
+}

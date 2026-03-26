@@ -1,25 +1,38 @@
-import { Application, Assets, Container, type Texture } from "pixi.js";
-import { MANIFEST } from "./manifest";
-import { CANVAS_WIDTH, CANVAS_HEIGHT, SHIP_SPAWN_INTERVAL_MS, ASTEROID_SPAWN_INTERVAL_MS } from "./constants";
+import { Application, Assets, Container, type Spritesheet, type Texture } from "pixi.js";
+import { MANIFEST, ENGINE_ALIASES, ASTEROID_ALIASES, COLOR_PRESET_ALIASES } from "./manifest";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, SHIP_SPAWN_INTERVAL, ASTEROID_SPAWN_INTERVAL } from "./constants";
 import { createTiledBackground } from "./background";
-import { buildPlanetTextures, buildPlanetRingTextures, createRandomPlanet } from "./planets";
-import { preloadShipImages, createShip, updateShips, type ShipEntity } from "./ships";
+import { createRandomPlanet } from "./planets";
+import { createShip, updateShips, type ShipEntity } from "./ships";
 import { createAsteroid, updateAsteroids, type AsteroidEntity } from "./asteroids";
-import { buildStarParticleTextures, StarParticleManager } from "./particles";
+import { StarParticleManager } from "./particles";
+
+interface LoadedAssets {
+  background: Texture;
+  planets: Spritesheet;
+  planetsRing: Spritesheet;
+  starsParticle: Spritesheet;
+  spaceships: Spritesheet;
+  spaceshipsColormap: Spritesheet;
+  engines: Record<string, Spritesheet>;
+  asteroids: Record<string, Spritesheet>;
+  colorPresets: Record<string, Texture>;
+}
 
 export class StarshipDemoGame {
   private app: Application;
-  private world!: Container;
+  private assets!: LoadedAssets;
+
   private shipLayer!: Container;
   private asteroidLayer!: Container;
 
   private ships: ShipEntity[] = [];
-  private asteroids: AsteroidEntity[] = [];
-  private assets!: Record<string, Texture>;
+  private asteroidEntities: AsteroidEntity[] = [];
+  private starParticles!: StarParticleManager;
 
   private shipSpawnTimer = 0;
   private asteroidSpawnTimer = 0;
-  private starParticles!: StarParticleManager;
+  private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
   constructor(app: Application) {
     this.app = app;
@@ -28,71 +41,95 @@ export class StarshipDemoGame {
   async init(): Promise<void> {
     const bundle = MANIFEST.bundles[0];
     Assets.addBundle(bundle.name, bundle.assets);
-    this.assets = await Assets.loadBundle("starship-demo") as Record<string, Texture>;
-    await preloadShipImages();
+    const raw = await Assets.loadBundle("starship-demo");
+
+    this.assets = {
+      background: raw["background"] as Texture,
+      planets: raw["planets"] as Spritesheet,
+      planetsRing: raw["planets-ring"] as Spritesheet,
+      starsParticle: raw["stars-particle"] as Spritesheet,
+      spaceships: raw["spaceships"] as Spritesheet,
+      spaceshipsColormap: raw["spaceships-colormap"] as Spritesheet,
+      engines: Object.fromEntries(
+        ENGINE_ALIASES.map((a) => [a, raw[a] as Spritesheet])
+      ),
+      asteroids: Object.fromEntries(
+        ASTEROID_ALIASES.map((a) => [a, raw[a] as Spritesheet])
+      ),
+      colorPresets: Object.fromEntries(
+        COLOR_PRESET_ALIASES.map((a) => [a, raw[a] as Texture])
+      ),
+    };
 
     this.buildScene();
-    this.app.ticker.add((ticker) => this.update(ticker.deltaMS / 1000));
+    this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
+    this.app.ticker.add(this.tickerCallback);
   }
 
   private buildScene(): void {
-    this.world = new Container();
-    this.app.stage.addChild(this.world);
+    const world = new Container();
+    this.app.stage.addChild(world);
 
-    const bg = createTiledBackground(this.assets["background"]);
-    this.world.addChild(bg);
+    world.addChild(createTiledBackground(this.assets.background));
 
-    const starTextures = buildStarParticleTextures(this.assets["stars-particle"]);
-    this.starParticles = new StarParticleManager(starTextures);
-    this.world.addChild(this.starParticles.container);
+    this.starParticles = new StarParticleManager(this.assets.starsParticle);
+    world.addChild(this.starParticles.container);
 
-    const planetTextures = buildPlanetTextures(this.assets["planet-sheet"]);
-    const planetRingTextures = buildPlanetRingTextures(this.assets["planet-ring-sheet"]);
-    const planet = createRandomPlanet(planetTextures, planetRingTextures);
-    this.world.addChild(planet);
+    world.addChild(
+      createRandomPlanet(this.assets.planets, this.assets.planetsRing)
+    );
 
     this.asteroidLayer = new Container();
-    this.world.addChild(this.asteroidLayer);
+    world.addChild(this.asteroidLayer);
 
     this.shipLayer = new Container();
-    this.world.addChild(this.shipLayer);
+    world.addChild(this.shipLayer);
   }
 
   private update(dt: number): void {
     this.starParticles.update(dt);
 
-    this.shipSpawnTimer += dt * 1000;
-    if (this.shipSpawnTimer >= SHIP_SPAWN_INTERVAL_MS) {
+    this.shipSpawnTimer += dt;
+    if (this.shipSpawnTimer >= SHIP_SPAWN_INTERVAL) {
       this.shipSpawnTimer = 0;
       this.spawnShip();
     }
 
-    this.asteroidSpawnTimer += dt * 1000;
-    if (this.asteroidSpawnTimer >= ASTEROID_SPAWN_INTERVAL_MS) {
+    this.asteroidSpawnTimer += dt;
+    if (this.asteroidSpawnTimer >= ASTEROID_SPAWN_INTERVAL) {
       this.asteroidSpawnTimer = 0;
       this.spawnAsteroid();
     }
 
     this.ships = updateShips(this.ships, dt);
-    this.asteroids = updateAsteroids(this.asteroids, dt);
+    this.asteroidEntities = updateAsteroids(this.asteroidEntities, dt);
   }
 
   private spawnShip(): void {
-    const ship = createShip(this.assets);
+    const ship = createShip(
+      this.assets.spaceships,
+      this.assets.spaceshipsColormap,
+      this.assets.engines,
+      this.assets.colorPresets
+    );
     this.shipLayer.addChild(ship.container);
     this.ships.push(ship);
   }
 
   private spawnAsteroid(): void {
-    const asteroid = createAsteroid(this.assets);
+    const asteroid = createAsteroid(this.assets.asteroids);
     this.asteroidLayer.addChild(asteroid.sprite);
-    this.asteroids.push(asteroid);
+    this.asteroidEntities.push(asteroid);
   }
 
   destroy(): void {
+    if (this.tickerCallback) {
+      this.app.ticker.remove(this.tickerCallback);
+      this.tickerCallback = null;
+    }
     this.starParticles.destroy();
     for (const s of this.ships) s.container.destroy();
-    for (const a of this.asteroids) a.sprite.destroy();
+    for (const a of this.asteroidEntities) a.sprite.destroy();
     this.app.destroy(true);
   }
 }

@@ -1,0 +1,80 @@
+{
+  "frames": {
+    "star-0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 7,
+        "h": 7
+      }
+    },
+    "star-1": {
+      "frame": {
+        "x": 0,
+        "y": 7,
+        "w": 7,
+        "h": 7
+      }
+    },
+    "star-2": {
+      "frame": {
+        "x": 0,
+        "y": 14,
+        "w": 7,
+        "h": 7
+      }
+    },
+    "star-3": {
+      "frame": {
+        "x": 0,
+        "y": 21,
+        "w": 7,
+        "h": 7
+      }
+    },
+    "star-4": {
+      "frame": {
+        "x": 0,
+        "y": 28,
+        "w": 7,
+        "h": 7
+      }
+    },
+    "star-5": {
+      "frame": {
+        "x": 0,
+        "y": 35,
+        "w": 7,
+        "h": 7
+      }
+    },
+    "star-6": {
+      "frame": {
+        "x": 0,
+        "y": 42,
+        "w": 7,
+        "h": 7
+      }
+    }
+  },
+  "animations": {
+    "stars": [
+      "star-0",
+      "star-1",
+      "star-2",
+      "star-3",
+      "star-4",
+      "star-5",
+      "star-6"
+    ]
+  },
+  "meta": {
+    "image": "Stars Particle.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 7,
+      "h": 49
+    },
+    "scale": "1"
+  }
+}
