@@ -10,6 +10,12 @@ const GAMES = [
     description:
       "A wave-based typing defense game. Type words to shoot down enemies before they break through your shield.",
   },
+  {
+    slug: "starship-demo",
+    title: "Starship Demo",
+    description:
+      "An asset showcase featuring every ship from the Pixel Starships kit with color presets, animated engines, drifting asteroids, star particles, and a tiled space background.",
+  },
 ];
 
 export const GamesPage = () => {

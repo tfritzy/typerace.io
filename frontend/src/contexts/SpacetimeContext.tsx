@@ -15,10 +15,7 @@ const SpacetimeContext = createContext<SpacetimeContextType | undefined>(undefin
 
 export const useDatabase = () => {
     const context = useContext(SpacetimeContext);
-    if (!context) {
-        throw new Error('useDatabase must be used within SpacetimeProvider');
-    }
-    return context.conn;
+    return context?.conn ?? null;
 };
 
 export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
