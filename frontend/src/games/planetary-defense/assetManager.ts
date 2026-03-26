@@ -1,5 +1,4 @@
 import { Assets, type AssetsManifest, type Spritesheet, type Texture } from "pixi.js";
-import { setNearestNeighbor, setTextureNearest } from "../utils";
 
 export interface LoadedAssets {
   background: Texture;
@@ -11,6 +10,14 @@ export interface LoadedAssets {
   engines: Record<string, Spritesheet>;
   asteroids: Record<string, Spritesheet>;
   colorPresets: Record<string, Texture>;
+}
+
+function setNearestNeighbor(sheet: Spritesheet): void {
+  sheet.textureSource.style.scaleMode = "nearest";
+}
+
+function setTextureNearest(tex: Texture): void {
+  tex.source.style.scaleMode = "nearest";
 }
 
 export class AssetManager {

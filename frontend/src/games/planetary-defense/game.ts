@@ -7,26 +7,41 @@ import { AssetManager } from "./assetManager";
 import {
   createInitialState,
   updateState,
+  spawnMeteorAt,
   type GameState,
   type ShipState,
-  type AsteroidState,
+  type MeteorState,
 } from "./state";
 import { applyPaletteSwap } from "./ships";
+import { MeteorType } from "./types";
 
-export class StarshipDemoGame {
+const ENGINE_TYPE_TO_ALIAS = ENGINE_ALIASES;
+const COLOR_PRESET_TO_ALIAS = COLOR_PRESET_ALIASES;
+const METEOR_TYPE_TO_ALIAS: Record<MeteorType, string> = {
+  [MeteorType.LargeBrown]: "asteroids-big-brown",
+  [MeteorType.LargeWhite]: "asteroids-big-white",
+  [MeteorType.SmallBrown]: "asteroids-small-brown",
+  [MeteorType.SmallWhite]: "asteroids-small-white",
+};
+
+export class PlanetaryDefenseGame {
   private app: Application;
   private assetManager!: AssetManager;
   state!: GameState;
 
   private shipLayer!: Container;
-  private asteroidLayer!: Container;
+  private meteorLayer!: Container;
   private starParticles!: StarParticleManager;
 
   private shipContainers = new Map<number, Container>();
-  private asteroidSprites = new Map<number, Sprite>();
+  private meteorSprites = new Map<number, Sprite>();
 
-  private shipFrameNames: string[] = [];
-  private asteroidTextureCounts: Record<string, number> = {};
+  private meteorVariantCounts: Record<MeteorType, number> = {
+    [MeteorType.LargeBrown]: 1,
+    [MeteorType.LargeWhite]: 1,
+    [MeteorType.SmallBrown]: 1,
+    [MeteorType.SmallWhite]: 1,
+  };
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
@@ -37,27 +52,21 @@ export class StarshipDemoGame {
   async init(): Promise<void> {
     this.assetManager = await AssetManager.load(
       MANIFEST,
-      "starship-demo",
+      "planetary-defense",
       ENGINE_ALIASES,
       ASTEROID_ALIASES,
       COLOR_PRESET_ALIASES
     );
 
     const assets = this.assetManager.assets;
-    this.shipFrameNames = Object.keys(assets.spaceships.textures);
 
-    for (const alias of ASTEROID_ALIASES) {
-      this.asteroidTextureCounts[alias] = Object.keys(
+    for (const [meteorType, alias] of Object.entries(METEOR_TYPE_TO_ALIAS)) {
+      this.meteorVariantCounts[Number(meteorType) as MeteorType] = Object.keys(
         assets.asteroids[alias].textures
       ).length;
     }
 
-    const planetFrames = [
-      ...Object.keys(assets.planets.textures),
-      ...Object.keys(assets.planetsRing.textures),
-    ];
-
-    this.state = createInitialState(planetFrames);
+    this.state = createInitialState();
     this.buildScene();
 
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
@@ -74,18 +83,16 @@ export class StarshipDemoGame {
     this.starParticles = new StarParticleManager(assets.starsParticle);
     world.addChild(this.starParticles.container);
 
-    const planetTexture =
-      assets.planets.textures[this.state.planetFrame] ??
-      assets.planetsRing.textures[this.state.planetFrame];
-    const planet = new Sprite(planetTexture);
+    const planetTextures = Object.values(assets.planets.textures);
+    const planet = new Sprite(planetTextures[0]);
     planet.anchor.set(0.5);
     planet.scale.set(PLANET_SCALE);
     planet.x = CANVAS_WIDTH / 2;
     planet.y = CANVAS_HEIGHT / 2;
     world.addChild(planet);
 
-    this.asteroidLayer = new Container();
-    world.addChild(this.asteroidLayer);
+    this.meteorLayer = new Container();
+    world.addChild(this.meteorLayer);
 
     this.shipLayer = new Container();
     world.addChild(this.shipLayer);
@@ -94,17 +101,22 @@ export class StarshipDemoGame {
   private createShipContainer(ship: ShipState): Container {
     const assets = this.assetManager.assets;
 
+    const shipFrameName = `ship-${ship.shipType}`;
+    const colormapFrameName = `cm-${ship.shipType}`;
+    const presetAlias = COLOR_PRESET_TO_ALIAS[ship.colorPreset];
+    const engineAlias = ENGINE_TYPE_TO_ALIAS[ship.engineType];
+
     const shipTexture = applyPaletteSwap(
-      assets.spaceships.textures[ship.shipFrame],
-      assets.spaceshipsColormap.textures[ship.colormapFrame],
-      assets.colorPresets[ship.presetAlias]
+      assets.spaceships.textures[shipFrameName],
+      assets.spaceshipsColormap.textures[colormapFrameName],
+      assets.colorPresets[presetAlias]
     );
 
     const shipSprite = new Sprite(shipTexture);
     shipSprite.anchor.set(0.5);
 
-    const engineSheet = assets.engines[ship.engineAlias];
-    const engineFrames = engineSheet.animations[ship.engineAlias];
+    const engineSheet = assets.engines[engineAlias];
+    const engineFrames = engineSheet.animations[engineAlias];
     const engine = new AnimatedSprite(engineFrames);
     engine.animationSpeed = 0.15;
     engine.play();
@@ -121,20 +133,33 @@ export class StarshipDemoGame {
     return container;
   }
 
-  private createAsteroidSprite(asteroid: AsteroidState): Sprite {
+  private createMeteorSprite(meteor: MeteorState): Sprite {
     const assets = this.assetManager.assets;
-    const sheet = assets.asteroids[asteroid.asteroidAlias];
+    const alias = METEOR_TYPE_TO_ALIAS[meteor.meteorType];
+    const sheet = assets.asteroids[alias];
     const textures = Object.values(sheet.textures);
-    const texture = textures[asteroid.textureIndex % textures.length];
+    const texture = textures[meteor.variant % textures.length];
 
     const sprite = new Sprite(texture);
     sprite.anchor.set(0.5);
     sprite.scale.set(ASTEROID_SCALE);
-    sprite.x = asteroid.x;
-    sprite.y = asteroid.y;
-    sprite.rotation = asteroid.rotation;
+    sprite.x = meteor.x;
+    sprite.y = meteor.y;
+    sprite.rotation = meteor.rotation;
 
     return sprite;
+  }
+
+  handleSpawnMeteor(canvasX: number, canvasY: number): void {
+    const meteor = spawnMeteorAt(
+      this.state,
+      this.meteorVariantCounts,
+      canvasX,
+      canvasY
+    );
+    const sprite = this.createMeteorSprite(meteor);
+    this.meteorLayer.addChild(sprite);
+    this.meteorSprites.set(meteor.id, sprite);
   }
 
   private update(dt: number): void {
@@ -143,8 +168,7 @@ export class StarshipDemoGame {
     const result = updateState(
       this.state,
       dt,
-      this.shipFrameNames,
-      this.asteroidTextureCounts
+      this.meteorVariantCounts
     );
 
     if (result.newShip) {
@@ -153,10 +177,10 @@ export class StarshipDemoGame {
       this.shipContainers.set(result.newShip.id, container);
     }
 
-    if (result.newAsteroid) {
-      const sprite = this.createAsteroidSprite(result.newAsteroid);
-      this.asteroidLayer.addChild(sprite);
-      this.asteroidSprites.set(result.newAsteroid.id, sprite);
+    if (result.newMeteor) {
+      const sprite = this.createMeteorSprite(result.newMeteor);
+      this.meteorLayer.addChild(sprite);
+      this.meteorSprites.set(result.newMeteor.id, sprite);
     }
 
     for (const ship of this.state.ships) {
@@ -167,12 +191,12 @@ export class StarshipDemoGame {
       }
     }
 
-    for (const asteroid of this.state.asteroids) {
-      const sprite = this.asteroidSprites.get(asteroid.id);
+    for (const meteor of this.state.meteors) {
+      const sprite = this.meteorSprites.get(meteor.id);
       if (sprite) {
-        sprite.x = asteroid.x;
-        sprite.y = asteroid.y;
-        sprite.rotation = asteroid.rotation;
+        sprite.x = meteor.x;
+        sprite.y = meteor.y;
+        sprite.rotation = meteor.rotation;
       }
     }
 
@@ -184,11 +208,11 @@ export class StarshipDemoGame {
       }
     }
 
-    for (const id of result.removedAsteroidIds) {
-      const sprite = this.asteroidSprites.get(id);
+    for (const id of result.removedMeteorIds) {
+      const sprite = this.meteorSprites.get(id);
       if (sprite) {
         sprite.destroy();
-        this.asteroidSprites.delete(id);
+        this.meteorSprites.delete(id);
       }
     }
   }
@@ -200,14 +224,14 @@ export class StarshipDemoGame {
     }
     this.starParticles.destroy();
     for (const c of this.shipContainers.values()) c.destroy();
-    for (const s of this.asteroidSprites.values()) s.destroy();
+    for (const s of this.meteorSprites.values()) s.destroy();
     this.app.destroy(true);
   }
 }
 
-export async function createStarshipDemoGame(
+export async function createPlanetaryDefenseGame(
   container: HTMLElement
-): Promise<StarshipDemoGame> {
+): Promise<PlanetaryDefenseGame> {
   const app = new Application();
   await app.init({
     width: CANVAS_WIDTH,
@@ -223,7 +247,7 @@ export async function createStarshipDemoGame(
   app.canvas.style.aspectRatio = "16/9";
   container.appendChild(app.canvas);
 
-  const game = new StarshipDemoGame(app);
+  const game = new PlanetaryDefenseGame(app);
   await game.init();
   return game;
 }

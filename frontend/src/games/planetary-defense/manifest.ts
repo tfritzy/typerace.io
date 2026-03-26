@@ -5,7 +5,7 @@ const BASE = "/pixel_starships_kit";
 export const MANIFEST: AssetsManifest = {
   bundles: [
     {
-      name: "starship-demo",
+      name: "planetary-defense",
       assets: [
         { alias: "background", src: `${BASE}/Backgrounds/Background.png` },
 

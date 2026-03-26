@@ -6,7 +6,7 @@ import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { SiteStatsPage } from "./pages/SiteStatsPage";
 import { GamesPage } from "./games/GamesPage";
 import { WordDefensePage } from "./games/word-defense/WordDefensePage";
-import { StarshipDemoPage } from "./games/starship-demo/StarshipDemoPage";
+import { PlanetaryDefensePage } from "./games/planetary-defense/PlanetaryDefensePage";
 import { SpacetimeProvider } from "./contexts/SpacetimeContext";
 import { ToastProvider } from "./hooks/useToast";
 import { ToastContainer } from "./components/Toast";
@@ -35,7 +35,7 @@ function App() {
         <Routes>
           <Route path="/games" element={<GamesPage />} />
           <Route path="/games/word-defense" element={<WordDefensePage />} />
-          <Route path="/games/starship-demo" element={<StarshipDemoPage />} />
+          <Route path="/games/planetary-defense" element={<PlanetaryDefensePage />} />
           <Route path="*" element={<ConnectedRoutes />} />
         </Routes>
         <ToastContainer />
