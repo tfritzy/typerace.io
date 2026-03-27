@@ -18,3 +18,7 @@ export function pickEdgeSpawn(
     angle: Math.PI - Math.PI / 4 + (Math.random() * Math.PI) / 2,
   };
 }
+
+export function randInt(max: number): number {
+  return Math.floor(Math.random() * max);
+}

@@ -3,7 +3,7 @@ import {
   ShipType, EngineType, ColorPreset, MeteorType,
   SHIP_TYPE_COUNT, ENGINE_TYPE_COUNT, COLOR_PRESET_COUNT, METEOR_TYPE_COUNT,
 } from "./types";
-import { pickEdgeSpawn } from "../utils";
+import { pickEdgeSpawn, randInt } from "./utils";
 
 export interface ShipState {
   id: number;
@@ -35,10 +35,6 @@ export interface GameState {
   nextId: number;
 }
 
-function randInt(max: number): number {
-  return Math.floor(Math.random() * max);
-}
-
 export function createInitialState(): GameState {
   return {
     ships: [],
@@ -65,25 +61,6 @@ export function spawnMeteor(state: GameState): void {
   const { x, y, angle } = pickEdgeSpawn(CANVAS_WIDTH, CANVAS_HEIGHT);
   const speed =
     ASTEROID_SPEED_MIN + Math.random() * (ASTEROID_SPEED_MAX - ASTEROID_SPEED_MIN);
-  const rotDir = Math.random() > 0.5 ? 1 : -1;
-
-  state.meteors.push({
-    id: state.nextId++,
-    x,
-    y,
-    vx: Math.cos(angle) * speed,
-    vy: Math.sin(angle) * speed,
-    rotation: 0,
-    rotationSpeed: (0.5 + Math.random() * 1.5) * rotDir,
-    meteorType: randInt(METEOR_TYPE_COUNT),
-    variant: randInt(16),
-  });
-}
-
-export function spawnMeteorAt(state: GameState, x: number, y: number): void {
-  const speed =
-    ASTEROID_SPEED_MIN + Math.random() * (ASTEROID_SPEED_MAX - ASTEROID_SPEED_MIN);
-  const angle = Math.random() * Math.PI * 2;
   const rotDir = Math.random() > 0.5 ? 1 : -1;
 
   state.meteors.push({

@@ -24,6 +24,9 @@ export class PlanetaryDefenseGame {
   private shipContainers = new Map<number, Container>();
   private meteorSprites = new Map<number, Sprite>();
 
+  private activeShipIds = new Set<number>();
+  private activeMeteorIds = new Set<number>();
+
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
   constructor(app: Application) {
@@ -70,9 +73,9 @@ export class PlanetaryDefenseGame {
   }
 
   private syncRendering(): void {
-    const activeShipIds = new Set<number>();
+    this.activeShipIds.clear();
     for (const ship of this.state.ships) {
-      activeShipIds.add(ship.id);
+      this.activeShipIds.add(ship.id);
       let container = this.shipContainers.get(ship.id);
       if (!container) {
         container = createShipContainer(this.assetManager, ship);
@@ -84,15 +87,15 @@ export class PlanetaryDefenseGame {
     }
 
     for (const [id, container] of this.shipContainers) {
-      if (!activeShipIds.has(id)) {
+      if (!this.activeShipIds.has(id)) {
         container.destroy();
         this.shipContainers.delete(id);
       }
     }
 
-    const activeMeteorIds = new Set<number>();
+    this.activeMeteorIds.clear();
     for (const meteor of this.state.meteors) {
-      activeMeteorIds.add(meteor.id);
+      this.activeMeteorIds.add(meteor.id);
       let sprite = this.meteorSprites.get(meteor.id);
       if (!sprite) {
         sprite = createMeteorSprite(this.assetManager, meteor);
@@ -105,7 +108,7 @@ export class PlanetaryDefenseGame {
     }
 
     for (const [id, sprite] of this.meteorSprites) {
-      if (!activeMeteorIds.has(id)) {
+      if (!this.activeMeteorIds.has(id)) {
         sprite.destroy();
         this.meteorSprites.delete(id);
       }
