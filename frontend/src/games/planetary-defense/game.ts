@@ -1,7 +1,8 @@
-import { Application, Container, Sprite } from "pixi.js";
+import { Application, Container } from "pixi.js";
 import { MANIFEST } from "./manifest";
-import { CANVAS_WIDTH, CANVAS_HEIGHT, PLANET_SCALE } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { Background } from "./Background";
+import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
 import { AssetManager } from "./assetManager";
 import {
@@ -16,6 +17,7 @@ export class PlanetaryDefenseGame {
   state!: GameState;
 
   private background!: Background;
+  private planetManager!: PlanetManager;
   private enemyManager!: EnemyManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
@@ -40,13 +42,8 @@ export class PlanetaryDefenseGame {
     this.background = new Background(this.assetManager);
     world.addChild(this.background.container);
 
-    const planetTextures = Object.values(this.assetManager.planets.textures);
-    const planet = new Sprite(planetTextures[0]);
-    planet.anchor.set(0.5);
-    planet.scale.set(PLANET_SCALE);
-    planet.x = CANVAS_WIDTH / 2;
-    planet.y = CANVAS_HEIGHT / 2;
-    world.addChild(planet);
+    this.planetManager = new PlanetManager(this.assetManager);
+    world.addChild(this.planetManager.container);
 
     this.enemyManager = new EnemyManager(this.assetManager);
     world.addChild(this.enemyManager.meteorLayer);
@@ -56,7 +53,7 @@ export class PlanetaryDefenseGame {
   private update(dt: number): void {
     this.background.update(dt);
     updateState(this.state, dt);
-    this.enemyManager.syncRendering(this.state);
+    this.enemyManager.update(this.state, dt);
   }
 
   destroy(): void {
@@ -65,6 +62,7 @@ export class PlanetaryDefenseGame {
       this.tickerCallback = null;
     }
     this.background.destroy();
+    this.planetManager.destroy();
     this.enemyManager.destroy();
     this.app.destroy(true);
   }

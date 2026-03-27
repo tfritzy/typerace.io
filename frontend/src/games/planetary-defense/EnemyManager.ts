@@ -1,6 +1,6 @@
 import { Container, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
-import type { GameState } from "./state";
+import { spawnShip, spawnMeteor, type GameState } from "./state";
 import { createShipContainer } from "./prefabs/shipPrefab";
 import { createMeteorSprite } from "./prefabs/meteorPrefab";
 
@@ -13,6 +13,8 @@ export class EnemyManager {
   private meteorSprites = new Map<number, Sprite>();
   private activeShipIds = new Set<number>();
   private activeMeteorIds = new Set<number>();
+  private shipSpawnTimer = 0;
+  private meteorSpawnTimer = 0;
 
   constructor(assets: AssetManager) {
     this.assets = assets;
@@ -20,7 +22,23 @@ export class EnemyManager {
     this.meteorLayer = new Container();
   }
 
-  syncRendering(state: GameState): void {
+  update(state: GameState, dt: number): void {
+    this.shipSpawnTimer += dt;
+    if (this.shipSpawnTimer >= 3) {
+      this.shipSpawnTimer = 0;
+      spawnShip(state);
+    }
+
+    this.meteorSpawnTimer += dt;
+    if (this.meteorSpawnTimer >= 1.5) {
+      this.meteorSpawnTimer = 0;
+      spawnMeteor(state);
+    }
+
+    this.syncRendering(state);
+  }
+
+  private syncRendering(state: GameState): void {
     this.activeShipIds.clear();
     for (const ship of state.ships) {
       this.activeShipIds.add(ship.id);

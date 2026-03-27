@@ -1,4 +1,4 @@
-import { CANVAS_WIDTH, CANVAS_HEIGHT, SHIP_SPEED_MIN, SHIP_SPEED_MAX, ASTEROID_SPEED_MIN, ASTEROID_SPEED_MAX, SHIP_SPAWN_INTERVAL, ASTEROID_SPAWN_INTERVAL } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import {
   ShipType, EngineType, ColorPreset, MeteorType,
   SHIP_TYPE_COUNT, ENGINE_TYPE_COUNT, COLOR_PRESET_COUNT, METEOR_TYPE_COUNT,
@@ -31,8 +31,6 @@ export interface MeteorState {
 export interface GameState {
   ships: ShipState[];
   meteors: MeteorState[];
-  shipSpawnTimer: number;
-  meteorSpawnTimer: number;
   nextId: number;
 }
 
@@ -40,8 +38,6 @@ export function createInitialState(): GameState {
   return {
     ships: [],
     meteors: [],
-    shipSpawnTimer: 0,
-    meteorSpawnTimer: 0,
     nextId: 1,
   };
 }
@@ -51,7 +47,7 @@ export function spawnShip(state: GameState): void {
     id: state.nextId++,
     x: -100,
     y: 100 + Math.random() * (CANVAS_HEIGHT - 200),
-    vx: SHIP_SPEED_MIN + Math.random() * (SHIP_SPEED_MAX - SHIP_SPEED_MIN),
+    vx: 60 + Math.random() * 80,
     shipType: randInt(SHIP_TYPE_COUNT),
     colorPreset: randInt(COLOR_PRESET_COUNT),
     engineType: randInt(ENGINE_TYPE_COUNT),
@@ -61,8 +57,7 @@ export function spawnShip(state: GameState): void {
 
 export function spawnMeteor(state: GameState): void {
   const { x, y, angle } = pickEdgeSpawn(CANVAS_WIDTH, CANVAS_HEIGHT);
-  const speed =
-    ASTEROID_SPEED_MIN + Math.random() * (ASTEROID_SPEED_MAX - ASTEROID_SPEED_MIN);
+  const speed = 30 + Math.random() * 70;
   const rotDir = Math.random() > 0.5 ? 1 : -1;
 
   state.meteors.push({
@@ -79,18 +74,6 @@ export function spawnMeteor(state: GameState): void {
 }
 
 export function updateState(state: GameState, dt: number): void {
-  state.shipSpawnTimer += dt;
-  if (state.shipSpawnTimer >= SHIP_SPAWN_INTERVAL) {
-    state.shipSpawnTimer = 0;
-    spawnShip(state);
-  }
-
-  state.meteorSpawnTimer += dt;
-  if (state.meteorSpawnTimer >= ASTEROID_SPAWN_INTERVAL) {
-    state.meteorSpawnTimer = 0;
-    spawnMeteor(state);
-  }
-
   for (const ship of state.ships) {
     ship.x += ship.vx * dt;
   }

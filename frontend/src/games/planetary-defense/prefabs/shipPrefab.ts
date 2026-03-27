@@ -2,8 +2,6 @@ import { Container, Sprite, AnimatedSprite } from "pixi.js";
 import type { AssetManager } from "../assetManager";
 import type { ShipState } from "../state";
 import { ShipType } from "../types";
-import { SHIP_SCALE } from "../constants";
-
 interface EngineOffset {
   x: number;
   y: number;
@@ -108,7 +106,7 @@ export function createShipContainer(
     container.addChild(shield);
   }
 
-  container.scale.set(SHIP_SCALE);
+  container.scale.set(3);
   container.x = ship.x;
   container.y = ship.y;
 
