@@ -43,4 +43,3 @@ scripts/model_comparison_*.txt
 *.sln
 *.sw?
 nohup.out
-frontend/module_bindings

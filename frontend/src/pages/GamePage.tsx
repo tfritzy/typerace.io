@@ -147,7 +147,7 @@ export const GamePage = () => {
       if (currentPlayerProgress.progressIndex >= game.phrase.length) {
         setHasFinished(true);
       }
-    } else if (gamePlayerProgress.length > 0 && !currentPlayerProgress) {
+    } else if (gamePlayerProgress.length > 0 && !currentPlayerProgress && game.state?.tag === "Archived") {
       setHasFinished(true);
     }
   }, [conn, game, gamePlayerProgress]);
