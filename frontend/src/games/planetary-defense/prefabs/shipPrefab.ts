@@ -2,12 +2,12 @@ import { Container, Sprite, AnimatedSprite } from "pixi.js";
 import type { AssetManager } from "../assetManager";
 import type { ShipState } from "../state";
 import { ShipType } from "../types";
-interface EngineOffset {
+export interface EngineOffset {
   x: number;
   y: number;
 }
 
-const ENGINE_POSITIONS: Record<ShipType, EngineOffset[]> = {
+export const ENGINE_POSITIONS: Record<ShipType, EngineOffset[]> = {
   [ShipType.Vanguard]: [{ x: -18, y: -5 }, { x: -18, y: 4 }],
   [ShipType.Sentinel]: [{ x: -10, y: 0 }],
   [ShipType.Corsair]: [{ x: -16, y: 0 }],
