@@ -5,20 +5,10 @@ import {
   addEngine,
   removeEngine,
   exportConfig,
+  SHIP_NAMES,
 } from "./thrusterEditor";
 import type { Application } from "pixi.js";
 import { SHIP_TYPE_COUNT } from "./types";
-
-const SHIP_NAMES: string[] = [
-  "Vanguard", "Sentinel", "Corsair", "Falcon", "Scout", "Dart", "Wasp", "Phoenix",
-  "Hawk", "Sparrow", "Gnat", "Stinger", "Needle", "Mite", "Titan", "Raptor",
-  "Lance", "Javelin", "Pip", "Raven", "Osprey", "Leviathan", "Talon", "Hornet",
-  "Behemoth", "Dreadnought", "Marauder", "Eagle", "Pike", "Arrow", "Juggernaut", "Warden",
-  "Specter", "Harrier", "Viper", "Flea", "Broadside", "Kestrel", "Finch", "Striker",
-  "Robin", "Cricket", "Moth", "Colossus", "Cutlass", "Sabre", "Mantis", "Speck",
-  "Crest", "Piston", "Vulture", "Orb", "Flicker", "Barb", "Sliver", "Flagship",
-  "Aegis", "Bolt", "Spur", "Dot", "Rampart", "Clipper",
-];
 
 export const ThrusterEditorPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);

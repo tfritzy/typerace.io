@@ -14,7 +14,7 @@ import { ShipType, EngineType, ColorPreset, SHIP_TYPE_COUNT } from "./types";
 import { ENGINE_POSITIONS, SHIP_ENGINE_TYPE } from "./prefabs/shipPrefab";
 import type { EngineOffset } from "./prefabs/shipPrefab";
 
-const SHIP_NAMES: string[] = [
+export const SHIP_NAMES: string[] = [
   "Vanguard", "Sentinel", "Corsair", "Falcon", "Scout", "Dart", "Wasp", "Phoenix",
   "Hawk", "Sparrow", "Gnat", "Stinger", "Needle", "Mite", "Titan", "Raptor",
   "Lance", "Javelin", "Pip", "Raven", "Osprey", "Leviathan", "Talon", "Hornet",
@@ -106,6 +106,15 @@ export async function createThrusterEditor(
     fontFamily: "monospace",
   });
 
+  let dragState: {
+    shipIndex: number;
+    engineIndex: number;
+    handle: Graphics;
+    innerContainer: Container;
+    offsetX: number;
+    offsetY: number;
+  } | null = null;
+
   function rebuildShip(i: number) {
     const old = shipContainers[i];
     if (old) {
@@ -154,45 +163,19 @@ export async function createThrusterEditor(
         handle.cursor = "grab";
 
         const engineIndex = ei;
-        let dragging = false;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
 
         handle.on("pointerdown", (e: FederatedPointerEvent) => {
-          dragging = true;
+          const local = innerContainer.toLocal(e.global);
+          dragState = {
+            shipIndex: i,
+            engineIndex,
+            handle,
+            innerContainer,
+            offsetX: handle.x - local.x,
+            offsetY: handle.y - local.y,
+          };
           handle.cursor = "grabbing";
-          const local = innerContainer.toLocal(e.global);
-          dragOffsetX = handle.x - local.x;
-          dragOffsetY = handle.y - local.y;
           e.stopPropagation();
-        });
-
-        app.stage.on("pointermove", (e: FederatedPointerEvent) => {
-          if (!dragging) return;
-          const local = innerContainer.toLocal(e.global);
-          const newX = Math.round(local.x + dragOffsetX);
-          const newY = Math.round(local.y + dragOffsetY);
-          handle.x = newX;
-          handle.y = newY;
-
-          const engineSprites = innerContainer.children.filter(
-            (c) => c instanceof AnimatedSprite
-          ) as AnimatedSprite[];
-          if (engineSprites[engineIndex]) {
-            engineSprites[engineIndex].x = newX;
-            engineSprites[engineIndex].y = newY;
-          }
-
-          config.positions[engineIndex] = { x: newX, y: newY };
-          updateLabel(i);
-          callbacks.onConfigChange({ ...configs });
-        });
-
-        app.stage.on("pointerup", () => {
-          if (dragging) {
-            dragging = false;
-            handle.cursor = "grab";
-          }
         });
 
         innerContainer.addChild(handle);
@@ -253,6 +236,35 @@ export async function createThrusterEditor(
 
   app.stage.eventMode = "static";
   app.stage.hitArea = app.screen;
+
+  app.stage.on("pointermove", (e: FederatedPointerEvent) => {
+    if (!dragState) return;
+    const { engineIndex, handle, innerContainer, offsetX, offsetY, shipIndex } = dragState;
+    const local = innerContainer.toLocal(e.global);
+    const newX = Math.round(local.x + offsetX);
+    const newY = Math.round(local.y + offsetY);
+    handle.x = newX;
+    handle.y = newY;
+
+    const engineSprites = innerContainer.children.filter(
+      (c) => c instanceof AnimatedSprite
+    ) as AnimatedSprite[];
+    if (engineSprites[engineIndex]) {
+      engineSprites[engineIndex].x = newX;
+      engineSprites[engineIndex].y = newY;
+    }
+
+    configs[shipIndex].positions[engineIndex] = { x: newX, y: newY };
+    updateLabel(shipIndex);
+    callbacks.onConfigChange({ ...configs });
+  });
+
+  app.stage.on("pointerup", () => {
+    if (dragState) {
+      dragState.handle.cursor = "grab";
+      dragState = null;
+    }
+  });
 
   for (let i = 0; i < SHIP_TYPE_COUNT; i++) {
     rebuildShip(i);
