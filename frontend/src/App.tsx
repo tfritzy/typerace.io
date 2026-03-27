@@ -37,6 +37,7 @@ function App() {
           <Route path="/games" element={<GamesPage />} />
           <Route path="/games/word-defense" element={<WordDefensePage />} />
           <Route path="/games/planetary-defense" element={<PlanetaryDefensePage />} />
+          <Route path="/games/ship-grid" element={<ShipGridPage />} />
           <Route path="*" element={<ConnectedRoutes />} />
         </Routes>
         <ToastContainer />
