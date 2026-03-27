@@ -7,6 +7,7 @@ import { SiteStatsPage } from "./pages/SiteStatsPage";
 import { GamesPage } from "./games/GamesPage";
 import { WordDefensePage } from "./games/word-defense/WordDefensePage";
 import { PlanetaryDefensePage } from "./games/planetary-defense/PlanetaryDefensePage";
+import { ShipGridPage } from "./games/planetary-defense/ShipGridPage";
 import { SpacetimeProvider } from "./contexts/SpacetimeContext";
 import { ToastProvider } from "./hooks/useToast";
 import { ToastContainer } from "./components/Toast";
