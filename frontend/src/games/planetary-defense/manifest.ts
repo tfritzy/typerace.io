@@ -15,6 +15,7 @@ export const MANIFEST: AssetsManifest = {
 
         { alias: "spaceships", src: `${BASE}/SpaceShips/spaceships.json` },
         { alias: "spaceships-colormap", src: `${BASE}/SpaceShips/spaceships-colormap.json` },
+        { alias: "spaceships-shield", src: `${BASE}/SpaceShips/spaceships-shield.json` },
         { alias: "color-preset-1", src: `${BASE}/SpaceShips/SpaceShip Color Preset 1.png` },
         { alias: "color-preset-2", src: `${BASE}/SpaceShips/SpaceShip Color Preset 2.png` },
         { alias: "color-preset-3", src: `${BASE}/SpaceShips/SpaceShip Color Preset 3.png` },

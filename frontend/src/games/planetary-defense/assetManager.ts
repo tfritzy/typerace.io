@@ -27,18 +27,6 @@ const COLOR_PRESET_ALIASES: Record<ColorPreset, string> = {
   [ColorPreset.Preset4]: "color-preset-4",
 };
 
-interface RawAssets {
-  background: Texture;
-  planets: Spritesheet;
-  planetsRing: Spritesheet;
-  starsParticle: Spritesheet;
-  spaceships: Spritesheet;
-  spaceshipsColormap: Spritesheet;
-  engines: Record<string, Spritesheet>;
-  asteroids: Record<string, Spritesheet>;
-  colorPresets: Record<string, Texture>;
-}
-
 function setNearestNeighbor(sheet: Spritesheet): void {
   sheet.textureSource.style.scaleMode = "nearest";
 }
@@ -48,22 +36,52 @@ function setTextureNearest(tex: Texture): void {
 }
 
 export class AssetManager {
-  private raw: RawAssets;
+  private background_: Texture;
+  private planets_: Spritesheet;
+  private planetsRing_: Spritesheet;
+  private starsParticle_: Spritesheet;
+  private spaceships_: Spritesheet;
+  private spaceshipsColormap_: Spritesheet;
+  private spaceshipsShield_: Spritesheet;
+  private engines_: Record<string, Spritesheet>;
+  private asteroids_: Record<string, Spritesheet>;
+  private colorPresets_: Record<string, Texture>;
 
-  private constructor(raw: RawAssets) {
-    this.raw = raw;
+  constructor(loaded: Record<string, unknown>) {
+    const engineAliasValues = Object.values(ENGINE_ALIASES);
+    const meteorAliasValues = Object.values(METEOR_ALIASES);
+    const presetAliasValues = Object.values(COLOR_PRESET_ALIASES);
+
+    this.background_ = loaded["background"] as Texture;
+    this.planets_ = loaded["planets"] as Spritesheet;
+    this.planetsRing_ = loaded["planets-ring"] as Spritesheet;
+    this.starsParticle_ = loaded["stars-particle"] as Spritesheet;
+    this.spaceships_ = loaded["spaceships"] as Spritesheet;
+    this.spaceshipsColormap_ = loaded["spaceships-colormap"] as Spritesheet;
+    this.spaceshipsShield_ = loaded["spaceships-shield"] as Spritesheet;
+    this.engines_ = Object.fromEntries(
+      engineAliasValues.map((a) => [a, loaded[a] as Spritesheet])
+    );
+    this.asteroids_ = Object.fromEntries(
+      meteorAliasValues.map((a) => [a, loaded[a] as Spritesheet])
+    );
+    this.colorPresets_ = Object.fromEntries(
+      presetAliasValues.map((a) => [a, loaded[a] as Texture])
+    );
+
+    this.applyNearestNeighbor();
   }
 
   get background(): Texture {
-    return this.raw.background;
+    return this.background_;
   }
 
   get planets(): Spritesheet {
-    return this.raw.planets;
+    return this.planets_;
   }
 
   get starsParticle(): Spritesheet {
-    return this.raw.starsParticle;
+    return this.starsParticle_;
   }
 
   getShipTexture(shipType: ShipType, colorPreset: ColorPreset): Texture {
@@ -71,21 +89,25 @@ export class AssetManager {
     const cmFrame = `cm-${shipType}`;
     const presetAlias = COLOR_PRESET_ALIASES[colorPreset];
     return applyPaletteSwap(
-      this.raw.spaceships.textures[shipFrame],
-      this.raw.spaceshipsColormap.textures[cmFrame],
-      this.raw.colorPresets[presetAlias]
+      this.spaceships_.textures[shipFrame],
+      this.spaceshipsColormap_.textures[cmFrame],
+      this.colorPresets_[presetAlias]
     );
+  }
+
+  getShieldTexture(shipType: ShipType): Texture {
+    return this.spaceshipsShield_.textures[`shield-${shipType}`];
   }
 
   getEngineFrames(engineType: EngineType): Texture[] {
     const alias = ENGINE_ALIASES[engineType];
-    const sheet = this.raw.engines[alias];
+    const sheet = this.engines_[alias];
     return sheet.animations[alias];
   }
 
   getMeteorTexture(meteorType: MeteorType, variant: number): Texture {
     const alias = METEOR_ALIASES[meteorType];
-    const sheet = this.raw.asteroids[alias];
+    const sheet = this.asteroids_[alias];
     const textures = Object.values(sheet.textures);
     return textures[variant % textures.length];
   }
@@ -94,50 +116,26 @@ export class AssetManager {
     const bundle = manifest.bundles[0];
     Assets.addBundle(bundle.name, bundle.assets);
     const loaded = await Assets.loadBundle(bundle.name);
-
-    const engineAliasValues = Object.values(ENGINE_ALIASES);
-    const meteorAliasValues = Object.values(METEOR_ALIASES);
-    const presetAliasValues = Object.values(COLOR_PRESET_ALIASES);
-
-    const raw: RawAssets = {
-      background: loaded["background"] as Texture,
-      planets: loaded["planets"] as Spritesheet,
-      planetsRing: loaded["planets-ring"] as Spritesheet,
-      starsParticle: loaded["stars-particle"] as Spritesheet,
-      spaceships: loaded["spaceships"] as Spritesheet,
-      spaceshipsColormap: loaded["spaceships-colormap"] as Spritesheet,
-      engines: Object.fromEntries(
-        engineAliasValues.map((a) => [a, loaded[a] as Spritesheet])
-      ),
-      asteroids: Object.fromEntries(
-        meteorAliasValues.map((a) => [a, loaded[a] as Spritesheet])
-      ),
-      colorPresets: Object.fromEntries(
-        presetAliasValues.map((a) => [a, loaded[a] as Texture])
-      ),
-    };
-
-    const mgr = new AssetManager(raw);
-    mgr.applyNearestNeighbor();
-    return mgr;
+    return new AssetManager(loaded);
   }
 
   private applyNearestNeighbor(): void {
-    setTextureNearest(this.raw.background);
+    setTextureNearest(this.background_);
 
-    setNearestNeighbor(this.raw.planets);
-    setNearestNeighbor(this.raw.planetsRing);
-    setNearestNeighbor(this.raw.starsParticle);
-    setNearestNeighbor(this.raw.spaceships);
-    setNearestNeighbor(this.raw.spaceshipsColormap);
+    setNearestNeighbor(this.planets_);
+    setNearestNeighbor(this.planetsRing_);
+    setNearestNeighbor(this.starsParticle_);
+    setNearestNeighbor(this.spaceships_);
+    setNearestNeighbor(this.spaceshipsColormap_);
+    setNearestNeighbor(this.spaceshipsShield_);
 
-    for (const sheet of Object.values(this.raw.engines)) {
+    for (const sheet of Object.values(this.engines_)) {
       setNearestNeighbor(sheet);
     }
-    for (const sheet of Object.values(this.raw.asteroids)) {
+    for (const sheet of Object.values(this.asteroids_)) {
       setNearestNeighbor(sheet);
     }
-    for (const tex of Object.values(this.raw.colorPresets)) {
+    for (const tex of Object.values(this.colorPresets_)) {
       setTextureNearest(tex);
     }
   }

@@ -13,6 +13,7 @@ export interface ShipState {
   shipType: ShipType;
   colorPreset: ColorPreset;
   engineType: EngineType;
+  hasShield: boolean;
 }
 
 export interface MeteorState {
@@ -54,6 +55,7 @@ export function spawnShip(state: GameState): void {
     shipType: randInt(SHIP_TYPE_COUNT),
     colorPreset: randInt(COLOR_PRESET_COUNT),
     engineType: randInt(ENGINE_TYPE_COUNT),
+    hasShield: Math.random() > 0.5,
   });
 }
 
