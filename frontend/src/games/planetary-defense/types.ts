@@ -76,8 +76,6 @@ export enum EngineType {
   Engine4Small,
 }
 
-export const ENGINE_TYPE_COUNT = 8;
-
 export enum ColorPreset {
   Preset1,
   Preset2,
