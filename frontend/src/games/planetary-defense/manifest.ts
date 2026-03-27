@@ -37,28 +37,3 @@ export const MANIFEST: AssetsManifest = {
     },
   ],
 };
-
-export const ENGINE_ALIASES = [
-  "engine-1-big",
-  "engine-1-small",
-  "engine-2-big",
-  "engine-2-small",
-  "engine-3-big",
-  "engine-3-small",
-  "engine-4-big",
-  "engine-4-small",
-];
-
-export const ASTEROID_ALIASES = [
-  "asteroids-big-brown",
-  "asteroids-big-white",
-  "asteroids-small-brown",
-  "asteroids-small-white",
-];
-
-export const COLOR_PRESET_ALIASES = [
-  "color-preset-1",
-  "color-preset-2",
-  "color-preset-3",
-  "color-preset-4",
-];

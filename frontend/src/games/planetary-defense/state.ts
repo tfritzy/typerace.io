@@ -49,8 +49,8 @@ export function createInitialState(): GameState {
   };
 }
 
-export function spawnShip(state: GameState): ShipState {
-  const ship: ShipState = {
+export function spawnShip(state: GameState): void {
+  state.ships.push({
     id: state.nextId++,
     x: -100,
     y: 100 + Math.random() * (CANVAS_HEIGHT - 200),
@@ -58,22 +58,16 @@ export function spawnShip(state: GameState): ShipState {
     shipType: randInt(SHIP_TYPE_COUNT),
     colorPreset: randInt(COLOR_PRESET_COUNT),
     engineType: randInt(ENGINE_TYPE_COUNT),
-  };
-  state.ships.push(ship);
-  return ship;
+  });
 }
 
-export function spawnMeteor(
-  state: GameState,
-  meteorVariantCounts: Record<MeteorType, number>
-): MeteorState {
-  const meteorType: MeteorType = randInt(METEOR_TYPE_COUNT);
+export function spawnMeteor(state: GameState): void {
   const { x, y, angle } = pickEdgeSpawn(CANVAS_WIDTH, CANVAS_HEIGHT);
   const speed =
     ASTEROID_SPEED_MIN + Math.random() * (ASTEROID_SPEED_MAX - ASTEROID_SPEED_MIN);
   const rotDir = Math.random() > 0.5 ? 1 : -1;
 
-  const meteor: MeteorState = {
+  state.meteors.push({
     id: state.nextId++,
     x,
     y,
@@ -81,69 +75,41 @@ export function spawnMeteor(
     vy: Math.sin(angle) * speed,
     rotation: 0,
     rotationSpeed: (0.5 + Math.random() * 1.5) * rotDir,
-    meteorType,
-    variant: randInt(meteorVariantCounts[meteorType] || 1),
-  };
-  state.meteors.push(meteor);
-  return meteor;
+    meteorType: randInt(METEOR_TYPE_COUNT),
+    variant: randInt(16),
+  });
 }
 
-export function spawnMeteorAt(
-  state: GameState,
-  meteorVariantCounts: Record<MeteorType, number>,
-  canvasX: number,
-  canvasY: number
-): MeteorState {
-  const meteorType: MeteorType = randInt(METEOR_TYPE_COUNT);
+export function spawnMeteorAt(state: GameState, x: number, y: number): void {
   const speed =
     ASTEROID_SPEED_MIN + Math.random() * (ASTEROID_SPEED_MAX - ASTEROID_SPEED_MIN);
   const angle = Math.random() * Math.PI * 2;
   const rotDir = Math.random() > 0.5 ? 1 : -1;
 
-  const meteor: MeteorState = {
+  state.meteors.push({
     id: state.nextId++,
-    x: canvasX,
-    y: canvasY,
+    x,
+    y,
     vx: Math.cos(angle) * speed,
     vy: Math.sin(angle) * speed,
     rotation: 0,
     rotationSpeed: (0.5 + Math.random() * 1.5) * rotDir,
-    meteorType,
-    variant: randInt(meteorVariantCounts[meteorType] || 1),
-  };
-  state.meteors.push(meteor);
-  return meteor;
+    meteorType: randInt(METEOR_TYPE_COUNT),
+    variant: randInt(16),
+  });
 }
 
-export interface UpdateResult {
-  newShip: ShipState | null;
-  newMeteor: MeteorState | null;
-  removedShipIds: number[];
-  removedMeteorIds: number[];
-}
-
-export function updateState(
-  state: GameState,
-  dt: number,
-  meteorVariantCounts: Record<MeteorType, number>
-): UpdateResult {
-  const result: UpdateResult = {
-    newShip: null,
-    newMeteor: null,
-    removedShipIds: [],
-    removedMeteorIds: [],
-  };
-
+export function updateState(state: GameState, dt: number): void {
   state.shipSpawnTimer += dt;
   if (state.shipSpawnTimer >= SHIP_SPAWN_INTERVAL) {
     state.shipSpawnTimer = 0;
-    result.newShip = spawnShip(state);
+    spawnShip(state);
   }
 
   state.meteorSpawnTimer += dt;
   if (state.meteorSpawnTimer >= ASTEROID_SPAWN_INTERVAL) {
     state.meteorSpawnTimer = 0;
-    result.newMeteor = spawnMeteor(state, meteorVariantCounts);
+    spawnMeteor(state);
   }
 
   for (const ship of state.ships) {
@@ -157,26 +123,12 @@ export function updateState(
   }
 
   const pad = 100;
-  state.ships = state.ships.filter((s) => {
-    if (s.x > CANVAS_WIDTH + 200) {
-      result.removedShipIds.push(s.id);
-      return false;
-    }
-    return true;
-  });
-
-  state.meteors = state.meteors.filter((m) => {
-    const oob =
-      m.x < -pad ||
-      m.x > CANVAS_WIDTH + pad ||
-      m.y < -pad ||
-      m.y > CANVAS_HEIGHT + pad;
-    if (oob) {
-      result.removedMeteorIds.push(m.id);
-      return false;
-    }
-    return true;
-  });
-
-  return result;
+  state.ships = state.ships.filter((s) => s.x <= CANVAS_WIDTH + 200);
+  state.meteors = state.meteors.filter(
+    (m) =>
+      m.x >= -pad &&
+      m.x <= CANVAS_WIDTH + pad &&
+      m.y >= -pad &&
+      m.y <= CANVAS_HEIGHT + pad
+  );
 }
