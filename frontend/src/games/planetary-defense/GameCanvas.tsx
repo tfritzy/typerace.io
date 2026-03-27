@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
-import { spawnMeteor } from "./state";
 
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,9 +32,7 @@ export const GameCanvas = () => {
   }, []);
 
   const handleSpawnMeteor = useCallback(() => {
-    const game = gameRef.current;
-    if (!game) return;
-    spawnMeteor(game.state);
+    gameRef.current?.store.dispatch({ type: "spawnMeteor" });
   }, []);
 
   return (

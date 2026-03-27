@@ -5,16 +5,12 @@ import { Background } from "./Background";
 import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
 import { AssetManager } from "./assetManager";
-import {
-  createInitialState,
-  updateState,
-  type GameState,
-} from "./state";
+import { GameStore } from "./state";
 
 export class PlanetaryDefenseGame {
   private app: Application;
   private assetManager!: AssetManager;
-  state!: GameState;
+  store: GameStore;
 
   private background!: Background;
   private planetManager!: PlanetManager;
@@ -24,11 +20,11 @@ export class PlanetaryDefenseGame {
 
   constructor(app: Application) {
     this.app = app;
+    this.store = new GameStore();
   }
 
   async init(): Promise<void> {
     this.assetManager = await AssetManager.load(MANIFEST);
-    this.state = createInitialState();
     this.buildScene();
 
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
@@ -52,8 +48,8 @@ export class PlanetaryDefenseGame {
 
   private update(dt: number): void {
     this.background.update(dt);
-    updateState(this.state, dt);
-    this.enemyManager.update(this.state, dt);
+    this.store.dispatch({ type: "update", dt });
+    this.enemyManager.update(this.store, dt);
   }
 
   destroy(): void {

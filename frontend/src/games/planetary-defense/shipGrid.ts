@@ -1,8 +1,8 @@
 import { Application, Container, Sprite, AnimatedSprite, Text, TextStyle } from "pixi.js";
 import { MANIFEST } from "./manifest";
 import { AssetManager } from "./assetManager";
-import { ShipType, EngineType, ColorPreset, SHIP_TYPE_COUNT } from "./types";
-import { ENGINE_POSITIONS } from "./prefabs/shipPrefab";
+import { ShipType, ColorPreset, SHIP_TYPE_COUNT } from "./types";
+import { ENGINE_POSITIONS, SHIP_ENGINE_TYPE } from "./prefabs/shipPrefab";
 
 const SHIP_NAMES: string[] = [
   "Vanguard", "Sentinel", "Corsair", "Falcon", "Scout", "Dart", "Wasp", "Phoenix",
@@ -58,17 +58,20 @@ export async function createShipGrid(container: HTMLElement): Promise<Applicatio
 
     const shipContainer = new Container();
 
-    const positions = ENGINE_POSITIONS[shipType] || [{ x: -10, y: 0 }];
-    const frames = assets.getEngineFrames(EngineType.Engine1Big);
+    const positions = ENGINE_POSITIONS[shipType] || [];
+    const engineType = SHIP_ENGINE_TYPE[shipType];
 
-    for (const pos of positions) {
-      const engine = new AnimatedSprite(frames);
-      engine.animationSpeed = 0.15;
-      engine.play();
-      engine.anchor.set(0.5);
-      engine.x = pos.x;
-      engine.y = pos.y;
-      shipContainer.addChild(engine);
+    if (engineType !== null && positions.length > 0) {
+      const frames = assets.getEngineFrames(engineType);
+      for (const pos of positions) {
+        const engine = new AnimatedSprite(frames);
+        engine.animationSpeed = 0.15;
+        engine.play();
+        engine.anchor.set(0.5);
+        engine.x = pos.x;
+        engine.y = pos.y;
+        shipContainer.addChild(engine);
+      }
     }
 
     shipContainer.addChild(shipSprite);
