@@ -4,6 +4,8 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
 import { Background } from "./Background";
 import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
+import { TowerManager } from "./TowerManager";
+import { ProjectileManager } from "./ProjectileManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState } from "./state";
 import type { GameState } from "./state";
@@ -16,6 +18,8 @@ export class PlanetaryDefenseGame {
   private background!: Background;
   private planetManager!: PlanetManager;
   private enemyManager!: EnemyManager;
+  private towerManager!: TowerManager;
+  private projectileManager!: ProjectileManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
@@ -60,6 +64,12 @@ export class PlanetaryDefenseGame {
     this.planetManager = new PlanetManager(this.assetManager);
     world.addChild(this.planetManager.container);
 
+    this.towerManager = new TowerManager();
+    world.addChild(this.towerManager.container);
+
+    this.projectileManager = new ProjectileManager();
+    world.addChild(this.projectileManager.container);
+
     this.enemyManager = new EnemyManager(this.assetManager);
     world.addChild(this.enemyManager.meteorLayer);
     world.addChild(this.enemyManager.shipLayer);
@@ -69,6 +79,8 @@ export class PlanetaryDefenseGame {
     this.background.update(dt);
     updateState(this.state, dt);
     this.enemyManager.update(this.state, dt);
+    this.towerManager.update(this.state);
+    this.projectileManager.update(this.state);
   }
 
   destroy(): void {
@@ -78,6 +90,8 @@ export class PlanetaryDefenseGame {
     }
     this.background.destroy();
     this.planetManager.destroy();
+    this.towerManager.destroy();
+    this.projectileManager.destroy();
     this.enemyManager.destroy();
     this.app.destroy(true);
   }

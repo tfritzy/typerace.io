@@ -114,13 +114,13 @@ export class EnemyManager {
 
   update(state: GameState, dt: number): void {
     this.shipSpawnTimer += dt;
-    if (this.shipSpawnTimer >= 3) {
+    if (this.shipSpawnTimer >= 9) {
       this.shipSpawnTimer = 0;
       spawnShip(state);
     }
 
     this.meteorSpawnTimer += dt;
-    if (this.meteorSpawnTimer >= 1.5) {
+    if (this.meteorSpawnTimer >= 4.5) {
       this.meteorSpawnTimer = 0;
       spawnMeteor(state);
     }

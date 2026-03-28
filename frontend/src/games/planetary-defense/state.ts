@@ -6,10 +6,23 @@ import {
 import { randInt } from "./utils";
 import { getLanguageFromSlug } from "../../utils/modes";
 import { getRandomWord } from "../../utils/wordLists";
+import {
+  TowerType,
+  TOWER_CONFIGS,
+  TOWER_SLOT_COUNT,
+  TOWER_ORBIT_RADIUS,
+} from "./towerConfig";
 
-const PLANET_X = CANVAS_WIDTH / 2;
-const PLANET_Y = CANVAS_HEIGHT / 2;
+export const PLANET_X = CANVAS_WIDTH / 2;
+export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLANET_HIT_RADIUS = 100;
+
+export function getTowerPosition(slot: TowerSlot): { x: number; y: number } {
+  return {
+    x: PLANET_X + Math.cos(slot.angle) * TOWER_ORBIT_RADIUS,
+    y: PLANET_Y + Math.sin(slot.angle) * TOWER_ORBIT_RADIUS,
+  };
+}
 
 export interface ShipState {
   id: number;
@@ -38,6 +51,25 @@ export interface MeteorState {
   typedCount: number;
 }
 
+export interface TowerState {
+  type: TowerType;
+  level: number;
+  charge: number;
+}
+
+export interface TowerSlot {
+  angle: number;
+  tower: TowerState | null;
+}
+
+export interface ProjectileState {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+}
+
 export class GameEvent {
   private listeners = new Set<() => void>();
 
@@ -56,22 +88,41 @@ export class GameEvent {
 export interface GameState {
   ships: ShipState[];
   meteors: MeteorState[];
+  towerSlots: TowerSlot[];
+  projectiles: ProjectileState[];
   nextId: number;
   enemiesKilled: number;
   planetHealth: number;
   maxPlanetHealth: number;
   onPlanetDamaged: GameEvent;
+  onTowerFired: GameEvent;
+}
+
+function createTowerSlots(): TowerSlot[] {
+  const slots: TowerSlot[] = [];
+  for (let i = 0; i < TOWER_SLOT_COUNT; i++) {
+    const angle = (i * 2 * Math.PI) / TOWER_SLOT_COUNT - Math.PI / 2;
+    const tower =
+      i % 2 === 0
+        ? { type: TowerType.Gun, level: 1, charge: 0 }
+        : null;
+    slots.push({ angle, tower });
+  }
+  return slots;
 }
 
 export function createGameState(): GameState {
   return {
     ships: [],
     meteors: [],
+    towerSlots: createTowerSlots(),
+    projectiles: [],
     nextId: 1,
     enemiesKilled: 0,
     planetHealth: 100,
     maxPlanetHealth: 100,
     onPlanetDamaged: new GameEvent(),
+    onTowerFired: new GameEvent(),
   };
 }
 
@@ -110,7 +161,7 @@ function getLangCode(): string {
 
 export function spawnShip(state: GameState): void {
   const { x, y } = spawnFromEdge();
-  const speed = 60 + Math.random() * 80;
+  const speed = 30 + Math.random() * 40;
   const { vx, vy } = aimAtPlanet(x, y, speed);
   const usedWords = new Set([
     ...state.ships.map((ship) => ship.word),
@@ -133,7 +184,7 @@ export function spawnShip(state: GameState): void {
 
 export function spawnMeteor(state: GameState): void {
   const { x, y } = spawnFromEdge();
-  const speed = 30 + Math.random() * 70;
+  const speed = 15 + Math.random() * 35;
   const { vx, vy } = aimAtPlanet(x, y, speed);
   const rotDir = Math.random() > 0.5 ? 1 : -1;
   const usedWords = new Set([
@@ -157,19 +208,15 @@ export function spawnMeteor(state: GameState): void {
 }
 
 function applyTypedCharacter<T extends { word: string; typedCount: number }>(
-  state: GameState,
   entities: T[],
   key: string
 ): void {
   const normalizedKey = key.toLowerCase();
-  for (let i = entities.length - 1; i >= 0; i--) {
-    const entity = entities[i];
+  for (const entity of entities) {
+    if (entity.typedCount >= entity.word.length) continue;
     const nextChar = entity.word[entity.typedCount];
     if (normalizedKey === nextChar.toLowerCase()) {
       entity.typedCount++;
-      if (entity.typedCount >= entity.word.length) {
-        destroyEntity(state, entities, i, true);
-      }
     } else if (entity.typedCount > 0) {
       entity.typedCount = 0;
     }
@@ -190,8 +237,70 @@ function destroyEntity<T>(
 
 export function handleTypedCharacter(state: GameState, key: string): void {
   if (key.length !== 1) return;
-  applyTypedCharacter(state, state.ships, key);
-  applyTypedCharacter(state, state.meteors, key);
+  applyTypedCharacter(state.ships, key);
+  applyTypedCharacter(state.meteors, key);
+  chargeTowers(state);
+}
+
+const SECTOR_HALF = Math.PI / 4;
+
+function isInSector(slot: TowerSlot, ex: number, ey: number): boolean {
+  const enemyAngle = Math.atan2(ey - PLANET_Y, ex - PLANET_X);
+  let diff = enemyAngle - slot.angle;
+  diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+  return Math.abs(diff) <= SECTOR_HALF;
+}
+
+function findTypedTargetInSector(
+  state: GameState,
+  slot: TowerSlot
+): { x: number; y: number } | null {
+  for (const ship of state.ships) {
+    if (ship.typedCount > 0 && isInSector(slot, ship.x, ship.y)) return ship;
+  }
+  for (const meteor of state.meteors) {
+    if (meteor.typedCount > 0 && isInSector(slot, meteor.x, meteor.y)) return meteor;
+  }
+  return null;
+}
+
+function chargeTowers(state: GameState): void {
+  for (const slot of state.towerSlots) {
+    if (!slot.tower) continue;
+    const target = findTypedTargetInSector(state, slot);
+    if (!target) continue;
+
+    const config = TOWER_CONFIGS[slot.tower.type];
+    slot.tower.charge++;
+    if (slot.tower.charge >= config.charsToFire) {
+      slot.tower.charge = 0;
+      fireTower(state, slot, target);
+    }
+  }
+}
+
+function fireTower(
+  state: GameState,
+  slot: TowerSlot,
+  target: { x: number; y: number }
+): void {
+  const { x: towerX, y: towerY } = getTowerPosition(slot);
+
+  const config = TOWER_CONFIGS[slot.tower!.type];
+  const dx = target.x - towerX;
+  const dy = target.y - towerY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist === 0) return;
+
+  state.projectiles.push({
+    id: state.nextId++,
+    x: towerX,
+    y: towerY,
+    vx: (dx / dist) * config.projectileSpeed,
+    vy: (dy / dist) * config.projectileSpeed,
+  });
+
+  state.onTowerFired.emit();
 }
 
 function isInBounds(x: number, y: number): boolean {
@@ -247,6 +356,56 @@ export function updateState(state: GameState, dt: number): void {
     m.y += m.vy * dt;
     m.rotation += m.rotationSpeed * dt;
   }
+  for (const p of state.projectiles) {
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+  }
 
   checkCollisions(state);
+  checkProjectileCollisions(state);
+}
+
+const PROJECTILE_HIT_RADIUS = 20;
+
+function checkProjectileCollisions(state: GameState): void {
+  const hitR2 = PROJECTILE_HIT_RADIUS * PROJECTILE_HIT_RADIUS;
+
+  for (let pi = state.projectiles.length - 1; pi >= 0; pi--) {
+    const p = state.projectiles[pi];
+
+    if (!isInBounds(p.x, p.y)) {
+      state.projectiles.splice(pi, 1);
+      continue;
+    }
+
+    let hit = false;
+
+    for (let si = state.ships.length - 1; si >= 0; si--) {
+      const s = state.ships[si];
+      const dx = p.x - s.x;
+      const dy = p.y - s.y;
+      if (dx * dx + dy * dy < hitR2) {
+        destroyEntity(state, state.ships, si, true);
+        hit = true;
+        break;
+      }
+    }
+
+    if (!hit) {
+      for (let mi = state.meteors.length - 1; mi >= 0; mi--) {
+        const m = state.meteors[mi];
+        const dx = p.x - m.x;
+        const dy = p.y - m.y;
+        if (dx * dx + dy * dy < hitR2) {
+          destroyEntity(state, state.meteors, mi, true);
+          hit = true;
+          break;
+        }
+      }
+    }
+
+    if (hit) {
+      state.projectiles.splice(pi, 1);
+    }
+  }
 }
