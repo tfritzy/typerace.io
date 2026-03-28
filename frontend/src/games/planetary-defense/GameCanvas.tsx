@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
-import { spawnMeteor } from "./state";
+import { spawnMeteor, handleTypedCharacter } from "./state";
 
 const PIXEL_FONT = "'Press Start 2P', monospace";
 
@@ -66,6 +66,7 @@ export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<PlanetaryDefenseGame | null>(null);
   const [healthRatio, setHealthRatio] = useState(1);
+  const [enemyWords, setEnemyWords] = useState<string[]>([]);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -97,6 +98,34 @@ export const GameCanvas = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const game = gameRef.current;
+      if (!game) return;
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key.length !== 1) return;
+      handleTypedCharacter(game.state, e.key);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  useEffect(() => {
+    let intervalId: number | null = null;
+    intervalId = window.setInterval(() => {
+      const game = gameRef.current;
+      if (!game) return;
+      const words = [
+        ...game.state.ships.map((ship) => ship.word),
+        ...game.state.meteors.map((meteor) => meteor.word),
+      ];
+      setEnemyWords(words);
+    }, 100);
+    return () => {
+      if (intervalId !== null) window.clearInterval(intervalId);
+    };
+  }, []);
+
   const handleSpawnMeteor = useCallback(() => {
     const game = gameRef.current;
     if (game) spawnMeteor(game.state);
@@ -105,6 +134,23 @@ export const GameCanvas = () => {
   return (
     <div ref={containerRef} className="w-full h-full relative">
       <PlanetHealthBar ratio={healthRatio} />
+      <div
+        className="absolute top-3 left-36 z-10"
+        style={{
+          fontFamily: PIXEL_FONT,
+          background: "rgba(10, 10, 26, 0.85)",
+          color: "#cdd6f4",
+          padding: "8px 10px",
+          minWidth: "180px",
+          maxWidth: "420px",
+          maxHeight: "180px",
+          overflowY: "auto",
+          fontSize: "8px",
+          lineHeight: "1.6",
+        }}
+      >
+        {enemyWords.length > 0 ? enemyWords.join("  •  ") : "NO ENEMIES"}
+      </div>
       <button
         onClick={handleSpawnMeteor}
         style={{

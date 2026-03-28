@@ -4,6 +4,8 @@ import {
   SHIP_TYPE_COUNT, COLOR_PRESET_COUNT, METEOR_TYPE_COUNT,
 } from "./types";
 import { randInt } from "./utils";
+import { getLanguageFromSlug } from "../../utils/modes";
+import { getRandomWord } from "../../utils/wordLists";
 
 const PLANET_X = CANVAS_WIDTH / 2;
 const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -18,6 +20,8 @@ export interface ShipState {
   shipType: ShipType;
   colorPreset: ColorPreset;
   hasShield: boolean;
+  word: string;
+  typedCount: number;
 }
 
 export interface MeteorState {
@@ -30,6 +34,8 @@ export interface MeteorState {
   rotationSpeed: number;
   meteorType: MeteorType;
   variant: number;
+  word: string;
+  typedCount: number;
 }
 
 export class GameEvent {
@@ -91,10 +97,20 @@ function aimAtPlanet(
   return { vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed };
 }
 
+function getLangCode(): string {
+  try {
+    const slug = localStorage.getItem("typerace_lang_slug");
+    return getLanguageFromSlug(slug ?? undefined).htmlLang;
+  } catch {
+    return "en";
+  }
+}
+
 export function spawnShip(state: GameState): void {
   const { x, y } = spawnFromEdge();
   const speed = 60 + Math.random() * 80;
   const { vx, vy } = aimAtPlanet(x, y, speed);
+  const word = getRandomWord(getLangCode());
   state.ships.push({
     id: state.nextId++,
     x,
@@ -104,6 +120,8 @@ export function spawnShip(state: GameState): void {
     shipType: randInt(SHIP_TYPE_COUNT),
     colorPreset: randInt(COLOR_PRESET_COUNT),
     hasShield: Math.random() > 0.5,
+    word,
+    typedCount: 0,
   });
 }
 
@@ -112,6 +130,7 @@ export function spawnMeteor(state: GameState): void {
   const speed = 30 + Math.random() * 70;
   const { vx, vy } = aimAtPlanet(x, y, speed);
   const rotDir = Math.random() > 0.5 ? 1 : -1;
+  const word = getRandomWord(getLangCode());
   state.meteors.push({
     id: state.nextId++,
     x,
@@ -122,7 +141,33 @@ export function spawnMeteor(state: GameState): void {
     rotationSpeed: (0.5 + Math.random() * 1.5) * rotDir,
     meteorType: randInt(METEOR_TYPE_COUNT),
     variant: randInt(16),
+    word,
+    typedCount: 0,
   });
+}
+
+function applyTypedCharacter<T extends { word: string; typedCount: number }>(
+  entities: T[],
+  key: string
+): void {
+  for (let i = entities.length - 1; i >= 0; i--) {
+    const entity = entities[i];
+    const nextChar = entity.word[entity.typedCount];
+    if (key === nextChar) {
+      entity.typedCount++;
+      if (entity.typedCount >= entity.word.length) {
+        entities.splice(i, 1);
+      }
+    } else if (entity.typedCount > 0) {
+      entity.typedCount = 0;
+    }
+  }
+}
+
+export function handleTypedCharacter(state: GameState, key: string): void {
+  if (key.length !== 1) return;
+  applyTypedCharacter(state.ships, key);
+  applyTypedCharacter(state.meteors, key);
 }
 
 function isInBounds(x: number, y: number): boolean {
