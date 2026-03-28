@@ -126,6 +126,32 @@ export function spawnMeteor(state: GameState): void {
   });
 }
 
+function filterEntities<T extends { x: number; y: number }>(
+  entities: T[],
+  damage: number,
+  state: GameState,
+  r2: number
+): { filtered: T[]; damaged: boolean } {
+  const pad = 200;
+  let damaged = false;
+  const filtered = entities.filter((e) => {
+    const dx = e.x - PLANET_X;
+    const dy = e.y - PLANET_Y;
+    if (dx * dx + dy * dy < r2) {
+      state.planetHealth = Math.max(0, state.planetHealth - damage);
+      damaged = true;
+      return false;
+    }
+    return (
+      e.x >= -pad &&
+      e.x <= CANVAS_WIDTH + pad &&
+      e.y >= -pad &&
+      e.y <= CANVAS_HEIGHT + pad
+    );
+  });
+  return { filtered, damaged };
+}
+
 export function updateState(state: GameState, dt: number): void {
   for (const ship of state.ships) {
     ship.x += ship.vx * dt;
@@ -137,46 +163,11 @@ export function updateState(state: GameState, dt: number): void {
     m.rotation += m.rotationSpeed * dt;
   }
 
-  let healthChanged = false;
   const r2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
+  const ships = filterEntities(state.ships, 5, state, r2);
+  const meteors = filterEntities(state.meteors, 3, state, r2);
+  state.ships = ships.filtered;
+  state.meteors = meteors.filtered;
 
-  state.ships = state.ships.filter((s) => {
-    const dx = s.x - PLANET_X;
-    const dy = s.y - PLANET_Y;
-    if (dx * dx + dy * dy < r2) {
-      state.planetHealth = Math.max(0, state.planetHealth - 5);
-      healthChanged = true;
-      return false;
-    }
-    return true;
-  });
-
-  state.meteors = state.meteors.filter((m) => {
-    const dx = m.x - PLANET_X;
-    const dy = m.y - PLANET_Y;
-    if (dx * dx + dy * dy < r2) {
-      state.planetHealth = Math.max(0, state.planetHealth - 3);
-      healthChanged = true;
-      return false;
-    }
-    return true;
-  });
-
-  if (healthChanged) notify(state);
-
-  const pad = 200;
-  state.ships = state.ships.filter(
-    (s) =>
-      s.x >= -pad &&
-      s.x <= CANVAS_WIDTH + pad &&
-      s.y >= -pad &&
-      s.y <= CANVAS_HEIGHT + pad
-  );
-  state.meteors = state.meteors.filter(
-    (m) =>
-      m.x >= -pad &&
-      m.x <= CANVAS_WIDTH + pad &&
-      m.y >= -pad &&
-      m.y <= CANVAS_HEIGHT + pad
-  );
+  if (ships.damaged || meteors.damaged) notify(state);
 }
