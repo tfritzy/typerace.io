@@ -7,14 +7,12 @@ const TOWER_SIZE = 28;
 const CHARGE_DOT_RADIUS = 4;
 const CHARGE_DOT_SPACING = 12;
 const CHARGE_DOT_OFFSET = TOWER_SIZE / 2 + 10;
-const PROJECTILE_RADIUS = 3;
 
 export class TowerManager {
   readonly container: Container;
 
   private towerGraphics = new Map<number, Graphics>();
   private chargeGraphics = new Map<number, Graphics>();
-  private projectileGraphics = new Map<number, Graphics>();
 
   constructor() {
     this.container = new Container();
@@ -22,7 +20,6 @@ export class TowerManager {
 
   update(state: GameState): void {
     this.syncTowers(state);
-    this.syncProjectiles(state);
   }
 
   private syncTowers(state: GameState): void {
@@ -115,38 +112,11 @@ export class TowerManager {
     }
   }
 
-  private syncProjectiles(state: GameState): void {
-    const activeIds = new Set<number>();
-
-    for (const p of state.projectiles) {
-      activeIds.add(p.id);
-      let g = this.projectileGraphics.get(p.id);
-      if (!g) {
-        g = new Graphics();
-        g.circle(0, 0, PROJECTILE_RADIUS);
-        g.fill({ color: 0xfbbf24 });
-        this.container.addChild(g);
-        this.projectileGraphics.set(p.id, g);
-      }
-      g.x = p.x;
-      g.y = p.y;
-    }
-
-    for (const [id, g] of this.projectileGraphics) {
-      if (!activeIds.has(id)) {
-        g.destroy();
-        this.projectileGraphics.delete(id);
-      }
-    }
-  }
-
   destroy(): void {
     for (const g of this.towerGraphics.values()) g.destroy();
     for (const g of this.chargeGraphics.values()) g.destroy();
-    for (const g of this.projectileGraphics.values()) g.destroy();
     this.towerGraphics.clear();
     this.chargeGraphics.clear();
-    this.projectileGraphics.clear();
     this.container.destroy();
   }
 }

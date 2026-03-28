@@ -246,7 +246,7 @@ export function handleTypedCharacter(state: GameState, key: string): void {
   chargeTowers(state);
 }
 
-const SECTOR_HALF = Math.PI / TOWER_SLOT_COUNT;
+const SECTOR_HALF = Math.PI / 4;
 
 function isInSector(slot: TowerSlot, ex: number, ey: number): boolean {
   const enemyAngle = Math.atan2(ey - PLANET_Y, ex - PLANET_X);
