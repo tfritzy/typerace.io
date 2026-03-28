@@ -46,17 +46,24 @@ class EnemyLabel {
 }
 
 class EnemyLabelManager {
-  private labels = new Map<number, EnemyLabel>();
-  private typedStyle: TextStyle;
-  private untypedStyle: TextStyle;
-
-  constructor(typedStyle: TextStyle, untypedStyle: TextStyle) {
-    this.typedStyle = typedStyle;
-    this.untypedStyle = untypedStyle;
-  }
+  private labels = new Map<string, EnemyLabel>();
+  private typedStyle = new TextStyle({
+    fontFamily: PIXEL_FONT,
+    fontSize: 16,
+    fontWeight: "bold",
+    fill: 0x90ee90,
+    stroke: { color: 0x000000, width: 4, join: "round" },
+  });
+  private untypedStyle = new TextStyle({
+    fontFamily: PIXEL_FONT,
+    fontSize: 16,
+    fontWeight: "bold",
+    fill: 0xffffff,
+    stroke: { color: 0x000000, width: 4, join: "round" },
+  });
 
   update(
-    id: number,
+    id: string,
     layer: Container,
     word: string,
     typedCount: number,
@@ -71,7 +78,7 @@ class EnemyLabelManager {
     label.update(word, typedCount, centerX, y);
   }
 
-  removeMissing(activeIds: Set<number>): void {
+  removeMissing(activeIds: Set<string>): void {
     for (const [id, label] of this.labels) {
       if (activeIds.has(id)) continue;
       label.destroy();
@@ -92,26 +99,12 @@ export class EnemyManager {
   readonly meteorLayer: Container;
 
   private assets: AssetManager;
-  private shipContainers = new Map<number, Container>();
-  private meteorSprites = new Map<number, Sprite>();
+  private shipContainers = new Map<string, Container>();
+  private meteorSprites = new Map<string, Sprite>();
   private activeEntityIds = new Set<string>();
   private shipSpawnTimer = 0;
   private meteorSpawnTimer = 0;
-  private untypedLabelStyle = new TextStyle({
-    fontFamily: PIXEL_FONT,
-    fontSize: 16,
-    fontWeight: "bold",
-    fill: 0xffffff,
-    stroke: { color: 0x000000, width: 4, join: "round" },
-  });
-  private typedLabelStyle = new TextStyle({
-    fontFamily: PIXEL_FONT,
-    fontSize: 16,
-    fontWeight: "bold",
-    fill: 0x90ee90,
-    stroke: { color: 0x000000, width: 4, join: "round" },
-  });
-  private labelManager = new EnemyLabelManager(this.typedLabelStyle, this.untypedLabelStyle);
+  private labelManager = new EnemyLabelManager();
 
   constructor(assets: AssetManager) {
     this.assets = assets;
@@ -138,7 +131,7 @@ export class EnemyManager {
   private syncRendering(state: GameState): void {
     this.activeEntityIds.clear();
     for (const ship of state.ships) {
-      this.activeEntityIds.add(`ship:${ship.id}`);
+      this.activeEntityIds.add(ship.id);
       let container = this.shipContainers.get(ship.id);
       if (!container) {
         container = createShipContainer(this.assets, ship);
@@ -152,14 +145,14 @@ export class EnemyManager {
     }
 
     for (const [id, container] of this.shipContainers) {
-      if (!this.activeEntityIds.has(`ship:${id}`)) {
+      if (!this.activeEntityIds.has(id)) {
         container.destroy();
         this.shipContainers.delete(id);
       }
     }
 
     for (const meteor of state.meteors) {
-      this.activeEntityIds.add(`meteor:${meteor.id}`);
+      this.activeEntityIds.add(meteor.id);
       let sprite = this.meteorSprites.get(meteor.id);
       if (!sprite) {
         sprite = createMeteorSprite(this.assets, meteor);
@@ -180,7 +173,7 @@ export class EnemyManager {
     }
 
     for (const [id, sprite] of this.meteorSprites) {
-      if (!this.activeEntityIds.has(`meteor:${id}`)) {
+      if (!this.activeEntityIds.has(id)) {
         sprite.destroy();
         this.meteorSprites.delete(id);
       }

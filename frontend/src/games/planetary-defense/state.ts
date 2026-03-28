@@ -4,6 +4,7 @@ import {
   SHIP_TYPE_COUNT, COLOR_PRESET_COUNT, METEOR_TYPE_COUNT,
 } from "./types";
 import { randInt } from "./utils";
+import { createPrefixedId } from "./idGenerator";
 import { getLanguageFromSlug } from "../../utils/modes";
 import { getRandomWord } from "../../utils/wordLists";
 
@@ -12,7 +13,7 @@ const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLANET_HIT_RADIUS = 100;
 
 export interface ShipState {
-  id: number;
+  id: string;
   x: number;
   y: number;
   vx: number;
@@ -25,7 +26,7 @@ export interface ShipState {
 }
 
 export interface MeteorState {
-  id: number;
+  id: string;
   x: number;
   y: number;
   vx: number;
@@ -56,7 +57,6 @@ export class GameEvent {
 export interface GameState {
   ships: ShipState[];
   meteors: MeteorState[];
-  nextId: number;
   enemiesKilled: number;
   planetHealth: number;
   maxPlanetHealth: number;
@@ -67,7 +67,6 @@ export function createGameState(): GameState {
   return {
     ships: [],
     meteors: [],
-    nextId: 1,
     enemiesKilled: 0,
     planetHealth: 100,
     maxPlanetHealth: 100,
@@ -118,7 +117,7 @@ export function spawnShip(state: GameState): void {
   ]);
   const word = getRandomWord(getLangCode(), usedWords);
   state.ships.push({
-    id: state.nextId++,
+    id: createPrefixedId("ship"),
     x,
     y,
     vx,
@@ -142,7 +141,7 @@ export function spawnMeteor(state: GameState): void {
   ]);
   const word = getRandomWord(getLangCode(), usedWords);
   state.meteors.push({
-    id: state.nextId++,
+    id: createPrefixedId("meteor"),
     x,
     y,
     vx,
