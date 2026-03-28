@@ -1,6 +1,7 @@
 import { Container, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
-import type { GameStore } from "./state";
+import type { GameState } from "./state";
+import { spawnShip, spawnMeteor } from "./state";
 import { createShipContainer } from "./prefabs/shipPrefab";
 import { createMeteorSprite } from "./prefabs/meteorPrefab";
 
@@ -22,25 +23,23 @@ export class EnemyManager {
     this.meteorLayer = new Container();
   }
 
-  update(store: GameStore, dt: number): void {
+  update(state: GameState, dt: number): void {
     this.shipSpawnTimer += dt;
     if (this.shipSpawnTimer >= 3) {
       this.shipSpawnTimer = 0;
-      store.dispatch({ type: "spawnShip" });
+      spawnShip(state);
     }
 
     this.meteorSpawnTimer += dt;
     if (this.meteorSpawnTimer >= 1.5) {
       this.meteorSpawnTimer = 0;
-      store.dispatch({ type: "spawnMeteor" });
+      spawnMeteor(state);
     }
 
-    this.syncRendering(store);
+    this.syncRendering(state);
   }
 
-  private syncRendering(store: GameStore): void {
-    const { state } = store;
-
+  private syncRendering(state: GameState): void {
     this.activeShipIds.clear();
     for (const ship of state.ships) {
       this.activeShipIds.add(ship.id);
