@@ -57,6 +57,7 @@ export interface GameState {
   ships: ShipState[];
   meteors: MeteorState[];
   nextId: number;
+  enemiesKilled: number;
   planetHealth: number;
   maxPlanetHealth: number;
   onPlanetDamaged: GameEvent;
@@ -67,6 +68,7 @@ export function createGameState(): GameState {
     ships: [],
     meteors: [],
     nextId: 1,
+    enemiesKilled: 0,
     planetHealth: 100,
     maxPlanetHealth: 100,
     onPlanetDamaged: new GameEvent(),
@@ -155,6 +157,7 @@ export function spawnMeteor(state: GameState): void {
 }
 
 function applyTypedCharacter<T extends { word: string; typedCount: number }>(
+  state: GameState,
   entities: T[],
   key: string
 ): void {
@@ -165,7 +168,7 @@ function applyTypedCharacter<T extends { word: string; typedCount: number }>(
     if (normalizedKey === nextChar.toLowerCase()) {
       entity.typedCount++;
       if (entity.typedCount >= entity.word.length) {
-        entities.splice(i, 1);
+        destroyEntity(state, entities, i, true);
       }
     } else if (entity.typedCount > 0) {
       entity.typedCount = 0;
@@ -173,10 +176,22 @@ function applyTypedCharacter<T extends { word: string; typedCount: number }>(
   }
 }
 
+function destroyEntity<T>(
+  state: GameState,
+  entities: T[],
+  index: number,
+  killed: boolean
+): void {
+  if (killed) {
+    state.enemiesKilled++;
+  }
+  entities.splice(index, 1);
+}
+
 export function handleTypedCharacter(state: GameState, key: string): void {
   if (key.length !== 1) return;
-  applyTypedCharacter(state.ships, key);
-  applyTypedCharacter(state.meteors, key);
+  applyTypedCharacter(state, state.ships, key);
+  applyTypedCharacter(state, state.meteors, key);
 }
 
 function isInBounds(x: number, y: number): boolean {
@@ -199,10 +214,10 @@ function checkCollisions(state: GameState): void {
     const dy = s.y - PLANET_Y;
     if (dx * dx + dy * dy < r2) {
       state.planetHealth = Math.max(0, state.planetHealth - 5);
-      state.ships.splice(i, 1);
+      destroyEntity(state, state.ships, i, false);
       damaged = true;
     } else if (!isInBounds(s.x, s.y)) {
-      state.ships.splice(i, 1);
+      destroyEntity(state, state.ships, i, false);
     }
   }
 
@@ -212,10 +227,10 @@ function checkCollisions(state: GameState): void {
     const dy = m.y - PLANET_Y;
     if (dx * dx + dy * dy < r2) {
       state.planetHealth = Math.max(0, state.planetHealth - 3);
-      state.meteors.splice(i, 1);
+      destroyEntity(state, state.meteors, i, false);
       damaged = true;
     } else if (!isInBounds(m.x, m.y)) {
-      state.meteors.splice(i, 1);
+      destroyEntity(state, state.meteors, i, false);
     }
   }
 
