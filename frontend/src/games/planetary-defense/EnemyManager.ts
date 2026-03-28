@@ -21,18 +21,20 @@ export class EnemyManager {
   private shipSpawnTimer = 0;
   private meteorSpawnTimer = 0;
   private untypedLabelStyle = new TextStyle({
-    fontFamily: "monospace",
-    fontSize: 14,
+    fontFamily: "'Press Start 2P', monospace",
+    fontSize: 16,
     fontWeight: "bold",
     fill: 0xffffff,
-    stroke: { color: 0x000000, width: 3 },
+    stroke: { color: 0x000000, width: 4 },
+    lineJoin: "round",
   });
   private typedLabelStyle = new TextStyle({
-    fontFamily: "monospace",
-    fontSize: 14,
+    fontFamily: "'Press Start 2P', monospace",
+    fontSize: 16,
     fontWeight: "bold",
     fill: 0x90ee90,
-    stroke: { color: 0x000000, width: 3 },
+    stroke: { color: 0x000000, width: 4 },
+    lineJoin: "round",
   });
 
   constructor(assets: AssetManager) {
