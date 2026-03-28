@@ -110,7 +110,11 @@ export function spawnShip(state: GameState): void {
   const { x, y } = spawnFromEdge();
   const speed = 60 + Math.random() * 80;
   const { vx, vy } = aimAtPlanet(x, y, speed);
-  const word = getRandomWord(getLangCode());
+  const usedWords = new Set([
+    ...state.ships.map((ship) => ship.word),
+    ...state.meteors.map((meteor) => meteor.word),
+  ]);
+  const word = getRandomWord(getLangCode(), usedWords);
   state.ships.push({
     id: state.nextId++,
     x,
@@ -130,7 +134,11 @@ export function spawnMeteor(state: GameState): void {
   const speed = 30 + Math.random() * 70;
   const { vx, vy } = aimAtPlanet(x, y, speed);
   const rotDir = Math.random() > 0.5 ? 1 : -1;
-  const word = getRandomWord(getLangCode());
+  const usedWords = new Set([
+    ...state.ships.map((ship) => ship.word),
+    ...state.meteors.map((meteor) => meteor.word),
+  ]);
+  const word = getRandomWord(getLangCode(), usedWords);
   state.meteors.push({
     id: state.nextId++,
     x,
