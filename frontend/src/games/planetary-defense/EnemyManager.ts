@@ -94,8 +94,6 @@ export class EnemyManager {
   private assets: AssetManager;
   private shipContainers = new Map<number, Container>();
   private meteorSprites = new Map<number, Sprite>();
-  private activeShipIds = new Set<number>();
-  private activeMeteorIds = new Set<number>();
   private activeEntityIds = new Set<number>();
   private shipSpawnTimer = 0;
   private meteorSpawnTimer = 0;
@@ -139,9 +137,7 @@ export class EnemyManager {
 
   private syncRendering(state: GameState): void {
     this.activeEntityIds.clear();
-    this.activeShipIds.clear();
     for (const ship of state.ships) {
-      this.activeShipIds.add(ship.id);
       this.activeEntityIds.add(ship.id);
       let container = this.shipContainers.get(ship.id);
       if (!container) {
@@ -152,19 +148,17 @@ export class EnemyManager {
       container.x = ship.x;
       container.y = ship.y;
       container.rotation = Math.atan2(ship.vy, ship.vx);
-      this.labelManager.update(ship.id, this.shipLayer, ship.word, ship.typedCount, ship.x, ship.y - 20);
+      this.labelManager.update(ship.id, this.shipLayer, ship.word, ship.typedCount, ship.x, ship.y - 24);
     }
 
     for (const [id, container] of this.shipContainers) {
-      if (!this.activeShipIds.has(id)) {
+      if (!this.activeEntityIds.has(id)) {
         container.destroy();
         this.shipContainers.delete(id);
       }
     }
 
-    this.activeMeteorIds.clear();
     for (const meteor of state.meteors) {
-      this.activeMeteorIds.add(meteor.id);
       this.activeEntityIds.add(meteor.id);
       let sprite = this.meteorSprites.get(meteor.id);
       if (!sprite) {
@@ -181,12 +175,12 @@ export class EnemyManager {
         meteor.word,
         meteor.typedCount,
         meteor.x,
-        meteor.y - 16
+        meteor.y - 20
       );
     }
 
     for (const [id, sprite] of this.meteorSprites) {
-      if (!this.activeMeteorIds.has(id)) {
+      if (!this.activeEntityIds.has(id)) {
         sprite.destroy();
         this.meteorSprites.delete(id);
       }
