@@ -46,7 +46,7 @@ class EnemyLabel {
 }
 
 class EnemyLabelManager {
-  private labels = new Map<string, EnemyLabel>();
+  private labels = new Map<number, EnemyLabel>();
   private typedStyle = new TextStyle({
     fontFamily: PIXEL_FONT,
     fontSize: 16,
@@ -63,7 +63,7 @@ class EnemyLabelManager {
   });
 
   update(
-    id: string,
+    id: number,
     layer: Container,
     word: string,
     typedCount: number,
@@ -78,7 +78,7 @@ class EnemyLabelManager {
     label.update(word, typedCount, centerX, y);
   }
 
-  removeMissing(activeIds: Set<string>): void {
+  removeMissing(activeIds: Set<number>): void {
     for (const [id, label] of this.labels) {
       if (activeIds.has(id)) continue;
       label.destroy();
@@ -99,9 +99,9 @@ export class EnemyManager {
   readonly meteorLayer: Container;
 
   private assets: AssetManager;
-  private shipContainers = new Map<string, Container>();
-  private meteorSprites = new Map<string, Sprite>();
-  private activeEntityIds = new Set<string>();
+  private shipContainers = new Map<number, Container>();
+  private meteorSprites = new Map<number, Sprite>();
+  private activeEntityIds = new Set<number>();
   private shipSpawnTimer = 0;
   private meteorSpawnTimer = 0;
   private labelManager = new EnemyLabelManager();
