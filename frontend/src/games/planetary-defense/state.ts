@@ -246,22 +246,48 @@ export function handleTypedCharacter(state: GameState, key: string): void {
   chargeTowers(state);
 }
 
+const SECTOR_HALF = Math.PI / TOWER_SLOT_COUNT;
+
+function isInSector(slot: TowerSlot, ex: number, ey: number): boolean {
+  const enemyAngle = Math.atan2(ey - PLANET_Y, ex - PLANET_X);
+  let diff = enemyAngle - slot.angle;
+  diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+  return Math.abs(diff) <= SECTOR_HALF;
+}
+
+function findTypedTargetInSector(
+  state: GameState,
+  slot: TowerSlot
+): { x: number; y: number } | null {
+  for (const ship of state.ships) {
+    if (ship.typedCount > 0 && isInSector(slot, ship.x, ship.y)) return ship;
+  }
+  for (const meteor of state.meteors) {
+    if (meteor.typedCount > 0 && isInSector(slot, meteor.x, meteor.y)) return meteor;
+  }
+  return null;
+}
+
 function chargeTowers(state: GameState): void {
   for (const slot of state.towerSlots) {
     if (!slot.tower) continue;
+    const target = findTypedTargetInSector(state, slot);
+    if (!target) continue;
+
     const config = TOWER_CONFIGS[slot.tower.type];
     slot.tower.charge++;
     if (slot.tower.charge >= config.charsToFire) {
       slot.tower.charge = 0;
-      fireTower(state, slot);
+      fireTower(state, slot, target);
     }
   }
 }
 
-function fireTower(state: GameState, slot: TowerSlot): void {
-  const target = findNearestEnemy(state, slot);
-  if (!target) return;
-
+function fireTower(
+  state: GameState,
+  slot: TowerSlot,
+  target: { x: number; y: number }
+): void {
   const { x: towerX, y: towerY } = getTowerPosition(slot);
 
   const config = TOWER_CONFIGS[slot.tower!.type];
@@ -279,38 +305,6 @@ function fireTower(state: GameState, slot: TowerSlot): void {
   });
 
   state.onTowerFired.emit();
-}
-
-function findNearestEnemy(
-  state: GameState,
-  slot: TowerSlot
-): { x: number; y: number } | null {
-  const { x: towerX, y: towerY } = getTowerPosition(slot);
-
-  let best: { x: number; y: number } | null = null;
-  let bestDist = Infinity;
-
-  for (const ship of state.ships) {
-    const dx = ship.x - towerX;
-    const dy = ship.y - towerY;
-    const d = dx * dx + dy * dy;
-    if (d < bestDist) {
-      bestDist = d;
-      best = ship;
-    }
-  }
-
-  for (const meteor of state.meteors) {
-    const dx = meteor.x - towerX;
-    const dy = meteor.y - towerY;
-    const d = dx * dx + dy * dy;
-    if (d < bestDist) {
-      bestDist = d;
-      best = meteor;
-    }
-  }
-
-  return best;
 }
 
 function isInBounds(x: number, y: number): boolean {
