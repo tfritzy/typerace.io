@@ -94,10 +94,7 @@ export class EnemyManager {
       const untypedText = ship.word.slice(ship.typedCount);
       typedLabel.text = typedText;
       untypedLabel.text = untypedText;
-      typedLabel.x = ship.x;
-      typedLabel.y = ship.y - 20;
-      untypedLabel.x = ship.x;
-      untypedLabel.y = ship.y - 20;
+      this.positionWordLabels(typedLabel, untypedLabel, ship.x, ship.y - 20);
     }
 
     for (const [id, container] of this.shipContainers) {
@@ -152,10 +149,7 @@ export class EnemyManager {
       const untypedText = meteor.word.slice(meteor.typedCount);
       typedLabel.text = typedText;
       untypedLabel.text = untypedText;
-      typedLabel.x = meteor.x;
-      typedLabel.y = meteor.y - 16;
-      untypedLabel.x = meteor.x;
-      untypedLabel.y = meteor.y - 16;
+      this.positionWordLabels(typedLabel, untypedLabel, meteor.x, meteor.y - 16);
     }
 
     for (const [id, sprite] of this.meteorSprites) {
@@ -191,5 +185,15 @@ export class EnemyManager {
     this.meteorUntypedLabels.clear();
     this.shipLayer.destroy();
     this.meteorLayer.destroy();
+  }
+
+  private positionWordLabels(typedLabel: Text, untypedLabel: Text, centerX: number, y: number): void {
+    const typedWidth = typedLabel.width;
+    const totalWidth = typedWidth + untypedLabel.width;
+    const splitX = Math.round(centerX - totalWidth / 2 + typedWidth);
+    typedLabel.x = splitX;
+    untypedLabel.x = splitX;
+    typedLabel.y = y;
+    untypedLabel.y = y;
   }
 }
