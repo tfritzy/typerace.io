@@ -12,6 +12,7 @@ import {
   TOWER_SLOT_COUNT,
   TOWER_ORBIT_RADIUS,
 } from "./towerConfig";
+import { METEOR_HEALTH, SHIP_HEALTH } from "./enemyConfig";
 
 export const PLANET_X = CANVAS_WIDTH / 2;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -35,6 +36,7 @@ export interface ShipState {
   hasShield: boolean;
   word: string;
   typedCount: number;
+  health: number;
 }
 
 export interface MeteorState {
@@ -49,6 +51,7 @@ export interface MeteorState {
   variant: number;
   word: string;
   typedCount: number;
+  health: number;
 }
 
 export interface TowerState {
@@ -68,6 +71,7 @@ export interface ProjectileState {
   y: number;
   vx: number;
   vy: number;
+  damage: number;
 }
 
 export class GameEvent {
@@ -168,17 +172,19 @@ export function spawnShip(state: GameState): void {
     ...state.meteors.map((meteor) => meteor.word),
   ]);
   const word = getRandomWord(getLangCode(), usedWords);
+  const shipType: ShipType = randInt(SHIP_TYPE_COUNT);
   state.ships.push({
     id: state.nextId++,
     x,
     y,
     vx,
     vy,
-    shipType: randInt(SHIP_TYPE_COUNT),
+    shipType,
     colorPreset: randInt(COLOR_PRESET_COUNT),
     hasShield: Math.random() > 0.5,
     word,
     typedCount: 0,
+    health: SHIP_HEALTH[shipType],
   });
 }
 
@@ -192,6 +198,7 @@ export function spawnMeteor(state: GameState): void {
     ...state.meteors.map((meteor) => meteor.word),
   ]);
   const word = getRandomWord(getLangCode(), usedWords);
+  const meteorType: MeteorType = randInt(METEOR_TYPE_COUNT);
   state.meteors.push({
     id: state.nextId++,
     x,
@@ -200,10 +207,11 @@ export function spawnMeteor(state: GameState): void {
     vy,
     rotation: 0,
     rotationSpeed: (0.5 + Math.random() * 1.5) * rotDir,
-    meteorType: randInt(METEOR_TYPE_COUNT),
+    meteorType,
     variant: randInt(16),
     word,
     typedCount: 0,
+    health: METEOR_HEALTH[meteorType],
   });
 }
 
@@ -298,6 +306,7 @@ function fireTower(
     y: towerY,
     vx: (dx / dist) * config.projectileSpeed,
     vy: (dy / dist) * config.projectileSpeed,
+    damage: config.damage,
   });
 
   state.onTowerFired.emit();
@@ -385,7 +394,10 @@ function checkProjectileCollisions(state: GameState): void {
       const dx = p.x - s.x;
       const dy = p.y - s.y;
       if (dx * dx + dy * dy < hitR2) {
-        destroyEntity(state, state.ships, si, true);
+        s.health -= p.damage;
+        if (s.health <= 0) {
+          destroyEntity(state, state.ships, si, true);
+        }
         hit = true;
         break;
       }
@@ -397,7 +409,10 @@ function checkProjectileCollisions(state: GameState): void {
         const dx = p.x - m.x;
         const dy = p.y - m.y;
         if (dx * dx + dy * dy < hitR2) {
-          destroyEntity(state, state.meteors, mi, true);
+          m.health -= p.damage;
+          if (m.health <= 0) {
+            destroyEntity(state, state.meteors, mi, true);
+          }
           hit = true;
           break;
         }
