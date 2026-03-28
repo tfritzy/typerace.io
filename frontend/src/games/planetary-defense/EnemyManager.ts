@@ -5,6 +5,8 @@ import { spawnShip, spawnMeteor } from "./state";
 import { createShipContainer } from "./prefabs/shipPrefab";
 import { createMeteorSprite } from "./prefabs/meteorPrefab";
 
+const PIXEL_FONT = "Press Start 2P";
+
 export class EnemyManager {
   readonly shipLayer: Container;
   readonly meteorLayer: Container;
@@ -21,14 +23,14 @@ export class EnemyManager {
   private shipSpawnTimer = 0;
   private meteorSpawnTimer = 0;
   private untypedLabelStyle = new TextStyle({
-    fontFamily: "Press Start 2P",
+    fontFamily: PIXEL_FONT,
     fontSize: 16,
     fontWeight: "bold",
     fill: 0xffffff,
     stroke: { color: 0x000000, width: 4 },
   });
   private typedLabelStyle = new TextStyle({
-    fontFamily: "Press Start 2P",
+    fontFamily: PIXEL_FONT,
     fontSize: 16,
     fontWeight: "bold",
     fill: 0x90ee90,
