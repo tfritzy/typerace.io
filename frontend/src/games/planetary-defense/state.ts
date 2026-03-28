@@ -17,6 +17,13 @@ export const PLANET_X = CANVAS_WIDTH / 2;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLANET_HIT_RADIUS = 100;
 
+export function getTowerPosition(slot: TowerSlot): { x: number; y: number } {
+  return {
+    x: PLANET_X + Math.cos(slot.angle) * TOWER_ORBIT_RADIUS,
+    y: PLANET_Y + Math.sin(slot.angle) * TOWER_ORBIT_RADIUS,
+  };
+}
+
 export interface ShipState {
   id: number;
   x: number;
@@ -255,8 +262,7 @@ function fireTower(state: GameState, slot: TowerSlot): void {
   const target = findNearestEnemy(state, slot);
   if (!target) return;
 
-  const towerX = PLANET_X + Math.cos(slot.angle) * TOWER_ORBIT_RADIUS;
-  const towerY = PLANET_Y + Math.sin(slot.angle) * TOWER_ORBIT_RADIUS;
+  const { x: towerX, y: towerY } = getTowerPosition(slot);
 
   const config = TOWER_CONFIGS[slot.tower!.type];
   const dx = target.x - towerX;
@@ -279,8 +285,7 @@ function findNearestEnemy(
   state: GameState,
   slot: TowerSlot
 ): { x: number; y: number } | null {
-  const towerX = PLANET_X + Math.cos(slot.angle) * TOWER_ORBIT_RADIUS;
-  const towerY = PLANET_Y + Math.sin(slot.angle) * TOWER_ORBIT_RADIUS;
+  const { x: towerX, y: towerY } = getTowerPosition(slot);
 
   let best: { x: number; y: number } | null = null;
   let bestDist = Infinity;

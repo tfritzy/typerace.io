@@ -1,7 +1,7 @@
 import { Container, Graphics } from "pixi.js";
 import type { GameState, TowerSlot } from "./state";
-import { PLANET_X, PLANET_Y } from "./state";
-import { TOWER_CONFIGS, TOWER_ORBIT_RADIUS } from "./towerConfig";
+import { getTowerPosition } from "./state";
+import { TOWER_CONFIGS } from "./towerConfig";
 
 const TOWER_SIZE = 28;
 const CHARGE_DOT_RADIUS = 4;
@@ -33,8 +33,7 @@ export class TowerManager {
         continue;
       }
 
-      const x = PLANET_X + Math.cos(slot.angle) * TOWER_ORBIT_RADIUS;
-      const y = PLANET_Y + Math.sin(slot.angle) * TOWER_ORBIT_RADIUS;
+      const { x, y } = getTowerPosition(slot);
 
       this.drawTower(i, x, y);
       this.drawCharge(i, slot, x, y);
@@ -98,7 +97,6 @@ export class TowerManager {
       } else {
         g.circle(cx, cy, CHARGE_DOT_RADIUS);
         g.fill({ color: 0x333333 });
-        g.circle(cx, cy, CHARGE_DOT_RADIUS);
         g.stroke({ color: 0x555555, width: 1 });
       }
     }
