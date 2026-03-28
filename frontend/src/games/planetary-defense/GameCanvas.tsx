@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
-import { spawnMeteor } from "./state";
+import { spawnMeteor, handleTypedCharacter } from "./state";
 
 const PIXEL_FONT = "'Press Start 2P', monospace";
 
@@ -95,6 +95,18 @@ export const GameCanvas = () => {
       gameRef.current?.destroy();
       gameRef.current = null;
     };
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const game = gameRef.current;
+      if (!game) return;
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key.length !== 1) return;
+      handleTypedCharacter(game.state, e.key);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
   }, []);
 
   const handleSpawnMeteor = useCallback(() => {

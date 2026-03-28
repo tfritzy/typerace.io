@@ -1,6 +1,6 @@
 import { Application, Container } from "pixi.js";
 import { MANIFEST } from "./manifest";
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
 import { Background } from "./Background";
 import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
@@ -25,11 +25,29 @@ export class PlanetaryDefenseGame {
   }
 
   async init(): Promise<void> {
+    await this.waitForPixelFont();
     this.assetManager = await AssetManager.load(MANIFEST);
     this.buildScene();
 
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
     this.app.ticker.add(this.tickerCallback);
+  }
+
+  private async waitForPixelFont(): Promise<void> {
+    if (typeof document === "undefined" || !("fonts" in document)) return;
+    let timedOut = false;
+    await Promise.race([
+      document.fonts.load(`16px "${PIXEL_FONT_FAMILY}"`),
+      new Promise<void>((resolve) =>
+        setTimeout(() => {
+          timedOut = true;
+          resolve();
+        }, 1000)
+      ),
+    ]);
+    if (timedOut) {
+      console.warn(`Timed out loading font "${PIXEL_FONT_FAMILY}" for Planetary Defense labels.`);
+    }
   }
 
   private buildScene(): void {
@@ -69,12 +87,14 @@ export async function createPlanetaryDefenseGame(
   container: HTMLElement
 ): Promise<PlanetaryDefenseGame> {
   const app = new Application();
+  const resolution = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
   await app.init({
     width: CANVAS_WIDTH,
     height: CANVAS_HEIGHT,
     background: 0x0a0a1a,
     antialias: false,
-    resolution: 1,
+    resolution,
+    autoDensity: true,
     preserveDrawingBuffer: true,
   });
 
