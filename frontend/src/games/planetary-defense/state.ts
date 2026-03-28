@@ -161,7 +161,7 @@ function getLangCode(): string {
 
 export function spawnShip(state: GameState): void {
   const { x, y } = spawnFromEdge();
-  const speed = 60 + Math.random() * 80;
+  const speed = 30 + Math.random() * 40;
   const { vx, vy } = aimAtPlanet(x, y, speed);
   const usedWords = new Set([
     ...state.ships.map((ship) => ship.word),
@@ -184,7 +184,7 @@ export function spawnShip(state: GameState): void {
 
 export function spawnMeteor(state: GameState): void {
   const { x, y } = spawnFromEdge();
-  const speed = 30 + Math.random() * 70;
+  const speed = 15 + Math.random() * 35;
   const { vx, vy } = aimAtPlanet(x, y, speed);
   const rotDir = Math.random() > 0.5 ? 1 : -1;
   const usedWords = new Set([
@@ -208,19 +208,15 @@ export function spawnMeteor(state: GameState): void {
 }
 
 function applyTypedCharacter<T extends { word: string; typedCount: number }>(
-  state: GameState,
   entities: T[],
   key: string
 ): void {
   const normalizedKey = key.toLowerCase();
-  for (let i = entities.length - 1; i >= 0; i--) {
-    const entity = entities[i];
+  for (const entity of entities) {
+    if (entity.typedCount >= entity.word.length) continue;
     const nextChar = entity.word[entity.typedCount];
     if (normalizedKey === nextChar.toLowerCase()) {
       entity.typedCount++;
-      if (entity.typedCount >= entity.word.length) {
-        destroyEntity(state, entities, i, true);
-      }
     } else if (entity.typedCount > 0) {
       entity.typedCount = 0;
     }
@@ -241,8 +237,8 @@ function destroyEntity<T>(
 
 export function handleTypedCharacter(state: GameState, key: string): void {
   if (key.length !== 1) return;
-  applyTypedCharacter(state, state.ships, key);
-  applyTypedCharacter(state, state.meteors, key);
+  applyTypedCharacter(state.ships, key);
+  applyTypedCharacter(state.meteors, key);
   chargeTowers(state);
 }
 
