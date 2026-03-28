@@ -4,8 +4,7 @@ import type { GameState } from "./state";
 import { spawnShip, spawnMeteor } from "./state";
 import { createShipContainer } from "./prefabs/shipPrefab";
 import { createMeteorSprite } from "./prefabs/meteorPrefab";
-
-const PIXEL_FONT = "Press Start 2P";
+import { PIXEL_FONT } from "./constants";
 
 export class EnemyManager {
   readonly shipLayer: Container;
@@ -27,14 +26,14 @@ export class EnemyManager {
     fontSize: 16,
     fontWeight: "bold",
     fill: 0xffffff,
-    stroke: { color: 0x000000, width: 4 },
+    stroke: { color: 0x000000, width: 4, join: "round" },
   });
   private typedLabelStyle = new TextStyle({
     fontFamily: PIXEL_FONT,
     fontSize: 16,
     fontWeight: "bold",
     fill: 0x90ee90,
-    stroke: { color: 0x000000, width: 4 },
+    stroke: { color: 0x000000, width: 4, join: "round" },
   });
 
   constructor(assets: AssetManager) {
