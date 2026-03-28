@@ -51,6 +51,7 @@ export class EnemyManager {
       }
       container.x = ship.x;
       container.y = ship.y;
+      container.rotation = Math.atan2(ship.vy, ship.vx);
     }
 
     for (const [id, container] of this.shipContainers) {

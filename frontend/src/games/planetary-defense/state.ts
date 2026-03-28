@@ -3,13 +3,18 @@ import {
   ShipType, ColorPreset, MeteorType,
   SHIP_TYPE_COUNT, COLOR_PRESET_COUNT, METEOR_TYPE_COUNT,
 } from "./types";
-import { pickEdgeSpawn, randInt } from "./utils";
+import { randInt } from "./utils";
+
+const PLANET_X = CANVAS_WIDTH / 2;
+const PLANET_Y = CANVAS_HEIGHT / 2;
+const PLANET_HIT_RADIUS = 100;
 
 export interface ShipState {
   id: number;
   x: number;
   y: number;
   vx: number;
+  vy: number;
   shipType: ShipType;
   colorPreset: ColorPreset;
   hasShield: boolean;
@@ -27,22 +32,75 @@ export interface MeteorState {
   variant: number;
 }
 
+export class GameEvent {
+  private listeners = new Set<() => void>();
+
+  subscribe(listener: () => void): () => void {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  emit(): void {
+    for (const listener of this.listeners) listener();
+  }
+}
+
 export interface GameState {
   ships: ShipState[];
   meteors: MeteorState[];
   nextId: number;
+  planetHealth: number;
+  maxPlanetHealth: number;
+  onPlanetDamaged: GameEvent;
 }
 
 export function createGameState(): GameState {
-  return { ships: [], meteors: [], nextId: 1 };
+  return {
+    ships: [],
+    meteors: [],
+    nextId: 1,
+    planetHealth: 100,
+    maxPlanetHealth: 100,
+    onPlanetDamaged: new GameEvent(),
+  };
+}
+
+function spawnFromEdge(): { x: number; y: number } {
+  const pad = 60;
+  const edge = Math.floor(Math.random() * 4);
+  switch (edge) {
+    case 0:
+      return { x: Math.random() * CANVAS_WIDTH, y: -pad };
+    case 1:
+      return { x: CANVAS_WIDTH + pad, y: Math.random() * CANVAS_HEIGHT };
+    case 2:
+      return { x: Math.random() * CANVAS_WIDTH, y: CANVAS_HEIGHT + pad };
+    default:
+      return { x: -pad, y: Math.random() * CANVAS_HEIGHT };
+  }
+}
+
+function aimAtPlanet(
+  x: number,
+  y: number,
+  speed: number
+): { vx: number; vy: number } {
+  const angle = Math.atan2(PLANET_Y - y, PLANET_X - x);
+  return { vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed };
 }
 
 export function spawnShip(state: GameState): void {
+  const { x, y } = spawnFromEdge();
+  const speed = 60 + Math.random() * 80;
+  const { vx, vy } = aimAtPlanet(x, y, speed);
   state.ships.push({
     id: state.nextId++,
-    x: -100,
-    y: 100 + Math.random() * (CANVAS_HEIGHT - 200),
-    vx: 60 + Math.random() * 80,
+    x,
+    y,
+    vx,
+    vy,
     shipType: randInt(SHIP_TYPE_COUNT),
     colorPreset: randInt(COLOR_PRESET_COUNT),
     hasShield: Math.random() > 0.5,
@@ -50,15 +108,16 @@ export function spawnShip(state: GameState): void {
 }
 
 export function spawnMeteor(state: GameState): void {
-  const { x, y, angle } = pickEdgeSpawn(CANVAS_WIDTH, CANVAS_HEIGHT);
+  const { x, y } = spawnFromEdge();
   const speed = 30 + Math.random() * 70;
+  const { vx, vy } = aimAtPlanet(x, y, speed);
   const rotDir = Math.random() > 0.5 ? 1 : -1;
   state.meteors.push({
     id: state.nextId++,
     x,
     y,
-    vx: Math.cos(angle) * speed,
-    vy: Math.sin(angle) * speed,
+    vx,
+    vy,
     rotation: 0,
     rotationSpeed: (0.5 + Math.random() * 1.5) * rotDir,
     meteorType: randInt(METEOR_TYPE_COUNT),
@@ -66,22 +125,59 @@ export function spawnMeteor(state: GameState): void {
   });
 }
 
+function isInBounds(x: number, y: number): boolean {
+  const pad = 200;
+  return (
+    x >= -pad &&
+    x <= CANVAS_WIDTH + pad &&
+    y >= -pad &&
+    y <= CANVAS_HEIGHT + pad
+  );
+}
+
+function checkCollisions(state: GameState): void {
+  const r2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
+  let damaged = false;
+
+  for (let i = state.ships.length - 1; i >= 0; i--) {
+    const s = state.ships[i];
+    const dx = s.x - PLANET_X;
+    const dy = s.y - PLANET_Y;
+    if (dx * dx + dy * dy < r2) {
+      state.planetHealth = Math.max(0, state.planetHealth - 5);
+      state.ships.splice(i, 1);
+      damaged = true;
+    } else if (!isInBounds(s.x, s.y)) {
+      state.ships.splice(i, 1);
+    }
+  }
+
+  for (let i = state.meteors.length - 1; i >= 0; i--) {
+    const m = state.meteors[i];
+    const dx = m.x - PLANET_X;
+    const dy = m.y - PLANET_Y;
+    if (dx * dx + dy * dy < r2) {
+      state.planetHealth = Math.max(0, state.planetHealth - 3);
+      state.meteors.splice(i, 1);
+      damaged = true;
+    } else if (!isInBounds(m.x, m.y)) {
+      state.meteors.splice(i, 1);
+    }
+  }
+
+  if (damaged) state.onPlanetDamaged.emit();
+}
+
 export function updateState(state: GameState, dt: number): void {
   for (const ship of state.ships) {
     ship.x += ship.vx * dt;
+    ship.y += ship.vy * dt;
   }
   for (const m of state.meteors) {
     m.x += m.vx * dt;
     m.y += m.vy * dt;
     m.rotation += m.rotationSpeed * dt;
   }
-  const pad = 100;
-  state.ships = state.ships.filter((s) => s.x <= CANVAS_WIDTH + 200);
-  state.meteors = state.meteors.filter(
-    (m) =>
-      m.x >= -pad &&
-      m.x <= CANVAS_WIDTH + pad &&
-      m.y >= -pad &&
-      m.y <= CANVAS_HEIGHT + pad
-  );
+
+  checkCollisions(state);
 }
