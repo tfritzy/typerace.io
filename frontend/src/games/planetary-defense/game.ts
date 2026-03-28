@@ -25,11 +25,20 @@ export class PlanetaryDefenseGame {
   }
 
   async init(): Promise<void> {
+    await this.waitForPixelFont();
     this.assetManager = await AssetManager.load(MANIFEST);
     this.buildScene();
 
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
     this.app.ticker.add(this.tickerCallback);
+  }
+
+  private async waitForPixelFont(): Promise<void> {
+    if (typeof document === "undefined" || !("fonts" in document)) return;
+    await Promise.race([
+      document.fonts.load('16px "Press Start 2P"'),
+      new Promise<void>((resolve) => setTimeout(resolve, 1000)),
+    ]);
   }
 
   private buildScene(): void {
