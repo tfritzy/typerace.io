@@ -158,10 +158,11 @@ function applyTypedCharacter<T extends { word: string; typedCount: number }>(
   entities: T[],
   key: string
 ): void {
+  const normalizedKey = key.toLowerCase();
   for (let i = entities.length - 1; i >= 0; i--) {
     const entity = entities[i];
     const nextChar = entity.word[entity.typedCount];
-    if (key === nextChar) {
+    if (normalizedKey === nextChar.toLowerCase()) {
       entity.typedCount++;
       if (entity.typedCount >= entity.word.length) {
         entities.splice(i, 1);
