@@ -6,9 +6,15 @@ import {
 import { randInt } from "./utils";
 import { getLanguageFromSlug } from "../../utils/modes";
 import { getRandomWord } from "../../utils/wordLists";
+import {
+  TowerType,
+  TOWER_CONFIGS,
+  TOWER_SLOT_COUNT,
+  TOWER_ORBIT_RADIUS,
+} from "./towerConfig";
 
-const PLANET_X = CANVAS_WIDTH / 2;
-const PLANET_Y = CANVAS_HEIGHT / 2;
+export const PLANET_X = CANVAS_WIDTH / 2;
+export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLANET_HIT_RADIUS = 100;
 
 export interface ShipState {
@@ -38,6 +44,25 @@ export interface MeteorState {
   typedCount: number;
 }
 
+export interface TowerState {
+  type: TowerType;
+  level: number;
+  charge: number;
+}
+
+export interface TowerSlot {
+  angle: number;
+  tower: TowerState | null;
+}
+
+export interface ProjectileState {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+}
+
 export class GameEvent {
   private listeners = new Set<() => void>();
 
@@ -56,22 +81,41 @@ export class GameEvent {
 export interface GameState {
   ships: ShipState[];
   meteors: MeteorState[];
+  towerSlots: TowerSlot[];
+  projectiles: ProjectileState[];
   nextId: number;
   enemiesKilled: number;
   planetHealth: number;
   maxPlanetHealth: number;
   onPlanetDamaged: GameEvent;
+  onTowerFired: GameEvent;
+}
+
+function createTowerSlots(): TowerSlot[] {
+  const slots: TowerSlot[] = [];
+  for (let i = 0; i < TOWER_SLOT_COUNT; i++) {
+    const angle = (i * 2 * Math.PI) / TOWER_SLOT_COUNT - Math.PI / 2;
+    const tower =
+      i < 4
+        ? { type: TowerType.Gun, level: 1, charge: 0 }
+        : null;
+    slots.push({ angle, tower });
+  }
+  return slots;
 }
 
 export function createGameState(): GameState {
   return {
     ships: [],
     meteors: [],
+    towerSlots: createTowerSlots(),
+    projectiles: [],
     nextId: 1,
     enemiesKilled: 0,
     planetHealth: 100,
     maxPlanetHealth: 100,
     onPlanetDamaged: new GameEvent(),
+    onTowerFired: new GameEvent(),
   };
 }
 
@@ -192,6 +236,76 @@ export function handleTypedCharacter(state: GameState, key: string): void {
   if (key.length !== 1) return;
   applyTypedCharacter(state, state.ships, key);
   applyTypedCharacter(state, state.meteors, key);
+  chargeTowers(state);
+}
+
+function chargeTowers(state: GameState): void {
+  for (const slot of state.towerSlots) {
+    if (!slot.tower) continue;
+    const config = TOWER_CONFIGS[slot.tower.type];
+    slot.tower.charge++;
+    if (slot.tower.charge >= config.charsToFire) {
+      slot.tower.charge = 0;
+      fireTower(state, slot);
+    }
+  }
+}
+
+function fireTower(state: GameState, slot: TowerSlot): void {
+  const target = findNearestEnemy(state, slot);
+  if (!target) return;
+
+  const towerX = PLANET_X + Math.cos(slot.angle) * TOWER_ORBIT_RADIUS;
+  const towerY = PLANET_Y + Math.sin(slot.angle) * TOWER_ORBIT_RADIUS;
+
+  const config = TOWER_CONFIGS[slot.tower!.type];
+  const dx = target.x - towerX;
+  const dy = target.y - towerY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist === 0) return;
+
+  state.projectiles.push({
+    id: state.nextId++,
+    x: towerX,
+    y: towerY,
+    vx: (dx / dist) * config.projectileSpeed,
+    vy: (dy / dist) * config.projectileSpeed,
+  });
+
+  state.onTowerFired.emit();
+}
+
+function findNearestEnemy(
+  state: GameState,
+  slot: TowerSlot
+): { x: number; y: number } | null {
+  const towerX = PLANET_X + Math.cos(slot.angle) * TOWER_ORBIT_RADIUS;
+  const towerY = PLANET_Y + Math.sin(slot.angle) * TOWER_ORBIT_RADIUS;
+
+  let best: { x: number; y: number } | null = null;
+  let bestDist = Infinity;
+
+  for (const ship of state.ships) {
+    const dx = ship.x - towerX;
+    const dy = ship.y - towerY;
+    const d = dx * dx + dy * dy;
+    if (d < bestDist) {
+      bestDist = d;
+      best = ship;
+    }
+  }
+
+  for (const meteor of state.meteors) {
+    const dx = meteor.x - towerX;
+    const dy = meteor.y - towerY;
+    const d = dx * dx + dy * dy;
+    if (d < bestDist) {
+      bestDist = d;
+      best = meteor;
+    }
+  }
+
+  return best;
 }
 
 function isInBounds(x: number, y: number): boolean {
@@ -247,6 +361,56 @@ export function updateState(state: GameState, dt: number): void {
     m.y += m.vy * dt;
     m.rotation += m.rotationSpeed * dt;
   }
+  for (const p of state.projectiles) {
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+  }
 
   checkCollisions(state);
+  checkProjectileCollisions(state);
+}
+
+const PROJECTILE_HIT_RADIUS = 20;
+
+function checkProjectileCollisions(state: GameState): void {
+  const hitR2 = PROJECTILE_HIT_RADIUS * PROJECTILE_HIT_RADIUS;
+
+  for (let pi = state.projectiles.length - 1; pi >= 0; pi--) {
+    const p = state.projectiles[pi];
+
+    if (!isInBounds(p.x, p.y)) {
+      state.projectiles.splice(pi, 1);
+      continue;
+    }
+
+    let hit = false;
+
+    for (let si = state.ships.length - 1; si >= 0; si--) {
+      const s = state.ships[si];
+      const dx = p.x - s.x;
+      const dy = p.y - s.y;
+      if (dx * dx + dy * dy < hitR2) {
+        destroyEntity(state, state.ships, si, true);
+        hit = true;
+        break;
+      }
+    }
+
+    if (!hit) {
+      for (let mi = state.meteors.length - 1; mi >= 0; mi--) {
+        const m = state.meteors[mi];
+        const dx = p.x - m.x;
+        const dy = p.y - m.y;
+        if (dx * dx + dy * dy < hitR2) {
+          destroyEntity(state, state.meteors, mi, true);
+          hit = true;
+          break;
+        }
+      }
+    }
+
+    if (hit) {
+      state.projectiles.splice(pi, 1);
+    }
+  }
 }
