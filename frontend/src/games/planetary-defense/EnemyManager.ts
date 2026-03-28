@@ -190,9 +190,9 @@ export class EnemyManager {
   private positionWordLabels(typedLabel: Text, untypedLabel: Text, centerX: number, y: number): void {
     const typedWidth = typedLabel.width;
     const totalWidth = typedWidth + untypedLabel.width;
-    const splitX = Math.round(centerX - totalWidth / 2 + typedWidth);
-    typedLabel.x = splitX;
-    untypedLabel.x = splitX;
+    const startX = Math.round(centerX - totalWidth / 2);
+    typedLabel.x = startX;
+    untypedLabel.x = startX + typedWidth;
     typedLabel.y = y;
     untypedLabel.y = y;
   }

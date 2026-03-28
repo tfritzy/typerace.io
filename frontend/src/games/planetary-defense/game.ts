@@ -1,6 +1,6 @@
 import { Application, Container } from "pixi.js";
 import { MANIFEST } from "./manifest";
-import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
 import { Background } from "./Background";
 import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
@@ -37,7 +37,7 @@ export class PlanetaryDefenseGame {
     if (typeof document === "undefined" || !("fonts" in document)) return;
     let timedOut = false;
     await Promise.race([
-      document.fonts.load(`16px "${PIXEL_FONT}"`),
+      document.fonts.load(`16px "${PIXEL_FONT_FAMILY}"`),
       new Promise<void>((resolve) =>
         setTimeout(() => {
           timedOut = true;
@@ -46,7 +46,7 @@ export class PlanetaryDefenseGame {
       ),
     ]);
     if (timedOut) {
-      console.warn(`Timed out loading font "${PIXEL_FONT}" for Planetary Defense labels.`);
+      console.warn(`Timed out loading font "${PIXEL_FONT_FAMILY}" for Planetary Defense labels.`);
     }
   }
 
