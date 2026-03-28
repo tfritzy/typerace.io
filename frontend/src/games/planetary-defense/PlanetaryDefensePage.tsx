@@ -1,9 +1,9 @@
 import { GameLayout } from "../GameLayout";
 import { GameCanvas } from "./GameCanvas";
 
-export const WordDefensePage = () => {
+export const PlanetaryDefensePage = () => {
   return (
-    <GameLayout title="Word Defense" aspectRatio={16 / 9}>
+    <GameLayout title="Planetary Defense" aspectRatio={16 / 9}>
       <GameCanvas />
     </GameLayout>
   );
