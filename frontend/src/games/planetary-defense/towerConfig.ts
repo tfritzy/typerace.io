@@ -12,7 +12,7 @@ export const TOWER_CONFIGS: Record<TowerType, TowerTypeConfig> = {
   [TowerType.Gun]: {
     charsToFire: 4,
     projectileSpeed: 800,
-    damage: 1,
+    damage: 10,
   },
 };
 
