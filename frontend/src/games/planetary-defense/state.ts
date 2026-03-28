@@ -103,7 +103,7 @@ function createTowerSlots(): TowerSlot[] {
   for (let i = 0; i < TOWER_SLOT_COUNT; i++) {
     const angle = (i * 2 * Math.PI) / TOWER_SLOT_COUNT - Math.PI / 2;
     const tower =
-      i < 4
+      i % 2 === 0
         ? { type: TowerType.Gun, level: 1, charge: 0 }
         : null;
     slots.push({ angle, tower });

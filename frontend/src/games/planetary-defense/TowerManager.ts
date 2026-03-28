@@ -75,18 +75,14 @@ export class TowerManager {
 
     const config = TOWER_CONFIGS[slot.tower.type];
     const count = config.charsToFire;
-    const outX = Math.cos(slot.angle);
-    const outY = Math.sin(slot.angle);
-    const perpX = -outY;
-    const perpY = outX;
 
     const totalWidth = (count - 1) * CHARGE_DOT_SPACING;
     const startOffset = -totalWidth / 2;
 
     for (let d = 0; d < count; d++) {
       const along = startOffset + d * CHARGE_DOT_SPACING;
-      const cx = towerX + outX * CHARGE_DOT_OFFSET + perpX * along;
-      const cy = towerY + outY * CHARGE_DOT_OFFSET + perpY * along;
+      const cx = towerX + along;
+      const cy = towerY + CHARGE_DOT_OFFSET;
 
       if (d < slot.tower.charge) {
         g.circle(cx, cy, CHARGE_DOT_RADIUS);
