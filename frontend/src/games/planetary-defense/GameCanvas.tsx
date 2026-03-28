@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
-import { spawnMeteor, subscribe } from "./state";
+import { spawnMeteor } from "./state";
 
 const PIXEL_FONT = "'Press Start 2P', monospace";
 
@@ -14,7 +14,6 @@ const PlanetHealthBar = ({ ratio }: { ratio: number }) => {
       <div
         style={{
           background: "rgba(10, 10, 26, 0.85)",
-          border: "3px solid #8b8fa3",
           padding: "10px 14px",
           imageRendering: "pixelated",
         }}
@@ -82,7 +81,7 @@ export const GameCanvas = () => {
           return;
         }
         gameRef.current = game;
-        unsubscribe = subscribe(game.state, () => {
+        unsubscribe = game.state.onPlanetDamaged.subscribe(() => {
           setHealthRatio(game.state.planetHealth / game.state.maxPlanetHealth);
         });
       })
@@ -113,7 +112,6 @@ export const GameCanvas = () => {
           fontSize: "10px",
           letterSpacing: "1px",
           imageRendering: "pixelated",
-          border: "3px solid #8b8fa3",
           background: "rgba(10, 10, 26, 0.85)",
           color: "#cdd6f4",
           padding: "8px 14px",

@@ -32,13 +32,28 @@ export interface MeteorState {
   variant: number;
 }
 
+export class GameEvent {
+  private listeners = new Set<() => void>();
+
+  subscribe(listener: () => void): () => void {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  emit(): void {
+    for (const listener of this.listeners) listener();
+  }
+}
+
 export interface GameState {
   ships: ShipState[];
   meteors: MeteorState[];
   nextId: number;
   planetHealth: number;
   maxPlanetHealth: number;
-  listeners: Set<() => void>;
+  onPlanetDamaged: GameEvent;
 }
 
 export function createGameState(): GameState {
@@ -48,22 +63,8 @@ export function createGameState(): GameState {
     nextId: 1,
     planetHealth: 100,
     maxPlanetHealth: 100,
-    listeners: new Set(),
+    onPlanetDamaged: new GameEvent(),
   };
-}
-
-export function subscribe(
-  state: GameState,
-  listener: () => void
-): () => void {
-  state.listeners.add(listener);
-  return () => {
-    state.listeners.delete(listener);
-  };
-}
-
-function notify(state: GameState): void {
-  for (const listener of state.listeners) listener();
 }
 
 function spawnFromEdge(): { x: number; y: number } {
@@ -84,18 +85,16 @@ function spawnFromEdge(): { x: number; y: number } {
 function aimAtPlanet(
   x: number,
   y: number,
-  speed: number,
-  spread: number
+  speed: number
 ): { vx: number; vy: number } {
-  const angle =
-    Math.atan2(PLANET_Y - y, PLANET_X - x) + (Math.random() - 0.5) * spread;
+  const angle = Math.atan2(PLANET_Y - y, PLANET_X - x);
   return { vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed };
 }
 
 export function spawnShip(state: GameState): void {
   const { x, y } = spawnFromEdge();
   const speed = 60 + Math.random() * 80;
-  const { vx, vy } = aimAtPlanet(x, y, speed, 0.3);
+  const { vx, vy } = aimAtPlanet(x, y, speed);
   state.ships.push({
     id: state.nextId++,
     x,
@@ -111,7 +110,7 @@ export function spawnShip(state: GameState): void {
 export function spawnMeteor(state: GameState): void {
   const { x, y } = spawnFromEdge();
   const speed = 30 + Math.random() * 70;
-  const { vx, vy } = aimAtPlanet(x, y, speed, 0.5);
+  const { vx, vy } = aimAtPlanet(x, y, speed);
   const rotDir = Math.random() > 0.5 ? 1 : -1;
   state.meteors.push({
     id: state.nextId++,
@@ -126,30 +125,47 @@ export function spawnMeteor(state: GameState): void {
   });
 }
 
-function filterEntities<T extends { x: number; y: number }>(
-  entities: T[],
-  damage: number,
-  state: GameState,
-  r2: number
-): { filtered: T[]; damaged: boolean } {
+function isInBounds(x: number, y: number): boolean {
   const pad = 200;
+  return (
+    x >= -pad &&
+    x <= CANVAS_WIDTH + pad &&
+    y >= -pad &&
+    y <= CANVAS_HEIGHT + pad
+  );
+}
+
+function checkCollisions(state: GameState): void {
+  const r2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
   let damaged = false;
-  const filtered = entities.filter((e) => {
-    const dx = e.x - PLANET_X;
-    const dy = e.y - PLANET_Y;
+
+  for (let i = state.ships.length - 1; i >= 0; i--) {
+    const s = state.ships[i];
+    const dx = s.x - PLANET_X;
+    const dy = s.y - PLANET_Y;
     if (dx * dx + dy * dy < r2) {
-      state.planetHealth = Math.max(0, state.planetHealth - damage);
+      state.planetHealth = Math.max(0, state.planetHealth - 5);
+      state.ships.splice(i, 1);
       damaged = true;
-      return false;
+    } else if (!isInBounds(s.x, s.y)) {
+      state.ships.splice(i, 1);
     }
-    return (
-      e.x >= -pad &&
-      e.x <= CANVAS_WIDTH + pad &&
-      e.y >= -pad &&
-      e.y <= CANVAS_HEIGHT + pad
-    );
-  });
-  return { filtered, damaged };
+  }
+
+  for (let i = state.meteors.length - 1; i >= 0; i--) {
+    const m = state.meteors[i];
+    const dx = m.x - PLANET_X;
+    const dy = m.y - PLANET_Y;
+    if (dx * dx + dy * dy < r2) {
+      state.planetHealth = Math.max(0, state.planetHealth - 3);
+      state.meteors.splice(i, 1);
+      damaged = true;
+    } else if (!isInBounds(m.x, m.y)) {
+      state.meteors.splice(i, 1);
+    }
+  }
+
+  if (damaged) state.onPlanetDamaged.emit();
 }
 
 export function updateState(state: GameState, dt: number): void {
@@ -163,11 +179,5 @@ export function updateState(state: GameState, dt: number): void {
     m.rotation += m.rotationSpeed * dt;
   }
 
-  const r2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
-  const ships = filterEntities(state.ships, 5, state, r2);
-  const meteors = filterEntities(state.meteors, 3, state, r2);
-  state.ships = ships.filtered;
-  state.meteors = meteors.filtered;
-
-  if (ships.damaged || meteors.damaged) notify(state);
+  checkCollisions(state);
 }
