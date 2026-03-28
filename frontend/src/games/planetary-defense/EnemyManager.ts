@@ -33,7 +33,7 @@ class EnemyLabel {
     const typedWidth = this.typedLabel.width;
     const totalWidth = typedWidth + this.untypedLabel.width;
     const startX = Math.round(centerX - totalWidth / 2);
-    this.typedLabel.x = startX;
+    this.typedLabel.x = startX + typedWidth;
     this.untypedLabel.x = startX + typedWidth;
     this.typedLabel.y = y;
     this.untypedLabel.y = y;
