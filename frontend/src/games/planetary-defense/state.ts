@@ -100,7 +100,10 @@ export interface GameState {
   entities: EntityState[];
   towerSlots: TowerSlot[];
   projectiles: ProjectileState[];
-  elapsedTime: number;
+  time: {
+    time: number;
+    deltaTime: number;
+  };
   nextId: number;
   enemiesKilled: number;
   planetHealth: number;
@@ -133,7 +136,10 @@ export function createGameState(): GameState {
     entities: [],
     towerSlots: createTowerSlots(),
     projectiles: [],
-    elapsedTime: 0,
+    time: {
+      time: 0,
+      deltaTime: 0,
+    },
     nextId: 1,
     enemiesKilled: 0,
     planetHealth: 100,
@@ -357,18 +363,19 @@ function checkCollisions(state: GameState): void {
 }
 
 export function updateState(state: GameState, dt: number): void {
-  const timeBefore = state.elapsedTime;
-  state.elapsedTime += dt;
+  state.time.deltaTime = dt;
+  const timeBefore = state.time.time;
+  state.time.time += state.time.deltaTime;
 
   for (const e of state.entities) {
-    e.x += e.vx * dt;
-    e.y += e.vy * dt;
-    e.rotation += e.rotationSpeed * dt;
+    e.x += e.vx * state.time.deltaTime;
+    e.y += e.vy * state.time.deltaTime;
+    e.rotation += e.rotationSpeed * state.time.deltaTime;
   }
-  applyBleedDamage(state, timeBefore, state.elapsedTime);
+  applyBleedDamage(state, timeBefore, state.time.time);
   for (const p of state.projectiles) {
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
+    p.x += p.vx * state.time.deltaTime;
+    p.y += p.vy * state.time.deltaTime;
   }
 
   checkCollisions(state);
@@ -436,7 +443,7 @@ function checkProjectileCollisions(state: GameState): void {
           Math.random() < p.bleedApplicationChance
         ) {
           e.bleedStacks++;
-          e.bleedTimer = state.elapsedTime + BLEED_DURATION_SECONDS;
+          e.bleedTimer = state.time.time + BLEED_DURATION_SECONDS;
         }
         hit = true;
         break;
