@@ -41,6 +41,7 @@ export interface EntityState {
   power: number;
   bleedStacks: number;
   bleedTimer: number;
+  bleedTickTimer: number;
   colorPreset?: ColorPreset;
   hasShield?: boolean;
   variant?: number;
@@ -206,6 +207,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
     power: config.power,
     bleedStacks: 0,
     bleedTimer: 0,
+    bleedTickTimer: 0,
   };
 
   if (isShip) {
@@ -368,25 +370,34 @@ export function updateState(state: GameState, dt: number): void {
 
   checkCollisions(state);
   checkProjectileCollisions(state);
+  resolveEntityDeaths(state);
 }
 
 const PROJECTILE_HIT_RADIUS = 20;
 const BLEED_DURATION_SECONDS = 3;
-const BLEED_DAMAGE_PER_STACK_PER_SECOND = 1;
+const BLEED_TICK_INTERVAL_SECONDS = 1;
 
 function applyBleedDamage(state: GameState, dt: number): void {
-  for (let i = state.entities.length - 1; i >= 0; i--) {
-    const entity = state.entities[i];
+  for (const entity of state.entities) {
     if (entity.bleedStacks <= 0) continue;
 
-    entity.health -=
-      entity.bleedStacks * BLEED_DAMAGE_PER_STACK_PER_SECOND * dt;
+    entity.bleedTickTimer += dt;
+    while (entity.bleedTickTimer >= BLEED_TICK_INTERVAL_SECONDS) {
+      entity.health -= entity.bleedStacks;
+      entity.bleedTickTimer -= BLEED_TICK_INTERVAL_SECONDS;
+    }
+
     entity.bleedTimer = Math.max(0, entity.bleedTimer - dt);
     if (entity.bleedTimer <= 0) {
       entity.bleedStacks = 0;
+      entity.bleedTickTimer = 0;
     }
+  }
+}
 
-    if (entity.health <= 0) {
+function resolveEntityDeaths(state: GameState): void {
+  for (let i = state.entities.length - 1; i >= 0; i--) {
+    if (state.entities[i].health <= 0) {
       destroyEntity(state, i, true);
     }
   }
@@ -407,6 +418,7 @@ function checkProjectileCollisions(state: GameState): void {
 
     for (let ei = state.entities.length - 1; ei >= 0; ei--) {
       const e = state.entities[ei];
+      if (e.health <= 0) continue;
       const dx = p.x - e.x;
       const dy = p.y - e.y;
       if (dx * dx + dy * dy < hitR2) {
@@ -417,9 +429,6 @@ function checkProjectileCollisions(state: GameState): void {
         ) {
           e.bleedStacks++;
           e.bleedTimer = BLEED_DURATION_SECONDS;
-        }
-        if (e.health <= 0) {
-          destroyEntity(state, ei, true);
         }
         hit = true;
         break;
