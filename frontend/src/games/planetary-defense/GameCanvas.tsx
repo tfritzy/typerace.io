@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
-import { handleTypedCharacter, startNextWave, WavePhase } from "./state";
+import { handleTypedCharacter, startNextWave } from "./state";
 
 const PIXEL_FONT = "'Press Start 2P', monospace";
 
@@ -10,7 +10,7 @@ const PlanetHealthBar = ({ ratio }: { ratio: number }) => {
   const barColor = pct > 60 ? "#4ade80" : pct > 30 ? "#fbbf24" : "#ef4444";
 
   return (
-    <div className="absolute top-3 right-3 z-10" style={{ fontFamily: PIXEL_FONT }}>
+    <div className="absolute top-3 right-3 z-10">
       <div
         style={{
           background: "rgba(10, 10, 26, 0.85)",
@@ -67,7 +67,7 @@ export const GameCanvas = () => {
   const gameRef = useRef<PlanetaryDefenseGame | null>(null);
   const [healthRatio, setHealthRatio] = useState(1);
   const [waveNumber, setWaveNumber] = useState(0);
-  const [wavePhase, setWavePhase] = useState<WavePhase>(WavePhase.Idle);
+  const [waveActive, setWaveActive] = useState(false);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -75,7 +75,7 @@ export const GameCanvas = () => {
 
     let cancelled = false;
     let unsubDamage: (() => void) | null = null;
-    let unsubWave: (() => void) | null = null;
+    let unsubWaveComplete: (() => void) | null = null;
 
     createPlanetaryDefenseGame(div)
       .then((game) => {
@@ -87,9 +87,9 @@ export const GameCanvas = () => {
         unsubDamage = game.state.onPlanetDamaged.subscribe(() => {
           setHealthRatio(game.state.planetHealth / game.state.maxPlanetHealth);
         });
-        unsubWave = game.state.onWavePhaseChange.subscribe(() => {
+        unsubWaveComplete = game.state.onWaveComplete.subscribe(() => {
           setWaveNumber(game.state.wave.wave);
-          setWavePhase(game.state.wave.phase);
+          setWaveActive(false);
         });
       })
       .catch((err) => {
@@ -99,7 +99,7 @@ export const GameCanvas = () => {
     return () => {
       cancelled = true;
       unsubDamage?.();
-      unsubWave?.();
+      unsubWaveComplete?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -122,14 +122,18 @@ export const GameCanvas = () => {
     if (game) {
       startNextWave(game.state);
       setWaveNumber(game.state.wave.wave);
-      setWavePhase(game.state.wave.phase);
+      setWaveActive(true);
     }
   }, []);
 
   return (
-    <div ref={containerRef} className="w-full h-full relative">
+    <div
+      ref={containerRef}
+      className="w-full h-full relative"
+      style={{ fontFamily: PIXEL_FONT }}
+    >
       <PlanetHealthBar ratio={healthRatio} />
-      <div className="absolute top-3 left-3 z-10" style={{ fontFamily: PIXEL_FONT }}>
+      <div className="absolute top-3 left-3 z-10">
         <div
           style={{
             background: "rgba(10, 10, 26, 0.85)",
@@ -148,11 +152,10 @@ export const GameCanvas = () => {
             WAVE {waveNumber}
           </div>
         </div>
-        {wavePhase === WavePhase.Idle && (
+        {!waveActive && (
           <button
             onClick={handleNextWave}
             style={{
-              fontFamily: PIXEL_FONT,
               fontSize: "10px",
               letterSpacing: "1px",
               imageRendering: "pixelated",
@@ -167,32 +170,6 @@ export const GameCanvas = () => {
           >
             {waveNumber === 0 ? "START" : "NEXT WAVE"}
           </button>
-        )}
-        {wavePhase === WavePhase.Spawning && (
-          <div
-            style={{
-              fontSize: "8px",
-              color: "#fbbf24",
-              padding: "8px 14px",
-              marginTop: "6px",
-              background: "rgba(10, 10, 26, 0.85)",
-            }}
-          >
-            INCOMING...
-          </div>
-        )}
-        {wavePhase === WavePhase.Clearing && (
-          <div
-            style={{
-              fontSize: "8px",
-              color: "#a6adc8",
-              padding: "8px 14px",
-              marginTop: "6px",
-              background: "rgba(10, 10, 26, 0.85)",
-            }}
-          >
-            CLEAR REMAINING
-          </div>
         )}
       </div>
     </div>

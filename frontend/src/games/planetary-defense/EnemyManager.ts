@@ -1,7 +1,7 @@
 import { Container, Sprite, Text, TextStyle } from "pixi.js";
 import type { AssetManager } from "./assetManager";
-import type { GameState } from "./state";
-import { WavePhase, spawnShip, spawnMeteor } from "./state";
+import type { GameState, EntityState } from "./state";
+import { WavePhase, spawnEntity } from "./state";
 import { createShipContainer } from "./prefabs/shipPrefab";
 import { createMeteorSprite } from "./prefabs/meteorPrefab";
 import { PIXEL_FONT } from "./constants";
@@ -94,19 +94,16 @@ class EnemyLabelManager {
 }
 
 export class EnemyManager {
-  readonly shipLayer: Container;
-  readonly meteorLayer: Container;
+  readonly layer: Container;
 
   private assets: AssetManager;
-  private shipContainers = new Map<number, Container>();
-  private meteorSprites = new Map<number, Sprite>();
+  private entityDisplayObjects = new Map<number, Container>();
   private activeEntityIds = new Set<number>();
   private labelManager = new EnemyLabelManager();
 
   constructor(assets: AssetManager) {
     this.assets = assets;
-    this.shipLayer = new Container();
-    this.meteorLayer = new Container();
+    this.layer = new Container();
   }
 
   update(state: GameState, dt: number): void {
@@ -115,95 +112,88 @@ export class EnemyManager {
     if (wave.phase === WavePhase.Spawning) {
       wave.waveTimer += dt;
 
+      if (
+        state.entities.length === 0 &&
+        wave.spawnIndex < wave.spawnQueue.length
+      ) {
+        wave.waveTimer = wave.spawnQueue[wave.spawnIndex].spawnTime;
+      }
+
       while (
         wave.spawnIndex < wave.spawnQueue.length &&
         wave.waveTimer >= wave.spawnQueue[wave.spawnIndex].spawnTime
       ) {
         const entry = wave.spawnQueue[wave.spawnIndex];
-        if (entry.kind === "ship") {
-          spawnShip(state, entry.shipType);
-        } else {
-          spawnMeteor(state, entry.meteorType);
-        }
+        spawnEntity(state, entry.config);
         wave.spawnIndex++;
       }
 
       if (wave.spawnIndex >= wave.spawnQueue.length) {
         wave.phase = WavePhase.Clearing;
-        state.onWavePhaseChange.emit();
       }
     }
 
     if (wave.phase === WavePhase.Clearing) {
-      if (state.ships.length === 0 && state.meteors.length === 0) {
+      if (state.entities.length === 0) {
         wave.phase = WavePhase.Idle;
-        state.onWavePhaseChange.emit();
+        state.onWaveComplete.emit();
       }
     }
 
     this.syncRendering(state);
   }
 
+  private createDisplayObject(entity: EntityState): Container {
+    if (entity.shipType != null) {
+      return createShipContainer(this.assets, entity);
+    }
+    return createMeteorSprite(this.assets, entity);
+  }
+
   private syncRendering(state: GameState): void {
     this.activeEntityIds.clear();
-    for (const ship of state.ships) {
-      this.activeEntityIds.add(ship.id);
-      let container = this.shipContainers.get(ship.id);
-      if (!container) {
-        container = createShipContainer(this.assets, ship);
-        this.shipLayer.addChild(container);
-        this.shipContainers.set(ship.id, container);
-      }
-      container.x = ship.x;
-      container.y = ship.y;
-      container.rotation = Math.atan2(ship.vy, ship.vx);
-      this.labelManager.update(ship.id, this.shipLayer, ship.word, ship.typedCount, ship.x, ship.y - 24);
-    }
 
-    for (const [id, container] of this.shipContainers) {
-      if (!this.activeEntityIds.has(id)) {
-        container.destroy();
-        this.shipContainers.delete(id);
+    for (const entity of state.entities) {
+      this.activeEntityIds.add(entity.id);
+      let display = this.entityDisplayObjects.get(entity.id);
+      if (!display) {
+        display = this.createDisplayObject(entity);
+        this.layer.addChild(display);
+        this.entityDisplayObjects.set(entity.id, display);
       }
-    }
+      display.x = entity.x;
+      display.y = entity.y;
 
-    for (const meteor of state.meteors) {
-      this.activeEntityIds.add(meteor.id);
-      let sprite = this.meteorSprites.get(meteor.id);
-      if (!sprite) {
-        sprite = createMeteorSprite(this.assets, meteor);
-        this.meteorLayer.addChild(sprite);
-        this.meteorSprites.set(meteor.id, sprite);
+      if (entity.shipType != null) {
+        display.rotation = Math.atan2(entity.vy, entity.vx);
+      } else {
+        display.rotation = entity.rotation;
       }
-      sprite.x = meteor.x;
-      sprite.y = meteor.y;
-      sprite.rotation = meteor.rotation;
+
+      const labelOffset = entity.shipType != null ? -24 : -20;
       this.labelManager.update(
-        meteor.id,
-        this.meteorLayer,
-        meteor.word,
-        meteor.typedCount,
-        meteor.x,
-        meteor.y - 20
+        entity.id,
+        this.layer,
+        entity.word,
+        entity.typedCount,
+        entity.x,
+        entity.y + labelOffset
       );
     }
 
-    for (const [id, sprite] of this.meteorSprites) {
+    for (const [id, display] of this.entityDisplayObjects) {
       if (!this.activeEntityIds.has(id)) {
-        sprite.destroy();
-        this.meteorSprites.delete(id);
+        display.destroy();
+        this.entityDisplayObjects.delete(id);
       }
     }
     this.labelManager.removeMissing(this.activeEntityIds);
   }
 
   destroy(): void {
-    for (const c of this.shipContainers.values()) c.destroy();
-    for (const s of this.meteorSprites.values()) s.destroy();
-    this.shipContainers.clear();
-    this.meteorSprites.clear();
+    for (const d of this.entityDisplayObjects.values()) d.destroy();
+    this.entityDisplayObjects.clear();
     this.labelManager.destroy();
-    this.shipLayer.destroy();
-    this.meteorLayer.destroy();
+    this.layer.destroy();
   }
 }

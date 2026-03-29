@@ -1,12 +1,12 @@
 import { Container, Sprite } from "pixi.js";
 import type { AssetManager } from "../assetManager";
-import type { ShipState } from "../state";
+import type { EntityState } from "../state";
 
 export function createShipContainer(
   assets: AssetManager,
-  ship: ShipState
+  entity: EntityState
 ): Container {
-  const shipTexture = assets.getShipTexture(ship.shipType, ship.colorPreset);
+  const shipTexture = assets.getShipTexture(entity.shipType!, entity.colorPreset!);
 
   const shipSprite = new Sprite(shipTexture);
   shipSprite.anchor.set(0.5);
@@ -14,8 +14,8 @@ export function createShipContainer(
   const container = new Container();
   container.addChild(shipSprite);
 
-  if (ship.hasShield) {
-    const shieldTexture = assets.getShieldTexture(ship.shipType);
+  if (entity.hasShield) {
+    const shieldTexture = assets.getShieldTexture(entity.shipType!);
     const shield = new Sprite(shieldTexture);
     shield.anchor.set(0.5);
     shield.alpha = 0.6;
@@ -23,8 +23,8 @@ export function createShipContainer(
   }
 
   container.scale.set(3);
-  container.x = ship.x;
-  container.y = ship.y;
+  container.x = entity.x;
+  container.y = entity.y;
 
   return container;
 }
