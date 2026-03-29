@@ -372,15 +372,17 @@ export function updateState(state: GameState, dt: number): void {
 
 const PROJECTILE_HIT_RADIUS = 20;
 const BLEED_DURATION_SECONDS = 3;
+const BLEED_DAMAGE_PER_STACK_PER_SECOND = 1;
 
 function applyBleedDamage(state: GameState, dt: number): void {
   for (let i = state.entities.length - 1; i >= 0; i--) {
     const entity = state.entities[i];
     if (entity.bleedStacks <= 0) continue;
 
-    entity.health -= entity.bleedStacks * dt;
+    entity.health -=
+      entity.bleedStacks * BLEED_DAMAGE_PER_STACK_PER_SECOND * dt;
     entity.bleedTimer = Math.max(0, entity.bleedTimer - dt);
-    if (entity.bleedTimer === 0) {
+    if (entity.bleedTimer <= 0) {
       entity.bleedStacks = 0;
     }
 
