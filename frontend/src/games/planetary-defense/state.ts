@@ -237,20 +237,17 @@ function rerollCompletedWords(state: GameState): void {
     ...state.meteors.map((m) => m.word),
   ]);
   const langCode = getLangCode();
-  for (const ship of state.ships) {
-    if (ship.typedCount >= ship.word.length) {
-      ship.word = getRandomWord(langCode, usedWords);
-      usedWords.add(ship.word);
-      ship.typedCount = 0;
+  const reroll = (entities: { word: string; typedCount: number }[]) => {
+    for (const entity of entities) {
+      if (entity.typedCount >= entity.word.length) {
+        entity.word = getRandomWord(langCode, usedWords);
+        usedWords.add(entity.word);
+        entity.typedCount = 0;
+      }
     }
-  }
-  for (const meteor of state.meteors) {
-    if (meteor.typedCount >= meteor.word.length) {
-      meteor.word = getRandomWord(langCode, usedWords);
-      usedWords.add(meteor.word);
-      meteor.typedCount = 0;
-    }
-  }
+  };
+  reroll(state.ships);
+  reroll(state.meteors);
 }
 
 function destroyEntity<T>(
