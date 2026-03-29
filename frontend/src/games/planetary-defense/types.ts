@@ -93,3 +93,84 @@ export enum MeteorType {
 }
 
 export const METEOR_TYPE_COUNT = 4;
+
+export enum EntityType {
+  MeteorLargeBrown,
+  MeteorLargeWhite,
+  MeteorSmallBrown,
+  MeteorSmallWhite,
+  Vanguard,
+  Sentinel,
+  Corsair,
+  Falcon,
+  Scout,
+  Dart,
+  Wasp,
+  Phoenix,
+  Hawk,
+  Sparrow,
+  Gnat,
+  Stinger,
+  Needle,
+  Mite,
+  Titan,
+  Raptor,
+  Lance,
+  Javelin,
+  Pip,
+  Raven,
+  Osprey,
+  Leviathan,
+  Talon,
+  Hornet,
+  Behemoth,
+  Dreadnought,
+  Marauder,
+  Eagle,
+  Pike,
+  Arrow,
+  Juggernaut,
+  Warden,
+  Specter,
+  Harrier,
+  Viper,
+  Flea,
+  Broadside,
+  Kestrel,
+  Finch,
+  Striker,
+  Robin,
+  Cricket,
+  Moth,
+  Colossus,
+  Cutlass,
+  Sabre,
+  Mantis,
+  Speck,
+  Crest,
+  Piston,
+  Vulture,
+  Orb,
+  Flicker,
+  Barb,
+  Sliver,
+  Flagship,
+  Aegis,
+  Bolt,
+  Spur,
+  Dot,
+  Rampart,
+  Clipper,
+}
+
+export function isShipEntityType(t: EntityType): boolean {
+  return t >= EntityType.Vanguard;
+}
+
+export function toShipType(t: EntityType): ShipType {
+  return (t - EntityType.Vanguard) as ShipType;
+}
+
+export function toMeteorType(t: EntityType): MeteorType {
+  return t as MeteorType;
+}

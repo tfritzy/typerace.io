@@ -1,7 +1,7 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import {
-  ShipType, ColorPreset, MeteorType,
-  COLOR_PRESET_COUNT,
+  EntityType, ColorPreset,
+  COLOR_PRESET_COUNT, isShipEntityType,
 } from "./types";
 import { randInt } from "./utils";
 import { getLanguageFromSlug } from "../../utils/modes";
@@ -28,6 +28,7 @@ export function getTowerPosition(slot: TowerSlot): { x: number; y: number } {
 
 export interface EntityState {
   id: number;
+  entityType: EntityType;
   x: number;
   y: number;
   vx: number;
@@ -38,10 +39,8 @@ export interface EntityState {
   typedCount: number;
   health: number;
   power: number;
-  shipType?: ShipType;
   colorPreset?: ColorPreset;
   hasShield?: boolean;
-  meteorType?: MeteorType;
   variant?: number;
 }
 
@@ -183,29 +182,27 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
   const usedWords = new Set(state.entities.map((e) => e.word));
   const word = getRandomWord(getLangCode(), usedWords);
   const rotDir = Math.random() > 0.5 ? 1 : -1;
+  const isShip = isShipEntityType(config.entityType);
 
   const entity: EntityState = {
     id: state.nextId++,
+    entityType: config.entityType,
     x,
     y,
     vx,
     vy,
     rotation: 0,
-    rotationSpeed: config.meteorType != null ? (0.5 + Math.random() * 1.5) * rotDir : 0,
+    rotationSpeed: isShip ? 0 : (0.5 + Math.random() * 1.5) * rotDir,
     word,
     typedCount: 0,
     health: config.health,
     power: config.power,
   };
 
-  if (config.shipType != null) {
-    entity.shipType = config.shipType;
+  if (isShip) {
     entity.colorPreset = randInt(COLOR_PRESET_COUNT);
     entity.hasShield = Math.random() > 0.5;
-  }
-
-  if (config.meteorType != null) {
-    entity.meteorType = config.meteorType;
+  } else {
     entity.variant = randInt(16);
   }
 

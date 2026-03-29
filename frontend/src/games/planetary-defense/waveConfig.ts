@@ -19,10 +19,11 @@ export function generateWaveSpawns(wave: number): SpawnEntry[] {
   const eligible = ENEMY_CATALOG.filter((e) => e.power <= maxSinglePower);
   if (eligible.length === 0) return [];
 
+  const cutoffPower = Math.max(eligible[0].power, Math.floor(totalPower * 0.05));
   const enemies: EnemyConfig[] = [];
   let remaining = totalPower;
 
-  while (remaining > 0) {
+  while (remaining >= cutoffPower) {
     const affordable = eligible.filter((e) => e.power <= remaining);
     if (affordable.length === 0) break;
 
