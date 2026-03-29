@@ -41,7 +41,6 @@ export interface EntityState {
   power: number;
   bleedStacks: number;
   bleedTimer: number;
-  bleedTickTimer: number;
   colorPreset?: ColorPreset;
   hasShield?: boolean;
   variant?: number;
@@ -118,7 +117,7 @@ function createTowerSlots(): TowerSlot[] {
     const tower =
       i % 2 === 0
         ? {
-          type: i === 0 ? TowerType.Bleed : TowerType.Gun,
+          type: TowerType.Gun,
           level: 1,
           charge: 0,
         }
@@ -207,7 +206,6 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
     power: config.power,
     bleedStacks: 0,
     bleedTimer: 0,
-    bleedTickTimer: 0,
   };
 
   if (isShip) {
@@ -375,22 +373,19 @@ export function updateState(state: GameState, dt: number): void {
 
 const PROJECTILE_HIT_RADIUS = 20;
 const BLEED_DURATION_SECONDS = 3;
-const BLEED_TICK_INTERVAL_SECONDS = 1;
 
 function applyBleedDamage(state: GameState, dt: number): void {
   for (const entity of state.entities) {
     if (entity.bleedStacks <= 0) continue;
 
-    entity.bleedTickTimer += dt;
-    while (entity.bleedTickTimer >= BLEED_TICK_INTERVAL_SECONDS) {
-      entity.health -= entity.bleedStacks;
-      entity.bleedTickTimer -= BLEED_TICK_INTERVAL_SECONDS;
-    }
-
+    const timerBefore = entity.bleedTimer;
     entity.bleedTimer = Math.max(0, entity.bleedTimer - dt);
+    const bleedTicks = Math.ceil(timerBefore) - Math.ceil(entity.bleedTimer);
+    if (bleedTicks > 0) {
+      entity.health -= entity.bleedStacks * bleedTicks;
+    }
     if (entity.bleedTimer <= 0) {
       entity.bleedStacks = 0;
-      entity.bleedTickTimer = 0;
     }
   }
 }
