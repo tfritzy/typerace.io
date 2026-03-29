@@ -93,6 +93,28 @@ export class GameEvent {
   }
 }
 
+export class GameDataEvent<T> {
+  private listeners = new Set<(data: T) => void>();
+
+  subscribe(listener: (data: T) => void): () => void {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  emit(data: T): void {
+    for (const listener of this.listeners) listener(data);
+  }
+}
+
+export interface DamageData {
+  amount: number;
+  x: number;
+  y: number;
+  killed: boolean;
+}
+
 export interface GameState {
   entities: EntityState[];
   towerSlots: TowerSlot[];
@@ -105,6 +127,7 @@ export interface GameState {
   onPlanetDamaged: GameEvent;
   onTowerFired: GameEvent;
   onWaveComplete: GameEvent;
+  onDamageDealt: GameDataEvent<DamageData>;
 }
 
 function createTowerSlots(): TowerSlot[] {
@@ -139,6 +162,7 @@ export function createGameState(): GameState {
     onPlanetDamaged: new GameEvent(),
     onTowerFired: new GameEvent(),
     onWaveComplete: new GameEvent(),
+    onDamageDealt: new GameDataEvent<DamageData>(),
   };
 }
 
@@ -380,7 +404,9 @@ function checkProjectileCollisions(state: GameState): void {
       const dy = p.y - e.y;
       if (dx * dx + dy * dy < hitR2) {
         e.health -= p.damage;
-        if (e.health <= 0) {
+        const killed = e.health <= 0;
+        state.onDamageDealt.emit({ amount: p.damage, x: e.x, y: e.y, killed });
+        if (killed) {
           destroyEntity(state, ei, true);
         }
         hit = true;
