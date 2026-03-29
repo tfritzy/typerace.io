@@ -61,7 +61,7 @@ export const LabelOverlay = ({ gameRef }: { gameRef: React.RefObject<PlanetaryDe
       const labels: LabelData[] = game.labels;
       const containerWidth = overlay.clientWidth;
       const scale = containerWidth / CANVAS_WIDTH;
-      const fontSize = Math.max(6, Math.round(LABEL_FONT_SIZE * scale));
+      const fontSize = Math.max(10, Math.round(LABEL_FONT_SIZE * scale));
       const fontSizePx = `${fontSize}px`;
 
       if (scale !== lastScaleRef.current) {
