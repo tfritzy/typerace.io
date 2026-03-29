@@ -100,6 +100,7 @@ export interface GameState {
   entities: EntityState[];
   towerSlots: TowerSlot[];
   projectiles: ProjectileState[];
+  elapsedTime: number;
   nextId: number;
   enemiesKilled: number;
   planetHealth: number;
@@ -132,6 +133,7 @@ export function createGameState(): GameState {
     entities: [],
     towerSlots: createTowerSlots(),
     projectiles: [],
+    elapsedTime: 0,
     nextId: 1,
     enemiesKilled: 0,
     planetHealth: 100,
@@ -355,12 +357,15 @@ function checkCollisions(state: GameState): void {
 }
 
 export function updateState(state: GameState, dt: number): void {
+  const timeBefore = state.elapsedTime;
+  state.elapsedTime += dt;
+
   for (const e of state.entities) {
     e.x += e.vx * dt;
     e.y += e.vy * dt;
     e.rotation += e.rotationSpeed * dt;
   }
-  applyBleedDamage(state, dt);
+  applyBleedDamage(state, timeBefore, state.elapsedTime);
   for (const p of state.projectiles) {
     p.x += p.vx * dt;
     p.y += p.vy * dt;
@@ -374,17 +379,25 @@ export function updateState(state: GameState, dt: number): void {
 const PROJECTILE_HIT_RADIUS = 20;
 const BLEED_DURATION_SECONDS = 3;
 
-function applyBleedDamage(state: GameState, dt: number): void {
+function applyBleedDamage(
+  state: GameState,
+  timeBefore: number,
+  timeAfter: number
+): void {
+  const previousWholeSecond = Math.floor(timeBefore);
+
   for (const entity of state.entities) {
     if (entity.bleedStacks <= 0) continue;
 
-    const timerBefore = entity.bleedTimer;
-    entity.bleedTimer = Math.max(0, entity.bleedTimer - dt);
-    const bleedTicks = Math.ceil(timerBefore) - Math.ceil(entity.bleedTimer);
+    const cappedTimeAfter = Math.min(timeAfter, entity.bleedTimer);
+    const bleedTicks = Math.max(
+      0,
+      Math.floor(cappedTimeAfter) - previousWholeSecond
+    );
     if (bleedTicks > 0) {
-      entity.health -= entity.bleedStacks * bleedTicks;
+      entity.health -= bleedTicks * entity.bleedStacks;
     }
-    if (entity.bleedTimer <= 0) {
+    if (entity.bleedTimer <= timeAfter) {
       entity.bleedStacks = 0;
     }
   }
@@ -423,7 +436,7 @@ function checkProjectileCollisions(state: GameState): void {
           Math.random() < p.bleedApplicationChance
         ) {
           e.bleedStacks++;
-          e.bleedTimer = BLEED_DURATION_SECONDS;
+          e.bleedTimer = state.elapsedTime + BLEED_DURATION_SECONDS;
         }
         hit = true;
         break;
