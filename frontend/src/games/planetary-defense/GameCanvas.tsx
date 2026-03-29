@@ -3,6 +3,7 @@ import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
 import { handleTypedCharacter, startNextWave } from "./state";
 import { LabelOverlay } from "./LabelOverlay";
+import { DamageNumbers } from "./DamageNumbers";
 
 const PIXEL_FONT = "'Press Start 2P', monospace";
 
@@ -134,6 +135,7 @@ export const GameCanvas = () => {
       style={{ fontFamily: PIXEL_FONT }}
     >
       <LabelOverlay gameRef={gameRef} />
+      <DamageNumbers gameRef={gameRef} />
       <PlanetHealthBar ratio={healthRatio} />
       <div className="absolute top-3 left-3 z-10">
         <div
