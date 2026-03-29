@@ -39,6 +39,8 @@ export interface EntityState {
   typedCount: number;
   health: number;
   power: number;
+  bleedStacks: number;
+  bleedTimer: number;
   colorPreset?: ColorPreset;
   hasShield?: boolean;
   variant?: number;
@@ -62,6 +64,7 @@ export interface ProjectileState {
   vx: number;
   vy: number;
   damage: number;
+  bleedApplicationChance: number;
 }
 
 export enum WavePhase {
@@ -113,7 +116,11 @@ function createTowerSlots(): TowerSlot[] {
     const angle = (i * 2 * Math.PI) / TOWER_SLOT_COUNT - Math.PI / 2;
     const tower =
       i % 2 === 0
-        ? { type: TowerType.Gun, level: 1, charge: 0 }
+        ? {
+          type: i === 0 ? TowerType.Bleed : TowerType.Gun,
+          level: 1,
+          charge: 0,
+        }
         : null;
     slots.push({ angle, tower });
   }
@@ -197,6 +204,8 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
     typedCount: 0,
     health: config.health,
     power: config.power,
+    bleedStacks: 0,
+    bleedTimer: 0,
   };
 
   if (isShip) {
@@ -309,6 +318,7 @@ function fireTower(
     vx: (dx / dist) * config.projectileSpeed,
     vy: (dy / dist) * config.projectileSpeed,
     damage: config.damage,
+    bleedApplicationChance: config.bleedApplicationChance,
   });
 
   state.onTowerFired.emit();
@@ -350,6 +360,7 @@ export function updateState(state: GameState, dt: number): void {
     e.y += e.vy * dt;
     e.rotation += e.rotationSpeed * dt;
   }
+  applyBleedDamage(state, dt);
   for (const p of state.projectiles) {
     p.x += p.vx * dt;
     p.y += p.vy * dt;
@@ -360,6 +371,24 @@ export function updateState(state: GameState, dt: number): void {
 }
 
 const PROJECTILE_HIT_RADIUS = 20;
+const BLEED_DURATION_SECONDS = 3;
+
+function applyBleedDamage(state: GameState, dt: number): void {
+  for (let i = state.entities.length - 1; i >= 0; i--) {
+    const entity = state.entities[i];
+    if (entity.bleedStacks <= 0) continue;
+
+    entity.health -= entity.bleedStacks * dt;
+    entity.bleedTimer = Math.max(0, entity.bleedTimer - dt);
+    if (entity.bleedTimer === 0) {
+      entity.bleedStacks = 0;
+    }
+
+    if (entity.health <= 0) {
+      destroyEntity(state, i, true);
+    }
+  }
+}
 
 function checkProjectileCollisions(state: GameState): void {
   const hitR2 = PROJECTILE_HIT_RADIUS * PROJECTILE_HIT_RADIUS;
@@ -380,6 +409,13 @@ function checkProjectileCollisions(state: GameState): void {
       const dy = p.y - e.y;
       if (dx * dx + dy * dy < hitR2) {
         e.health -= p.damage;
+        if (
+          p.bleedApplicationChance > 0 &&
+          Math.random() < p.bleedApplicationChance
+        ) {
+          e.bleedStacks++;
+          e.bleedTimer = BLEED_DURATION_SECONDS;
+        }
         if (e.health <= 0) {
           destroyEntity(state, ei, true);
         }

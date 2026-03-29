@@ -1,11 +1,13 @@
 export enum TowerType {
   Gun,
+  Bleed,
 }
 
 export interface TowerTypeConfig {
   charsToFire: number;
   projectileSpeed: number;
   damage: number;
+  bleedApplicationChance: number;
 }
 
 export const TOWER_CONFIGS: Record<TowerType, TowerTypeConfig> = {
@@ -13,6 +15,13 @@ export const TOWER_CONFIGS: Record<TowerType, TowerTypeConfig> = {
     charsToFire: 4,
     projectileSpeed: 800,
     damage: 10,
+    bleedApplicationChance: 0,
+  },
+  [TowerType.Bleed]: {
+    charsToFire: 3,
+    projectileSpeed: 800,
+    damage: 10,
+    bleedApplicationChance: 0.2,
   },
 };
 
