@@ -30,8 +30,9 @@ class EnemyLabel {
     const untypedText = word.slice(typedCount);
     this.typedLabel.text = typedText;
     this.untypedLabel.text = untypedText;
-    const typedWidth = this.typedLabel.width;
-    const totalWidth = typedWidth + this.untypedLabel.width;
+    const typedWidth = Math.round(this.typedLabel.width);
+    const untypedWidth = Math.round(this.untypedLabel.width);
+    const totalWidth = typedWidth + untypedWidth;
     const startX = Math.round(centerX - totalWidth / 2);
     this.typedLabel.x = startX + typedWidth;
     this.untypedLabel.x = startX + typedWidth;
@@ -50,14 +51,12 @@ class EnemyLabelManager {
   private typedStyle = new TextStyle({
     fontFamily: PIXEL_FONT,
     fontSize: 16,
-    fontWeight: "bold",
     fill: 0x90ee90,
     stroke: { color: 0x000000, width: 4, join: "round" },
   });
   private untypedStyle = new TextStyle({
     fontFamily: PIXEL_FONT,
     fontSize: 16,
-    fontWeight: "bold",
     fill: 0xffffff,
     stroke: { color: 0x000000, width: 4, join: "round" },
   });

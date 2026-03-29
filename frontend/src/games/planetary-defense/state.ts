@@ -231,6 +231,25 @@ function applyTypedCharacter<T extends { word: string; typedCount: number }>(
   }
 }
 
+function rerollCompletedWords(state: GameState): void {
+  const usedWords = new Set([
+    ...state.ships.map((s) => s.word),
+    ...state.meteors.map((m) => m.word),
+  ]);
+  const langCode = getLangCode();
+  const reroll = (entities: { word: string; typedCount: number }[]) => {
+    for (const entity of entities) {
+      if (entity.typedCount >= entity.word.length) {
+        entity.word = getRandomWord(langCode, usedWords);
+        usedWords.add(entity.word);
+        entity.typedCount = 0;
+      }
+    }
+  };
+  reroll(state.ships);
+  reroll(state.meteors);
+}
+
 function destroyEntity<T>(
   state: GameState,
   entities: T[],
@@ -247,6 +266,7 @@ export function handleTypedCharacter(state: GameState, key: string): void {
   if (key.length !== 1) return;
   applyTypedCharacter(state.ships, key);
   applyTypedCharacter(state.meteors, key);
+  rerollCompletedWords(state);
   chargeTowers(state);
 }
 
