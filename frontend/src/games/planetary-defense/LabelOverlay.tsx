@@ -17,26 +17,18 @@ interface LabelDom {
 export const LabelOverlay = ({ gameRef }: { gameRef: React.RefObject<PlanetaryDefenseGame | null> }) => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const labelDomsRef = useRef(new Map<number, LabelDom>());
-  const shadowRef = useRef("");
+  const strokeRef = useRef("2px");
   const lastScaleRef = useRef(0);
 
   useEffect(() => {
     let animId: number;
 
-    const buildShadow = (s: number): string => {
-      return [
-        `${-s}px ${-s}px 0 #000`,
-        `${s}px ${-s}px 0 #000`,
-        `${-s}px ${s}px 0 #000`,
-        `${s}px ${s}px 0 #000`,
-        `0 ${-s}px 0 #000`,
-        `0 ${s}px 0 #000`,
-        `${-s}px 0 0 #000`,
-        `${s}px 0 0 #000`,
-      ].join(", ");
+    const applyStroke = (el: HTMLElement, strokePx: string) => {
+      el.style.setProperty("-webkit-text-stroke", `${strokePx} #000`);
+      el.style.paintOrder = "stroke fill";
     };
 
-    const createLabelDom = (overlay: HTMLDivElement, shadow: string, fontSize: string): LabelDom => {
+    const createLabelDom = (overlay: HTMLDivElement, strokePx: string, fontSize: string): LabelDom => {
       const container = document.createElement("div");
       container.style.position = "absolute";
       container.style.fontFamily = PIXEL_FONT;
@@ -44,15 +36,16 @@ export const LabelOverlay = ({ gameRef }: { gameRef: React.RefObject<PlanetaryDe
       container.style.pointerEvents = "none";
       container.style.transform = "translate(-50%, -100%)";
       container.style.fontSize = fontSize;
-      container.style.textShadow = shadow;
       container.style.lineHeight = "1";
 
       const typedSpan = document.createElement("span");
       typedSpan.style.color = TYPED_COLOR;
+      applyStroke(typedSpan, strokePx);
       container.appendChild(typedSpan);
 
       const untypedSpan = document.createElement("span");
       untypedSpan.style.color = UNTYPED_COLOR;
+      applyStroke(untypedSpan, strokePx);
       container.appendChild(untypedSpan);
 
       overlay.appendChild(container);
@@ -73,11 +66,11 @@ export const LabelOverlay = ({ gameRef }: { gameRef: React.RefObject<PlanetaryDe
 
       if (scale !== lastScaleRef.current) {
         lastScaleRef.current = scale;
-        const strokePx = Math.max(1, Math.round(2 * scale));
-        shadowRef.current = buildShadow(strokePx);
+        strokeRef.current = `${Math.max(1, Math.round(2 * scale))}px`;
         for (const dom of labelDomsRef.current.values()) {
           dom.container.style.fontSize = fontSizePx;
-          dom.container.style.textShadow = shadowRef.current;
+          applyStroke(dom.typedSpan, strokeRef.current);
+          applyStroke(dom.untypedSpan, strokeRef.current);
         }
       }
 
@@ -86,7 +79,7 @@ export const LabelOverlay = ({ gameRef }: { gameRef: React.RefObject<PlanetaryDe
         activeIds.add(label.id);
         let dom = labelDomsRef.current.get(label.id);
         if (!dom) {
-          dom = createLabelDom(overlay, shadowRef.current, fontSizePx);
+          dom = createLabelDom(overlay, strokeRef.current, fontSizePx);
           labelDomsRef.current.set(label.id, dom);
         }
 
