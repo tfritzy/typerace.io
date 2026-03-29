@@ -1,7 +1,7 @@
 import { Container, Sprite, Text, TextStyle } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState } from "./state";
-import { spawnShip, spawnMeteor } from "./state";
+import { WavePhase, spawnShip, spawnMeteor } from "./state";
 import { createShipContainer } from "./prefabs/shipPrefab";
 import { createMeteorSprite } from "./prefabs/meteorPrefab";
 import { PIXEL_FONT } from "./constants";
@@ -101,8 +101,6 @@ export class EnemyManager {
   private shipContainers = new Map<number, Container>();
   private meteorSprites = new Map<number, Sprite>();
   private activeEntityIds = new Set<number>();
-  private shipSpawnTimer = 0;
-  private meteorSpawnTimer = 0;
   private labelManager = new EnemyLabelManager();
 
   constructor(assets: AssetManager) {
@@ -112,16 +110,35 @@ export class EnemyManager {
   }
 
   update(state: GameState, dt: number): void {
-    this.shipSpawnTimer += dt;
-    if (this.shipSpawnTimer >= 9) {
-      this.shipSpawnTimer = 0;
-      spawnShip(state);
+    const wave = state.wave;
+
+    if (wave.phase === WavePhase.Spawning) {
+      wave.waveTimer += dt;
+
+      while (
+        wave.spawnIndex < wave.spawnQueue.length &&
+        wave.waveTimer >= wave.spawnQueue[wave.spawnIndex].spawnTime
+      ) {
+        const entry = wave.spawnQueue[wave.spawnIndex];
+        if (entry.kind === "ship") {
+          spawnShip(state, entry.shipType);
+        } else {
+          spawnMeteor(state, entry.meteorType);
+        }
+        wave.spawnIndex++;
+      }
+
+      if (wave.spawnIndex >= wave.spawnQueue.length) {
+        wave.phase = WavePhase.Clearing;
+        state.onWavePhaseChange.emit();
+      }
     }
 
-    this.meteorSpawnTimer += dt;
-    if (this.meteorSpawnTimer >= 4.5) {
-      this.meteorSpawnTimer = 0;
-      spawnMeteor(state);
+    if (wave.phase === WavePhase.Clearing) {
+      if (state.ships.length === 0 && state.meteors.length === 0) {
+        wave.phase = WavePhase.Idle;
+        state.onWavePhaseChange.emit();
+      }
     }
 
     this.syncRendering(state);

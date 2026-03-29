@@ -13,6 +13,7 @@ import {
   TOWER_ORBIT_RADIUS,
 } from "./towerConfig";
 import { METEOR_HEALTH, SHIP_HEALTH } from "./enemyConfig";
+import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
 
 export const PLANET_X = CANVAS_WIDTH / 2;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -74,6 +75,20 @@ export interface ProjectileState {
   damage: number;
 }
 
+export enum WavePhase {
+  Idle,
+  Spawning,
+  Clearing,
+}
+
+export interface WaveState {
+  wave: number;
+  phase: WavePhase;
+  spawnQueue: SpawnEntry[];
+  spawnIndex: number;
+  waveTimer: number;
+}
+
 export class GameEvent {
   private listeners = new Set<() => void>();
 
@@ -98,8 +113,10 @@ export interface GameState {
   enemiesKilled: number;
   planetHealth: number;
   maxPlanetHealth: number;
+  wave: WaveState;
   onPlanetDamaged: GameEvent;
   onTowerFired: GameEvent;
+  onWavePhaseChange: GameEvent;
 }
 
 function createTowerSlots(): TowerSlot[] {
@@ -125,8 +142,16 @@ export function createGameState(): GameState {
     enemiesKilled: 0,
     planetHealth: 100,
     maxPlanetHealth: 100,
+    wave: {
+      wave: 0,
+      phase: WavePhase.Idle,
+      spawnQueue: [],
+      spawnIndex: 0,
+      waveTimer: 0,
+    },
     onPlanetDamaged: new GameEvent(),
     onTowerFired: new GameEvent(),
+    onWavePhaseChange: new GameEvent(),
   };
 }
 
@@ -163,7 +188,7 @@ function getLangCode(): string {
   }
 }
 
-export function spawnShip(state: GameState): void {
+export function spawnShip(state: GameState, specificType?: ShipType): void {
   const { x, y } = spawnFromEdge();
   const speed = 30 + Math.random() * 40;
   const { vx, vy } = aimAtPlanet(x, y, speed);
@@ -172,7 +197,7 @@ export function spawnShip(state: GameState): void {
     ...state.meteors.map((meteor) => meteor.word),
   ]);
   const word = getRandomWord(getLangCode(), usedWords);
-  const shipType: ShipType = randInt(SHIP_TYPE_COUNT);
+  const shipType: ShipType = specificType ?? randInt(SHIP_TYPE_COUNT);
   state.ships.push({
     id: state.nextId++,
     x,
@@ -188,7 +213,7 @@ export function spawnShip(state: GameState): void {
   });
 }
 
-export function spawnMeteor(state: GameState): void {
+export function spawnMeteor(state: GameState, specificType?: MeteorType): void {
   const { x, y } = spawnFromEdge();
   const speed = 15 + Math.random() * 35;
   const { vx, vy } = aimAtPlanet(x, y, speed);
@@ -198,7 +223,7 @@ export function spawnMeteor(state: GameState): void {
     ...state.meteors.map((meteor) => meteor.word),
   ]);
   const word = getRandomWord(getLangCode(), usedWords);
-  const meteorType: MeteorType = randInt(METEOR_TYPE_COUNT);
+  const meteorType: MeteorType = specificType ?? randInt(METEOR_TYPE_COUNT);
   state.meteors.push({
     id: state.nextId++,
     x,
@@ -443,4 +468,13 @@ function checkProjectileCollisions(state: GameState): void {
       state.projectiles.splice(pi, 1);
     }
   }
+}
+
+export function startNextWave(state: GameState): void {
+  state.wave.wave++;
+  state.wave.spawnQueue = generateWaveSpawns(state.wave.wave);
+  state.wave.spawnIndex = 0;
+  state.wave.waveTimer = 0;
+  state.wave.phase = WavePhase.Spawning;
+  state.onWavePhaseChange.emit();
 }
