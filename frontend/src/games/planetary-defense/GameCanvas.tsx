@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
 import { handleTypedCharacter, startNextWave } from "./state";
+import { LabelOverlay } from "./LabelOverlay";
 
 const PIXEL_FONT = "'Press Start 2P', monospace";
 
@@ -132,6 +133,7 @@ export const GameCanvas = () => {
       className="w-full h-full relative"
       style={{ fontFamily: PIXEL_FONT }}
     >
+      <LabelOverlay gameRef={gameRef} />
       <PlanetHealthBar ratio={healthRatio} />
       <div className="absolute top-3 left-3 z-10">
         <div

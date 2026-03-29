@@ -1,106 +1,27 @@
-import { Container, Sprite, Text, TextStyle } from "pixi.js";
+import { Container } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState } from "./state";
 import { WavePhase, spawnEntity } from "./state";
 import { createShipContainer } from "./prefabs/shipPrefab";
 import { createMeteorSprite } from "./prefabs/meteorPrefab";
-import { PIXEL_FONT } from "./constants";
 import { SHIP_ENTITY_TYPES } from "./types";
 
-class EnemyLabel {
-  private typedLabel: Text;
-  private untypedLabel: Text;
-
-  constructor(layer: Container, typedStyle: TextStyle, untypedStyle: TextStyle) {
-    this.typedLabel = new Text({
-      text: "",
-      style: typedStyle,
-    });
-    this.untypedLabel = new Text({
-      text: "",
-      style: untypedStyle,
-    });
-    this.typedLabel.anchor.set(1, 1);
-    this.untypedLabel.anchor.set(0, 1);
-    layer.addChild(this.typedLabel);
-    layer.addChild(this.untypedLabel);
-  }
-
-  update(word: string, typedCount: number, centerX: number, y: number): void {
-    const typedText = word.slice(0, typedCount);
-    const untypedText = word.slice(typedCount);
-    this.typedLabel.text = typedText;
-    this.untypedLabel.text = untypedText;
-    const typedWidth = Math.round(this.typedLabel.width);
-    const untypedWidth = Math.round(this.untypedLabel.width);
-    const totalWidth = typedWidth + untypedWidth;
-    const startX = Math.round(centerX - totalWidth / 2);
-    this.typedLabel.x = startX + typedWidth;
-    this.untypedLabel.x = startX + typedWidth;
-    this.typedLabel.y = y;
-    this.untypedLabel.y = y;
-  }
-
-  destroy(): void {
-    this.typedLabel.destroy();
-    this.untypedLabel.destroy();
-  }
-}
-
-class EnemyLabelManager {
-  private labels = new Map<number, EnemyLabel>();
-  private typedStyle = new TextStyle({
-    fontFamily: PIXEL_FONT,
-    fontSize: 16,
-    fill: 0x90ee90,
-    stroke: { color: 0x000000, width: 4, join: "round" },
-  });
-  private untypedStyle = new TextStyle({
-    fontFamily: PIXEL_FONT,
-    fontSize: 16,
-    fill: 0xffffff,
-    stroke: { color: 0x000000, width: 4, join: "round" },
-  });
-
-  update(
-    id: number,
-    layer: Container,
-    word: string,
-    typedCount: number,
-    centerX: number,
-    y: number
-  ): void {
-    let label = this.labels.get(id);
-    if (!label) {
-      label = new EnemyLabel(layer, this.typedStyle, this.untypedStyle);
-      this.labels.set(id, label);
-    }
-    label.update(word, typedCount, centerX, y);
-  }
-
-  removeMissing(activeIds: Set<number>): void {
-    for (const [id, label] of this.labels) {
-      if (activeIds.has(id)) continue;
-      label.destroy();
-      this.labels.delete(id);
-    }
-  }
-
-  destroy(): void {
-    for (const label of this.labels.values()) {
-      label.destroy();
-    }
-    this.labels.clear();
-  }
+export interface LabelData {
+  id: number;
+  word: string;
+  typedCount: number;
+  x: number;
+  y: number;
 }
 
 export class EnemyManager {
   readonly layer: Container;
 
+  labels: LabelData[] = [];
+
   private assets: AssetManager;
   private entityDisplayObjects = new Map<number, Container>();
   private activeEntityIds = new Set<number>();
-  private labelManager = new EnemyLabelManager();
 
   constructor(assets: AssetManager) {
     this.assets = assets;
@@ -153,6 +74,7 @@ export class EnemyManager {
 
   private syncRendering(state: GameState): void {
     this.activeEntityIds.clear();
+    this.labels.length = 0;
 
     for (const entity of state.entities) {
       this.activeEntityIds.add(entity.id);
@@ -172,14 +94,7 @@ export class EnemyManager {
       }
 
       const labelOffset = SHIP_ENTITY_TYPES.includes(entity.entityType) ? -24 : -20;
-      this.labelManager.update(
-        entity.id,
-        this.layer,
-        entity.word,
-        entity.typedCount,
-        entity.x,
-        entity.y + labelOffset
-      );
+      this.labels.push({ id: entity.id, word: entity.word, typedCount: entity.typedCount, x: entity.x, y: entity.y + labelOffset });
     }
 
     for (const [id, display] of this.entityDisplayObjects) {
@@ -188,13 +103,12 @@ export class EnemyManager {
         this.entityDisplayObjects.delete(id);
       }
     }
-    this.labelManager.removeMissing(this.activeEntityIds);
   }
 
   destroy(): void {
     for (const d of this.entityDisplayObjects.values()) d.destroy();
     this.entityDisplayObjects.clear();
-    this.labelManager.destroy();
+    this.labels.length = 0;
     this.layer.destroy();
   }
 }
