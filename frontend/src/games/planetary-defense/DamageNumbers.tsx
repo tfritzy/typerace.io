@@ -28,7 +28,7 @@ export const DamageNumbers = ({
 
   useEffect(() => {
     let unsub: (() => void) | null = null;
-    let animId: number;
+    let animId = 0;
 
     const trySubscribe = () => {
       const game = gameRef.current;
@@ -111,8 +111,8 @@ export const DamageNumbers = ({
               fontSize: `${BASE_FONT_SIZE}px`,
               fontWeight: 400,
               color: n.killed ? "#fbbf24" : "#ffffff",
-              ["--dx" as string]: `${n.dx}px`,
-              ["--dy" as string]: `${n.dy}px`,
+              "--dx": `${n.dx}px`,
+              "--dy": `${n.dy}px`,
               animation: `damage-pop ${DURATION_MS}ms ease-out forwards`,
               WebkitTextStroke: "2px #000",
               paintOrder: "stroke fill",
