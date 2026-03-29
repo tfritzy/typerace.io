@@ -39,18 +39,19 @@ export class PlanetaryDefenseGame {
 
   private async waitForPixelFont(): Promise<void> {
     if (typeof document === "undefined" || !("fonts" in document)) return;
-    let timedOut = false;
-    await Promise.race([
-      document.fonts.load(`16px "${PIXEL_FONT_FAMILY}"`),
-      new Promise<void>((resolve) =>
-        setTimeout(() => {
-          timedOut = true;
-          resolve();
-        }, 1000)
-      ),
-    ]);
-    if (timedOut) {
-      console.warn(`Timed out loading font "${PIXEL_FONT_FAMILY}" for Planetary Defense labels.`);
+    try {
+      const font = new FontFace(
+        PIXEL_FONT_FAMILY,
+        "url(/fonts/press-start-2p.ttf)"
+      );
+      const loaded = await Promise.race([
+        font.load(),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 2000)),
+      ]);
+      if (loaded) {
+        document.fonts.add(font);
+      }
+    } catch {
     }
   }
 
@@ -109,12 +110,14 @@ export async function createPlanetaryDefenseGame(
     antialias: false,
     resolution,
     autoDensity: true,
+    roundPixels: true,
     preserveDrawingBuffer: true,
   });
 
   app.canvas.style.width = "100%";
   app.canvas.style.height = "auto";
   app.canvas.style.aspectRatio = "16/9";
+  app.canvas.style.imageRendering = "pixelated";
   container.appendChild(app.canvas);
 
   const game = new PlanetaryDefenseGame(app);
