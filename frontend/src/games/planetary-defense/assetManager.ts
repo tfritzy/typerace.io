@@ -1,5 +1,8 @@
 import { Assets, type AssetsManifest, type Spritesheet, type Texture } from "pixi.js";
-import { EngineType, ColorPreset, MeteorType, ShipType } from "./types";
+import {
+  EngineType, ColorPreset,
+  type EntityType, SHIP_ENTITY_TYPES,
+} from "./types";
 import { applyPaletteSwap } from "./ships";
 
 const ENGINE_ALIASES: Record<EngineType, string> = {
@@ -13,11 +16,11 @@ const ENGINE_ALIASES: Record<EngineType, string> = {
   [EngineType.Engine4Small]: "engine-4-small",
 };
 
-const METEOR_ALIASES: Record<MeteorType, string> = {
-  [MeteorType.LargeBrown]: "asteroids-big-brown",
-  [MeteorType.LargeWhite]: "asteroids-big-white",
-  [MeteorType.SmallBrown]: "asteroids-small-brown",
-  [MeteorType.SmallWhite]: "asteroids-small-white",
+const METEOR_ALIASES: Partial<Record<EntityType, string>> = {
+  MeteorLargeBrown: "asteroids-big-brown",
+  MeteorLargeWhite: "asteroids-big-white",
+  MeteorSmallBrown: "asteroids-small-brown",
+  MeteorSmallWhite: "asteroids-small-white",
 };
 
 const COLOR_PRESET_ALIASES: Record<ColorPreset, string> = {
@@ -84,9 +87,10 @@ export class AssetManager {
     return this.starsParticle_;
   }
 
-  getShipTexture(shipType: ShipType, colorPreset: ColorPreset): Texture {
-    const shipFrame = `ship-${shipType}`;
-    const cmFrame = `cm-${shipType}`;
+  getShipTexture(entityType: EntityType, colorPreset: ColorPreset): Texture {
+    const frameIndex = SHIP_ENTITY_TYPES.indexOf(entityType);
+    const shipFrame = `ship-${frameIndex}`;
+    const cmFrame = `cm-${frameIndex}`;
     const presetAlias = COLOR_PRESET_ALIASES[colorPreset];
     return applyPaletteSwap(
       this.spaceships_.textures[shipFrame],
@@ -95,8 +99,9 @@ export class AssetManager {
     );
   }
 
-  getShieldTexture(shipType: ShipType): Texture {
-    return this.spaceshipsShield_.textures[`shield-${shipType}`];
+  getShieldTexture(entityType: EntityType): Texture {
+    const frameIndex = SHIP_ENTITY_TYPES.indexOf(entityType);
+    return this.spaceshipsShield_.textures[`shield-${frameIndex}`];
   }
 
   getEngineFrames(engineType: EngineType): Texture[] {
@@ -105,8 +110,8 @@ export class AssetManager {
     return sheet.animations[alias];
   }
 
-  getMeteorTexture(meteorType: MeteorType, variant: number): Texture {
-    const alias = METEOR_ALIASES[meteorType];
+  getMeteorTexture(entityType: EntityType, variant: number): Texture {
+    const alias = METEOR_ALIASES[entityType]!;
     const sheet = this.asteroids_[alias];
     const textures = Object.values(sheet.textures);
     return textures[variant % textures.length];

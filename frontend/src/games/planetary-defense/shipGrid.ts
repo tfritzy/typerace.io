@@ -1,22 +1,11 @@
 import { Application, Container, Sprite, Text, TextStyle } from "pixi.js";
 import { MANIFEST } from "./manifest";
 import { AssetManager } from "./assetManager";
-import { ShipType, ColorPreset, SHIP_TYPE_COUNT } from "./types";
-
-const SHIP_NAMES: string[] = [
-  "Vanguard", "Sentinel", "Corsair", "Falcon", "Scout", "Dart", "Wasp", "Phoenix",
-  "Hawk", "Sparrow", "Gnat", "Stinger", "Needle", "Mite", "Titan", "Raptor",
-  "Lance", "Javelin", "Pip", "Raven", "Osprey", "Leviathan", "Talon", "Hornet",
-  "Behemoth", "Dreadnought", "Marauder", "Eagle", "Pike", "Arrow", "Juggernaut", "Warden",
-  "Specter", "Harrier", "Viper", "Flea", "Broadside", "Kestrel", "Finch", "Striker",
-  "Robin", "Cricket", "Moth", "Colossus", "Cutlass", "Sabre", "Mantis", "Speck",
-  "Crest", "Piston", "Vulture", "Orb", "Flicker", "Barb", "Sliver", "Flagship",
-  "Aegis", "Bolt", "Spur", "Dot", "Rampart", "Clipper",
-];
+import { ColorPreset, SHIP_ENTITY_TYPES } from "./types";
 
 export async function createShipGrid(container: HTMLElement): Promise<Application> {
   const cols = 8;
-  const rows = Math.ceil(SHIP_TYPE_COUNT / cols);
+  const rows = Math.ceil(SHIP_ENTITY_TYPES.length / cols);
   const cellW = 200;
   const cellH = 120;
   const width = cols * cellW;
@@ -44,14 +33,14 @@ export async function createShipGrid(container: HTMLElement): Promise<Applicatio
     fontFamily: "monospace",
   });
 
-  for (let i = 0; i < SHIP_TYPE_COUNT; i++) {
+  for (let i = 0; i < SHIP_ENTITY_TYPES.length; i++) {
     const col = i % cols;
     const row = Math.floor(i / cols);
     const cx = col * cellW + cellW / 2;
     const cy = row * cellH + cellH / 2;
 
-    const shipType = i as ShipType;
-    const shipTexture = assets.getShipTexture(shipType, ColorPreset.Preset1);
+    const entityType = SHIP_ENTITY_TYPES[i];
+    const shipTexture = assets.getShipTexture(entityType, ColorPreset.Preset1);
     const shipSprite = new Sprite(shipTexture);
     shipSprite.anchor.set(0.5);
 
@@ -64,7 +53,7 @@ export async function createShipGrid(container: HTMLElement): Promise<Applicatio
     app.stage.addChild(shipContainer);
 
     const label = new Text({
-      text: `${i}: ${SHIP_NAMES[i]}`,
+      text: `${i}: ${entityType}`,
       style: labelStyle,
     });
     label.x = col * cellW + 4;
