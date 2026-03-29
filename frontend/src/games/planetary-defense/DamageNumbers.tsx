@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { PlanetaryDefenseGame } from "./game";
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT } from "./constants";
 import type { DamageData } from "./state";
 
-const PIXEL_FONT = "'Press Start 2P', monospace";
 const DURATION_MS = 900;
 const FLY_DISTANCE = 60;
-const BASE_FONT_SIZE = 18;
+const BASE_FONT_SIZE = 12;
 
 interface DamageNumber {
   id: number;
@@ -39,7 +38,7 @@ export const DamageNumbers = ({
 
       unsub = game.state.onDamageDealt.subscribe((data: DamageData) => {
         const id = nextIdRef.current++;
-        const angle = Math.random() * Math.PI * 2;
+        const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI;
         const dx = Math.cos(angle) * FLY_DISTANCE;
         const dy = Math.sin(angle) * FLY_DISTANCE;
         setNumbers((prev) => [
