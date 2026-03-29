@@ -2,6 +2,7 @@ import { ShipType, MeteorType } from "./types";
 import { SHIP_HEALTH, METEOR_HEALTH } from "./enemyConfig";
 
 export const WAVE_SPAWN_DURATION = 15;
+const MIN_ENEMY_POWER = 10;
 
 interface EnemyEntry {
   kind: "ship" | "meteor";
@@ -36,7 +37,7 @@ export interface SpawnEntry {
 
 export function generateWaveSpawns(wave: number): SpawnEntry[] {
   const totalPower = calculateWavePower(wave);
-  const maxSinglePower = Math.max(10, Math.floor(totalPower * 0.4));
+  const maxSinglePower = Math.max(MIN_ENEMY_POWER, Math.floor(totalPower * 0.4));
 
   const eligible = ENEMY_CATALOG.filter((e) => e.health <= maxSinglePower);
   if (eligible.length === 0) return [];
@@ -63,7 +64,7 @@ export function generateWaveSpawns(wave: number): SpawnEntry[] {
   }
 
   const interval =
-    enemies.length > 1 ? WAVE_SPAWN_DURATION / enemies.length : 0;
+    enemies.length > 1 ? WAVE_SPAWN_DURATION / (enemies.length - 1) : 0;
 
   return enemies.map((e, i) => ({
     ...e,
