@@ -7,6 +7,7 @@ import { EnemyManager } from "./EnemyManager";
 import type { LabelData } from "./EnemyManager";
 import { TowerManager } from "./TowerManager";
 import { ProjectileManager } from "./ProjectileManager";
+import { DamageNumberManager } from "./DamageNumberManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState } from "./state";
 import type { GameState } from "./state";
@@ -23,6 +24,7 @@ export class PlanetaryDefenseGame {
   private enemyManager!: EnemyManager;
   private towerManager!: TowerManager;
   private projectileManager!: ProjectileManager;
+  private damageNumberManager!: DamageNumberManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
@@ -78,6 +80,10 @@ export class PlanetaryDefenseGame {
     this.projectileManager = new ProjectileManager();
     world.addChild(this.projectileManager.container);
 
+    this.damageNumberManager = new DamageNumberManager();
+    this.damageNumberManager.subscribe(this.state);
+    world.addChild(this.damageNumberManager.container);
+
     this.enemyManager = new EnemyManager(this.assetManager);
     world.addChild(this.enemyManager.layer);
   }
@@ -88,6 +94,7 @@ export class PlanetaryDefenseGame {
     this.enemyManager.update(this.state, dt);
     this.towerManager.update(this.state);
     this.projectileManager.update(this.state);
+    this.damageNumberManager.update(dt);
   }
 
   destroy(): void {
@@ -99,6 +106,7 @@ export class PlanetaryDefenseGame {
     this.planetManager.destroy();
     this.towerManager.destroy();
     this.projectileManager.destroy();
+    this.damageNumberManager.destroy();
     this.enemyManager.destroy();
     this.app.destroy(true);
   }
