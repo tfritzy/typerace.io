@@ -1,7 +1,7 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import {
-  EntityType, ColorPreset,
-  COLOR_PRESET_COUNT, isShipEntityType,
+  type EntityType, ColorPreset,
+  COLOR_PRESET_COUNT, SHIP_ENTITY_TYPES,
 } from "./types";
 import { randInt } from "./utils";
 import { getLanguageFromSlug } from "../../utils/modes";
@@ -182,7 +182,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
   const usedWords = new Set(state.entities.map((e) => e.word));
   const word = getRandomWord(getLangCode(), usedWords);
   const rotDir = Math.random() > 0.5 ? 1 : -1;
-  const isShip = isShipEntityType(config.entityType);
+  const isShip = SHIP_ENTITY_TYPES.includes(config.entityType);
 
   const entity: EntityState = {
     id: state.nextId++,

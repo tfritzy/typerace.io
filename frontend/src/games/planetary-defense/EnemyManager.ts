@@ -5,7 +5,7 @@ import { WavePhase, spawnEntity } from "./state";
 import { createShipContainer } from "./prefabs/shipPrefab";
 import { createMeteorSprite } from "./prefabs/meteorPrefab";
 import { PIXEL_FONT } from "./constants";
-import { isShipEntityType } from "./types";
+import { SHIP_ENTITY_TYPES } from "./types";
 
 class EnemyLabel {
   private typedLabel: Text;
@@ -145,7 +145,7 @@ export class EnemyManager {
   }
 
   private createDisplayObject(entity: EntityState): Container {
-    if (isShipEntityType(entity.entityType)) {
+    if (SHIP_ENTITY_TYPES.includes(entity.entityType)) {
       return createShipContainer(this.assets, entity);
     }
     return createMeteorSprite(this.assets, entity);
@@ -165,13 +165,13 @@ export class EnemyManager {
       display.x = entity.x;
       display.y = entity.y;
 
-      if (isShipEntityType(entity.entityType)) {
+      if (SHIP_ENTITY_TYPES.includes(entity.entityType)) {
         display.rotation = Math.atan2(entity.vy, entity.vx);
       } else {
         display.rotation = entity.rotation;
       }
 
-      const labelOffset = isShipEntityType(entity.entityType) ? -24 : -20;
+      const labelOffset = SHIP_ENTITY_TYPES.includes(entity.entityType) ? -24 : -20;
       this.labelManager.update(
         entity.id,
         this.layer,
