@@ -4,11 +4,14 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
 import { Background } from "./Background";
 import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
+import type { LabelData } from "./EnemyManager";
 import { TowerManager } from "./TowerManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState } from "./state";
 import type { GameState } from "./state";
+
+export type { LabelData };
 
 export class PlanetaryDefenseGame {
   private app: Application;
@@ -26,6 +29,10 @@ export class PlanetaryDefenseGame {
   constructor(app: Application) {
     this.app = app;
     this.state = createGameState();
+  }
+
+  get labels(): LabelData[] {
+    return this.enemyManager?.labels ?? [];
   }
 
   async init(): Promise<void> {
