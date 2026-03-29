@@ -72,8 +72,7 @@ export class PlanetaryDefenseGame {
     world.addChild(this.projectileManager.container);
 
     this.enemyManager = new EnemyManager(this.assetManager);
-    world.addChild(this.enemyManager.meteorLayer);
-    world.addChild(this.enemyManager.shipLayer);
+    world.addChild(this.enemyManager.layer);
   }
 
   private update(dt: number): void {

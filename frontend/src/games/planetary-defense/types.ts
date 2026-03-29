@@ -1,70 +1,3 @@
-export enum ShipType {
-  Vanguard,
-  Sentinel,
-  Corsair,
-  Falcon,
-  Scout,
-  Dart,
-  Wasp,
-  Phoenix,
-  Hawk,
-  Sparrow,
-  Gnat,
-  Stinger,
-  Needle,
-  Mite,
-  Titan,
-  Raptor,
-  Lance,
-  Javelin,
-  Pip,
-  Raven,
-  Osprey,
-  Leviathan,
-  Talon,
-  Hornet,
-  Behemoth,
-  Dreadnought,
-  Marauder,
-  Eagle,
-  Pike,
-  Arrow,
-  Juggernaut,
-  Warden,
-  Specter,
-  Harrier,
-  Viper,
-  Flea,
-  Broadside,
-  Kestrel,
-  Finch,
-  Striker,
-  Robin,
-  Cricket,
-  Moth,
-  Colossus,
-  Cutlass,
-  Sabre,
-  Mantis,
-  Speck,
-  Crest,
-  Piston,
-  Vulture,
-  Orb,
-  Flicker,
-  Barb,
-  Sliver,
-  Flagship,
-  Aegis,
-  Bolt,
-  Spur,
-  Dot,
-  Rampart,
-  Clipper,
-}
-
-export const SHIP_TYPE_COUNT = 62;
-
 export enum EngineType {
   Engine1Big,
   Engine1Small,
@@ -85,11 +18,25 @@ export enum ColorPreset {
 
 export const COLOR_PRESET_COUNT = 4;
 
-export enum MeteorType {
-  LargeBrown,
-  LargeWhite,
-  SmallBrown,
-  SmallWhite,
-}
+export const METEOR_ENTITY_TYPES = [
+  "MeteorSmallBrown",
+  "MeteorSmallWhite",
+  "MeteorLargeBrown",
+  "MeteorLargeWhite",
+] as const;
 
-export const METEOR_TYPE_COUNT = 4;
+export const SHIP_ENTITY_TYPES = [
+  "Vanguard", "Sentinel", "Corsair", "Falcon", "Scout", "Dart", "Wasp",
+  "Phoenix", "Hawk", "Sparrow", "Gnat", "Stinger", "Needle", "Mite",
+  "Titan", "Raptor", "Lance", "Javelin", "Pip", "Raven", "Osprey",
+  "Leviathan", "Talon", "Hornet", "Behemoth", "Dreadnought", "Marauder",
+  "Eagle", "Pike", "Arrow", "Juggernaut", "Warden", "Specter", "Harrier",
+  "Viper", "Flea", "Broadside", "Kestrel", "Finch", "Striker", "Robin",
+  "Cricket", "Moth", "Colossus", "Cutlass", "Sabre", "Mantis", "Speck",
+  "Crest", "Piston", "Vulture", "Orb", "Flicker", "Barb", "Sliver",
+  "Flagship", "Aegis", "Bolt", "Spur", "Dot", "Rampart", "Clipper",
+] as const;
+
+export type EntityType =
+  | (typeof METEOR_ENTITY_TYPES)[number]
+  | (typeof SHIP_ENTITY_TYPES)[number];

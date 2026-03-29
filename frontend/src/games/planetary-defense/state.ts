@@ -1,7 +1,7 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import {
-  ShipType, ColorPreset, MeteorType,
-  SHIP_TYPE_COUNT, COLOR_PRESET_COUNT, METEOR_TYPE_COUNT,
+  type EntityType, ColorPreset,
+  COLOR_PRESET_COUNT, SHIP_ENTITY_TYPES,
 } from "./types";
 import { randInt } from "./utils";
 import { getLanguageFromSlug } from "../../utils/modes";
@@ -12,7 +12,8 @@ import {
   TOWER_SLOT_COUNT,
   TOWER_ORBIT_RADIUS,
 } from "./towerConfig";
-import { METEOR_HEALTH, SHIP_HEALTH } from "./enemyConfig";
+import { type EnemyConfig } from "./enemyConfig";
+import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
 
 export const PLANET_X = CANVAS_WIDTH / 2;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -25,33 +26,22 @@ export function getTowerPosition(slot: TowerSlot): { x: number; y: number } {
   };
 }
 
-export interface ShipState {
+export interface EntityState {
   id: number;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  shipType: ShipType;
-  colorPreset: ColorPreset;
-  hasShield: boolean;
-  word: string;
-  typedCount: number;
-  health: number;
-}
-
-export interface MeteorState {
-  id: number;
+  entityType: EntityType;
   x: number;
   y: number;
   vx: number;
   vy: number;
   rotation: number;
   rotationSpeed: number;
-  meteorType: MeteorType;
-  variant: number;
   word: string;
   typedCount: number;
   health: number;
+  power: number;
+  colorPreset?: ColorPreset;
+  hasShield?: boolean;
+  variant?: number;
 }
 
 export interface TowerState {
@@ -74,6 +64,20 @@ export interface ProjectileState {
   damage: number;
 }
 
+export enum WavePhase {
+  Idle,
+  Spawning,
+  Clearing,
+}
+
+export interface WaveState {
+  wave: number;
+  phase: WavePhase;
+  spawnQueue: SpawnEntry[];
+  spawnIndex: number;
+  waveTimer: number;
+}
+
 export class GameEvent {
   private listeners = new Set<() => void>();
 
@@ -90,16 +94,17 @@ export class GameEvent {
 }
 
 export interface GameState {
-  ships: ShipState[];
-  meteors: MeteorState[];
+  entities: EntityState[];
   towerSlots: TowerSlot[];
   projectiles: ProjectileState[];
   nextId: number;
   enemiesKilled: number;
   planetHealth: number;
   maxPlanetHealth: number;
+  wave: WaveState;
   onPlanetDamaged: GameEvent;
   onTowerFired: GameEvent;
+  onWaveComplete: GameEvent;
 }
 
 function createTowerSlots(): TowerSlot[] {
@@ -117,16 +122,23 @@ function createTowerSlots(): TowerSlot[] {
 
 export function createGameState(): GameState {
   return {
-    ships: [],
-    meteors: [],
+    entities: [],
     towerSlots: createTowerSlots(),
     projectiles: [],
     nextId: 1,
     enemiesKilled: 0,
     planetHealth: 100,
     maxPlanetHealth: 100,
+    wave: {
+      wave: 0,
+      phase: WavePhase.Idle,
+      spawnQueue: [],
+      spawnIndex: 0,
+      waveTimer: 0,
+    },
     onPlanetDamaged: new GameEvent(),
     onTowerFired: new GameEvent(),
+    onWaveComplete: new GameEvent(),
   };
 }
 
@@ -163,60 +175,42 @@ function getLangCode(): string {
   }
 }
 
-export function spawnShip(state: GameState): void {
+export function spawnEntity(state: GameState, config: EnemyConfig): void {
   const { x, y } = spawnFromEdge();
-  const speed = 30 + Math.random() * 40;
+  const speed = 20 + Math.random() * 35;
   const { vx, vy } = aimAtPlanet(x, y, speed);
-  const usedWords = new Set([
-    ...state.ships.map((ship) => ship.word),
-    ...state.meteors.map((meteor) => meteor.word),
-  ]);
+  const usedWords = new Set(state.entities.map((e) => e.word));
   const word = getRandomWord(getLangCode(), usedWords);
-  const shipType: ShipType = randInt(SHIP_TYPE_COUNT);
-  state.ships.push({
-    id: state.nextId++,
-    x,
-    y,
-    vx,
-    vy,
-    shipType,
-    colorPreset: randInt(COLOR_PRESET_COUNT),
-    hasShield: Math.random() > 0.5,
-    word,
-    typedCount: 0,
-    health: SHIP_HEALTH[shipType],
-  });
-}
-
-export function spawnMeteor(state: GameState): void {
-  const { x, y } = spawnFromEdge();
-  const speed = 15 + Math.random() * 35;
-  const { vx, vy } = aimAtPlanet(x, y, speed);
   const rotDir = Math.random() > 0.5 ? 1 : -1;
-  const usedWords = new Set([
-    ...state.ships.map((ship) => ship.word),
-    ...state.meteors.map((meteor) => meteor.word),
-  ]);
-  const word = getRandomWord(getLangCode(), usedWords);
-  const meteorType: MeteorType = randInt(METEOR_TYPE_COUNT);
-  state.meteors.push({
+  const isShip = SHIP_ENTITY_TYPES.includes(config.entityType);
+
+  const entity: EntityState = {
     id: state.nextId++,
+    entityType: config.entityType,
     x,
     y,
     vx,
     vy,
     rotation: 0,
-    rotationSpeed: (0.5 + Math.random() * 1.5) * rotDir,
-    meteorType,
-    variant: randInt(16),
+    rotationSpeed: isShip ? 0 : (0.5 + Math.random() * 1.5) * rotDir,
     word,
     typedCount: 0,
-    health: METEOR_HEALTH[meteorType],
-  });
+    health: config.health,
+    power: config.power,
+  };
+
+  if (isShip) {
+    entity.colorPreset = randInt(COLOR_PRESET_COUNT);
+    entity.hasShield = Math.random() > 0.5;
+  } else {
+    entity.variant = randInt(16);
+  }
+
+  state.entities.push(entity);
 }
 
-function applyTypedCharacter<T extends { word: string; typedCount: number }>(
-  entities: T[],
+function applyTypedCharacter(
+  entities: EntityState[],
   key: string
 ): void {
   const normalizedKey = key.toLowerCase();
@@ -232,40 +226,31 @@ function applyTypedCharacter<T extends { word: string; typedCount: number }>(
 }
 
 function rerollCompletedWords(state: GameState): void {
-  const usedWords = new Set([
-    ...state.ships.map((s) => s.word),
-    ...state.meteors.map((m) => m.word),
-  ]);
+  const usedWords = new Set(state.entities.map((e) => e.word));
   const langCode = getLangCode();
-  const reroll = (entities: { word: string; typedCount: number }[]) => {
-    for (const entity of entities) {
-      if (entity.typedCount >= entity.word.length) {
-        entity.word = getRandomWord(langCode, usedWords);
-        usedWords.add(entity.word);
-        entity.typedCount = 0;
-      }
+  for (const entity of state.entities) {
+    if (entity.typedCount >= entity.word.length) {
+      entity.word = getRandomWord(langCode, usedWords);
+      usedWords.add(entity.word);
+      entity.typedCount = 0;
     }
-  };
-  reroll(state.ships);
-  reroll(state.meteors);
+  }
 }
 
-function destroyEntity<T>(
+function destroyEntity(
   state: GameState,
-  entities: T[],
   index: number,
   killed: boolean
 ): void {
   if (killed) {
     state.enemiesKilled++;
   }
-  entities.splice(index, 1);
+  state.entities.splice(index, 1);
 }
 
 export function handleTypedCharacter(state: GameState, key: string): void {
   if (key.length !== 1) return;
-  applyTypedCharacter(state.ships, key);
-  applyTypedCharacter(state.meteors, key);
+  applyTypedCharacter(state.entities, key);
   rerollCompletedWords(state);
   chargeTowers(state);
 }
@@ -283,11 +268,8 @@ function findTypedTargetInSector(
   state: GameState,
   slot: TowerSlot
 ): { x: number; y: number } | null {
-  for (const ship of state.ships) {
-    if (ship.typedCount > 0 && isInSector(slot, ship.x, ship.y)) return ship;
-  }
-  for (const meteor of state.meteors) {
-    if (meteor.typedCount > 0 && isInSector(slot, meteor.x, meteor.y)) return meteor;
+  for (const entity of state.entities) {
+    if (entity.typedCount > 0 && isInSector(slot, entity.x, entity.y)) return entity;
   }
   return null;
 }
@@ -346,29 +328,16 @@ function checkCollisions(state: GameState): void {
   const r2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
   let damaged = false;
 
-  for (let i = state.ships.length - 1; i >= 0; i--) {
-    const s = state.ships[i];
-    const dx = s.x - PLANET_X;
-    const dy = s.y - PLANET_Y;
-    if (dx * dx + dy * dy < r2) {
-      state.planetHealth = Math.max(0, state.planetHealth - 5);
-      destroyEntity(state, state.ships, i, false);
-      damaged = true;
-    } else if (!isInBounds(s.x, s.y)) {
-      destroyEntity(state, state.ships, i, false);
-    }
-  }
-
-  for (let i = state.meteors.length - 1; i >= 0; i--) {
-    const m = state.meteors[i];
-    const dx = m.x - PLANET_X;
-    const dy = m.y - PLANET_Y;
+  for (let i = state.entities.length - 1; i >= 0; i--) {
+    const e = state.entities[i];
+    const dx = e.x - PLANET_X;
+    const dy = e.y - PLANET_Y;
     if (dx * dx + dy * dy < r2) {
       state.planetHealth = Math.max(0, state.planetHealth - 3);
-      destroyEntity(state, state.meteors, i, false);
+      destroyEntity(state, i, false);
       damaged = true;
-    } else if (!isInBounds(m.x, m.y)) {
-      destroyEntity(state, state.meteors, i, false);
+    } else if (!isInBounds(e.x, e.y)) {
+      destroyEntity(state, i, false);
     }
   }
 
@@ -376,14 +345,10 @@ function checkCollisions(state: GameState): void {
 }
 
 export function updateState(state: GameState, dt: number): void {
-  for (const ship of state.ships) {
-    ship.x += ship.vx * dt;
-    ship.y += ship.vy * dt;
-  }
-  for (const m of state.meteors) {
-    m.x += m.vx * dt;
-    m.y += m.vy * dt;
-    m.rotation += m.rotationSpeed * dt;
+  for (const e of state.entities) {
+    e.x += e.vx * dt;
+    e.y += e.vy * dt;
+    e.rotation += e.rotationSpeed * dt;
   }
   for (const p of state.projectiles) {
     p.x += p.vx * dt;
@@ -409,33 +374,17 @@ function checkProjectileCollisions(state: GameState): void {
 
     let hit = false;
 
-    for (let si = state.ships.length - 1; si >= 0; si--) {
-      const s = state.ships[si];
-      const dx = p.x - s.x;
-      const dy = p.y - s.y;
+    for (let ei = state.entities.length - 1; ei >= 0; ei--) {
+      const e = state.entities[ei];
+      const dx = p.x - e.x;
+      const dy = p.y - e.y;
       if (dx * dx + dy * dy < hitR2) {
-        s.health -= p.damage;
-        if (s.health <= 0) {
-          destroyEntity(state, state.ships, si, true);
+        e.health -= p.damage;
+        if (e.health <= 0) {
+          destroyEntity(state, ei, true);
         }
         hit = true;
         break;
-      }
-    }
-
-    if (!hit) {
-      for (let mi = state.meteors.length - 1; mi >= 0; mi--) {
-        const m = state.meteors[mi];
-        const dx = p.x - m.x;
-        const dy = p.y - m.y;
-        if (dx * dx + dy * dy < hitR2) {
-          m.health -= p.damage;
-          if (m.health <= 0) {
-            destroyEntity(state, state.meteors, mi, true);
-          }
-          hit = true;
-          break;
-        }
       }
     }
 
@@ -443,4 +392,12 @@ function checkProjectileCollisions(state: GameState): void {
       state.projectiles.splice(pi, 1);
     }
   }
+}
+
+export function startNextWave(state: GameState): void {
+  state.wave.wave++;
+  state.wave.spawnQueue = generateWaveSpawns(state.wave.wave);
+  state.wave.spawnIndex = 0;
+  state.wave.waveTimer = 0;
+  state.wave.phase = WavePhase.Spawning;
 }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
-import { spawnMeteor, handleTypedCharacter } from "./state";
+import { handleTypedCharacter, startNextWave } from "./state";
 
 const PIXEL_FONT = "'Press Start 2P', monospace";
 
@@ -10,7 +10,7 @@ const PlanetHealthBar = ({ ratio }: { ratio: number }) => {
   const barColor = pct > 60 ? "#4ade80" : pct > 30 ? "#fbbf24" : "#ef4444";
 
   return (
-    <div className="absolute top-3 right-3 z-10" style={{ fontFamily: PIXEL_FONT }}>
+    <div className="absolute top-3 right-3 z-10">
       <div
         style={{
           background: "rgba(10, 10, 26, 0.85)",
@@ -66,13 +66,16 @@ export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<PlanetaryDefenseGame | null>(null);
   const [healthRatio, setHealthRatio] = useState(1);
+  const [waveNumber, setWaveNumber] = useState(0);
+  const [waveActive, setWaveActive] = useState(false);
 
   useEffect(() => {
     const div = containerRef.current;
     if (!div) return;
 
     let cancelled = false;
-    let unsubscribe: (() => void) | null = null;
+    let unsubDamage: (() => void) | null = null;
+    let unsubWaveComplete: (() => void) | null = null;
 
     createPlanetaryDefenseGame(div)
       .then((game) => {
@@ -81,8 +84,12 @@ export const GameCanvas = () => {
           return;
         }
         gameRef.current = game;
-        unsubscribe = game.state.onPlanetDamaged.subscribe(() => {
+        unsubDamage = game.state.onPlanetDamaged.subscribe(() => {
           setHealthRatio(game.state.planetHealth / game.state.maxPlanetHealth);
+        });
+        unsubWaveComplete = game.state.onWaveComplete.subscribe(() => {
+          setWaveNumber(game.state.wave.wave);
+          setWaveActive(false);
         });
       })
       .catch((err) => {
@@ -91,7 +98,8 @@ export const GameCanvas = () => {
 
     return () => {
       cancelled = true;
-      unsubscribe?.();
+      unsubDamage?.();
+      unsubWaveComplete?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -109,29 +117,61 @@ export const GameCanvas = () => {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  const handleSpawnMeteor = useCallback(() => {
+  const handleNextWave = useCallback(() => {
     const game = gameRef.current;
-    if (game) spawnMeteor(game.state);
+    if (game) {
+      startNextWave(game.state);
+      setWaveNumber(game.state.wave.wave);
+      setWaveActive(true);
+    }
   }, []);
 
   return (
-    <div ref={containerRef} className="w-full h-full relative">
+    <div
+      ref={containerRef}
+      className="w-full h-full relative"
+      style={{ fontFamily: PIXEL_FONT }}
+    >
       <PlanetHealthBar ratio={healthRatio} />
-      <button
-        onClick={handleSpawnMeteor}
-        style={{
-          fontFamily: PIXEL_FONT,
-          fontSize: "10px",
-          letterSpacing: "1px",
-          imageRendering: "pixelated",
-          background: "rgba(10, 10, 26, 0.85)",
-          color: "#cdd6f4",
-          padding: "8px 14px",
-        }}
-        className="absolute top-3 left-3 z-10 cursor-pointer hover:brightness-125"
-      >
-        SPAWN METEOR
-      </button>
+      <div className="absolute top-3 left-3 z-10">
+        <div
+          style={{
+            background: "rgba(10, 10, 26, 0.85)",
+            padding: "10px 14px",
+            imageRendering: "pixelated",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "9px",
+              color: "#cdd6f4",
+              letterSpacing: "1px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            WAVE {waveNumber}
+          </div>
+        </div>
+        {!waveActive && (
+          <button
+            onClick={handleNextWave}
+            style={{
+              fontSize: "10px",
+              letterSpacing: "1px",
+              imageRendering: "pixelated",
+              background: "rgba(74, 222, 128, 0.85)",
+              color: "#0a0a1a",
+              padding: "8px 14px",
+              marginTop: "6px",
+              display: "block",
+              width: "100%",
+            }}
+            className="cursor-pointer hover:brightness-125"
+          >
+            {waveNumber === 0 ? "START" : "NEXT WAVE"}
+          </button>
+        )}
+      </div>
     </div>
   );
 };
