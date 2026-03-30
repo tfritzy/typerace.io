@@ -309,14 +309,11 @@ function findTypedTarget(
   state: GameState
 ): { x: number; y: number } | null {
   let best: EntityState | null = null;
-  let bestDist = -1;
+  let bestTyped = 0;
   for (const entity of state.entities) {
     if (entity.typedCount <= 0) continue;
-    const dx = entity.x - PLANET_X;
-    const dy = entity.y - PLANET_Y;
-    const dist = dx * dx + dy * dy;
-    if (dist > bestDist) {
-      bestDist = dist;
+    if (entity.typedCount > bestTyped) {
+      bestTyped = entity.typedCount;
       best = entity;
     }
   }
