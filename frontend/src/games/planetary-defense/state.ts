@@ -154,6 +154,8 @@ function createTowerSlots(): TowerSlot[] {
       tower = { type: TowerType.Plasma, level: 1, charge: 0 };
     } else if (i === 3) {
       tower = { type: TowerType.Slow, level: 1, charge: 0 };
+    } else if (i === 5) {
+      tower = { type: TowerType.Charge, level: 1, charge: 0 };
     }
     slots.push({ angle, tower });
   }
@@ -324,8 +326,20 @@ function findTypedTargetInSector(
   return null;
 }
 
+function getNeighborSlots(
+  state: GameState,
+  slotIndex: number
+): number[] {
+  const count = state.towerSlots.length;
+  return [
+    (slotIndex - 1 + count) % count,
+    (slotIndex + 1) % count,
+  ];
+}
+
 function chargeTowers(state: GameState): void {
-  for (const slot of state.towerSlots) {
+  for (let i = 0; i < state.towerSlots.length; i++) {
+    const slot = state.towerSlots[i];
     if (!slot.tower) continue;
     const target = findTypedTargetInSector(state, slot);
     if (!target) continue;
@@ -334,7 +348,29 @@ function chargeTowers(state: GameState): void {
     slot.tower.charge++;
     if (slot.tower.charge >= config.charsToFire) {
       slot.tower.charge = 0;
-      fireTower(state, slot, target);
+      if (slot.tower.type === TowerType.Charge) {
+        chargeNeighbors(state, i);
+      } else {
+        fireTower(state, slot, target);
+      }
+    }
+  }
+}
+
+function chargeNeighbors(state: GameState, slotIndex: number): void {
+  for (const ni of getNeighborSlots(state, slotIndex)) {
+    const neighbor = state.towerSlots[ni];
+    if (!neighbor.tower) continue;
+    if (neighbor.tower.type === TowerType.Charge) continue;
+
+    const neighborConfig = TOWER_CONFIGS[neighbor.tower.type];
+    neighbor.tower.charge++;
+    if (neighbor.tower.charge >= neighborConfig.charsToFire) {
+      neighbor.tower.charge = 0;
+      const target = findTypedTargetInSector(state, neighbor);
+      if (target) {
+        fireTower(state, neighbor, target);
+      }
     }
   }
 }
