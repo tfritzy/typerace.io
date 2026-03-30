@@ -75,6 +75,12 @@ export interface ProjectileState {
   explosionRange: number;
 }
 
+interface PendingShot {
+  slotIndex: number;
+  towerType: TowerType;
+  fireTime: number;
+}
+
 export enum WavePhase {
   Idle,
   Spawning,
@@ -130,6 +136,7 @@ export interface GameState {
   entities: EntityState[];
   towerSlots: TowerSlot[];
   projectiles: ProjectileState[];
+  pendingShots: PendingShot[];
   time: {
     time: number;
     deltaTime: number;
@@ -167,6 +174,7 @@ export function createGameState(): GameState {
     entities: [],
     towerSlots: createTowerSlots(),
     projectiles: [],
+    pendingShots: [],
     time: {
       time: 0,
       deltaTime: 0,
@@ -344,7 +352,7 @@ function tryFireSlot(
   slot.tower!.charge = 0;
   const target = findTypedTarget(state);
   if (target) {
-    fireTower(state, slot, target);
+    fireTower(state, slot, slotIndex, target);
   }
   if (config.chargesNeighbors) {
     chargeNeighbors(state, slotIndex);
@@ -372,18 +380,17 @@ function chargeNeighbors(state: GameState, slotIndex: number): void {
   }
 }
 
-function fireTower(
+function spawnProjectile(
   state: GameState,
   slot: TowerSlot,
   target: { x: number; y: number }
-): void {
+): boolean {
   const { x: towerX, y: towerY } = getTowerPosition(slot);
-
   const config = TOWER_CONFIGS[slot.tower!.type];
   const dx = target.x - towerX;
   const dy = target.y - towerY;
   const dist = Math.sqrt(dx * dx + dy * dy);
-  if (dist === 0) return;
+  if (dist === 0) return false;
 
   state.projectiles.push({
     id: state.nextId++,
@@ -401,6 +408,25 @@ function fireTower(
   });
 
   state.onTowerFired.emit();
+  return true;
+}
+
+function fireTower(
+  state: GameState,
+  slot: TowerSlot,
+  slotIndex: number,
+  target: { x: number; y: number }
+): void {
+  if (!spawnProjectile(state, slot, target)) return;
+
+  const config = TOWER_CONFIGS[slot.tower!.type];
+  for (let i = 1; i < config.multiShotCount; i++) {
+    state.pendingShots.push({
+      slotIndex,
+      towerType: slot.tower!.type,
+      fireTime: state.time.time + config.multiShotDelay * i,
+    });
+  }
 }
 
 function isInBounds(x: number, y: number): boolean {
@@ -433,10 +459,29 @@ function checkCollisions(state: GameState): void {
   if (damaged) state.onPlanetDamaged.emit();
 }
 
+function processPendingShots(state: GameState): void {
+  for (let i = state.pendingShots.length - 1; i >= 0; i--) {
+    const pending = state.pendingShots[i];
+    if (state.time.time < pending.fireTime) continue;
+
+    state.pendingShots.splice(i, 1);
+
+    const slot = state.towerSlots[pending.slotIndex];
+    if (!slot.tower || slot.tower.type !== pending.towerType) continue;
+
+    const target = findTypedTarget(state);
+    if (!target) continue;
+
+    spawnProjectile(state, slot, target);
+  }
+}
+
 export function updateState(state: GameState, dt: number): void {
   state.time.deltaTime = dt;
   const timeBefore = state.time.time;
   state.time.time += state.time.deltaTime;
+
+  processPendingShots(state);
 
   for (const e of state.entities) {
     let speedMult = 1;
