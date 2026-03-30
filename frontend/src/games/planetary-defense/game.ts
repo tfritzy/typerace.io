@@ -8,7 +8,6 @@ import type { LabelData } from "./EnemyManager";
 import { TowerManager } from "./TowerManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { DamageNumberManager } from "./DamageNumberManager";
-import { ChainLightningManager } from "./ChainLightningManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState } from "./state";
 import type { GameState } from "./state";
@@ -25,7 +24,6 @@ export class PlanetaryDefenseGame {
   private enemyManager!: EnemyManager;
   private towerManager!: TowerManager;
   private projectileManager!: ProjectileManager;
-  private chainLightningManager!: ChainLightningManager;
   private damageNumberManager!: DamageNumberManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
@@ -82,10 +80,6 @@ export class PlanetaryDefenseGame {
     this.projectileManager = new ProjectileManager();
     world.addChild(this.projectileManager.container);
 
-    this.chainLightningManager = new ChainLightningManager();
-    this.chainLightningManager.subscribe(this.state);
-    world.addChild(this.chainLightningManager.container);
-
     this.damageNumberManager = new DamageNumberManager();
     this.damageNumberManager.subscribe(this.state);
     world.addChild(this.damageNumberManager.container);
@@ -100,7 +94,6 @@ export class PlanetaryDefenseGame {
     this.enemyManager.update(this.state, dt);
     this.towerManager.update(this.state);
     this.projectileManager.update(this.state);
-    this.chainLightningManager.update(dt);
     this.damageNumberManager.update(dt);
   }
 
@@ -113,7 +106,6 @@ export class PlanetaryDefenseGame {
     this.planetManager.destroy();
     this.towerManager.destroy();
     this.projectileManager.destroy();
-    this.chainLightningManager.destroy();
     this.damageNumberManager.destroy();
     this.enemyManager.destroy();
     this.app.destroy(true);

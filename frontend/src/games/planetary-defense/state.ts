@@ -125,13 +125,6 @@ export interface DamageData {
   killed: boolean;
 }
 
-export interface ChainHitData {
-  fromX: number;
-  fromY: number;
-  toX: number;
-  toY: number;
-}
-
 export interface GameState {
   entities: EntityState[];
   towerSlots: TowerSlot[];
@@ -149,7 +142,6 @@ export interface GameState {
   onTowerFired: GameEvent;
   onWaveComplete: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
-  onChainHit: GameDataEvent<ChainHitData>;
 }
 
 function createTowerSlots(): TowerSlot[] {
@@ -193,7 +185,6 @@ export function createGameState(): GameState {
     onTowerFired: new GameEvent(),
     onWaveComplete: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
-    onChainHit: new GameDataEvent<ChainHitData>(),
   };
 }
 
@@ -636,12 +627,6 @@ function checkProjectileCollisions(state: GameState): void {
           for (let c = 0; c < p.chainCount; c++) {
             const next = findChainTarget(state.entities, prevX, prevY, hitIds);
             if (!next) break;
-            state.onChainHit.emit({
-              fromX: prevX,
-              fromY: prevY,
-              toX: next.x,
-              toY: next.y,
-            });
             applyProjectileEffects(state, p, next);
             hitIds.add(next.id);
             prevX = next.x;
