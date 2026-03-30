@@ -431,12 +431,14 @@ export function updateState(state: GameState, dt: number): void {
 const PROJECTILE_HIT_RADIUS = 20;
 const BLEED_DURATION_SECONDS = 3;
 
+const TICK_RATE = 2;
+
 function applyBleedDamage(
   state: GameState,
   timeBefore: number,
   timeAfter: number
 ): void {
-  const previousWholeSecond = Math.floor(timeBefore);
+  const previousTick = Math.floor(timeBefore * TICK_RATE);
 
   for (const entity of state.entities) {
     if (entity.bleedStacks <= 0) continue;
@@ -444,7 +446,7 @@ function applyBleedDamage(
     const cappedTimeAfter = Math.min(timeAfter, entity.bleedTimer);
     const bleedTicks = Math.max(
       0,
-      Math.floor(cappedTimeAfter) - previousWholeSecond
+      Math.floor(cappedTimeAfter * TICK_RATE) - previousTick
     );
     if (bleedTicks > 0) {
       entity.health -= bleedTicks * entity.bleedStacks;
@@ -460,8 +462,8 @@ function applyPlasmaDamage(
   timeBefore: number,
   timeAfter: number
 ): void {
-  const previousWholeSecond = Math.floor(timeBefore);
-  const ticks = Math.max(0, Math.floor(timeAfter) - previousWholeSecond);
+  const previousTick = Math.floor(timeBefore * TICK_RATE);
+  const ticks = Math.max(0, Math.floor(timeAfter * TICK_RATE) - previousTick);
   if (ticks <= 0) return;
 
   for (const entity of state.entities) {
@@ -478,8 +480,8 @@ function applySlowDecay(
   timeBefore: number,
   timeAfter: number
 ): void {
-  const previousWholeSecond = Math.floor(timeBefore);
-  const ticks = Math.max(0, Math.floor(timeAfter) - previousWholeSecond);
+  const previousTick = Math.floor(timeBefore * TICK_RATE);
+  const ticks = Math.max(0, Math.floor(timeAfter * TICK_RATE) - previousTick);
   if (ticks <= 0) return;
 
   for (const entity of state.entities) {
@@ -494,8 +496,8 @@ function applyFreezeDecay(
   timeBefore: number,
   timeAfter: number
 ): void {
-  const previousWholeSecond = Math.floor(timeBefore);
-  const ticks = Math.max(0, Math.floor(timeAfter) - previousWholeSecond);
+  const previousTick = Math.floor(timeBefore * TICK_RATE);
+  const ticks = Math.max(0, Math.floor(timeAfter * TICK_RATE) - previousTick);
   if (ticks <= 0) return;
 
   for (const entity of state.entities) {
