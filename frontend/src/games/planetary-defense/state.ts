@@ -72,6 +72,7 @@ export interface ProjectileState {
   slowStacks: number;
   freezeStacks: number;
   chainCount: number;
+  explosionRange: number;
 }
 
 export enum WavePhase {
@@ -396,6 +397,7 @@ function fireTower(
     slowStacks: config.slowStacks,
     freezeStacks: config.freezeStacks,
     chainCount: config.chainCount,
+    explosionRange: config.explosionRange,
   });
 
   state.onTowerFired.emit();
@@ -619,6 +621,18 @@ function checkProjectileCollisions(state: GameState): void {
       if (dx * dx + dy * dy < hitR2) {
         applyProjectileEffects(state, p, e);
         hit = true;
+
+        if (p.explosionRange > 0) {
+          const explosionR2 = p.explosionRange * p.explosionRange;
+          for (const other of state.entities) {
+            if (other === e || other.health <= 0) continue;
+            const edx = e.x - other.x;
+            const edy = e.y - other.y;
+            if (edx * edx + edy * edy < explosionR2) {
+              applyProjectileEffects(state, p, other);
+            }
+          }
+        }
 
         if (p.chainCount > 0) {
           const hitIds = new Set<number>([e.id]);
