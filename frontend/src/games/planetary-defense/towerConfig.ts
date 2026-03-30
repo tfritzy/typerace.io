@@ -15,6 +15,7 @@ export interface TowerTypeConfig {
   slowStacks: number;
   freezeStacks: number;
   chargesNeighbors: boolean;
+  chainCount: number;
 }
 
 const TOWER_DEFAULTS: TowerTypeConfig = {
@@ -26,6 +27,7 @@ const TOWER_DEFAULTS: TowerTypeConfig = {
   slowStacks: 0,
   freezeStacks: 0,
   chargesNeighbors: false,
+  chainCount: 0,
 };
 
 function tower(overrides: Partial<TowerTypeConfig>): TowerTypeConfig {
@@ -33,7 +35,7 @@ function tower(overrides: Partial<TowerTypeConfig>): TowerTypeConfig {
 }
 
 export const TOWER_CONFIGS: Record<TowerType, TowerTypeConfig> = {
-  [TowerType.Gun]: tower({}),
+  [TowerType.Gun]: tower({ chainCount: 2 }),
   [TowerType.Bleed]: tower({ charsToFire: 3, bleedApplicationChance: 0.2 }),
   [TowerType.Plasma]: tower({ charsToFire: 5, damage: 5, plasmaStacks: 3 }),
   [TowerType.Slow]: tower({ damage: 5, slowStacks: 3 }),

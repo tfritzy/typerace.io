@@ -71,6 +71,7 @@ export interface ProjectileState {
   plasmaStacks: number;
   slowStacks: number;
   freezeStacks: number;
+  chainCount: number;
 }
 
 export enum WavePhase {
@@ -124,6 +125,13 @@ export interface DamageData {
   killed: boolean;
 }
 
+export interface ChainHitData {
+  fromX: number;
+  fromY: number;
+  toX: number;
+  toY: number;
+}
+
 export interface GameState {
   entities: EntityState[];
   towerSlots: TowerSlot[];
@@ -141,6 +149,7 @@ export interface GameState {
   onTowerFired: GameEvent;
   onWaveComplete: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
+  onChainHit: GameDataEvent<ChainHitData>;
 }
 
 function createTowerSlots(): TowerSlot[] {
@@ -184,6 +193,7 @@ export function createGameState(): GameState {
     onTowerFired: new GameEvent(),
     onWaveComplete: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
+    onChainHit: new GameDataEvent<ChainHitData>(),
   };
 }
 
@@ -394,6 +404,7 @@ function fireTower(
     plasmaStacks: config.plasmaStacks,
     slowStacks: config.slowStacks,
     freezeStacks: config.freezeStacks,
+    chainCount: config.chainCount,
   });
 
   state.onTowerFired.emit();
@@ -461,6 +472,7 @@ export function updateState(state: GameState, dt: number): void {
 
 const PROJECTILE_HIT_RADIUS = 20;
 const BLEED_DURATION_SECONDS = 3;
+export const CHAIN_JUMP_RANGE = 150;
 
 const TICK_RATE = 2;
 
@@ -546,6 +558,55 @@ function resolveEntityDeaths(state: GameState): void {
   }
 }
 
+function applyProjectileEffects(
+  state: GameState,
+  p: ProjectileState,
+  e: EntityState
+): void {
+  e.health -= p.damage;
+  if (
+    p.bleedApplicationChance > 0 &&
+    Math.random() < p.bleedApplicationChance
+  ) {
+    e.bleedStacks++;
+    e.bleedTimer = state.time.time + BLEED_DURATION_SECONDS;
+  }
+  if (p.plasmaStacks > 0) {
+    e.plasmaStacks += p.plasmaStacks;
+  }
+  if (p.slowStacks > 0) {
+    e.slowStacks += p.slowStacks;
+  }
+  if (p.freezeStacks > 0) {
+    e.freezeStacks += p.freezeStacks;
+  }
+  const killed = e.health <= 0;
+  state.onDamageDealt.emit({ amount: p.damage, x: e.x, y: e.y, killed });
+}
+
+function findChainTarget(
+  entities: EntityState[],
+  fromX: number,
+  fromY: number,
+  hitIds: Set<number>
+): EntityState | null {
+  const rangeR2 = CHAIN_JUMP_RANGE * CHAIN_JUMP_RANGE;
+  let closest: EntityState | null = null;
+  let closestDist = Infinity;
+  for (const e of entities) {
+    if (e.health <= 0) continue;
+    if (hitIds.has(e.id)) continue;
+    const dx = fromX - e.x;
+    const dy = fromY - e.y;
+    const dist2 = dx * dx + dy * dy;
+    if (dist2 < rangeR2 && dist2 < closestDist) {
+      closestDist = dist2;
+      closest = e;
+    }
+  }
+  return closest;
+}
+
 function checkProjectileCollisions(state: GameState): void {
   const hitR2 = PROJECTILE_HIT_RADIUS * PROJECTILE_HIT_RADIUS;
 
@@ -565,26 +626,29 @@ function checkProjectileCollisions(state: GameState): void {
       const dx = p.x - e.x;
       const dy = p.y - e.y;
       if (dx * dx + dy * dy < hitR2) {
-        e.health -= p.damage;
-        if (
-          p.bleedApplicationChance > 0 &&
-          Math.random() < p.bleedApplicationChance
-        ) {
-          e.bleedStacks++;
-          e.bleedTimer = state.time.time + BLEED_DURATION_SECONDS;
-        }
-        if (p.plasmaStacks > 0) {
-          e.plasmaStacks += p.plasmaStacks;
-        }
-        if (p.slowStacks > 0) {
-          e.slowStacks += p.slowStacks;
-        }
-        if (p.freezeStacks > 0) {
-          e.freezeStacks += p.freezeStacks;
-        }
-        const killed = e.health <= 0;
-        state.onDamageDealt.emit({ amount: p.damage, x: e.x, y: e.y, killed });
+        applyProjectileEffects(state, p, e);
         hit = true;
+
+        if (p.chainCount > 0) {
+          const hitIds = new Set<number>([e.id]);
+          let prevX = e.x;
+          let prevY = e.y;
+          for (let c = 0; c < p.chainCount; c++) {
+            const next = findChainTarget(state.entities, prevX, prevY, hitIds);
+            if (!next) break;
+            state.onChainHit.emit({
+              fromX: prevX,
+              fromY: prevY,
+              toX: next.x,
+              toY: next.y,
+            });
+            applyProjectileEffects(state, p, next);
+            hitIds.add(next.id);
+            prevX = next.x;
+            prevY = next.y;
+          }
+        }
+
         break;
       }
     }
