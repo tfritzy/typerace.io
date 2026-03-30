@@ -42,6 +42,8 @@ export interface EntityState {
   bleedStacks: number;
   bleedTimer: number;
   plasmaStacks: number;
+  slowStacks: number;
+  freezeStacks: number;
   colorPreset?: ColorPreset;
   hasShield?: boolean;
   variant?: number;
@@ -67,6 +69,8 @@ export interface ProjectileState {
   damage: number;
   bleedApplicationChance: number;
   plasmaStacks: number;
+  slowStacks: number;
+  freezeStacks: number;
 }
 
 export enum WavePhase {
@@ -148,6 +152,8 @@ function createTowerSlots(): TowerSlot[] {
       tower = { type: TowerType.Gun, level: 1, charge: 0 };
     } else if (i === 1) {
       tower = { type: TowerType.Plasma, level: 1, charge: 0 };
+    } else if (i === 3) {
+      tower = { type: TowerType.Slow, level: 1, charge: 0 };
     }
     slots.push({ angle, tower });
   }
@@ -239,6 +245,8 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
     bleedStacks: 0,
     bleedTimer: 0,
     plasmaStacks: 0,
+    slowStacks: 0,
+    freezeStacks: 0,
   };
 
   if (isShip) {
@@ -353,6 +361,8 @@ function fireTower(
     damage: config.damage,
     bleedApplicationChance: config.bleedApplicationChance,
     plasmaStacks: config.plasmaStacks,
+    slowStacks: config.slowStacks,
+    freezeStacks: config.freezeStacks,
   });
 
   state.onTowerFired.emit();
@@ -394,12 +404,20 @@ export function updateState(state: GameState, dt: number): void {
   state.time.time += state.time.deltaTime;
 
   for (const e of state.entities) {
-    e.x += e.vx * state.time.deltaTime;
-    e.y += e.vy * state.time.deltaTime;
+    let speedMult = 1;
+    if (e.freezeStacks > 0) {
+      speedMult = 0;
+    } else if (e.slowStacks > 0) {
+      speedMult = 0.5;
+    }
+    e.x += e.vx * state.time.deltaTime * speedMult;
+    e.y += e.vy * state.time.deltaTime * speedMult;
     e.rotation += e.rotationSpeed * state.time.deltaTime;
   }
   applyBleedDamage(state, timeBefore, state.time.time);
   applyPlasmaDamage(state, timeBefore, state.time.time);
+  applySlowDecay(state, timeBefore, state.time.time);
+  applyFreezeDecay(state, timeBefore, state.time.time);
   for (const p of state.projectiles) {
     p.x += p.vx * state.time.deltaTime;
     p.y += p.vy * state.time.deltaTime;
@@ -455,6 +473,38 @@ function applyPlasmaDamage(
   }
 }
 
+function applySlowDecay(
+  state: GameState,
+  timeBefore: number,
+  timeAfter: number
+): void {
+  const previousWholeSecond = Math.floor(timeBefore);
+  const ticks = Math.max(0, Math.floor(timeAfter) - previousWholeSecond);
+  if (ticks <= 0) return;
+
+  for (const entity of state.entities) {
+    if (entity.slowStacks <= 0) continue;
+
+    entity.slowStacks = Math.max(0, entity.slowStacks - ticks);
+  }
+}
+
+function applyFreezeDecay(
+  state: GameState,
+  timeBefore: number,
+  timeAfter: number
+): void {
+  const previousWholeSecond = Math.floor(timeBefore);
+  const ticks = Math.max(0, Math.floor(timeAfter) - previousWholeSecond);
+  if (ticks <= 0) return;
+
+  for (const entity of state.entities) {
+    if (entity.freezeStacks <= 0) continue;
+
+    entity.freezeStacks = Math.max(0, entity.freezeStacks - ticks);
+  }
+}
+
 function resolveEntityDeaths(state: GameState): void {
   for (let i = state.entities.length - 1; i >= 0; i--) {
     if (state.entities[i].health <= 0) {
@@ -492,6 +542,12 @@ function checkProjectileCollisions(state: GameState): void {
         }
         if (p.plasmaStacks > 0) {
           e.plasmaStacks += p.plasmaStacks;
+        }
+        if (p.slowStacks > 0) {
+          e.slowStacks += p.slowStacks;
+        }
+        if (p.freezeStacks > 0) {
+          e.freezeStacks += p.freezeStacks;
         }
         const killed = e.health <= 0;
         state.onDamageDealt.emit({ amount: p.damage, x: e.x, y: e.y, killed });
