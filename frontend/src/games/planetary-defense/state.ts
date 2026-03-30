@@ -308,10 +308,19 @@ export function handleTypedCharacter(state: GameState, key: string): void {
 function findTypedTarget(
   state: GameState
 ): { x: number; y: number } | null {
+  let best: EntityState | null = null;
+  let bestDist = -1;
   for (const entity of state.entities) {
-    if (entity.typedCount > 0) return entity;
+    if (entity.typedCount <= 0) continue;
+    const dx = entity.x - PLANET_X;
+    const dy = entity.y - PLANET_Y;
+    const dist = dx * dx + dy * dy;
+    if (dist > bestDist) {
+      bestDist = dist;
+      best = entity;
+    }
   }
-  return null;
+  return best;
 }
 
 function getNeighborSlots(
