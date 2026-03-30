@@ -14,6 +14,7 @@ export interface TowerTypeConfig {
   plasmaStacks: number;
   slowStacks: number;
   freezeStacks: number;
+  chargesNeighbors: boolean;
 }
 
 const TOWER_DEFAULTS: TowerTypeConfig = {
@@ -24,6 +25,7 @@ const TOWER_DEFAULTS: TowerTypeConfig = {
   plasmaStacks: 0,
   slowStacks: 0,
   freezeStacks: 0,
+  chargesNeighbors: false,
 };
 
 function tower(overrides: Partial<TowerTypeConfig>): TowerTypeConfig {

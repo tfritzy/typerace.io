@@ -305,37 +305,68 @@ export function handleTypedCharacter(state: GameState, key: string): void {
   chargeTowers(state);
 }
 
-const SECTOR_HALF = Math.PI / 4;
-
-function isInSector(slot: TowerSlot, ex: number, ey: number): boolean {
-  const enemyAngle = Math.atan2(ey - PLANET_Y, ex - PLANET_X);
-  let diff = enemyAngle - slot.angle;
-  diff = Math.atan2(Math.sin(diff), Math.cos(diff));
-  return Math.abs(diff) <= SECTOR_HALF;
+function findTypedTarget(
+  state: GameState
+): { x: number; y: number } | null {
+  let best: EntityState | null = null;
+  let bestTyped = 0;
+  for (const entity of state.entities) {
+    if (entity.typedCount <= 0) continue;
+    if (entity.typedCount > bestTyped) {
+      bestTyped = entity.typedCount;
+      best = entity;
+    }
+  }
+  return best;
 }
 
-function findTypedTargetInSector(
+function getNeighborSlots(
   state: GameState,
-  slot: TowerSlot
-): { x: number; y: number } | null {
-  for (const entity of state.entities) {
-    if (entity.typedCount > 0 && isInSector(slot, entity.x, entity.y)) return entity;
+  slotIndex: number
+): number[] {
+  const count = state.towerSlots.length;
+  return [
+    (slotIndex - 1 + count) % count,
+    (slotIndex + 1) % count,
+  ];
+}
+
+function tryFireSlot(
+  state: GameState,
+  slot: TowerSlot,
+  slotIndex: number
+): void {
+  const config = TOWER_CONFIGS[slot.tower!.type];
+  if (slot.tower!.charge < config.charsToFire) return;
+
+  slot.tower!.charge = 0;
+  const target = findTypedTarget(state);
+  if (target) {
+    fireTower(state, slot, target);
   }
-  return null;
+  if (config.chargesNeighbors) {
+    chargeNeighbors(state, slotIndex);
+  }
 }
 
 function chargeTowers(state: GameState): void {
-  for (const slot of state.towerSlots) {
+  for (let i = 0; i < state.towerSlots.length; i++) {
+    const slot = state.towerSlots[i];
     if (!slot.tower) continue;
-    const target = findTypedTargetInSector(state, slot);
-    if (!target) continue;
+    if (!findTypedTarget(state)) continue;
 
-    const config = TOWER_CONFIGS[slot.tower.type];
     slot.tower.charge++;
-    if (slot.tower.charge >= config.charsToFire) {
-      slot.tower.charge = 0;
-      fireTower(state, slot, target);
-    }
+    tryFireSlot(state, slot, i);
+  }
+}
+
+function chargeNeighbors(state: GameState, slotIndex: number): void {
+  for (const ni of getNeighborSlots(state, slotIndex)) {
+    const neighbor = state.towerSlots[ni];
+    if (!neighbor.tower) continue;
+
+    neighbor.tower.charge++;
+    tryFireSlot(state, neighbor, ni);
   }
 }
 
