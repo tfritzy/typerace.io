@@ -41,6 +41,7 @@ export interface EntityState {
   power: number;
   bleedStacks: number;
   bleedTimer: number;
+  plasmaStacks: number;
   colorPreset?: ColorPreset;
   hasShield?: boolean;
   variant?: number;
@@ -65,6 +66,7 @@ export interface ProjectileState {
   vy: number;
   damage: number;
   bleedApplicationChance: number;
+  plasmaStacks: number;
 }
 
 export enum WavePhase {
@@ -141,14 +143,12 @@ function createTowerSlots(): TowerSlot[] {
   const slots: TowerSlot[] = [];
   for (let i = 0; i < TOWER_SLOT_COUNT; i++) {
     const angle = (i * 2 * Math.PI) / TOWER_SLOT_COUNT - Math.PI / 2;
-    const tower =
-      i % 2 === 0
-        ? {
-          type: TowerType.Gun,
-          level: 1,
-          charge: 0,
-        }
-        : null;
+    let tower: TowerState | null = null;
+    if (i % 2 === 0) {
+      tower = { type: TowerType.Gun, level: 1, charge: 0 };
+    } else if (i === 1) {
+      tower = { type: TowerType.Plasma, level: 1, charge: 0 };
+    }
     slots.push({ angle, tower });
   }
   return slots;
@@ -238,6 +238,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
     power: config.power,
     bleedStacks: 0,
     bleedTimer: 0,
+    plasmaStacks: 0,
   };
 
   if (isShip) {
@@ -351,6 +352,7 @@ function fireTower(
     vy: (dy / dist) * config.projectileSpeed,
     damage: config.damage,
     bleedApplicationChance: config.bleedApplicationChance,
+    plasmaStacks: config.plasmaStacks,
   });
 
   state.onTowerFired.emit();
@@ -397,6 +399,7 @@ export function updateState(state: GameState, dt: number): void {
     e.rotation += e.rotationSpeed * state.time.deltaTime;
   }
   applyBleedDamage(state, timeBefore, state.time.time);
+  applyPlasmaDamage(state, timeBefore, state.time.time);
   for (const p of state.projectiles) {
     p.x += p.vx * state.time.deltaTime;
     p.y += p.vy * state.time.deltaTime;
@@ -434,6 +437,24 @@ function applyBleedDamage(
   }
 }
 
+function applyPlasmaDamage(
+  state: GameState,
+  timeBefore: number,
+  timeAfter: number
+): void {
+  const previousWholeSecond = Math.floor(timeBefore);
+  const ticks = Math.max(0, Math.floor(timeAfter) - previousWholeSecond);
+  if (ticks <= 0) return;
+
+  for (const entity of state.entities) {
+    if (entity.plasmaStacks <= 0) continue;
+
+    const actualTicks = Math.min(ticks, entity.plasmaStacks);
+    entity.health -= actualTicks;
+    entity.plasmaStacks -= actualTicks;
+  }
+}
+
 function resolveEntityDeaths(state: GameState): void {
   for (let i = state.entities.length - 1; i >= 0; i--) {
     if (state.entities[i].health <= 0) {
@@ -468,6 +489,9 @@ function checkProjectileCollisions(state: GameState): void {
         ) {
           e.bleedStacks++;
           e.bleedTimer = state.time.time + BLEED_DURATION_SECONDS;
+        }
+        if (p.plasmaStacks > 0) {
+          e.plasmaStacks += p.plasmaStacks;
         }
         const killed = e.health <= 0;
         state.onDamageDealt.emit({ amount: p.damage, x: e.x, y: e.y, killed });
