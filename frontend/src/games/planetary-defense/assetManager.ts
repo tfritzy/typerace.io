@@ -1,4 +1,4 @@
-import { Assets, type AssetsManifest, type Spritesheet, type Texture } from "pixi.js";
+import { Assets, Rectangle, Texture as PixiTexture, type AssetsManifest, type Spritesheet, type Texture } from "pixi.js";
 import {
   EngineType, ColorPreset,
   type EntityType, SHIP_ENTITY_TYPES,
@@ -49,6 +49,7 @@ export class AssetManager {
   private engines_: Record<string, Spritesheet>;
   private asteroids_: Record<string, Spritesheet>;
   private colorPresets_: Record<string, Texture>;
+  private projectiles_: Record<number, Texture>;
 
   constructor(loaded: Record<string, unknown>) {
     const engineAliasValues = Object.values(ENGINE_ALIASES);
@@ -71,6 +72,15 @@ export class AssetManager {
     this.colorPresets_ = Object.fromEntries(
       presetAliasValues.map((a) => [a, loaded[a] as Texture])
     );
+
+    this.projectiles_ = {};
+    for (let i = 1; i <= 6; i++) {
+      const fullTex = loaded[`projectile-${i}`] as Texture;
+      this.projectiles_[i] = new PixiTexture({
+        source: fullTex.source,
+        frame: new Rectangle(0, 0, 32, 32),
+      });
+    }
 
     this.applyNearestNeighbor();
   }
@@ -110,6 +120,10 @@ export class AssetManager {
     return sheet.animations[alias];
   }
 
+  getProjectileTexture(projectileType: number): Texture {
+    return this.projectiles_[projectileType];
+  }
+
   getMeteorTexture(entityType: EntityType, variant: number): Texture {
     const alias = METEOR_ALIASES[entityType]!;
     const sheet = this.asteroids_[alias];
@@ -141,6 +155,9 @@ export class AssetManager {
       setNearestNeighbor(sheet);
     }
     for (const tex of Object.values(this.colorPresets_)) {
+      setTextureNearest(tex);
+    }
+    for (const tex of Object.values(this.projectiles_)) {
       setTextureNearest(tex);
     }
   }

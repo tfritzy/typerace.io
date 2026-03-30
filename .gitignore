@@ -45,3 +45,4 @@ scripts/model_comparison_*.txt
 nohup.out
 frontend/module_bindings
 node_modules/
+node_modules

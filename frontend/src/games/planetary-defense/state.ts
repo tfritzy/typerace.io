@@ -14,6 +14,7 @@ import {
 } from "./towerConfig";
 import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
+import { SHIP_WEAPON_CONFIGS } from "./shipWeaponConfig";
 
 export const PLANET_X = CANVAS_WIDTH / 2;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -47,6 +48,7 @@ export interface EntityState {
   colorPreset?: ColorPreset;
   hasShield?: boolean;
   variant?: number;
+  fireTimer: number;
 }
 
 export interface TowerState {
@@ -73,6 +75,17 @@ export interface ProjectileState {
   freezeStacks: number;
   chainCount: number;
   explosionRange: number;
+}
+
+export interface EnemyProjectileState {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  damage: number;
+  projectileType: number;
+  rotation: number;
 }
 
 export enum WavePhase {
@@ -130,6 +143,7 @@ export interface GameState {
   entities: EntityState[];
   towerSlots: TowerSlot[];
   projectiles: ProjectileState[];
+  enemyProjectiles: EnemyProjectileState[];
   time: {
     time: number;
     deltaTime: number;
@@ -167,6 +181,7 @@ export function createGameState(): GameState {
     entities: [],
     towerSlots: createTowerSlots(),
     projectiles: [],
+    enemyProjectiles: [],
     time: {
       time: 0,
       deltaTime: 0,
@@ -249,6 +264,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
     plasmaStacks: 0,
     slowStacks: 0,
     freezeStacks: 0,
+    fireTimer: 0,
   };
 
   if (isShip) {
@@ -457,9 +473,15 @@ export function updateState(state: GameState, dt: number): void {
     p.x += p.vx * state.time.deltaTime;
     p.y += p.vy * state.time.deltaTime;
   }
+  for (const ep of state.enemyProjectiles) {
+    ep.x += ep.vx * state.time.deltaTime;
+    ep.y += ep.vy * state.time.deltaTime;
+  }
 
+  updateEnemyFiring(state);
   checkCollisions(state);
   checkProjectileCollisions(state);
+  checkEnemyProjectileCollisions(state);
   resolveEntityDeaths(state);
 }
 
@@ -656,6 +678,77 @@ function checkProjectileCollisions(state: GameState): void {
       state.projectiles.splice(pi, 1);
     }
   }
+}
+
+function updateEnemyFiring(state: GameState): void {
+  const dt = state.time.deltaTime;
+
+  for (const e of state.entities) {
+    if (e.health <= 0) continue;
+    if (!SHIP_ENTITY_TYPES.includes(e.entityType)) continue;
+
+    const weaponConfig = SHIP_WEAPON_CONFIGS[e.entityType];
+    if (!weaponConfig) continue;
+
+    const dx = PLANET_X - e.x;
+    const dy = PLANET_Y - e.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist > weaponConfig.range) continue;
+
+    e.fireTimer += dt;
+    if (e.fireTimer < weaponConfig.fireRate) continue;
+    e.fireTimer -= weaponConfig.fireRate;
+
+    const angle = Math.atan2(e.vy, e.vx);
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+    for (const gunPos of weaponConfig.gunPositions) {
+      const worldGunX = e.x + cos * gunPos.x - sin * gunPos.y;
+      const worldGunY = e.y + sin * gunPos.x + cos * gunPos.y;
+
+      const gdx = PLANET_X - worldGunX;
+      const gdy = PLANET_Y - worldGunY;
+      const gDist = Math.sqrt(gdx * gdx + gdy * gdy);
+      if (gDist === 0) continue;
+
+      state.enemyProjectiles.push({
+        id: state.nextId++,
+        x: worldGunX,
+        y: worldGunY,
+        vx: (gdx / gDist) * weaponConfig.projectileSpeed,
+        vy: (gdy / gDist) * weaponConfig.projectileSpeed,
+        damage: weaponConfig.damage,
+        projectileType: weaponConfig.projectileType,
+        rotation: Math.atan2(gdy, gdx),
+      });
+    }
+  }
+}
+
+function checkEnemyProjectileCollisions(state: GameState): void {
+  const r2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
+  let damaged = false;
+
+  for (let i = state.enemyProjectiles.length - 1; i >= 0; i--) {
+    const ep = state.enemyProjectiles[i];
+
+    if (!isInBounds(ep.x, ep.y)) {
+      state.enemyProjectiles.splice(i, 1);
+      continue;
+    }
+
+    const dx = ep.x - PLANET_X;
+    const dy = ep.y - PLANET_Y;
+    if (dx * dx + dy * dy < r2) {
+      state.planetHealth = Math.max(0, state.planetHealth - ep.damage);
+      state.enemyProjectiles.splice(i, 1);
+      damaged = true;
+    }
+  }
+
+  if (damaged) state.onPlanetDamaged.emit();
 }
 
 export function startNextWave(state: GameState): void {
