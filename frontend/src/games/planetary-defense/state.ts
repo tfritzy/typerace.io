@@ -150,15 +150,22 @@ export interface GameState {
 
 function createRelicSlots(): RelicSlot[] {
   const slots: RelicSlot[] = [];
+  const startingRelics: (RelicType | null)[] = [
+    RelicType.SteelBattleaxe,
+    RelicType.EmbercrestBlade,
+    RelicType.RavenplumeEdge,
+    RelicType.GildedPlumeblade,
+    RelicType.CloudveilLongsword,
+    null,
+    RelicType.DarkwoodHatchet,
+    null,
+  ];
   for (let i = 0; i < RELIC_SLOT_COUNT; i++) {
     const angle = (i * 2 * Math.PI) / RELIC_SLOT_COUNT - Math.PI / 2;
     let relic: RelicState | null = null;
-    if (i % 2 === 0) {
-      relic = { type: RelicType.Gun, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
-    } else if (i === 1) {
-      relic = { type: RelicType.Plasma, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
-    } else if (i === 3) {
-      relic = { type: RelicType.Slow, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
+    const relicType = startingRelics[i] ?? null;
+    if (relicType !== null) {
+      relic = { type: relicType, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
     }
     slots.push({ angle, relic });
   }

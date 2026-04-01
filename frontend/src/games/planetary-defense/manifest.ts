@@ -34,6 +34,9 @@ export const MANIFEST: AssetsManifest = {
         { alias: "asteroids-big-white", src: `${BASE}/Asteroids/asteroids-big-white.json` },
         { alias: "asteroids-small-brown", src: `${BASE}/Asteroids/asteroids-small-brown.json` },
         { alias: "asteroids-small-white", src: `${BASE}/Asteroids/asteroids-small-white.json` },
+
+        { alias: "swordtember", src: "/Swordtember 2024 - Sheet/swordtember_2024.json" },
+        { alias: "axetober", src: "/Axetober Sheet/axetober_2024.json" },
       ],
     },
   ],
