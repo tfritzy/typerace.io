@@ -1,17 +1,17 @@
 import { Container, Graphics } from "pixi.js";
-import type { GameState, TowerSlot } from "./state";
-import { getTowerPosition } from "./state";
-import { TOWER_CONFIGS } from "./towerConfig";
+import type { GameState, RelicSlot } from "./state";
+import { getRelicPosition } from "./state";
+import { RELIC_CONFIGS } from "./relicConfig";
 
-const TOWER_SIZE = 28;
+const RELIC_SIZE = 28;
 const CHARGE_DOT_RADIUS = 4;
 const CHARGE_DOT_SPACING = 12;
-const CHARGE_DOT_OFFSET = TOWER_SIZE / 2 + 10;
+const CHARGE_DOT_OFFSET = RELIC_SIZE / 2 + 10;
 
-export class TowerManager {
+export class RelicManager {
   readonly container: Container;
 
-  private towerGraphics = new Map<number, Graphics>();
+  private relicGraphics = new Map<number, Graphics>();
   private chargeGraphics = new Map<number, Graphics>();
 
   constructor() {
@@ -19,38 +19,38 @@ export class TowerManager {
   }
 
   update(state: GameState): void {
-    this.syncTowers(state);
+    this.syncRelics(state);
   }
 
-  private syncTowers(state: GameState): void {
-    for (let i = 0; i < state.towerSlots.length; i++) {
-      const slot = state.towerSlots[i];
-      if (!slot.tower) {
-        this.removeTowerGraphic(i);
+  private syncRelics(state: GameState): void {
+    for (let i = 0; i < state.relicSlots.length; i++) {
+      const slot = state.relicSlots[i];
+      if (!slot.relic) {
+        this.removeRelicGraphic(i);
         continue;
       }
 
-      const { x, y } = getTowerPosition(slot);
+      const { x, y } = getRelicPosition(slot);
 
-      this.drawTower(i, x, y);
+      this.drawRelic(i, x, y);
       this.drawCharge(i, slot, x, y);
     }
   }
 
-  private drawTower(index: number, x: number, y: number): void {
-    let g = this.towerGraphics.get(index);
+  private drawRelic(index: number, x: number, y: number): void {
+    let g = this.relicGraphics.get(index);
     if (!g) {
       g = new Graphics();
       this.container.addChild(g);
-      this.towerGraphics.set(index, g);
+      this.relicGraphics.set(index, g);
     }
 
     g.clear();
     g.rect(
-      x - TOWER_SIZE / 2,
-      y - TOWER_SIZE / 2,
-      TOWER_SIZE,
-      TOWER_SIZE
+      x - RELIC_SIZE / 2,
+      y - RELIC_SIZE / 2,
+      RELIC_SIZE,
+      RELIC_SIZE
     );
     g.fill({ color: 0x888888 });
     g.stroke({ color: 0xaaaaaa, width: 2 });
@@ -58,11 +58,11 @@ export class TowerManager {
 
   private drawCharge(
     index: number,
-    slot: TowerSlot,
-    towerX: number,
-    towerY: number
+    slot: RelicSlot,
+    relicX: number,
+    relicY: number
   ): void {
-    if (!slot.tower) return;
+    if (!slot.relic) return;
 
     let g = this.chargeGraphics.get(index);
     if (!g) {
@@ -73,7 +73,7 @@ export class TowerManager {
 
     g.clear();
 
-    const config = TOWER_CONFIGS[slot.tower.type];
+    const config = RELIC_CONFIGS[slot.relic.type];
     const count = config.charsToFire;
 
     const totalWidth = (count - 1) * CHARGE_DOT_SPACING;
@@ -81,10 +81,10 @@ export class TowerManager {
 
     for (let d = 0; d < count; d++) {
       const along = startOffset + d * CHARGE_DOT_SPACING;
-      const cx = towerX + along;
-      const cy = towerY + CHARGE_DOT_OFFSET;
+      const cx = relicX + along;
+      const cy = relicY + CHARGE_DOT_OFFSET;
 
-      if (d < slot.tower.charge) {
+      if (d < slot.relic.charge) {
         g.circle(cx, cy, CHARGE_DOT_RADIUS);
         g.fill({ color: 0x4ade80 });
       } else {
@@ -95,11 +95,11 @@ export class TowerManager {
     }
   }
 
-  private removeTowerGraphic(index: number): void {
-    const tg = this.towerGraphics.get(index);
+  private removeRelicGraphic(index: number): void {
+    const tg = this.relicGraphics.get(index);
     if (tg) {
       tg.destroy();
-      this.towerGraphics.delete(index);
+      this.relicGraphics.delete(index);
     }
     const cg = this.chargeGraphics.get(index);
     if (cg) {
@@ -109,9 +109,9 @@ export class TowerManager {
   }
 
   destroy(): void {
-    for (const g of this.towerGraphics.values()) g.destroy();
+    for (const g of this.relicGraphics.values()) g.destroy();
     for (const g of this.chargeGraphics.values()) g.destroy();
-    this.towerGraphics.clear();
+    this.relicGraphics.clear();
     this.chargeGraphics.clear();
     this.container.destroy();
   }

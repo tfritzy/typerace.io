@@ -7,12 +7,12 @@ import { randInt } from "./utils";
 import { getLanguageFromSlug } from "../../utils/modes";
 import { getRandomWord } from "../../utils/wordLists";
 import {
-  TowerType,
-  TOWER_CONFIGS,
-  TOWER_SLOT_COUNT,
-  TOWER_ORBIT_RADIUS,
-  type TowerTypeConfig,
-} from "./towerConfig";
+  RelicType,
+  RELIC_CONFIGS,
+  RELIC_SLOT_COUNT,
+  RELIC_ORBIT_RADIUS,
+  type RelicTypeConfig,
+} from "./relicConfig";
 import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
 
@@ -20,10 +20,10 @@ export const PLANET_X = CANVAS_WIDTH / 2;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLANET_HIT_RADIUS = 100;
 
-export function getTowerPosition(slot: TowerSlot): { x: number; y: number } {
+export function getRelicPosition(slot: RelicSlot): { x: number; y: number } {
   return {
-    x: PLANET_X + Math.cos(slot.angle) * TOWER_ORBIT_RADIUS,
-    y: PLANET_Y + Math.sin(slot.angle) * TOWER_ORBIT_RADIUS,
+    x: PLANET_X + Math.cos(slot.angle) * RELIC_ORBIT_RADIUS,
+    y: PLANET_Y + Math.sin(slot.angle) * RELIC_ORBIT_RADIUS,
   };
 }
 
@@ -50,17 +50,17 @@ export interface EntityState {
   variant?: number;
 }
 
-export interface TowerState {
-  type: TowerType;
+export interface RelicState {
+  type: RelicType;
   level: number;
   charge: number;
   remainingShots: number;
   nextShotTime: number;
 }
 
-export interface TowerSlot {
+export interface RelicSlot {
   angle: number;
-  tower: TowerState | null;
+  relic: RelicState | null;
 }
 
 export interface ProjectileState {
@@ -131,7 +131,7 @@ export interface DamageData {
 
 export interface GameState {
   entities: EntityState[];
-  towerSlots: TowerSlot[];
+  relicSlots: RelicSlot[];
   projectiles: ProjectileState[];
   time: {
     time: number;
@@ -143,24 +143,24 @@ export interface GameState {
   maxPlanetHealth: number;
   wave: WaveState;
   onPlanetDamaged: GameEvent;
-  onTowerFired: GameEvent;
+  onRelicFired: GameEvent;
   onWaveComplete: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
 }
 
-function createTowerSlots(): TowerSlot[] {
-  const slots: TowerSlot[] = [];
-  for (let i = 0; i < TOWER_SLOT_COUNT; i++) {
-    const angle = (i * 2 * Math.PI) / TOWER_SLOT_COUNT - Math.PI / 2;
-    let tower: TowerState | null = null;
+function createRelicSlots(): RelicSlot[] {
+  const slots: RelicSlot[] = [];
+  for (let i = 0; i < RELIC_SLOT_COUNT; i++) {
+    const angle = (i * 2 * Math.PI) / RELIC_SLOT_COUNT - Math.PI / 2;
+    let relic: RelicState | null = null;
     if (i % 2 === 0) {
-      tower = { type: TowerType.Gun, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
+      relic = { type: RelicType.Gun, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
     } else if (i === 1) {
-      tower = { type: TowerType.Plasma, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
+      relic = { type: RelicType.Plasma, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
     } else if (i === 3) {
-      tower = { type: TowerType.Slow, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
+      relic = { type: RelicType.Slow, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
     }
-    slots.push({ angle, tower });
+    slots.push({ angle, relic });
   }
   return slots;
 }
@@ -168,7 +168,7 @@ function createTowerSlots(): TowerSlot[] {
 export function createGameState(): GameState {
   return {
     entities: [],
-    towerSlots: createTowerSlots(),
+    relicSlots: createRelicSlots(),
     projectiles: [],
     time: {
       time: 0,
@@ -186,7 +186,7 @@ export function createGameState(): GameState {
       waveTimer: 0,
     },
     onPlanetDamaged: new GameEvent(),
-    onTowerFired: new GameEvent(),
+    onRelicFired: new GameEvent(),
     onWaveComplete: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
   };
@@ -307,7 +307,7 @@ export function handleTypedCharacter(state: GameState, key: string): void {
   if (key.length !== 1) return;
   applyTypedCharacter(state.entities, key);
   rerollCompletedWords(state);
-  chargeTowers(state);
+  chargeRelics(state);
 }
 
 function findTypedTarget(
@@ -329,7 +329,7 @@ function getNeighborSlots(
   state: GameState,
   slotIndex: number
 ): number[] {
-  const count = state.towerSlots.length;
+  const count = state.relicSlots.length;
   return [
     (slotIndex - 1 + count) % count,
     (slotIndex + 1) % count,
@@ -337,12 +337,12 @@ function getNeighborSlots(
 }
 
 function getDamageBuffMultiplier(state: GameState, slotIndex: number): number {
-  const count = state.towerSlots.length;
+  const count = state.relicSlots.length;
   let multiplier = 1;
   for (let j = 0; j < count; j++) {
-    const slot = state.towerSlots[j];
-    if (!slot.tower) continue;
-    const config: TowerTypeConfig = TOWER_CONFIGS[slot.tower.type];
+    const slot = state.relicSlots[j];
+    if (!slot.relic) continue;
+    const config: RelicTypeConfig = RELIC_CONFIGS[slot.relic.type];
     if (config.damageBuffMultiplier === 0) continue;
     if (config.damageBuffAll && j !== slotIndex) {
       multiplier += config.damageBuffMultiplier;
@@ -361,53 +361,53 @@ function getDamageBuffMultiplier(state: GameState, slotIndex: number): number {
 
 function tryFireSlot(
   state: GameState,
-  slot: TowerSlot,
+  slot: RelicSlot,
   slotIndex: number
 ): void {
-  const config = TOWER_CONFIGS[slot.tower!.type];
-  if (slot.tower!.charge < config.charsToFire) return;
+  const config = RELIC_CONFIGS[slot.relic!.type];
+  if (slot.relic!.charge < config.charsToFire) return;
 
-  slot.tower!.charge = 0;
+  slot.relic!.charge = 0;
   const target = findTypedTarget(state);
   if (target) {
-    fireTower(state, slot, slotIndex, target);
+    fireRelic(state, slot, slotIndex, target);
   }
   if (config.chargesNeighbors) {
     chargeNeighbors(state, slotIndex);
   }
 }
 
-function chargeTowers(state: GameState): void {
-  for (let i = 0; i < state.towerSlots.length; i++) {
-    const slot = state.towerSlots[i];
-    if (!slot.tower) continue;
+function chargeRelics(state: GameState): void {
+  for (let i = 0; i < state.relicSlots.length; i++) {
+    const slot = state.relicSlots[i];
+    if (!slot.relic) continue;
     if (!findTypedTarget(state)) continue;
 
-    slot.tower.charge++;
+    slot.relic.charge++;
     tryFireSlot(state, slot, i);
   }
 }
 
 function chargeNeighbors(state: GameState, slotIndex: number): void {
   for (const ni of getNeighborSlots(state, slotIndex)) {
-    const neighbor = state.towerSlots[ni];
-    if (!neighbor.tower) continue;
+    const neighbor = state.relicSlots[ni];
+    if (!neighbor.relic) continue;
 
-    neighbor.tower.charge++;
+    neighbor.relic.charge++;
     tryFireSlot(state, neighbor, ni);
   }
 }
 
 function spawnProjectile(
   state: GameState,
-  slot: TowerSlot,
+  slot: RelicSlot,
   slotIndex: number,
   target: { x: number; y: number }
 ): boolean {
-  const { x: towerX, y: towerY } = getTowerPosition(slot);
-  const config = TOWER_CONFIGS[slot.tower!.type];
-  const dx = target.x - towerX;
-  const dy = target.y - towerY;
+  const { x: relicX, y: relicY } = getRelicPosition(slot);
+  const config = RELIC_CONFIGS[slot.relic!.type];
+  const dx = target.x - relicX;
+  const dy = target.y - relicY;
   const dist = Math.sqrt(dx * dx + dy * dy);
   if (dist === 0) return false;
 
@@ -415,8 +415,8 @@ function spawnProjectile(
 
   state.projectiles.push({
     id: state.nextId++,
-    x: towerX,
-    y: towerY,
+    x: relicX,
+    y: relicY,
     vx: (dx / dist) * config.projectileSpeed,
     vy: (dy / dist) * config.projectileSpeed,
     damage: config.damage * buffMultiplier,
@@ -428,22 +428,22 @@ function spawnProjectile(
     explosionRange: config.explosionRange,
   });
 
-  state.onTowerFired.emit();
+  state.onRelicFired.emit();
   return true;
 }
 
-function fireTower(
+function fireRelic(
   state: GameState,
-  slot: TowerSlot,
+  slot: RelicSlot,
   slotIndex: number,
   target: { x: number; y: number }
 ): void {
   if (!spawnProjectile(state, slot, slotIndex, target)) return;
 
-  const config = TOWER_CONFIGS[slot.tower!.type];
+  const config = RELIC_CONFIGS[slot.relic!.type];
   if (config.multiShotCount > 1) {
-    slot.tower!.remainingShots = config.multiShotCount - 1;
-    slot.tower!.nextShotTime = state.time.time + MULTI_SHOT_DELAY;
+    slot.relic!.remainingShots = config.multiShotCount - 1;
+    slot.relic!.nextShotTime = state.time.time + MULTI_SHOT_DELAY;
   }
 }
 
@@ -478,14 +478,14 @@ function checkCollisions(state: GameState): void {
 }
 
 function processPendingShots(state: GameState): void {
-  for (let i = 0; i < state.towerSlots.length; i++) {
-    const slot = state.towerSlots[i];
-    if (!slot.tower || slot.tower.remainingShots <= 0) continue;
-    if (state.time.time < slot.tower.nextShotTime) continue;
+  for (let i = 0; i < state.relicSlots.length; i++) {
+    const slot = state.relicSlots[i];
+    if (!slot.relic || slot.relic.remainingShots <= 0) continue;
+    if (state.time.time < slot.relic.nextShotTime) continue;
 
-    slot.tower.remainingShots--;
-    if (slot.tower.remainingShots > 0) {
-      slot.tower.nextShotTime = state.time.time + MULTI_SHOT_DELAY;
+    slot.relic.remainingShots--;
+    if (slot.relic.remainingShots > 0) {
+      slot.relic.nextShotTime = state.time.time + MULTI_SHOT_DELAY;
     }
 
     const target = findTypedTarget(state);
