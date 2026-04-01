@@ -1,7 +1,7 @@
 import { Container, Graphics, Sprite, type Spritesheet } from "pixi.js";
 import type { GameState, RelicSlot } from "./state";
 import { getRelicPosition } from "./state";
-import { getRelicConfig } from "./relicConfig";
+import { RelicType, getRelicConfig } from "./relicConfig";
 
 const RELIC_SPRITE_SCALE = 2.5;
 const CHARGE_DOT_RADIUS = 4;
@@ -40,8 +40,7 @@ export class RelicManager {
 
   private drawRelic(index: number, slot: RelicSlot, x: number, y: number): void {
     let sprite = this.relicSprites.get(index);
-    const config = getRelicConfig(slot.relic!.type);
-    const frameName = `item-${config.spriteIndex}`;
+    const frameName = RelicType[slot.relic!.type];
 
     if (!sprite) {
       const texture = this.itemsSheet.textures[frameName];
