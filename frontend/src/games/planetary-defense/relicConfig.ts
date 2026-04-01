@@ -234,4 +234,4 @@ export const RELIC_DISPLAY: Record<RelicType, RelicDisplayInfo> = {
 };
 
 export const RELIC_SLOT_COUNT = 8;
-export const RELIC_ORBIT_RADIUS = 140;
+export const RELIC_ORBIT_RADIUS = 160;

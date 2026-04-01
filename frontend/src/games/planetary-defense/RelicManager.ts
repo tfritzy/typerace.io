@@ -4,15 +4,26 @@ import { getRelicPosition } from "./state";
 import { RELIC_CONFIGS, RELIC_DISPLAY } from "./relicConfig";
 import type { AssetManager } from "./assetManager";
 
-const RELIC_SIZE = 28;
+const RELIC_SIZE = 56;
+const CONTAINER_PADDING = 8;
+const CONTAINER_SIZE = RELIC_SIZE + CONTAINER_PADDING * 2;
+const CONTAINER_RADIUS = 8;
+const CONTAINER_BG = 0x1a1a2e;
+const CONTAINER_BORDER = 0x3a3a5e;
 const CHARGE_DOT_RADIUS = 4;
 const CHARGE_DOT_SPACING = 12;
-const CHARGE_DOT_OFFSET = RELIC_SIZE / 2 + 10;
+const CHARGE_DOT_OFFSET = CONTAINER_SIZE / 2 + 10;
+
+interface RelicVisual {
+  wrapper: Container;
+  bg: Graphics;
+  sprite: Sprite;
+}
 
 export class RelicManager {
   readonly container: Container;
 
-  private relicSprites = new Map<number, Sprite>();
+  private relicVisuals = new Map<number, RelicVisual>();
   private chargeGraphics = new Map<number, Graphics>();
   private assetManager: AssetManager;
 
@@ -41,20 +52,38 @@ export class RelicManager {
   }
 
   private drawRelic(index: number, x: number, y: number, slot: RelicSlot): void {
-    let sprite = this.relicSprites.get(index);
-    if (!sprite) {
+    let visual = this.relicVisuals.get(index);
+    if (!visual) {
+      const wrapper = new Container();
+
+      const bg = new Graphics();
+      bg.roundRect(
+        -CONTAINER_SIZE / 2,
+        -CONTAINER_SIZE / 2,
+        CONTAINER_SIZE,
+        CONTAINER_SIZE,
+        CONTAINER_RADIUS
+      );
+      bg.fill({ color: CONTAINER_BG, alpha: 0.85 });
+      bg.stroke({ color: CONTAINER_BORDER, width: 1.5 });
+      wrapper.addChild(bg);
+
       const display = RELIC_DISPLAY[slot.relic!.type];
       const texture = this.assetManager.getRelicTexture(display.spriteSheet, display.frameName);
-      sprite = new Sprite(texture);
+      texture.source.scaleMode = "nearest";
+      const sprite = new Sprite(texture);
       sprite.anchor.set(0.5);
       sprite.width = RELIC_SIZE;
       sprite.height = RELIC_SIZE;
-      this.container.addChild(sprite);
-      this.relicSprites.set(index, sprite);
+      wrapper.addChild(sprite);
+
+      this.container.addChild(wrapper);
+      visual = { wrapper, bg, sprite };
+      this.relicVisuals.set(index, visual);
     }
 
-    sprite.x = x;
-    sprite.y = y;
+    visual.wrapper.x = x;
+    visual.wrapper.y = y;
   }
 
   private drawCharge(
@@ -97,10 +126,10 @@ export class RelicManager {
   }
 
   private removeRelicGraphic(index: number): void {
-    const sprite = this.relicSprites.get(index);
-    if (sprite) {
-      sprite.destroy();
-      this.relicSprites.delete(index);
+    const visual = this.relicVisuals.get(index);
+    if (visual) {
+      visual.wrapper.destroy();
+      this.relicVisuals.delete(index);
     }
     const cg = this.chargeGraphics.get(index);
     if (cg) {
@@ -110,9 +139,9 @@ export class RelicManager {
   }
 
   destroy(): void {
-    for (const s of this.relicSprites.values()) s.destroy();
+    for (const v of this.relicVisuals.values()) v.wrapper.destroy();
     for (const g of this.chargeGraphics.values()) g.destroy();
-    this.relicSprites.clear();
+    this.relicVisuals.clear();
     this.chargeGraphics.clear();
     this.container.destroy();
   }
