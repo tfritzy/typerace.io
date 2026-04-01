@@ -49,6 +49,7 @@ export class AssetManager {
   private engines_: Record<string, Spritesheet>;
   private asteroids_: Record<string, Spritesheet>;
   private colorPresets_: Record<string, Texture>;
+  private itemsSheet_: Spritesheet;
 
   constructor(loaded: Record<string, unknown>) {
     const engineAliasValues = Object.values(ENGINE_ALIASES);
@@ -71,6 +72,7 @@ export class AssetManager {
     this.colorPresets_ = Object.fromEntries(
       presetAliasValues.map((a) => [a, loaded[a] as Texture])
     );
+    this.itemsSheet_ = loaded["items-sheet"] as Spritesheet;
 
     this.applyNearestNeighbor();
   }
@@ -85,6 +87,10 @@ export class AssetManager {
 
   get starsParticle(): Spritesheet {
     return this.starsParticle_;
+  }
+
+  get itemsSheet(): Spritesheet {
+    return this.itemsSheet_;
   }
 
   getShipTexture(entityType: EntityType, colorPreset: ColorPreset): Texture {
@@ -133,6 +139,7 @@ export class AssetManager {
     setNearestNeighbor(this.spaceships_);
     setNearestNeighbor(this.spaceshipsColormap_);
     setNearestNeighbor(this.spaceshipsShield_);
+    setNearestNeighbor(this.itemsSheet_);
 
     for (const sheet of Object.values(this.engines_)) {
       setNearestNeighbor(sheet);
