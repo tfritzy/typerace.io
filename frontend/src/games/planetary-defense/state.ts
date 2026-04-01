@@ -11,6 +11,7 @@ import {
   TOWER_CONFIGS,
   TOWER_SLOT_COUNT,
   TOWER_ORBIT_RADIUS,
+  type TowerTypeConfig,
 } from "./towerConfig";
 import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
@@ -335,6 +336,25 @@ function getNeighborSlots(
   ];
 }
 
+function getDamageBuffMultiplier(state: GameState, slotIndex: number): number {
+  const count = state.towerSlots.length;
+  let multiplier = 1;
+  for (let j = 0; j < count; j++) {
+    const slot = state.towerSlots[j];
+    if (!slot.tower) continue;
+    const config: TowerTypeConfig = TOWER_CONFIGS[slot.tower.type];
+    if (config.damageBuffIndexes.length === 0) continue;
+    for (const offset of config.damageBuffIndexes) {
+      const buffedSlot = ((j + offset) % count + count) % count;
+      if (buffedSlot === slotIndex) {
+        multiplier += config.damageBuffMultiplier;
+        break;
+      }
+    }
+  }
+  return multiplier;
+}
+
 function tryFireSlot(
   state: GameState,
   slot: TowerSlot,
@@ -346,7 +366,7 @@ function tryFireSlot(
   slot.tower!.charge = 0;
   const target = findTypedTarget(state);
   if (target) {
-    fireTower(state, slot, target);
+    fireTower(state, slot, slotIndex, target);
   }
   if (config.chargesNeighbors) {
     chargeNeighbors(state, slotIndex);
@@ -377,6 +397,7 @@ function chargeNeighbors(state: GameState, slotIndex: number): void {
 function spawnProjectile(
   state: GameState,
   slot: TowerSlot,
+  slotIndex: number,
   target: { x: number; y: number }
 ): boolean {
   const { x: towerX, y: towerY } = getTowerPosition(slot);
@@ -386,13 +407,15 @@ function spawnProjectile(
   const dist = Math.sqrt(dx * dx + dy * dy);
   if (dist === 0) return false;
 
+  const buffMultiplier = getDamageBuffMultiplier(state, slotIndex);
+
   state.projectiles.push({
     id: state.nextId++,
     x: towerX,
     y: towerY,
     vx: (dx / dist) * config.projectileSpeed,
     vy: (dy / dist) * config.projectileSpeed,
-    damage: config.damage,
+    damage: config.damage * buffMultiplier,
     bleedApplicationChance: config.bleedApplicationChance,
     plasmaStacks: config.plasmaStacks,
     slowStacks: config.slowStacks,
@@ -408,9 +431,10 @@ function spawnProjectile(
 function fireTower(
   state: GameState,
   slot: TowerSlot,
+  slotIndex: number,
   target: { x: number; y: number }
 ): void {
-  if (!spawnProjectile(state, slot, target)) return;
+  if (!spawnProjectile(state, slot, slotIndex, target)) return;
 
   const config = TOWER_CONFIGS[slot.tower!.type];
   if (config.multiShotCount > 1) {
@@ -450,7 +474,8 @@ function checkCollisions(state: GameState): void {
 }
 
 function processPendingShots(state: GameState): void {
-  for (const slot of state.towerSlots) {
+  for (let i = 0; i < state.towerSlots.length; i++) {
+    const slot = state.towerSlots[i];
     if (!slot.tower || slot.tower.remainingShots <= 0) continue;
     if (state.time.time < slot.tower.nextShotTime) continue;
 
@@ -462,7 +487,7 @@ function processPendingShots(state: GameState): void {
     const target = findTypedTarget(state);
     if (!target) continue;
 
-    spawnProjectile(state, slot, target);
+    spawnProjectile(state, slot, i, target);
   }
 }
 

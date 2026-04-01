@@ -18,6 +18,8 @@ export interface TowerTypeConfig {
   chainCount: number;
   explosionRange: number;
   multiShotCount: number;
+  damageBuffIndexes: number[];
+  damageBuffMultiplier: number;
 }
 
 const TOWER_DEFAULTS: TowerTypeConfig = {
@@ -32,6 +34,8 @@ const TOWER_DEFAULTS: TowerTypeConfig = {
   chainCount: 0,
   explosionRange: 0,
   multiShotCount: 1,
+  damageBuffIndexes: [],
+  damageBuffMultiplier: 0,
 };
 
 function tower(overrides: Partial<TowerTypeConfig>): TowerTypeConfig {
