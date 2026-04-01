@@ -49,6 +49,8 @@ export class AssetManager {
   private engines_: Record<string, Spritesheet>;
   private asteroids_: Record<string, Spritesheet>;
   private colorPresets_: Record<string, Texture>;
+  private swordtember_: Spritesheet;
+  private axetober_: Spritesheet;
 
   constructor(loaded: Record<string, unknown>) {
     const engineAliasValues = Object.values(ENGINE_ALIASES);
@@ -71,6 +73,8 @@ export class AssetManager {
     this.colorPresets_ = Object.fromEntries(
       presetAliasValues.map((a) => [a, loaded[a] as Texture])
     );
+    this.swordtember_ = loaded["swordtember"] as Spritesheet;
+    this.axetober_ = loaded["axetober"] as Spritesheet;
 
     this.applyNearestNeighbor();
   }
@@ -117,6 +121,11 @@ export class AssetManager {
     return textures[variant % textures.length];
   }
 
+  getRelicTexture(spriteSheet: 'swordtember' | 'axetober', frameName: string): Texture {
+    const sheet = spriteSheet === 'swordtember' ? this.swordtember_ : this.axetober_;
+    return sheet.textures[frameName];
+  }
+
   static async load(manifest: AssetsManifest): Promise<AssetManager> {
     const bundle = manifest.bundles[0];
     Assets.addBundle(bundle.name, bundle.assets);
@@ -143,5 +152,7 @@ export class AssetManager {
     for (const tex of Object.values(this.colorPresets_)) {
       setTextureNearest(tex);
     }
+    setNearestNeighbor(this.swordtember_);
+    setNearestNeighbor(this.axetober_);
   }
 }

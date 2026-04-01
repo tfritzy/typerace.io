@@ -74,7 +74,7 @@ export class PlanetaryDefenseGame {
     this.planetManager = new PlanetManager(this.assetManager);
     world.addChild(this.planetManager.container);
 
-    this.relicManager = new RelicManager();
+    this.relicManager = new RelicManager(this.assetManager);
     world.addChild(this.relicManager.container);
 
     this.projectileManager = new ProjectileManager();
