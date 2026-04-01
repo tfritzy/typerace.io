@@ -1,4 +1,4 @@
-export enum TowerType {
+export enum RelicType {
   Gun,
   Bleed,
   Plasma,
@@ -6,7 +6,7 @@ export enum TowerType {
   Freeze,
 }
 
-export interface TowerTypeConfig {
+export interface RelicTypeConfig {
   charsToFire: number;
   projectileSpeed: number;
   damage: number;
@@ -23,7 +23,7 @@ export interface TowerTypeConfig {
   damageBuffMultiplier: number;
 }
 
-const TOWER_DEFAULTS: TowerTypeConfig = {
+const RELIC_DEFAULTS: RelicTypeConfig = {
   charsToFire: 4,
   projectileSpeed: 800,
   damage: 10,
@@ -40,17 +40,17 @@ const TOWER_DEFAULTS: TowerTypeConfig = {
   damageBuffMultiplier: 0,
 };
 
-function tower(overrides: Partial<TowerTypeConfig>): TowerTypeConfig {
-  return { ...TOWER_DEFAULTS, ...overrides };
+function relic(overrides: Partial<RelicTypeConfig>): RelicTypeConfig {
+  return { ...RELIC_DEFAULTS, ...overrides };
 }
 
-export const TOWER_CONFIGS: Record<TowerType, TowerTypeConfig> = {
-  [TowerType.Gun]: tower({ chainCount: 2 }),
-  [TowerType.Bleed]: tower({ charsToFire: 3, bleedApplicationChance: 0.2 }),
-  [TowerType.Plasma]: tower({ charsToFire: 5, damage: 5, plasmaStacks: 3 }),
-  [TowerType.Slow]: tower({ damage: 5, slowStacks: 3 }),
-  [TowerType.Freeze]: tower({ charsToFire: 6, damage: 5, freezeStacks: 2 }),
+export const RELIC_CONFIGS: Record<RelicType, RelicTypeConfig> = {
+  [RelicType.Gun]: relic({ chainCount: 2 }),
+  [RelicType.Bleed]: relic({ charsToFire: 3, bleedApplicationChance: 0.2 }),
+  [RelicType.Plasma]: relic({ charsToFire: 5, damage: 5, plasmaStacks: 3 }),
+  [RelicType.Slow]: relic({ damage: 5, slowStacks: 3 }),
+  [RelicType.Freeze]: relic({ charsToFire: 6, damage: 5, freezeStacks: 2 }),
 };
 
-export const TOWER_SLOT_COUNT = 8;
-export const TOWER_ORBIT_RADIUS = 140;
+export const RELIC_SLOT_COUNT = 8;
+export const RELIC_ORBIT_RADIUS = 140;
