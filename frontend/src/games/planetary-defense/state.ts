@@ -153,11 +153,11 @@ function createRelicSlots(): RelicSlot[] {
   const startingRelics: (RelicType | null)[] = [
     RelicType.SteelBattleaxe,
     RelicType.EmbercrestBlade,
-    RelicType.GlacialCrusader,
-    RelicType.VoidthornBlade,
+    RelicType.RavenplumeEdge,
     RelicType.GildedPlumeblade,
-    null,
     RelicType.CloudveilLongsword,
+    null,
+    RelicType.DarkwoodHatchet,
     null,
   ];
   for (let i = 0; i < RELIC_SLOT_COUNT; i++) {
