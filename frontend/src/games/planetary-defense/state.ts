@@ -53,6 +53,8 @@ export interface TowerState {
   type: TowerType;
   level: number;
   charge: number;
+  remainingShots: number;
+  nextShotTime: number;
 }
 
 export interface TowerSlot {
@@ -73,12 +75,6 @@ export interface ProjectileState {
   freezeStacks: number;
   chainCount: number;
   explosionRange: number;
-}
-
-interface PendingShot {
-  slotIndex: number;
-  towerType: TowerType;
-  fireTime: number;
 }
 
 export enum WavePhase {
@@ -136,7 +132,6 @@ export interface GameState {
   entities: EntityState[];
   towerSlots: TowerSlot[];
   projectiles: ProjectileState[];
-  pendingShots: PendingShot[];
   time: {
     time: number;
     deltaTime: number;
@@ -158,11 +153,11 @@ function createTowerSlots(): TowerSlot[] {
     const angle = (i * 2 * Math.PI) / TOWER_SLOT_COUNT - Math.PI / 2;
     let tower: TowerState | null = null;
     if (i % 2 === 0) {
-      tower = { type: TowerType.Gun, level: 1, charge: 0 };
+      tower = { type: TowerType.Gun, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
     } else if (i === 1) {
-      tower = { type: TowerType.Plasma, level: 1, charge: 0 };
+      tower = { type: TowerType.Plasma, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
     } else if (i === 3) {
-      tower = { type: TowerType.Slow, level: 1, charge: 0 };
+      tower = { type: TowerType.Slow, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
     }
     slots.push({ angle, tower });
   }
@@ -174,7 +169,6 @@ export function createGameState(): GameState {
     entities: [],
     towerSlots: createTowerSlots(),
     projectiles: [],
-    pendingShots: [],
     time: {
       time: 0,
       deltaTime: 0,
@@ -352,7 +346,7 @@ function tryFireSlot(
   slot.tower!.charge = 0;
   const target = findTypedTarget(state);
   if (target) {
-    fireTower(state, slot, slotIndex, target);
+    fireTower(state, slot, target);
   }
   if (config.chargesNeighbors) {
     chargeNeighbors(state, slotIndex);
@@ -414,18 +408,14 @@ function spawnProjectile(
 function fireTower(
   state: GameState,
   slot: TowerSlot,
-  slotIndex: number,
   target: { x: number; y: number }
 ): void {
   if (!spawnProjectile(state, slot, target)) return;
 
   const config = TOWER_CONFIGS[slot.tower!.type];
-  for (let i = 1; i < config.multiShotCount; i++) {
-    state.pendingShots.push({
-      slotIndex,
-      towerType: slot.tower!.type,
-      fireTime: state.time.time + config.multiShotDelay * i,
-    });
+  if (config.multiShotCount > 1) {
+    slot.tower!.remainingShots = config.multiShotCount - 1;
+    slot.tower!.nextShotTime = state.time.time + MULTI_SHOT_DELAY;
   }
 }
 
@@ -460,14 +450,14 @@ function checkCollisions(state: GameState): void {
 }
 
 function processPendingShots(state: GameState): void {
-  for (let i = state.pendingShots.length - 1; i >= 0; i--) {
-    const pending = state.pendingShots[i];
-    if (state.time.time < pending.fireTime) continue;
+  for (const slot of state.towerSlots) {
+    if (!slot.tower || slot.tower.remainingShots <= 0) continue;
+    if (state.time.time < slot.tower.nextShotTime) continue;
 
-    state.pendingShots.splice(i, 1);
-
-    const slot = state.towerSlots[pending.slotIndex];
-    if (!slot.tower || slot.tower.type !== pending.towerType) continue;
+    slot.tower.remainingShots--;
+    if (slot.tower.remainingShots > 0) {
+      slot.tower.nextShotTime = state.time.time + MULTI_SHOT_DELAY;
+    }
 
     const target = findTypedTarget(state);
     if (!target) continue;
@@ -511,6 +501,7 @@ export function updateState(state: GameState, dt: number): void {
 const PROJECTILE_HIT_RADIUS = 20;
 const BLEED_DURATION_SECONDS = 3;
 export const CHAIN_JUMP_RANGE = 150;
+const MULTI_SHOT_DELAY = 0.1;
 
 const TICK_RATE = 2;
 
