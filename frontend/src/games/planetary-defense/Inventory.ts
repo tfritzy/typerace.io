@@ -34,6 +34,7 @@ const ITEM_BG_COLOR = 0x252545;
 const ITEM_BORDER_COLOR = 0x4a4a7e;
 const VALID_COLOR = 0x4ade80;
 const INVALID_COLOR = 0xef4444;
+const TEMP_ITEM_ID = -1;
 
 export interface InventoryItem {
   id: number;
@@ -462,7 +463,7 @@ export class Inventory {
 
     const size = getRelicSize(relicType);
     const tempItem: InventoryItem = {
-      id: -1,
+      id: TEMP_ITEM_ID,
       relicType,
       gridX: gridCol,
       gridY: gridRow,
