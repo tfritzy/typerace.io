@@ -5,7 +5,7 @@ import { Background } from "./Background";
 import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
 import type { LabelData } from "./EnemyManager";
-import { TowerManager } from "./TowerManager";
+import { RelicManager } from "./RelicManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { DamageNumberManager } from "./DamageNumberManager";
 import { AssetManager } from "./assetManager";
@@ -22,7 +22,7 @@ export class PlanetaryDefenseGame {
   private background!: Background;
   private planetManager!: PlanetManager;
   private enemyManager!: EnemyManager;
-  private towerManager!: TowerManager;
+  private relicManager!: RelicManager;
   private projectileManager!: ProjectileManager;
   private damageNumberManager!: DamageNumberManager;
 
@@ -74,8 +74,8 @@ export class PlanetaryDefenseGame {
     this.planetManager = new PlanetManager(this.assetManager);
     world.addChild(this.planetManager.container);
 
-    this.towerManager = new TowerManager();
-    world.addChild(this.towerManager.container);
+    this.relicManager = new RelicManager();
+    world.addChild(this.relicManager.container);
 
     this.projectileManager = new ProjectileManager();
     world.addChild(this.projectileManager.container);
@@ -92,7 +92,7 @@ export class PlanetaryDefenseGame {
     this.background.update(dt);
     updateState(this.state, dt);
     this.enemyManager.update(this.state, dt);
-    this.towerManager.update(this.state);
+    this.relicManager.update(this.state);
     this.projectileManager.update(this.state);
     this.damageNumberManager.update(dt);
   }
@@ -104,7 +104,7 @@ export class PlanetaryDefenseGame {
     }
     this.background.destroy();
     this.planetManager.destroy();
-    this.towerManager.destroy();
+    this.relicManager.destroy();
     this.projectileManager.destroy();
     this.damageNumberManager.destroy();
     this.enemyManager.destroy();
