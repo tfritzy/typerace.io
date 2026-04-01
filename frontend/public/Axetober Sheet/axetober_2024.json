@@ -1,0 +1,103 @@
+{
+  "frames": {
+    "Steel Battleaxe": {
+      "frame": { "x": 0, "y": 0, "w": 32, "h": 32 }
+    },
+    "Moonlit Hatchet": {
+      "frame": { "x": 32, "y": 0, "w": 32, "h": 32 }
+    },
+    "Obsidian Reaver": {
+      "frame": { "x": 64, "y": 0, "w": 32, "h": 32 }
+    },
+    "Rubyflare Greataxe": {
+      "frame": { "x": 96, "y": 0, "w": 32, "h": 32 }
+    },
+    "Gilded Waraxe": {
+      "frame": { "x": 128, "y": 0, "w": 32, "h": 32 }
+    },
+    "Copperhead Cleaver": {
+      "frame": { "x": 160, "y": 0, "w": 32, "h": 32 }
+    },
+    "Bonecrest Axe": {
+      "frame": { "x": 0, "y": 32, "w": 32, "h": 32 }
+    },
+    "Darkwood Hatchet": {
+      "frame": { "x": 32, "y": 32, "w": 32, "h": 32 }
+    },
+    "Duskforge Halberd": {
+      "frame": { "x": 64, "y": 32, "w": 32, "h": 32 }
+    },
+    "Rosegold Broadaxe": {
+      "frame": { "x": 96, "y": 32, "w": 32, "h": 32 }
+    },
+    "Frostbite Cleaver": {
+      "frame": { "x": 128, "y": 32, "w": 32, "h": 32 }
+    },
+    "Bloodmoon Reaver": {
+      "frame": { "x": 160, "y": 32, "w": 32, "h": 32 }
+    },
+    "Tidebreak Axe": {
+      "frame": { "x": 0, "y": 64, "w": 32, "h": 32 }
+    },
+    "Ironwood Tomahawk": {
+      "frame": { "x": 32, "y": 64, "w": 32, "h": 32 }
+    },
+    "Greystone Broadaxe": {
+      "frame": { "x": 64, "y": 64, "w": 32, "h": 32 }
+    },
+    "Sandstone Hatchet": {
+      "frame": { "x": 96, "y": 64, "w": 32, "h": 32 }
+    },
+    "Crimson Waraxe": {
+      "frame": { "x": 128, "y": 64, "w": 32, "h": 32 }
+    },
+    "Goldscar Halberd": {
+      "frame": { "x": 160, "y": 64, "w": 32, "h": 32 }
+    },
+    "Flamecrest Greataxe": {
+      "frame": { "x": 0, "y": 96, "w": 32, "h": 32 }
+    },
+    "Wrought Iron Chopper": {
+      "frame": { "x": 32, "y": 96, "w": 32, "h": 32 }
+    },
+    "Spectral Cleaver": {
+      "frame": { "x": 64, "y": 96, "w": 32, "h": 32 }
+    },
+    "Bloodrune Axe": {
+      "frame": { "x": 96, "y": 96, "w": 32, "h": 32 }
+    },
+    "Pearlsteel Hatchet": {
+      "frame": { "x": 128, "y": 96, "w": 32, "h": 32 }
+    },
+    "Emberstrike Tomahawk": {
+      "frame": { "x": 160, "y": 96, "w": 32, "h": 32 }
+    },
+    "Nightbloom Reaver": {
+      "frame": { "x": 0, "y": 128, "w": 32, "h": 32 }
+    },
+    "Blackiron Splitter": {
+      "frame": { "x": 32, "y": 128, "w": 32, "h": 32 }
+    },
+    "Verdant Waraxe": {
+      "frame": { "x": 64, "y": 128, "w": 32, "h": 32 }
+    },
+    "Ashen Broadaxe": {
+      "frame": { "x": 96, "y": 128, "w": 32, "h": 32 }
+    },
+    "Prismatic Greataxe": {
+      "frame": { "x": 128, "y": 128, "w": 32, "h": 32 }
+    },
+    "Hellforged Cleaver": {
+      "frame": { "x": 160, "y": 128, "w": 32, "h": 32 }
+    },
+    "Granite Waraxe": {
+      "frame": { "x": 0, "y": 160, "w": 32, "h": 32 }
+    }
+  },
+  "meta": {
+    "image": "Axetober 2024.png",
+    "format": "RGBA8888",
+    "size": { "w": 192, "h": 192 },
+    "scale": "1"
+  }
+}
