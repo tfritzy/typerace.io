@@ -45,7 +45,10 @@ export class RelicManager {
 
     if (!sprite) {
       const texture = this.itemsSheet.textures[frameName];
-      if (!texture) return;
+      if (!texture) {
+        console.warn(`Missing relic texture: ${frameName}`);
+        return;
+      }
       sprite = new Sprite(texture);
       sprite.anchor.set(0.5);
       sprite.scale.set(RELIC_SPRITE_SCALE);

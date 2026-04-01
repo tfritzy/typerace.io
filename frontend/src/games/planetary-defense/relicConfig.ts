@@ -541,11 +541,11 @@ function relic(overrides: Partial<RelicTypeConfig>): RelicTypeConfig {
 }
 
 export const RELIC_CONFIGS: Partial<Record<RelicType, RelicTypeConfig>> = {
-  [RelicType.CrystalSword]: relic({ chainCount: 2, spriteIndex: RelicType.CrystalSword }),
-  [RelicType.PoisonDagger]: relic({ charsToFire: 3, bleedApplicationChance: 0.2, spriteIndex: RelicType.PoisonDagger }),
-  [RelicType.CrystalStaff]: relic({ charsToFire: 5, damage: 5, plasmaStacks: 3, spriteIndex: RelicType.CrystalStaff }),
-  [RelicType.IcePotion]: relic({ damage: 5, slowStacks: 3, spriteIndex: RelicType.IcePotion }),
-  [RelicType.IceArrow]: relic({ charsToFire: 6, damage: 5, freezeStacks: 2, spriteIndex: RelicType.IceArrow }),
+  [RelicType.CrystalSword]: relic({ chainCount: 2 }),
+  [RelicType.PoisonDagger]: relic({ charsToFire: 3, bleedApplicationChance: 0.2 }),
+  [RelicType.CrystalStaff]: relic({ charsToFire: 5, damage: 5, plasmaStacks: 3 }),
+  [RelicType.IcePotion]: relic({ damage: 5, slowStacks: 3 }),
+  [RelicType.IceArrow]: relic({ charsToFire: 6, damage: 5, freezeStacks: 2 }),
 };
 
 export function getRelicConfig(type: RelicType): RelicTypeConfig {
