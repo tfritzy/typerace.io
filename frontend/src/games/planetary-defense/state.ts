@@ -343,7 +343,11 @@ function getDamageBuffMultiplier(state: GameState, slotIndex: number): number {
     const slot = state.towerSlots[j];
     if (!slot.tower) continue;
     const config: TowerTypeConfig = TOWER_CONFIGS[slot.tower.type];
-    if (config.damageBuffIndexes.length === 0) continue;
+    if (config.damageBuffMultiplier === 0) continue;
+    if (config.damageBuffAll && j !== slotIndex) {
+      multiplier += config.damageBuffMultiplier;
+      continue;
+    }
     for (const offset of config.damageBuffIndexes) {
       const buffedSlot = ((j + offset) % count + count) % count;
       if (buffedSlot === slotIndex) {

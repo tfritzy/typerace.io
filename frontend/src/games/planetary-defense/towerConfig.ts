@@ -19,6 +19,7 @@ export interface TowerTypeConfig {
   explosionRange: number;
   multiShotCount: number;
   damageBuffIndexes: number[];
+  damageBuffAll: boolean;
   damageBuffMultiplier: number;
 }
 
@@ -35,6 +36,7 @@ const TOWER_DEFAULTS: TowerTypeConfig = {
   explosionRange: 0,
   multiShotCount: 1,
   damageBuffIndexes: [],
+  damageBuffAll: false,
   damageBuffMultiplier: 0,
 };
 
