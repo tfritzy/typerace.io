@@ -17,6 +17,7 @@ export interface TowerTypeConfig {
   chargesNeighbors: boolean;
   chainCount: number;
   explosionRange: number;
+  multiShotCount: number;
 }
 
 const TOWER_DEFAULTS: TowerTypeConfig = {
@@ -30,6 +31,7 @@ const TOWER_DEFAULTS: TowerTypeConfig = {
   chargesNeighbors: false,
   chainCount: 0,
   explosionRange: 0,
+  multiShotCount: 1,
 };
 
 function tower(overrides: Partial<TowerTypeConfig>): TowerTypeConfig {
