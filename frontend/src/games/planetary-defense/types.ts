@@ -40,3 +40,16 @@ export const SHIP_ENTITY_TYPES = [
 export type EntityType =
   | (typeof METEOR_ENTITY_TYPES)[number]
   | (typeof SHIP_ENTITY_TYPES)[number];
+
+const shipEntityTypeSet: ReadonlySet<string> = new Set(SHIP_ENTITY_TYPES);
+const shipEntityTypeIndex = new Map<string, number>(
+  SHIP_ENTITY_TYPES.map((t, i) => [t, i])
+);
+
+export function isShipEntityType(type: EntityType): boolean {
+  return shipEntityTypeSet.has(type);
+}
+
+export function getShipEntityIndex(type: EntityType): number {
+  return shipEntityTypeIndex.get(type) ?? -1;
+}

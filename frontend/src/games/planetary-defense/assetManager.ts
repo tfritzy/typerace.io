@@ -1,7 +1,7 @@
 import { Assets, type AssetsManifest, type Spritesheet, type Texture } from "pixi.js";
 import {
   EngineType, ColorPreset,
-  type EntityType, SHIP_ENTITY_TYPES,
+  type EntityType, getShipEntityIndex,
 } from "./types";
 import { applyPaletteSwap } from "./ships";
 
@@ -92,7 +92,7 @@ export class AssetManager {
   }
 
   getShipTexture(entityType: EntityType, colorPreset: ColorPreset): Texture {
-    const frameIndex = (SHIP_ENTITY_TYPES as readonly string[]).indexOf(entityType);
+    const frameIndex = getShipEntityIndex(entityType);
     const shipFrame = `ship-${frameIndex}`;
     const cmFrame = `cm-${frameIndex}`;
     const presetAlias = COLOR_PRESET_ALIASES[colorPreset];
@@ -104,7 +104,7 @@ export class AssetManager {
   }
 
   getShieldTexture(entityType: EntityType): Texture {
-    const frameIndex = (SHIP_ENTITY_TYPES as readonly string[]).indexOf(entityType);
+    const frameIndex = getShipEntityIndex(entityType);
     return this.spaceshipsShield_.textures[`shield-${frameIndex}`];
   }
 
