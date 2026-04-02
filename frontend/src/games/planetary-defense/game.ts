@@ -10,10 +10,13 @@ import { ProjectileManager } from "./ProjectileManager";
 import { DamageNumberManager } from "./DamageNumberManager";
 import { Inventory } from "./Inventory";
 import { AssetManager } from "./assetManager";
-import { createGameState, updateState } from "./state";
-import type { GameState } from "./state";
+import { createGameState, updateState, getRelicPosition } from "./state";
+import type { GameState, RelicState } from "./state";
+import { RELIC_SLOT_COUNT } from "./relicConfig";
 
 export type { LabelData };
+
+const WEAPON_SLOT_SIZE = 64;
 
 export class PlanetaryDefenseGame {
   private app: Application;
@@ -27,6 +30,8 @@ export class PlanetaryDefenseGame {
   private projectileManager!: ProjectileManager;
   private damageNumberManager!: DamageNumberManager;
   private inventory!: Inventory;
+  private weaponSlots: Inventory[] = [];
+  private dragOverlay!: Container;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
@@ -76,7 +81,7 @@ export class PlanetaryDefenseGame {
     this.planetManager = new PlanetManager(this.assetManager);
     world.addChild(this.planetManager.container);
 
-    this.relicManager = new RelicManager(this.assetManager);
+    this.relicManager = new RelicManager();
     world.addChild(this.relicManager.container);
 
     this.projectileManager = new ProjectileManager();
@@ -89,8 +94,58 @@ export class PlanetaryDefenseGame {
     this.enemyManager = new EnemyManager(this.assetManager);
     world.addChild(this.enemyManager.layer);
 
-    this.inventory = new Inventory(this.app, this.assetManager);
+    this.dragOverlay = new Container();
+
+    this.inventory = new Inventory(this.app, this.assetManager, this.dragOverlay);
     world.addChild(this.inventory.container);
+    this.inventory.populateTestData();
+
+    this.buildWeaponSlots(world);
+
+    world.addChild(this.dragOverlay);
+  }
+
+  private buildWeaponSlots(world: Container): void {
+    for (let i = 0; i < RELIC_SLOT_COUNT; i++) {
+      const slot = this.state.relicSlots[i];
+      const { x, y } = getRelicPosition(slot);
+
+      const weaponSlot = new Inventory(
+        this.app,
+        this.assetManager,
+        this.dragOverlay,
+        {
+          cols: 1,
+          rows: 1,
+          x: x - WEAPON_SLOT_SIZE / 2,
+          y: y - WEAPON_SLOT_SIZE / 2,
+          drawBorder: false,
+        }
+      );
+
+      if (slot.relic) {
+        weaponSlot.addItem(slot.relic.type, 0, 0);
+      }
+
+      const slotIndex = i;
+      weaponSlot.onItemAdded.subscribe((item) => {
+        const relic: RelicState = {
+          type: item.relicType,
+          level: 1,
+          charge: 0,
+          remainingShots: 0,
+          nextShotTime: 0,
+        };
+        this.state.relicSlots[slotIndex].relic = relic;
+      });
+
+      weaponSlot.onItemRemoved.subscribe(() => {
+        this.state.relicSlots[slotIndex].relic = null;
+      });
+
+      world.addChild(weaponSlot.container);
+      this.weaponSlots.push(weaponSlot);
+    }
   }
 
   private update(dt: number): void {
@@ -114,6 +169,9 @@ export class PlanetaryDefenseGame {
     this.damageNumberManager.destroy();
     this.enemyManager.destroy();
     this.inventory.destroy();
+    for (const ws of this.weaponSlots) ws.destroy();
+    this.weaponSlots = [];
+    this.dragOverlay.destroy();
     this.app.destroy(true);
   }
 }
