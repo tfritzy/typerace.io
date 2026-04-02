@@ -66,7 +66,7 @@ export class EnemyManager {
   }
 
   private createDisplayObject(entity: EntityState): Container {
-    if (SHIP_ENTITY_TYPES.includes(entity.entityType)) {
+    if ((SHIP_ENTITY_TYPES as readonly string[]).includes(entity.entityType)) {
       return createShipContainer(this.assets, entity);
     }
     return createMeteorSprite(this.assets, entity);
@@ -87,13 +87,13 @@ export class EnemyManager {
       display.x = entity.x;
       display.y = entity.y;
 
-      if (SHIP_ENTITY_TYPES.includes(entity.entityType)) {
+      if ((SHIP_ENTITY_TYPES as readonly string[]).includes(entity.entityType)) {
         display.rotation = Math.atan2(entity.vy, entity.vx);
       } else {
         display.rotation = entity.rotation;
       }
 
-      const labelOffset = SHIP_ENTITY_TYPES.includes(entity.entityType) ? -24 : -20;
+      const labelOffset = (SHIP_ENTITY_TYPES as readonly string[]).includes(entity.entityType) ? -24 : -20;
       this.labels.push({ id: entity.id, word: entity.word, typedCount: entity.typedCount, x: entity.x, y: entity.y + labelOffset });
     }
 
