@@ -1,9 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useCallback, useState, useMemo } from "react";
-import {
-  type Game,
-  type PlayerProgress,
-} from "../types/stdb";
+import { type Game, type PlayerProgress } from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
 import { Countdown } from "../components/Countdown";
@@ -17,6 +14,7 @@ import { getMaxPlayerCount } from "../utils/modes";
 import { GhostCursor } from "../components/GhostCursor";
 import { getPlayerColorHex } from "../utils/colorMapping";
 import { getTranslations } from "../utils/translations";
+import { GameState } from "../../module_bindings";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -24,7 +22,9 @@ export const GamePage = () => {
   const conn = useDatabase();
   const [hasFinished, setHasFinished] = useState(false);
   const [game, setGame] = useState<Game | null>(null);
-  const [gamePlayerProgress, setGamePlayerProgress] = useState<PlayerProgress[]>([]);
+  const [gamePlayerProgress, setGamePlayerProgress] = useState<
+    PlayerProgress[]
+  >([]);
 
   useEffect(() => {
     setGame(null);
@@ -64,7 +64,11 @@ export const GamePage = () => {
       }
     };
 
-    const handleProgressUpdate = (_ctx: any, _oldPP: PlayerProgress, newPP: PlayerProgress) => {
+    const handleProgressUpdate = (
+      _ctx: any,
+      _oldPP: PlayerProgress,
+      newPP: PlayerProgress,
+    ) => {
       if (newPP.gameId.toString() === gameId) {
         setGamePlayerProgress((prev) => {
           const existingIndex = prev.findIndex((pp) => pp.id === newPP.id);
@@ -84,8 +88,11 @@ export const GamePage = () => {
         setGamePlayerProgress((prev) => prev.filter((p) => p.id !== pp.id));
         if (conn.identity && pp.playerId.isEqual(conn.identity)) {
           setTimeout(() => {
-            const stillExists = Array.from(conn.db.playerprogress.iter())
-              .some(p => p.gameId.toString() === gameId && p.playerId.isEqual(conn.identity!));
+            const stillExists = Array.from(conn.db.playerprogress.iter()).some(
+              (p) =>
+                p.gameId.toString() === gameId &&
+                p.playerId.isEqual(conn.identity!),
+            );
             if (!stillExists) {
               navigate("/", { replace: true });
             }
@@ -106,19 +113,21 @@ export const GamePage = () => {
 
     if (conn.identity) {
       subscriptionQueries.push(
-        `SELECT * FROM playerprogress WHERE PlayerId = '${conn.identity}'`
+        `SELECT * FROM playerprogress WHERE PlayerId = '${conn.identity}'`,
       );
     }
 
-    const pageSubscription = conn.subscriptionBuilder()
+    const pageSubscription = conn
+      .subscriptionBuilder()
       .onApplied(() => {
         const currentGame = conn.db.game.id.find(gameId);
         if (currentGame) {
           setGame(currentGame);
         }
 
-        const currentGameProgress = Array.from(conn.db.playerprogress.iter())
-          .filter((pp) => pp.gameId.toString() === gameId);
+        const currentGameProgress = Array.from(
+          conn.db.playerprogress.iter(),
+        ).filter((pp) => pp.gameId.toString() === gameId);
         setGamePlayerProgress(currentGameProgress);
       })
       .subscribe(subscriptionQueries);
@@ -139,18 +148,26 @@ export const GamePage = () => {
     const currentPlayerId = conn.identity;
     if (!currentPlayerId) return;
 
-    const currentPlayerProgress = gamePlayerProgress.find(
-      (pp) => pp.playerId.isEqual(currentPlayerId)
+    const currentPlayerProgress = gamePlayerProgress.find((pp) =>
+      pp.playerId.isEqual(currentPlayerId),
     );
 
     if (currentPlayerProgress && game.phrase) {
       if (currentPlayerProgress.progressIndex >= game.phrase.length) {
         setHasFinished(true);
       }
-    } else if (gamePlayerProgress.length > 0 && !currentPlayerProgress) {
+    }
+
+    if (gamePlayerProgress.length > 0 && gamePlayerProgress.every(pp => pp.progressIndex >= game.phrase.length)) {
       setHasFinished(true);
     }
   }, [conn, game, gamePlayerProgress]);
+
+  useEffect(() => {
+    if (game?.state == GameState.Archived) {
+      setHasFinished(true);
+    }
+  }, [game]);
 
   useEffect(() => {
     if (!conn || !game || !gameId) return;
@@ -158,7 +175,7 @@ export const GamePage = () => {
     if (game.gameType?.tag === "Private" && game.state?.tag === "Lobby") {
       const currentPlayerId = conn.identity;
       const hasProgress = gamePlayerProgress.some(
-        (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
+        (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
       );
 
       if (!hasProgress) {
@@ -171,17 +188,23 @@ export const GamePage = () => {
     setHasFinished(true);
   }, []);
 
-  const handleKickPlayer = useCallback((targetPlayerId: PlayerProgress["playerId"]) => {
-    if (!conn || !gameId) return;
-    conn.reducers.kickPlayer({ gameId, targetPlayerId });
-  }, [conn, gameId]);
+  const handleKickPlayer = useCallback(
+    (targetPlayerId: PlayerProgress["playerId"]) => {
+      if (!conn || !gameId) return;
+      conn.reducers.kickPlayer({ gameId, targetPlayerId });
+    },
+    [conn, gameId],
+  );
 
   const currentPlayerId = conn?.identity;
 
   const otherPlayerProgress = useMemo(() => {
     if (!currentPlayerId || !game?.phrase) return [];
-    return gamePlayerProgress
-      .filter((pp) => !pp.playerId.isEqual(currentPlayerId) && pp.progressIndex < game.phrase.length);
+    return gamePlayerProgress.filter(
+      (pp) =>
+        !pp.playerId.isEqual(currentPlayerId) &&
+        pp.progressIndex < game.phrase.length,
+    );
   }, [gamePlayerProgress, currentPlayerId, game?.phrase]);
 
   useEffect(() => {
@@ -199,22 +222,29 @@ export const GamePage = () => {
   }
 
   const gameTypeTag = game.gameType?.tag ?? "Public";
-  const maxPlayers = gameTypeTag === "Private" ? gamePlayerProgress.length : getMaxPlayerCount(gameTypeTag);
+  const maxPlayers =
+    gameTypeTag === "Private"
+      ? gamePlayerProgress.length
+      : getMaxPlayerCount(gameTypeTag);
   const totalSlots = Math.max(maxPlayers, gamePlayerProgress.length);
   const isInLobby = game.state?.tag === "Lobby";
   const isLobby = game.gameType?.tag === "Private" && isInLobby;
-  const isPrivateGameOwner = game.gameType?.tag === "Private" && currentPlayerId && game.owner?.isEqual(currentPlayerId);
+  const isPrivateGameOwner =
+    game.gameType?.tag === "Private" &&
+    currentPlayerId &&
+    game.owner?.isEqual(currentPlayerId);
   const isCountdown = game.state?.tag === "Countdown";
-  const isDisabled = isInLobby || isCountdown;
   const t = getTranslations();
 
   const currentPlayerProgress = gamePlayerProgress.find(
-    (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
+    (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
   );
   const initialProgress = currentPlayerProgress?.progressIndex ?? 0;
   const hasCompletedRace = currentPlayerProgress
     ? currentPlayerProgress.progressIndex >= game.phrase.length
     : false;
+  const isMemberOfRace = !!currentPlayerProgress;
+  const isDisabled = isInLobby || isCountdown || !currentPlayerProgress;
 
   return (
     <div className="relative h-full flex flex-col">
@@ -224,7 +254,9 @@ export const GamePage = () => {
 
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4">
         <div className="content-container w-full my-auto">
-          <div className={`mb-3 grid gap-3 ${totalSlots > 3 ? 'sm:grid-cols-2' : ''}`}>
+          <div
+            className={`mb-3 grid gap-3 ${totalSlots > 3 ? "sm:grid-cols-2" : ""}`}
+          >
             {Array.from({ length: totalSlots }).map((_, index) => {
               const pp = gamePlayerProgress[index];
               const isCurrentPlayer =
@@ -265,8 +297,14 @@ export const GamePage = () => {
                     placement={pp.placement}
                     isBot={pp.isBot}
                     isAnonymous={pp.isAnonymous}
-                    onKick={isPrivateGameOwner && !isCurrentPlayer ? () => handleKickPlayer(pp.playerId) : undefined}
-                    playerColorTag={isCurrentPlayer ? undefined : pp.playerColor?.tag}
+                    onKick={
+                      isPrivateGameOwner && !isCurrentPlayer
+                        ? () => handleKickPlayer(pp.playerId)
+                        : undefined
+                    }
+                    playerColorTag={
+                      isCurrentPlayer ? undefined : pp.playerColor?.tag
+                    }
                   />
                 </div>
               );
@@ -276,14 +314,21 @@ export const GamePage = () => {
           {hasFinished || hasCompletedRace ? (
             (() => {
               const currentPP = gamePlayerProgress.find(
-                (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
+                (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
               );
 
-              const isOwner = currentPlayerId && game.owner && currentPlayerId.isEqual(game.owner);
-              const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;
+              const isOwner =
+                currentPlayerId &&
+                game.owner &&
+                currentPlayerId.isEqual(game.owner);
+              const rematchDisabled =
+                game.gameType?.tag === "Private" && !isOwner;
 
               return (
-                <div key="stats-section" className="w-full animate-slideUpFadeIn pb-4">
+                <div
+                  key="stats-section"
+                  className="w-full animate-slideUpFadeIn pb-4"
+                >
                   {currentPP && (
                     <PlayerStatsRow
                       playerProgress={currentPP}
@@ -312,7 +357,11 @@ export const GamePage = () => {
             <GameLobby
               gameId={gameId!}
               conn={conn}
-              isOwner={currentPlayerId ? game.owner?.isEqual(currentPlayerId) ?? false : false}
+              isOwner={
+                currentPlayerId
+                  ? (game.owner?.isEqual(currentPlayerId) ?? false)
+                  : false
+              }
             />
           ) : (
             <GamePageTypeBox
@@ -325,18 +374,21 @@ export const GamePage = () => {
               disabled={isDisabled}
               initialProgress={initialProgress}
               isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
+              hideCursor={!isMemberOfRace}
             />
           )}
         </div>
       </div>
-      {!(hasFinished || hasCompletedRace) && !isLobby && otherPlayerProgress.map((pp) => (
-        <GhostCursor
-          key={pp.id.toString()}
-          charIndex={pp.progressIndex}
-          color={getPlayerColorHex(pp.playerColor?.tag ?? '')}
-          lerp={0.15}
-        />
-      ))}
+      {!(hasFinished || hasCompletedRace) &&
+        !isLobby &&
+        otherPlayerProgress.map((pp) => (
+          <GhostCursor
+            key={pp.id.toString()}
+            charIndex={pp.progressIndex}
+            color={getPlayerColorHex(pp.playerColor?.tag ?? "")}
+            lerp={0.15}
+          />
+        ))}
     </div>
   );
 };

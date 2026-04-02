@@ -21,6 +21,7 @@ type TypeBoxProps = {
   resetOnComplete?: boolean;
   disabled?: boolean;
   initialProgress?: number;
+  hideCursor?: boolean;
 };
 
 export type TypeBoxRef = {
@@ -40,6 +41,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       resetOnComplete = false,
       disabled = false,
       initialProgress = 0,
+      hideCursor = false,
     },
     ref
   ) => {
@@ -308,7 +310,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               targetRef={targetRef}
               lerp={0.22}
               fadeDelay={500}
-              visible={focused && !isComplete}
+              visible={focused && !isComplete && !hideCursor}
             />
 
             <textarea

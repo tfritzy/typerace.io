@@ -71,7 +71,7 @@ export const PlayerAvatar = memo(({
     return (
         <div
             className={`relative shrink-0 border-2 rounded-full ${isLoading ? 'border-dashed' : ''}`}
-            style={{ borderColor: borderColor || avatarColors[2] }}
+            style={{ borderColor: borderColor || avatarColors[1] }}
         >
             {crownColor && (
                 <div
