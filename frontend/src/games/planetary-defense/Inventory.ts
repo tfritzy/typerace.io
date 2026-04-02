@@ -250,8 +250,8 @@ export class Inventory {
 
   private globalToGrid(globalX: number, globalY: number): { col: number; row: number } {
     const localPos = this.container.toLocal({ x: globalX, y: globalY });
-    const col = Math.round((localPos.x - this.gridOriginX + CELL_SIZE / 2) / CELL_SIZE - 1);
-    const row = Math.round((localPos.y - this.gridOriginY + CELL_SIZE / 2) / CELL_SIZE - 1);
+    const col = Math.floor((localPos.x - this.gridOriginX) / CELL_SIZE);
+    const row = Math.floor((localPos.y - this.gridOriginY) / CELL_SIZE);
     return { col, row };
   }
 
