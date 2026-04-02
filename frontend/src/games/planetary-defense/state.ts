@@ -129,6 +129,22 @@ export interface DamageData {
   killed: boolean;
 }
 
+export interface MerchantItem {
+  relicType: RelicType;
+  price: number;
+}
+
+export interface MerchantShipState {
+  items: MerchantItem[];
+}
+
+export interface MerchantState {
+  active: boolean;
+  leftShip: MerchantShipState;
+  rightShip: MerchantShipState;
+  selectedShip: 'left' | 'right' | null;
+}
+
 export interface GameState {
   entities: EntityState[];
   relicSlots: RelicSlot[];
@@ -141,11 +157,16 @@ export interface GameState {
   enemiesKilled: number;
   planetHealth: number;
   maxPlanetHealth: number;
+  gold: number;
   wave: WaveState;
+  merchant: MerchantState;
   onPlanetDamaged: GameEvent;
   onRelicFired: GameEvent;
   onWaveComplete: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
+  onGoldChanged: GameEvent;
+  onMerchantOpened: GameEvent;
+  onMerchantClosed: GameEvent;
 }
 
 function createRelicSlots(): RelicSlot[] {
@@ -185,6 +206,7 @@ export function createGameState(): GameState {
     enemiesKilled: 0,
     planetHealth: 100,
     maxPlanetHealth: 100,
+    gold: 50,
     wave: {
       wave: 0,
       phase: WavePhase.Idle,
@@ -192,10 +214,19 @@ export function createGameState(): GameState {
       spawnIndex: 0,
       waveTimer: 0,
     },
+    merchant: {
+      active: false,
+      leftShip: { items: [] },
+      rightShip: { items: [] },
+      selectedShip: null,
+    },
     onPlanetDamaged: new GameEvent(),
     onRelicFired: new GameEvent(),
     onWaveComplete: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
+    onGoldChanged: new GameEvent(),
+    onMerchantOpened: new GameEvent(),
+    onMerchantClosed: new GameEvent(),
   };
 }
 
@@ -306,6 +337,8 @@ function destroyEntity(
 ): void {
   if (killed) {
     state.enemiesKilled++;
+    state.gold += 5;
+    state.onGoldChanged.emit();
   }
   state.entities.splice(index, 1);
 }
@@ -731,9 +764,83 @@ function checkProjectileCollisions(state: GameState): void {
 }
 
 export function startNextWave(state: GameState): void {
+  state.merchant.active = false;
+  state.merchant.selectedShip = null;
   state.wave.wave++;
   state.wave.spawnQueue = generateWaveSpawns(state.wave.wave);
   state.wave.spawnIndex = 0;
   state.wave.waveTimer = 0;
   state.wave.phase = WavePhase.Spawning;
+}
+
+function getRandomRelicType(): RelicType {
+  const values = Object.values(RelicType).filter(
+    (v) => typeof v === "number"
+  ) as RelicType[];
+  return values[Math.floor(Math.random() * values.length)];
+}
+
+function generateRelicPrice(relicType: RelicType): number {
+  const config = RELIC_CONFIGS[relicType];
+  let base = 10;
+  if (config.damage >= 15) base += 10;
+  if (config.chainCount >= 2) base += 8;
+  if (config.explosionRange > 0) base += 8;
+  if (config.multiShotCount > 1) base += 6;
+  if (config.freezeStacks > 0) base += 5;
+  if (config.damageBuffAll) base += 10;
+  return base + Math.floor(Math.random() * 10);
+}
+
+function generateMerchantShip(): MerchantShipState {
+  const count = 3;
+  const items: MerchantItem[] = [];
+  const usedTypes = new Set<RelicType>();
+  for (let i = 0; i < count; i++) {
+    let relicType: RelicType;
+    do {
+      relicType = getRandomRelicType();
+    } while (usedTypes.has(relicType));
+    usedTypes.add(relicType);
+    items.push({ relicType, price: generateRelicPrice(relicType) });
+  }
+  return { items };
+}
+
+export function generateMerchants(state: GameState): void {
+  state.merchant.leftShip = generateMerchantShip();
+  state.merchant.rightShip = generateMerchantShip();
+  state.merchant.active = true;
+  state.merchant.selectedShip = null;
+  state.onMerchantOpened.emit();
+}
+
+export function selectMerchantShip(
+  state: GameState,
+  side: 'left' | 'right'
+): void {
+  state.merchant.selectedShip = side;
+}
+
+export function purchaseMerchantItem(
+  state: GameState,
+  itemIndex: number
+): MerchantItem | null {
+  const ship =
+    state.merchant.selectedShip === 'left'
+      ? state.merchant.leftShip
+      : state.merchant.rightShip;
+  if (itemIndex < 0 || itemIndex >= ship.items.length) return null;
+  const item = ship.items[itemIndex];
+  if (state.gold < item.price) return null;
+  state.gold -= item.price;
+  state.onGoldChanged.emit();
+  ship.items.splice(itemIndex, 1);
+  return item;
+}
+
+export function closeMerchant(state: GameState): void {
+  state.merchant.active = false;
+  state.merchant.selectedShip = null;
+  state.onMerchantClosed.emit();
 }

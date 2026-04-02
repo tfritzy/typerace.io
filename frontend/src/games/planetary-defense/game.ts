@@ -9,6 +9,7 @@ import { RelicManager } from "./RelicManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { DamageNumberManager } from "./DamageNumberManager";
 import { Inventory } from "./Inventory";
+import { MerchantShop } from "./MerchantShop";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState } from "./state";
 import type { GameState } from "./state";
@@ -27,6 +28,7 @@ export class PlanetaryDefenseGame {
   private projectileManager!: ProjectileManager;
   private damageNumberManager!: DamageNumberManager;
   private inventory!: Inventory;
+  private merchantShop!: MerchantShop;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
@@ -91,6 +93,14 @@ export class PlanetaryDefenseGame {
 
     this.inventory = new Inventory(this.app, this.assetManager);
     world.addChild(this.inventory.container);
+
+    this.merchantShop = new MerchantShop(
+      this.app,
+      this.assetManager,
+      this.state,
+      this.inventory
+    );
+    world.addChild(this.merchantShop.container);
   }
 
   private update(dt: number): void {
@@ -114,6 +124,7 @@ export class PlanetaryDefenseGame {
     this.damageNumberManager.destroy();
     this.enemyManager.destroy();
     this.inventory.destroy();
+    this.merchantShop.destroy();
     this.app.destroy(true);
   }
 }

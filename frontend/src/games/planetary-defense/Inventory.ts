@@ -10,7 +10,7 @@ import { RelicType, RELIC_DISPLAY } from "./relicConfig";
 import type { AssetManager } from "./assetManager";
 
 const GRID_COLS = 10;
-const GRID_ROWS = 5;
+const GRID_ROWS = 3;
 const CELL_SIZE = 64;
 const CELL_PADDING = 4;
 const GRID_PADDING = 8;

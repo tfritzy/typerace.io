@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
-import { handleTypedCharacter, startNextWave } from "./state";
+import {
+  handleTypedCharacter,
+  startNextWave,
+  generateMerchants,
+  closeMerchant,
+} from "./state";
 import { LabelOverlay } from "./LabelOverlay";
 
 const PIXEL_FONT = "'Press Start 2P', monospace";
@@ -69,6 +74,8 @@ export const GameCanvas = () => {
   const [healthRatio, setHealthRatio] = useState(1);
   const [waveNumber, setWaveNumber] = useState(0);
   const [waveActive, setWaveActive] = useState(false);
+  const [gold, setGold] = useState(50);
+  const [merchantActive, setMerchantActive] = useState(false);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -77,6 +84,9 @@ export const GameCanvas = () => {
     let cancelled = false;
     let unsubDamage: (() => void) | null = null;
     let unsubWaveComplete: (() => void) | null = null;
+    let unsubGold: (() => void) | null = null;
+    let unsubMerchantOpened: (() => void) | null = null;
+    let unsubMerchantClosed: (() => void) | null = null;
 
     createPlanetaryDefenseGame(div)
       .then((game) => {
@@ -91,6 +101,17 @@ export const GameCanvas = () => {
         unsubWaveComplete = game.state.onWaveComplete.subscribe(() => {
           setWaveNumber(game.state.wave.wave);
           setWaveActive(false);
+          generateMerchants(game.state);
+          setMerchantActive(true);
+        });
+        unsubGold = game.state.onGoldChanged.subscribe(() => {
+          setGold(game.state.gold);
+        });
+        unsubMerchantOpened = game.state.onMerchantOpened.subscribe(() => {
+          setMerchantActive(true);
+        });
+        unsubMerchantClosed = game.state.onMerchantClosed.subscribe(() => {
+          setMerchantActive(false);
         });
       })
       .catch((err) => {
@@ -101,6 +122,9 @@ export const GameCanvas = () => {
       cancelled = true;
       unsubDamage?.();
       unsubWaveComplete?.();
+      unsubGold?.();
+      unsubMerchantOpened?.();
+      unsubMerchantClosed?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -121,9 +145,13 @@ export const GameCanvas = () => {
   const handleNextWave = useCallback(() => {
     const game = gameRef.current;
     if (game) {
+      if (game.state.merchant.active) {
+        closeMerchant(game.state);
+      }
       startNextWave(game.state);
       setWaveNumber(game.state.wave.wave);
       setWaveActive(true);
+      setMerchantActive(false);
     }
   }, []);
 
@@ -154,7 +182,26 @@ export const GameCanvas = () => {
             WAVE {waveNumber}
           </div>
         </div>
-        {!waveActive && (
+        <div
+          style={{
+            background: "rgba(10, 10, 26, 0.85)",
+            padding: "10px 14px",
+            marginTop: "4px",
+            imageRendering: "pixelated",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "9px",
+              color: "#ffd700",
+              letterSpacing: "1px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            GOLD {gold}
+          </div>
+        </div>
+        {!waveActive && !merchantActive && (
           <button
             onClick={handleNextWave}
             style={{
@@ -171,6 +218,25 @@ export const GameCanvas = () => {
             className="cursor-pointer hover:brightness-125"
           >
             {waveNumber === 0 ? "START" : "NEXT WAVE"}
+          </button>
+        )}
+        {!waveActive && merchantActive && (
+          <button
+            onClick={handleNextWave}
+            style={{
+              fontSize: "10px",
+              letterSpacing: "1px",
+              imageRendering: "pixelated",
+              background: "rgba(212, 160, 23, 0.85)",
+              color: "#0a0a1a",
+              padding: "8px 14px",
+              marginTop: "6px",
+              display: "block",
+              width: "100%",
+            }}
+            className="cursor-pointer hover:brightness-125"
+          >
+            DONE SHOPPING
           </button>
         )}
       </div>
