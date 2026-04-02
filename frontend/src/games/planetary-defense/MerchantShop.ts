@@ -40,6 +40,8 @@ const AFFORDABLE_COLOR = 0x4ade80;
 const UNAFFORDABLE_COLOR = 0xef4444;
 const VALID_COLOR = 0x4ade80;
 
+const INV_GRID_ORIGIN = 11;
+
 const SHIP_BTN_W = 200;
 const SHIP_BTN_H = 80;
 const SHIP_BTN_GAP = 120;
@@ -83,7 +85,7 @@ export class MerchantShop {
   private highlightGraphics!: Graphics;
   private dragState: MerchantDragState | null = null;
 
-  private unsubWaveComplete: (() => void) | null = null;
+  private unsubMerchantOpened: (() => void) | null = null;
   private unsubMerchantClosed: (() => void) | null = null;
 
   constructor(
@@ -110,8 +112,8 @@ export class MerchantShop {
     this.buildPanel();
     this.setupDragEvents();
 
-    this.unsubWaveComplete = state.onWaveComplete.subscribe(() => {
-      this.onWaveComplete();
+    this.unsubMerchantOpened = state.onMerchantOpened.subscribe(() => {
+      this.show();
     });
     this.unsubMerchantClosed = state.onMerchantClosed.subscribe(() => {
       this.hide();
@@ -334,24 +336,43 @@ export class MerchantShop {
   private onPointerUp = (e: FederatedPointerEvent): void => {
     if (!this.dragState) return;
 
-    const dropped = this.inventory.handleExternalDrop(
-      this.dragState.relicType,
-      e.global.x,
-      e.global.y
-    );
+    const invLocal = this.inventory.container.toLocal(e.global);
+    const invGridX = Math.floor((invLocal.x - INV_GRID_ORIGIN) / CELL_SIZE);
+    const invGridY = Math.floor((invLocal.y - INV_GRID_ORIGIN) / CELL_SIZE);
+    const overInventory =
+      invGridX >= 0 && invGridX < 10 && invGridY >= 0 && invGridY < 3;
 
-    if (dropped) {
+    let success = false;
+    if (overInventory) {
       const purchased = purchaseMerchantItem(
         this.state,
         this.dragState.itemIndex
       );
       if (purchased) {
-        const ship =
-          this.state.merchant.selectedShip === "left"
-            ? this.state.merchant.leftShip
-            : this.state.merchant.rightShip;
-        this.drawPanel(ship.items);
+        const dropped = this.inventory.handleExternalDrop(
+          this.dragState.relicType,
+          e.global.x,
+          e.global.y
+        );
+        if (!dropped) {
+          this.state.gold += purchased.price;
+          this.state.onGoldChanged.emit();
+          const ship =
+            this.state.merchant.selectedShip === "left"
+              ? this.state.merchant.leftShip
+              : this.state.merchant.rightShip;
+          ship.items.splice(this.dragState.itemIndex, 0, purchased);
+        }
+        success = dropped;
       }
+    }
+
+    if (success) {
+      const ship =
+        this.state.merchant.selectedShip === "left"
+          ? this.state.merchant.leftShip
+          : this.state.merchant.rightShip;
+      this.drawPanel(ship.items);
     } else {
       this.resetDragPosition();
     }
@@ -376,13 +397,13 @@ export class MerchantShop {
     if (!this.dragState) return;
 
     const invLocal = this.inventory.container.toLocal(e.global);
-    const invGridX = Math.floor((invLocal.x - 11) / CELL_SIZE);
-    const invGridY = Math.floor((invLocal.y - 11) / CELL_SIZE);
+    const invGridX = Math.floor((invLocal.x - INV_GRID_ORIGIN) / CELL_SIZE);
+    const invGridY = Math.floor((invLocal.y - INV_GRID_ORIGIN) / CELL_SIZE);
 
     if (invGridX >= 0 && invGridX < 10 && invGridY >= 0 && invGridY < 3) {
       const screenPos = this.inventory.container.toGlobal({
-        x: 11 + invGridX * CELL_SIZE,
-        y: 11 + invGridY * CELL_SIZE,
+        x: INV_GRID_ORIGIN + invGridX * CELL_SIZE,
+        y: INV_GRID_ORIGIN + invGridY * CELL_SIZE,
       });
       const panelLocal = this.panelContainer.toLocal(screenPos);
       this.highlightGraphics.rect(
@@ -403,11 +424,6 @@ export class MerchantShop {
         ? this.state.merchant.leftShip
         : this.state.merchant.rightShip;
     this.drawPanel(ship.items);
-  }
-
-  private onWaveComplete(): void {
-    if (this.state.wave.wave < 1) return;
-    this.show();
   }
 
   show(): void {
@@ -441,7 +457,7 @@ export class MerchantShop {
   }
 
   destroy(): void {
-    this.unsubWaveComplete?.();
+    this.unsubMerchantOpened?.();
     this.unsubMerchantClosed?.();
 
     this.app.stage.off("pointermove", this.onPointerMove);
