@@ -34,15 +34,12 @@ const ITEM_BG_COLOR = 0x252545;
 const ITEM_BORDER_COLOR = 0x4a4a7e;
 const VALID_COLOR = 0x4ade80;
 const INVALID_COLOR = 0xef4444;
-const TEMP_ITEM_ID = -1;
 
 export interface InventoryItem {
   id: number;
   relicType: RelicType;
   gridX: number;
   gridY: number;
-  width: number;
-  height: number;
 }
 
 interface DragState {
@@ -66,82 +63,6 @@ function createEvent<T>() {
     },
     emit: (data: T) => listeners.forEach((fn) => fn(data)),
   };
-}
-
-const RELIC_SIZES: Partial<
-  Record<RelicType, { width: number; height: number }>
-> = {
-  [RelicType.BloodthornDirk]: { width: 1, height: 1 },
-  [RelicType.StarfallStiletto]: { width: 1, height: 1 },
-  [RelicType.MoonlitHatchet]: { width: 1, height: 1 },
-  [RelicType.RavenplumeEdge]: { width: 1, height: 1 },
-  [RelicType.EmberstrikeTomahawk]: { width: 1, height: 1 },
-  [RelicType.PearlsteelHatchet]: { width: 1, height: 1 },
-  [RelicType.DarkwoodHatchet]: { width: 1, height: 1 },
-  [RelicType.SandstoneHatchet]: { width: 1, height: 1 },
-  [RelicType.IronwoodTomahawk]: { width: 1, height: 1 },
-
-  [RelicType.EmbercrestBlade]: { width: 1, height: 2 },
-  [RelicType.BriarthornSaber]: { width: 1, height: 2 },
-  [RelicType.RosevineRapier]: { width: 1, height: 2 },
-  [RelicType.CrystalbreakSaber]: { width: 1, height: 2 },
-  [RelicType.CinderstoneBlade]: { width: 1, height: 2 },
-  [RelicType.EmeraldFang]: { width: 1, height: 2 },
-  [RelicType.MistralSabre]: { width: 1, height: 2 },
-  [RelicType.SunfireScimitar]: { width: 1, height: 2 },
-  [RelicType.AzureCrescent]: { width: 1, height: 2 },
-  [RelicType.TigerstripeFalchion]: { width: 1, height: 2 },
-  [RelicType.DawnfireCutlass]: { width: 1, height: 2 },
-  [RelicType.VoidthornBlade]: { width: 1, height: 2 },
-
-  [RelicType.TwinflareCrossblades]: { width: 2, height: 1 },
-
-  [RelicType.CloudveilLongsword]: { width: 1, height: 3 },
-  [RelicType.SolarisEdge]: { width: 1, height: 3 },
-  [RelicType.ChainlinkEstoc]: { width: 1, height: 3 },
-  [RelicType.TidecallerBlade]: { width: 1, height: 3 },
-
-  [RelicType.SteelBattleaxe]: { width: 2, height: 2 },
-  [RelicType.CrimsonCleaver]: { width: 2, height: 2 },
-  [RelicType.CrimsonWaraxe]: { width: 2, height: 2 },
-  [RelicType.FrostbiteCleaver]: { width: 2, height: 2 },
-  [RelicType.GreystoneBroadaxe]: { width: 2, height: 2 },
-  [RelicType.GildedWaraxe]: { width: 2, height: 2 },
-  [RelicType.RosegoldBroadaxe]: { width: 2, height: 2 },
-  [RelicType.SpectralCleaver]: { width: 2, height: 2 },
-  [RelicType.WroughtIronChopper]: { width: 2, height: 2 },
-  [RelicType.AshenBroadaxe]: { width: 2, height: 2 },
-  [RelicType.CopperheadCleaver]: { width: 2, height: 2 },
-  [RelicType.ObsidianReaver]: { width: 2, height: 2 },
-  [RelicType.BloodmoonReaver]: { width: 2, height: 2 },
-
-  [RelicType.FrostfangClaymore]: { width: 1, height: 4 },
-  [RelicType.JadecrossBroadsword]: { width: 1, height: 4 },
-  [RelicType.PermafrostGreatsword]: { width: 1, height: 4 },
-  [RelicType.RubyguardGreatsword]: { width: 1, height: 4 },
-
-  [RelicType.MoltenZweihander]: { width: 2, height: 3 },
-  [RelicType.InfernalRavager]: { width: 2, height: 3 },
-  [RelicType.DuskforgeHalberd]: { width: 2, height: 3 },
-  [RelicType.SporesparkGlaive]: { width: 2, height: 3 },
-  [RelicType.RubyflareGreataxe]: { width: 2, height: 3 },
-  [RelicType.FlamecrestGreataxe]: { width: 2, height: 3 },
-  [RelicType.PrismaticGreataxe]: { width: 2, height: 3 },
-  [RelicType.HellforgedCleaver]: { width: 2, height: 3 },
-  [RelicType.GoldscarHalberd]: { width: 2, height: 3 },
-
-  [RelicType.BlackironSplitter]: { width: 2, height: 4 },
-  [RelicType.GraniteWaraxe]: { width: 2, height: 4 },
-};
-
-function getRelicSize(type: RelicType): { width: number; height: number } {
-  return RELIC_SIZES[type] ?? { width: 1, height: 2 };
-}
-
-export function getRelicInventorySize(
-  type: RelicType
-): { width: number; height: number } {
-  return getRelicSize(type);
 }
 
 export class Inventory {
@@ -234,10 +155,10 @@ export class Inventory {
     const { container: dragContainer, originalGridX, originalGridY } =
       this.dragState;
 
-    const targetCol = this.getDragTargetCol(item, dragContainer);
-    const targetRow = this.getDragTargetRow(item, dragContainer);
+    const targetCol = this.getDragTargetCol(dragContainer);
+    const targetRow = this.getDragTargetRow(dragContainer);
 
-    if (this.canPlace(item, targetCol, targetRow)) {
+    if (this.canPlace(targetCol, targetRow, item.id)) {
       item.gridX = targetCol;
       item.gridY = targetRow;
     } else {
@@ -245,7 +166,7 @@ export class Inventory {
       item.gridY = originalGridY;
     }
 
-    this.markCells(item, true);
+    this.occupied[item.gridY][item.gridX] = true;
     this.snapToGrid(dragContainer, item);
     dragContainer.alpha = 1;
     dragContainer.cursor = "grab";
@@ -253,18 +174,14 @@ export class Inventory {
     this.highlightGraphics.clear();
   };
 
-  private getDragTargetCol(item: InventoryItem, c: Container): number {
-    const centerX = c.x + (item.width * CELL_SIZE) / 2;
-    return Math.round(
-      (centerX - this.gridOriginX) / CELL_SIZE - item.width / 2
-    );
+  private getDragTargetCol(c: Container): number {
+    const centerX = c.x + CELL_SIZE / 2;
+    return Math.round((centerX - this.gridOriginX) / CELL_SIZE - 0.5);
   }
 
-  private getDragTargetRow(item: InventoryItem, c: Container): number {
-    const centerY = c.y + (item.height * CELL_SIZE) / 2;
-    return Math.round(
-      (centerY - this.gridOriginY) / CELL_SIZE - item.height / 2
-    );
+  private getDragTargetRow(c: Container): number {
+    const centerY = c.y + CELL_SIZE / 2;
+    return Math.round((centerY - this.gridOriginY) / CELL_SIZE - 0.5);
   }
 
   private updateHighlight(): void {
@@ -274,60 +191,35 @@ export class Inventory {
     const item = this.items.find((i) => i.id === this.dragState!.itemId)!;
     const { container: dragContainer } = this.dragState;
 
-    const gridCol = this.getDragTargetCol(item, dragContainer);
-    const gridRow = this.getDragTargetRow(item, dragContainer);
-    const valid = this.canPlace(item, gridCol, gridRow);
+    const gridCol = this.getDragTargetCol(dragContainer);
+    const gridRow = this.getDragTargetRow(dragContainer);
+    const valid = this.canPlace(gridCol, gridRow, item.id);
     const color = valid ? VALID_COLOR : INVALID_COLOR;
 
-    for (let dy = 0; dy < item.height; dy++) {
-      for (let dx = 0; dx < item.width; dx++) {
-        const cellCol = gridCol + dx;
-        const cellRow = gridRow + dy;
-        if (
-          cellCol < 0 ||
-          cellCol >= GRID_COLS ||
-          cellRow < 0 ||
-          cellRow >= GRID_ROWS
-        )
-          continue;
-
-        const x = this.gridOriginX + cellCol * CELL_SIZE;
-        const y = this.gridOriginY + cellRow * CELL_SIZE;
-        this.highlightGraphics.rect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
-        this.highlightGraphics.fill({ color, alpha: 0.3 });
-      }
+    if (gridCol >= 0 && gridCol < GRID_COLS && gridRow >= 0 && gridRow < GRID_ROWS) {
+      const x = this.gridOriginX + gridCol * CELL_SIZE;
+      const y = this.gridOriginY + gridRow * CELL_SIZE;
+      this.highlightGraphics.rect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+      this.highlightGraphics.fill({ color, alpha: 0.3 });
     }
   }
 
-  private canPlace(
-    item: InventoryItem,
-    gridX: number,
-    gridY: number
-  ): boolean {
-    if (
-      gridX < 0 ||
-      gridY < 0 ||
-      gridX + item.width > GRID_COLS ||
-      gridY + item.height > GRID_ROWS
-    ) {
+  private canPlace(gridX: number, gridY: number, excludeItemId?: number): boolean {
+    if (gridX < 0 || gridY < 0 || gridX >= GRID_COLS || gridY >= GRID_ROWS) {
       return false;
     }
 
-    for (let dy = 0; dy < item.height; dy++) {
-      for (let dx = 0; dx < item.width; dx++) {
-        if (this.occupied[gridY + dy][gridX + dx]) return false;
+    if (this.occupied[gridY][gridX]) {
+      if (excludeItemId !== undefined) {
+        const occupant = this.items.find(
+          (i) => i.gridX === gridX && i.gridY === gridY && i.id !== excludeItemId
+        );
+        return !occupant;
       }
+      return false;
     }
 
     return true;
-  }
-
-  private markCells(item: InventoryItem, value: boolean): void {
-    for (let dy = 0; dy < item.height; dy++) {
-      for (let dx = 0; dx < item.width; dx++) {
-        this.occupied[item.gridY + dy][item.gridX + dx] = value;
-      }
-    }
   }
 
   private snapToGrid(c: Container, item: InventoryItem): void {
@@ -335,25 +227,18 @@ export class Inventory {
     c.y = this.gridOriginY + item.gridY * CELL_SIZE;
   }
 
-  addItem(
-    relicType: RelicType,
-    gridX: number,
-    gridY: number
-  ): InventoryItem | null {
-    const size = getRelicSize(relicType);
+  addItem(relicType: RelicType, gridX: number, gridY: number): InventoryItem | null {
+    if (!this.canPlace(gridX, gridY)) return null;
+
     const item: InventoryItem = {
       id: this.nextItemId++,
       relicType,
       gridX,
       gridY,
-      width: size.width,
-      height: size.height,
     };
 
-    if (!this.canPlace(item, gridX, gridY)) return null;
-
     this.items.push(item);
-    this.markCells(item, true);
+    this.occupied[gridY][gridX] = true;
 
     const itemContainer = this.createItemVisual(item);
     this.itemContainers.set(item.id, itemContainer);
@@ -369,7 +254,7 @@ export class Inventory {
     if (index < 0) return null;
 
     const item = this.items[index];
-    this.markCells(item, false);
+    this.occupied[item.gridY][item.gridX] = false;
     this.items.splice(index, 1);
 
     const c = this.itemContainers.get(itemId);
@@ -387,11 +272,8 @@ export class Inventory {
     wrapper.eventMode = "static";
     wrapper.cursor = "grab";
 
-    const w = item.width * CELL_SIZE;
-    const h = item.height * CELL_SIZE;
-
     const bg = new Graphics();
-    bg.roundRect(2, 2, w - 4, h - 4, 3);
+    bg.roundRect(2, 2, CELL_SIZE - 4, CELL_SIZE - 4, 3);
     bg.fill({ color: ITEM_BG_COLOR, alpha: 0.8 });
     bg.stroke({ color: ITEM_BORDER_COLOR, width: 1 });
     wrapper.addChild(bg);
@@ -405,11 +287,11 @@ export class Inventory {
     const sprite = new Sprite(texture);
     sprite.anchor.set(0.5);
 
-    const spriteSize = Math.min(w, h) - CELL_PADDING * 2;
+    const spriteSize = CELL_SIZE - CELL_PADDING * 2;
     sprite.width = spriteSize;
     sprite.height = spriteSize;
-    sprite.x = w / 2;
-    sprite.y = h / 2;
+    sprite.x = CELL_SIZE / 2;
+    sprite.y = CELL_SIZE / 2;
     wrapper.addChild(sprite);
 
     const itemId = item.id;
@@ -427,7 +309,7 @@ export class Inventory {
     const c = this.itemContainers.get(itemId);
     if (!c) return;
 
-    this.markCells(item, false);
+    this.occupied[item.gridY][item.gridX] = false;
 
     const localPos = this.container.toLocal(e.global);
     const offsetX = localPos.x - c.x;
@@ -461,17 +343,7 @@ export class Inventory {
       (localPos.y - this.gridOriginY) / CELL_SIZE
     );
 
-    const size = getRelicSize(relicType);
-    const tempItem: InventoryItem = {
-      id: TEMP_ITEM_ID,
-      relicType,
-      gridX: gridCol,
-      gridY: gridRow,
-      width: size.width,
-      height: size.height,
-    };
-
-    if (!this.canPlace(tempItem, gridCol, gridRow)) return false;
+    if (!this.canPlace(gridCol, gridRow)) return false;
 
     this.addItem(relicType, gridCol, gridRow);
     this.onExternalDrop.emit({ relicType, gridX: gridCol, gridY: gridRow });
@@ -481,14 +353,14 @@ export class Inventory {
   private populateTestData(): void {
     this.addItem(RelicType.StarfallStiletto, 0, 0);
     this.addItem(RelicType.BloodthornDirk, 1, 0);
-    this.addItem(RelicType.EmbercrestBlade, 0, 1);
-    this.addItem(RelicType.BriarthornSaber, 1, 1);
-    this.addItem(RelicType.TwinflareCrossblades, 2, 0);
-    this.addItem(RelicType.CloudveilLongsword, 4, 0);
-    this.addItem(RelicType.SteelBattleaxe, 5, 0);
+    this.addItem(RelicType.EmbercrestBlade, 2, 0);
+    this.addItem(RelicType.BriarthornSaber, 3, 0);
+    this.addItem(RelicType.TwinflareCrossblades, 4, 0);
+    this.addItem(RelicType.CloudveilLongsword, 5, 0);
+    this.addItem(RelicType.SteelBattleaxe, 6, 0);
     this.addItem(RelicType.MoltenZweihander, 7, 0);
-    this.addItem(RelicType.MoonlitHatchet, 9, 0);
-    this.addItem(RelicType.FrostfangClaymore, 9, 1);
+    this.addItem(RelicType.MoonlitHatchet, 8, 0);
+    this.addItem(RelicType.FrostfangClaymore, 9, 0);
   }
 
   destroy(): void {
