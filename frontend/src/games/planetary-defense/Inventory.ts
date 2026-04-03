@@ -11,10 +11,10 @@ import type { AssetManager } from "./assetManager";
 
 const DEFAULT_COLS = 10;
 const DEFAULT_ROWS = 5;
-const CELL_SIZE = 64;
+export const CELL_SIZE = 64;
 const CELL_PADDING = 4;
-const DEFAULT_GRID_PADDING = 8;
-const DEFAULT_BORDER_WIDTH = 3;
+export const GRID_PADDING = 8;
+export const BORDER_WIDTH = 3;
 
 const BG_COLOR = 0x111122;
 const BG_ALPHA = 0.92;
@@ -31,7 +31,6 @@ export interface InventoryConfig {
   rows?: number;
   x?: number;
   y?: number;
-  drawBorder?: boolean;
 }
 
 export interface InventoryItem {
@@ -50,6 +49,13 @@ interface DragState {
   originalGridY: number;
 }
 
+export interface DropEvent {
+  relicType: RelicType;
+  globalX: number;
+  globalY: number;
+  handled: boolean;
+}
+
 function createEvent<T>() {
   const listeners: Array<(data: T) => void> = [];
   return {
@@ -64,15 +70,11 @@ function createEvent<T>() {
   };
 }
 
-const allInventories: Inventory[] = [];
-
 export class Inventory {
   readonly container: Container;
 
   private cols: number;
   private rows: number;
-  private gridPadding: number;
-  private borderWidth: number;
   private gridOriginX: number;
   private gridOriginY: number;
   private occupied: boolean[][];
@@ -88,8 +90,9 @@ export class Inventory {
 
   readonly onItemAdded = createEvent<InventoryItem>();
   readonly onItemRemoved = createEvent<InventoryItem>();
-  readonly onExternalDrop =
-    createEvent<{ relicType: RelicType; gridX: number; gridY: number }>();
+  readonly onDragMove = createEvent<{ globalX: number; globalY: number }>();
+  readonly onDragEnd = createEvent<undefined>();
+  readonly onDropFailed = createEvent<DropEvent>();
 
   constructor(
     app: Application,
@@ -104,15 +107,11 @@ export class Inventory {
 
     this.cols = config?.cols ?? DEFAULT_COLS;
     this.rows = config?.rows ?? DEFAULT_ROWS;
-    const drawBorder = config?.drawBorder ?? true;
-
-    this.gridPadding = drawBorder ? DEFAULT_GRID_PADDING : 0;
-    this.borderWidth = drawBorder ? DEFAULT_BORDER_WIDTH : 0;
 
     const gridInnerWidth = this.cols * CELL_SIZE;
     const gridInnerHeight = this.rows * CELL_SIZE;
-    const totalWidth = gridInnerWidth + this.gridPadding * 2 + this.borderWidth * 2;
-    const totalHeight = gridInnerHeight + this.gridPadding * 2 + this.borderWidth * 2;
+    const totalWidth = gridInnerWidth + GRID_PADDING * 2 + BORDER_WIDTH * 2;
+    const totalHeight = gridInnerHeight + GRID_PADDING * 2 + BORDER_WIDTH * 2;
 
     const defaultX = (CANVAS_WIDTH - totalWidth) / 2;
     const defaultY = CANVAS_HEIGHT - totalHeight - 20;
@@ -120,8 +119,8 @@ export class Inventory {
     this.container.x = config?.x ?? defaultX;
     this.container.y = config?.y ?? defaultY;
 
-    this.gridOriginX = this.gridPadding + this.borderWidth;
-    this.gridOriginY = this.gridPadding + this.borderWidth;
+    this.gridOriginX = GRID_PADDING + BORDER_WIDTH;
+    this.gridOriginY = GRID_PADDING + BORDER_WIDTH;
 
     this.occupied = Array.from({ length: this.rows }, () =>
       Array<boolean>(this.cols).fill(false)
@@ -133,29 +132,25 @@ export class Inventory {
     this.highlightGraphics = new Graphics();
     this.container.addChild(this.highlightGraphics);
 
-    this.drawGrid(drawBorder, totalWidth, totalHeight);
+    this.drawGrid(totalWidth, totalHeight);
     this.setupDragEvents();
-
-    allInventories.push(this);
   }
 
-  private drawGrid(drawBorder: boolean, totalWidth: number, totalHeight: number): void {
+  private drawGrid(totalWidth: number, totalHeight: number): void {
     const g = this.gridBackground;
     g.clear();
 
-    if (drawBorder) {
-      g.roundRect(0, 0, totalWidth, totalHeight, 4);
-      g.fill({ color: BG_COLOR, alpha: BG_ALPHA });
-      g.stroke({ color: BORDER_COLOR, width: this.borderWidth });
-    }
+    g.roundRect(0, 0, totalWidth, totalHeight, 4);
+    g.fill({ color: BG_COLOR, alpha: BG_ALPHA });
+    g.stroke({ color: BORDER_COLOR, width: BORDER_WIDTH });
 
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {
         const x = this.gridOriginX + c * CELL_SIZE;
         const y = this.gridOriginY + r * CELL_SIZE;
-        g.roundRect(x, y, CELL_SIZE, CELL_SIZE, drawBorder ? 0 : 6);
-        g.fill({ color: CELL_BG_COLOR, alpha: drawBorder ? 0.5 : 0.85 });
-        g.stroke({ color: drawBorder ? CELL_LINE_COLOR : 0x3a3a5e, width: drawBorder ? 1 : 1.5 });
+        g.rect(x, y, CELL_SIZE, CELL_SIZE);
+        g.fill({ color: CELL_BG_COLOR, alpha: 0.5 });
+        g.stroke({ color: CELL_LINE_COLOR, width: 1 });
       }
     }
   }
@@ -195,29 +190,34 @@ export class Inventory {
       this.dragState;
 
     const centerGlobal = this.getDragCenterGlobal();
-    const { col: targetCol, row: targetRow } = this.globalToGrid(centerGlobal.x, centerGlobal.y);
+    const { col, row } = this.globalToGrid(centerGlobal.x, centerGlobal.y);
 
-    if (this.canPlace(targetCol, targetRow, item.id)) {
-      item.gridX = targetCol;
-      item.gridY = targetRow;
+    if (this.canPlace(col, row, item.id)) {
+      item.gridX = col;
+      item.gridY = row;
       this.finalizeDrop(item, dragContainer);
-      this.clearAllHighlights();
+      this.onDragEnd.emit(undefined);
       return;
     }
 
-    for (const other of allInventories) {
-      if (other === this) continue;
-      if (other.handleExternalDrop(item.relicType, centerGlobal.x, centerGlobal.y)) {
-        this.removeDraggedItem(item, dragContainer);
-        this.clearAllHighlights();
-        return;
-      }
+    const dropEvent: DropEvent = {
+      relicType: item.relicType,
+      globalX: centerGlobal.x,
+      globalY: centerGlobal.y,
+      handled: false,
+    };
+    this.onDropFailed.emit(dropEvent);
+
+    if (dropEvent.handled) {
+      this.removeDraggedItem(item, dragContainer);
+      this.onDragEnd.emit(undefined);
+      return;
     }
 
     item.gridX = originalGridX;
     item.gridY = originalGridY;
     this.finalizeDrop(item, dragContainer);
-    this.clearAllHighlights();
+    this.onDragEnd.emit(undefined);
   };
 
   private finalizeDrop(item: InventoryItem, dragContainer: Container): void {
@@ -242,12 +242,6 @@ export class Inventory {
     this.highlightGraphics.clear();
   }
 
-  private clearAllHighlights(): void {
-    for (const inv of allInventories) {
-      inv.highlightGraphics.clear();
-    }
-  }
-
   private globalToGrid(globalX: number, globalY: number): { col: number; row: number } {
     const localPos = this.container.toLocal({ x: globalX, y: globalY });
     const col = Math.floor((localPos.x - this.gridOriginX) / CELL_SIZE);
@@ -261,21 +255,18 @@ export class Inventory {
 
     const item = this.items.find((i) => i.id === this.dragState!.itemId)!;
     const centerGlobal = this.getDragCenterGlobal();
-    const { col: gridCol, row: gridRow } = this.globalToGrid(centerGlobal.x, centerGlobal.y);
-    const valid = this.canPlace(gridCol, gridRow, item.id);
+    const { col, row } = this.globalToGrid(centerGlobal.x, centerGlobal.y);
+    const valid = this.canPlace(col, row, item.id);
     const color = valid ? VALID_COLOR : INVALID_COLOR;
 
-    if (gridCol >= 0 && gridCol < this.cols && gridRow >= 0 && gridRow < this.rows) {
-      const x = this.gridOriginX + gridCol * CELL_SIZE;
-      const y = this.gridOriginY + gridRow * CELL_SIZE;
+    if (col >= 0 && col < this.cols && row >= 0 && row < this.rows) {
+      const x = this.gridOriginX + col * CELL_SIZE;
+      const y = this.gridOriginY + row * CELL_SIZE;
       this.highlightGraphics.rect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
       this.highlightGraphics.fill({ color, alpha: 0.3 });
     }
 
-    for (const other of allInventories) {
-      if (other === this) continue;
-      other.showDropHighlight(centerGlobal.x, centerGlobal.y);
-    }
+    this.onDragMove.emit({ globalX: centerGlobal.x, globalY: centerGlobal.y });
   }
 
   showDropHighlight(globalX: number, globalY: number): void {
@@ -290,6 +281,10 @@ export class Inventory {
     const y = this.gridOriginY + row * CELL_SIZE;
     this.highlightGraphics.rect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
     this.highlightGraphics.fill({ color, alpha: 0.3 });
+  }
+
+  clearHighlight(): void {
+    this.highlightGraphics.clear();
   }
 
   private canPlace(gridX: number, gridY: number, excludeItemId?: number): boolean {
@@ -357,6 +352,19 @@ export class Inventory {
 
   getItems(): InventoryItem[] {
     return this.items;
+  }
+
+  handleExternalDrop(
+    relicType: RelicType,
+    globalX: number,
+    globalY: number
+  ): boolean {
+    const { col, row } = this.globalToGrid(globalX, globalY);
+
+    if (!this.canPlace(col, row)) return false;
+
+    this.addItem(relicType, col, row);
+    return true;
   }
 
   private createItemVisual(item: InventoryItem): Container {
@@ -428,20 +436,6 @@ export class Inventory {
     c.cursor = "grabbing";
   }
 
-  handleExternalDrop(
-    relicType: RelicType,
-    globalX: number,
-    globalY: number
-  ): boolean {
-    const { col: gridCol, row: gridRow } = this.globalToGrid(globalX, globalY);
-
-    if (!this.canPlace(gridCol, gridRow)) return false;
-
-    this.addItem(relicType, gridCol, gridRow);
-    this.onExternalDrop.emit({ relicType, gridX: gridCol, gridY: gridRow });
-    return true;
-  }
-
   populateTestData(): void {
     this.addItem(RelicType.StarfallStiletto, 0, 0);
     this.addItem(RelicType.BloodthornDirk, 1, 0);
@@ -456,9 +450,6 @@ export class Inventory {
   }
 
   destroy(): void {
-    const idx = allInventories.indexOf(this);
-    if (idx >= 0) allInventories.splice(idx, 1);
-
     this.app.stage.off("pointermove", this.onPointerMove);
     this.app.stage.off("pointerup", this.onPointerUp);
     this.app.stage.off("pointerupoutside", this.onPointerUp);

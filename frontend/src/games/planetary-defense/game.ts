@@ -8,7 +8,8 @@ import type { LabelData } from "./EnemyManager";
 import { RelicManager } from "./RelicManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { DamageNumberManager } from "./DamageNumberManager";
-import { Inventory } from "./Inventory";
+import { Inventory, CELL_SIZE, GRID_PADDING, BORDER_WIDTH } from "./Inventory";
+import { InventoryManager } from "./InventoryManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, getRelicPosition } from "./state";
 import type { GameState, RelicState } from "./state";
@@ -16,7 +17,7 @@ import { RELIC_SLOT_COUNT } from "./relicConfig";
 
 export type { LabelData };
 
-const WEAPON_SLOT_SIZE = 64;
+const WEAPON_SLOT_CENTER_OFFSET = GRID_PADDING + BORDER_WIDTH + CELL_SIZE / 2;
 
 export class PlanetaryDefenseGame {
   private app: Application;
@@ -31,6 +32,7 @@ export class PlanetaryDefenseGame {
   private damageNumberManager!: DamageNumberManager;
   private inventory!: Inventory;
   private weaponSlots: Inventory[] = [];
+  private inventoryManager!: InventoryManager;
   private dragOverlay!: Container;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
@@ -95,10 +97,12 @@ export class PlanetaryDefenseGame {
     world.addChild(this.enemyManager.layer);
 
     this.dragOverlay = new Container();
+    this.inventoryManager = new InventoryManager();
 
     this.inventory = new Inventory(this.app, this.assetManager, this.dragOverlay);
     world.addChild(this.inventory.container);
     this.inventory.populateTestData();
+    this.inventoryManager.register(this.inventory);
 
     this.buildWeaponSlots(world);
 
@@ -117,9 +121,8 @@ export class PlanetaryDefenseGame {
         {
           cols: 1,
           rows: 1,
-          x: x - WEAPON_SLOT_SIZE / 2,
-          y: y - WEAPON_SLOT_SIZE / 2,
-          drawBorder: false,
+          x: x - WEAPON_SLOT_CENTER_OFFSET,
+          y: y - WEAPON_SLOT_CENTER_OFFSET,
         }
       );
 
@@ -145,6 +148,7 @@ export class PlanetaryDefenseGame {
 
       world.addChild(weaponSlot.container);
       this.weaponSlots.push(weaponSlot);
+      this.inventoryManager.register(weaponSlot);
     }
   }
 
@@ -171,6 +175,7 @@ export class PlanetaryDefenseGame {
     this.inventory.destroy();
     for (const ws of this.weaponSlots) ws.destroy();
     this.weaponSlots = [];
+    this.inventoryManager.destroy();
     this.dragOverlay.destroy();
     this.app.destroy(true);
   }
