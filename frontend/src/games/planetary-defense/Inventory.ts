@@ -1,5 +1,4 @@
 import {
-  Application,
   Container,
   Graphics,
   Sprite,
@@ -40,22 +39,6 @@ export interface InventoryItem {
   gridY: number;
 }
 
-interface DragState {
-  itemId: number;
-  container: Container;
-  offsetX: number;
-  offsetY: number;
-  originalGridX: number;
-  originalGridY: number;
-}
-
-export interface DropEvent {
-  relicType: RelicType;
-  globalX: number;
-  globalY: number;
-  handled: boolean;
-}
-
 function createEvent<T>() {
   const listeners: Array<(data: T) => void> = [];
   return {
@@ -82,27 +65,19 @@ export class Inventory {
   private itemContainers = new Map<number, Container>();
   private gridBackground: Graphics;
   private highlightGraphics: Graphics;
-  private dragState: DragState | null = null;
   private assetManager: AssetManager;
-  private app: Application;
-  private dragOverlay: Container;
   private nextItemId = 1;
 
   readonly onItemAdded = createEvent<InventoryItem>();
   readonly onItemRemoved = createEvent<InventoryItem>();
-  readonly onDragMove = createEvent<{ globalX: number; globalY: number }>();
-  readonly onDragEnd = createEvent<undefined>();
-  readonly onDropFailed = createEvent<DropEvent>();
+  readonly onDragStart = createEvent<{
+    inventory: Inventory;
+    item: InventoryItem;
+    event: FederatedPointerEvent;
+  }>();
 
-  constructor(
-    app: Application,
-    assetManager: AssetManager,
-    dragOverlay: Container,
-    config?: InventoryConfig
-  ) {
-    this.app = app;
+  constructor(assetManager: AssetManager, config?: InventoryConfig) {
     this.assetManager = assetManager;
-    this.dragOverlay = dragOverlay;
     this.container = new Container();
 
     this.cols = config?.cols ?? DEFAULT_COLS;
@@ -133,7 +108,6 @@ export class Inventory {
     this.container.addChild(this.highlightGraphics);
 
     this.drawGrid(totalWidth, totalHeight);
-    this.setupDragEvents();
   }
 
   private drawGrid(totalWidth: number, totalHeight: number): void {
@@ -155,121 +129,29 @@ export class Inventory {
     }
   }
 
-  private setupDragEvents(): void {
-    this.app.stage.eventMode = "static";
-    this.app.stage.hitArea = this.app.screen;
-
-    this.app.stage.on("pointermove", this.onPointerMove);
-    this.app.stage.on("pointerup", this.onPointerUp);
-    this.app.stage.on("pointerupoutside", this.onPointerUp);
-  }
-
-  private onPointerMove = (e: FederatedPointerEvent): void => {
-    if (!this.dragState) return;
-
-    const pos = this.dragOverlay.toLocal(e.global);
-    this.dragState.container.x = pos.x - this.dragState.offsetX;
-    this.dragState.container.y = pos.y - this.dragState.offsetY;
-
-    this.updateHighlight();
-  };
-
-  private getDragCenterGlobal(): { x: number; y: number } {
-    const c = this.dragState!.container;
-    return this.dragOverlay.toGlobal({
-      x: c.x + CELL_SIZE / 2,
-      y: c.y + CELL_SIZE / 2,
-    });
-  }
-
-  private onPointerUp = (): void => {
-    if (!this.dragState) return;
-
-    const item = this.items.find((i) => i.id === this.dragState!.itemId)!;
-    const { container: dragContainer, originalGridX, originalGridY } =
-      this.dragState;
-
-    const centerGlobal = this.getDragCenterGlobal();
-    const { col, row } = this.globalToGrid(centerGlobal.x, centerGlobal.y);
-
-    if (this.canPlace(col, row, item.id)) {
-      item.gridX = col;
-      item.gridY = row;
-      this.finalizeDrop(item, dragContainer);
-      this.onDragEnd.emit(undefined);
-      return;
-    }
-
-    const dropEvent: DropEvent = {
-      relicType: item.relicType,
-      globalX: centerGlobal.x,
-      globalY: centerGlobal.y,
-      handled: false,
-    };
-    this.onDropFailed.emit(dropEvent);
-
-    if (dropEvent.handled) {
-      this.removeDraggedItem(item, dragContainer);
-      this.onDragEnd.emit(undefined);
-      return;
-    }
-
-    item.gridX = originalGridX;
-    item.gridY = originalGridY;
-    this.finalizeDrop(item, dragContainer);
-    this.onDragEnd.emit(undefined);
-  };
-
-  private finalizeDrop(item: InventoryItem, dragContainer: Container): void {
-    this.occupied[item.gridY][item.gridX] = true;
-    this.dragOverlay.removeChild(dragContainer);
-    this.container.addChild(dragContainer);
-    this.snapToGrid(dragContainer, item);
-    dragContainer.alpha = 1;
-    dragContainer.cursor = "grab";
-    this.dragState = null;
-    this.highlightGraphics.clear();
-  }
-
-  private removeDraggedItem(item: InventoryItem, dragContainer: Container): void {
-    const idx = this.items.indexOf(item);
-    if (idx >= 0) this.items.splice(idx, 1);
-    this.dragOverlay.removeChild(dragContainer);
-    dragContainer.destroy();
-    this.itemContainers.delete(item.id);
-    this.onItemRemoved.emit(item);
-    this.dragState = null;
-    this.highlightGraphics.clear();
-  }
-
-  private globalToGrid(globalX: number, globalY: number): { col: number; row: number } {
+  globalToGrid(globalX: number, globalY: number): { col: number; row: number } {
     const localPos = this.container.toLocal({ x: globalX, y: globalY });
     const col = Math.floor((localPos.x - this.gridOriginX) / CELL_SIZE);
     const row = Math.floor((localPos.y - this.gridOriginY) / CELL_SIZE);
     return { col, row };
   }
 
-  private updateHighlight(): void {
-    this.highlightGraphics.clear();
-    if (!this.dragState) return;
-
-    const item = this.items.find((i) => i.id === this.dragState!.itemId)!;
-    const centerGlobal = this.getDragCenterGlobal();
-    const { col, row } = this.globalToGrid(centerGlobal.x, centerGlobal.y);
-    const valid = this.canPlace(col, row, item.id);
-    const color = valid ? VALID_COLOR : INVALID_COLOR;
-
-    if (col >= 0 && col < this.cols && row >= 0 && row < this.rows) {
-      const x = this.gridOriginX + col * CELL_SIZE;
-      const y = this.gridOriginY + row * CELL_SIZE;
-      this.highlightGraphics.rect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
-      this.highlightGraphics.fill({ color, alpha: 0.3 });
+  canPlace(col: number, row: number): boolean {
+    if (col < 0 || row < 0 || col >= this.cols || row >= this.rows) {
+      return false;
     }
 
-    this.onDragMove.emit({ globalX: centerGlobal.x, globalY: centerGlobal.y });
+    return !this.occupied[row][col];
   }
 
-  showDropHighlight(globalX: number, globalY: number): void {
+  getItemGlobalPosition(item: InventoryItem): { x: number; y: number } {
+    return this.container.toGlobal({
+      x: this.gridOriginX + item.gridX * CELL_SIZE,
+      y: this.gridOriginY + item.gridY * CELL_SIZE,
+    });
+  }
+
+  showHighlight(globalX: number, globalY: number): void {
     this.highlightGraphics.clear();
     const { col, row } = this.globalToGrid(globalX, globalY);
 
@@ -287,22 +169,43 @@ export class Inventory {
     this.highlightGraphics.clear();
   }
 
-  private canPlace(gridX: number, gridY: number, excludeItemId?: number): boolean {
-    if (gridX < 0 || gridY < 0 || gridX >= this.cols || gridY >= this.rows) {
-      return false;
-    }
+  beginItemDrag(itemId: number): InventoryItem | null {
+    const item = this.items.find((i) => i.id === itemId);
+    if (!item) return null;
 
-    if (this.occupied[gridY][gridX]) {
-      if (excludeItemId !== undefined) {
-        const occupant = this.items.find(
-          (i) => i.gridX === gridX && i.gridY === gridY && i.id !== excludeItemId
-        );
-        return !occupant;
-      }
-      return false;
+    this.occupied[item.gridY][item.gridX] = false;
+    const c = this.itemContainers.get(itemId);
+    if (c) c.visible = false;
+
+    return item;
+  }
+
+  endItemDrag(itemId: number, col: number, row: number): boolean {
+    const item = this.items.find((i) => i.id === itemId);
+    if (!item) return false;
+
+    if (!this.canPlace(col, row)) return false;
+
+    item.gridX = col;
+    item.gridY = row;
+    this.occupied[row][col] = true;
+
+    const c = this.itemContainers.get(itemId);
+    if (c) {
+      c.visible = true;
+      this.snapToGrid(c, item);
     }
 
     return true;
+  }
+
+  cancelItemDrag(itemId: number): void {
+    const item = this.items.find((i) => i.id === itemId);
+    if (!item) return;
+
+    this.occupied[item.gridY][item.gridX] = true;
+    const c = this.itemContainers.get(itemId);
+    if (c) c.visible = true;
   }
 
   private snapToGrid(c: Container, item: InventoryItem): void {
@@ -354,19 +257,6 @@ export class Inventory {
     return this.items;
   }
 
-  handleExternalDrop(
-    relicType: RelicType,
-    globalX: number,
-    globalY: number
-  ): boolean {
-    const { col, row } = this.globalToGrid(globalX, globalY);
-
-    if (!this.canPlace(col, row)) return false;
-
-    this.addItem(relicType, col, row);
-    return true;
-  }
-
   private createItemVisual(item: InventoryItem): Container {
     const wrapper = new Container();
     wrapper.eventMode = "static";
@@ -394,46 +284,11 @@ export class Inventory {
     sprite.y = CELL_SIZE / 2;
     wrapper.addChild(sprite);
 
-    const itemId = item.id;
     wrapper.on("pointerdown", (e: FederatedPointerEvent) => {
-      this.startDrag(itemId, e);
+      this.onDragStart.emit({ inventory: this, item, event: e });
     });
 
     return wrapper;
-  }
-
-  private startDrag(itemId: number, e: FederatedPointerEvent): void {
-    const item = this.items.find((i) => i.id === itemId);
-    if (!item) return;
-
-    const c = this.itemContainers.get(itemId);
-    if (!c) return;
-
-    this.occupied[item.gridY][item.gridX] = false;
-
-    const globalPos = this.container.toGlobal({ x: c.x, y: c.y });
-    const overlayPos = this.dragOverlay.toLocal(globalPos);
-
-    this.container.removeChild(c);
-    this.dragOverlay.addChild(c);
-    c.x = overlayPos.x;
-    c.y = overlayPos.y;
-
-    const pointerOverlay = this.dragOverlay.toLocal(e.global);
-    const offsetX = pointerOverlay.x - c.x;
-    const offsetY = pointerOverlay.y - c.y;
-
-    this.dragState = {
-      itemId,
-      container: c,
-      offsetX,
-      offsetY,
-      originalGridX: item.gridX,
-      originalGridY: item.gridY,
-    };
-
-    c.alpha = 0.8;
-    c.cursor = "grabbing";
   }
 
   populateTestData(): void {
@@ -450,10 +305,6 @@ export class Inventory {
   }
 
   destroy(): void {
-    this.app.stage.off("pointermove", this.onPointerMove);
-    this.app.stage.off("pointerup", this.onPointerUp);
-    this.app.stage.off("pointerupoutside", this.onPointerUp);
-
     for (const c of this.itemContainers.values()) c.destroy();
     this.itemContainers.clear();
     this.gridBackground.destroy();

@@ -33,7 +33,6 @@ export class PlanetaryDefenseGame {
   private inventory!: Inventory;
   private weaponSlots: Inventory[] = [];
   private inventoryManager!: InventoryManager;
-  private dragOverlay!: Container;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
@@ -96,17 +95,14 @@ export class PlanetaryDefenseGame {
     this.enemyManager = new EnemyManager(this.assetManager);
     world.addChild(this.enemyManager.layer);
 
-    this.dragOverlay = new Container();
-    this.inventoryManager = new InventoryManager();
+    this.inventoryManager = new InventoryManager(this.app, this.assetManager);
 
-    this.inventory = new Inventory(this.app, this.assetManager, this.dragOverlay);
+    this.inventory = new Inventory(this.assetManager);
     world.addChild(this.inventory.container);
     this.inventory.populateTestData();
     this.inventoryManager.register(this.inventory);
 
     this.buildWeaponSlots(world);
-
-    world.addChild(this.dragOverlay);
   }
 
   private buildWeaponSlots(world: Container): void {
@@ -114,17 +110,12 @@ export class PlanetaryDefenseGame {
       const slot = this.state.relicSlots[i];
       const { x, y } = getRelicPosition(slot);
 
-      const weaponSlot = new Inventory(
-        this.app,
-        this.assetManager,
-        this.dragOverlay,
-        {
-          cols: 1,
-          rows: 1,
-          x: x - WEAPON_SLOT_CENTER_OFFSET,
-          y: y - WEAPON_SLOT_CENTER_OFFSET,
-        }
-      );
+      const weaponSlot = new Inventory(this.assetManager, {
+        cols: 1,
+        rows: 1,
+        x: x - WEAPON_SLOT_CENTER_OFFSET,
+        y: y - WEAPON_SLOT_CENTER_OFFSET,
+      });
 
       if (slot.relic) {
         weaponSlot.addItem(slot.relic.type, 0, 0);
@@ -176,7 +167,6 @@ export class PlanetaryDefenseGame {
     for (const ws of this.weaponSlots) ws.destroy();
     this.weaponSlots = [];
     this.inventoryManager.destroy();
-    this.dragOverlay.destroy();
     this.app.destroy(true);
   }
 }
