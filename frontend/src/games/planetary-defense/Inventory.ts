@@ -103,6 +103,9 @@ export function buildItemCell(item: Item, assetManager: AssetManager): Container
 export class Inventory {
   readonly container: Container;
 
+  onBeforeExtract?: (item: InventoryItem) => boolean;
+  onBeforeReceive?: (item: InventoryItem) => boolean;
+
   private cols: number;
   private rows: number;
   private gridOriginX: number;

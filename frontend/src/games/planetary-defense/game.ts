@@ -116,7 +116,6 @@ export class PlanetaryDefenseGame {
     this.inventoryManager.register(this.inventory);
 
     this.merchantManager.setInventoryManager(this.inventoryManager);
-    this.merchantManager.setPlayerInventory(this.inventory);
     this.merchantManager.init(this.state);
 
     this.buildWeaponSlots(world);

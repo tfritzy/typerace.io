@@ -6,7 +6,6 @@ import {
 import { Inventory, CELL_SIZE, buildItemCell } from "./Inventory";
 import type { InventoryItem } from "./Inventory";
 import type { AssetManager } from "./assetManager";
-import type { GameState, MerchantShipState, MerchantItem } from "./state";
 
 interface DragState {
   source: Inventory;
@@ -19,20 +18,12 @@ interface DragState {
   offsetY: number;
 }
 
-interface MerchantContext {
-  inventory: Inventory;
-  merchant: MerchantShipState;
-  state: GameState;
-  onPurchase: () => void;
-}
-
 export class InventoryManager {
   private app: Application;
   private assetManager: AssetManager;
   private inventories: Inventory[] = [];
   private unsubscribers: (() => void)[] = [];
   private dragState: DragState | null = null;
-  private merchantCtx: MerchantContext | null = null;
 
   constructor(app: Application, assetManager: AssetManager) {
     this.app = app;
@@ -55,37 +46,9 @@ export class InventoryManager {
     );
   }
 
-  setMerchantContext(
-    inventory: Inventory,
-    merchant: MerchantShipState,
-    state: GameState,
-    onPurchase: () => void
-  ): void {
-    this.merchantCtx = { inventory, merchant, state, onPurchase };
-  }
-
-  clearMerchantContext(): void {
-    if (this.merchantCtx) {
-      const idx = this.inventories.indexOf(this.merchantCtx.inventory);
-      if (idx >= 0) this.inventories.splice(idx, 1);
-      this.merchantCtx = null;
-    }
-  }
-
-  private isMerchantSource(source: Inventory): boolean {
-    return this.merchantCtx !== null && this.merchantCtx.inventory === source;
-  }
-
-  private isMerchantInventory(inv: Inventory): boolean {
-    return this.merchantCtx !== null && this.merchantCtx.inventory === inv;
-  }
-
-  private getMerchantPrice(slot: InventoryItem): number | null {
-    if (!this.merchantCtx || !slot.item) return null;
-    const merchantItem = this.merchantCtx.merchant.items.find(
-      (mi: MerchantItem) => mi.item.type === slot.item!.type
-    );
-    return merchantItem ? merchantItem.price : null;
+  unregister(inventory: Inventory): void {
+    const idx = this.inventories.indexOf(inventory);
+    if (idx >= 0) this.inventories.splice(idx, 1);
   }
 
   private startDrag(
@@ -142,31 +105,18 @@ export class InventoryManager {
       if (inv === source) {
         source.endItemDrag(itemId, col, row);
       } else if (slot.item) {
-        if (this.isMerchantInventory(inv) && !this.isMerchantSource(source)) {
+        if (inv.onBeforeReceive && !inv.onBeforeReceive(slot)) {
           source.cancelItemDrag(itemId);
           this.finishDrag(ghost);
           return;
-        } else if (this.isMerchantSource(source)) {
-          const price = this.getMerchantPrice(slot);
-          if (price === null || !this.merchantCtx || this.merchantCtx.state.gold < price) {
-            source.cancelItemDrag(itemId);
-            this.finishDrag(ghost);
-            return;
-          }
-          this.merchantCtx.state.gold -= price;
-          const itemIndex = this.merchantCtx.merchant.items.findIndex(
-            (mi: MerchantItem) => mi.item.type === slot.item!.type
-          );
-          if (itemIndex >= 0) {
-            this.merchantCtx.merchant.items.splice(itemIndex, 1);
-          }
-          source.removeItem(itemId);
-          inv.addItem(slot.item, col, row);
-          this.merchantCtx.onPurchase();
-        } else {
-          source.removeItem(itemId);
-          inv.addItem(slot.item, col, row);
         }
+        if (source.onBeforeExtract && !source.onBeforeExtract(slot)) {
+          source.cancelItemDrag(itemId);
+          this.finishDrag(ghost);
+          return;
+        }
+        source.removeItem(itemId);
+        inv.addItem(slot.item, col, row);
       }
 
       this.finishDrag(ghost);

@@ -1,6 +1,6 @@
 import { Container, Circle, Graphics, Text } from "pixi.js";
 import type { AssetManager } from "./assetManager";
-import type { GameState, MerchantShipState } from "./state";
+import type { GameState, MerchantShipState, MerchantItem } from "./state";
 import { createShipContainer } from "./prefabs/shipPrefab";
 import type { EntityState } from "./state";
 import {
@@ -24,7 +24,6 @@ export class MerchantManager {
   private shopInventory: Inventory | null = null;
   private priceLabels = new Map<number, Container>();
   private inventoryManager: InventoryManager | null = null;
-  private playerInventory: Inventory | null = null;
   private goldLabel: Text | null = null;
 
   constructor(assets: AssetManager) {
@@ -35,10 +34,6 @@ export class MerchantManager {
 
   setInventoryManager(manager: InventoryManager): void {
     this.inventoryManager = manager;
-  }
-
-  setPlayerInventory(inventory: Inventory): void {
-    this.playerInventory = inventory;
   }
 
   init(state: GameState): void {
@@ -139,6 +134,22 @@ export class MerchantManager {
       y: panelY,
     });
 
+    this.shopInventory.onBeforeReceive = () => false;
+
+    this.shopInventory.onBeforeExtract = (slot) => {
+      if (!slot.item) return false;
+      const idx = merchant.items.findIndex(
+        (mi: MerchantItem) => mi.item.type === slot.item!.type
+      );
+      if (idx < 0) return false;
+      const merchantItem = merchant.items[idx];
+      if (state.gold < merchantItem.price) return false;
+      state.gold -= merchantItem.price;
+      merchant.items.splice(idx, 1);
+      this.addPriceOverlays(merchant, panelX, panelY, cols);
+      return true;
+    };
+
     this.shopPanel = new Container();
 
     const titleBg = new Graphics();
@@ -186,12 +197,6 @@ export class MerchantManager {
 
     if (this.inventoryManager) {
       this.inventoryManager.register(this.shopInventory);
-      this.inventoryManager.setMerchantContext(
-        this.shopInventory,
-        merchant,
-        state,
-        () => this.refreshPriceOverlays(merchant, panelX, panelY, cols)
-      );
     }
   }
 
@@ -237,15 +242,6 @@ export class MerchantManager {
     }
   }
 
-  private refreshPriceOverlays(
-    merchant: MerchantShipState,
-    panelX: number,
-    panelY: number,
-    cols: number
-  ): void {
-    this.addPriceOverlays(merchant, panelX, panelY, cols);
-  }
-
   private clearPriceOverlays(): void {
     for (const label of this.priceLabels.values()) {
       label.destroy();
@@ -258,7 +254,7 @@ export class MerchantManager {
 
     if (this.shopInventory) {
       if (this.inventoryManager) {
-        this.inventoryManager.clearMerchantContext();
+        this.inventoryManager.unregister(this.shopInventory);
       }
       this.shopInventory.destroy();
       this.shopInventory = null;
