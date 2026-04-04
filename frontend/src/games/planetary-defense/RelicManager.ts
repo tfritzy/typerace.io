@@ -1,7 +1,7 @@
 import { Container, Graphics } from "pixi.js";
 import type { GameState } from "./state";
 import { getRelicPosition } from "./state";
-import { RELIC_CONFIGS } from "./relicConfig";
+import { RELIC_CONFIGS, type RelicType } from "./relicConfig";
 
 const CHARGE_DOT_RADIUS = 4;
 const CHARGE_DOT_SPACING = 12;
@@ -50,7 +50,7 @@ export class RelicManager {
 
     g.clear();
 
-    const config = RELIC_CONFIGS[slot.relic.type];
+    const config = RELIC_CONFIGS[slot.relic.type as RelicType];
     const count = config.charsToFire;
 
     const totalWidth = (count - 1) * CHARGE_DOT_SPACING;

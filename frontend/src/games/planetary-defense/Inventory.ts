@@ -6,7 +6,7 @@ import {
   type FederatedPointerEvent,
 } from "pixi.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
-import { type Item, type ItemType, getItemConfig, getItemDisplay } from "./itemConfig";
+import { type Item, getItemConfig, getItemDisplay } from "./itemConfig";
 import { RelicType } from "./relicConfig";
 import type { AssetManager } from "./assetManager";
 
