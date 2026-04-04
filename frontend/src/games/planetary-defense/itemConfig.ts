@@ -225,6 +225,27 @@ export const ITEM_CONFIGS: Record<ItemType, ItemConfig> = {
   Gold: { stackable: true, maxStack: 2147483647 },
 };
 
+export const TOPAZ_TIERS: GemType[] = [
+  GemType.ChippedTopaz, GemType.FlawedTopaz, GemType.Topaz,
+  GemType.FlawlessTopaz, GemType.PerfectTopaz,
+];
+export const RUBY_TIERS: GemType[] = [
+  GemType.ChippedRuby, GemType.FlawedRuby, GemType.Ruby,
+  GemType.FlawlessRuby, GemType.PerfectRuby,
+];
+export const EMERALD_TIERS: GemType[] = [
+  GemType.ChippedEmerald, GemType.FlawedEmerald, GemType.Emerald,
+  GemType.FlawlessEmerald, GemType.PerfectEmerald,
+];
+export const SAPPHIRE_TIERS: GemType[] = [
+  GemType.ChippedSapphire, GemType.FlawedSapphire, GemType.Sapphire,
+  GemType.FlawlessSapphire, GemType.PerfectSapphire,
+];
+export const AMETHYST_TIERS: GemType[] = [
+  GemType.ChippedAmethyst, GemType.FlawedAmethyst, GemType.Amethyst,
+  GemType.FlawlessAmethyst, GemType.PerfectAmethyst,
+];
+
 export function getItemDisplay(type: ItemType): ItemDisplay {
   return ITEM_DISPLAY[type];
 }
