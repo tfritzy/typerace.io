@@ -1,7 +1,7 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import {
   type EntityType, ColorPreset,
-  COLOR_PRESET_COUNT, isShipEntityType,
+  isShipEntityType,
 } from "./types";
 import { randInt } from "./utils";
 import { getLanguageFromSlug } from "../../utils/modes";
@@ -288,7 +288,7 @@ export function createGameState(): GameState {
     x: CANVAS_WIDTH - 250,
     y: CANVAS_HEIGHT / 2,
     entityType: "Clipper",
-    colorPreset: ColorPreset.Preset2,
+    colorPreset: ColorPreset.Preset3,
     items: generateMerchantItems(6),
   });
 
@@ -358,7 +358,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
   };
 
   if (isShip) {
-    entity.colorPreset = randInt(COLOR_PRESET_COUNT);
+    entity.colorPreset = ColorPreset.Preset4;
     entity.hasShield = Math.random() > 0.5;
   } else {
     entity.variant = randInt(16);
