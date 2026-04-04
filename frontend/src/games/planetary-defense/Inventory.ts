@@ -11,7 +11,7 @@ import { GemType, GemQuality, GEM_COLORS, GEM_NAMES, QUALITY_NAMES } from "./dro
 import type { AssetManager } from "./assetManager";
 
 const DEFAULT_COLS = 10;
-const DEFAULT_ROWS = 5;
+const DEFAULT_ROWS = 2;
 export const CELL_SIZE = 64;
 const CELL_PADDING = 4;
 export const GRID_PADDING = 8;
