@@ -113,6 +113,7 @@ export class PlanetaryDefenseGame {
     this.inventory = new Inventory(this.assetManager);
     world.addChild(this.inventory.container);
     this.inventory.populateTestData();
+    this.inventory.addToFirstEmpty({ type: "Gold", amount: 100 });
     this.inventoryManager.register(this.inventory);
 
     this.merchantManager.setInventoryManager(this.inventoryManager);

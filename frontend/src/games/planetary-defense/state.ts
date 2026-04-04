@@ -148,18 +148,13 @@ export interface DamageData {
   killed: boolean;
 }
 
-export interface MerchantItem {
-  item: Item;
-  price: number;
-}
-
 export interface MerchantShipState {
   id: number;
   x: number;
   y: number;
   entityType: EntityType;
   colorPreset: ColorPreset;
-  items: MerchantItem[];
+  items: Item[];
 }
 
 export interface GameState {
@@ -168,8 +163,6 @@ export interface GameState {
   projectiles: ProjectileState[];
   drops: DropState[];
   merchants: MerchantShipState[];
-  activeMerchantId: number | null;
-  gold: number;
   time: {
     time: number;
     deltaTime: number;
@@ -240,7 +233,7 @@ const MERCHANT_RELICS: RelicType[] = [
   RelicType.TidebreakAxe,
 ];
 
-function generateMerchantItems(count: number): MerchantItem[] {
+function generateMerchantItems(count: number): Item[] {
   const pool = [...MERCHANT_RELICS];
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -248,9 +241,39 @@ function generateMerchantItems(count: number): MerchantItem[] {
   }
   const selected = pool.slice(0, count);
   return selected.map((relicType) => ({
-    item: { type: relicType, amount: 1 },
+    type: relicType,
+    amount: 1,
     price: 10 + Math.floor(Math.random() * 40) * 5,
   }));
+}
+
+export function createEntityState(
+  id: number,
+  entityType: EntityType,
+  x: number,
+  y: number,
+  overrides?: Partial<EntityState>
+): EntityState {
+  return {
+    id,
+    entityType,
+    x,
+    y,
+    vx: 0,
+    vy: 0,
+    rotation: 0,
+    rotationSpeed: 0,
+    word: "",
+    typedCount: 0,
+    health: 1,
+    power: 0,
+    bleedStacks: 0,
+    bleedTimer: 0,
+    plasmaStacks: 0,
+    slowStacks: 0,
+    freezeStacks: 0,
+    ...overrides,
+  };
 }
 
 export function createGameState(): GameState {
@@ -260,8 +283,6 @@ export function createGameState(): GameState {
     projectiles: [],
     drops: [],
     merchants: [],
-    activeMerchantId: null,
-    gold: 100,
     time: {
       time: 0,
       deltaTime: 0,
@@ -502,11 +523,6 @@ export function handleTypedCharacter(state: GameState, key: string): Item[] {
   applyTypedCharacterToDrops(state.drops, normalizedKey);
   rerollCompletedWords(state);
   const collected = collectCompletedDrops(state);
-  for (const item of collected) {
-    if (item.type === "Gold") {
-      state.gold += item.amount;
-    }
-  }
   chargeRelics(state);
   return collected;
 }

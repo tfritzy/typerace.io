@@ -38,6 +38,7 @@ export interface ItemConfig {
 export interface Item {
   type: ItemType;
   amount: number;
+  price?: number;
 }
 
 export interface ItemDisplay {

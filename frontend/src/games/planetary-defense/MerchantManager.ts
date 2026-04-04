@@ -1,8 +1,8 @@
 import { Container, Circle, Graphics, Text } from "pixi.js";
 import type { AssetManager } from "./assetManager";
-import type { GameState, MerchantShipState, MerchantItem } from "./state";
+import type { GameState, MerchantShipState } from "./state";
+import { createEntityState } from "./state";
 import { createShipContainer } from "./prefabs/shipPrefab";
-import type { EntityState } from "./state";
 import {
   Inventory,
   CELL_SIZE,
@@ -11,6 +11,7 @@ import {
 } from "./Inventory";
 import type { InventoryManager } from "./InventoryManager";
 import { PIXEL_FONT_FAMILY } from "./constants";
+import { ColorPreset } from "./types";
 
 const CLICK_RADIUS = 50;
 const PANEL_WIDTH = CELL_SIZE * 3 + GRID_PADDING * 2 + BORDER_WIDTH * 2;
@@ -22,9 +23,8 @@ export class MerchantManager {
   private shipDisplays = new Map<number, Container>();
   private shopPanel: Container | null = null;
   private shopInventory: Inventory | null = null;
-  private priceLabels = new Map<number, Container>();
   private inventoryManager: InventoryManager | null = null;
-  private goldLabel: Text | null = null;
+  private activeMerchantId: number | null = null;
 
   constructor(assets: AssetManager) {
     this.assets = assets;
@@ -43,29 +43,15 @@ export class MerchantManager {
   }
 
   private createMerchantDisplay(merchant: MerchantShipState): void {
-    const fakeEntity: EntityState = {
-      id: merchant.id,
-      entityType: merchant.entityType,
-      x: merchant.x,
-      y: merchant.y,
-      vx: 1,
-      vy: 0,
-      rotation: 0,
-      rotationSpeed: 0,
-      word: "",
-      typedCount: 0,
-      health: 1,
-      power: 0,
-      bleedStacks: 0,
-      bleedTimer: 0,
-      plasmaStacks: 0,
-      slowStacks: 0,
-      freezeStacks: 0,
-      colorPreset: merchant.colorPreset,
-      hasShield: false,
-    };
+    const entity = createEntityState(
+      merchant.id,
+      merchant.entityType,
+      merchant.x,
+      merchant.y,
+      { vx: 1, colorPreset: merchant.colorPreset }
+    );
 
-    const display = createShipContainer(this.assets, fakeEntity);
+    const display = createShipContainer(this.assets, entity);
     display.eventMode = "static";
     display.cursor = "pointer";
     display.hitArea = new Circle(0, 0, CLICK_RADIUS);
@@ -92,34 +78,19 @@ export class MerchantManager {
   }
 
   private toggleShop(merchant: MerchantShipState): void {
-    const state = this.getCurrentState();
-    if (!state) return;
-
-    if (state.activeMerchantId === merchant.id) {
-      this.closeShop(state);
+    if (this.activeMerchantId === merchant.id) {
+      this.closeShop();
       return;
     }
 
-    this.closeShop(state);
-    this.openShop(state, merchant);
+    this.closeShop();
+    this.openShop(merchant);
   }
 
-  private getCurrentState(): GameState | null {
-    return this._state;
-  }
+  update(_state: GameState): void {}
 
-  private _state: GameState | null = null;
-
-  update(state: GameState): void {
-    this._state = state;
-
-    if (this.goldLabel) {
-      this.goldLabel.text = `Gold: ${state.gold}`;
-    }
-  }
-
-  private openShop(state: GameState, merchant: MerchantShipState): void {
-    state.activeMerchantId = merchant.id;
+  private openShop(merchant: MerchantShipState): void {
+    this.activeMerchantId = merchant.id;
 
     const rows = Math.ceil(merchant.items.length / 3);
     const cols = 3;
@@ -133,22 +104,6 @@ export class MerchantManager {
       x: panelX,
       y: panelY,
     });
-
-    this.shopInventory.onBeforeReceive = () => false;
-
-    this.shopInventory.onBeforeExtract = (slot) => {
-      if (!slot.item) return false;
-      const idx = merchant.items.findIndex(
-        (mi: MerchantItem) => mi.item.type === slot.item!.type
-      );
-      if (idx < 0) return false;
-      const merchantItem = merchant.items[idx];
-      if (state.gold < merchantItem.price) return false;
-      state.gold -= merchantItem.price;
-      merchant.items.splice(idx, 1);
-      this.addPriceOverlays(merchant, panelX, panelY, cols);
-      return true;
-    };
 
     this.shopPanel = new Container();
 
@@ -170,87 +125,23 @@ export class MerchantManager {
     title.y = panelY - 26;
     this.shopPanel.addChild(title);
 
-    this.goldLabel = new Text({
-      text: `Gold: ${state.gold}`,
-      style: {
-        fontFamily: PIXEL_FONT_FAMILY,
-        fontSize: 10,
-        fill: 0xffd700,
-      },
-    });
-    this.goldLabel.anchor.set(1, 0);
-    this.goldLabel.x = panelX + PANEL_WIDTH - 8;
-    this.goldLabel.y = panelY - 26;
-    this.shopPanel.addChild(this.goldLabel);
-
     this.layer.addChild(this.shopPanel);
     this.layer.addChild(this.shopInventory.container);
 
     for (let i = 0; i < merchant.items.length; i++) {
-      const merchantItem = merchant.items[i];
+      const item = merchant.items[i];
       const gridX = i % cols;
       const gridY = Math.floor(i / cols);
-      this.shopInventory.addItem(merchantItem.item, gridX, gridY);
+      this.shopInventory.addItem(item, gridX, gridY);
     }
-
-    this.addPriceOverlays(merchant, panelX, panelY, cols);
 
     if (this.inventoryManager) {
       this.inventoryManager.register(this.shopInventory);
     }
   }
 
-  private addPriceOverlays(
-    merchant: MerchantShipState,
-    panelX: number,
-    panelY: number,
-    cols: number
-  ): void {
-    this.clearPriceOverlays();
-
-    const gridOriginX = GRID_PADDING + BORDER_WIDTH;
-    const gridOriginY = GRID_PADDING + BORDER_WIDTH;
-
-    for (let i = 0; i < merchant.items.length; i++) {
-      const merchantItem = merchant.items[i];
-      const gridX = i % cols;
-      const gridY = Math.floor(i / cols);
-
-      const priceContainer = new Container();
-      const priceBg = new Graphics();
-      priceBg.roundRect(0, 0, CELL_SIZE - 4, 16, 3);
-      priceBg.fill({ color: 0x000000, alpha: 0.8 });
-      priceContainer.addChild(priceBg);
-
-      const priceText = new Text({
-        text: `${merchantItem.price}g`,
-        style: {
-          fontFamily: PIXEL_FONT_FAMILY,
-          fontSize: 8,
-          fill: 0xffd700,
-        },
-      });
-      priceText.x = 4;
-      priceText.y = 2;
-      priceContainer.addChild(priceText);
-
-      priceContainer.x = panelX + gridOriginX + gridX * CELL_SIZE + 2;
-      priceContainer.y = panelY + gridOriginY + gridY * CELL_SIZE + CELL_SIZE - 18;
-
-      this.layer.addChild(priceContainer);
-      this.priceLabels.set(i, priceContainer);
-    }
-  }
-
-  private clearPriceOverlays(): void {
-    for (const label of this.priceLabels.values()) {
-      label.destroy();
-    }
-    this.priceLabels.clear();
-  }
-
-  private closeShop(state: GameState): void {
-    state.activeMerchantId = null;
+  private closeShop(): void {
+    this.activeMerchantId = null;
 
     if (this.shopInventory) {
       if (this.inventoryManager) {
@@ -264,15 +155,11 @@ export class MerchantManager {
       this.shopPanel.destroy();
       this.shopPanel = null;
     }
-
-    this.goldLabel = null;
-    this.clearPriceOverlays();
   }
 
   destroy(): void {
     for (const d of this.shipDisplays.values()) d.destroy();
     this.shipDisplays.clear();
-    this.clearPriceOverlays();
 
     if (this.shopInventory) this.shopInventory.destroy();
     if (this.shopPanel) this.shopPanel.destroy();
