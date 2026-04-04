@@ -14,8 +14,7 @@ import { InventoryManager } from "./InventoryManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, getRelicPosition, handleTypedCharacter as stateHandleTypedCharacter } from "./state";
 import type { GameState, RelicState } from "./state";
-import { isRelic } from "./itemConfig";
-import { RELIC_SLOT_COUNT, RelicType } from "./relicConfig";
+import { RELIC_SLOT_COUNT, RelicType, RELIC_CONFIGS } from "./relicConfig";
 
 export type { LabelData };
 
@@ -131,9 +130,12 @@ export class PlanetaryDefenseGame {
 
       const slotIndex = i;
       weaponSlot.onItemAdded.subscribe((invItem) => {
-        if (!invItem.item || !isRelic(invItem.item.type)) return;
+        if (!invItem.item) return;
+        const relicType = invItem.item.type as RelicType;
+        if (!(relicType in RELIC_CONFIGS)) return;
         const relic: RelicState = {
-          type: invItem.item.type as RelicType,
+          type: relicType,
+          item: invItem.item,
           level: 1,
           charge: 0,
           remainingShots: 0,

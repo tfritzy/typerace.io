@@ -289,9 +289,18 @@ export class Inventory {
         (s) => s.item && s.item.type === item.type
       );
       if (existing && existing.item) {
-        existing.item.amount += item.amount;
-        this.refreshItemVisual(existing);
-        return existing;
+        const maxStack = config.maxStack ?? Infinity;
+        const spaceLeft = maxStack - existing.item.amount;
+        if (spaceLeft >= item.amount) {
+          existing.item.amount += item.amount;
+          this.refreshItemVisual(existing);
+          return existing;
+        } else if (spaceLeft > 0) {
+          existing.item.amount = maxStack;
+          this.refreshItemVisual(existing);
+          const overflow: Item = { type: item.type, amount: item.amount - spaceLeft };
+          return this.addToFirstEmpty(overflow);
+        }
       }
     }
 

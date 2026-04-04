@@ -1,4 +1,4 @@
-import { RelicType, RELIC_DISPLAY } from "./relicConfig";
+import { RelicType } from "./relicConfig";
 
 export enum GemType {
   ChippedTopaz = "ChippedTopaz",
@@ -16,12 +16,23 @@ export enum GemType {
   Emerald = "Emerald",
   FlawlessEmerald = "FlawlessEmerald",
   PerfectEmerald = "PerfectEmerald",
+  ChippedSapphire = "ChippedSapphire",
+  FlawedSapphire = "FlawedSapphire",
+  Sapphire = "Sapphire",
+  FlawlessSapphire = "FlawlessSapphire",
+  PerfectSapphire = "PerfectSapphire",
+  ChippedAmethyst = "ChippedAmethyst",
+  FlawedAmethyst = "FlawedAmethyst",
+  Amethyst = "Amethyst",
+  FlawlessAmethyst = "FlawlessAmethyst",
+  PerfectAmethyst = "PerfectAmethyst",
 }
 
 export type ItemType = RelicType | GemType | "Gold";
 
 export interface ItemConfig {
   stackable: boolean;
+  maxStack?: number;
 }
 
 export interface Item {
@@ -29,26 +40,73 @@ export interface Item {
   amount: number;
 }
 
-const RELIC_VALUES = new Set<ItemType>(
-  Object.values(RelicType).filter((v) => typeof v === "number") as RelicType[]
-);
-
-const GEM_VALUES = new Set<ItemType>(Object.values(GemType));
-
-export function isRelic(type: ItemType): type is RelicType {
-  return RELIC_VALUES.has(type);
-}
-
-export function isGem(type: ItemType): type is GemType {
-  return GEM_VALUES.has(type);
-}
-
 export interface ItemDisplay {
   spriteSheet: "swordtember" | "axetober";
   frameName: string;
 }
 
-const GEM_PLACEHOLDER_SPRITES: Record<GemType, ItemDisplay> = {
+export const ITEM_DISPLAY: Record<ItemType, ItemDisplay> = {
+  [RelicType.EmbercrestBlade]: { spriteSheet: "swordtember", frameName: "Embercrest Blade" },
+  [RelicType.BriarthornSaber]: { spriteSheet: "swordtember", frameName: "Briarthorn Saber" },
+  [RelicType.RavenplumeEdge]: { spriteSheet: "swordtember", frameName: "Ravenplume Edge" },
+  [RelicType.RubyguardGreatsword]: { spriteSheet: "swordtember", frameName: "Rubyguard Greatsword" },
+  [RelicType.SunfireScimitar]: { spriteSheet: "swordtember", frameName: "Sunfire Scimitar" },
+  [RelicType.CloudveilLongsword]: { spriteSheet: "swordtember", frameName: "Cloudveil Longsword" },
+  [RelicType.VoidthornBlade]: { spriteSheet: "swordtember", frameName: "Voidthorn Blade" },
+  [RelicType.GildedPlumeblade]: { spriteSheet: "swordtember", frameName: "Gilded Plumeblade" },
+  [RelicType.GlacialCrusader]: { spriteSheet: "swordtember", frameName: "Glacial Crusader" },
+  [RelicType.BloodthornDirk]: { spriteSheet: "swordtember", frameName: "Bloodthorn Dirk" },
+  [RelicType.TwinflareCrossblades]: { spriteSheet: "swordtember", frameName: "Twinflare Crossblades" },
+  [RelicType.MoltenZweihander]: { spriteSheet: "swordtember", frameName: "Molten Zweihander" },
+  [RelicType.FrostfangClaymore]: { spriteSheet: "swordtember", frameName: "Frostfang Claymore" },
+  [RelicType.SporesparkGlaive]: { spriteSheet: "swordtember", frameName: "Sporespark Glaive" },
+  [RelicType.AzureCrescent]: { spriteSheet: "swordtember", frameName: "Azure Crescent" },
+  [RelicType.RosevineRapier]: { spriteSheet: "swordtember", frameName: "Rosevine Rapier" },
+  [RelicType.CrystalbreakSaber]: { spriteSheet: "swordtember", frameName: "Crystalbreak Saber" },
+  [RelicType.CinderstoneBlade]: { spriteSheet: "swordtember", frameName: "Cinderstone Blade" },
+  [RelicType.EmeraldFang]: { spriteSheet: "swordtember", frameName: "Emerald Fang" },
+  [RelicType.StarfallStiletto]: { spriteSheet: "swordtember", frameName: "Starfall Stiletto" },
+  [RelicType.CrimsonCleaver]: { spriteSheet: "swordtember", frameName: "Crimson Cleaver" },
+  [RelicType.TigerstripeFalchion]: { spriteSheet: "swordtember", frameName: "Tigerstripe Falchion" },
+  [RelicType.DawnfireCutlass]: { spriteSheet: "swordtember", frameName: "Dawnfire Cutlass" },
+  [RelicType.JadecrossBroadsword]: { spriteSheet: "swordtember", frameName: "Jadecross Broadsword" },
+  [RelicType.ChainlinkEstoc]: { spriteSheet: "swordtember", frameName: "Chainlink Estoc" },
+  [RelicType.PermafrostGreatsword]: { spriteSheet: "swordtember", frameName: "Permafrost Greatsword" },
+  [RelicType.MistralSabre]: { spriteSheet: "swordtember", frameName: "Mistral Sabre" },
+  [RelicType.TidecallerBlade]: { spriteSheet: "swordtember", frameName: "Tidecaller Blade" },
+  [RelicType.SolarisEdge]: { spriteSheet: "swordtember", frameName: "Solaris Edge" },
+  [RelicType.InfernalRavager]: { spriteSheet: "swordtember", frameName: "Infernal Ravager" },
+  [RelicType.SteelBattleaxe]: { spriteSheet: "axetober", frameName: "Steel Battleaxe" },
+  [RelicType.MoonlitHatchet]: { spriteSheet: "axetober", frameName: "Moonlit Hatchet" },
+  [RelicType.ObsidianReaver]: { spriteSheet: "axetober", frameName: "Obsidian Reaver" },
+  [RelicType.RubyflareGreataxe]: { spriteSheet: "axetober", frameName: "Rubyflare Greataxe" },
+  [RelicType.GildedWaraxe]: { spriteSheet: "axetober", frameName: "Gilded Waraxe" },
+  [RelicType.CopperheadCleaver]: { spriteSheet: "axetober", frameName: "Copperhead Cleaver" },
+  [RelicType.BonecrestAxe]: { spriteSheet: "axetober", frameName: "Bonecrest Axe" },
+  [RelicType.DarkwoodHatchet]: { spriteSheet: "axetober", frameName: "Darkwood Hatchet" },
+  [RelicType.DuskforgeHalberd]: { spriteSheet: "axetober", frameName: "Duskforge Halberd" },
+  [RelicType.RosegoldBroadaxe]: { spriteSheet: "axetober", frameName: "Rosegold Broadaxe" },
+  [RelicType.FrostbiteCleaver]: { spriteSheet: "axetober", frameName: "Frostbite Cleaver" },
+  [RelicType.BloodmoonReaver]: { spriteSheet: "axetober", frameName: "Bloodmoon Reaver" },
+  [RelicType.TidebreakAxe]: { spriteSheet: "axetober", frameName: "Tidebreak Axe" },
+  [RelicType.IronwoodTomahawk]: { spriteSheet: "axetober", frameName: "Ironwood Tomahawk" },
+  [RelicType.GreystoneBroadaxe]: { spriteSheet: "axetober", frameName: "Greystone Broadaxe" },
+  [RelicType.SandstoneHatchet]: { spriteSheet: "axetober", frameName: "Sandstone Hatchet" },
+  [RelicType.CrimsonWaraxe]: { spriteSheet: "axetober", frameName: "Crimson Waraxe" },
+  [RelicType.GoldscarHalberd]: { spriteSheet: "axetober", frameName: "Goldscar Halberd" },
+  [RelicType.FlamecrestGreataxe]: { spriteSheet: "axetober", frameName: "Flamecrest Greataxe" },
+  [RelicType.WroughtIronChopper]: { spriteSheet: "axetober", frameName: "Wrought Iron Chopper" },
+  [RelicType.SpectralCleaver]: { spriteSheet: "axetober", frameName: "Spectral Cleaver" },
+  [RelicType.BloodruneAxe]: { spriteSheet: "axetober", frameName: "Bloodrune Axe" },
+  [RelicType.PearlsteelHatchet]: { spriteSheet: "axetober", frameName: "Pearlsteel Hatchet" },
+  [RelicType.EmberstrikeTomahawk]: { spriteSheet: "axetober", frameName: "Emberstrike Tomahawk" },
+  [RelicType.NightbloomReaver]: { spriteSheet: "axetober", frameName: "Nightbloom Reaver" },
+  [RelicType.BlackironSplitter]: { spriteSheet: "axetober", frameName: "Blackiron Splitter" },
+  [RelicType.VerdantWaraxe]: { spriteSheet: "axetober", frameName: "Verdant Waraxe" },
+  [RelicType.AshenBroadaxe]: { spriteSheet: "axetober", frameName: "Ashen Broadaxe" },
+  [RelicType.PrismaticGreataxe]: { spriteSheet: "axetober", frameName: "Prismatic Greataxe" },
+  [RelicType.HellforgedCleaver]: { spriteSheet: "axetober", frameName: "Hellforged Cleaver" },
+  [RelicType.GraniteWaraxe]: { spriteSheet: "axetober", frameName: "Granite Waraxe" },
   [GemType.ChippedTopaz]: { spriteSheet: "swordtember", frameName: "Sunfire Scimitar" },
   [GemType.FlawedTopaz]: { spriteSheet: "swordtember", frameName: "Sunfire Scimitar" },
   [GemType.Topaz]: { spriteSheet: "swordtember", frameName: "Sunfire Scimitar" },
@@ -64,51 +122,113 @@ const GEM_PLACEHOLDER_SPRITES: Record<GemType, ItemDisplay> = {
   [GemType.Emerald]: { spriteSheet: "swordtember", frameName: "Emerald Fang" },
   [GemType.FlawlessEmerald]: { spriteSheet: "swordtember", frameName: "Emerald Fang" },
   [GemType.PerfectEmerald]: { spriteSheet: "swordtember", frameName: "Emerald Fang" },
+  [GemType.ChippedSapphire]: { spriteSheet: "swordtember", frameName: "Azure Crescent" },
+  [GemType.FlawedSapphire]: { spriteSheet: "swordtember", frameName: "Azure Crescent" },
+  [GemType.Sapphire]: { spriteSheet: "swordtember", frameName: "Azure Crescent" },
+  [GemType.FlawlessSapphire]: { spriteSheet: "swordtember", frameName: "Azure Crescent" },
+  [GemType.PerfectSapphire]: { spriteSheet: "swordtember", frameName: "Azure Crescent" },
+  [GemType.ChippedAmethyst]: { spriteSheet: "swordtember", frameName: "Voidthorn Blade" },
+  [GemType.FlawedAmethyst]: { spriteSheet: "swordtember", frameName: "Voidthorn Blade" },
+  [GemType.Amethyst]: { spriteSheet: "swordtember", frameName: "Voidthorn Blade" },
+  [GemType.FlawlessAmethyst]: { spriteSheet: "swordtember", frameName: "Voidthorn Blade" },
+  [GemType.PerfectAmethyst]: { spriteSheet: "swordtember", frameName: "Voidthorn Blade" },
+  Gold: { spriteSheet: "axetober", frameName: "Gilded Waraxe" },
 };
 
-const GOLD_DISPLAY: ItemDisplay = { spriteSheet: "axetober", frameName: "Gilded Waraxe" };
-
-function buildItemDisplay(): Map<ItemType, ItemDisplay> {
-  const display = new Map<ItemType, ItemDisplay>();
-
-  for (const key of RELIC_VALUES) {
-    const rd = RELIC_DISPLAY[key as RelicType];
-    display.set(key, { spriteSheet: rd.spriteSheet, frameName: rd.frameName });
-  }
-
-  for (const gem of Object.values(GemType)) {
-    display.set(gem, GEM_PLACEHOLDER_SPRITES[gem]);
-  }
-
-  display.set("Gold", GOLD_DISPLAY);
-
-  return display;
-}
-
-export const ITEM_DISPLAY: Map<ItemType, ItemDisplay> = buildItemDisplay();
+export const ITEM_CONFIGS: Record<ItemType, ItemConfig> = {
+  [RelicType.EmbercrestBlade]: { stackable: false },
+  [RelicType.BriarthornSaber]: { stackable: false },
+  [RelicType.RavenplumeEdge]: { stackable: false },
+  [RelicType.RubyguardGreatsword]: { stackable: false },
+  [RelicType.SunfireScimitar]: { stackable: false },
+  [RelicType.CloudveilLongsword]: { stackable: false },
+  [RelicType.VoidthornBlade]: { stackable: false },
+  [RelicType.GildedPlumeblade]: { stackable: false },
+  [RelicType.GlacialCrusader]: { stackable: false },
+  [RelicType.BloodthornDirk]: { stackable: false },
+  [RelicType.TwinflareCrossblades]: { stackable: false },
+  [RelicType.MoltenZweihander]: { stackable: false },
+  [RelicType.FrostfangClaymore]: { stackable: false },
+  [RelicType.SporesparkGlaive]: { stackable: false },
+  [RelicType.AzureCrescent]: { stackable: false },
+  [RelicType.RosevineRapier]: { stackable: false },
+  [RelicType.CrystalbreakSaber]: { stackable: false },
+  [RelicType.CinderstoneBlade]: { stackable: false },
+  [RelicType.EmeraldFang]: { stackable: false },
+  [RelicType.StarfallStiletto]: { stackable: false },
+  [RelicType.CrimsonCleaver]: { stackable: false },
+  [RelicType.TigerstripeFalchion]: { stackable: false },
+  [RelicType.DawnfireCutlass]: { stackable: false },
+  [RelicType.JadecrossBroadsword]: { stackable: false },
+  [RelicType.ChainlinkEstoc]: { stackable: false },
+  [RelicType.PermafrostGreatsword]: { stackable: false },
+  [RelicType.MistralSabre]: { stackable: false },
+  [RelicType.TidecallerBlade]: { stackable: false },
+  [RelicType.SolarisEdge]: { stackable: false },
+  [RelicType.InfernalRavager]: { stackable: false },
+  [RelicType.SteelBattleaxe]: { stackable: false },
+  [RelicType.MoonlitHatchet]: { stackable: false },
+  [RelicType.ObsidianReaver]: { stackable: false },
+  [RelicType.RubyflareGreataxe]: { stackable: false },
+  [RelicType.GildedWaraxe]: { stackable: false },
+  [RelicType.CopperheadCleaver]: { stackable: false },
+  [RelicType.BonecrestAxe]: { stackable: false },
+  [RelicType.DarkwoodHatchet]: { stackable: false },
+  [RelicType.DuskforgeHalberd]: { stackable: false },
+  [RelicType.RosegoldBroadaxe]: { stackable: false },
+  [RelicType.FrostbiteCleaver]: { stackable: false },
+  [RelicType.BloodmoonReaver]: { stackable: false },
+  [RelicType.TidebreakAxe]: { stackable: false },
+  [RelicType.IronwoodTomahawk]: { stackable: false },
+  [RelicType.GreystoneBroadaxe]: { stackable: false },
+  [RelicType.SandstoneHatchet]: { stackable: false },
+  [RelicType.CrimsonWaraxe]: { stackable: false },
+  [RelicType.GoldscarHalberd]: { stackable: false },
+  [RelicType.FlamecrestGreataxe]: { stackable: false },
+  [RelicType.WroughtIronChopper]: { stackable: false },
+  [RelicType.SpectralCleaver]: { stackable: false },
+  [RelicType.BloodruneAxe]: { stackable: false },
+  [RelicType.PearlsteelHatchet]: { stackable: false },
+  [RelicType.EmberstrikeTomahawk]: { stackable: false },
+  [RelicType.NightbloomReaver]: { stackable: false },
+  [RelicType.BlackironSplitter]: { stackable: false },
+  [RelicType.VerdantWaraxe]: { stackable: false },
+  [RelicType.AshenBroadaxe]: { stackable: false },
+  [RelicType.PrismaticGreataxe]: { stackable: false },
+  [RelicType.HellforgedCleaver]: { stackable: false },
+  [RelicType.GraniteWaraxe]: { stackable: false },
+  [GemType.ChippedTopaz]: { stackable: false },
+  [GemType.FlawedTopaz]: { stackable: false },
+  [GemType.Topaz]: { stackable: false },
+  [GemType.FlawlessTopaz]: { stackable: false },
+  [GemType.PerfectTopaz]: { stackable: false },
+  [GemType.ChippedRuby]: { stackable: false },
+  [GemType.FlawedRuby]: { stackable: false },
+  [GemType.Ruby]: { stackable: false },
+  [GemType.FlawlessRuby]: { stackable: false },
+  [GemType.PerfectRuby]: { stackable: false },
+  [GemType.ChippedEmerald]: { stackable: false },
+  [GemType.FlawedEmerald]: { stackable: false },
+  [GemType.Emerald]: { stackable: false },
+  [GemType.FlawlessEmerald]: { stackable: false },
+  [GemType.PerfectEmerald]: { stackable: false },
+  [GemType.ChippedSapphire]: { stackable: false },
+  [GemType.FlawedSapphire]: { stackable: false },
+  [GemType.Sapphire]: { stackable: false },
+  [GemType.FlawlessSapphire]: { stackable: false },
+  [GemType.PerfectSapphire]: { stackable: false },
+  [GemType.ChippedAmethyst]: { stackable: false },
+  [GemType.FlawedAmethyst]: { stackable: false },
+  [GemType.Amethyst]: { stackable: false },
+  [GemType.FlawlessAmethyst]: { stackable: false },
+  [GemType.PerfectAmethyst]: { stackable: false },
+  Gold: { stackable: true, maxStack: 2147483647 },
+};
 
 export function getItemDisplay(type: ItemType): ItemDisplay {
-  return ITEM_DISPLAY.get(type) ?? GOLD_DISPLAY;
+  return ITEM_DISPLAY[type];
 }
-
-function buildItemConfigs(): Map<ItemType, ItemConfig> {
-  const configs = new Map<ItemType, ItemConfig>();
-
-  for (const key of RELIC_VALUES) {
-    configs.set(key, { stackable: false });
-  }
-
-  for (const gem of Object.values(GemType)) {
-    configs.set(gem, { stackable: false });
-  }
-
-  configs.set("Gold", { stackable: true });
-
-  return configs;
-}
-
-export const ITEM_CONFIGS: Map<ItemType, ItemConfig> = buildItemConfigs();
 
 export function getItemConfig(type: ItemType): ItemConfig {
-  return ITEM_CONFIGS.get(type) ?? { stackable: false };
+  return ITEM_CONFIGS[type];
 }

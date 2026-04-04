@@ -15,12 +15,30 @@ import {
 } from "./relicConfig";
 import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
-import { type Item } from "./itemConfig";
-import {
-  DROP_SPEED,
-  calculateGoldDrop,
-  rollGemDrop,
-} from "./dropConfig";
+import { type Item, GemType } from "./itemConfig";
+
+const DROP_SPEED = 80;
+
+const TOPAZ_TIERS: GemType[] = [
+  GemType.ChippedTopaz, GemType.FlawedTopaz, GemType.Topaz,
+  GemType.FlawlessTopaz, GemType.PerfectTopaz,
+];
+const RUBY_TIERS: GemType[] = [
+  GemType.ChippedRuby, GemType.FlawedRuby, GemType.Ruby,
+  GemType.FlawlessRuby, GemType.PerfectRuby,
+];
+const EMERALD_TIERS: GemType[] = [
+  GemType.ChippedEmerald, GemType.FlawedEmerald, GemType.Emerald,
+  GemType.FlawlessEmerald, GemType.PerfectEmerald,
+];
+const SAPPHIRE_TIERS: GemType[] = [
+  GemType.ChippedSapphire, GemType.FlawedSapphire, GemType.Sapphire,
+  GemType.FlawlessSapphire, GemType.PerfectSapphire,
+];
+const AMETHYST_TIERS: GemType[] = [
+  GemType.ChippedAmethyst, GemType.FlawedAmethyst, GemType.Amethyst,
+  GemType.FlawlessAmethyst, GemType.PerfectAmethyst,
+];
 
 export const PLANET_X = CANVAS_WIDTH / 2;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -58,6 +76,7 @@ export interface EntityState {
 
 export interface RelicState {
   type: RelicType;
+  item: Item;
   level: number;
   charge: number;
   remainingShots: number;
@@ -183,7 +202,7 @@ function createRelicSlots(): RelicSlot[] {
     let relic: RelicState | null = null;
     const relicType = startingRelics[i] ?? null;
     if (relicType !== null) {
-      relic = { type: relicType, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
+      relic = { type: relicType, item: { type: relicType, amount: 1 }, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
     }
     slots.push({ angle, relic });
   }
@@ -353,6 +372,31 @@ function destroyEntity(
     spawnDrops(state, entity);
   }
   state.entities.splice(index, 1);
+}
+
+function calculateGoldDrop(power: number): number {
+  return Math.ceil(power / 10);
+}
+
+function rollGemDrop(power: number): GemType | null {
+  const gemChance = Math.min(0.5, 0.05 + power / 10000);
+  if (Math.random() >= gemChance) return null;
+
+  const families: GemType[][] = [TOPAZ_TIERS];
+  if (power >= 50) families.push(SAPPHIRE_TIERS);
+  if (power >= 100) families.push(RUBY_TIERS);
+  if (power >= 250) families.push(AMETHYST_TIERS);
+  if (power >= 500) families.push(EMERALD_TIERS);
+  const family = families[Math.floor(Math.random() * families.length)];
+
+  let quality: number;
+  if (power >= 10000) quality = 4;
+  else if (power >= 1000) quality = 3;
+  else if (power >= 200) quality = 2;
+  else if (power >= 50) quality = 1;
+  else quality = 0;
+
+  return family[quality];
 }
 
 function spawnDrops(state: GameState, entity: EntityState): void {
