@@ -1,4 +1,4 @@
-import { Assets, type AssetsManifest, type Spritesheet, type Texture } from "pixi.js";
+import { Assets, Texture, type AssetsManifest, type Spritesheet } from "pixi.js";
 import {
   EngineType, ColorPreset,
   type EntityType, getShipEntityIndex,
@@ -103,6 +103,18 @@ export class AssetManager {
     );
   }
 
+  getShipTextureWithColor(entityType: EntityType, r: number, g: number, b: number): Texture {
+    const frameIndex = getShipEntityIndex(entityType);
+    const shipFrame = `ship-${frameIndex}`;
+    const cmFrame = `cm-${frameIndex}`;
+    const presetTexture = createGradientPreset(r, g, b);
+    return applyPaletteSwap(
+      this.spaceships_.textures[shipFrame],
+      this.spaceshipsColormap_.textures[cmFrame],
+      presetTexture
+    );
+  }
+
   getShieldTexture(entityType: EntityType): Texture {
     const frameIndex = getShipEntityIndex(entityType);
     return this.spaceshipsShield_.textures[`shield-${frameIndex}`];
@@ -155,4 +167,27 @@ export class AssetManager {
     setNearestNeighbor(this.swordtember_);
     setNearestNeighbor(this.axetober_);
   }
+}
+
+function createGradientPreset(r: number, g: number, b: number): Texture {
+  const width = 8;
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = 1;
+  const ctx = canvas.getContext("2d")!;
+  const imageData = ctx.createImageData(width, 1);
+
+  for (let i = 0; i < width; i++) {
+    const t = i / (width - 1);
+    const pi = i * 4;
+    imageData.data[pi] = Math.round(r * (0.3 + 0.7 * t));
+    imageData.data[pi + 1] = Math.round(g * (0.3 + 0.7 * t));
+    imageData.data[pi + 2] = Math.round(b * (0.3 + 0.7 * t));
+    imageData.data[pi + 3] = 255;
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  const tex = Texture.from({ resource: canvas });
+  tex.source.style.scaleMode = "nearest";
+  return tex;
 }
