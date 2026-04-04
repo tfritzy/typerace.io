@@ -21,6 +21,7 @@ import {
 } from "./itemConfig";
 
 const DROP_SPEED = 80;
+const DROP_CHANCE = 0.5;
 
 export const PLANET_X = CANVAS_WIDTH / 2;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -382,7 +383,7 @@ function rollGemDrop(power: number): GemType | null {
 }
 
 function spawnDrops(state: GameState, entity: EntityState): void {
-  if (Math.random() < 0.5) return;
+  if (Math.random() < DROP_CHANCE) return;
 
   const gemType = rollGemDrop(entity.power);
   if (gemType !== null) {
