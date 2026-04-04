@@ -233,7 +233,7 @@ const MERCHANT_RELICS: RelicType[] = [
   RelicType.TidebreakAxe,
 ];
 
-function generateMerchantItems(count: number): Item[] {
+function generateShopItems(count: number): Item[] {
   const pool = [...MERCHANT_RELICS];
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -310,7 +310,7 @@ export function createGameState(): GameState {
     y: CANVAS_HEIGHT / 2,
     entityType: "Clipper",
     colorPreset: ColorPreset.Preset3,
-    items: generateMerchantItems(6),
+    items: generateShopItems(6),
   });
 
   return state;
