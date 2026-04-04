@@ -148,11 +148,28 @@ export interface DamageData {
   killed: boolean;
 }
 
+export interface MerchantItem {
+  item: Item;
+  price: number;
+}
+
+export interface MerchantShipState {
+  id: number;
+  x: number;
+  y: number;
+  entityType: EntityType;
+  colorPreset: ColorPreset;
+  items: MerchantItem[];
+}
+
 export interface GameState {
   entities: EntityState[];
   relicSlots: RelicSlot[];
   projectiles: ProjectileState[];
   drops: DropState[];
+  merchants: MerchantShipState[];
+  activeMerchantId: number | null;
+  gold: number;
   time: {
     time: number;
     deltaTime: number;
@@ -192,12 +209,55 @@ function createRelicSlots(): RelicSlot[] {
   return slots;
 }
 
+const MERCHANT_RELICS: RelicType[] = [
+  RelicType.RubyguardGreatsword,
+  RelicType.SunfireScimitar,
+  RelicType.GlacialCrusader,
+  RelicType.SporesparkGlaive,
+  RelicType.AzureCrescent,
+  RelicType.RosevineRapier,
+  RelicType.CrystalbreakSaber,
+  RelicType.CinderstoneBlade,
+  RelicType.CrimsonCleaver,
+  RelicType.TigerstripeFalchion,
+  RelicType.DawnfireCutlass,
+  RelicType.JadecrossBroadsword,
+  RelicType.ChainlinkEstoc,
+  RelicType.PermafrostGreatsword,
+  RelicType.MistralSabre,
+  RelicType.TidecallerBlade,
+  RelicType.SolarisEdge,
+  RelicType.InfernalRavager,
+  RelicType.ObsidianReaver,
+  RelicType.RubyflareGreataxe,
+  RelicType.GildedWaraxe,
+  RelicType.CopperheadCleaver,
+  RelicType.BonecrestAxe,
+  RelicType.DuskforgeHalberd,
+  RelicType.RosegoldBroadaxe,
+  RelicType.FrostbiteCleaver,
+  RelicType.BloodmoonReaver,
+  RelicType.TidebreakAxe,
+];
+
+function generateMerchantItems(count: number): MerchantItem[] {
+  const shuffled = [...MERCHANT_RELICS].sort(() => Math.random() - 0.5);
+  const selected = shuffled.slice(0, count);
+  return selected.map((relicType) => ({
+    item: { type: relicType, amount: 1 },
+    price: 10 + Math.floor(Math.random() * 40) * 5,
+  }));
+}
+
 export function createGameState(): GameState {
-  return {
+  const state: GameState = {
     entities: [],
     relicSlots: createRelicSlots(),
     projectiles: [],
     drops: [],
+    merchants: [],
+    activeMerchantId: null,
+    gold: 100,
     time: {
       time: 0,
       deltaTime: 0,
@@ -218,6 +278,17 @@ export function createGameState(): GameState {
     onWaveComplete: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
   };
+
+  state.merchants.push({
+    id: state.nextId++,
+    x: CANVAS_WIDTH - 250,
+    y: CANVAS_HEIGHT / 2,
+    entityType: "Clipper",
+    colorPreset: ColorPreset.Preset2,
+    items: generateMerchantItems(6),
+  });
+
+  return state;
 }
 
 function spawnFromEdge(): { x: number; y: number } {
@@ -427,6 +498,11 @@ export function handleTypedCharacter(state: GameState, key: string): Item[] {
   applyTypedCharacterToDrops(state.drops, normalizedKey);
   rerollCompletedWords(state);
   const collected = collectCompletedDrops(state);
+  for (const item of collected) {
+    if (item.type === "Gold") {
+      state.gold += item.amount;
+    }
+  }
   chargeRelics(state);
   return collected;
 }

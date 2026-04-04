@@ -2,14 +2,19 @@ import { Container, Sprite } from "pixi.js";
 import type { AssetManager } from "../assetManager";
 import type { EntityState } from "../state";
 
+const ENEMY_TINT = 0xff6666;
+const FRIENDLY_TINT = 0x66ff88;
+
 export function createShipContainer(
   assets: AssetManager,
-  entity: EntityState
+  entity: EntityState,
+  friendly?: boolean
 ): Container {
   const shipTexture = assets.getShipTexture(entity.entityType, entity.colorPreset!);
 
   const shipSprite = new Sprite(shipTexture);
   shipSprite.anchor.set(0.5);
+  shipSprite.tint = friendly ? FRIENDLY_TINT : ENEMY_TINT;
 
   const container = new Container();
   container.addChild(shipSprite);
