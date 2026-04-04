@@ -1,10 +1,7 @@
 import { Container, Graphics } from "pixi.js";
 import type { GameState, DropState } from "./state";
-import { DropCategory, GEM_COLORS, GOLD_COLOR, GOLD_LABEL_COLOR, GEM_LABEL_COLORS } from "./dropConfig";
+import { DropCategory, GEM_COLORS, GOLD_COLOR, DROP_LABEL_COLOR, DROP_SIZE } from "./dropConfig";
 import type { LabelData } from "./EnemyManager";
-
-const GOLD_SIZE = 8;
-const GEM_SIZE = 10;
 
 export class DropManager {
   readonly layer: Container;
@@ -16,12 +13,6 @@ export class DropManager {
 
   constructor() {
     this.layer = new Container();
-  }
-
-  getLabelColor(drop: DropState): string {
-    if (drop.category === DropCategory.Gold) return GOLD_LABEL_COLOR;
-    if (drop.gemType !== undefined) return GEM_LABEL_COLORS[drop.gemType];
-    return "#ffffff";
   }
 
   update(state: GameState): void {
@@ -45,7 +36,7 @@ export class DropManager {
         typedCount: drop.typedCount,
         x: drop.x,
         y: drop.y - 16,
-        color: this.getLabelColor(drop),
+        color: DROP_LABEL_COLOR,
       });
     }
 
@@ -61,19 +52,12 @@ export class DropManager {
     const g = new Graphics();
 
     if (drop.category === DropCategory.Gold) {
-      g.circle(0, 0, GOLD_SIZE);
+      g.rect(-DROP_SIZE / 2, -DROP_SIZE / 2, DROP_SIZE, DROP_SIZE);
       g.fill({ color: GOLD_COLOR });
-      g.stroke({ color: 0xd4a017, width: 2 });
     } else {
       const color = drop.gemType !== undefined ? GEM_COLORS[drop.gemType] : 0xffffff;
-      g.moveTo(0, -GEM_SIZE);
-      g.lineTo(GEM_SIZE * 0.7, -GEM_SIZE * 0.3);
-      g.lineTo(GEM_SIZE * 0.5, GEM_SIZE * 0.6);
-      g.lineTo(-GEM_SIZE * 0.5, GEM_SIZE * 0.6);
-      g.lineTo(-GEM_SIZE * 0.7, -GEM_SIZE * 0.3);
-      g.closePath();
+      g.rect(-DROP_SIZE / 2, -DROP_SIZE / 2, DROP_SIZE, DROP_SIZE);
       g.fill({ color });
-      g.stroke({ color: 0xffffff, width: 1 });
     }
 
     return g;

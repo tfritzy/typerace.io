@@ -17,13 +17,12 @@ import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
 import {
   DropCategory,
-  type GemType,
-  type GemQuality,
   DROP_SPEED,
   DROP_FRICTION,
   calculateGoldDrop,
   rollGemDrop,
 } from "./dropConfig";
+import type { GemType } from "./dropConfig";
 
 export const PLANET_X = CANVAS_WIDTH / 2;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -98,7 +97,6 @@ export interface DropState {
   category: DropCategory;
   goldAmount: number;
   gemType?: GemType;
-  gemQuality?: GemQuality;
 }
 
 export enum WavePhase {
@@ -378,8 +376,7 @@ function spawnDrops(state: GameState, entity: EntityState): void {
     spawnDrop(state, entity.x, entity.y, {
       category: DropCategory.Gem,
       goldAmount: 0,
-      gemType: gemResult.gemType,
-      gemQuality: gemResult.gemQuality,
+      gemType: gemResult,
     });
   }
 }

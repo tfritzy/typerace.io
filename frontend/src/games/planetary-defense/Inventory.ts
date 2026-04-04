@@ -7,7 +7,8 @@ import {
 } from "pixi.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
 import { RelicType, RELIC_DISPLAY } from "./relicConfig";
-import { GemType, GemQuality, GEM_COLORS, GEM_NAMES, QUALITY_NAMES } from "./dropConfig";
+import { GEM_COLORS, GOLD_COLOR } from "./dropConfig";
+import type { GemType } from "./dropConfig";
 import type { AssetManager } from "./assetManager";
 
 const DEFAULT_COLS = 10;
@@ -27,6 +28,12 @@ const ITEM_BORDER_COLOR = 0x4a4a7e;
 const VALID_COLOR = 0x4ade80;
 const INVALID_COLOR = 0xef4444;
 
+export enum ItemType {
+  Relic,
+  Gold,
+  Gem,
+}
+
 export interface InventoryConfig {
   cols?: number;
   rows?: number;
@@ -36,9 +43,9 @@ export interface InventoryConfig {
 
 export interface InventoryItem {
   id: number;
-  relicType?: RelicType;
-  gemType?: GemType;
-  gemQuality?: GemQuality;
+  type: ItemType;
+  subType: number;
+  amount: number;
   gridX: number;
   gridY: number;
 }
@@ -217,12 +224,14 @@ export class Inventory {
     c.y = this.gridOriginY + item.gridY * CELL_SIZE;
   }
 
-  addItem(relicType: RelicType, gridX: number, gridY: number): InventoryItem | null {
+  addItem(type: ItemType, subType: number, gridX: number, gridY: number, amount = 1): InventoryItem | null {
     if (!this.canPlace(gridX, gridY)) return null;
 
     const item: InventoryItem = {
       id: this.nextItemId++,
-      relicType,
+      type,
+      subType,
+      amount,
       gridX,
       gridY,
     };
@@ -239,38 +248,36 @@ export class Inventory {
     return item;
   }
 
-  addGem(gemType: GemType, gemQuality: GemQuality, gridX: number, gridY: number): InventoryItem | null {
-    if (!this.canPlace(gridX, gridY)) return null;
+  addToFirstEmpty(type: ItemType, subType: number, amount = 1): InventoryItem | null {
+    if (type === ItemType.Gold) {
+      const existing = this.items.find((i) => i.type === ItemType.Gold);
+      if (existing) {
+        existing.amount += amount;
+        this.refreshItemVisual(existing);
+        return existing;
+      }
+    }
 
-    const item: InventoryItem = {
-      id: this.nextItemId++,
-      gemType,
-      gemQuality,
-      gridX,
-      gridY,
-    };
-
-    this.items.push(item);
-    this.occupied[gridY][gridX] = true;
-
-    const itemContainer = this.createItemVisual(item);
-    this.itemContainers.set(item.id, itemContainer);
-    this.container.addChild(itemContainer);
-    this.snapToGrid(itemContainer, item);
-
-    this.onItemAdded.emit(item);
-    return item;
-  }
-
-  addGemToFirstEmpty(gemType: GemType, gemQuality: GemQuality): InventoryItem | null {
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {
         if (!this.occupied[r][c]) {
-          return this.addGem(gemType, gemQuality, c, r);
+          return this.addItem(type, subType, c, r, amount);
         }
       }
     }
     return null;
+  }
+
+  private refreshItemVisual(item: InventoryItem): void {
+    const existing = this.itemContainers.get(item.id);
+    if (existing) {
+      existing.destroy();
+      this.itemContainers.delete(item.id);
+    }
+    const newContainer = this.createItemVisual(item);
+    this.itemContainers.set(item.id, newContainer);
+    this.container.addChild(newContainer);
+    this.snapToGrid(newContainer, item);
   }
 
   removeItem(itemId: number): InventoryItem | null {
@@ -306,8 +313,8 @@ export class Inventory {
     bg.stroke({ color: ITEM_BORDER_COLOR, width: 1 });
     wrapper.addChild(bg);
 
-    if (item.relicType !== undefined) {
-      const display = RELIC_DISPLAY[item.relicType];
+    if (item.type === ItemType.Relic) {
+      const display = RELIC_DISPLAY[item.subType as RelicType];
       const texture = this.assetManager.getRelicTexture(
         display.spriteSheet,
         display.frameName
@@ -322,38 +329,39 @@ export class Inventory {
       sprite.x = CELL_SIZE / 2;
       sprite.y = CELL_SIZE / 2;
       wrapper.addChild(sprite);
-    } else if (item.gemType !== undefined && item.gemQuality !== undefined) {
-      const gemColor = GEM_COLORS[item.gemType];
-      const gemGraphic = new Graphics();
+    } else if (item.type === ItemType.Gold) {
+      const s = 20;
       const cx = CELL_SIZE / 2;
       const cy = CELL_SIZE / 2;
-      const s = 18;
-      gemGraphic.moveTo(cx, cy - s);
-      gemGraphic.lineTo(cx + s * 0.7, cy - s * 0.3);
-      gemGraphic.lineTo(cx + s * 0.5, cy + s * 0.6);
-      gemGraphic.lineTo(cx - s * 0.5, cy + s * 0.6);
-      gemGraphic.lineTo(cx - s * 0.7, cy - s * 0.3);
-      gemGraphic.closePath();
-      gemGraphic.fill({ color: gemColor });
-      gemGraphic.stroke({ color: 0xffffff, width: 1 });
-      wrapper.addChild(gemGraphic);
+      const gfx = new Graphics();
+      gfx.rect(cx - s / 2, cy - s / 2, s, s);
+      gfx.fill({ color: GOLD_COLOR });
+      wrapper.addChild(gfx);
 
-      const qualityName = QUALITY_NAMES[item.gemQuality];
-      const gemName = GEM_NAMES[item.gemType];
-      const label = qualityName ? `${qualityName[0]}` : gemName[0];
-      const labelText = new Text({
-        text: label,
-        style: {
-          fontFamily: PIXEL_FONT_FAMILY,
-          fontSize: 10,
-          fill: 0xffffff,
-          stroke: { color: 0x000000, width: 2 },
-        },
-      });
-      labelText.anchor.set(0.5);
-      labelText.x = cx;
-      labelText.y = cy + s * 0.9;
-      wrapper.addChild(labelText);
+      if (item.amount > 1) {
+        const label = new Text({
+          text: `${item.amount}`,
+          style: {
+            fontFamily: PIXEL_FONT_FAMILY,
+            fontSize: 10,
+            fill: 0xffffff,
+            stroke: { color: 0x000000, width: 2 },
+          },
+        });
+        label.anchor.set(0.5);
+        label.x = cx;
+        label.y = cy + s / 2 + 8;
+        wrapper.addChild(label);
+      }
+    } else if (item.type === ItemType.Gem) {
+      const gemColor = GEM_COLORS[item.subType as GemType];
+      const s = 20;
+      const cx = CELL_SIZE / 2;
+      const cy = CELL_SIZE / 2;
+      const gfx = new Graphics();
+      gfx.rect(cx - s / 2, cy - s / 2, s, s);
+      gfx.fill({ color: gemColor });
+      wrapper.addChild(gfx);
     }
 
     wrapper.on("pointerdown", (e: FederatedPointerEvent) => {
@@ -364,16 +372,16 @@ export class Inventory {
   }
 
   populateTestData(): void {
-    this.addItem(RelicType.StarfallStiletto, 0, 0);
-    this.addItem(RelicType.BloodthornDirk, 1, 0);
-    this.addItem(RelicType.EmbercrestBlade, 2, 0);
-    this.addItem(RelicType.BriarthornSaber, 3, 0);
-    this.addItem(RelicType.TwinflareCrossblades, 4, 0);
-    this.addItem(RelicType.CloudveilLongsword, 5, 0);
-    this.addItem(RelicType.SteelBattleaxe, 6, 0);
-    this.addItem(RelicType.MoltenZweihander, 7, 0);
-    this.addItem(RelicType.MoonlitHatchet, 8, 0);
-    this.addItem(RelicType.FrostfangClaymore, 9, 0);
+    this.addItem(ItemType.Relic, RelicType.StarfallStiletto, 0, 0);
+    this.addItem(ItemType.Relic, RelicType.BloodthornDirk, 1, 0);
+    this.addItem(ItemType.Relic, RelicType.EmbercrestBlade, 2, 0);
+    this.addItem(ItemType.Relic, RelicType.BriarthornSaber, 3, 0);
+    this.addItem(ItemType.Relic, RelicType.TwinflareCrossblades, 4, 0);
+    this.addItem(ItemType.Relic, RelicType.CloudveilLongsword, 5, 0);
+    this.addItem(ItemType.Relic, RelicType.SteelBattleaxe, 6, 0);
+    this.addItem(ItemType.Relic, RelicType.MoltenZweihander, 7, 0);
+    this.addItem(ItemType.Relic, RelicType.MoonlitHatchet, 8, 0);
+    this.addItem(ItemType.Relic, RelicType.FrostfangClaymore, 9, 0);
   }
 
   destroy(): void {

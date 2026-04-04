@@ -5,10 +5,11 @@ import {
   Sprite,
   type FederatedPointerEvent,
 } from "pixi.js";
-import { Inventory, CELL_SIZE } from "./Inventory";
+import { Inventory, ItemType, CELL_SIZE } from "./Inventory";
 import type { InventoryItem } from "./Inventory";
-import { RELIC_DISPLAY } from "./relicConfig";
-import { GEM_COLORS } from "./dropConfig";
+import { RELIC_DISPLAY, RelicType } from "./relicConfig";
+import { GEM_COLORS, GOLD_COLOR } from "./dropConfig";
+import type { GemType } from "./dropConfig";
 import type { AssetManager } from "./assetManager";
 
 const ITEM_BG_COLOR = 0x252545;
@@ -109,11 +110,7 @@ export class InventoryManager {
         source.endItemDrag(itemId, col, row);
       } else {
         source.removeItem(itemId);
-        if (item.relicType !== undefined) {
-          inv.addItem(item.relicType, col, row);
-        } else if (item.gemType !== undefined && item.gemQuality !== undefined) {
-          inv.addGem(item.gemType, item.gemQuality, col, row);
-        }
+        inv.addItem(item.type, item.subType, col, row, item.amount);
       }
 
       this.finishDrag(ghost);
@@ -143,8 +140,8 @@ export class InventoryManager {
     bg.stroke({ color: ITEM_BORDER_COLOR, width: 1 });
     wrapper.addChild(bg);
 
-    if (item.relicType !== undefined) {
-      const display = RELIC_DISPLAY[item.relicType];
+    if (item.type === ItemType.Relic) {
+      const display = RELIC_DISPLAY[item.subType as RelicType];
       const texture = this.assetManager.getRelicTexture(
         display.spriteSheet,
         display.frameName
@@ -159,21 +156,19 @@ export class InventoryManager {
       sprite.x = CELL_SIZE / 2;
       sprite.y = CELL_SIZE / 2;
       wrapper.addChild(sprite);
-    } else if (item.gemType !== undefined) {
-      const gemColor = GEM_COLORS[item.gemType];
-      const gemGraphic = new Graphics();
-      const cx = CELL_SIZE / 2;
-      const cy = CELL_SIZE / 2;
-      const s = 18;
-      gemGraphic.moveTo(cx, cy - s);
-      gemGraphic.lineTo(cx + s * 0.7, cy - s * 0.3);
-      gemGraphic.lineTo(cx + s * 0.5, cy + s * 0.6);
-      gemGraphic.lineTo(cx - s * 0.5, cy + s * 0.6);
-      gemGraphic.lineTo(cx - s * 0.7, cy - s * 0.3);
-      gemGraphic.closePath();
-      gemGraphic.fill({ color: gemColor });
-      gemGraphic.stroke({ color: 0xffffff, width: 1 });
-      wrapper.addChild(gemGraphic);
+    } else if (item.type === ItemType.Gold) {
+      const s = 20;
+      const gfx = new Graphics();
+      gfx.rect(CELL_SIZE / 2 - s / 2, CELL_SIZE / 2 - s / 2, s, s);
+      gfx.fill({ color: GOLD_COLOR });
+      wrapper.addChild(gfx);
+    } else if (item.type === ItemType.Gem) {
+      const gemColor = GEM_COLORS[item.subType as GemType];
+      const s = 20;
+      const gfx = new Graphics();
+      gfx.rect(CELL_SIZE / 2 - s / 2, CELL_SIZE / 2 - s / 2, s, s);
+      gfx.fill({ color: gemColor });
+      wrapper.addChild(gfx);
     }
 
     return wrapper;

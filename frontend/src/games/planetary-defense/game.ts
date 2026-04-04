@@ -9,13 +9,13 @@ import { RelicManager } from "./RelicManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { DamageNumberManager } from "./DamageNumberManager";
 import { DropManager } from "./DropManager";
-import { Inventory, CELL_SIZE, GRID_PADDING, BORDER_WIDTH } from "./Inventory";
+import { Inventory, ItemType, CELL_SIZE, GRID_PADDING, BORDER_WIDTH } from "./Inventory";
 import { InventoryManager } from "./InventoryManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, getRelicPosition } from "./state";
 import type { GameState, RelicState } from "./state";
 import { DropCategory } from "./dropConfig";
-import { RELIC_SLOT_COUNT } from "./relicConfig";
+import { RELIC_SLOT_COUNT, RelicType } from "./relicConfig";
 
 export type { LabelData };
 
@@ -113,8 +113,10 @@ export class PlanetaryDefenseGame {
     this.buildWeaponSlots(world);
 
     this.state.onDropCollected.subscribe((drop) => {
-      if (drop.category === DropCategory.Gem && drop.gemType !== undefined && drop.gemQuality !== undefined) {
-        this.inventory.addGemToFirstEmpty(drop.gemType, drop.gemQuality);
+      if (drop.category === DropCategory.Gold) {
+        this.inventory.addToFirstEmpty(ItemType.Gold, 0, drop.goldAmount);
+      } else if (drop.category === DropCategory.Gem && drop.gemType !== undefined) {
+        this.inventory.addToFirstEmpty(ItemType.Gem, drop.gemType);
       }
     });
   }
@@ -132,14 +134,14 @@ export class PlanetaryDefenseGame {
       });
 
       if (slot.relic) {
-        weaponSlot.addItem(slot.relic.type, 0, 0);
+        weaponSlot.addItem(ItemType.Relic, slot.relic.type, 0, 0);
       }
 
       const slotIndex = i;
       weaponSlot.onItemAdded.subscribe((item) => {
-        if (item.relicType === undefined) return;
+        if (item.type !== ItemType.Relic) return;
         const relic: RelicState = {
-          type: item.relicType,
+          type: item.subType as RelicType,
           level: 1,
           charge: 0,
           remainingShots: 0,

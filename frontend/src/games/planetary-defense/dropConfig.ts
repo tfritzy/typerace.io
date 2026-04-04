@@ -4,56 +4,63 @@ export enum DropCategory {
 }
 
 export enum GemType {
+  ChippedTopaz,
+  FlawedTopaz,
   Topaz,
+  FlawlessTopaz,
+  PerfectTopaz,
+  ChippedRuby,
+  FlawedRuby,
   Ruby,
+  FlawlessRuby,
+  PerfectRuby,
+  ChippedEmerald,
+  FlawedEmerald,
   Emerald,
-}
-
-export enum GemQuality {
-  Chipped,
-  Flawed,
-  Normal,
-  Flawless,
-  Perfect,
+  FlawlessEmerald,
+  PerfectEmerald,
 }
 
 export const GEM_COLORS: Record<GemType, number> = {
+  [GemType.ChippedTopaz]: 0xf59e0b,
+  [GemType.FlawedTopaz]: 0xf59e0b,
   [GemType.Topaz]: 0xf59e0b,
+  [GemType.FlawlessTopaz]: 0xf59e0b,
+  [GemType.PerfectTopaz]: 0xf59e0b,
+  [GemType.ChippedRuby]: 0xef4444,
+  [GemType.FlawedRuby]: 0xef4444,
   [GemType.Ruby]: 0xef4444,
+  [GemType.FlawlessRuby]: 0xef4444,
+  [GemType.PerfectRuby]: 0xef4444,
+  [GemType.ChippedEmerald]: 0x10b981,
+  [GemType.FlawedEmerald]: 0x10b981,
   [GemType.Emerald]: 0x10b981,
-};
-
-export const GEM_LABEL_COLORS: Record<GemType, string> = {
-  [GemType.Topaz]: "#f59e0b",
-  [GemType.Ruby]: "#ef4444",
-  [GemType.Emerald]: "#10b981",
-};
-
-export const GEM_QUALITY_LABEL_COLORS: Record<GemQuality, string> = {
-  [GemQuality.Chipped]: "#9ca3af",
-  [GemQuality.Flawed]: "#d1d5db",
-  [GemQuality.Normal]: "#ffffff",
-  [GemQuality.Flawless]: "#60a5fa",
-  [GemQuality.Perfect]: "#c084fc",
+  [GemType.FlawlessEmerald]: 0x10b981,
+  [GemType.PerfectEmerald]: 0x10b981,
 };
 
 export const GEM_NAMES: Record<GemType, string> = {
+  [GemType.ChippedTopaz]: "Chipped Topaz",
+  [GemType.FlawedTopaz]: "Flawed Topaz",
   [GemType.Topaz]: "Topaz",
+  [GemType.FlawlessTopaz]: "Flawless Topaz",
+  [GemType.PerfectTopaz]: "Perfect Topaz",
+  [GemType.ChippedRuby]: "Chipped Ruby",
+  [GemType.FlawedRuby]: "Flawed Ruby",
   [GemType.Ruby]: "Ruby",
+  [GemType.FlawlessRuby]: "Flawless Ruby",
+  [GemType.PerfectRuby]: "Perfect Ruby",
+  [GemType.ChippedEmerald]: "Chipped Emerald",
+  [GemType.FlawedEmerald]: "Flawed Emerald",
   [GemType.Emerald]: "Emerald",
-};
-
-export const QUALITY_NAMES: Record<GemQuality, string> = {
-  [GemQuality.Chipped]: "Chipped",
-  [GemQuality.Flawed]: "Flawed",
-  [GemQuality.Normal]: "",
-  [GemQuality.Flawless]: "Flawless",
-  [GemQuality.Perfect]: "Perfect",
+  [GemType.FlawlessEmerald]: "Flawless Emerald",
+  [GemType.PerfectEmerald]: "Perfect Emerald",
 };
 
 export const GOLD_COLOR = 0xfbbf24;
-export const GOLD_LABEL_COLOR = "#fbbf24";
+export const DROP_LABEL_COLOR = "#b0b0b0";
 
+export const DROP_SIZE = 8;
 export const DROP_SPEED = 80;
 export const DROP_FRICTION = 1.5;
 
@@ -61,20 +68,19 @@ export function calculateGoldDrop(power: number): number {
   return Math.ceil(power / 10);
 }
 
-export function rollGemDrop(power: number): { gemType: GemType; gemQuality: GemQuality } | null {
+export function rollGemDrop(power: number): GemType | null {
   const gemChance = Math.min(0.5, 0.05 + power / 10000);
   if (Math.random() >= gemChance) return null;
 
-  const gemType = [GemType.Topaz, GemType.Ruby, GemType.Emerald][
-    Math.floor(Math.random() * 3)
-  ];
+  const bases = [0, 5, 10];
+  const base = bases[Math.floor(Math.random() * 3)];
 
-  let gemQuality: GemQuality;
-  if (power >= 10000) gemQuality = GemQuality.Perfect;
-  else if (power >= 1000) gemQuality = GemQuality.Flawless;
-  else if (power >= 200) gemQuality = GemQuality.Normal;
-  else if (power >= 50) gemQuality = GemQuality.Flawed;
-  else gemQuality = GemQuality.Chipped;
+  let quality: number;
+  if (power >= 10000) quality = 4;
+  else if (power >= 1000) quality = 3;
+  else if (power >= 200) quality = 2;
+  else if (power >= 50) quality = 1;
+  else quality = 0;
 
-  return { gemType, gemQuality };
+  return (base + quality) as GemType;
 }
