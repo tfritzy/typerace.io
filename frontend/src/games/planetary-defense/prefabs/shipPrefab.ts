@@ -4,15 +4,9 @@ import type { EntityState } from "../state";
 
 export function createShipContainer(
   assets: AssetManager,
-  entity: EntityState,
-  friendly?: boolean
+  entity: EntityState
 ): Container {
-  let shipTexture;
-  if (friendly) {
-    shipTexture = assets.getShipTextureWithColor(entity.entityType, 100, 255, 136);
-  } else {
-    shipTexture = assets.getShipTextureWithColor(entity.entityType, 255, 100, 100);
-  }
+  const shipTexture = assets.getShipTexture(entity.entityType, entity.colorPreset!);
 
   const shipSprite = new Sprite(shipTexture);
   shipSprite.anchor.set(0.5);

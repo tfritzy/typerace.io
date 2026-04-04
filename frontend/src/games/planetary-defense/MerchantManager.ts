@@ -70,7 +70,7 @@ export class MerchantManager {
       hasShield: false,
     };
 
-    const display = createShipContainer(this.assets, fakeEntity, true);
+    const display = createShipContainer(this.assets, fakeEntity);
     display.eventMode = "static";
     display.cursor = "pointer";
     display.hitArea = new Circle(0, 0, CLICK_RADIUS);
