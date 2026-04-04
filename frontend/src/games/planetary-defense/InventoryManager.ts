@@ -7,7 +7,8 @@ import {
 } from "pixi.js";
 import { Inventory, CELL_SIZE } from "./Inventory";
 import type { InventoryItem } from "./Inventory";
-import { type RelicType, RELIC_DISPLAY } from "./relicConfig";
+import { RELIC_DISPLAY } from "./relicConfig";
+import { GEM_COLORS } from "./dropConfig";
 import type { AssetManager } from "./assetManager";
 
 const ITEM_BG_COLOR = 0x252545;
@@ -17,7 +18,7 @@ const CELL_PADDING = 4;
 interface DragState {
   source: Inventory;
   itemId: number;
-  relicType: RelicType;
+  item: InventoryItem;
   originalCol: number;
   originalRow: number;
   ghost: Container;
@@ -63,7 +64,7 @@ export class InventoryManager {
     const itemGlobal = source.getItemGlobalPosition(item);
     source.beginItemDrag(item.id);
 
-    const ghost = this.createGhost(item.relicType);
+    const ghost = this.createGhost(item);
     ghost.x = itemGlobal.x;
     ghost.y = itemGlobal.y;
     this.app.stage.addChild(ghost);
@@ -71,7 +72,7 @@ export class InventoryManager {
     this.dragState = {
       source,
       itemId: item.id,
-      relicType: item.relicType,
+      item,
       originalCol: item.gridX,
       originalRow: item.gridY,
       ghost,
@@ -95,7 +96,7 @@ export class InventoryManager {
   private onPointerUp = (e: FederatedPointerEvent): void => {
     if (!this.dragState) return;
 
-    const { source, itemId, relicType, originalCol, originalRow, ghost } =
+    const { source, itemId, item, ghost } =
       this.dragState;
 
     for (let i = this.inventories.length - 1; i >= 0; i--) {
@@ -108,7 +109,11 @@ export class InventoryManager {
         source.endItemDrag(itemId, col, row);
       } else {
         source.removeItem(itemId);
-        inv.addItem(relicType, col, row);
+        if (item.relicType !== undefined) {
+          inv.addItem(item.relicType, col, row);
+        } else if (item.gemType !== undefined && item.gemQuality !== undefined) {
+          inv.addGem(item.gemType, item.gemQuality, col, row);
+        }
       }
 
       this.finishDrag(ghost);
@@ -128,7 +133,7 @@ export class InventoryManager {
     }
   }
 
-  private createGhost(relicType: RelicType): Container {
+  private createGhost(item: InventoryItem): Container {
     const wrapper = new Container();
     wrapper.alpha = 0.8;
 
@@ -138,21 +143,38 @@ export class InventoryManager {
     bg.stroke({ color: ITEM_BORDER_COLOR, width: 1 });
     wrapper.addChild(bg);
 
-    const display = RELIC_DISPLAY[relicType];
-    const texture = this.assetManager.getRelicTexture(
-      display.spriteSheet,
-      display.frameName
-    );
-    texture.source.scaleMode = "nearest";
-    const sprite = new Sprite(texture);
-    sprite.anchor.set(0.5);
+    if (item.relicType !== undefined) {
+      const display = RELIC_DISPLAY[item.relicType];
+      const texture = this.assetManager.getRelicTexture(
+        display.spriteSheet,
+        display.frameName
+      );
+      texture.source.scaleMode = "nearest";
+      const sprite = new Sprite(texture);
+      sprite.anchor.set(0.5);
 
-    const spriteSize = CELL_SIZE - CELL_PADDING * 2;
-    sprite.width = spriteSize;
-    sprite.height = spriteSize;
-    sprite.x = CELL_SIZE / 2;
-    sprite.y = CELL_SIZE / 2;
-    wrapper.addChild(sprite);
+      const spriteSize = CELL_SIZE - CELL_PADDING * 2;
+      sprite.width = spriteSize;
+      sprite.height = spriteSize;
+      sprite.x = CELL_SIZE / 2;
+      sprite.y = CELL_SIZE / 2;
+      wrapper.addChild(sprite);
+    } else if (item.gemType !== undefined) {
+      const gemColor = GEM_COLORS[item.gemType];
+      const gemGraphic = new Graphics();
+      const cx = CELL_SIZE / 2;
+      const cy = CELL_SIZE / 2;
+      const s = 18;
+      gemGraphic.moveTo(cx, cy - s);
+      gemGraphic.lineTo(cx + s * 0.7, cy - s * 0.3);
+      gemGraphic.lineTo(cx + s * 0.5, cy + s * 0.6);
+      gemGraphic.lineTo(cx - s * 0.5, cy + s * 0.6);
+      gemGraphic.lineTo(cx - s * 0.7, cy - s * 0.3);
+      gemGraphic.closePath();
+      gemGraphic.fill({ color: gemColor });
+      gemGraphic.stroke({ color: 0xffffff, width: 1 });
+      wrapper.addChild(gemGraphic);
+    }
 
     return wrapper;
   }

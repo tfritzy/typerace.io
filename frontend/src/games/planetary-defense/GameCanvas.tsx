@@ -69,6 +69,7 @@ export const GameCanvas = () => {
   const [healthRatio, setHealthRatio] = useState(1);
   const [waveNumber, setWaveNumber] = useState(0);
   const [waveActive, setWaveActive] = useState(false);
+  const [gold, setGold] = useState(0);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -77,6 +78,8 @@ export const GameCanvas = () => {
     let cancelled = false;
     let unsubDamage: (() => void) | null = null;
     let unsubWaveComplete: (() => void) | null = null;
+    let unsubDropCollected: (() => void) | null = null;
+    let goldPollId: number | null = null;
 
     createPlanetaryDefenseGame(div)
       .then((game) => {
@@ -92,6 +95,9 @@ export const GameCanvas = () => {
           setWaveNumber(game.state.wave.wave);
           setWaveActive(false);
         });
+        unsubDropCollected = game.state.onDropCollected.subscribe(() => {
+          setGold(game.state.gold);
+        });
       })
       .catch((err) => {
         console.error("Failed to initialize Planetary Defense:", err);
@@ -101,6 +107,8 @@ export const GameCanvas = () => {
       cancelled = true;
       unsubDamage?.();
       unsubWaveComplete?.();
+      unsubDropCollected?.();
+      if (goldPollId !== null) cancelAnimationFrame(goldPollId);
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -152,6 +160,17 @@ export const GameCanvas = () => {
             }}
           >
             WAVE {waveNumber}
+          </div>
+          <div
+            style={{
+              fontSize: "9px",
+              color: "#fbbf24",
+              letterSpacing: "1px",
+              whiteSpace: "nowrap",
+              marginTop: "8px",
+            }}
+          >
+            GOLD {gold}
           </div>
         </div>
         {!waveActive && (

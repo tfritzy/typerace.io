@@ -15,6 +15,15 @@ import {
 } from "./relicConfig";
 import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
+import {
+  DropCategory,
+  type GemType,
+  type GemQuality,
+  DROP_SPEED,
+  DROP_FRICTION,
+  calculateGoldDrop,
+  rollGemDrop,
+} from "./dropConfig";
 
 export const PLANET_X = CANVAS_WIDTH / 2;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -78,6 +87,20 @@ export interface ProjectileState {
   explosionRange: number;
 }
 
+export interface DropState {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  word: string;
+  typedCount: number;
+  category: DropCategory;
+  goldAmount: number;
+  gemType?: GemType;
+  gemQuality?: GemQuality;
+}
+
 export enum WavePhase {
   Idle,
   Spawning,
@@ -133,6 +156,8 @@ export interface GameState {
   entities: EntityState[];
   relicSlots: RelicSlot[];
   projectiles: ProjectileState[];
+  drops: DropState[];
+  gold: number;
   time: {
     time: number;
     deltaTime: number;
@@ -146,6 +171,7 @@ export interface GameState {
   onRelicFired: GameEvent;
   onWaveComplete: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
+  onDropCollected: GameDataEvent<DropState>;
 }
 
 function createRelicSlots(): RelicSlot[] {
@@ -177,6 +203,8 @@ export function createGameState(): GameState {
     entities: [],
     relicSlots: createRelicSlots(),
     projectiles: [],
+    drops: [],
+    gold: 0,
     time: {
       time: 0,
       deltaTime: 0,
@@ -196,6 +224,7 @@ export function createGameState(): GameState {
     onRelicFired: new GameEvent(),
     onWaveComplete: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
+    onDropCollected: new GameDataEvent<DropState>(),
   };
 }
 
@@ -299,21 +328,95 @@ function rerollCompletedWords(state: GameState): void {
   }
 }
 
+function applyTypedCharacterToDrops(drops: DropState[], key: string): void {
+  for (const drop of drops) {
+    if (drop.typedCount >= drop.word.length) continue;
+    const nextChar = drop.word[drop.typedCount];
+    if (key === nextChar.toLowerCase()) {
+      drop.typedCount++;
+    } else if (drop.typedCount > 0) {
+      drop.typedCount = 0;
+    }
+  }
+}
+
+function collectCompletedDrops(state: GameState): void {
+  for (let i = state.drops.length - 1; i >= 0; i--) {
+    const drop = state.drops[i];
+    if (drop.typedCount >= drop.word.length) {
+      if (drop.category === DropCategory.Gold) {
+        state.gold += drop.goldAmount;
+      }
+      state.onDropCollected.emit(drop);
+      state.drops.splice(i, 1);
+    }
+  }
+}
+
 function destroyEntity(
   state: GameState,
   index: number,
   killed: boolean
 ): void {
+  const entity = state.entities[index];
   if (killed) {
     state.enemiesKilled++;
+    spawnDrops(state, entity);
   }
   state.entities.splice(index, 1);
 }
 
+function spawnDrops(state: GameState, entity: EntityState): void {
+  const goldAmount = calculateGoldDrop(entity.power);
+  spawnDrop(state, entity.x, entity.y, {
+    category: DropCategory.Gold,
+    goldAmount,
+  });
+
+  const gemResult = rollGemDrop(entity.power);
+  if (gemResult) {
+    spawnDrop(state, entity.x, entity.y, {
+      category: DropCategory.Gem,
+      goldAmount: 0,
+      gemType: gemResult.gemType,
+      gemQuality: gemResult.gemQuality,
+    });
+  }
+}
+
+function spawnDrop(
+  state: GameState,
+  x: number,
+  y: number,
+  dropInfo: Omit<DropState, "id" | "x" | "y" | "vx" | "vy" | "word" | "typedCount">
+): void {
+  const angle = Math.random() * Math.PI * 2;
+  const speed = DROP_SPEED * (0.5 + Math.random() * 0.5);
+  const usedWords = new Set([
+    ...state.entities.map((e) => e.word),
+    ...state.drops.map((d) => d.word),
+  ]);
+  const word = getRandomWord(getLangCode(), usedWords);
+
+  state.drops.push({
+    id: state.nextId++,
+    x,
+    y,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+    word,
+    typedCount: 0,
+    ...dropInfo,
+  });
+}
+
 export function handleTypedCharacter(state: GameState, key: string): void {
   if (key.length !== 1) return;
-  applyTypedCharacter(state.entities, key);
+  const normalizedKey = key.toLowerCase();
+  applyTypedCharacter(state.entities, normalizedKey);
+  applyTypedCharacterToDrops(state.drops, normalizedKey);
   rerollCompletedWords(state);
+  collectCompletedDrops(state);
   chargeRelics(state);
 }
 
@@ -527,6 +630,20 @@ export function updateState(state: GameState, dt: number): void {
   for (const p of state.projectiles) {
     p.x += p.vx * state.time.deltaTime;
     p.y += p.vy * state.time.deltaTime;
+  }
+
+  for (const d of state.drops) {
+    d.x += d.vx * state.time.deltaTime;
+    d.y += d.vy * state.time.deltaTime;
+    const friction = Math.max(0, 1 - DROP_FRICTION * state.time.deltaTime);
+    d.vx *= friction;
+    d.vy *= friction;
+  }
+
+  for (let i = state.drops.length - 1; i >= 0; i--) {
+    if (!isInBounds(state.drops[i].x, state.drops[i].y)) {
+      state.drops.splice(i, 1);
+    }
   }
 
   checkCollisions(state);

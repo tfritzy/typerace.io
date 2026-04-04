@@ -12,6 +12,7 @@ export interface LabelData {
   typedCount: number;
   x: number;
   y: number;
+  color?: string;
 }
 
 export class EnemyManager {

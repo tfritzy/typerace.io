@@ -8,11 +8,13 @@ import type { LabelData } from "./EnemyManager";
 import { RelicManager } from "./RelicManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { DamageNumberManager } from "./DamageNumberManager";
+import { DropManager } from "./DropManager";
 import { Inventory, CELL_SIZE, GRID_PADDING, BORDER_WIDTH } from "./Inventory";
 import { InventoryManager } from "./InventoryManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, getRelicPosition } from "./state";
 import type { GameState, RelicState } from "./state";
+import { DropCategory } from "./dropConfig";
 import { RELIC_SLOT_COUNT } from "./relicConfig";
 
 export type { LabelData };
@@ -30,6 +32,7 @@ export class PlanetaryDefenseGame {
   private relicManager!: RelicManager;
   private projectileManager!: ProjectileManager;
   private damageNumberManager!: DamageNumberManager;
+  private dropManager!: DropManager;
   private inventory!: Inventory;
   private weaponSlots: Inventory[] = [];
   private inventoryManager!: InventoryManager;
@@ -42,7 +45,9 @@ export class PlanetaryDefenseGame {
   }
 
   get labels(): LabelData[] {
-    return this.enemyManager?.labels ?? [];
+    const enemy = this.enemyManager?.labels ?? [];
+    const drop = this.dropManager?.labels ?? [];
+    return [...enemy, ...drop];
   }
 
   async init(): Promise<void> {
@@ -95,6 +100,9 @@ export class PlanetaryDefenseGame {
     this.enemyManager = new EnemyManager(this.assetManager);
     world.addChild(this.enemyManager.layer);
 
+    this.dropManager = new DropManager();
+    world.addChild(this.dropManager.layer);
+
     this.inventoryManager = new InventoryManager(this.app, this.assetManager);
 
     this.inventory = new Inventory(this.assetManager);
@@ -103,6 +111,12 @@ export class PlanetaryDefenseGame {
     this.inventoryManager.register(this.inventory);
 
     this.buildWeaponSlots(world);
+
+    this.state.onDropCollected.subscribe((drop) => {
+      if (drop.category === DropCategory.Gem && drop.gemType !== undefined && drop.gemQuality !== undefined) {
+        this.inventory.addGemToFirstEmpty(drop.gemType, drop.gemQuality);
+      }
+    });
   }
 
   private buildWeaponSlots(world: Container): void {
@@ -123,6 +137,7 @@ export class PlanetaryDefenseGame {
 
       const slotIndex = i;
       weaponSlot.onItemAdded.subscribe((item) => {
+        if (item.relicType === undefined) return;
         const relic: RelicState = {
           type: item.relicType,
           level: 1,
@@ -150,6 +165,7 @@ export class PlanetaryDefenseGame {
     this.relicManager.update(this.state);
     this.projectileManager.update(this.state);
     this.damageNumberManager.update(dt);
+    this.dropManager.update(this.state);
   }
 
   destroy(): void {
@@ -162,6 +178,7 @@ export class PlanetaryDefenseGame {
     this.relicManager.destroy();
     this.projectileManager.destroy();
     this.damageNumberManager.destroy();
+    this.dropManager.destroy();
     this.enemyManager.destroy();
     this.inventory.destroy();
     for (const ws of this.weaponSlots) ws.destroy();

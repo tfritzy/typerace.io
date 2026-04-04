@@ -87,6 +87,7 @@ export const LabelOverlay = ({ gameRef }: { gameRef: React.RefObject<PlanetaryDe
         dom.container.style.top = `${(label.y / CANVAS_HEIGHT) * 100}%`;
         dom.typedSpan.textContent = label.word.slice(0, label.typedCount);
         dom.untypedSpan.textContent = label.word.slice(label.typedCount);
+        dom.untypedSpan.style.color = label.color ?? UNTYPED_COLOR;
       }
 
       for (const [id, dom] of labelDomsRef.current) {

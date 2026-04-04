@@ -2,10 +2,12 @@ import {
   Container,
   Graphics,
   Sprite,
+  Text,
   type FederatedPointerEvent,
 } from "pixi.js";
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
 import { RelicType, RELIC_DISPLAY } from "./relicConfig";
+import { GemType, GemQuality, GEM_COLORS, GEM_NAMES, QUALITY_NAMES } from "./dropConfig";
 import type { AssetManager } from "./assetManager";
 
 const DEFAULT_COLS = 10;
@@ -34,7 +36,9 @@ export interface InventoryConfig {
 
 export interface InventoryItem {
   id: number;
-  relicType: RelicType;
+  relicType?: RelicType;
+  gemType?: GemType;
+  gemQuality?: GemQuality;
   gridX: number;
   gridY: number;
 }
@@ -235,6 +239,40 @@ export class Inventory {
     return item;
   }
 
+  addGem(gemType: GemType, gemQuality: GemQuality, gridX: number, gridY: number): InventoryItem | null {
+    if (!this.canPlace(gridX, gridY)) return null;
+
+    const item: InventoryItem = {
+      id: this.nextItemId++,
+      gemType,
+      gemQuality,
+      gridX,
+      gridY,
+    };
+
+    this.items.push(item);
+    this.occupied[gridY][gridX] = true;
+
+    const itemContainer = this.createItemVisual(item);
+    this.itemContainers.set(item.id, itemContainer);
+    this.container.addChild(itemContainer);
+    this.snapToGrid(itemContainer, item);
+
+    this.onItemAdded.emit(item);
+    return item;
+  }
+
+  addGemToFirstEmpty(gemType: GemType, gemQuality: GemQuality): InventoryItem | null {
+    for (let r = 0; r < this.rows; r++) {
+      for (let c = 0; c < this.cols; c++) {
+        if (!this.occupied[r][c]) {
+          return this.addGem(gemType, gemQuality, c, r);
+        }
+      }
+    }
+    return null;
+  }
+
   removeItem(itemId: number): InventoryItem | null {
     const index = this.items.findIndex((i) => i.id === itemId);
     if (index < 0) return null;
@@ -268,21 +306,55 @@ export class Inventory {
     bg.stroke({ color: ITEM_BORDER_COLOR, width: 1 });
     wrapper.addChild(bg);
 
-    const display = RELIC_DISPLAY[item.relicType];
-    const texture = this.assetManager.getRelicTexture(
-      display.spriteSheet,
-      display.frameName
-    );
-    texture.source.scaleMode = "nearest";
-    const sprite = new Sprite(texture);
-    sprite.anchor.set(0.5);
+    if (item.relicType !== undefined) {
+      const display = RELIC_DISPLAY[item.relicType];
+      const texture = this.assetManager.getRelicTexture(
+        display.spriteSheet,
+        display.frameName
+      );
+      texture.source.scaleMode = "nearest";
+      const sprite = new Sprite(texture);
+      sprite.anchor.set(0.5);
 
-    const spriteSize = CELL_SIZE - CELL_PADDING * 2;
-    sprite.width = spriteSize;
-    sprite.height = spriteSize;
-    sprite.x = CELL_SIZE / 2;
-    sprite.y = CELL_SIZE / 2;
-    wrapper.addChild(sprite);
+      const spriteSize = CELL_SIZE - CELL_PADDING * 2;
+      sprite.width = spriteSize;
+      sprite.height = spriteSize;
+      sprite.x = CELL_SIZE / 2;
+      sprite.y = CELL_SIZE / 2;
+      wrapper.addChild(sprite);
+    } else if (item.gemType !== undefined) {
+      const gemColor = GEM_COLORS[item.gemType];
+      const gemGraphic = new Graphics();
+      const cx = CELL_SIZE / 2;
+      const cy = CELL_SIZE / 2;
+      const s = 18;
+      gemGraphic.moveTo(cx, cy - s);
+      gemGraphic.lineTo(cx + s * 0.7, cy - s * 0.3);
+      gemGraphic.lineTo(cx + s * 0.5, cy + s * 0.6);
+      gemGraphic.lineTo(cx - s * 0.5, cy + s * 0.6);
+      gemGraphic.lineTo(cx - s * 0.7, cy - s * 0.3);
+      gemGraphic.closePath();
+      gemGraphic.fill({ color: gemColor });
+      gemGraphic.stroke({ color: 0xffffff, width: 1 });
+      wrapper.addChild(gemGraphic);
+
+      const qualityName = QUALITY_NAMES[item.gemQuality!];
+      const gemName = GEM_NAMES[item.gemType];
+      const label = qualityName ? `${qualityName[0]}` : gemName[0];
+      const labelText = new Text({
+        text: label,
+        style: {
+          fontFamily: PIXEL_FONT_FAMILY,
+          fontSize: 10,
+          fill: 0xffffff,
+          stroke: { color: 0x000000, width: 2 },
+        },
+      });
+      labelText.anchor.set(0.5);
+      labelText.x = cx;
+      labelText.y = cy + s * 0.9;
+      wrapper.addChild(labelText);
+    }
 
     wrapper.on("pointerdown", (e: FederatedPointerEvent) => {
       this.onDragStart.emit({ inventory: this, item, event: e });
