@@ -1,23 +1,16 @@
 import {
   Application,
   Container,
-  Graphics,
-  Sprite,
   type FederatedPointerEvent,
 } from "pixi.js";
-import { Inventory, CELL_SIZE } from "./Inventory";
+import { Inventory, CELL_SIZE, buildItemCell } from "./Inventory";
 import type { InventoryItem } from "./Inventory";
-import { type RelicType, RELIC_DISPLAY } from "./relicConfig";
 import type { AssetManager } from "./assetManager";
-
-const ITEM_BG_COLOR = 0x252545;
-const ITEM_BORDER_COLOR = 0x4a4a7e;
-const CELL_PADDING = 4;
 
 interface DragState {
   source: Inventory;
   itemId: number;
-  relicType: RelicType;
+  slot: InventoryItem;
   originalCol: number;
   originalRow: number;
   ghost: Container;
@@ -55,25 +48,26 @@ export class InventoryManager {
 
   private startDrag(
     source: Inventory,
-    item: InventoryItem,
+    slot: InventoryItem,
     e: FederatedPointerEvent
   ): void {
     if (this.dragState) return;
+    if (!slot.item) return;
 
-    const itemGlobal = source.getItemGlobalPosition(item);
-    source.beginItemDrag(item.id);
+    const itemGlobal = source.getItemGlobalPosition(slot);
+    source.beginItemDrag(slot.id);
 
-    const ghost = this.createGhost(item.relicType);
+    const ghost = this.createGhost(slot);
     ghost.x = itemGlobal.x;
     ghost.y = itemGlobal.y;
     this.app.stage.addChild(ghost);
 
     this.dragState = {
       source,
-      itemId: item.id,
-      relicType: item.relicType,
-      originalCol: item.gridX,
-      originalRow: item.gridY,
+      itemId: slot.id,
+      slot,
+      originalCol: slot.gridX,
+      originalRow: slot.gridY,
       ghost,
       offsetX: e.global.x - itemGlobal.x,
       offsetY: e.global.y - itemGlobal.y,
@@ -95,8 +89,7 @@ export class InventoryManager {
   private onPointerUp = (e: FederatedPointerEvent): void => {
     if (!this.dragState) return;
 
-    const { source, itemId, relicType, originalCol, originalRow, ghost } =
-      this.dragState;
+    const { source, itemId, slot, ghost } = this.dragState;
 
     for (let i = this.inventories.length - 1; i >= 0; i--) {
       const inv = this.inventories[i];
@@ -106,9 +99,9 @@ export class InventoryManager {
 
       if (inv === source) {
         source.endItemDrag(itemId, col, row);
-      } else {
+      } else if (slot.item) {
         source.removeItem(itemId);
-        inv.addItem(relicType, col, row);
+        inv.addItem(slot.item, col, row);
       }
 
       this.finishDrag(ghost);
@@ -128,32 +121,10 @@ export class InventoryManager {
     }
   }
 
-  private createGhost(relicType: RelicType): Container {
-    const wrapper = new Container();
+  private createGhost(slot: InventoryItem): Container {
+    if (!slot.item) return new Container();
+    const wrapper = buildItemCell(slot.item, this.assetManager);
     wrapper.alpha = 0.8;
-
-    const bg = new Graphics();
-    bg.roundRect(2, 2, CELL_SIZE - 4, CELL_SIZE - 4, 3);
-    bg.fill({ color: ITEM_BG_COLOR, alpha: 0.8 });
-    bg.stroke({ color: ITEM_BORDER_COLOR, width: 1 });
-    wrapper.addChild(bg);
-
-    const display = RELIC_DISPLAY[relicType];
-    const texture = this.assetManager.getRelicTexture(
-      display.spriteSheet,
-      display.frameName
-    );
-    texture.source.scaleMode = "nearest";
-    const sprite = new Sprite(texture);
-    sprite.anchor.set(0.5);
-
-    const spriteSize = CELL_SIZE - CELL_PADDING * 2;
-    sprite.width = spriteSize;
-    sprite.height = spriteSize;
-    sprite.x = CELL_SIZE / 2;
-    sprite.y = CELL_SIZE / 2;
-    wrapper.addChild(sprite);
-
     return wrapper;
   }
 

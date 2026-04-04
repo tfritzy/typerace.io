@@ -15,6 +15,13 @@ import {
 } from "./relicConfig";
 import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
+import {
+  type Item, GemType,
+  TOPAZ_TIERS, RUBY_TIERS, EMERALD_TIERS, SAPPHIRE_TIERS, AMETHYST_TIERS,
+} from "./itemConfig";
+
+const DROP_SPEED = 80;
+const DROP_CHANCE = 0.5;
 
 export const PLANET_X = CANVAS_WIDTH / 2;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -52,6 +59,7 @@ export interface EntityState {
 
 export interface RelicState {
   type: RelicType;
+  item: Item;
   level: number;
   charge: number;
   remainingShots: number;
@@ -76,6 +84,17 @@ export interface ProjectileState {
   freezeStacks: number;
   chainCount: number;
   explosionRange: number;
+}
+
+export interface DropState {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  word: string;
+  typedCount: number;
+  item: Item;
 }
 
 export enum WavePhase {
@@ -133,6 +152,7 @@ export interface GameState {
   entities: EntityState[];
   relicSlots: RelicSlot[];
   projectiles: ProjectileState[];
+  drops: DropState[];
   time: {
     time: number;
     deltaTime: number;
@@ -165,7 +185,7 @@ function createRelicSlots(): RelicSlot[] {
     let relic: RelicState | null = null;
     const relicType = startingRelics[i] ?? null;
     if (relicType !== null) {
-      relic = { type: relicType, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
+      relic = { type: relicType, item: { type: relicType, amount: 1 }, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
     }
     slots.push({ angle, relic });
   }
@@ -177,6 +197,7 @@ export function createGameState(): GameState {
     entities: [],
     relicSlots: createRelicSlots(),
     projectiles: [],
+    drops: [],
     time: {
       time: 0,
       deltaTime: 0,
@@ -299,22 +320,115 @@ function rerollCompletedWords(state: GameState): void {
   }
 }
 
+function applyTypedCharacterToDrops(drops: DropState[], key: string): void {
+  for (const drop of drops) {
+    if (drop.typedCount >= drop.word.length) continue;
+    const nextChar = drop.word[drop.typedCount];
+    if (key === nextChar.toLowerCase()) {
+      drop.typedCount++;
+    } else if (drop.typedCount > 0) {
+      drop.typedCount = 0;
+    }
+  }
+}
+
+function collectCompletedDrops(state: GameState): Item[] {
+  const collected: Item[] = [];
+  for (let i = state.drops.length - 1; i >= 0; i--) {
+    const drop = state.drops[i];
+    if (drop.typedCount >= drop.word.length) {
+      collected.push(drop.item);
+      state.drops.splice(i, 1);
+    }
+  }
+  return collected;
+}
+
 function destroyEntity(
   state: GameState,
   index: number,
   killed: boolean
 ): void {
+  const entity = state.entities[index];
   if (killed) {
     state.enemiesKilled++;
+    spawnDrops(state, entity);
   }
   state.entities.splice(index, 1);
 }
 
-export function handleTypedCharacter(state: GameState, key: string): void {
-  if (key.length !== 1) return;
-  applyTypedCharacter(state.entities, key);
+function calculateGoldDrop(power: number): number {
+  return Math.ceil(power / 10);
+}
+
+function rollGemDrop(power: number): GemType | null {
+  const gemChance = Math.min(0.5, 0.05 + power / 10000);
+  if (Math.random() >= gemChance) return null;
+
+  const families: GemType[][] = [TOPAZ_TIERS];
+  if (power >= 50) families.push(SAPPHIRE_TIERS);
+  if (power >= 100) families.push(RUBY_TIERS);
+  if (power >= 250) families.push(AMETHYST_TIERS);
+  if (power >= 500) families.push(EMERALD_TIERS);
+  const family = families[Math.floor(Math.random() * families.length)];
+
+  let quality: number;
+  if (power >= 10000) quality = 4;
+  else if (power >= 1000) quality = 3;
+  else if (power >= 200) quality = 2;
+  else if (power >= 50) quality = 1;
+  else quality = 0;
+
+  return family[quality];
+}
+
+function spawnDrops(state: GameState, entity: EntityState): void {
+  if (Math.random() < DROP_CHANCE) return;
+
+  const gemType = rollGemDrop(entity.power);
+  if (gemType !== null) {
+    spawnDrop(state, entity.x, entity.y, { type: gemType, amount: 1 });
+  } else {
+    const goldAmount = calculateGoldDrop(entity.power);
+    spawnDrop(state, entity.x, entity.y, { type: "Gold", amount: goldAmount });
+  }
+}
+
+function spawnDrop(
+  state: GameState,
+  x: number,
+  y: number,
+  item: Item
+): void {
+  const angle = Math.random() * Math.PI * 2;
+  const speed = DROP_SPEED * (0.5 + Math.random() * 0.5);
+  const usedWords = new Set([
+    ...state.entities.map((e) => e.word),
+    ...state.drops.map((d) => d.word),
+  ]);
+  const word = getRandomWord(getLangCode(), usedWords);
+
+  state.drops.push({
+    id: state.nextId++,
+    x,
+    y,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+    word,
+    typedCount: 0,
+    item,
+  });
+}
+
+export function handleTypedCharacter(state: GameState, key: string): Item[] {
+  if (key.length !== 1) return [];
+  const normalizedKey = key.toLowerCase();
+  applyTypedCharacter(state.entities, normalizedKey);
+  applyTypedCharacterToDrops(state.drops, normalizedKey);
   rerollCompletedWords(state);
+  const collected = collectCompletedDrops(state);
   chargeRelics(state);
+  return collected;
 }
 
 function findTypedTarget(
@@ -527,6 +641,17 @@ export function updateState(state: GameState, dt: number): void {
   for (const p of state.projectiles) {
     p.x += p.vx * state.time.deltaTime;
     p.y += p.vy * state.time.deltaTime;
+  }
+
+  for (const d of state.drops) {
+    d.x += d.vx * state.time.deltaTime;
+    d.y += d.vy * state.time.deltaTime;
+  }
+
+  for (let i = state.drops.length - 1; i >= 0; i--) {
+    if (!isInBounds(state.drops[i].x, state.drops[i].y)) {
+      state.drops.splice(i, 1);
+    }
   }
 
   checkCollisions(state);

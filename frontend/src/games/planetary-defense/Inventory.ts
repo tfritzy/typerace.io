@@ -2,14 +2,16 @@ import {
   Container,
   Graphics,
   Sprite,
+  Text,
   type FederatedPointerEvent,
 } from "pixi.js";
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
-import { RelicType, RELIC_DISPLAY } from "./relicConfig";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
+import { type Item, type ItemType, getItemConfig, getItemDisplay } from "./itemConfig";
+import { RelicType } from "./relicConfig";
 import type { AssetManager } from "./assetManager";
 
 const DEFAULT_COLS = 10;
-const DEFAULT_ROWS = 5;
+const DEFAULT_ROWS = 2;
 export const CELL_SIZE = 64;
 const CELL_PADDING = 4;
 export const GRID_PADDING = 8;
@@ -20,8 +22,8 @@ const BG_ALPHA = 0.92;
 const BORDER_COLOR = 0x8b7355;
 const CELL_LINE_COLOR = 0x2a2a3e;
 const CELL_BG_COLOR = 0x15152a;
-const ITEM_BG_COLOR = 0x252545;
-const ITEM_BORDER_COLOR = 0x4a4a7e;
+export const ITEM_BG_COLOR = 0x252545;
+export const ITEM_BORDER_COLOR = 0x4a4a7e;
 const VALID_COLOR = 0x4ade80;
 const INVALID_COLOR = 0xef4444;
 
@@ -34,7 +36,7 @@ export interface InventoryConfig {
 
 export interface InventoryItem {
   id: number;
-  relicType: RelicType;
+  item: Item | null;
   gridX: number;
   gridY: number;
 }
@@ -51,6 +53,51 @@ function createEvent<T>() {
     },
     emit: (data: T) => listeners.forEach((fn) => fn(data)),
   };
+}
+
+export function buildItemCell(item: Item, assetManager: AssetManager): Container {
+  const wrapper = new Container();
+
+  const bg = new Graphics();
+  bg.roundRect(2, 2, CELL_SIZE - 4, CELL_SIZE - 4, 3);
+  bg.fill({ color: ITEM_BG_COLOR, alpha: 0.8 });
+  bg.stroke({ color: ITEM_BORDER_COLOR, width: 1 });
+  wrapper.addChild(bg);
+
+  const cx = CELL_SIZE / 2;
+  const cy = CELL_SIZE / 2;
+
+  const config = getItemConfig(item.type);
+  const display = getItemDisplay(item.type);
+  const texture = assetManager.getRelicTexture(display.spriteSheet, display.frameName);
+  texture.source.scaleMode = "nearest";
+  const sprite = new Sprite(texture);
+  sprite.anchor.set(0.5);
+
+  const spriteSize = CELL_SIZE - CELL_PADDING * 2;
+  sprite.width = spriteSize;
+  sprite.height = spriteSize;
+  sprite.x = cx;
+  sprite.y = cy;
+  wrapper.addChild(sprite);
+
+  if (config.stackable && item.amount > 1) {
+    const label = new Text({
+      text: `${item.amount}`,
+      style: {
+        fontFamily: PIXEL_FONT_FAMILY,
+        fontSize: 10,
+        fill: 0xffffff,
+        stroke: { color: 0x000000, width: 2 },
+      },
+    });
+    label.anchor.set(1, 1);
+    label.x = CELL_SIZE - 6;
+    label.y = CELL_SIZE - 4;
+    wrapper.addChild(label);
+  }
+
+  return wrapper;
 }
 
 export class Inventory {
@@ -144,10 +191,10 @@ export class Inventory {
     return !this.occupied[row][col];
   }
 
-  getItemGlobalPosition(item: InventoryItem): { x: number; y: number } {
+  getItemGlobalPosition(slot: InventoryItem): { x: number; y: number } {
     return this.container.toGlobal({
-      x: this.gridOriginX + item.gridX * CELL_SIZE,
-      y: this.gridOriginY + item.gridY * CELL_SIZE,
+      x: this.gridOriginX + slot.gridX * CELL_SIZE,
+      y: this.gridOriginY + slot.gridY * CELL_SIZE,
     });
   }
 
@@ -170,77 +217,121 @@ export class Inventory {
   }
 
   beginItemDrag(itemId: number): InventoryItem | null {
-    const item = this.items.find((i) => i.id === itemId);
-    if (!item) return null;
+    const slot = this.items.find((i) => i.id === itemId);
+    if (!slot) return null;
 
-    this.occupied[item.gridY][item.gridX] = false;
+    this.occupied[slot.gridY][slot.gridX] = false;
     const c = this.itemContainers.get(itemId);
     if (c) c.visible = false;
 
-    return item;
+    return slot;
   }
 
   endItemDrag(itemId: number, col: number, row: number): boolean {
-    const item = this.items.find((i) => i.id === itemId);
-    if (!item) return false;
+    const slot = this.items.find((i) => i.id === itemId);
+    if (!slot) return false;
 
     if (!this.canPlace(col, row)) return false;
 
-    item.gridX = col;
-    item.gridY = row;
+    slot.gridX = col;
+    slot.gridY = row;
     this.occupied[row][col] = true;
 
     const c = this.itemContainers.get(itemId);
     if (c) {
       c.visible = true;
-      this.snapToGrid(c, item);
+      this.snapToGrid(c, slot);
     }
 
     return true;
   }
 
   cancelItemDrag(itemId: number): void {
-    const item = this.items.find((i) => i.id === itemId);
-    if (!item) return;
+    const slot = this.items.find((i) => i.id === itemId);
+    if (!slot) return;
 
-    this.occupied[item.gridY][item.gridX] = true;
+    this.occupied[slot.gridY][slot.gridX] = true;
     const c = this.itemContainers.get(itemId);
     if (c) c.visible = true;
   }
 
-  private snapToGrid(c: Container, item: InventoryItem): void {
-    c.x = this.gridOriginX + item.gridX * CELL_SIZE;
-    c.y = this.gridOriginY + item.gridY * CELL_SIZE;
+  private snapToGrid(c: Container, slot: InventoryItem): void {
+    c.x = this.gridOriginX + slot.gridX * CELL_SIZE;
+    c.y = this.gridOriginY + slot.gridY * CELL_SIZE;
   }
 
-  addItem(relicType: RelicType, gridX: number, gridY: number): InventoryItem | null {
+  addItem(item: Item, gridX: number, gridY: number): InventoryItem | null {
     if (!this.canPlace(gridX, gridY)) return null;
 
-    const item: InventoryItem = {
+    const slot: InventoryItem = {
       id: this.nextItemId++,
-      relicType,
+      item,
       gridX,
       gridY,
     };
 
-    this.items.push(item);
+    this.items.push(slot);
     this.occupied[gridY][gridX] = true;
 
-    const itemContainer = this.createItemVisual(item);
-    this.itemContainers.set(item.id, itemContainer);
+    const itemContainer = this.createItemVisual(slot);
+    this.itemContainers.set(slot.id, itemContainer);
     this.container.addChild(itemContainer);
-    this.snapToGrid(itemContainer, item);
+    this.snapToGrid(itemContainer, slot);
 
-    this.onItemAdded.emit(item);
-    return item;
+    this.onItemAdded.emit(slot);
+    return slot;
+  }
+
+  addToFirstEmpty(item: Item): InventoryItem | null {
+    const config = getItemConfig(item.type);
+    if (config.stackable) {
+      const existing = this.items.find(
+        (s) => s.item && s.item.type === item.type
+      );
+      if (existing && existing.item) {
+        const maxStack = config.maxStack ?? Infinity;
+        const spaceLeft = maxStack - existing.item.amount;
+        if (spaceLeft >= item.amount) {
+          existing.item.amount += item.amount;
+          this.refreshItemVisual(existing);
+          return existing;
+        } else if (spaceLeft > 0) {
+          existing.item.amount = maxStack;
+          this.refreshItemVisual(existing);
+          const overflow: Item = { type: item.type, amount: item.amount - spaceLeft };
+          return this.addToFirstEmpty(overflow);
+        }
+      }
+    }
+
+    for (let r = 0; r < this.rows; r++) {
+      for (let c = 0; c < this.cols; c++) {
+        if (!this.occupied[r][c]) {
+          return this.addItem(item, c, r);
+        }
+      }
+    }
+    return null;
+  }
+
+  private refreshItemVisual(slot: InventoryItem): void {
+    const existing = this.itemContainers.get(slot.id);
+    if (existing) {
+      existing.destroy();
+      this.itemContainers.delete(slot.id);
+    }
+    const newContainer = this.createItemVisual(slot);
+    this.itemContainers.set(slot.id, newContainer);
+    this.container.addChild(newContainer);
+    this.snapToGrid(newContainer, slot);
   }
 
   removeItem(itemId: number): InventoryItem | null {
     const index = this.items.findIndex((i) => i.id === itemId);
     if (index < 0) return null;
 
-    const item = this.items[index];
-    this.occupied[item.gridY][item.gridX] = false;
+    const slot = this.items[index];
+    this.occupied[slot.gridY][slot.gridX] = false;
     this.items.splice(index, 1);
 
     const c = this.itemContainers.get(itemId);
@@ -249,59 +340,39 @@ export class Inventory {
       this.itemContainers.delete(itemId);
     }
 
-    this.onItemRemoved.emit(item);
-    return item;
+    this.onItemRemoved.emit(slot);
+    return slot;
   }
 
   getItems(): InventoryItem[] {
     return this.items;
   }
 
-  private createItemVisual(item: InventoryItem): Container {
-    const wrapper = new Container();
+  private createItemVisual(slot: InventoryItem): Container {
+    if (!slot.item) return new Container();
+
+    const wrapper = buildItemCell(slot.item, this.assetManager);
     wrapper.eventMode = "static";
     wrapper.cursor = "grab";
 
-    const bg = new Graphics();
-    bg.roundRect(2, 2, CELL_SIZE - 4, CELL_SIZE - 4, 3);
-    bg.fill({ color: ITEM_BG_COLOR, alpha: 0.8 });
-    bg.stroke({ color: ITEM_BORDER_COLOR, width: 1 });
-    wrapper.addChild(bg);
-
-    const display = RELIC_DISPLAY[item.relicType];
-    const texture = this.assetManager.getRelicTexture(
-      display.spriteSheet,
-      display.frameName
-    );
-    texture.source.scaleMode = "nearest";
-    const sprite = new Sprite(texture);
-    sprite.anchor.set(0.5);
-
-    const spriteSize = CELL_SIZE - CELL_PADDING * 2;
-    sprite.width = spriteSize;
-    sprite.height = spriteSize;
-    sprite.x = CELL_SIZE / 2;
-    sprite.y = CELL_SIZE / 2;
-    wrapper.addChild(sprite);
-
     wrapper.on("pointerdown", (e: FederatedPointerEvent) => {
-      this.onDragStart.emit({ inventory: this, item, event: e });
+      this.onDragStart.emit({ inventory: this, item: slot, event: e });
     });
 
     return wrapper;
   }
 
   populateTestData(): void {
-    this.addItem(RelicType.StarfallStiletto, 0, 0);
-    this.addItem(RelicType.BloodthornDirk, 1, 0);
-    this.addItem(RelicType.EmbercrestBlade, 2, 0);
-    this.addItem(RelicType.BriarthornSaber, 3, 0);
-    this.addItem(RelicType.TwinflareCrossblades, 4, 0);
-    this.addItem(RelicType.CloudveilLongsword, 5, 0);
-    this.addItem(RelicType.SteelBattleaxe, 6, 0);
-    this.addItem(RelicType.MoltenZweihander, 7, 0);
-    this.addItem(RelicType.MoonlitHatchet, 8, 0);
-    this.addItem(RelicType.FrostfangClaymore, 9, 0);
+    this.addItem({ type: RelicType.StarfallStiletto, amount: 1 }, 0, 0);
+    this.addItem({ type: RelicType.BloodthornDirk, amount: 1 }, 1, 0);
+    this.addItem({ type: RelicType.EmbercrestBlade, amount: 1 }, 2, 0);
+    this.addItem({ type: RelicType.BriarthornSaber, amount: 1 }, 3, 0);
+    this.addItem({ type: RelicType.TwinflareCrossblades, amount: 1 }, 4, 0);
+    this.addItem({ type: RelicType.CloudveilLongsword, amount: 1 }, 5, 0);
+    this.addItem({ type: RelicType.SteelBattleaxe, amount: 1 }, 6, 0);
+    this.addItem({ type: RelicType.MoltenZweihander, amount: 1 }, 7, 0);
+    this.addItem({ type: RelicType.MoonlitHatchet, amount: 1 }, 8, 0);
+    this.addItem({ type: RelicType.FrostfangClaymore, amount: 1 }, 9, 0);
   }
 
   destroy(): void {
