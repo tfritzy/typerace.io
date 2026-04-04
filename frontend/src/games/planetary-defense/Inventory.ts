@@ -322,7 +322,7 @@ export class Inventory {
       sprite.x = CELL_SIZE / 2;
       sprite.y = CELL_SIZE / 2;
       wrapper.addChild(sprite);
-    } else if (item.gemType !== undefined) {
+    } else if (item.gemType !== undefined && item.gemQuality !== undefined) {
       const gemColor = GEM_COLORS[item.gemType];
       const gemGraphic = new Graphics();
       const cx = CELL_SIZE / 2;
@@ -338,7 +338,7 @@ export class Inventory {
       gemGraphic.stroke({ color: 0xffffff, width: 1 });
       wrapper.addChild(gemGraphic);
 
-      const qualityName = QUALITY_NAMES[item.gemQuality!];
+      const qualityName = QUALITY_NAMES[item.gemQuality];
       const gemName = GEM_NAMES[item.gemType];
       const label = qualityName ? `${qualityName[0]}` : gemName[0];
       const labelText = new Text({

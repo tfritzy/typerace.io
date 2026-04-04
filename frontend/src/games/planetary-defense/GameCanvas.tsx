@@ -79,7 +79,6 @@ export const GameCanvas = () => {
     let unsubDamage: (() => void) | null = null;
     let unsubWaveComplete: (() => void) | null = null;
     let unsubDropCollected: (() => void) | null = null;
-    let goldPollId: number | null = null;
 
     createPlanetaryDefenseGame(div)
       .then((game) => {
@@ -108,7 +107,6 @@ export const GameCanvas = () => {
       unsubDamage?.();
       unsubWaveComplete?.();
       unsubDropCollected?.();
-      if (goldPollId !== null) cancelAnimationFrame(goldPollId);
       gameRef.current?.destroy();
       gameRef.current = null;
     };
