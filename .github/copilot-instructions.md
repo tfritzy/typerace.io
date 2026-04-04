@@ -63,6 +63,18 @@ This is the second most important rule in this entire file, right after the scre
 
 **"But fixing that error is outside the scope of my task."** — DO NOT CARE. A broken build is always in scope. Always. If the build fails, your task is not done. Your task is NEVER done until the build passes.
 
+**"But I can just use `any` or `unknown` to make it compile."** — ABSOLUTELY NOT. Silencing the compiler is NOT fixing the build. You are BANNED from using hacky workarounds to get TypeScript passing. The fix must be elegant, correct, and consistent with the original author's intent. The following are ALL BANNED:
+- `any` type — NEVER use it. Find the correct type and use it.
+- `unknown` type as a lazy escape hatch — if you don't know the type, FIGURE IT OUT. Read the code. Trace the data flow. Use the correct type.
+- `@ts-ignore` — NEVER. This hides errors instead of fixing them.
+- `@ts-expect-error` — NEVER. Same problem as `@ts-ignore`.
+- `as any` type assertions — NEVER. This is just `any` with extra steps.
+- `as unknown as SomeType` double casting — NEVER. If you need to double-cast, your types are wrong. Fix the types.
+- Overly broad type unions or generics that defeat the purpose of type safety
+- Deleting or weakening existing type definitions to make errors go away
+
+**The fix must match the original author's intent.** Read the surrounding code. Understand what the types SHOULD be. Use proper interfaces, proper generics, proper narrowing. If a function returns `string | null`, handle the `null` case — don't cast it to `string`. If a variable is typed as `Foo`, don't change it to `any` because you got a type error. Fix the ACTUAL problem. Write the code the way the original author would have written it.
+
 **Before you even START writing code, run `cd frontend && npx tsc -b` to see the current state.** After EVERY code change, run it again. After your LAST code change, run it one final time. The build must pass at every step. If it doesn't, you stop what you're doing and fix it before continuing.
 
 Mandatory steps — execute all of them, after every iteration, no shortcuts, no skipping:
