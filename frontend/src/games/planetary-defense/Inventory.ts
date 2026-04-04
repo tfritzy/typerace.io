@@ -6,7 +6,7 @@ import {
   type FederatedPointerEvent,
 } from "pixi.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
-import { type Item, type ItemType, getItemConfig, getItemDisplay } from "./itemConfig";
+import { type Item, getItemConfig, getItemDisplay } from "./itemConfig";
 import { RelicType } from "./relicConfig";
 import type { AssetManager } from "./assetManager";
 
@@ -95,6 +95,30 @@ export function buildItemCell(item: Item, assetManager: AssetManager): Container
     label.x = CELL_SIZE - 6;
     label.y = CELL_SIZE - 4;
     wrapper.addChild(label);
+  }
+
+  if (item.price != null) {
+    const priceBg = new Graphics();
+    priceBg.roundRect(0, 0, CELL_SIZE - 4, 16, 3);
+    priceBg.fill({ color: 0x000000, alpha: 0.8 });
+
+    const priceLabel = new Text({
+      text: `${item.price}g`,
+      style: {
+        fontFamily: PIXEL_FONT_FAMILY,
+        fontSize: 8,
+        fill: 0xffd700,
+      },
+    });
+    priceLabel.x = 4;
+    priceLabel.y = 2;
+
+    const priceContainer = new Container();
+    priceContainer.addChild(priceBg);
+    priceContainer.addChild(priceLabel);
+    priceContainer.x = 2;
+    priceContainer.y = CELL_SIZE - 18;
+    wrapper.addChild(priceContainer);
   }
 
   return wrapper;
@@ -346,6 +370,34 @@ export class Inventory {
 
   getItems(): InventoryItem[] {
     return this.items;
+  }
+
+  getGoldAmount(): number {
+    let total = 0;
+    for (const slot of this.items) {
+      if (slot.item && slot.item.type === "Gold") {
+        total += slot.item.amount;
+      }
+    }
+    return total;
+  }
+
+  deductGold(amount: number): boolean {
+    if (this.getGoldAmount() < amount) return false;
+    let remaining = amount;
+    for (let i = this.items.length - 1; i >= 0 && remaining > 0; i--) {
+      const slot = this.items[i];
+      if (!slot.item || slot.item.type !== "Gold") continue;
+      if (slot.item.amount <= remaining) {
+        remaining -= slot.item.amount;
+        this.removeItem(slot.id);
+      } else {
+        slot.item.amount -= remaining;
+        remaining = 0;
+        this.refreshItemVisual(slot);
+      }
+    }
+    return true;
   }
 
   private createItemVisual(slot: InventoryItem): Container {

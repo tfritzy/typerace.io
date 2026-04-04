@@ -3,9 +3,10 @@ import {
   Container,
   type FederatedPointerEvent,
 } from "pixi.js";
-import { Inventory, CELL_SIZE, buildItemCell } from "./Inventory";
+import { Inventory, buildItemCell } from "./Inventory";
 import type { InventoryItem } from "./Inventory";
 import type { AssetManager } from "./assetManager";
+import type { Item } from "./itemConfig";
 
 interface DragState {
   source: Inventory;
@@ -44,6 +45,11 @@ export class InventoryManager {
         this.startDrag(source, item, event);
       })
     );
+  }
+
+  unregister(inventory: Inventory): void {
+    const idx = this.inventories.indexOf(inventory);
+    if (idx >= 0) this.inventories.splice(idx, 1);
   }
 
   private startDrag(
@@ -100,8 +106,16 @@ export class InventoryManager {
       if (inv === source) {
         source.endItemDrag(itemId, col, row);
       } else if (slot.item) {
+        if (slot.item.price != null && slot.item.price > 0) {
+          if (!inv.deductGold(slot.item.price)) {
+            source.cancelItemDrag(itemId);
+            this.finishDrag(ghost);
+            return;
+          }
+        }
         source.removeItem(itemId);
-        inv.addItem(slot.item, col, row);
+        const purchased: Item = { type: slot.item.type, amount: slot.item.amount };
+        inv.addItem(purchased, col, row);
       }
 
       this.finishDrag(ghost);

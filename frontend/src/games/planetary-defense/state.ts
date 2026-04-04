@@ -1,7 +1,7 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import {
   type EntityType, ColorPreset,
-  COLOR_PRESET_COUNT, isShipEntityType,
+  isShipEntityType,
 } from "./types";
 import { randInt } from "./utils";
 import { getLanguageFromSlug } from "../../utils/modes";
@@ -148,11 +148,20 @@ export interface DamageData {
   killed: boolean;
 }
 
+export interface MerchantShipState {
+  id: number;
+  x: number;
+  y: number;
+  entityType: EntityType;
+  items: Item[];
+}
+
 export interface GameState {
   entities: EntityState[];
   relicSlots: RelicSlot[];
   projectiles: ProjectileState[];
   drops: DropState[];
+  merchants: MerchantShipState[];
   time: {
     time: number;
     deltaTime: number;
@@ -192,12 +201,87 @@ function createRelicSlots(): RelicSlot[] {
   return slots;
 }
 
-export function createGameState(): GameState {
+const MERCHANT_RELICS: RelicType[] = [
+  RelicType.RubyguardGreatsword,
+  RelicType.SunfireScimitar,
+  RelicType.GlacialCrusader,
+  RelicType.SporesparkGlaive,
+  RelicType.AzureCrescent,
+  RelicType.RosevineRapier,
+  RelicType.CrystalbreakSaber,
+  RelicType.CinderstoneBlade,
+  RelicType.CrimsonCleaver,
+  RelicType.TigerstripeFalchion,
+  RelicType.DawnfireCutlass,
+  RelicType.JadecrossBroadsword,
+  RelicType.ChainlinkEstoc,
+  RelicType.PermafrostGreatsword,
+  RelicType.MistralSabre,
+  RelicType.TidecallerBlade,
+  RelicType.SolarisEdge,
+  RelicType.InfernalRavager,
+  RelicType.ObsidianReaver,
+  RelicType.RubyflareGreataxe,
+  RelicType.GildedWaraxe,
+  RelicType.CopperheadCleaver,
+  RelicType.BonecrestAxe,
+  RelicType.DuskforgeHalberd,
+  RelicType.RosegoldBroadaxe,
+  RelicType.FrostbiteCleaver,
+  RelicType.BloodmoonReaver,
+  RelicType.TidebreakAxe,
+];
+
+function generateShopItems(count: number): Item[] {
+  const pool = [...MERCHANT_RELICS];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  const selected = pool.slice(0, count);
+  return selected.map((relicType) => ({
+    type: relicType,
+    amount: 1,
+    price: 10 + Math.floor(Math.random() * 40) * 5,
+  }));
+}
+
+export function createEntityState(
+  id: number,
+  entityType: EntityType,
+  x: number,
+  y: number,
+  overrides?: Partial<EntityState>
+): EntityState {
   return {
+    id,
+    entityType,
+    x,
+    y,
+    vx: 0,
+    vy: 0,
+    rotation: 0,
+    rotationSpeed: 0,
+    word: "",
+    typedCount: 0,
+    health: 1,
+    power: 0,
+    bleedStacks: 0,
+    bleedTimer: 0,
+    plasmaStacks: 0,
+    slowStacks: 0,
+    freezeStacks: 0,
+    ...overrides,
+  };
+}
+
+export function createGameState(): GameState {
+  const state: GameState = {
     entities: [],
     relicSlots: createRelicSlots(),
     projectiles: [],
     drops: [],
+    merchants: [],
     time: {
       time: 0,
       deltaTime: 0,
@@ -218,6 +302,16 @@ export function createGameState(): GameState {
     onWaveComplete: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
   };
+
+  state.merchants.push({
+    id: state.nextId++,
+    x: CANVAS_WIDTH - 250,
+    y: CANVAS_HEIGHT / 2,
+    entityType: "Clipper",
+    items: generateShopItems(6),
+  });
+
+  return state;
 }
 
 function spawnFromEdge(): { x: number; y: number } {
@@ -283,7 +377,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
   };
 
   if (isShip) {
-    entity.colorPreset = randInt(COLOR_PRESET_COUNT);
+    entity.colorPreset = ColorPreset.Preset4;
     entity.hasShield = Math.random() > 0.5;
   } else {
     entity.variant = randInt(16);

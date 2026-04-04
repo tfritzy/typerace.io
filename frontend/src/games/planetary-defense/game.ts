@@ -11,6 +11,7 @@ import { DamageNumberManager } from "./DamageNumberManager";
 import { DropManager } from "./DropManager";
 import { Inventory, CELL_SIZE, GRID_PADDING, BORDER_WIDTH } from "./Inventory";
 import { InventoryManager } from "./InventoryManager";
+import { MerchantManager } from "./MerchantManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, getRelicPosition, handleTypedCharacter as stateHandleTypedCharacter } from "./state";
 import type { GameState, RelicState } from "./state";
@@ -35,6 +36,7 @@ export class PlanetaryDefenseGame {
   private inventory!: Inventory;
   private weaponSlots: Inventory[] = [];
   private inventoryManager!: InventoryManager;
+  private merchantManager!: MerchantManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
@@ -78,6 +80,7 @@ export class PlanetaryDefenseGame {
 
   private buildScene(): void {
     const world = new Container();
+    world.eventMode = "static";
     this.app.stage.addChild(world);
 
     this.background = new Background(this.assetManager);
@@ -102,12 +105,19 @@ export class PlanetaryDefenseGame {
     this.dropManager = new DropManager();
     world.addChild(this.dropManager.layer);
 
+    this.merchantManager = new MerchantManager(this.assetManager);
+    world.addChild(this.merchantManager.layer);
+
     this.inventoryManager = new InventoryManager(this.app, this.assetManager);
 
     this.inventory = new Inventory(this.assetManager);
     world.addChild(this.inventory.container);
     this.inventory.populateTestData();
+    this.inventory.addToFirstEmpty({ type: "Gold", amount: 100 });
     this.inventoryManager.register(this.inventory);
+
+    this.merchantManager.setInventoryManager(this.inventoryManager);
+    this.merchantManager.init(this.state);
 
     this.buildWeaponSlots(world);
   }
@@ -169,6 +179,7 @@ export class PlanetaryDefenseGame {
     this.projectileManager.update(this.state);
     this.damageNumberManager.update(dt);
     this.dropManager.update(this.state);
+    this.merchantManager.update(this.state);
   }
 
   destroy(): void {
@@ -183,6 +194,7 @@ export class PlanetaryDefenseGame {
     this.damageNumberManager.destroy();
     this.dropManager.destroy();
     this.enemyManager.destroy();
+    this.merchantManager.destroy();
     this.inventory.destroy();
     for (const ws of this.weaponSlots) ws.destroy();
     this.weaponSlots = [];
