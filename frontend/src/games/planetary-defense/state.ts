@@ -153,7 +153,6 @@ export interface MerchantShipState {
   x: number;
   y: number;
   entityType: EntityType;
-  colorPreset: ColorPreset;
   items: Item[];
 }
 
@@ -309,7 +308,6 @@ export function createGameState(): GameState {
     x: CANVAS_WIDTH - 250,
     y: CANVAS_HEIGHT / 2,
     entityType: "Clipper",
-    colorPreset: ColorPreset.Preset3,
     items: generateShopItems(6),
   });
 

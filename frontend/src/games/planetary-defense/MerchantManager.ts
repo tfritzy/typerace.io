@@ -48,7 +48,7 @@ export class MerchantManager {
       merchant.entityType,
       merchant.x,
       merchant.y,
-      { vx: 1, colorPreset: merchant.colorPreset }
+      { vx: 1, colorPreset: ColorPreset.Preset3 }
     );
 
     const display = createShipContainer(this.assets, entity);
@@ -59,19 +59,6 @@ export class MerchantManager {
     display.on("pointerdown", () => {
       this.toggleShop(merchant);
     });
-
-    const label = new Text({
-      text: "Merchant",
-      style: {
-        fontFamily: PIXEL_FONT_FAMILY,
-        fontSize: 10,
-        fill: 0x66ff88,
-        stroke: { color: 0x000000, width: 3 },
-      },
-    });
-    label.anchor.set(0.5, 1);
-    label.y = -30;
-    display.addChild(label);
 
     this.layer.addChild(display);
     this.shipDisplays.set(merchant.id, display);
