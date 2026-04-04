@@ -76,6 +76,13 @@ function hslToHex(h: number, s: number, l: number): string {
     return `#${f(0)}${f(8)}${f(4)}`;
 }
 
+export function getDisplayColorHex(playerColorTag: string | undefined, isCurrentPlayer: boolean): string {
+    if (isCurrentPlayer) {
+        return getComputedStyle(document.documentElement).getPropertyValue('--accent-primary').trim();
+    }
+    return getPlayerColorHex(playerColorTag ?? '');
+}
+
 export function getPlayerAvatarColors(playerColorTag: string): string[] {
     const hex = getPlayerColorHex(playerColorTag);
     const [h] = hexToHsl(hex);
