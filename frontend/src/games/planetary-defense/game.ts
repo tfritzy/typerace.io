@@ -114,7 +114,7 @@ export class PlanetaryDefenseGame {
 
     this.state.onDropCollected.subscribe((drop) => {
       if (drop.category === DropCategory.Gold) {
-        this.inventory.addToFirstEmpty(ItemType.Gold, 0, drop.goldAmount);
+        this.inventory.addToFirstEmpty(ItemType.Gold, 0, drop.goldAmount ?? 0);
       } else if (drop.category === DropCategory.Gem && drop.gemType !== undefined) {
         this.inventory.addToFirstEmpty(ItemType.Gem, drop.gemType);
       }

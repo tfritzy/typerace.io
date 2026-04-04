@@ -95,7 +95,7 @@ export interface DropState {
   word: string;
   typedCount: number;
   category: DropCategory;
-  goldAmount: number;
+  goldAmount?: number;
   gemType?: GemType;
 }
 
@@ -155,7 +155,6 @@ export interface GameState {
   relicSlots: RelicSlot[];
   projectiles: ProjectileState[];
   drops: DropState[];
-  gold: number;
   time: {
     time: number;
     deltaTime: number;
@@ -202,7 +201,6 @@ export function createGameState(): GameState {
     relicSlots: createRelicSlots(),
     projectiles: [],
     drops: [],
-    gold: 0,
     time: {
       time: 0,
       deltaTime: 0,
@@ -342,9 +340,6 @@ function collectCompletedDrops(state: GameState): void {
   for (let i = state.drops.length - 1; i >= 0; i--) {
     const drop = state.drops[i];
     if (drop.typedCount >= drop.word.length) {
-      if (drop.category === DropCategory.Gold) {
-        state.gold += drop.goldAmount;
-      }
       state.onDropCollected.emit(drop);
       state.drops.splice(i, 1);
     }
@@ -375,7 +370,6 @@ function spawnDrops(state: GameState, entity: EntityState): void {
   if (gemResult) {
     spawnDrop(state, entity.x, entity.y, {
       category: DropCategory.Gem,
-      goldAmount: 0,
       gemType: gemResult,
     });
   }

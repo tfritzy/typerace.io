@@ -1,20 +1,11 @@
 import {
   Application,
   Container,
-  Graphics,
-  Sprite,
   type FederatedPointerEvent,
 } from "pixi.js";
-import { Inventory, ItemType, CELL_SIZE } from "./Inventory";
+import { Inventory, CELL_SIZE, buildItemCell } from "./Inventory";
 import type { InventoryItem } from "./Inventory";
-import { RELIC_DISPLAY, RelicType } from "./relicConfig";
-import { GEM_COLORS, GOLD_COLOR } from "./dropConfig";
-import type { GemType } from "./dropConfig";
 import type { AssetManager } from "./assetManager";
-
-const ITEM_BG_COLOR = 0x252545;
-const ITEM_BORDER_COLOR = 0x4a4a7e;
-const CELL_PADDING = 4;
 
 interface DragState {
   source: Inventory;
@@ -131,46 +122,8 @@ export class InventoryManager {
   }
 
   private createGhost(item: InventoryItem): Container {
-    const wrapper = new Container();
+    const wrapper = buildItemCell(item, this.assetManager);
     wrapper.alpha = 0.8;
-
-    const bg = new Graphics();
-    bg.roundRect(2, 2, CELL_SIZE - 4, CELL_SIZE - 4, 3);
-    bg.fill({ color: ITEM_BG_COLOR, alpha: 0.8 });
-    bg.stroke({ color: ITEM_BORDER_COLOR, width: 1 });
-    wrapper.addChild(bg);
-
-    if (item.type === ItemType.Relic) {
-      const display = RELIC_DISPLAY[item.subType as RelicType];
-      const texture = this.assetManager.getRelicTexture(
-        display.spriteSheet,
-        display.frameName
-      );
-      texture.source.scaleMode = "nearest";
-      const sprite = new Sprite(texture);
-      sprite.anchor.set(0.5);
-
-      const spriteSize = CELL_SIZE - CELL_PADDING * 2;
-      sprite.width = spriteSize;
-      sprite.height = spriteSize;
-      sprite.x = CELL_SIZE / 2;
-      sprite.y = CELL_SIZE / 2;
-      wrapper.addChild(sprite);
-    } else if (item.type === ItemType.Gold) {
-      const s = 20;
-      const gfx = new Graphics();
-      gfx.rect(CELL_SIZE / 2 - s / 2, CELL_SIZE / 2 - s / 2, s, s);
-      gfx.fill({ color: GOLD_COLOR });
-      wrapper.addChild(gfx);
-    } else if (item.type === ItemType.Gem) {
-      const gemColor = GEM_COLORS[item.subType as GemType];
-      const s = 20;
-      const gfx = new Graphics();
-      gfx.rect(CELL_SIZE / 2 - s / 2, CELL_SIZE / 2 - s / 2, s, s);
-      gfx.fill({ color: gemColor });
-      wrapper.addChild(gfx);
-    }
-
     return wrapper;
   }
 

@@ -23,10 +23,11 @@ const BG_ALPHA = 0.92;
 const BORDER_COLOR = 0x8b7355;
 const CELL_LINE_COLOR = 0x2a2a3e;
 const CELL_BG_COLOR = 0x15152a;
-const ITEM_BG_COLOR = 0x252545;
-const ITEM_BORDER_COLOR = 0x4a4a7e;
+export const ITEM_BG_COLOR = 0x252545;
+export const ITEM_BORDER_COLOR = 0x4a4a7e;
 const VALID_COLOR = 0x4ade80;
 const INVALID_COLOR = 0xef4444;
+const ITEM_ICON_SIZE = 20;
 
 export enum ItemType {
   Relic,
@@ -62,6 +63,66 @@ function createEvent<T>() {
     },
     emit: (data: T) => listeners.forEach((fn) => fn(data)),
   };
+}
+
+export function buildItemCell(item: InventoryItem, assetManager: AssetManager): Container {
+  const wrapper = new Container();
+
+  const bg = new Graphics();
+  bg.roundRect(2, 2, CELL_SIZE - 4, CELL_SIZE - 4, 3);
+  bg.fill({ color: ITEM_BG_COLOR, alpha: 0.8 });
+  bg.stroke({ color: ITEM_BORDER_COLOR, width: 1 });
+  wrapper.addChild(bg);
+
+  const cx = CELL_SIZE / 2;
+  const cy = CELL_SIZE / 2;
+
+  if (item.type === ItemType.Relic) {
+    const display = RELIC_DISPLAY[item.subType as RelicType];
+    const texture = assetManager.getRelicTexture(
+      display.spriteSheet,
+      display.frameName
+    );
+    texture.source.scaleMode = "nearest";
+    const sprite = new Sprite(texture);
+    sprite.anchor.set(0.5);
+
+    const spriteSize = CELL_SIZE - CELL_PADDING * 2;
+    sprite.width = spriteSize;
+    sprite.height = spriteSize;
+    sprite.x = cx;
+    sprite.y = cy;
+    wrapper.addChild(sprite);
+  } else if (item.type === ItemType.Gold) {
+    const gfx = new Graphics();
+    gfx.rect(cx - ITEM_ICON_SIZE / 2, cy - ITEM_ICON_SIZE / 2, ITEM_ICON_SIZE, ITEM_ICON_SIZE);
+    gfx.fill({ color: GOLD_COLOR });
+    wrapper.addChild(gfx);
+
+    if (item.amount > 1) {
+      const label = new Text({
+        text: `${item.amount}`,
+        style: {
+          fontFamily: PIXEL_FONT_FAMILY,
+          fontSize: 10,
+          fill: 0xffffff,
+          stroke: { color: 0x000000, width: 2 },
+        },
+      });
+      label.anchor.set(0.5);
+      label.x = cx;
+      label.y = cy + ITEM_ICON_SIZE / 2 + 8;
+      wrapper.addChild(label);
+    }
+  } else if (item.type === ItemType.Gem) {
+    const gemColor = GEM_COLORS[item.subType as GemType];
+    const gfx = new Graphics();
+    gfx.rect(cx - ITEM_ICON_SIZE / 2, cy - ITEM_ICON_SIZE / 2, ITEM_ICON_SIZE, ITEM_ICON_SIZE);
+    gfx.fill({ color: gemColor });
+    wrapper.addChild(gfx);
+  }
+
+  return wrapper;
 }
 
 export class Inventory {
@@ -303,66 +364,9 @@ export class Inventory {
   }
 
   private createItemVisual(item: InventoryItem): Container {
-    const wrapper = new Container();
+    const wrapper = buildItemCell(item, this.assetManager);
     wrapper.eventMode = "static";
     wrapper.cursor = "grab";
-
-    const bg = new Graphics();
-    bg.roundRect(2, 2, CELL_SIZE - 4, CELL_SIZE - 4, 3);
-    bg.fill({ color: ITEM_BG_COLOR, alpha: 0.8 });
-    bg.stroke({ color: ITEM_BORDER_COLOR, width: 1 });
-    wrapper.addChild(bg);
-
-    if (item.type === ItemType.Relic) {
-      const display = RELIC_DISPLAY[item.subType as RelicType];
-      const texture = this.assetManager.getRelicTexture(
-        display.spriteSheet,
-        display.frameName
-      );
-      texture.source.scaleMode = "nearest";
-      const sprite = new Sprite(texture);
-      sprite.anchor.set(0.5);
-
-      const spriteSize = CELL_SIZE - CELL_PADDING * 2;
-      sprite.width = spriteSize;
-      sprite.height = spriteSize;
-      sprite.x = CELL_SIZE / 2;
-      sprite.y = CELL_SIZE / 2;
-      wrapper.addChild(sprite);
-    } else if (item.type === ItemType.Gold) {
-      const s = 20;
-      const cx = CELL_SIZE / 2;
-      const cy = CELL_SIZE / 2;
-      const gfx = new Graphics();
-      gfx.rect(cx - s / 2, cy - s / 2, s, s);
-      gfx.fill({ color: GOLD_COLOR });
-      wrapper.addChild(gfx);
-
-      if (item.amount > 1) {
-        const label = new Text({
-          text: `${item.amount}`,
-          style: {
-            fontFamily: PIXEL_FONT_FAMILY,
-            fontSize: 10,
-            fill: 0xffffff,
-            stroke: { color: 0x000000, width: 2 },
-          },
-        });
-        label.anchor.set(0.5);
-        label.x = cx;
-        label.y = cy + s / 2 + 8;
-        wrapper.addChild(label);
-      }
-    } else if (item.type === ItemType.Gem) {
-      const gemColor = GEM_COLORS[item.subType as GemType];
-      const s = 20;
-      const cx = CELL_SIZE / 2;
-      const cy = CELL_SIZE / 2;
-      const gfx = new Graphics();
-      gfx.rect(cx - s / 2, cy - s / 2, s, s);
-      gfx.fill({ color: gemColor });
-      wrapper.addChild(gfx);
-    }
 
     wrapper.on("pointerdown", (e: FederatedPointerEvent) => {
       this.onDragStart.emit({ inventory: this, item, event: e });

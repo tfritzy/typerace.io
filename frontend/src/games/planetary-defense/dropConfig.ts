@@ -39,24 +39,6 @@ export const GEM_COLORS: Record<GemType, number> = {
   [GemType.PerfectEmerald]: 0x10b981,
 };
 
-export const GEM_NAMES: Record<GemType, string> = {
-  [GemType.ChippedTopaz]: "Chipped Topaz",
-  [GemType.FlawedTopaz]: "Flawed Topaz",
-  [GemType.Topaz]: "Topaz",
-  [GemType.FlawlessTopaz]: "Flawless Topaz",
-  [GemType.PerfectTopaz]: "Perfect Topaz",
-  [GemType.ChippedRuby]: "Chipped Ruby",
-  [GemType.FlawedRuby]: "Flawed Ruby",
-  [GemType.Ruby]: "Ruby",
-  [GemType.FlawlessRuby]: "Flawless Ruby",
-  [GemType.PerfectRuby]: "Perfect Ruby",
-  [GemType.ChippedEmerald]: "Chipped Emerald",
-  [GemType.FlawedEmerald]: "Flawed Emerald",
-  [GemType.Emerald]: "Emerald",
-  [GemType.FlawlessEmerald]: "Flawless Emerald",
-  [GemType.PerfectEmerald]: "Perfect Emerald",
-};
-
 export const GOLD_COLOR = 0xfbbf24;
 export const DROP_LABEL_COLOR = "#b0b0b0";
 
