@@ -241,8 +241,12 @@ const MERCHANT_RELICS: RelicType[] = [
 ];
 
 function generateMerchantItems(count: number): MerchantItem[] {
-  const shuffled = [...MERCHANT_RELICS].sort(() => Math.random() - 0.5);
-  const selected = shuffled.slice(0, count);
+  const pool = [...MERCHANT_RELICS];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  const selected = pool.slice(0, count);
   return selected.map((relicType) => ({
     item: { type: relicType, amount: 1 },
     price: 10 + Math.floor(Math.random() * 40) * 5,

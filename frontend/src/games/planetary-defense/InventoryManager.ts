@@ -146,26 +146,23 @@ export class InventoryManager {
           source.cancelItemDrag(itemId);
           this.finishDrag(ghost);
           return;
-        }
-        if (this.isMerchantSource(source)) {
+        } else if (this.isMerchantSource(source)) {
           const price = this.getMerchantPrice(slot);
-          if (price !== null && this.merchantCtx) {
-            if (this.merchantCtx.state.gold < price) {
-              source.cancelItemDrag(itemId);
-              this.finishDrag(ghost);
-              return;
-            }
-            this.merchantCtx.state.gold -= price;
-            const itemIndex = this.merchantCtx.merchant.items.findIndex(
-              (mi: MerchantItem) => mi.item.type === slot.item!.type
-            );
-            if (itemIndex >= 0) {
-              this.merchantCtx.merchant.items.splice(itemIndex, 1);
-            }
-            source.removeItem(itemId);
-            inv.addItem(slot.item, col, row);
-            this.merchantCtx.onPurchase();
+          if (price === null || !this.merchantCtx || this.merchantCtx.state.gold < price) {
+            source.cancelItemDrag(itemId);
+            this.finishDrag(ghost);
+            return;
           }
+          this.merchantCtx.state.gold -= price;
+          const itemIndex = this.merchantCtx.merchant.items.findIndex(
+            (mi: MerchantItem) => mi.item.type === slot.item!.type
+          );
+          if (itemIndex >= 0) {
+            this.merchantCtx.merchant.items.splice(itemIndex, 1);
+          }
+          source.removeItem(itemId);
+          inv.addItem(slot.item, col, row);
+          this.merchantCtx.onPurchase();
         } else {
           source.removeItem(itemId);
           inv.addItem(slot.item, col, row);

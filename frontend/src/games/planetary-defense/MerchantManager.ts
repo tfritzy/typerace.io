@@ -1,4 +1,4 @@
-import { Container, Graphics, Text } from "pixi.js";
+import { Container, Circle, Graphics, Text } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, MerchantShipState } from "./state";
 import { createShipContainer } from "./prefabs/shipPrefab";
@@ -73,7 +73,7 @@ export class MerchantManager {
     const display = createShipContainer(this.assets, fakeEntity, true);
     display.eventMode = "static";
     display.cursor = "pointer";
-    display.hitArea = { contains: (x: number, y: number) => x * x + y * y < CLICK_RADIUS * CLICK_RADIUS };
+    display.hitArea = new Circle(0, 0, CLICK_RADIUS);
 
     display.on("pointerdown", () => {
       this.toggleShop(merchant);
