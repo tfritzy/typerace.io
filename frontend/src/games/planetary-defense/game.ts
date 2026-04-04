@@ -14,7 +14,7 @@ import { InventoryManager } from "./InventoryManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, getRelicPosition } from "./state";
 import type { GameState, RelicState } from "./state";
-import { ItemType, isRelic, toRelicType, fromRelicType } from "./dropConfig";
+import { isRelic } from "./itemConfig";
 import { RELIC_SLOT_COUNT, RelicType } from "./relicConfig";
 
 export type { LabelData };
@@ -113,7 +113,7 @@ export class PlanetaryDefenseGame {
     this.buildWeaponSlots(world);
 
     this.state.onDropCollected.subscribe((drop) => {
-      this.inventory.addToFirstEmpty(drop.itemType, drop.amount);
+      this.inventory.addToFirstEmpty({ type: drop.itemType, amount: drop.amount });
     });
   }
 
@@ -130,14 +130,14 @@ export class PlanetaryDefenseGame {
       });
 
       if (slot.relic) {
-        weaponSlot.addItem(fromRelicType(slot.relic.type), 0, 0);
+        weaponSlot.addItem({ type: slot.relic.type, amount: 1 }, 0, 0);
       }
 
       const slotIndex = i;
-      weaponSlot.onItemAdded.subscribe((item) => {
-        if (!isRelic(item.type)) return;
+      weaponSlot.onItemAdded.subscribe((invItem) => {
+        if (!invItem.item || !isRelic(invItem.item.type)) return;
         const relic: RelicState = {
-          type: toRelicType(item.type),
+          type: invItem.item.type as RelicType,
           level: 1,
           charge: 0,
           remainingShots: 0,

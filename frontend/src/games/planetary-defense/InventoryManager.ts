@@ -10,7 +10,7 @@ import type { AssetManager } from "./assetManager";
 interface DragState {
   source: Inventory;
   itemId: number;
-  item: InventoryItem;
+  slot: InventoryItem;
   originalCol: number;
   originalRow: number;
   ghost: Container;
@@ -48,25 +48,26 @@ export class InventoryManager {
 
   private startDrag(
     source: Inventory,
-    item: InventoryItem,
+    slot: InventoryItem,
     e: FederatedPointerEvent
   ): void {
     if (this.dragState) return;
+    if (!slot.item) return;
 
-    const itemGlobal = source.getItemGlobalPosition(item);
-    source.beginItemDrag(item.id);
+    const itemGlobal = source.getItemGlobalPosition(slot);
+    source.beginItemDrag(slot.id);
 
-    const ghost = this.createGhost(item);
+    const ghost = this.createGhost(slot);
     ghost.x = itemGlobal.x;
     ghost.y = itemGlobal.y;
     this.app.stage.addChild(ghost);
 
     this.dragState = {
       source,
-      itemId: item.id,
-      item,
-      originalCol: item.gridX,
-      originalRow: item.gridY,
+      itemId: slot.id,
+      slot,
+      originalCol: slot.gridX,
+      originalRow: slot.gridY,
       ghost,
       offsetX: e.global.x - itemGlobal.x,
       offsetY: e.global.y - itemGlobal.y,
@@ -88,8 +89,7 @@ export class InventoryManager {
   private onPointerUp = (e: FederatedPointerEvent): void => {
     if (!this.dragState) return;
 
-    const { source, itemId, item, ghost } =
-      this.dragState;
+    const { source, itemId, slot, ghost } = this.dragState;
 
     for (let i = this.inventories.length - 1; i >= 0; i--) {
       const inv = this.inventories[i];
@@ -99,9 +99,9 @@ export class InventoryManager {
 
       if (inv === source) {
         source.endItemDrag(itemId, col, row);
-      } else {
+      } else if (slot.item) {
         source.removeItem(itemId);
-        inv.addItem(item.type, col, row, item.amount);
+        inv.addItem(slot.item, col, row);
       }
 
       this.finishDrag(ghost);
@@ -121,8 +121,9 @@ export class InventoryManager {
     }
   }
 
-  private createGhost(item: InventoryItem): Container {
-    const wrapper = buildItemCell(item, this.assetManager);
+  private createGhost(slot: InventoryItem): Container {
+    if (!slot.item) return new Container();
+    const wrapper = buildItemCell(slot.item, this.assetManager);
     wrapper.alpha = 0.8;
     return wrapper;
   }

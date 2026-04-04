@@ -15,8 +15,8 @@ import {
 } from "./relicConfig";
 import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
+import { type ItemType } from "./itemConfig";
 import {
-  ItemType,
   DROP_SPEED,
   calculateGoldDrop,
   rollGemDrop,
@@ -358,7 +358,7 @@ function destroyEntity(
 
 function spawnDrops(state: GameState, entity: EntityState): void {
   const goldAmount = calculateGoldDrop(entity.power);
-  spawnDrop(state, entity.x, entity.y, ItemType.Gold, goldAmount);
+  spawnDrop(state, entity.x, entity.y, "Gold", goldAmount);
 
   const gemType = rollGemDrop(entity.power);
   if (gemType !== null) {

@@ -1,6 +1,6 @@
 import { Container, Graphics } from "pixi.js";
 import type { GameState, DropState } from "./state";
-import { ItemType, isGem, GEM_COLORS, GOLD_COLOR, DROP_LABEL_COLOR, DROP_SIZE } from "./dropConfig";
+import { DROP_LABEL_COLOR, DROP_SIZE } from "./dropConfig";
 import type { LabelData } from "./EnemyManager";
 
 export class DropManager {
@@ -48,21 +48,10 @@ export class DropManager {
     }
   }
 
-  private createDropVisual(drop: DropState): Graphics {
+  private createDropVisual(_drop: DropState): Graphics {
     const g = new Graphics();
-
-    let color: number;
-    if (drop.itemType === ItemType.Gold) {
-      color = GOLD_COLOR;
-    } else if (isGem(drop.itemType)) {
-      color = GEM_COLORS[drop.itemType] ?? 0xffffff;
-    } else {
-      color = 0xffffff;
-    }
-
     g.rect(-DROP_SIZE / 2, -DROP_SIZE / 2, DROP_SIZE, DROP_SIZE);
-    g.fill({ color });
-
+    g.fill({ color: 0xffffff });
     return g;
   }
 
