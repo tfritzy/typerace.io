@@ -12,7 +12,7 @@ import { DropManager } from "./DropManager";
 import { Inventory, CELL_SIZE, GRID_PADDING, BORDER_WIDTH } from "./Inventory";
 import { InventoryManager } from "./InventoryManager";
 import { AssetManager } from "./assetManager";
-import { createGameState, updateState, getRelicPosition } from "./state";
+import { createGameState, updateState, getRelicPosition, handleTypedCharacter as stateHandleTypedCharacter } from "./state";
 import type { GameState, RelicState } from "./state";
 import { isRelic } from "./itemConfig";
 import { RELIC_SLOT_COUNT, RelicType } from "./relicConfig";
@@ -111,10 +111,6 @@ export class PlanetaryDefenseGame {
     this.inventoryManager.register(this.inventory);
 
     this.buildWeaponSlots(world);
-
-    this.state.onDropCollected.subscribe((drop) => {
-      this.inventory.addToFirstEmpty({ type: drop.itemType, amount: drop.amount });
-    });
   }
 
   private buildWeaponSlots(world: Container): void {
@@ -153,6 +149,13 @@ export class PlanetaryDefenseGame {
       world.addChild(weaponSlot.container);
       this.weaponSlots.push(weaponSlot);
       this.inventoryManager.register(weaponSlot);
+    }
+  }
+
+  handleTypedCharacter(key: string): void {
+    const collected = stateHandleTypedCharacter(this.state, key);
+    for (const item of collected) {
+      this.inventory.addToFirstEmpty(item);
     }
   }
 

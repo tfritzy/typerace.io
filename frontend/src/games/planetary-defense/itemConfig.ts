@@ -1,4 +1,4 @@
-import { RelicType, RELIC_DISPLAY, type RelicDisplayInfo } from "./relicConfig";
+import { RelicType, RELIC_DISPLAY } from "./relicConfig";
 
 export enum GemType {
   ChippedTopaz = "ChippedTopaz",
@@ -22,8 +22,6 @@ export type ItemType = RelicType | GemType | "Gold";
 
 export interface ItemConfig {
   stackable: boolean;
-  spriteSheet: "swordtember" | "axetober";
-  frameName: string;
 }
 
 export interface Item {
@@ -31,7 +29,26 @@ export interface Item {
   amount: number;
 }
 
-const GEM_PLACEHOLDER_SPRITES: Record<GemType, RelicDisplayInfo> = {
+const RELIC_VALUES = new Set<ItemType>(
+  Object.values(RelicType).filter((v) => typeof v === "number") as RelicType[]
+);
+
+const GEM_VALUES = new Set<ItemType>(Object.values(GemType));
+
+export function isRelic(type: ItemType): type is RelicType {
+  return RELIC_VALUES.has(type);
+}
+
+export function isGem(type: ItemType): type is GemType {
+  return GEM_VALUES.has(type);
+}
+
+export interface ItemDisplay {
+  spriteSheet: "swordtember" | "axetober";
+  frameName: string;
+}
+
+const GEM_PLACEHOLDER_SPRITES: Record<GemType, ItemDisplay> = {
   [GemType.ChippedTopaz]: { spriteSheet: "swordtember", frameName: "Sunfire Scimitar" },
   [GemType.FlawedTopaz]: { spriteSheet: "swordtember", frameName: "Sunfire Scimitar" },
   [GemType.Topaz]: { spriteSheet: "swordtember", frameName: "Sunfire Scimitar" },
@@ -49,48 +66,49 @@ const GEM_PLACEHOLDER_SPRITES: Record<GemType, RelicDisplayInfo> = {
   [GemType.PerfectEmerald]: { spriteSheet: "swordtember", frameName: "Emerald Fang" },
 };
 
-const GOLD_SPRITE: RelicDisplayInfo = { spriteSheet: "axetober", frameName: "Gilded Waraxe" };
+const GOLD_DISPLAY: ItemDisplay = { spriteSheet: "axetober", frameName: "Gilded Waraxe" };
 
-function buildItemConfigs(): Record<ItemType, ItemConfig> {
-  const configs = {} as Record<ItemType, ItemConfig>;
+function buildItemDisplay(): Map<ItemType, ItemDisplay> {
+  const display = new Map<ItemType, ItemDisplay>();
 
-  for (const key of Object.values(RelicType).filter((v) => typeof v === "number") as RelicType[]) {
-    const display = RELIC_DISPLAY[key];
-    configs[key] = {
-      stackable: false,
-      spriteSheet: display.spriteSheet,
-      frameName: display.frameName,
-    };
+  for (const key of RELIC_VALUES) {
+    const rd = RELIC_DISPLAY[key as RelicType];
+    display.set(key, { spriteSheet: rd.spriteSheet, frameName: rd.frameName });
   }
 
   for (const gem of Object.values(GemType)) {
-    const display = GEM_PLACEHOLDER_SPRITES[gem];
-    configs[gem] = {
-      stackable: false,
-      spriteSheet: display.spriteSheet,
-      frameName: display.frameName,
-    };
+    display.set(gem, GEM_PLACEHOLDER_SPRITES[gem]);
   }
 
-  configs["Gold"] = {
-    stackable: true,
-    spriteSheet: GOLD_SPRITE.spriteSheet,
-    frameName: GOLD_SPRITE.frameName,
-  };
+  display.set("Gold", GOLD_DISPLAY);
+
+  return display;
+}
+
+export const ITEM_DISPLAY: Map<ItemType, ItemDisplay> = buildItemDisplay();
+
+export function getItemDisplay(type: ItemType): ItemDisplay {
+  return ITEM_DISPLAY.get(type) ?? GOLD_DISPLAY;
+}
+
+function buildItemConfigs(): Map<ItemType, ItemConfig> {
+  const configs = new Map<ItemType, ItemConfig>();
+
+  for (const key of RELIC_VALUES) {
+    configs.set(key, { stackable: false });
+  }
+
+  for (const gem of Object.values(GemType)) {
+    configs.set(gem, { stackable: false });
+  }
+
+  configs.set("Gold", { stackable: true });
 
   return configs;
 }
 
-export const ITEM_CONFIGS: Record<ItemType, ItemConfig> = buildItemConfigs();
+export const ITEM_CONFIGS: Map<ItemType, ItemConfig> = buildItemConfigs();
 
 export function getItemConfig(type: ItemType): ItemConfig {
-  return ITEM_CONFIGS[type];
-}
-
-export function isRelic(type: ItemType): type is RelicType {
-  return typeof type === "number";
-}
-
-export function isGem(type: ItemType): type is GemType {
-  return typeof type === "string" && type !== "Gold";
+  return ITEM_CONFIGS.get(type) ?? { stackable: false };
 }

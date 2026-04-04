@@ -6,7 +6,7 @@ import {
   type FederatedPointerEvent,
 } from "pixi.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
-import { type Item, type ItemType, getItemConfig } from "./itemConfig";
+import { type Item, type ItemType, getItemConfig, getItemDisplay } from "./itemConfig";
 import { RelicType } from "./relicConfig";
 import type { AssetManager } from "./assetManager";
 
@@ -68,7 +68,8 @@ export function buildItemCell(item: Item, assetManager: AssetManager): Container
   const cy = CELL_SIZE / 2;
 
   const config = getItemConfig(item.type);
-  const texture = assetManager.getRelicTexture(config.spriteSheet, config.frameName);
+  const display = getItemDisplay(item.type);
+  const texture = assetManager.getRelicTexture(display.spriteSheet, display.frameName);
   texture.source.scaleMode = "nearest";
   const sprite = new Sprite(texture);
   sprite.anchor.set(0.5);

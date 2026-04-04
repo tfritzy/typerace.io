@@ -15,7 +15,7 @@ import {
 } from "./relicConfig";
 import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
-import { type ItemType } from "./itemConfig";
+import { type Item } from "./itemConfig";
 import {
   DROP_SPEED,
   calculateGoldDrop,
@@ -92,8 +92,7 @@ export interface DropState {
   vy: number;
   word: string;
   typedCount: number;
-  itemType: ItemType;
-  amount: number;
+  item: Item;
 }
 
 export enum WavePhase {
@@ -165,7 +164,6 @@ export interface GameState {
   onRelicFired: GameEvent;
   onWaveComplete: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
-  onDropCollected: GameDataEvent<DropState>;
 }
 
 function createRelicSlots(): RelicSlot[] {
@@ -217,7 +215,6 @@ export function createGameState(): GameState {
     onRelicFired: new GameEvent(),
     onWaveComplete: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
-    onDropCollected: new GameDataEvent<DropState>(),
   };
 }
 
@@ -333,14 +330,16 @@ function applyTypedCharacterToDrops(drops: DropState[], key: string): void {
   }
 }
 
-function collectCompletedDrops(state: GameState): void {
+function collectCompletedDrops(state: GameState): Item[] {
+  const collected: Item[] = [];
   for (let i = state.drops.length - 1; i >= 0; i--) {
     const drop = state.drops[i];
     if (drop.typedCount >= drop.word.length) {
-      state.onDropCollected.emit(drop);
+      collected.push(drop.item);
       state.drops.splice(i, 1);
     }
   }
+  return collected;
 }
 
 function destroyEntity(
@@ -358,11 +357,11 @@ function destroyEntity(
 
 function spawnDrops(state: GameState, entity: EntityState): void {
   const goldAmount = calculateGoldDrop(entity.power);
-  spawnDrop(state, entity.x, entity.y, "Gold", goldAmount);
+  spawnDrop(state, entity.x, entity.y, { type: "Gold", amount: goldAmount });
 
   const gemType = rollGemDrop(entity.power);
   if (gemType !== null) {
-    spawnDrop(state, entity.x, entity.y, gemType, 1);
+    spawnDrop(state, entity.x, entity.y, { type: gemType, amount: 1 });
   }
 }
 
@@ -370,8 +369,7 @@ function spawnDrop(
   state: GameState,
   x: number,
   y: number,
-  itemType: ItemType,
-  amount: number
+  item: Item
 ): void {
   const angle = Math.random() * Math.PI * 2;
   const speed = DROP_SPEED * (0.5 + Math.random() * 0.5);
@@ -389,19 +387,19 @@ function spawnDrop(
     vy: Math.sin(angle) * speed,
     word,
     typedCount: 0,
-    itemType,
-    amount,
+    item,
   });
 }
 
-export function handleTypedCharacter(state: GameState, key: string): void {
-  if (key.length !== 1) return;
+export function handleTypedCharacter(state: GameState, key: string): Item[] {
+  if (key.length !== 1) return [];
   const normalizedKey = key.toLowerCase();
   applyTypedCharacter(state.entities, normalizedKey);
   applyTypedCharacterToDrops(state.drops, normalizedKey);
   rerollCompletedWords(state);
-  collectCompletedDrops(state);
+  const collected = collectCompletedDrops(state);
   chargeRelics(state);
+  return collected;
 }
 
 function findTypedTarget(

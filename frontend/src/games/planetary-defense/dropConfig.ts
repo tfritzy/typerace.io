@@ -29,13 +29,15 @@ const EMERALD_TIERS: GemType[] = [
   GemType.FlawlessEmerald,
   GemType.PerfectEmerald,
 ];
-const GEM_FAMILIES = [TOPAZ_TIERS, RUBY_TIERS, EMERALD_TIERS];
 
 export function rollGemDrop(power: number): GemType | null {
   const gemChance = Math.min(0.5, 0.05 + power / 10000);
   if (Math.random() >= gemChance) return null;
 
-  const family = GEM_FAMILIES[Math.floor(Math.random() * GEM_FAMILIES.length)];
+  const availableFamilies: GemType[][] = [TOPAZ_TIERS];
+  if (power >= 100) availableFamilies.push(RUBY_TIERS);
+  if (power >= 500) availableFamilies.push(EMERALD_TIERS);
+  const family = availableFamilies[Math.floor(Math.random() * availableFamilies.length)];
 
   let quality: number;
   if (power >= 10000) quality = 4;

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
-import { handleTypedCharacter, startNextWave } from "./state";
+import { startNextWave } from "./state";
 import { LabelOverlay } from "./LabelOverlay";
 
 const PIXEL_FONT = "'Press Start 2P', monospace";
@@ -112,7 +112,7 @@ export const GameCanvas = () => {
       if (!game) return;
       if (e.ctrlKey || e.altKey || e.metaKey) return;
       if (e.key.length !== 1) return;
-      handleTypedCharacter(game.state, e.key);
+      game.handleTypedCharacter(e.key);
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
