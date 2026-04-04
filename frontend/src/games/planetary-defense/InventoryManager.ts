@@ -101,7 +101,7 @@ export class InventoryManager {
         source.endItemDrag(itemId, col, row);
       } else {
         source.removeItem(itemId);
-        inv.addItem(item.type, item.subType, col, row, item.amount);
+        inv.addItem(item.type, col, row, item.amount);
       }
 
       this.finishDrag(ghost);

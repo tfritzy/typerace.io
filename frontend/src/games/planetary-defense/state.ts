@@ -16,13 +16,11 @@ import {
 import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
 import {
-  DropCategory,
+  ItemType,
   DROP_SPEED,
-  DROP_FRICTION,
   calculateGoldDrop,
   rollGemDrop,
 } from "./dropConfig";
-import type { GemType } from "./dropConfig";
 
 export const PLANET_X = CANVAS_WIDTH / 2;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -94,9 +92,8 @@ export interface DropState {
   vy: number;
   word: string;
   typedCount: number;
-  category: DropCategory;
-  goldAmount?: number;
-  gemType?: GemType;
+  itemType: ItemType;
+  amount: number;
 }
 
 export enum WavePhase {
@@ -361,17 +358,11 @@ function destroyEntity(
 
 function spawnDrops(state: GameState, entity: EntityState): void {
   const goldAmount = calculateGoldDrop(entity.power);
-  spawnDrop(state, entity.x, entity.y, {
-    category: DropCategory.Gold,
-    goldAmount,
-  });
+  spawnDrop(state, entity.x, entity.y, ItemType.Gold, goldAmount);
 
-  const gemResult = rollGemDrop(entity.power);
-  if (gemResult) {
-    spawnDrop(state, entity.x, entity.y, {
-      category: DropCategory.Gem,
-      gemType: gemResult,
-    });
+  const gemType = rollGemDrop(entity.power);
+  if (gemType !== null) {
+    spawnDrop(state, entity.x, entity.y, gemType, 1);
   }
 }
 
@@ -379,7 +370,8 @@ function spawnDrop(
   state: GameState,
   x: number,
   y: number,
-  dropInfo: Omit<DropState, "id" | "x" | "y" | "vx" | "vy" | "word" | "typedCount">
+  itemType: ItemType,
+  amount: number
 ): void {
   const angle = Math.random() * Math.PI * 2;
   const speed = DROP_SPEED * (0.5 + Math.random() * 0.5);
@@ -397,7 +389,8 @@ function spawnDrop(
     vy: Math.sin(angle) * speed,
     word,
     typedCount: 0,
-    ...dropInfo,
+    itemType,
+    amount,
   });
 }
 
@@ -626,9 +619,6 @@ export function updateState(state: GameState, dt: number): void {
   for (const d of state.drops) {
     d.x += d.vx * state.time.deltaTime;
     d.y += d.vy * state.time.deltaTime;
-    const friction = Math.max(0, 1 - DROP_FRICTION * state.time.deltaTime);
-    d.vx *= friction;
-    d.vy *= friction;
   }
 
   for (let i = state.drops.length - 1; i >= 0; i--) {

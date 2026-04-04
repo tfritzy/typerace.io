@@ -9,12 +9,12 @@ import { RelicManager } from "./RelicManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { DamageNumberManager } from "./DamageNumberManager";
 import { DropManager } from "./DropManager";
-import { Inventory, ItemType, CELL_SIZE, GRID_PADDING, BORDER_WIDTH } from "./Inventory";
+import { Inventory, CELL_SIZE, GRID_PADDING, BORDER_WIDTH } from "./Inventory";
 import { InventoryManager } from "./InventoryManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, getRelicPosition } from "./state";
 import type { GameState, RelicState } from "./state";
-import { DropCategory } from "./dropConfig";
+import { ItemType, isRelic, toRelicType, fromRelicType } from "./dropConfig";
 import { RELIC_SLOT_COUNT, RelicType } from "./relicConfig";
 
 export type { LabelData };
@@ -113,11 +113,7 @@ export class PlanetaryDefenseGame {
     this.buildWeaponSlots(world);
 
     this.state.onDropCollected.subscribe((drop) => {
-      if (drop.category === DropCategory.Gold) {
-        this.inventory.addToFirstEmpty(ItemType.Gold, 0, drop.goldAmount ?? 0);
-      } else if (drop.category === DropCategory.Gem && drop.gemType !== undefined) {
-        this.inventory.addToFirstEmpty(ItemType.Gem, drop.gemType);
-      }
+      this.inventory.addToFirstEmpty(drop.itemType, drop.amount);
     });
   }
 
@@ -134,14 +130,14 @@ export class PlanetaryDefenseGame {
       });
 
       if (slot.relic) {
-        weaponSlot.addItem(ItemType.Relic, slot.relic.type, 0, 0);
+        weaponSlot.addItem(fromRelicType(slot.relic.type), 0, 0);
       }
 
       const slotIndex = i;
       weaponSlot.onItemAdded.subscribe((item) => {
-        if (item.type !== ItemType.Relic) return;
+        if (!isRelic(item.type)) return;
         const relic: RelicState = {
-          type: item.subType as RelicType,
+          type: toRelicType(item.type),
           level: 1,
           charge: 0,
           remainingShots: 0,

@@ -6,9 +6,8 @@ import {
   type FederatedPointerEvent,
 } from "pixi.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
-import { RelicType, RELIC_DISPLAY } from "./relicConfig";
-import { GEM_COLORS, GOLD_COLOR } from "./dropConfig";
-import type { GemType } from "./dropConfig";
+import { RELIC_DISPLAY } from "./relicConfig";
+import { ItemType, isRelic, isGem, toRelicType, GEM_COLORS, GOLD_COLOR } from "./dropConfig";
 import type { AssetManager } from "./assetManager";
 
 const DEFAULT_COLS = 10;
@@ -29,12 +28,6 @@ const VALID_COLOR = 0x4ade80;
 const INVALID_COLOR = 0xef4444;
 const ITEM_ICON_SIZE = 20;
 
-export enum ItemType {
-  Relic,
-  Gold,
-  Gem,
-}
-
 export interface InventoryConfig {
   cols?: number;
   rows?: number;
@@ -45,7 +38,6 @@ export interface InventoryConfig {
 export interface InventoryItem {
   id: number;
   type: ItemType;
-  subType: number;
   amount: number;
   gridX: number;
   gridY: number;
@@ -77,8 +69,8 @@ export function buildItemCell(item: InventoryItem, assetManager: AssetManager): 
   const cx = CELL_SIZE / 2;
   const cy = CELL_SIZE / 2;
 
-  if (item.type === ItemType.Relic) {
-    const display = RELIC_DISPLAY[item.subType as RelicType];
+  if (isRelic(item.type)) {
+    const display = RELIC_DISPLAY[toRelicType(item.type)];
     const texture = assetManager.getRelicTexture(
       display.spriteSheet,
       display.frameName
@@ -114,8 +106,8 @@ export function buildItemCell(item: InventoryItem, assetManager: AssetManager): 
       label.y = cy + ITEM_ICON_SIZE / 2 + 8;
       wrapper.addChild(label);
     }
-  } else if (item.type === ItemType.Gem) {
-    const gemColor = GEM_COLORS[item.subType as GemType];
+  } else if (isGem(item.type)) {
+    const gemColor = GEM_COLORS[item.type] ?? 0xffffff;
     const gfx = new Graphics();
     gfx.rect(cx - ITEM_ICON_SIZE / 2, cy - ITEM_ICON_SIZE / 2, ITEM_ICON_SIZE, ITEM_ICON_SIZE);
     gfx.fill({ color: gemColor });
@@ -285,13 +277,12 @@ export class Inventory {
     c.y = this.gridOriginY + item.gridY * CELL_SIZE;
   }
 
-  addItem(type: ItemType, subType: number, gridX: number, gridY: number, amount = 1): InventoryItem | null {
+  addItem(type: ItemType, gridX: number, gridY: number, amount = 1): InventoryItem | null {
     if (!this.canPlace(gridX, gridY)) return null;
 
     const item: InventoryItem = {
       id: this.nextItemId++,
       type,
-      subType,
       amount,
       gridX,
       gridY,
@@ -309,7 +300,7 @@ export class Inventory {
     return item;
   }
 
-  addToFirstEmpty(type: ItemType, subType: number, amount = 1): InventoryItem | null {
+  addToFirstEmpty(type: ItemType, amount = 1): InventoryItem | null {
     if (type === ItemType.Gold) {
       const existing = this.items.find((i) => i.type === ItemType.Gold);
       if (existing) {
@@ -322,7 +313,7 @@ export class Inventory {
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {
         if (!this.occupied[r][c]) {
-          return this.addItem(type, subType, c, r, amount);
+          return this.addItem(type, c, r, amount);
         }
       }
     }
@@ -376,16 +367,16 @@ export class Inventory {
   }
 
   populateTestData(): void {
-    this.addItem(ItemType.Relic, RelicType.StarfallStiletto, 0, 0);
-    this.addItem(ItemType.Relic, RelicType.BloodthornDirk, 1, 0);
-    this.addItem(ItemType.Relic, RelicType.EmbercrestBlade, 2, 0);
-    this.addItem(ItemType.Relic, RelicType.BriarthornSaber, 3, 0);
-    this.addItem(ItemType.Relic, RelicType.TwinflareCrossblades, 4, 0);
-    this.addItem(ItemType.Relic, RelicType.CloudveilLongsword, 5, 0);
-    this.addItem(ItemType.Relic, RelicType.SteelBattleaxe, 6, 0);
-    this.addItem(ItemType.Relic, RelicType.MoltenZweihander, 7, 0);
-    this.addItem(ItemType.Relic, RelicType.MoonlitHatchet, 8, 0);
-    this.addItem(ItemType.Relic, RelicType.FrostfangClaymore, 9, 0);
+    this.addItem(ItemType.StarfallStiletto, 0, 0);
+    this.addItem(ItemType.BloodthornDirk, 1, 0);
+    this.addItem(ItemType.EmbercrestBlade, 2, 0);
+    this.addItem(ItemType.BriarthornSaber, 3, 0);
+    this.addItem(ItemType.TwinflareCrossblades, 4, 0);
+    this.addItem(ItemType.CloudveilLongsword, 5, 0);
+    this.addItem(ItemType.SteelBattleaxe, 6, 0);
+    this.addItem(ItemType.MoltenZweihander, 7, 0);
+    this.addItem(ItemType.MoonlitHatchet, 8, 0);
+    this.addItem(ItemType.FrostfangClaymore, 9, 0);
   }
 
   destroy(): void {
