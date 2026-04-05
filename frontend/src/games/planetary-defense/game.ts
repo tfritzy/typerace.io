@@ -181,7 +181,6 @@ export class PlanetaryDefenseGame {
 
     const waveActive = this.state.wave.phase !== WavePhase.Idle;
     this.inventory.container.visible = !waveActive;
-    for (const ws of this.weaponSlots) ws.container.visible = !waveActive;
     this.merchantManager.layer.visible = !waveActive;
   }
 
