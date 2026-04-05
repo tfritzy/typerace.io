@@ -1,9 +1,8 @@
 import { useEffect, useRef } from "react";
 import type { PlanetaryDefenseGame } from "./game";
 import type { LabelData } from "./DropManager";
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT } from "./constants";
 
-const PIXEL_FONT = "'Press Start 2P', monospace";
 const LABEL_FONT_SIZE = 16;
 const TYPED_COLOR = "#90ee90";
 const UNTYPED_COLOR = "#ffffff";

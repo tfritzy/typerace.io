@@ -479,15 +479,15 @@ function spawnDrop(
   });
 }
 
-export function handleTypedCharacter(state: GameState, key: string, phraseCorrect: boolean): Item[] {
+export function handleTypedCharacter(state: GameState, key: string): Item[] {
   if (key.length !== 1) return [];
   const normalizedKey = key.toLowerCase();
   applyTypedCharacterToDrops(state.drops, normalizedKey);
-  const collected = collectCompletedDrops(state);
-  if (phraseCorrect) {
-    chargeRelics(state);
-  }
-  return collected;
+  return collectCompletedDrops(state);
+}
+
+export function onCorrectKeystroke(state: GameState): void {
+  chargeRelics(state);
 }
 
 function findNearestEnemy(

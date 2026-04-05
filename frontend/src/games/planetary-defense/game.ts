@@ -13,7 +13,7 @@ import { Inventory, CELL_SIZE, GRID_PADDING, BORDER_WIDTH } from "./Inventory";
 import { InventoryManager } from "./InventoryManager";
 import { MerchantManager } from "./MerchantManager";
 import { AssetManager } from "./assetManager";
-import { createGameState, updateState, getRelicPosition, WavePhase, handleTypedCharacter as stateHandleTypedCharacter } from "./state";
+import { createGameState, updateState, getRelicPosition, WavePhase, handleTypedCharacter as stateHandleTypedCharacter, onCorrectKeystroke } from "./state";
 import type { GameState, RelicState } from "./state";
 import { RELIC_SLOT_COUNT, RelicType, RELIC_CONFIGS } from "./relicConfig";
 
@@ -162,11 +162,15 @@ export class PlanetaryDefenseGame {
     }
   }
 
-  handleTypedCharacter(key: string, phraseCorrect: boolean): void {
-    const collected = stateHandleTypedCharacter(this.state, key, phraseCorrect);
+  handleTypedCharacter(key: string): void {
+    const collected = stateHandleTypedCharacter(this.state, key);
     for (const item of collected) {
       this.inventory.addToFirstEmpty(item);
     }
+  }
+
+  onCorrectKeystroke(): void {
+    onCorrectKeystroke(this.state);
   }
 
   private update(dt: number): void {

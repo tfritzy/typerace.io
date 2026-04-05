@@ -3,24 +3,24 @@ import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
 import { startNextWave } from "./state";
 import { LabelOverlay } from "./LabelOverlay";
+import { PIXEL_FONT } from "./constants";
 import { getRandomWord } from "../../utils/wordLists";
 import { getLanguageFromSlug } from "../../utils/modes";
 
-const PIXEL_FONT = "'Press Start 2P', monospace";
-const PHRASE_BUFFER_SIZE = 40;
+const PHRASE_BUFFER_SIZE = 500;
 
 function getLangCode(): string {
   const slug = window.location.pathname.split("/").pop() ?? "";
   return getLanguageFromSlug(slug)?.htmlLang ?? "en";
 }
 
-function generateWords(count: number): string[] {
+function generatePhrase(wordCount: number): string {
   const langCode = getLangCode();
   const words: string[] = [];
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < wordCount; i++) {
     words.push(getRandomWord(langCode));
   }
-  return words;
+  return words.join(" ");
 }
 
 const PlanetHealthBar = ({ ratio }: { ratio: number }) => {
@@ -87,12 +87,13 @@ const PhraseOverlay = ({
   gameRef: React.RefObject<PlanetaryDefenseGame | null>;
   visible: boolean;
 }) => {
-  const [words, setWords] = useState<string[]>(() => generateWords(PHRASE_BUFFER_SIZE));
+  const [phrase, setPhrase] = useState(() => generatePhrase(PHRASE_BUFFER_SIZE));
   const [typedCount, setTypedCount] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const wordsRef = useRef(words);
+  const phraseRef = useRef(phrase);
   const typedCountRef = useRef(typedCount);
-  wordsRef.current = words;
+  phraseRef.current = phrase;
   typedCountRef.current = typedCount;
 
   useEffect(() => {
@@ -104,37 +105,26 @@ const PhraseOverlay = ({
       if (e.ctrlKey || e.altKey || e.metaKey) return;
       if (e.key.length !== 1) return;
 
-      const text = wordsRef.current.join(" ");
+      const text = phraseRef.current;
       const tc = typedCountRef.current;
       const normalizedKey = e.key.toLowerCase();
-      const phraseCorrect = tc < text.length && normalizedKey === text[tc].toLowerCase();
+      const correct = tc < text.length && normalizedKey === text[tc].toLowerCase();
 
-      if (phraseCorrect) {
-        const newTypedCount = tc + 1;
+      game.handleTypedCharacter(e.key);
 
-        let currentWords = wordsRef.current;
-        let adjustedTypedCount = newTypedCount;
+      if (correct) {
+        const newTc = tc + 1;
+        game.onCorrectKeystroke();
 
-        while (currentWords.length > 0) {
-          const firstWordLen = currentWords[0].length;
-          const boundary = firstWordLen + (currentWords.length > 1 ? 1 : 0);
-          if (adjustedTypedCount >= boundary) {
-            adjustedTypedCount -= boundary;
-            currentWords = currentWords.slice(1);
-          } else {
-            break;
-          }
+        if (newTc > text.length / 2) {
+          const remaining = text.slice(newTc);
+          const extra = generatePhrase(PHRASE_BUFFER_SIZE);
+          setPhrase(remaining + " " + extra);
+          setTypedCount(0);
+        } else {
+          setTypedCount(newTc);
         }
-
-        if (currentWords.length < PHRASE_BUFFER_SIZE) {
-          currentWords = [...currentWords, ...generateWords(PHRASE_BUFFER_SIZE - currentWords.length)];
-        }
-
-        setWords(currentWords);
-        setTypedCount(adjustedTypedCount);
       }
-
-      game.handleTypedCharacter(e.key, phraseCorrect);
     };
 
     document.addEventListener("keydown", onKeyDown);
@@ -143,17 +133,16 @@ const PhraseOverlay = ({
 
   useEffect(() => {
     if (visible) {
-      setWords(generateWords(PHRASE_BUFFER_SIZE));
+      setPhrase(generatePhrase(PHRASE_BUFFER_SIZE));
       setTypedCount(0);
     }
   }, [visible]);
 
   if (!visible) return null;
 
-  const text = words.join(" ");
-
   return (
     <div
+      onClick={() => inputRef.current?.focus()}
       style={{
         position: "absolute",
         bottom: "20px",
@@ -172,8 +161,22 @@ const PhraseOverlay = ({
         overflowWrap: "break-word",
       }}
     >
-      <span style={{ color: "#90ee90" }}>{text.slice(0, typedCount)}</span>
-      <span style={{ color: "#ffffff" }}>{text.slice(typedCount)}</span>
+      <input
+        ref={inputRef}
+        autoFocus
+        style={{
+          position: "absolute",
+          opacity: 0,
+          width: 0,
+          height: 0,
+          pointerEvents: "none",
+        }}
+        onInput={(e) => {
+          (e.target as HTMLInputElement).value = "";
+        }}
+      />
+      <span style={{ color: "#90ee90" }}>{phrase.slice(0, typedCount)}</span>
+      <span style={{ color: "#ffffff" }}>{phrase.slice(typedCount)}</span>
     </div>
   );
 };
@@ -231,7 +234,7 @@ export const GameCanvas = () => {
       if (!game) return;
       if (e.ctrlKey || e.altKey || e.metaKey) return;
       if (e.key.length !== 1) return;
-      game.handleTypedCharacter(e.key, false);
+      game.handleTypedCharacter(e.key);
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
