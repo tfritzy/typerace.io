@@ -80,6 +80,27 @@ const PlanetHealthBar = ({ ratio }: { ratio: number }) => {
   );
 };
 
+function computeFirstLineEnd(text: string, charsPerLine: number): number {
+  if (charsPerLine <= 0) return text.length;
+  let lineLen = 0;
+  let i = 0;
+  while (i < text.length) {
+    let wordEnd = text.indexOf(" ", i);
+    if (wordEnd === -1) wordEnd = text.length;
+    const wordLen = wordEnd - i;
+    if (lineLen === 0) {
+      if (wordLen > charsPerLine) return charsPerLine;
+      lineLen = wordLen;
+    } else if (lineLen + 1 + wordLen > charsPerLine) {
+      return i;
+    } else {
+      lineLen += 1 + wordLen;
+    }
+    i = wordEnd + 1;
+  }
+  return text.length;
+}
+
 const PhraseOverlay = ({
   gameRef,
   visible,
@@ -90,11 +111,40 @@ const PhraseOverlay = ({
   const [phrase, setPhrase] = useState(() => generatePhrase(PHRASE_BUFFER_SIZE));
   const [typedCount, setTypedCount] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const charsPerLineRef = useRef(0);
 
   const phraseRef = useRef(phrase);
   const typedCountRef = useRef(typedCount);
   phraseRef.current = phrase;
   typedCountRef.current = typedCount;
+
+  useEffect(() => {
+    if (!visible) return;
+    const box = boxRef.current;
+    if (!box) return;
+    const measure = () => {
+      const testSpan = document.createElement("span");
+      testSpan.style.visibility = "hidden";
+      testSpan.style.position = "absolute";
+      testSpan.style.whiteSpace = "nowrap";
+      testSpan.textContent = "x";
+      box.appendChild(testSpan);
+      const charWidth = testSpan.getBoundingClientRect().width;
+      box.removeChild(testSpan);
+      if (charWidth > 0) {
+        const style = getComputedStyle(box);
+        const padL = parseFloat(style.paddingLeft) || 0;
+        const padR = parseFloat(style.paddingRight) || 0;
+        const contentWidth = box.clientWidth - padL - padR;
+        charsPerLineRef.current = Math.floor(contentWidth / charWidth);
+      }
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, [visible]);
 
   useEffect(() => {
     if (!visible) return;
@@ -116,11 +166,15 @@ const PhraseOverlay = ({
         const newTc = tc + 1;
         game.onCorrectKeystroke();
 
-        if (newTc > text.length / 2) {
-          const remaining = text.slice(newTc);
-          const extra = generatePhrase(PHRASE_BUFFER_SIZE);
-          setPhrase(remaining + " " + extra);
-          setTypedCount(0);
+        const firstLineEnd = computeFirstLineEnd(text, charsPerLineRef.current);
+        if (firstLineEnd > 0 && firstLineEnd < text.length && newTc >= firstLineEnd) {
+          const remaining = text.slice(firstLineEnd);
+          let newPhrase = remaining;
+          if (remaining.length < PHRASE_BUFFER_SIZE * 2) {
+            newPhrase = remaining + " " + generatePhrase(PHRASE_BUFFER_SIZE);
+          }
+          setPhrase(newPhrase);
+          setTypedCount(newTc - firstLineEnd);
         } else {
           setTypedCount(newTc);
         }
@@ -142,6 +196,7 @@ const PhraseOverlay = ({
 
   return (
     <div
+      ref={boxRef}
       onClick={() => inputRef.current?.focus()}
       style={{
         position: "absolute",
@@ -149,7 +204,6 @@ const PhraseOverlay = ({
         left: "50%",
         transform: "translateX(-50%)",
         width: "80%",
-        fontFamily: PIXEL_FONT,
         fontSize: "14px",
         lineHeight: "2.4",
         height: "4.8em",
