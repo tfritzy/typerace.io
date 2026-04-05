@@ -1,11 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
-import { startNextWave, getPhraseText } from "./state";
+import { startNextWave } from "./state";
 import { LabelOverlay } from "./LabelOverlay";
-import { CANVAS_WIDTH } from "./constants";
+import { getRandomWord } from "../../utils/wordLists";
+import { getLanguageFromSlug } from "../../utils/modes";
 
 const PIXEL_FONT = "'Press Start 2P', monospace";
+const PHRASE_BUFFER_SIZE = 40;
+
+function getLangCode(): string {
+  const slug = window.location.pathname.split("/").pop() ?? "";
+  return getLanguageFromSlug(slug)?.htmlLang ?? "en";
+}
+
+function generateWords(count: number): string[] {
+  const langCode = getLangCode();
+  const words: string[] = [];
+  for (let i = 0; i < count; i++) {
+    words.push(getRandomWord(langCode));
+  }
+  return words;
+}
 
 const PlanetHealthBar = ({ ratio }: { ratio: number }) => {
   const pct = Math.max(0, Math.min(100, ratio * 100));
@@ -71,39 +87,73 @@ const PhraseOverlay = ({
   gameRef: React.RefObject<PlanetaryDefenseGame | null>;
   visible: boolean;
 }) => {
-  const typedRef = useRef<HTMLSpanElement>(null);
-  const untypedRef = useRef<HTMLSpanElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [words, setWords] = useState<string[]>(() => generateWords(PHRASE_BUFFER_SIZE));
+  const [typedCount, setTypedCount] = useState(0);
+
+  const wordsRef = useRef(words);
+  const typedCountRef = useRef(typedCount);
+  wordsRef.current = words;
+  typedCountRef.current = typedCount;
 
   useEffect(() => {
     if (!visible) return;
-    let animId: number;
 
-    const loop = () => {
-      animId = requestAnimationFrame(loop);
+    const onKeyDown = (e: KeyboardEvent) => {
       const game = gameRef.current;
-      if (!game || !typedRef.current || !untypedRef.current || !containerRef.current) return;
+      if (!game) return;
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key.length !== 1) return;
 
-      const phrase = game.state.phrase;
-      const text = getPhraseText(phrase);
-      typedRef.current.textContent = text.slice(0, phrase.typedCount);
-      untypedRef.current.textContent = text.slice(phrase.typedCount);
+      const text = wordsRef.current.join(" ");
+      const tc = typedCountRef.current;
+      const normalizedKey = e.key.toLowerCase();
+      const phraseCorrect = tc < text.length && normalizedKey === text[tc].toLowerCase();
 
-      const overlayWidth = containerRef.current.parentElement?.clientWidth ?? 0;
-      const scale = overlayWidth / CANVAS_WIDTH;
-      const fontSize = Math.max(10, Math.round(14 * scale));
-      containerRef.current.style.fontSize = `${fontSize}px`;
+      if (phraseCorrect) {
+        const newTypedCount = tc + 1;
+
+        let currentWords = wordsRef.current;
+        let adjustedTypedCount = newTypedCount;
+
+        while (currentWords.length > 0) {
+          const firstWordLen = currentWords[0].length;
+          const boundary = firstWordLen + (currentWords.length > 1 ? 1 : 0);
+          if (adjustedTypedCount >= boundary) {
+            adjustedTypedCount -= boundary;
+            currentWords = currentWords.slice(1);
+          } else {
+            break;
+          }
+        }
+
+        while (currentWords.length < PHRASE_BUFFER_SIZE) {
+          currentWords = [...currentWords, ...generateWords(1)];
+        }
+
+        setWords(currentWords);
+        setTypedCount(adjustedTypedCount);
+      }
+
+      game.handleTypedCharacter(e.key, phraseCorrect);
     };
 
-    animId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animId);
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
   }, [gameRef, visible]);
+
+  useEffect(() => {
+    if (visible) {
+      setWords(generateWords(PHRASE_BUFFER_SIZE));
+      setTypedCount(0);
+    }
+  }, [visible]);
 
   if (!visible) return null;
 
+  const text = words.join(" ");
+
   return (
     <div
-      ref={containerRef}
       style={{
         position: "absolute",
         bottom: "20px",
@@ -122,8 +172,8 @@ const PhraseOverlay = ({
         overflowWrap: "break-word",
       }}
     >
-      <span ref={typedRef} style={{ color: "#90ee90" }} />
-      <span ref={untypedRef} style={{ color: "#ffffff" }} />
+      <span style={{ color: "#90ee90" }}>{text.slice(0, typedCount)}</span>
+      <span style={{ color: "#ffffff" }}>{text.slice(typedCount)}</span>
     </div>
   );
 };
@@ -171,13 +221,17 @@ export const GameCanvas = () => {
     };
   }, []);
 
+  const waveActiveRef = useRef(false);
+  waveActiveRef.current = waveActive;
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      if (waveActiveRef.current) return;
       const game = gameRef.current;
       if (!game) return;
       if (e.ctrlKey || e.altKey || e.metaKey) return;
       if (e.key.length !== 1) return;
-      game.handleTypedCharacter(e.key);
+      game.handleTypedCharacter(e.key, false);
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);

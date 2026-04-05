@@ -162,8 +162,8 @@ export class PlanetaryDefenseGame {
     }
   }
 
-  handleTypedCharacter(key: string): void {
-    const collected = stateHandleTypedCharacter(this.state, key);
+  handleTypedCharacter(key: string, phraseCorrect: boolean): void {
+    const collected = stateHandleTypedCharacter(this.state, key, phraseCorrect);
     for (const item of collected) {
       this.inventory.addToFirstEmpty(item);
     }
