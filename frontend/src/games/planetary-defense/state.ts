@@ -411,8 +411,9 @@ export function getPhraseText(phrase: PhraseState): string {
 }
 
 function advancePhrase(phrase: PhraseState): void {
-  while (phrase.words.length > 1) {
-    const boundary = phrase.words[0].length + 1;
+  while (phrase.words.length > 0) {
+    const hasNext = phrase.words.length > 1;
+    const boundary = phrase.words[0].length + (hasNext ? 1 : 0);
     if (phrase.typedCount >= boundary) {
       phrase.typedCount -= boundary;
       phrase.words.shift();

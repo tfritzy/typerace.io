@@ -119,7 +119,7 @@ const PhraseOverlay = ({
         padding: "10px 20px",
         border: "2px solid #4a5568",
         zIndex: 10,
-        wordBreak: "break-all",
+        overflowWrap: "break-word",
       }}
     >
       <span ref={typedRef} style={{ color: "#90ee90" }} />
