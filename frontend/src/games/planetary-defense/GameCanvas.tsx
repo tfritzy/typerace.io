@@ -175,7 +175,7 @@ const PhraseOverlay = ({
       setPhrase(newPhrase);
       setTypedCount(typedCount - lineBreak);
     }
-  });
+  }, [typedCount, phrase, visible]);
 
   if (!visible) return null;
 
