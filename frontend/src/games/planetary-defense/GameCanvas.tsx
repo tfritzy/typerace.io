@@ -188,9 +188,8 @@ const PhraseOverlay = ({
       style={{
         position: "absolute",
         bottom: "20px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "80%",
+        left: "10%",
+        right: "10%",
         fontSize: "14px",
         lineHeight: "2.4",
         height: "4.8em",
