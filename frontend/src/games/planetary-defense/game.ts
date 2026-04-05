@@ -4,16 +4,16 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
 import { Background } from "./Background";
 import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
-import type { LabelData } from "./EnemyManager";
 import { RelicManager } from "./RelicManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { DamageNumberManager } from "./DamageNumberManager";
 import { DropManager } from "./DropManager";
+import type { LabelData } from "./DropManager";
 import { Inventory, CELL_SIZE, GRID_PADDING, BORDER_WIDTH } from "./Inventory";
 import { InventoryManager } from "./InventoryManager";
 import { MerchantManager } from "./MerchantManager";
 import { AssetManager } from "./assetManager";
-import { createGameState, updateState, getRelicPosition, handleTypedCharacter as stateHandleTypedCharacter } from "./state";
+import { createGameState, updateState, getRelicPosition, WavePhase, handleTypedCharacter as stateHandleTypedCharacter } from "./state";
 import type { GameState, RelicState } from "./state";
 import { RELIC_SLOT_COUNT, RelicType, RELIC_CONFIGS } from "./relicConfig";
 
@@ -46,9 +46,7 @@ export class PlanetaryDefenseGame {
   }
 
   get labels(): LabelData[] {
-    const enemy = this.enemyManager?.labels ?? [];
-    const drop = this.dropManager?.labels ?? [];
-    return [...enemy, ...drop];
+    return this.dropManager?.labels ?? [];
   }
 
   async init(): Promise<void> {
@@ -180,6 +178,11 @@ export class PlanetaryDefenseGame {
     this.damageNumberManager.update(dt);
     this.dropManager.update(this.state);
     this.merchantManager.update(this.state);
+
+    const waveActive = this.state.wave.phase !== WavePhase.Idle;
+    this.inventory.container.visible = !waveActive;
+    for (const ws of this.weaponSlots) ws.container.visible = !waveActive;
+    this.merchantManager.layer.visible = !waveActive;
   }
 
   destroy(): void {

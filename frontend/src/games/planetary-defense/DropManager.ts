@@ -1,7 +1,15 @@
 import { Container, Graphics } from "pixi.js";
 import type { GameState, DropState } from "./state";
 import { DROP_LABEL_COLOR, DROP_SIZE } from "./dropConfig";
-import type { LabelData } from "./EnemyManager";
+
+export interface LabelData {
+  id: number;
+  word: string;
+  typedCount: number;
+  x: number;
+  y: number;
+  color?: string;
+}
 
 export class DropManager {
   readonly layer: Container;

@@ -43,8 +43,6 @@ export interface EntityState {
   vy: number;
   rotation: number;
   rotationSpeed: number;
-  word: string;
-  typedCount: number;
   health: number;
   power: number;
   bleedStacks: number;
@@ -95,6 +93,11 @@ export interface DropState {
   word: string;
   typedCount: number;
   item: Item;
+}
+
+export interface PhraseState {
+  words: string[];
+  typedCount: number;
 }
 
 export enum WavePhase {
@@ -162,6 +165,7 @@ export interface GameState {
   projectiles: ProjectileState[];
   drops: DropState[];
   merchants: MerchantShipState[];
+  phrase: PhraseState;
   time: {
     time: number;
     deltaTime: number;
@@ -262,8 +266,6 @@ export function createEntityState(
     vy: 0,
     rotation: 0,
     rotationSpeed: 0,
-    word: "",
-    typedCount: 0,
     health: 1,
     power: 0,
     bleedStacks: 0,
@@ -275,6 +277,17 @@ export function createEntityState(
   };
 }
 
+const PHRASE_BUFFER_SIZE = 40;
+
+function createPhraseState(): PhraseState {
+  const langCode = getLangCode();
+  const words: string[] = [];
+  for (let i = 0; i < PHRASE_BUFFER_SIZE; i++) {
+    words.push(getRandomWord(langCode));
+  }
+  return { words, typedCount: 0 };
+}
+
 export function createGameState(): GameState {
   const state: GameState = {
     entities: [],
@@ -282,6 +295,7 @@ export function createGameState(): GameState {
     projectiles: [],
     drops: [],
     merchants: [],
+    phrase: createPhraseState(),
     time: {
       time: 0,
       deltaTime: 0,
@@ -351,8 +365,6 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
   const { x, y } = spawnFromEdge();
   const speed = 20 + Math.random() * 35;
   const { vx, vy } = aimAtPlanet(x, y, speed);
-  const usedWords = new Set(state.entities.map((e) => e.word));
-  const word = getRandomWord(getLangCode(), usedWords);
   const rotDir = Math.random() > 0.5 ? 1 : -1;
   const isShip = isShipEntityType(config.entityType);
 
@@ -365,8 +377,6 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
     vy,
     rotation: 0,
     rotationSpeed: isShip ? 0 : (0.5 + Math.random() * 1.5) * rotDir,
-    word,
-    typedCount: 0,
     health: config.health,
     power: config.power,
     bleedStacks: 0,
@@ -386,31 +396,33 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
   state.entities.push(entity);
 }
 
-function applyTypedCharacter(
-  entities: EntityState[],
-  key: string
-): void {
-  const normalizedKey = key.toLowerCase();
-  for (const entity of entities) {
-    if (entity.typedCount >= entity.word.length) continue;
-    const nextChar = entity.word[entity.typedCount];
-    if (normalizedKey === nextChar.toLowerCase()) {
-      entity.typedCount++;
-    } else if (entity.typedCount > 0) {
-      entity.typedCount = 0;
-    }
+function applyTypedCharacterToPhrase(phrase: PhraseState, key: string): boolean {
+  const text = getPhraseText(phrase);
+  if (phrase.typedCount >= text.length) return false;
+  if (key === text[phrase.typedCount].toLowerCase()) {
+    phrase.typedCount++;
+    return true;
   }
+  return false;
 }
 
-function rerollCompletedWords(state: GameState): void {
-  const usedWords = new Set(state.entities.map((e) => e.word));
-  const langCode = getLangCode();
-  for (const entity of state.entities) {
-    if (entity.typedCount >= entity.word.length) {
-      entity.word = getRandomWord(langCode, usedWords);
-      usedWords.add(entity.word);
-      entity.typedCount = 0;
+export function getPhraseText(phrase: PhraseState): string {
+  return phrase.words.join(" ");
+}
+
+function advancePhrase(phrase: PhraseState): void {
+  while (phrase.words.length > 1) {
+    const boundary = phrase.words[0].length + 1;
+    if (phrase.typedCount >= boundary) {
+      phrase.typedCount -= boundary;
+      phrase.words.shift();
+    } else {
+      break;
     }
+  }
+  const langCode = getLangCode();
+  while (phrase.words.length < PHRASE_BUFFER_SIZE) {
+    phrase.words.push(getRandomWord(langCode));
   }
 }
 
@@ -496,10 +508,9 @@ function spawnDrop(
 ): void {
   const angle = Math.random() * Math.PI * 2;
   const speed = DROP_SPEED * (0.5 + Math.random() * 0.5);
-  const usedWords = new Set([
-    ...state.entities.map((e) => e.word),
-    ...state.drops.map((d) => d.word),
-  ]);
+  const usedWords = new Set(
+    state.drops.map((d) => d.word)
+  );
   const word = getRandomWord(getLangCode(), usedWords);
 
   state.drops.push({
@@ -517,27 +528,31 @@ function spawnDrop(
 export function handleTypedCharacter(state: GameState, key: string): Item[] {
   if (key.length !== 1) return [];
   const normalizedKey = key.toLowerCase();
-  applyTypedCharacter(state.entities, normalizedKey);
+  const phraseAdvanced = applyTypedCharacterToPhrase(state.phrase, normalizedKey);
   applyTypedCharacterToDrops(state.drops, normalizedKey);
-  rerollCompletedWords(state);
+  advancePhrase(state.phrase);
   const collected = collectCompletedDrops(state);
-  chargeRelics(state);
+  if (phraseAdvanced) {
+    chargeRelics(state);
+  }
   return collected;
 }
 
-function findTypedTarget(
+function findNearestEnemy(
   state: GameState
 ): { x: number; y: number } | null {
-  let best: EntityState | null = null;
-  let bestTyped = 0;
+  let closest: EntityState | null = null;
+  let closestDist = Infinity;
   for (const entity of state.entities) {
-    if (entity.typedCount <= 0) continue;
-    if (entity.typedCount > bestTyped) {
-      bestTyped = entity.typedCount;
-      best = entity;
+    const dx = entity.x - PLANET_X;
+    const dy = entity.y - PLANET_Y;
+    const dist = dx * dx + dy * dy;
+    if (dist < closestDist) {
+      closestDist = dist;
+      closest = entity;
     }
   }
-  return best;
+  return closest;
 }
 
 function getNeighborSlots(
@@ -583,7 +598,7 @@ function tryFireSlot(
   if (slot.relic!.charge < config.charsToFire) return;
 
   slot.relic!.charge = 0;
-  const target = findTypedTarget(state);
+  const target = findNearestEnemy(state);
   if (target) {
     fireRelic(state, slot, slotIndex, target);
   }
@@ -593,10 +608,10 @@ function tryFireSlot(
 }
 
 function chargeRelics(state: GameState): void {
+  if (state.entities.length === 0) return;
   for (let i = 0; i < state.relicSlots.length; i++) {
     const slot = state.relicSlots[i];
     if (!slot.relic) continue;
-    if (!findTypedTarget(state)) continue;
 
     slot.relic.charge++;
     tryFireSlot(state, slot, i);
@@ -703,7 +718,7 @@ function processPendingShots(state: GameState): void {
       slot.relic.nextShotTime = state.time.time + MULTI_SHOT_DELAY;
     }
 
-    const target = findTypedTarget(state);
+    const target = findNearestEnemy(state);
     if (!target) continue;
 
     spawnProjectile(state, slot, i, target);
