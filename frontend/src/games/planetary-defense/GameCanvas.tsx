@@ -80,25 +80,32 @@ const PlanetHealthBar = ({ ratio }: { ratio: number }) => {
   );
 };
 
-function computeFirstLineEnd(text: string, charsPerLine: number): number {
-  if (charsPerLine <= 0) return text.length;
-  let lineLen = 0;
-  let i = 0;
-  while (i < text.length) {
-    let wordEnd = text.indexOf(" ", i);
-    if (wordEnd === -1) wordEnd = text.length;
-    const wordLen = wordEnd - i;
-    if (lineLen === 0) {
-      if (wordLen > charsPerLine) return charsPerLine;
-      lineLen = wordLen;
-    } else if (lineLen + 1 + wordLen > charsPerLine) {
-      return i;
-    } else {
-      lineLen += 1 + wordLen;
+function findFirstLineBreak(
+  typedNode: Text | null,
+  untypedNode: Text | null,
+  typedLen: number
+): number {
+  const range = document.createRange();
+  let firstTop: number | null = null;
+  if (typedNode && typedNode.textContent) {
+    for (let i = 0; i < typedNode.textContent.length; i++) {
+      range.setStart(typedNode, i);
+      range.setEnd(typedNode, i + 1);
+      const top = range.getBoundingClientRect().top;
+      if (firstTop === null) firstTop = top;
+      else if (top > firstTop) return i;
     }
-    i = wordEnd + 1;
   }
-  return text.length;
+  if (untypedNode && untypedNode.textContent) {
+    for (let i = 0; i < untypedNode.textContent.length; i++) {
+      range.setStart(untypedNode, i);
+      range.setEnd(untypedNode, i + 1);
+      const top = range.getBoundingClientRect().top;
+      if (firstTop === null) firstTop = top;
+      else if (top > firstTop) return typedLen + i;
+    }
+  }
+  return -1;
 }
 
 const PhraseOverlay = ({
@@ -112,39 +119,13 @@ const PhraseOverlay = ({
   const [typedCount, setTypedCount] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
-  const charsPerLineRef = useRef(0);
+  const typedRef = useRef<HTMLSpanElement>(null);
+  const untypedRef = useRef<HTMLSpanElement>(null);
 
   const phraseRef = useRef(phrase);
   const typedCountRef = useRef(typedCount);
   phraseRef.current = phrase;
   typedCountRef.current = typedCount;
-
-  useEffect(() => {
-    if (!visible) return;
-    const box = boxRef.current;
-    if (!box) return;
-    const measure = () => {
-      const testSpan = document.createElement("span");
-      testSpan.style.visibility = "hidden";
-      testSpan.style.position = "absolute";
-      testSpan.style.whiteSpace = "nowrap";
-      testSpan.textContent = "x";
-      box.appendChild(testSpan);
-      const charWidth = testSpan.getBoundingClientRect().width;
-      box.removeChild(testSpan);
-      if (charWidth > 0) {
-        const style = getComputedStyle(box);
-        const padL = parseFloat(style.paddingLeft) || 0;
-        const padR = parseFloat(style.paddingRight) || 0;
-        const contentWidth = box.clientWidth - padL - padR;
-        charsPerLineRef.current = Math.floor(contentWidth / charWidth);
-      }
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(box);
-    return () => observer.disconnect();
-  }, [visible]);
 
   useEffect(() => {
     if (!visible) return;
@@ -165,19 +146,7 @@ const PhraseOverlay = ({
       if (correct) {
         const newTc = tc + 1;
         game.onCorrectKeystroke();
-
-        const firstLineEnd = computeFirstLineEnd(text, charsPerLineRef.current);
-        if (firstLineEnd > 0 && firstLineEnd < text.length && newTc >= firstLineEnd) {
-          const remaining = text.slice(firstLineEnd);
-          let newPhrase = remaining;
-          if (remaining.length < PHRASE_BUFFER_SIZE * 2) {
-            newPhrase = remaining + " " + generatePhrase(PHRASE_BUFFER_SIZE);
-          }
-          setPhrase(newPhrase);
-          setTypedCount(newTc - firstLineEnd);
-        } else {
-          setTypedCount(newTc);
-        }
+        setTypedCount(newTc);
       }
     };
 
@@ -191,6 +160,22 @@ const PhraseOverlay = ({
       setTypedCount(0);
     }
   }, [visible]);
+
+  useEffect(() => {
+    if (!visible) return;
+    const typedNode = typedRef.current?.firstChild as Text | null;
+    const untypedNode = untypedRef.current?.firstChild as Text | null;
+    const lineBreak = findFirstLineBreak(typedNode, untypedNode, typedCount);
+    if (lineBreak > 0 && typedCount >= lineBreak) {
+      const remaining = phraseRef.current.slice(lineBreak);
+      let newPhrase = remaining;
+      if (remaining.length < PHRASE_BUFFER_SIZE * 2) {
+        newPhrase = remaining + " " + generatePhrase(PHRASE_BUFFER_SIZE);
+      }
+      setPhrase(newPhrase);
+      setTypedCount(typedCount - lineBreak);
+    }
+  });
 
   if (!visible) return null;
 
@@ -229,8 +214,8 @@ const PhraseOverlay = ({
           (e.target as HTMLInputElement).value = "";
         }}
       />
-      <span style={{ color: "#90ee90" }}>{phrase.slice(0, typedCount)}</span>
-      <span style={{ color: "#ffffff" }}>{phrase.slice(typedCount)}</span>
+      <span ref={typedRef} style={{ color: "#90ee90" }}>{phrase.slice(0, typedCount)}</span>
+      <span ref={untypedRef} style={{ color: "#ffffff" }}>{phrase.slice(typedCount)}</span>
     </div>
   );
 };
