@@ -95,9 +95,16 @@ export interface DropState {
   item: Item;
 }
 
+export interface PhraseLine {
+  text: string;
+  charOffset: number;
+}
+
 export interface PhraseState {
   words: string[];
   typedCount: number;
+  lines: PhraseLine[];
+  lineCharTarget: number;
 }
 
 export enum WavePhase {
@@ -278,6 +285,32 @@ export function createEntityState(
 }
 
 const PHRASE_BUFFER_SIZE = 40;
+const LINE_CHAR_TARGET = 40;
+const PHRASE_LINE_COUNT = 2;
+
+function buildPhraseLines(words: string[], lineCharTarget: number): PhraseLine[] {
+  const lines: PhraseLine[] = [];
+  let wordIndex = 0;
+  let charOffset = 0;
+
+  while (lines.length < PHRASE_LINE_COUNT && wordIndex < words.length) {
+    let lineText = "";
+    while (wordIndex < words.length) {
+      const word = words[wordIndex];
+      const sep = lineText.length > 0 ? " " : "";
+      const candidate = lineText + sep + word;
+      if (lineText.length > 0 && candidate.length > lineCharTarget) {
+        break;
+      }
+      lineText = candidate;
+      wordIndex++;
+    }
+    lines.push({ text: lineText, charOffset });
+    charOffset += lineText.length + 1;
+  }
+
+  return lines;
+}
 
 function createPhraseState(): PhraseState {
   const langCode = getLangCode();
@@ -285,7 +318,9 @@ function createPhraseState(): PhraseState {
   for (let i = 0; i < PHRASE_BUFFER_SIZE; i++) {
     words.push(getRandomWord(langCode));
   }
-  return { words, typedCount: 0 };
+  const lineCharTarget = LINE_CHAR_TARGET;
+  const lines = buildPhraseLines(words, lineCharTarget);
+  return { words, typedCount: 0, lines, lineCharTarget };
 }
 
 export function createGameState(): GameState {
@@ -397,34 +432,38 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
 }
 
 function applyTypedCharacterToPhrase(phrase: PhraseState, key: string): boolean {
-  const text = getPhraseText(phrase);
-  if (phrase.typedCount >= text.length) return false;
-  if (key === text[phrase.typedCount].toLowerCase()) {
+  const fullText = phrase.lines.map((l) => l.text).join(" ");
+  if (phrase.typedCount >= fullText.length) return false;
+  if (key === fullText[phrase.typedCount].toLowerCase()) {
     phrase.typedCount++;
     return true;
   }
   return false;
 }
 
-export function getPhraseText(phrase: PhraseState): string {
-  return phrase.words.join(" ");
-}
-
 function advancePhrase(phrase: PhraseState): void {
-  while (phrase.words.length > 0) {
-    const hasNext = phrase.words.length > 1;
-    const boundary = phrase.words[0].length + (hasNext ? 1 : 0);
-    if (phrase.typedCount >= boundary) {
-      phrase.typedCount -= boundary;
-      phrase.words.shift();
-    } else {
-      break;
+  if (phrase.lines.length === 0) return;
+  const firstLine = phrase.lines[0];
+  if (phrase.typedCount >= firstLine.text.length + 1) {
+    const charsConsumed = firstLine.text.length + 1;
+    phrase.typedCount -= charsConsumed;
+
+    let wordsInLine = 0;
+    let charCount = 0;
+    for (const word of phrase.words) {
+      const sep = wordsInLine > 0 ? 1 : 0;
+      if (charCount + sep + word.length > firstLine.text.length) break;
+      charCount += sep + word.length;
+      wordsInLine++;
     }
+    phrase.words.splice(0, wordsInLine);
   }
+
   const langCode = getLangCode();
   while (phrase.words.length < PHRASE_BUFFER_SIZE) {
     phrase.words.push(getRandomWord(langCode));
   }
+  phrase.lines = buildPhraseLines(phrase.words, phrase.lineCharTarget);
 }
 
 function applyTypedCharacterToDrops(drops: DropState[], key: string): void {

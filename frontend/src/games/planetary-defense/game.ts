@@ -12,6 +12,7 @@ import type { LabelData } from "./DropManager";
 import { Inventory, CELL_SIZE, GRID_PADDING, BORDER_WIDTH } from "./Inventory";
 import { InventoryManager } from "./InventoryManager";
 import { MerchantManager } from "./MerchantManager";
+import { PhraseManager } from "./PhraseManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, getRelicPosition, WavePhase, handleTypedCharacter as stateHandleTypedCharacter } from "./state";
 import type { GameState, RelicState } from "./state";
@@ -37,6 +38,7 @@ export class PlanetaryDefenseGame {
   private weaponSlots: Inventory[] = [];
   private inventoryManager!: InventoryManager;
   private merchantManager!: MerchantManager;
+  private phraseManager!: PhraseManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
@@ -117,6 +119,9 @@ export class PlanetaryDefenseGame {
     this.merchantManager.setInventoryManager(this.inventoryManager);
     this.merchantManager.init(this.state);
 
+    this.phraseManager = new PhraseManager();
+    world.addChild(this.phraseManager.container);
+
     this.buildWeaponSlots(world);
   }
 
@@ -178,6 +183,7 @@ export class PlanetaryDefenseGame {
     this.damageNumberManager.update(dt);
     this.dropManager.update(this.state);
     this.merchantManager.update(this.state);
+    this.phraseManager.update(this.state);
 
     const waveActive = this.state.wave.phase !== WavePhase.Idle;
     this.inventory.container.visible = !waveActive;
@@ -197,6 +203,7 @@ export class PlanetaryDefenseGame {
     this.dropManager.destroy();
     this.enemyManager.destroy();
     this.merchantManager.destroy();
+    this.phraseManager.destroy();
     this.inventory.destroy();
     for (const ws of this.weaponSlots) ws.destroy();
     this.weaponSlots = [];
