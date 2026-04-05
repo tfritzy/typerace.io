@@ -6,6 +6,7 @@ import { LabelOverlay } from "./LabelOverlay";
 import { PIXEL_FONT } from "./constants";
 import { getRandomWord } from "../../utils/wordLists";
 import { getLanguageFromSlug } from "../../utils/modes";
+import { Cursor } from "../../components/Cursor";
 
 const PHRASE_BUFFER_SIZE = 500;
 
@@ -121,6 +122,7 @@ const PhraseOverlay = ({
   const boxRef = useRef<HTMLDivElement>(null);
   const typedRef = useRef<HTMLSpanElement>(null);
   const untypedRef = useRef<HTMLSpanElement>(null);
+  const cursorTargetRef = useRef<HTMLSpanElement>(null);
 
   const phraseRef = useRef(phrase);
   const typedCountRef = useRef(typedCount);
@@ -215,7 +217,14 @@ const PhraseOverlay = ({
         }}
       />
       <span ref={typedRef} style={{ color: "#90ee90" }}>{phrase.slice(0, typedCount)}</span>
+      <span ref={cursorTargetRef} />
       <span ref={untypedRef} style={{ color: "#ffffff" }}>{phrase.slice(typedCount)}</span>
+      <Cursor
+        targetRef={cursorTargetRef}
+        lerp={0.22}
+        fadeDelay={500}
+        visible={visible}
+      />
     </div>
   );
 };
