@@ -441,6 +441,10 @@ function applyTypedCharacterToPhrase(phrase: PhraseState, key: string): boolean 
   return false;
 }
 
+export function getPhraseText(phrase: PhraseState): string {
+  return phrase.lines.map((l) => l.text).join(" ");
+}
+
 function advancePhrase(phrase: PhraseState): void {
   if (phrase.lines.length === 0) return;
   const firstLine = phrase.lines[0];
