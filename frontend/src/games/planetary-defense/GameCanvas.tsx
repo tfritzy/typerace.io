@@ -126,8 +126,8 @@ const PhraseOverlay = ({
           }
         }
 
-        while (currentWords.length < PHRASE_BUFFER_SIZE) {
-          currentWords = [...currentWords, ...generateWords(1)];
+        if (currentWords.length < PHRASE_BUFFER_SIZE) {
+          currentWords = [...currentWords, ...generateWords(PHRASE_BUFFER_SIZE - currentWords.length)];
         }
 
         setWords(currentWords);
