@@ -38,7 +38,7 @@ export class DamageNumberManager {
     const dy = Math.sin(angle) * FLY_DISTANCE;
 
     const text = new Text({
-      text: String(data.amount),
+      text: String(Math.round(data.amount)),
       style: {
         fontFamily: PIXEL_FONT_FAMILY,
         fontSize: FONT_SIZE,
