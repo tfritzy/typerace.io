@@ -10,7 +10,7 @@ import type { ChartOptions } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import type { PlayerProgress } from '../types/stdb';
 import { getAggWpmBySecond } from '../utils/wpmCalculator';
-import { getPlayerColorHex } from '../utils/colorMapping';
+import { getDisplayColorHex } from '../utils/colorMapping';
 import { useDatabase } from '../contexts/SpacetimeContext';
 
 ChartJS.register(
@@ -47,10 +47,8 @@ export const AllPlayersWpmChart = ({
             raceStartTimestamp
         );
         const currentPlayerId = conn?.identity;
-        const isCurrentPlayer = currentPlayerId && playerProgress.playerId.isEqual(currentPlayerId);
-        const lineColor = isCurrentPlayer
-            ? style.getPropertyValue('--accent-primary').trim()
-            : getPlayerColorHex(playerProgress.playerColor?.tag ?? '');
+        const isCurrentPlayer = !!(currentPlayerId && playerProgress.playerId.isEqual(currentPlayerId));
+        const lineColor = getDisplayColorHex(playerProgress.playerColor?.tag, isCurrentPlayer);
 
         return {
             label: playerProgress.playerName,
