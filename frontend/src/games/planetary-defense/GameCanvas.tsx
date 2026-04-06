@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
 import { startNextWave } from "./state";
@@ -6,7 +6,6 @@ import { LabelOverlay } from "./LabelOverlay";
 import { PIXEL_FONT } from "./constants";
 import { getRandomWord } from "../../utils/wordLists";
 import { getLanguageFromSlug } from "../../utils/modes";
-import { Cursor } from "../../components/Cursor";
 
 const PHRASE_BUFFER_SIZE = 500;
 
@@ -109,6 +108,9 @@ function findFirstLineBreak(
   return -1;
 }
 
+const CURSOR_LERP = 0.22;
+const CURSOR_BLINK_DELAY = 500;
+
 const PhraseOverlay = ({
   gameRef,
   visible,
@@ -123,6 +125,12 @@ const PhraseOverlay = ({
   const typedRef = useRef<HTMLSpanElement>(null);
   const untypedRef = useRef<HTMLSpanElement>(null);
   const cursorTargetRef = useRef<HTMLSpanElement>(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const cursorPos = useRef({ x: 0, y: 0 });
+  const cursorTargetXY = useRef({ x: 0, y: 0 });
+  const cursorInitialized = useRef(false);
+  const lastCursorMoveTime = useRef(0);
+  const isBlinking = useRef(false);
 
   const phraseRef = useRef(phrase);
   const typedCountRef = useRef(typedCount);
@@ -179,6 +187,72 @@ const PhraseOverlay = ({
     }
   }, [typedCount, phrase, visible]);
 
+  useLayoutEffect(() => {
+    if (!visible) {
+      cursorInitialized.current = false;
+      return;
+    }
+
+    lastCursorMoveTime.current = Date.now();
+    isBlinking.current = false;
+
+    const animate = () => {
+      const box = boxRef.current;
+      const target = cursorTargetRef.current;
+      const cursor = cursorRef.current;
+      if (!box || !target || !cursor) {
+        rafId = requestAnimationFrame(animate);
+        return;
+      }
+
+      const boxRect = box.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+
+      const newX = targetRect.left - boxRect.left;
+      const newY = targetRect.top - boxRect.top;
+
+      const dx = Math.abs(newX - cursorTargetXY.current.x);
+      const dy = Math.abs(newY - cursorTargetXY.current.y);
+      if (dx > 0.5 || dy > 0.5) {
+        lastCursorMoveTime.current = Date.now();
+        if (isBlinking.current) {
+          isBlinking.current = false;
+          cursor.classList.remove("animate-blink");
+          cursor.style.opacity = "1";
+        }
+      }
+      cursorTargetXY.current = { x: newX, y: newY };
+
+      if (!cursorInitialized.current) {
+        cursorPos.current = { ...cursorTargetXY.current };
+        cursorInitialized.current = true;
+      } else {
+        cursorPos.current.x +=
+          (cursorTargetXY.current.x - cursorPos.current.x) * CURSOR_LERP;
+        cursorPos.current.y +=
+          (cursorTargetXY.current.y - cursorPos.current.y) * CURSOR_LERP;
+      }
+
+      cursor.style.transform = `translate(${cursorPos.current.x}px, ${cursorPos.current.y}px)`;
+
+      if (
+        !isBlinking.current &&
+        Date.now() - lastCursorMoveTime.current >= CURSOR_BLINK_DELAY
+      ) {
+        isBlinking.current = true;
+        cursor.classList.add("animate-blink");
+      }
+
+      rafId = requestAnimationFrame(animate);
+    };
+
+    let rafId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+    };
+  }, [visible]);
+
   if (!visible) return null;
 
   return (
@@ -218,11 +292,18 @@ const PhraseOverlay = ({
       <span ref={typedRef} style={{ color: "#90ee90" }}>{phrase.slice(0, typedCount)}</span>
       <span ref={cursorTargetRef} />
       <span ref={untypedRef} style={{ color: "#ffffff" }}>{phrase.slice(typedCount)}</span>
-      <Cursor
-        targetRef={cursorTargetRef}
-        lerp={0.22}
-        fadeDelay={500}
-        visible={visible}
+      <div
+        ref={cursorRef}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "2px",
+          height: "1.2em",
+          background: "var(--accent)",
+          pointerEvents: "none",
+          opacity: 1,
+        }}
       />
     </div>
   );
