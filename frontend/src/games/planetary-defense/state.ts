@@ -634,7 +634,7 @@ function spawnProjectile(
     y: relicY,
     vx: (dx / dist) * config.projectileSpeed,
     vy: (dy / dist) * config.projectileSpeed,
-    damage: config.damage * buffMultiplier,
+    damage: Math.round(config.damage * buffMultiplier),
     bleedApplicationChance: config.bleedApplicationChance,
     plasmaStacks: config.plasmaStacks,
     slowStacks: config.slowStacks,
