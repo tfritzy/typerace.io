@@ -68,8 +68,7 @@ export function buildItemCell(item: Item, assetManager: AssetManager): Container
   const cy = CELL_SIZE / 2;
 
   const config = getItemConfig(item.type);
-  const display = getItemDisplay(item.type);
-  const texture = assetManager.getRelicTexture(display.spriteSheet, display.frameName);
+  const texture = assetManager.getItemTexture(getItemDisplay(item.type));
   texture.source.scaleMode = "nearest";
   const sprite = new Sprite(texture);
   sprite.anchor.set(0.5);
