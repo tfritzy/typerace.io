@@ -196,6 +196,8 @@ const PhraseOverlay = ({
     lastCursorMoveTime.current = Date.now();
     isBlinking.current = false;
 
+    let rafId = 0;
+
     const animate = () => {
       const box = boxRef.current;
       const target = cursorTargetRef.current;
@@ -246,7 +248,7 @@ const PhraseOverlay = ({
       rafId = requestAnimationFrame(animate);
     };
 
-    let rafId = requestAnimationFrame(animate);
+    rafId = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(rafId);
