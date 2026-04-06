@@ -5,27 +5,26 @@ export enum GemType {
   FlawedTopaz = "FlawedTopaz",
   Topaz = "Topaz",
   FlawlessTopaz = "FlawlessTopaz",
-  PerfectTopaz = "PerfectTopaz",
   ChippedRuby = "ChippedRuby",
   FlawedRuby = "FlawedRuby",
   Ruby = "Ruby",
   FlawlessRuby = "FlawlessRuby",
-  PerfectRuby = "PerfectRuby",
   ChippedEmerald = "ChippedEmerald",
   FlawedEmerald = "FlawedEmerald",
   Emerald = "Emerald",
   FlawlessEmerald = "FlawlessEmerald",
-  PerfectEmerald = "PerfectEmerald",
   ChippedSapphire = "ChippedSapphire",
   FlawedSapphire = "FlawedSapphire",
   Sapphire = "Sapphire",
   FlawlessSapphire = "FlawlessSapphire",
-  PerfectSapphire = "PerfectSapphire",
   ChippedAmethyst = "ChippedAmethyst",
   FlawedAmethyst = "FlawedAmethyst",
   Amethyst = "Amethyst",
   FlawlessAmethyst = "FlawlessAmethyst",
-  PerfectAmethyst = "PerfectAmethyst",
+  ChippedDiamond = "ChippedDiamond",
+  FlawedDiamond = "FlawedDiamond",
+  Diamond = "Diamond",
+  FlawlessDiamond = "FlawlessDiamond",
 }
 
 export type ItemType = RelicType | GemType | "Gold";
@@ -41,10 +40,9 @@ export interface Item {
   price?: number;
 }
 
-export interface ItemDisplay {
-  spriteSheet: "swordtember" | "axetober";
-  frameName: string;
-}
+export type ItemDisplay =
+  | { spriteSheet: "swordtember" | "axetober"; frameName: string }
+  | { textureAlias: string };
 
 export const ITEM_DISPLAY: Record<ItemType, ItemDisplay> = {
   [RelicType.EmbercrestBlade]: { spriteSheet: "swordtember", frameName: "Embercrest Blade" },
@@ -108,32 +106,31 @@ export const ITEM_DISPLAY: Record<ItemType, ItemDisplay> = {
   [RelicType.PrismaticGreataxe]: { spriteSheet: "axetober", frameName: "Prismatic Greataxe" },
   [RelicType.HellforgedCleaver]: { spriteSheet: "axetober", frameName: "Hellforged Cleaver" },
   [RelicType.GraniteWaraxe]: { spriteSheet: "axetober", frameName: "Granite Waraxe" },
-  [GemType.ChippedTopaz]: { spriteSheet: "swordtember", frameName: "Sunfire Scimitar" },
-  [GemType.FlawedTopaz]: { spriteSheet: "swordtember", frameName: "Sunfire Scimitar" },
-  [GemType.Topaz]: { spriteSheet: "swordtember", frameName: "Sunfire Scimitar" },
-  [GemType.FlawlessTopaz]: { spriteSheet: "swordtember", frameName: "Sunfire Scimitar" },
-  [GemType.PerfectTopaz]: { spriteSheet: "swordtember", frameName: "Sunfire Scimitar" },
-  [GemType.ChippedRuby]: { spriteSheet: "swordtember", frameName: "Infernal Ravager" },
-  [GemType.FlawedRuby]: { spriteSheet: "swordtember", frameName: "Infernal Ravager" },
-  [GemType.Ruby]: { spriteSheet: "swordtember", frameName: "Infernal Ravager" },
-  [GemType.FlawlessRuby]: { spriteSheet: "swordtember", frameName: "Infernal Ravager" },
-  [GemType.PerfectRuby]: { spriteSheet: "swordtember", frameName: "Infernal Ravager" },
-  [GemType.ChippedEmerald]: { spriteSheet: "swordtember", frameName: "Emerald Fang" },
-  [GemType.FlawedEmerald]: { spriteSheet: "swordtember", frameName: "Emerald Fang" },
-  [GemType.Emerald]: { spriteSheet: "swordtember", frameName: "Emerald Fang" },
-  [GemType.FlawlessEmerald]: { spriteSheet: "swordtember", frameName: "Emerald Fang" },
-  [GemType.PerfectEmerald]: { spriteSheet: "swordtember", frameName: "Emerald Fang" },
-  [GemType.ChippedSapphire]: { spriteSheet: "swordtember", frameName: "Azure Crescent" },
-  [GemType.FlawedSapphire]: { spriteSheet: "swordtember", frameName: "Azure Crescent" },
-  [GemType.Sapphire]: { spriteSheet: "swordtember", frameName: "Azure Crescent" },
-  [GemType.FlawlessSapphire]: { spriteSheet: "swordtember", frameName: "Azure Crescent" },
-  [GemType.PerfectSapphire]: { spriteSheet: "swordtember", frameName: "Azure Crescent" },
-  [GemType.ChippedAmethyst]: { spriteSheet: "swordtember", frameName: "Voidthorn Blade" },
-  [GemType.FlawedAmethyst]: { spriteSheet: "swordtember", frameName: "Voidthorn Blade" },
-  [GemType.Amethyst]: { spriteSheet: "swordtember", frameName: "Voidthorn Blade" },
-  [GemType.FlawlessAmethyst]: { spriteSheet: "swordtember", frameName: "Voidthorn Blade" },
-  [GemType.PerfectAmethyst]: { spriteSheet: "swordtember", frameName: "Voidthorn Blade" },
-  Gold: { spriteSheet: "axetober", frameName: "Gilded Waraxe" },
+  [GemType.ChippedTopaz]: { textureAlias: "topaz-0" },
+  [GemType.FlawedTopaz]: { textureAlias: "topaz-1" },
+  [GemType.Topaz]: { textureAlias: "topaz-2" },
+  [GemType.FlawlessTopaz]: { textureAlias: "topaz-3" },
+  [GemType.ChippedRuby]: { textureAlias: "ruby-0" },
+  [GemType.FlawedRuby]: { textureAlias: "ruby-1" },
+  [GemType.Ruby]: { textureAlias: "ruby-2" },
+  [GemType.FlawlessRuby]: { textureAlias: "ruby-3" },
+  [GemType.ChippedEmerald]: { textureAlias: "emerald-0" },
+  [GemType.FlawedEmerald]: { textureAlias: "emerald-1" },
+  [GemType.Emerald]: { textureAlias: "emerald-2" },
+  [GemType.FlawlessEmerald]: { textureAlias: "emerald-3" },
+  [GemType.ChippedSapphire]: { textureAlias: "sapphire-0" },
+  [GemType.FlawedSapphire]: { textureAlias: "sapphire-1" },
+  [GemType.Sapphire]: { textureAlias: "sapphire-2" },
+  [GemType.FlawlessSapphire]: { textureAlias: "sapphire-3" },
+  [GemType.ChippedAmethyst]: { textureAlias: "amethyst-0" },
+  [GemType.FlawedAmethyst]: { textureAlias: "amethyst-1" },
+  [GemType.Amethyst]: { textureAlias: "amethyst-2" },
+  [GemType.FlawlessAmethyst]: { textureAlias: "amethyst-3" },
+  [GemType.ChippedDiamond]: { textureAlias: "diamond-0" },
+  [GemType.FlawedDiamond]: { textureAlias: "diamond-1" },
+  [GemType.Diamond]: { textureAlias: "diamond-2" },
+  [GemType.FlawlessDiamond]: { textureAlias: "diamond-3" },
+  Gold: { textureAlias: "coin-1" },
 };
 
 export const ITEM_CONFIGS: Record<ItemType, ItemConfig> = {
@@ -202,49 +199,52 @@ export const ITEM_CONFIGS: Record<ItemType, ItemConfig> = {
   [GemType.FlawedTopaz]: { stackable: false },
   [GemType.Topaz]: { stackable: false },
   [GemType.FlawlessTopaz]: { stackable: false },
-  [GemType.PerfectTopaz]: { stackable: false },
   [GemType.ChippedRuby]: { stackable: false },
   [GemType.FlawedRuby]: { stackable: false },
   [GemType.Ruby]: { stackable: false },
   [GemType.FlawlessRuby]: { stackable: false },
-  [GemType.PerfectRuby]: { stackable: false },
   [GemType.ChippedEmerald]: { stackable: false },
   [GemType.FlawedEmerald]: { stackable: false },
   [GemType.Emerald]: { stackable: false },
   [GemType.FlawlessEmerald]: { stackable: false },
-  [GemType.PerfectEmerald]: { stackable: false },
   [GemType.ChippedSapphire]: { stackable: false },
   [GemType.FlawedSapphire]: { stackable: false },
   [GemType.Sapphire]: { stackable: false },
   [GemType.FlawlessSapphire]: { stackable: false },
-  [GemType.PerfectSapphire]: { stackable: false },
   [GemType.ChippedAmethyst]: { stackable: false },
   [GemType.FlawedAmethyst]: { stackable: false },
   [GemType.Amethyst]: { stackable: false },
   [GemType.FlawlessAmethyst]: { stackable: false },
-  [GemType.PerfectAmethyst]: { stackable: false },
+  [GemType.ChippedDiamond]: { stackable: false },
+  [GemType.FlawedDiamond]: { stackable: false },
+  [GemType.Diamond]: { stackable: false },
+  [GemType.FlawlessDiamond]: { stackable: false },
   Gold: { stackable: true, maxStack: 2147483647 },
 };
 
 export const TOPAZ_TIERS: GemType[] = [
   GemType.ChippedTopaz, GemType.FlawedTopaz, GemType.Topaz,
-  GemType.FlawlessTopaz, GemType.PerfectTopaz,
+  GemType.FlawlessTopaz,
 ];
 export const RUBY_TIERS: GemType[] = [
   GemType.ChippedRuby, GemType.FlawedRuby, GemType.Ruby,
-  GemType.FlawlessRuby, GemType.PerfectRuby,
+  GemType.FlawlessRuby,
 ];
 export const EMERALD_TIERS: GemType[] = [
   GemType.ChippedEmerald, GemType.FlawedEmerald, GemType.Emerald,
-  GemType.FlawlessEmerald, GemType.PerfectEmerald,
+  GemType.FlawlessEmerald,
 ];
 export const SAPPHIRE_TIERS: GemType[] = [
   GemType.ChippedSapphire, GemType.FlawedSapphire, GemType.Sapphire,
-  GemType.FlawlessSapphire, GemType.PerfectSapphire,
+  GemType.FlawlessSapphire,
 ];
 export const AMETHYST_TIERS: GemType[] = [
   GemType.ChippedAmethyst, GemType.FlawedAmethyst, GemType.Amethyst,
-  GemType.FlawlessAmethyst, GemType.PerfectAmethyst,
+  GemType.FlawlessAmethyst,
+];
+export const DIAMOND_TIERS: GemType[] = [
+  GemType.ChippedDiamond, GemType.FlawedDiamond, GemType.Diamond,
+  GemType.FlawlessDiamond,
 ];
 
 export function getItemDisplay(type: ItemType): ItemDisplay {

@@ -51,6 +51,7 @@ export class AssetManager {
   private colorPresets_: Record<string, Texture>;
   private swordtember_: Spritesheet;
   private axetober_: Spritesheet;
+  private itemTextures_: Record<string, Texture>;
 
   constructor(loaded: Record<string, unknown>) {
     const engineAliasValues = Object.values(ENGINE_ALIASES);
@@ -75,6 +76,21 @@ export class AssetManager {
     );
     this.swordtember_ = loaded["swordtember"] as Spritesheet;
     this.axetober_ = loaded["axetober"] as Spritesheet;
+
+    this.itemTextures_ = {};
+    for (const [key, value] of Object.entries(loaded)) {
+      if (
+        key.startsWith("topaz-") ||
+        key.startsWith("ruby-") ||
+        key.startsWith("emerald-") ||
+        key.startsWith("sapphire-") ||
+        key.startsWith("amethyst-") ||
+        key.startsWith("diamond-") ||
+        key.startsWith("coin-")
+      ) {
+        this.itemTextures_[key] = value as Texture;
+      }
+    }
 
     this.applyNearestNeighbor();
   }
@@ -126,6 +142,10 @@ export class AssetManager {
     return sheet.textures[frameName];
   }
 
+  getItemTexture(alias: string): Texture {
+    return this.itemTextures_[alias];
+  }
+
   static async load(manifest: AssetsManifest): Promise<AssetManager> {
     const bundle = manifest.bundles[0];
     Assets.addBundle(bundle.name, bundle.assets);
@@ -154,5 +174,8 @@ export class AssetManager {
     }
     setNearestNeighbor(this.swordtember_);
     setNearestNeighbor(this.axetober_);
+    for (const tex of Object.values(this.itemTextures_)) {
+      setTextureNearest(tex);
+    }
   }
 }
