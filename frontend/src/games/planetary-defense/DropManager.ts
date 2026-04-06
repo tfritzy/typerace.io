@@ -1,6 +1,8 @@
-import { Container, Graphics } from "pixi.js";
+import { Container, Sprite } from "pixi.js";
 import type { GameState, DropState } from "./state";
 import { DROP_LABEL_COLOR, DROP_SIZE } from "./dropConfig";
+import { getItemDisplay } from "./itemConfig";
+import type { AssetManager } from "./assetManager";
 
 export interface LabelData {
   id: number;
@@ -16,11 +18,13 @@ export class DropManager {
 
   labels: LabelData[] = [];
 
-  private displayObjects = new Map<number, Graphics>();
+  private displayObjects = new Map<number, Sprite>();
   private activeIds = new Set<number>();
+  private assetManager: AssetManager;
 
-  constructor() {
+  constructor(assetManager: AssetManager) {
     this.layer = new Container();
+    this.assetManager = assetManager;
   }
 
   update(state: GameState): void {
@@ -56,11 +60,14 @@ export class DropManager {
     }
   }
 
-  private createDropVisual(_drop: DropState): Graphics {
-    const g = new Graphics();
-    g.rect(-DROP_SIZE / 2, -DROP_SIZE / 2, DROP_SIZE, DROP_SIZE);
-    g.fill({ color: 0xffffff });
-    return g;
+  private createDropVisual(drop: DropState): Sprite {
+    const texture = this.assetManager.getItemTexture(getItemDisplay(drop.item.type));
+    texture.source.scaleMode = "nearest";
+    const sprite = new Sprite(texture);
+    sprite.anchor.set(0.5);
+    const scale = DROP_SIZE / Math.max(texture.width, texture.height);
+    sprite.scale.set(scale);
+    return sprite;
   }
 
   destroy(): void {

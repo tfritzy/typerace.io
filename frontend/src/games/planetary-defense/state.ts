@@ -17,7 +17,7 @@ import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
 import {
   type Item, GemType,
-  TOPAZ_TIERS, RUBY_TIERS, EMERALD_TIERS, SAPPHIRE_TIERS, AMETHYST_TIERS,
+  TOPAZ_TIERS, RUBY_TIERS, EMERALD_TIERS, SAPPHIRE_TIERS, AMETHYST_TIERS, DIAMOND_TIERS,
 } from "./itemConfig";
 
 const DROP_SPEED = 80;
@@ -430,12 +430,12 @@ function rollGemDrop(power: number): GemType | null {
   if (power >= 100) families.push(RUBY_TIERS);
   if (power >= 250) families.push(AMETHYST_TIERS);
   if (power >= 500) families.push(EMERALD_TIERS);
+  if (power >= 1000) families.push(DIAMOND_TIERS);
   const family = families[Math.floor(Math.random() * families.length)];
 
   let quality: number;
-  if (power >= 10000) quality = 4;
-  else if (power >= 1000) quality = 3;
-  else if (power >= 200) quality = 2;
+  if (power >= 10000) quality = 3;
+  else if (power >= 1000) quality = 2;
   else if (power >= 50) quality = 1;
   else quality = 0;
 

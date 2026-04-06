@@ -100,7 +100,7 @@ export class PlanetaryDefenseGame {
     this.enemyManager = new EnemyManager(this.assetManager);
     world.addChild(this.enemyManager.layer);
 
-    this.dropManager = new DropManager();
+    this.dropManager = new DropManager(this.assetManager);
     world.addChild(this.dropManager.layer);
 
     this.merchantManager = new MerchantManager(this.assetManager);

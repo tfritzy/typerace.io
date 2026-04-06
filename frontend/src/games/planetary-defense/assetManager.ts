@@ -49,8 +49,7 @@ export class AssetManager {
   private engines_: Record<string, Spritesheet>;
   private asteroids_: Record<string, Spritesheet>;
   private colorPresets_: Record<string, Texture>;
-  private swordtember_: Spritesheet;
-  private axetober_: Spritesheet;
+  private itemTextures_: Record<string, Texture>;
 
   constructor(loaded: Record<string, unknown>) {
     const engineAliasValues = Object.values(ENGINE_ALIASES);
@@ -73,8 +72,100 @@ export class AssetManager {
     this.colorPresets_ = Object.fromEntries(
       presetAliasValues.map((a) => [a, loaded[a] as Texture])
     );
-    this.swordtember_ = loaded["swordtember"] as Spritesheet;
-    this.axetober_ = loaded["axetober"] as Spritesheet;
+
+    const swordtember = loaded["swordtember"] as Spritesheet;
+    const axetober = loaded["axetober"] as Spritesheet;
+
+    this.itemTextures_ = {
+      "Embercrest Blade": swordtember.textures["Embercrest Blade"],
+      "Briarthorn Saber": swordtember.textures["Briarthorn Saber"],
+      "Ravenplume Edge": swordtember.textures["Ravenplume Edge"],
+      "Rubyguard Greatsword": swordtember.textures["Rubyguard Greatsword"],
+      "Sunfire Scimitar": swordtember.textures["Sunfire Scimitar"],
+      "Cloudveil Longsword": swordtember.textures["Cloudveil Longsword"],
+      "Voidthorn Blade": swordtember.textures["Voidthorn Blade"],
+      "Gilded Plumeblade": swordtember.textures["Gilded Plumeblade"],
+      "Glacial Crusader": swordtember.textures["Glacial Crusader"],
+      "Bloodthorn Dirk": swordtember.textures["Bloodthorn Dirk"],
+      "Twinflare Crossblades": swordtember.textures["Twinflare Crossblades"],
+      "Molten Zweihander": swordtember.textures["Molten Zweihander"],
+      "Frostfang Claymore": swordtember.textures["Frostfang Claymore"],
+      "Sporespark Glaive": swordtember.textures["Sporespark Glaive"],
+      "Azure Crescent": swordtember.textures["Azure Crescent"],
+      "Rosevine Rapier": swordtember.textures["Rosevine Rapier"],
+      "Crystalbreak Saber": swordtember.textures["Crystalbreak Saber"],
+      "Cinderstone Blade": swordtember.textures["Cinderstone Blade"],
+      "Emerald Fang": swordtember.textures["Emerald Fang"],
+      "Starfall Stiletto": swordtember.textures["Starfall Stiletto"],
+      "Crimson Cleaver": swordtember.textures["Crimson Cleaver"],
+      "Tigerstripe Falchion": swordtember.textures["Tigerstripe Falchion"],
+      "Dawnfire Cutlass": swordtember.textures["Dawnfire Cutlass"],
+      "Jadecross Broadsword": swordtember.textures["Jadecross Broadsword"],
+      "Chainlink Estoc": swordtember.textures["Chainlink Estoc"],
+      "Permafrost Greatsword": swordtember.textures["Permafrost Greatsword"],
+      "Mistral Sabre": swordtember.textures["Mistral Sabre"],
+      "Tidecaller Blade": swordtember.textures["Tidecaller Blade"],
+      "Solaris Edge": swordtember.textures["Solaris Edge"],
+      "Infernal Ravager": swordtember.textures["Infernal Ravager"],
+      "Steel Battleaxe": axetober.textures["Steel Battleaxe"],
+      "Moonlit Hatchet": axetober.textures["Moonlit Hatchet"],
+      "Obsidian Reaver": axetober.textures["Obsidian Reaver"],
+      "Rubyflare Greataxe": axetober.textures["Rubyflare Greataxe"],
+      "Gilded Waraxe": axetober.textures["Gilded Waraxe"],
+      "Copperhead Cleaver": axetober.textures["Copperhead Cleaver"],
+      "Bonecrest Axe": axetober.textures["Bonecrest Axe"],
+      "Darkwood Hatchet": axetober.textures["Darkwood Hatchet"],
+      "Duskforge Halberd": axetober.textures["Duskforge Halberd"],
+      "Rosegold Broadaxe": axetober.textures["Rosegold Broadaxe"],
+      "Frostbite Cleaver": axetober.textures["Frostbite Cleaver"],
+      "Bloodmoon Reaver": axetober.textures["Bloodmoon Reaver"],
+      "Tidebreak Axe": axetober.textures["Tidebreak Axe"],
+      "Ironwood Tomahawk": axetober.textures["Ironwood Tomahawk"],
+      "Greystone Broadaxe": axetober.textures["Greystone Broadaxe"],
+      "Sandstone Hatchet": axetober.textures["Sandstone Hatchet"],
+      "Crimson Waraxe": axetober.textures["Crimson Waraxe"],
+      "Goldscar Halberd": axetober.textures["Goldscar Halberd"],
+      "Flamecrest Greataxe": axetober.textures["Flamecrest Greataxe"],
+      "Wrought Iron Chopper": axetober.textures["Wrought Iron Chopper"],
+      "Spectral Cleaver": axetober.textures["Spectral Cleaver"],
+      "Bloodrune Axe": axetober.textures["Bloodrune Axe"],
+      "Pearlsteel Hatchet": axetober.textures["Pearlsteel Hatchet"],
+      "Emberstrike Tomahawk": axetober.textures["Emberstrike Tomahawk"],
+      "Nightbloom Reaver": axetober.textures["Nightbloom Reaver"],
+      "Blackiron Splitter": axetober.textures["Blackiron Splitter"],
+      "Verdant Waraxe": axetober.textures["Verdant Waraxe"],
+      "Ashen Broadaxe": axetober.textures["Ashen Broadaxe"],
+      "Prismatic Greataxe": axetober.textures["Prismatic Greataxe"],
+      "Hellforged Cleaver": axetober.textures["Hellforged Cleaver"],
+      "Granite Waraxe": axetober.textures["Granite Waraxe"],
+      "topaz-0": loaded["topaz-0"] as Texture,
+      "topaz-1": loaded["topaz-1"] as Texture,
+      "topaz-2": loaded["topaz-2"] as Texture,
+      "topaz-3": loaded["topaz-3"] as Texture,
+      "ruby-0": loaded["ruby-0"] as Texture,
+      "ruby-1": loaded["ruby-1"] as Texture,
+      "ruby-2": loaded["ruby-2"] as Texture,
+      "ruby-3": loaded["ruby-3"] as Texture,
+      "emerald-0": loaded["emerald-0"] as Texture,
+      "emerald-1": loaded["emerald-1"] as Texture,
+      "emerald-2": loaded["emerald-2"] as Texture,
+      "emerald-3": loaded["emerald-3"] as Texture,
+      "sapphire-0": loaded["sapphire-0"] as Texture,
+      "sapphire-1": loaded["sapphire-1"] as Texture,
+      "sapphire-2": loaded["sapphire-2"] as Texture,
+      "sapphire-3": loaded["sapphire-3"] as Texture,
+      "amethyst-0": loaded["amethyst-0"] as Texture,
+      "amethyst-1": loaded["amethyst-1"] as Texture,
+      "amethyst-2": loaded["amethyst-2"] as Texture,
+      "amethyst-3": loaded["amethyst-3"] as Texture,
+      "diamond-0": loaded["diamond-0"] as Texture,
+      "diamond-1": loaded["diamond-1"] as Texture,
+      "diamond-2": loaded["diamond-2"] as Texture,
+      "diamond-3": loaded["diamond-3"] as Texture,
+      "coin-0": loaded["coin-0"] as Texture,
+      "coin-1": loaded["coin-1"] as Texture,
+      "coin-2": loaded["coin-2"] as Texture,
+    };
 
     this.applyNearestNeighbor();
   }
@@ -121,9 +212,8 @@ export class AssetManager {
     return textures[variant % textures.length];
   }
 
-  getRelicTexture(spriteSheet: 'swordtember' | 'axetober', frameName: string): Texture {
-    const sheet = spriteSheet === 'swordtember' ? this.swordtember_ : this.axetober_;
-    return sheet.textures[frameName];
+  getItemTexture(alias: string): Texture {
+    return this.itemTextures_[alias];
   }
 
   static async load(manifest: AssetsManifest): Promise<AssetManager> {
@@ -152,7 +242,8 @@ export class AssetManager {
     for (const tex of Object.values(this.colorPresets_)) {
       setTextureNearest(tex);
     }
-    setNearestNeighbor(this.swordtember_);
-    setNearestNeighbor(this.axetober_);
+    for (const tex of Object.values(this.itemTextures_)) {
+      setTextureNearest(tex);
+    }
   }
 }
