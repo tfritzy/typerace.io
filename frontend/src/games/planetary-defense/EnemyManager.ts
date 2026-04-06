@@ -6,19 +6,8 @@ import { createShipContainer } from "./prefabs/shipPrefab";
 import { createMeteorSprite } from "./prefabs/meteorPrefab";
 import { isShipEntityType } from "./types";
 
-export interface LabelData {
-  id: number;
-  word: string;
-  typedCount: number;
-  x: number;
-  y: number;
-  color?: string;
-}
-
 export class EnemyManager {
   readonly layer: Container;
-
-  labels: LabelData[] = [];
 
   private assets: AssetManager;
   private entityDisplayObjects = new Map<number, Container>();
@@ -75,7 +64,6 @@ export class EnemyManager {
 
   private syncRendering(state: GameState): void {
     this.activeEntityIds.clear();
-    this.labels.length = 0;
 
     for (const entity of state.entities) {
       this.activeEntityIds.add(entity.id);
@@ -93,9 +81,6 @@ export class EnemyManager {
       } else {
         display.rotation = entity.rotation;
       }
-
-      const labelOffset = isShipEntityType(entity.entityType) ? -24 : -20;
-      this.labels.push({ id: entity.id, word: entity.word, typedCount: entity.typedCount, x: entity.x, y: entity.y + labelOffset });
     }
 
     for (const [id, display] of this.entityDisplayObjects) {
@@ -109,7 +94,6 @@ export class EnemyManager {
   destroy(): void {
     for (const d of this.entityDisplayObjects.values()) d.destroy();
     this.entityDisplayObjects.clear();
-    this.labels.length = 0;
     this.layer.destroy();
   }
 }

@@ -3,8 +3,8 @@ import { createPlanetaryDefenseGame } from "./game";
 import type { PlanetaryDefenseGame } from "./game";
 import { startNextWave } from "./state";
 import { LabelOverlay } from "./LabelOverlay";
-
-const PIXEL_FONT = "'Press Start 2P', monospace";
+import { PhraseOverlay } from "./PhraseOverlay";
+import { PIXEL_FONT } from "./constants";
 
 const PlanetHealthBar = ({ ratio }: { ratio: number }) => {
   const pct = Math.max(0, Math.min(100, ratio * 100));
@@ -106,8 +106,12 @@ export const GameCanvas = () => {
     };
   }, []);
 
+  const waveActiveRef = useRef(false);
+  waveActiveRef.current = waveActive;
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      if (waveActiveRef.current) return;
       const game = gameRef.current;
       if (!game) return;
       if (e.ctrlKey || e.altKey || e.metaKey) return;
@@ -134,6 +138,7 @@ export const GameCanvas = () => {
       style={{ fontFamily: PIXEL_FONT }}
     >
       <LabelOverlay gameRef={gameRef} />
+      <PhraseOverlay gameRef={gameRef} visible={waveActive} />
       <PlanetHealthBar ratio={healthRatio} />
       <div className="absolute top-3 left-3 z-10">
         <div
