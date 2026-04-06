@@ -6,7 +6,7 @@ import {
   type FederatedPointerEvent,
 } from "pixi.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
-import { type Item, type ItemDisplay, getItemConfig, getItemDisplay } from "./itemConfig";
+import { type Item, getItemConfig, getItemDisplay } from "./itemConfig";
 import { RelicType } from "./relicConfig";
 import type { AssetManager } from "./assetManager";
 
@@ -55,13 +55,6 @@ function createEvent<T>() {
   };
 }
 
-function getTextureForDisplay(display: ItemDisplay, assetManager: AssetManager) {
-  if ("textureAlias" in display) {
-    return assetManager.getItemTexture(display.textureAlias);
-  }
-  return assetManager.getRelicTexture(display.spriteSheet, display.frameName);
-}
-
 export function buildItemCell(item: Item, assetManager: AssetManager): Container {
   const wrapper = new Container();
 
@@ -75,8 +68,7 @@ export function buildItemCell(item: Item, assetManager: AssetManager): Container
   const cy = CELL_SIZE / 2;
 
   const config = getItemConfig(item.type);
-  const display = getItemDisplay(item.type);
-  const texture = getTextureForDisplay(display, assetManager);
+  const texture = assetManager.getItemTexture(getItemDisplay(item.type));
   texture.source.scaleMode = "nearest";
   const sprite = new Sprite(texture);
   sprite.anchor.set(0.5);

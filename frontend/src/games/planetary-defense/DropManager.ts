@@ -53,13 +53,7 @@ export class DropManager {
   }
 
   private createDropVisual(drop: DropState): Sprite {
-    const display = getItemDisplay(drop.item.type);
-    let texture;
-    if ("textureAlias" in display) {
-      texture = this.assetManager.getItemTexture(display.textureAlias);
-    } else {
-      texture = this.assetManager.getRelicTexture(display.spriteSheet, display.frameName);
-    }
+    const texture = this.assetManager.getItemTexture(getItemDisplay(drop.item.type));
     texture.source.scaleMode = "nearest";
     const sprite = new Sprite(texture);
     sprite.anchor.set(0.5);
