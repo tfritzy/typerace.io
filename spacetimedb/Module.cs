@@ -1487,6 +1487,29 @@ public static partial class Module
                 Log.Info($"Game {game.Id} transitioned to Archived state");
             }
         }
+
+        var thirtySecondsAgo = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 30_000_000;
+        var oneHourAgo = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 3_600_000_000;
+
+        foreach (var game in ctx.Db.game.State.Filter(GameState.Lobby))
+        {
+            if (game.GameType == GameType.Public && game.CreatedAt < thirtySecondsAgo)
+            {
+                var updatedGame = game;
+                updatedGame.State = GameState.Archived;
+                ctx.Db.game.Id.Update(updatedGame);
+
+                Log.Info($"Public lobby game {game.Id} archived after 30 seconds");
+            }
+            else if (game.GameType == GameType.Private && game.CreatedAt < oneHourAgo)
+            {
+                var updatedGame = game;
+                updatedGame.State = GameState.Archived;
+                ctx.Db.game.Id.Update(updatedGame);
+
+                Log.Info($"Private lobby game {game.Id} archived after 1 hour");
+            }
+        }
     }
 
     [Reducer]
