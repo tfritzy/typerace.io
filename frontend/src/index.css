@@ -368,11 +368,3 @@ body {
 .logo-io {
   color: var(--accent-primary);
 }
-
-.landing-tagline {
-  font-size: 0.95rem;
-  font-weight: 400;
-  color: var(--muted-foreground);
-  letter-spacing: 0.04em;
-  text-align: center;
-}
