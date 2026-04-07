@@ -300,7 +300,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         <div className="relative select-none flex-1">
           <div className="type-box">
             <div
-              className="whitespace-pre-wrap text-start text-[28px] tracking-wide leading-12"
+              className="whitespace-pre-wrap text-start text-[28px] leading-12"
               ref={phraseRef}
             >
               {renderText()}
@@ -308,7 +308,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
             <Cursor
               targetRef={targetRef}
-              lerp={0.22}
+              lerp={0.3}
               fadeDelay={500}
               visible={focused && !isComplete && !hideCursor}
             />

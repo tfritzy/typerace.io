@@ -88,7 +88,7 @@ export const PlayerAvatar = memo(({
             )}
             {medalColor && placement && (
                 <div
-                    className="absolute -bottom-1.5 -right-1.5 z-10 flex items-center justify-center rounded-full"
+                    className="absolute -bottom-1 -right-0.5 z-10 flex items-center justify-center rounded-full"
                     style={{
                         width: size * 0.4,
                         height: size * 0.4,

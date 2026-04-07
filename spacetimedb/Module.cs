@@ -679,14 +679,17 @@ public static partial class Module
 
         foreach (var game in ctx.Db.game.State_GameType.Filter((GameState.Lobby, GameType.Public)))
         {
-            if (CountPlayersInGame(ctx, game.Id) < GetMaxPlayerCount(gameType))
-            {
-                if (FindPlayerProgress(ctx, ctx.Sender, game.Id) == null)
+            if (game.GameMode == gameMode) {
+                if (CountPlayersInGame(ctx, game.Id) < GetMaxPlayerCount(gameType))
                 {
-                    return game;
+                    if (FindPlayerProgress(ctx, ctx.Sender, game.Id) == null)
+                    {
+                        return game;
+                    }
                 }
             }
         }
+        
         return null;
     }
 
