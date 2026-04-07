@@ -3,6 +3,7 @@ import { Bot, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { getPlayerProgressGradient } from '../utils/colorMapping';
+import { getInitialTheme } from '../utils/themes';
 
 type PlayerProgressBarProps = {
     name: string;
@@ -39,8 +40,8 @@ export const PlayerProgressBar = memo(({
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
 
-    const [themeVersion, setThemeVersion] = useState(0);
-    const onThemeChange = useCallback(() => setThemeVersion(v => v + 1), []);
+    const [currentTheme, setCurrentTheme] = useState(getInitialTheme);
+    const onThemeChange = useCallback(() => setCurrentTheme(getInitialTheme()), []);
     useEffect(() => {
         window.addEventListener('themechange', onThemeChange);
         return () => window.removeEventListener('themechange', onThemeChange);
@@ -50,7 +51,7 @@ export const PlayerProgressBar = memo(({
         () => playerColorTag
             ? getPlayerProgressGradient(playerColorTag)
             : 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))',
-        [playerColorTag, themeVersion]
+        [playerColorTag, currentTheme]
     );
 
     return (
