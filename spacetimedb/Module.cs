@@ -1493,21 +1493,19 @@ public static partial class Module
 
         foreach (var game in ctx.Db.game.State.Filter(GameState.Lobby))
         {
-            if (game.GameType == GameType.Public && game.CreatedAt < thirtySecondsAgo)
-            {
-                var updatedGame = game;
-                updatedGame.State = GameState.Archived;
-                ctx.Db.game.Id.Update(updatedGame);
+            bool shouldDelete =
+                (game.GameType == GameType.Public && game.CreatedAt < thirtySecondsAgo) ||
+                (game.GameType == GameType.Private && game.CreatedAt < oneHourAgo);
 
-                Log.Info($"Public lobby game {game.Id} archived after 30 seconds");
-            }
-            else if (game.GameType == GameType.Private && game.CreatedAt < oneHourAgo)
+            if (shouldDelete)
             {
-                var updatedGame = game;
-                updatedGame.State = GameState.Archived;
-                ctx.Db.game.Id.Update(updatedGame);
+                foreach (var pp in ctx.Db.playerprogress.GameId.Filter(game.Id))
+                {
+                    ctx.Db.playerprogress.Id.Delete(pp.Id);
+                }
 
-                Log.Info($"Private lobby game {game.Id} archived after 1 hour");
+                ctx.Db.game.Id.Delete(game.Id);
+                Log.Info($"Deleted stale {game.GameType} lobby game {game.Id}");
             }
         }
     }
