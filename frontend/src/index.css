@@ -378,3 +378,9 @@ body {
   line-height: 1;
   margin-top: -2px;
 }
+
+.logo-button {
+  all: unset;
+  cursor: pointer;
+  display: block;
+}
