@@ -9,7 +9,7 @@ import {
     type ThemeTag,
 } from '../utils/themes';
 
-function ThemeCard({
+function ThemeRow({
     tag,
     isSelected,
     onSelect,
@@ -24,40 +24,23 @@ function ThemeCard({
     return (
         <button
             onClick={onSelect}
-            className={`rounded-lg overflow-hidden cursor-pointer transition-all text-left w-full ${
+            className={`flex items-center gap-3 w-full rounded-md px-3 py-2 cursor-pointer transition-colors text-left ${
                 isSelected
-                    ? 'ring-2 ring-accent ring-offset-2 ring-offset-card'
-                    : 'hover:ring-1 hover:ring-foreground/20 hover:ring-offset-1 hover:ring-offset-card'
+                    ? 'bg-accent/15'
+                    : 'hover:bg-foreground/5'
             }`}
         >
-            <div
-                className="p-3 pb-2.5"
-                style={{ background: preset.backgroundColor }}
-            >
-                <div className="flex gap-1.5 mb-2">
-                    {resolved.previewColors.slice(1).map((color) => (
-                        <div
-                            key={color}
-                            className="h-2 flex-1 rounded-full"
-                            style={{ background: color }}
-                        />
-                    ))}
-                </div>
-                <div className="text-[11px] font-mono leading-relaxed">
-                    <span style={{ color: resolved.colors.accent }}>the </span>
-                    <span style={{ color: resolved.colors.textUntyped }}>quick fox</span>
-                </div>
+            <div className="flex gap-0.5 shrink-0">
+                {resolved.previewColors.map((color) => (
+                    <div
+                        key={color}
+                        className="w-4 h-4 rounded-sm first:rounded-l-md last:rounded-r-md"
+                        style={{ background: color }}
+                    />
+                ))}
             </div>
-            <div
-                className="px-3 py-1.5 flex items-center justify-between"
-                style={{
-                    background: resolved.colors.card,
-                    color: resolved.colors.foreground,
-                }}
-            >
-                <span className="text-xs font-medium truncate">{preset.name}</span>
-                {isSelected && <Check className="w-3.5 h-3.5 shrink-0 ml-1" style={{ color: resolved.colors.accent }} />}
-            </div>
+            <span className="flex-1 text-sm text-foreground truncate">{preset.name}</span>
+            {isSelected && <Check className="w-4 h-4 shrink-0 text-accent" />}
         </button>
     );
 }
@@ -79,16 +62,16 @@ export const ThemeShowcaseModal = ({ open, onClose }: ThemeShowcaseModalProps) =
 
     return (
         <Dialog open={open} onOpenChange={(open) => { if (!open) onClose(); }}>
-            <DialogContent className="max-w-lg max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
+            <DialogContent className="max-w-sm max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
                 <DialogTitle className="sr-only">Theme Settings</DialogTitle>
                 <div className="px-5 pt-5 pb-3 border-b border-border shrink-0">
                     <h2 className="text-lg font-semibold text-foreground">Themes</h2>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4">
-                    <div className="grid grid-cols-3 gap-2.5">
+                <div className="flex-1 overflow-y-auto p-2">
+                    <div className="flex flex-col gap-0.5">
                         {themeTags.map((tag) => (
-                            <ThemeCard
+                            <ThemeRow
                                 key={tag}
                                 tag={tag}
                                 isSelected={selectedTheme === tag}
