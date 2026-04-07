@@ -30,14 +30,14 @@ function ThemeRow({
                     : 'hover:bg-foreground/5'
             }`}
         >
-            <div className="flex gap-0.5 shrink-0">
-                {resolved.previewColors.map((color) => (
-                    <div
-                        key={color}
-                        className="w-4 h-4 rounded-sm first:rounded-l-md last:rounded-r-md"
-                        style={{ background: color }}
-                    />
-                ))}
+            <div
+                className="shrink-0 rounded-md overflow-hidden px-2.5 py-1.5"
+                style={{ background: resolved.colors.background }}
+            >
+                <div className="text-[11px] font-mono whitespace-nowrap">
+                    <span style={{ color: resolved.colors.accent }}>the </span>
+                    <span style={{ color: resolved.colors.textUntyped }}>quick fox</span>
+                </div>
             </div>
             <span className="flex-1 text-sm text-foreground truncate">{preset.name}</span>
             {isSelected && <Check className="w-4 h-4 shrink-0 text-accent" />}
