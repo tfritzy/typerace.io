@@ -368,3 +368,13 @@ body {
 .logo-io {
   color: var(--accent-primary);
 }
+
+.logo-tagline {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  margin-top: -2px;
+}
