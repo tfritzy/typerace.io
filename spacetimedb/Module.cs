@@ -935,7 +935,7 @@ public static partial class Module
                 }
 
                 var botConfig = botPlayer.Value.BotConfig.Value;
-                var shouldError = ctx.Rng.NextDouble() < botConfig.ErrorRate;
+                var shouldError = ctx.Rng.NextDouble() < botConfig.ErrorRate / 4;
 
                 if (shouldError)
                 {
