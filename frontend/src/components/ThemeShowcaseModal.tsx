@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Check } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import {
     THEME_PRESETS,
@@ -37,12 +36,27 @@ function ThemeRow({
             >
                 {preset.name}
             </span>
-            {isSelected && (
-                <Check
-                    className="w-4 h-4 shrink-0"
-                    style={{ color: resolved.colors.accent }}
-                />
-            )}
+            <div
+                className="w-5 h-5 shrink-0 rounded border-2 flex items-center justify-center"
+                style={{
+                    borderColor: resolved.colors.accent,
+                    background: isSelected ? resolved.colors.accent : 'transparent',
+                }}
+            >
+                {isSelected && (
+                    <svg
+                        viewBox="0 0 12 12"
+                        className="w-3 h-3"
+                        fill="none"
+                        stroke={resolved.colors.background}
+                        strokeWidth={2.5}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M2.5 6l2.5 2.5 4.5-5" />
+                    </svg>
+                )}
+            </div>
         </button>
     );
 }
