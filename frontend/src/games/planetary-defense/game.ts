@@ -13,7 +13,7 @@ import { Inventory, CELL_SIZE, GRID_PADDING, BORDER_WIDTH } from "./Inventory";
 import { InventoryManager } from "./InventoryManager";
 import { MerchantManager } from "./MerchantManager";
 import { AssetManager } from "./assetManager";
-import { createGameState, updateState, getRelicPosition, WavePhase, handleTypedCharacter as stateHandleTypedCharacter, onCorrectKeystroke } from "./state";
+import { createGameState, updateState, getRelicPosition, WavePhase, handleTypedCharacter as stateHandleTypedCharacter, onCorrectKeystroke, spawnMerchants } from "./state";
 import type { GameState, RelicState } from "./state";
 import { RELIC_SLOT_COUNT, RelicType, RELIC_CONFIGS } from "./relicConfig";
 
@@ -117,6 +117,10 @@ export class PlanetaryDefenseGame {
     this.merchantManager.setInventoryManager(this.inventoryManager);
     this.merchantManager.init(this.state);
 
+    this.state.onWaveComplete.subscribe(() => {
+      spawnMerchants(this.state);
+    });
+
     this.buildWeaponSlots(world);
   }
 
@@ -181,11 +185,10 @@ export class PlanetaryDefenseGame {
     this.projectileManager.update(this.state);
     this.damageNumberManager.update(dt);
     this.dropManager.update(this.state);
-    this.merchantManager.update(this.state);
+    this.merchantManager.update(this.state, dt);
 
     const waveActive = this.state.wave.phase !== WavePhase.Idle;
     this.inventory.container.visible = !waveActive;
-    this.merchantManager.layer.visible = !waveActive;
   }
 
   destroy(): void {

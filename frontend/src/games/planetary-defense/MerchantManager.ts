@@ -10,11 +10,19 @@ import {
   BORDER_WIDTH,
 } from "./Inventory";
 import type { InventoryManager } from "./InventoryManager";
-import { PIXEL_FONT_FAMILY } from "./constants";
+import { PIXEL_FONT_FAMILY, CANVAS_WIDTH } from "./constants";
 import { ColorPreset } from "./types";
 
 const CLICK_RADIUS = 50;
 const PANEL_WIDTH = CELL_SIZE * 3 + GRID_PADDING * 2 + BORDER_WIDTH * 2;
+const DEPART_SPEED = 300;
+const OFFSCREEN_BUFFER = 200;
+
+interface DepartingShip {
+  display: Container;
+  x: number;
+  y: number;
+}
 
 export class MerchantManager {
   readonly layer: Container;
@@ -25,6 +33,8 @@ export class MerchantManager {
   private shopInventory: Inventory | null = null;
   private inventoryManager: InventoryManager | null = null;
   private activeMerchantId: number | null = null;
+  private departingShips: DepartingShip[] = [];
+  private knownMerchantIds = new Set<number>();
 
   constructor(assets: AssetManager) {
     this.assets = assets;
@@ -39,6 +49,7 @@ export class MerchantManager {
   init(state: GameState): void {
     for (const merchant of state.merchants) {
       this.createMerchantDisplay(merchant);
+      this.knownMerchantIds.add(merchant.id);
     }
   }
 
@@ -74,7 +85,42 @@ export class MerchantManager {
     this.openShop(merchant);
   }
 
-  update(_state: GameState): void {}
+  update(state: GameState, dt: number): void {
+    for (let i = this.departingShips.length - 1; i >= 0; i--) {
+      const ship = this.departingShips[i];
+      ship.x += DEPART_SPEED * dt;
+      ship.display.x = ship.x;
+      if (ship.x > CANVAS_WIDTH + OFFSCREEN_BUFFER) {
+        ship.display.destroy();
+        this.departingShips.splice(i, 1);
+      }
+    }
+
+    this.syncMerchants(state);
+  }
+
+  private syncMerchants(state: GameState): void {
+    const currentIds = new Set(state.merchants.map((m) => m.id));
+
+    for (const [id, display] of this.shipDisplays) {
+      if (!currentIds.has(id)) {
+        this.departingShips.push({ display, x: display.x, y: display.y });
+        this.shipDisplays.delete(id);
+        this.knownMerchantIds.delete(id);
+      }
+    }
+
+    if (this.activeMerchantId !== null && !currentIds.has(this.activeMerchantId)) {
+      this.closeShop();
+    }
+
+    for (const merchant of state.merchants) {
+      if (!this.knownMerchantIds.has(merchant.id)) {
+        this.createMerchantDisplay(merchant);
+        this.knownMerchantIds.add(merchant.id);
+      }
+    }
+  }
 
   private openShop(merchant: MerchantShipState): void {
     this.activeMerchantId = merchant.id;
@@ -147,6 +193,9 @@ export class MerchantManager {
   destroy(): void {
     for (const d of this.shipDisplays.values()) d.destroy();
     this.shipDisplays.clear();
+
+    for (const d of this.departingShips) d.display.destroy();
+    this.departingShips.length = 0;
 
     if (this.shopInventory) this.shopInventory.destroy();
     if (this.shopPanel) this.shopPanel.destroy();

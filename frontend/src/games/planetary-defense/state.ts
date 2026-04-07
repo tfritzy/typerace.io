@@ -246,6 +246,34 @@ function generateShopItems(count: number): Item[] {
   }));
 }
 
+const MERCHANT_SHIP_TYPES: EntityType[] = ["Clipper", "Corsair", "Falcon", "Sentinel"];
+
+export function spawnMerchants(state: GameState): void {
+  state.merchants.length = 0;
+
+  const shuffled = [...MERCHANT_SHIP_TYPES];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  state.merchants.push({
+    id: state.nextId++,
+    x: CANVAS_WIDTH - 250,
+    y: CANVAS_HEIGHT / 2 - 150,
+    entityType: shuffled[0],
+    items: generateShopItems(6),
+  });
+
+  state.merchants.push({
+    id: state.nextId++,
+    x: CANVAS_WIDTH - 250,
+    y: CANVAS_HEIGHT / 2 + 150,
+    entityType: shuffled[1],
+    items: generateShopItems(6),
+  });
+}
+
 export function createEntityState(
   id: number,
   entityType: EntityType,
@@ -301,13 +329,7 @@ export function createGameState(): GameState {
     onDamageDealt: new GameDataEvent<DamageData>(),
   };
 
-  state.merchants.push({
-    id: state.nextId++,
-    x: CANVAS_WIDTH - 250,
-    y: CANVAS_HEIGHT / 2,
-    entityType: "Clipper",
-    items: generateShopItems(6),
-  });
+  spawnMerchants(state);
 
   return state;
 }
@@ -917,6 +939,7 @@ function checkProjectileCollisions(state: GameState): void {
 }
 
 export function startNextWave(state: GameState): void {
+  state.merchants.length = 0;
   state.wave.wave++;
   state.wave.spawnQueue = generateWaveSpawns(state.wave.wave);
   state.wave.spawnIndex = 0;
