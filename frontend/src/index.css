@@ -370,17 +370,22 @@ body {
 }
 
 .logo-tagline {
-  display: block;
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: 0.85rem;
+  font-weight: 400;
   color: var(--muted-foreground);
-  letter-spacing: 0.05em;
-  line-height: 1;
-  margin-top: -2px;
+  letter-spacing: 0.02em;
+}
+
+.logo-separator {
+  color: var(--accent-primary);
+  margin: 0 0.45em;
+  font-weight: 300;
+  opacity: 0.5;
 }
 
 .logo-button {
   all: unset;
   cursor: pointer;
-  display: block;
+  display: flex;
+  align-items: baseline;
 }

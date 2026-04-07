@@ -7,29 +7,36 @@ interface LogoProps {
 }
 
 export const Logo = memo(({ className, onClick, tagline }: LogoProps) => {
-    const logoContent = (
+    const nameContent = (
         <>
             <span className="logo-text">Type</span>
             <span className="logo-accent">Race</span>
             <span className="logo-io">.io</span>
-            {tagline && <span className="logo-tagline">{tagline}</span>}
         </>
     );
 
     if (tagline) {
-        return (
-            <h1 className={`logo ${className || ''}`}>
-                {onClick ? (
-                    <button className="logo-button" onClick={onClick}>{logoContent}</button>
-                ) : logoContent}
-            </h1>
+        const inner = onClick ? (
+            <button className="logo-button" onClick={onClick}>
+                {nameContent}
+                <span className="logo-separator">—</span>
+                <span className="logo-tagline">{tagline}</span>
+            </button>
+        ) : (
+            <>
+                {nameContent}
+                <span className="logo-separator">—</span>
+                <span className="logo-tagline">{tagline}</span>
+            </>
         );
+
+        return <h1 className={`logo ${className || ''}`}>{inner}</h1>;
     }
 
     const Component = onClick ? 'button' : 'div';
     return (
         <Component key="logo" className={`logo ${className || ''}`} onClick={onClick}>
-            {logoContent}
+            {nameContent}
         </Component>
     );
 });

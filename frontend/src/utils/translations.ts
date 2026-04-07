@@ -58,7 +58,7 @@ const translations: Record<Language, Translations> = {
     time: "Time",
     place: "Place",
     accuracy: "Accuracy",
-    tagline: "Typing Race",
+    tagline: "Multiplayer Typing Race",
   },
   [Language.Spanish]: {
     publicMatch: "Partida pública",
@@ -87,7 +87,7 @@ const translations: Record<Language, Translations> = {
     time: "Tiempo",
     place: "Posición",
     accuracy: "Precisión",
-    tagline: "Carrera de mecanografía",
+    tagline: "Carrera de mecanografía multijugador",
   },
   [Language.French]: {
     publicMatch: "Partie publique",
@@ -116,7 +116,7 @@ const translations: Record<Language, Translations> = {
     time: "Temps",
     place: "Place",
     accuracy: "Précision",
-    tagline: "Course de dactylographie",
+    tagline: "Course de dactylographie multijoueur",
   },
   [Language.German]: {
     publicMatch: "Öffentliches Spiel",
@@ -145,7 +145,7 @@ const translations: Record<Language, Translations> = {
     time: "Zeit",
     place: "Platz",
     accuracy: "Genauigkeit",
-    tagline: "Tippwettbewerb",
+    tagline: "Multiplayer-Tippwettbewerb",
   },
   [Language.Italian]: {
     publicMatch: "Partita pubblica",
@@ -174,7 +174,7 @@ const translations: Record<Language, Translations> = {
     time: "Tempo",
     place: "Posizione",
     accuracy: "Precisione",
-    tagline: "Gara di digitazione",
+    tagline: "Gara di digitazione multiplayer",
   },
   [Language.Portuguese]: {
     publicMatch: "Partida pública",
@@ -203,7 +203,7 @@ const translations: Record<Language, Translations> = {
     time: "Tempo",
     place: "Posição",
     accuracy: "Precisão",
-    tagline: "Corrida de digitação",
+    tagline: "Corrida de digitação multijogador",
   },
   [Language.Japanese]: {
     publicMatch: "パブリックマッチ",
@@ -232,7 +232,7 @@ const translations: Record<Language, Translations> = {
     time: "タイム",
     place: "順位",
     accuracy: "精度",
-    tagline: "タイピングレース",
+    tagline: "マルチプレイヤータイピングレース",
   },
   [Language.Korean]: {
     publicMatch: "공개 매치",
@@ -261,7 +261,7 @@ const translations: Record<Language, Translations> = {
     time: "시간",
     place: "순위",
     accuracy: "정확도",
-    tagline: "타이핑 레이스",
+    tagline: "멀티플레이어 타이핑 레이스",
   },
   [Language.Chinese]: {
     publicMatch: "公开比赛",
@@ -290,7 +290,7 @@ const translations: Record<Language, Translations> = {
     time: "时间",
     place: "名次",
     accuracy: "准确率",
-    tagline: "打字竞赛",
+    tagline: "多人在线打字竞赛",
   },
   [Language.Ukrainian]: {
     publicMatch: "Публічний матч",
@@ -319,7 +319,7 @@ const translations: Record<Language, Translations> = {
     time: "Час",
     place: "Місце",
     accuracy: "Точність",
-    tagline: "Змагання з друку",
+    tagline: "Багатокористувацькі змагання з друку",
   },
   [Language.Arabic]: {
     publicMatch: "مباراة عامة",
@@ -348,7 +348,7 @@ const translations: Record<Language, Translations> = {
     time: "الوقت",
     place: "المركز",
     accuracy: "الدقة",
-    tagline: "سباق الكتابة",
+    tagline: "سباق الكتابة الجماعي",
   },
   [Language.Hindi]: {
     publicMatch: "सार्वजनिक मैच",
@@ -377,7 +377,7 @@ const translations: Record<Language, Translations> = {
     time: "समय",
     place: "स्थान",
     accuracy: "सटीकता",
-    tagline: "टाइपिंग रेस",
+    tagline: "मल्टीप्लेयर टाइपिंग रेस",
   },
   [Language.Dutch]: {
     publicMatch: "Openbare wedstrijd",
@@ -406,7 +406,7 @@ const translations: Record<Language, Translations> = {
     time: "Tijd",
     place: "Plaats",
     accuracy: "Nauwkeurigheid",
-    tagline: "Typwedstrijd",
+    tagline: "Multiplayer typwedstrijd",
   },
   [Language.Swedish]: {
     publicMatch: "Offentlig match",
@@ -435,7 +435,7 @@ const translations: Record<Language, Translations> = {
     time: "Tid",
     place: "Plats",
     accuracy: "Noggrannhet",
-    tagline: "Skrivtävling",
+    tagline: "Multiplayer-skrivtävling",
   },
   [Language.Turkish]: {
     publicMatch: "Açık Maç",
@@ -464,7 +464,7 @@ const translations: Record<Language, Translations> = {
     time: "Süre",
     place: "Sıralama",
     accuracy: "Doğruluk",
-    tagline: "Yazma yarışı",
+    tagline: "Çok oyunculu yazma yarışı",
   },
 };
 
