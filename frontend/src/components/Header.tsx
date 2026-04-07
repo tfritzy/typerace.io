@@ -6,10 +6,9 @@ import { getLangHome } from "../utils/modes";
 
 interface HeaderProps {
     hideAvatar?: boolean;
-    tagline?: string;
 }
 
-export const Header = ({ hideAvatar = false, tagline }: HeaderProps) => {
+export const Header = ({ hideAvatar = false }: HeaderProps) => {
     const navigate = useNavigate();
 
     const onClick = useCallback(() => {
@@ -19,7 +18,7 @@ export const Header = ({ hideAvatar = false, tagline }: HeaderProps) => {
     return (
         <header className="w-full px-4">
             <nav className="content-container flex justify-between items-center h-16">
-                <Logo onClick={onClick} tagline={tagline} />
+                <Logo onClick={onClick} />
                 <div className={hideAvatar ? "invisible" : ""}>
                     <ProfileAvatar />
                 </div>

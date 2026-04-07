@@ -72,10 +72,11 @@ export const LobbyPage = () => {
 
   return (
     <div className="relative h-full flex flex-col">
-      <Header tagline={getTranslations().tagline} />
+      <Header />
       <main className="flex-1 flex flex-col items-center p-4 min-h-0">
         <div className="flex-[4]" />
         <div className="content-container">
+          <h1 className="landing-tagline mb-4">{getTranslations().tagline}</h1>
           <div className="text-2xl">
             <TypeBox
               ref={typeBoxRef}

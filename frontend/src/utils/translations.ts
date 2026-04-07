@@ -58,7 +58,7 @@ const translations: Record<Language, Translations> = {
     time: "Time",
     place: "Place",
     accuracy: "Accuracy",
-    tagline: "Multiplayer Typing Race",
+    tagline: "Multiplayer Typing Races",
   },
   [Language.Spanish]: {
     publicMatch: "Partida pública",
@@ -87,7 +87,7 @@ const translations: Record<Language, Translations> = {
     time: "Tiempo",
     place: "Posición",
     accuracy: "Precisión",
-    tagline: "Carrera de mecanografía multijugador",
+    tagline: "Carreras de mecanografía multijugador",
   },
   [Language.French]: {
     publicMatch: "Partie publique",
@@ -116,7 +116,7 @@ const translations: Record<Language, Translations> = {
     time: "Temps",
     place: "Place",
     accuracy: "Précision",
-    tagline: "Course de dactylographie multijoueur",
+    tagline: "Courses de dactylographie multijoueur",
   },
   [Language.German]: {
     publicMatch: "Öffentliches Spiel",
@@ -145,7 +145,7 @@ const translations: Record<Language, Translations> = {
     time: "Zeit",
     place: "Platz",
     accuracy: "Genauigkeit",
-    tagline: "Multiplayer-Tippwettbewerb",
+    tagline: "Multiplayer-Tippwettbewerbe",
   },
   [Language.Italian]: {
     publicMatch: "Partita pubblica",
@@ -174,7 +174,7 @@ const translations: Record<Language, Translations> = {
     time: "Tempo",
     place: "Posizione",
     accuracy: "Precisione",
-    tagline: "Gara di digitazione multiplayer",
+    tagline: "Gare di digitazione multiplayer",
   },
   [Language.Portuguese]: {
     publicMatch: "Partida pública",
@@ -203,7 +203,7 @@ const translations: Record<Language, Translations> = {
     time: "Tempo",
     place: "Posição",
     accuracy: "Precisão",
-    tagline: "Corrida de digitação multijogador",
+    tagline: "Corridas de digitação multijogador",
   },
   [Language.Japanese]: {
     publicMatch: "パブリックマッチ",
@@ -406,7 +406,7 @@ const translations: Record<Language, Translations> = {
     time: "Tijd",
     place: "Plaats",
     accuracy: "Nauwkeurigheid",
-    tagline: "Multiplayer typwedstrijd",
+    tagline: "Multiplayer typwedstrijden",
   },
   [Language.Swedish]: {
     publicMatch: "Offentlig match",
@@ -435,7 +435,7 @@ const translations: Record<Language, Translations> = {
     time: "Tid",
     place: "Plats",
     accuracy: "Noggrannhet",
-    tagline: "Multiplayer-skrivtävling",
+    tagline: "Multiplayer-skrivtävlingar",
   },
   [Language.Turkish]: {
     publicMatch: "Açık Maç",
@@ -464,7 +464,7 @@ const translations: Record<Language, Translations> = {
     time: "Süre",
     place: "Sıralama",
     accuracy: "Doğruluk",
-    tagline: "Çok oyunculu yazma yarışı",
+    tagline: "Çok oyunculu yazma yarışları",
   },
 };
 
