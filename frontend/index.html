@@ -173,6 +173,7 @@
       body { margin: 0; background-color: var(--color-bg-primary); }
       #root { height: 100dvh; }
       noscript { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
 
       .loading-container {
         width: 100%;
@@ -241,6 +242,7 @@
   </head>
   <body>
     <div id="root">
+      <h1 class="sr-only">Multiplayer Typing Races</h1>
       <div class="loading-container">
         <div class="loading-content">
           <div class="loading-logo"><span class="loading-logo-text">Type</span><span class="loading-logo-accent">Race</span><span class="loading-logo-io">.io</span></div>

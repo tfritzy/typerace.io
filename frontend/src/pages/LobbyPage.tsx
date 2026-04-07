@@ -7,6 +7,7 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { getRandomStartupPhrase, getLanguageFromSlug, getContentTypeFromMode, storeLangSlug } from "../utils/modes";
 import { useFindGame } from "../hooks/useFindGame";
+import { getTranslations } from "../utils/translations";
 
 const GAME_TYPE_KEY = "typerace_game_type";
 const CONTENT_TYPE_KEY = "typerace_content_type";
@@ -73,7 +74,7 @@ export const LobbyPage = () => {
     <div className="relative h-full flex flex-col">
       <Header />
       <main className="flex-1 flex flex-col items-center p-4 min-h-0">
-        <h1 className="sr-only">TypeRace.io - Multiplayer Typing Race</h1>
+        <h1 className="sr-only">{getTranslations().tagline}</h1>
         <div className="flex-[4]" />
         <div className="content-container">
           <div className="text-2xl">
