@@ -79,7 +79,7 @@ export interface RelicTypeConfig {
   damageBuffMultiplier: number;
 }
 
-const RELIC_DEFAULTS: RelicTypeConfig = {
+export const RELIC_DEFAULTS: RelicTypeConfig = {
   charsToFire: 4,
   projectileSpeed: 800,
   damage: 10,

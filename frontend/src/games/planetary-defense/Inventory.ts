@@ -145,6 +145,12 @@ export class Inventory {
     item: InventoryItem;
     event: FederatedPointerEvent;
   }>();
+  readonly onItemHover = createEvent<{
+    inventory: Inventory;
+    item: InventoryItem;
+    event: FederatedPointerEvent;
+  }>();
+  readonly onItemHoverEnd = createEvent<{ inventory: Inventory }>();
 
   constructor(assetManager: AssetManager, config?: InventoryConfig) {
     this.assetManager = assetManager;
@@ -204,6 +210,12 @@ export class Inventory {
     const col = Math.floor((localPos.x - this.gridOriginX) / CELL_SIZE);
     const row = Math.floor((localPos.y - this.gridOriginY) / CELL_SIZE);
     return { col, row };
+  }
+
+  getItemAt(globalX: number, globalY: number): InventoryItem | null {
+    const { col, row } = this.globalToGrid(globalX, globalY);
+    if (col < 0 || col >= this.cols || row < 0 || row >= this.rows) return null;
+    return this.items.find((i) => i.gridX === col && i.gridY === row) ?? null;
   }
 
   canPlace(col: number, row: number): boolean {
@@ -408,6 +420,14 @@ export class Inventory {
 
     wrapper.on("pointerdown", (e: FederatedPointerEvent) => {
       this.onDragStart.emit({ inventory: this, item: slot, event: e });
+    });
+
+    wrapper.on("pointerover", (e: FederatedPointerEvent) => {
+      this.onItemHover.emit({ inventory: this, item: slot, event: e });
+    });
+
+    wrapper.on("pointerout", () => {
+      this.onItemHoverEnd.emit({ inventory: this });
     });
 
     return wrapper;

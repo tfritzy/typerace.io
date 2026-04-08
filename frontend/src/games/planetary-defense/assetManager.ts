@@ -50,6 +50,7 @@ export class AssetManager {
   private asteroids_: Record<string, Spritesheet>;
   private colorPresets_: Record<string, Texture>;
   private itemTextures_: Record<string, Texture>;
+  private uiPanel9Slice_: Texture;
 
   constructor(loaded: Record<string, unknown>) {
     const engineAliasValues = Object.values(ENGINE_ALIASES);
@@ -167,6 +168,8 @@ export class AssetManager {
       "coin-2": loaded["coin-2"] as Texture,
     };
 
+    this.uiPanel9Slice_ = loaded["ui-panel-9slice"] as Texture;
+
     this.applyNearestNeighbor();
   }
 
@@ -216,6 +219,10 @@ export class AssetManager {
     return this.itemTextures_[alias];
   }
 
+  get uiPanel9Slice(): Texture {
+    return this.uiPanel9Slice_;
+  }
+
   static async load(manifest: AssetsManifest): Promise<AssetManager> {
     const bundle = manifest.bundles[0];
     Assets.addBundle(bundle.name, bundle.assets);
@@ -245,5 +252,6 @@ export class AssetManager {
     for (const tex of Object.values(this.itemTextures_)) {
       setTextureNearest(tex);
     }
+    setTextureNearest(this.uiPanel9Slice_);
   }
 }

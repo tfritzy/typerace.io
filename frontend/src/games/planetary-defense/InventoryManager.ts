@@ -7,6 +7,8 @@ import { Inventory, buildItemCell } from "./Inventory";
 import type { InventoryItem } from "./Inventory";
 import type { AssetManager } from "./assetManager";
 import type { Item } from "./itemConfig";
+import { ItemTooltip } from "./ItemTooltip";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 
 interface DragState {
   source: Inventory;
@@ -25,10 +27,15 @@ export class InventoryManager {
   private inventories: Inventory[] = [];
   private unsubscribers: (() => void)[] = [];
   private dragState: DragState | null = null;
+  private tooltip: ItemTooltip;
+  private hoveredItemId: number | null = null;
 
   constructor(app: Application, assetManager: AssetManager) {
     this.app = app;
     this.assetManager = assetManager;
+
+    this.tooltip = new ItemTooltip(assetManager);
+    app.stage.addChild(this.tooltip.container);
 
     app.stage.eventMode = "static";
     app.stage.hitArea = app.screen;
@@ -45,6 +52,26 @@ export class InventoryManager {
         this.startDrag(source, item, event);
       })
     );
+
+    this.unsubscribers.push(
+      inventory.onItemHover.subscribe(({ item, event }) => {
+        if (this.dragState) return;
+        if (!item.item) return;
+        if (this.hoveredItemId === item.id) return;
+        this.hoveredItemId = item.id;
+        const gx = event.global.x;
+        const gy = event.global.y;
+        this.tooltip.show(item.item, gx, gy, CANVAS_WIDTH, CANVAS_HEIGHT);
+      })
+    );
+
+    this.unsubscribers.push(
+      inventory.onItemHoverEnd.subscribe(() => {
+        if (this.dragState) return;
+        this.hoveredItemId = null;
+        this.tooltip.hide();
+      })
+    );
   }
 
   unregister(inventory: Inventory): void {
@@ -59,6 +86,9 @@ export class InventoryManager {
   ): void {
     if (this.dragState) return;
     if (!slot.item) return;
+
+    this.tooltip.hide();
+    this.hoveredItemId = null;
 
     const itemGlobal = source.getItemGlobalPosition(slot);
     source.beginItemDrag(slot.id);
@@ -155,5 +185,7 @@ export class InventoryManager {
       this.dragState.ghost.destroy();
       this.dragState = null;
     }
+
+    this.tooltip.destroy();
   }
 }
