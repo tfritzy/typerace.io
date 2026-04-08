@@ -302,9 +302,9 @@ export const InventoryOverlay = ({
   useEffect(() => {
     const overlay = overlayRef.current;
     if (!overlay) return;
-    const ro = new ResizeObserver(() => setTick((t) => t + 1));
-    ro.observe(overlay);
-    return () => ro.disconnect();
+    const resizeObserver = new ResizeObserver(() => setTick((t) => t + 1));
+    resizeObserver.observe(overlay);
+    return () => resizeObserver.disconnect();
   }, []);
 
   useEffect(() => {
