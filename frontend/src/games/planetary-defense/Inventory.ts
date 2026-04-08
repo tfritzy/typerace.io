@@ -212,12 +212,6 @@ export class Inventory {
     return { col, row };
   }
 
-  getItemAt(globalX: number, globalY: number): InventoryItem | null {
-    const { col, row } = this.globalToGrid(globalX, globalY);
-    if (col < 0 || col >= this.cols || row < 0 || row >= this.rows) return null;
-    return this.items.find((i) => i.gridX === col && i.gridY === row) ?? null;
-  }
-
   canPlace(col: number, row: number): boolean {
     if (col < 0 || row < 0 || col >= this.cols || row >= this.rows) {
       return false;

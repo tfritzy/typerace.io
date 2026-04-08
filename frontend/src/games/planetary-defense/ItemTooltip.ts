@@ -33,7 +33,7 @@ function isRelicType(type: ItemType): type is RelicType {
 function buildRelicStats(config: RelicTypeConfig): StatLine[] {
   const lines: StatLine[] = [];
 
-  if (config.damage !== RELIC_DEFAULTS.damage || config.damage > 0) {
+  if (config.damage > 0) {
     lines.push({ label: "Damage", value: `${config.damage}`, color: STAT_VALUE_COLOR });
   }
 

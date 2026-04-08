@@ -27,7 +27,7 @@ export class InventoryManager {
   private inventories: Inventory[] = [];
   private unsubscribers: (() => void)[] = [];
   private dragState: DragState | null = null;
-  private tooltip: ItemTooltip;
+  private readonly tooltip: ItemTooltip;
   private hoveredItemId: number | null = null;
 
   constructor(app: Application, assetManager: AssetManager) {
