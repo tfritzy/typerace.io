@@ -30,6 +30,8 @@ export class NineSlicePanel {
     const right = options.rightWidth ?? DEFAULT_RIGHT;
     const bottom = options.bottomHeight ?? DEFAULT_BOTTOM;
 
+    options.texture.source.scaleMode = "nearest";
+
     this.sprite = new NineSliceSprite({
       texture: options.texture,
       leftWidth: left,

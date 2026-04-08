@@ -7,16 +7,16 @@ import { getItemDisplay } from "./itemConfig";
 import { RelicType, RELIC_CONFIGS } from "./relicConfig";
 import type { RelicTypeConfig } from "./relicConfig";
 
-const PANEL_WIDTH = 280;
-const PANEL_PADDING = 20;
-const ICON_SIZE = 80;
+const PANEL_WIDTH = 440;
+const PANEL_PADDING = 28;
+const ICON_SIZE = 128;
 const PANEL_SCALE = 4;
-const TITLE_FONT_SIZE = 9;
-const STAT_FONT_SIZE = 7;
-const DESC_FONT_SIZE = 7;
-const LINE_HEIGHT = 14;
-const SECTION_GAP = 10;
-const ICON_GAP = 6;
+const TITLE_FONT_SIZE = 18;
+const STAT_FONT_SIZE = 12;
+const DESC_FONT_SIZE = 11;
+const LINE_HEIGHT = 22;
+const SECTION_GAP = 14;
+const ICON_GAP = 8;
 
 const TITLE_COLOR = 0xffd866;
 const DAMAGE_COLOR = 0xff4444;
@@ -300,7 +300,7 @@ export class ItemTooltip {
     if (config) {
       const damageIcon = new Graphics();
       drawSwordIcon(damageIcon);
-      damageIcon.scale.set(1.5);
+      damageIcon.scale.set(2.5);
       damageIcon.x = PANEL_PADDING;
       damageIcon.y = cursorY;
       this.content.addChild(damageIcon);
@@ -313,8 +313,8 @@ export class ItemTooltip {
           fill: EFFECT_COLOR,
         },
       });
-      damageLabel.x = PANEL_PADDING + 22;
-      damageLabel.y = cursorY + 2;
+      damageLabel.x = PANEL_PADDING + 38;
+      damageLabel.y = cursorY + 4;
       this.content.addChild(damageLabel);
 
       const damageValue = new Text({
@@ -327,13 +327,13 @@ export class ItemTooltip {
       });
       damageValue.anchor.set(1, 0);
       damageValue.x = PANEL_WIDTH - PANEL_PADDING;
-      damageValue.y = cursorY + 2;
+      damageValue.y = cursorY + 4;
       this.content.addChild(damageValue);
       cursorY += LINE_HEIGHT + 4;
 
       const charsIcon = new Graphics();
       drawKeyboardIcon(charsIcon);
-      charsIcon.scale.set(1.5);
+      charsIcon.scale.set(2.5);
       charsIcon.x = PANEL_PADDING;
       charsIcon.y = cursorY;
       this.content.addChild(charsIcon);
@@ -346,8 +346,8 @@ export class ItemTooltip {
           fill: EFFECT_COLOR,
         },
       });
-      charsLabel.x = PANEL_PADDING + 22;
-      charsLabel.y = cursorY + 2;
+      charsLabel.x = PANEL_PADDING + 38;
+      charsLabel.y = cursorY + 4;
       this.content.addChild(charsLabel);
 
       const charsValue = new Text({
@@ -360,7 +360,7 @@ export class ItemTooltip {
       });
       charsValue.anchor.set(1, 0);
       charsValue.x = PANEL_WIDTH - PANEL_PADDING;
-      charsValue.y = cursorY + 2;
+      charsValue.y = cursorY + 4;
       this.content.addChild(charsValue);
       cursorY += LINE_HEIGHT + 4;
     }
@@ -373,7 +373,7 @@ export class ItemTooltip {
       for (const effect of effects) {
         const iconGraphics = new Graphics();
         effect.drawIcon(iconGraphics);
-        iconGraphics.scale.set(1.5);
+        iconGraphics.scale.set(2.5);
         iconGraphics.x = PANEL_PADDING;
         iconGraphics.y = cursorY;
         this.content.addChild(iconGraphics);
@@ -385,11 +385,11 @@ export class ItemTooltip {
             fontSize: DESC_FONT_SIZE,
             fill: effect.color,
             wordWrap: true,
-            wordWrapWidth: contentWidth - ICON_GAP - 22,
+            wordWrapWidth: contentWidth - ICON_GAP - 38,
           },
         });
-        effectText.x = PANEL_PADDING + 22;
-        effectText.y = cursorY + 2;
+        effectText.x = PANEL_PADDING + 38;
+        effectText.y = cursorY + 4;
         this.content.addChild(effectText);
         cursorY += Math.max(LINE_HEIGHT, effectText.height + 4) + 2;
       }
@@ -433,15 +433,15 @@ export class ItemTooltip {
 
   private drawSeparator(y: number): void {
     const line = new Graphics();
-    const x1 = PANEL_PADDING + 8;
-    const x2 = PANEL_WIDTH - PANEL_PADDING - 8;
+    const x1 = PANEL_PADDING + 12;
+    const x2 = PANEL_WIDTH - PANEL_PADDING - 12;
     const lineWidth = x2 - x1;
 
     line.moveTo(0, 0);
     line.lineTo(lineWidth, 0);
-    line.stroke({ color: SEPARATOR_COLOR, width: 1, alpha: 0.6 });
+    line.stroke({ color: SEPARATOR_COLOR, width: 2, alpha: 0.6 });
 
-    line.circle(lineWidth / 2, 0, 1.5);
+    line.circle(lineWidth / 2, 0, 3);
     line.fill({ color: SEPARATOR_COLOR, alpha: 0.8 });
 
     line.x = x1;
