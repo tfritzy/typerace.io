@@ -75,7 +75,21 @@ type ThemeShowcaseModalProps = {
 export const ThemeShowcaseModal = ({ open, onClose }: ThemeShowcaseModalProps) => {
     const [selectedTheme, setSelectedTheme] = useState<string>(getInitialTheme);
 
-    const themeTags = Object.keys(THEME_PRESETS) as ThemeTag[];
+    const themeTags: ThemeTag[] = [
+        'AyuDark',
+        'Endesga',
+        'RosePine',
+        'TokyoNight',
+        'Sweetie16',
+        'CatppuccinMocha',
+        'Kanagawa',
+        'Monokai',
+        'GruvboxDark',
+        'Dracula',
+        'OneDark',
+        'Pico8',
+        'Nord',
+    ];
 
     const handleThemeSelect = (tag: ThemeTag) => {
         setSelectedTheme(tag);
