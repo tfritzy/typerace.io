@@ -1,0 +1,11 @@
+export const GameMode = {};
+export const Game = {};
+export const Player = {};
+export const GameRecord = {};
+export const PlayerProgress = {};
+export const XpGain = {};
+export const GameState = {};
+export const GameType = {};
+export const GlobalStats = {};
+export const PersonalRecord = {};
+export const CharacterEventType = {};

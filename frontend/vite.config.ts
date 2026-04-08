@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -17,6 +18,11 @@ export default defineConfig({
       '@pixi/math': path.resolve(__dirname, './src/pixi-compat/math.ts'),
       '@pixi/sprite': path.resolve(__dirname, './src/pixi-compat/sprite.ts'),
       '@pixi/ticker': path.resolve(__dirname, './src/pixi-compat/ticker.ts'),
+    },
+  },
+  test: {
+    alias: {
+      '../../module_bindings': path.resolve(__dirname, './src/__mocks__/module_bindings.ts'),
     },
   },
 })
