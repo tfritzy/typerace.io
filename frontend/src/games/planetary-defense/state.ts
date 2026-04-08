@@ -151,6 +151,7 @@ export interface DamageData {
 export interface MerchantShipState {
   id: number;
   name: string;
+  description: string;
   x: number;
   y: number;
   entityType: EntityType;
@@ -252,13 +253,14 @@ function generateShopItems(count: number): Item[] {
 interface MerchantArchetype {
   entityType: EntityType;
   name: string;
+  description: string;
 }
 
 const MERCHANT_ARCHETYPES: MerchantArchetype[] = [
-  { entityType: "Clipper", name: "Wandering Trader" },
-  { entityType: "Corsair", name: "Star Peddler" },
-  { entityType: "Falcon", name: "Void Merchant" },
-  { entityType: "Sentinel", name: "Cosmic Dealer" },
+  { entityType: "Clipper", name: "Wandering Trader", description: "Rare blades and exotic swords from distant star systems" },
+  { entityType: "Corsair", name: "Star Peddler", description: "Enchanted axes and heavy cleavers forged in nebulae" },
+  { entityType: "Falcon", name: "Void Merchant", description: "Mystical staves and arcane catalysts from the void" },
+  { entityType: "Sentinel", name: "Cosmic Dealer", description: "Shields, armor plating, and defensive relics" },
 ];
 
 export function spawnMerchants(state: GameState): void {
@@ -273,8 +275,9 @@ export function spawnMerchants(state: GameState): void {
   state.merchants.push({
     id: state.nextId++,
     name: shuffled[0].name,
+    description: shuffled[0].description,
     x: CANVAS_WIDTH - 250,
-    y: CANVAS_HEIGHT / 2 - 150,
+    y: CANVAS_HEIGHT / 2 - 80,
     entityType: shuffled[0].entityType,
     items: generateShopItems(6),
     departing: false,
@@ -284,8 +287,9 @@ export function spawnMerchants(state: GameState): void {
   state.merchants.push({
     id: state.nextId++,
     name: shuffled[1].name,
+    description: shuffled[1].description,
     x: CANVAS_WIDTH - 250,
-    y: CANVAS_HEIGHT / 2 + 150,
+    y: CANVAS_HEIGHT / 2 + 80,
     entityType: shuffled[1].entityType,
     items: generateShopItems(6),
     departing: false,
