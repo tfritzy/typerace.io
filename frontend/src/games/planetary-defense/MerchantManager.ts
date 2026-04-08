@@ -10,13 +10,14 @@ import {
   BORDER_WIDTH,
 } from "./Inventory";
 import type { InventoryManager } from "./InventoryManager";
-import { PIXEL_FONT_FAMILY, CANVAS_WIDTH } from "./constants";
+import { PIXEL_FONT_FAMILY, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { ColorPreset } from "./types";
 
 const CLICK_RADIUS = 50;
 const PANEL_WIDTH = CELL_SIZE * 3 + GRID_PADDING * 2 + BORDER_WIDTH * 2;
 const DEPART_SPEED = 300;
 const OFFSCREEN_BUFFER = 200;
+const NAME_LABEL_OFFSET_Y = -45;
 
 interface DepartingShip {
   display: Container;
@@ -29,12 +30,15 @@ export class MerchantManager {
 
   private assets: AssetManager;
   private shipDisplays = new Map<number, Container>();
+  private nameLabels = new Map<number, Container>();
   private shopPanel: Container | null = null;
   private shopInventory: Inventory | null = null;
   private inventoryManager: InventoryManager | null = null;
   private activeMerchantId: number | null = null;
   private departingShips: DepartingShip[] = [];
   private knownMerchantIds = new Set<number>();
+  private promptContainer: Container | null = null;
+  private selectedMerchantId: number | null = null;
 
   constructor(assets: AssetManager) {
     this.assets = assets;
@@ -50,6 +54,9 @@ export class MerchantManager {
     for (const merchant of state.merchants) {
       this.createMerchantDisplay(merchant);
       this.knownMerchantIds.add(merchant.id);
+    }
+    if (state.merchants.length > 0) {
+      this.showPrompt();
     }
   }
 
@@ -68,11 +75,112 @@ export class MerchantManager {
     display.hitArea = new Circle(0, 0, CLICK_RADIUS);
 
     display.on("pointerdown", () => {
-      this.toggleShop(merchant);
+      this.selectMerchant(merchant);
     });
 
     this.layer.addChild(display);
     this.shipDisplays.set(merchant.id, display);
+
+    this.createNameLabel(merchant);
+  }
+
+  private selectMerchant(merchant: MerchantShipState): void {
+    if (this.selectedMerchantId !== null && this.selectedMerchantId !== merchant.id) {
+      return;
+    }
+
+    if (this.selectedMerchantId === null) {
+      this.selectedMerchantId = merchant.id;
+      this.dismissUnselected(merchant.id);
+      this.hidePrompt();
+    }
+
+    this.toggleShop(merchant);
+  }
+
+  private dismissUnselected(selectedId: number): void {
+    for (const [id, display] of this.shipDisplays) {
+      if (id === selectedId) continue;
+      this.departingShips.push({ display, x: display.x, y: display.y });
+      this.shipDisplays.delete(id);
+      this.knownMerchantIds.delete(id);
+
+      const label = this.nameLabels.get(id);
+      if (label) {
+        label.destroy();
+        this.nameLabels.delete(id);
+      }
+    }
+  }
+
+  private createNameLabel(merchant: MerchantShipState): void {
+    const label = new Container();
+
+    const nameText = new Text({
+      text: merchant.name,
+      style: {
+        fontFamily: PIXEL_FONT_FAMILY,
+        fontSize: 9,
+        fill: 0xffd700,
+      },
+    });
+    nameText.anchor.set(0.5, 1);
+
+    label.addChild(nameText);
+    label.x = merchant.x;
+    label.y = merchant.y + NAME_LABEL_OFFSET_Y;
+
+    this.layer.addChild(label);
+    this.nameLabels.set(merchant.id, label);
+  }
+
+  private showPrompt(): void {
+    this.hidePrompt();
+
+    this.promptContainer = new Container();
+
+    const promptText = new Text({
+      text: "CHOOSE A MERCHANT",
+      style: {
+        fontFamily: PIXEL_FONT_FAMILY,
+        fontSize: 12,
+        fill: 0xffd700,
+      },
+    });
+    promptText.anchor.set(0.5, 0.5);
+
+    const hintText = new Text({
+      text: "click a ship to browse its wares",
+      style: {
+        fontFamily: PIXEL_FONT_FAMILY,
+        fontSize: 8,
+        fill: 0xa6adc8,
+      },
+    });
+    hintText.anchor.set(0.5, 0.5);
+    hintText.y = 22;
+
+    const bgWidth = 320;
+    const bgHeight = 50;
+    const bg = new Graphics();
+    bg.roundRect(-bgWidth / 2, -bgHeight / 2, bgWidth, bgHeight, 6);
+    bg.fill({ color: 0x111122, alpha: 0.9 });
+    bg.stroke({ color: 0xffd700, width: 1, alpha: 0.4 });
+
+    this.promptContainer.addChild(bg);
+    this.promptContainer.addChild(promptText);
+    this.promptContainer.addChild(hintText);
+    this.promptContainer.x = CANVAS_WIDTH - 250;
+    this.promptContainer.y = CANVAS_HEIGHT / 2 - 280;
+
+    this.layer.addChild(this.promptContainer);
+  }
+
+  private hidePrompt(): void {
+    if (this.promptContainer) {
+      this.promptContainer.destroy();
+      this.promptContainer = null;
+    }
   }
 
   private toggleShop(merchant: MerchantShipState): void {
@@ -107,6 +215,12 @@ export class MerchantManager {
         this.departingShips.push({ display, x: display.x, y: display.y });
         this.shipDisplays.delete(id);
         this.knownMerchantIds.delete(id);
+
+        const label = this.nameLabels.get(id);
+        if (label) {
+          label.destroy();
+          this.nameLabels.delete(id);
+        }
       }
     }
 
@@ -114,11 +228,24 @@ export class MerchantManager {
       this.closeShop();
     }
 
+    let hasNew = false;
     for (const merchant of state.merchants) {
       if (!this.knownMerchantIds.has(merchant.id)) {
         this.createMerchantDisplay(merchant);
         this.knownMerchantIds.add(merchant.id);
+        hasNew = true;
       }
+    }
+
+    if (hasNew) {
+      this.closeShop();
+      this.selectedMerchantId = null;
+      this.showPrompt();
+    }
+
+    if (state.merchants.length === 0) {
+      this.hidePrompt();
+      this.selectedMerchantId = null;
     }
   }
 
@@ -147,7 +274,7 @@ export class MerchantManager {
     this.shopPanel.addChild(titleBg);
 
     const title = new Text({
-      text: "Merchant",
+      text: merchant.name,
       style: {
         fontFamily: PIXEL_FONT_FAMILY,
         fontSize: 10,
@@ -196,6 +323,11 @@ export class MerchantManager {
 
     for (const d of this.departingShips) d.display.destroy();
     this.departingShips.length = 0;
+
+    for (const d of this.nameLabels.values()) d.destroy();
+    this.nameLabels.clear();
+
+    this.hidePrompt();
 
     if (this.shopInventory) this.shopInventory.destroy();
     if (this.shopPanel) this.shopPanel.destroy();
