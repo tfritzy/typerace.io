@@ -23,11 +23,12 @@ function ThemeRow({
     return (
         <button
             onClick={onSelect}
-            className="flex items-center w-full rounded-lg px-4 py-3 cursor-pointer transition-opacity text-left hover:opacity-90"
-            style={{
-                background: resolved.colors.background,
-                boxShadow: isSelected ? `0 0 0 2px ${resolved.colors.accent}` : undefined,
-            }}
+            className={`flex items-center w-full rounded-lg px-4 py-3 cursor-pointer transition-opacity text-left ${
+                isSelected
+                    ? 'ring-2 ring-accent'
+                    : 'hover:opacity-90'
+            }`}
+            style={{ background: resolved.colors.background }}
         >
             <span
                 className="flex-1 text-sm font-medium"
