@@ -318,6 +318,12 @@ export function getPlayerColorHex(playerColorTag: string): string {
     return PLAYER_COLOR_HEX[playerColorTag] ?? '#61AFEF';
 }
 
+export function getThemePlayerColorList(): string[] {
+    const themeTag = getCurrentThemeTag();
+    const themeColors = THEME_PLAYER_COLORS[themeTag as ThemeTag] ?? PLAYER_COLOR_HEX;
+    return Object.values(themeColors);
+}
+
 function hexToHsl(hex: string): [number, number, number] {
     const r = parseInt(hex.slice(1, 3), 16) / 255;
     const g = parseInt(hex.slice(3, 5), 16) / 255;

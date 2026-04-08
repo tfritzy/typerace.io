@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Header } from "../components/Header";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { getThemePlayerColorList } from "../utils/colorMapping";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -55,6 +56,13 @@ export const SiteStatsPage = () => {
     const conn = useDatabase();
     const [globalStats, setGlobalStats] = useState<GlobalStats[]>([]);
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('1month');
+    const [themeTick, setThemeTick] = useState(0);
+
+    const onThemeChange = useCallback(() => setThemeTick(t => t + 1), []);
+    useEffect(() => {
+        window.addEventListener('themechange', onThemeChange);
+        return () => window.removeEventListener('themechange', onThemeChange);
+    }, [onThemeChange]);
 
     useEffect(() => {
         document.title = "Site Statistics - TypeRace.io";
@@ -122,12 +130,7 @@ export const SiteStatsPage = () => {
 
     const filteredStats = getFilteredStats();
 
-    const chartColors = useMemo(() => {
-        const style = getComputedStyle(document.documentElement);
-        return Array.from({ length: 5 }, (_, i) =>
-            style.getPropertyValue(`--chart-${i + 1}`).trim()
-        );
-    }, []);
+    const chartColors = useMemo(() => getThemePlayerColorList(), [themeTick]);
 
     const chartNeutralColor = useMemo(() => {
         return getComputedStyle(document.documentElement).getPropertyValue('--chart-neutral').trim();
