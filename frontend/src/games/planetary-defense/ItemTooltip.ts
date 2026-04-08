@@ -325,7 +325,8 @@ export class ItemTooltip {
           fill: DAMAGE_COLOR,
         },
       });
-      damageValue.x = PANEL_WIDTH - PANEL_PADDING - damageValue.width;
+      damageValue.anchor.set(1, 0);
+      damageValue.x = PANEL_WIDTH - PANEL_PADDING;
       damageValue.y = cursorY + 2;
       this.content.addChild(damageValue);
       cursorY += LINE_HEIGHT + 4;
@@ -357,7 +358,8 @@ export class ItemTooltip {
           fill: 0xffffff,
         },
       });
-      charsValue.x = PANEL_WIDTH - PANEL_PADDING - charsValue.width;
+      charsValue.anchor.set(1, 0);
+      charsValue.x = PANEL_WIDTH - PANEL_PADDING;
       charsValue.y = cursorY + 2;
       this.content.addChild(charsValue);
       cursorY += LINE_HEIGHT + 4;
