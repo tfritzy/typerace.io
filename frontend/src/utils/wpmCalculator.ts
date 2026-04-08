@@ -72,6 +72,7 @@ export function getRawWpmBySecond(
 
   const charCountBySecond: number[] = [];
   const wpmBySecond: number[] = [];
+  let lastNonBackspaceTimeMicros = 0n;
 
   for (const evt of events) {
     if (evt.eventType.tag === "Backspace") {
@@ -79,6 +80,10 @@ export function getRawWpmBySecond(
     }
 
     const elapsedMicros = evt.timestamp - raceStartTimestamp;
+    if (elapsedMicros > lastNonBackspaceTimeMicros) {
+      lastNonBackspaceTimeMicros = elapsedMicros;
+    }
+
     const second = Number(elapsedMicros / 1_000_000n);
 
     if (second < 0) {
@@ -91,6 +96,19 @@ export function getRawWpmBySecond(
     }
 
     charCountBySecond[second]++;
+  }
+
+  if (charCountBySecond.length === 0) {
+    return [];
+  }
+
+  const totalElapsedSeconds = Number(lastNonBackspaceTimeMicros) / 1_000_000;
+  const lastBucketIndex = charCountBySecond.length - 1;
+  const lastBucketFraction = totalElapsedSeconds - lastBucketIndex;
+
+  if (lastBucketFraction < 1.0 && charCountBySecond.length > 1) {
+    charCountBySecond.pop();
+    wpmBySecond.pop();
   }
 
   for (let i = 0; i < wpmBySecond.length; i++) {
