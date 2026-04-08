@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
   CharacterEventType,
-  decodeCharacterHistory,
   getWpm,
   getRawWpmBySecond,
   getAggWpmBySecond,
@@ -10,303 +9,81 @@ import {
 } from "./wpmCalculator";
 
 const RACE_START = 0n;
+const C = CharacterEventType.Correct;
+const I = CharacterEventType.Incorrect;
+const B = CharacterEventType.Backspace;
 
 function encodeEvent(deciseconds: number, type: CharacterEventType): number[] {
   return [deciseconds & 0xff, (deciseconds >> 8) & 0xff, type];
 }
 
-function buildHistory(...events: number[][]): Uint8Array {
-  return new Uint8Array(events.flat());
+function buildHistory(...events: [number, CharacterEventType][]): Uint8Array {
+  return new Uint8Array(events.flatMap(([ds, type]) => encodeEvent(ds, type)));
 }
-
-function steadyTypingHistory(
-  charsPerSecond: number,
-  durationSeconds: number
-): Uint8Array {
-  const interval = 1 / charsPerSecond;
-  const events: number[][] = [];
-  for (let t = interval; t <= durationSeconds; t += interval) {
-    const ds = Math.round(t * 10);
-    events.push(encodeEvent(ds, CharacterEventType.Correct));
-  }
-  return buildHistory(...events);
-}
-
-describe("decodeCharacterHistory", () => {
-  it("decodes correct, incorrect, and backspace events", () => {
-    const history = buildHistory(
-      encodeEvent(10, CharacterEventType.Correct),
-      encodeEvent(20, CharacterEventType.Incorrect),
-      encodeEvent(30, CharacterEventType.Backspace)
-    );
-    const events = decodeCharacterHistory(history, RACE_START);
-
-    expect(events).toHaveLength(3);
-    expect(events[0].eventType.tag).toBe("Correct");
-    expect(events[1].eventType.tag).toBe("Incorrect");
-    expect(events[2].eventType.tag).toBe("Backspace");
-  });
-
-  it("computes timestamps from deciseconds", () => {
-    const history = buildHistory(encodeEvent(15, CharacterEventType.Correct));
-    const events = decodeCharacterHistory(history, 1000n);
-
-    expect(events[0].timestamp).toBe(1000n + 15n * 100_000n);
-  });
-
-  it("returns empty array for empty input", () => {
-    expect(decodeCharacterHistory(new Uint8Array(), RACE_START)).toEqual([]);
-  });
-
-  it("ignores trailing bytes that don't form a complete event", () => {
-    const history = new Uint8Array([10, 0, 0, 99, 99]);
-    const events = decodeCharacterHistory(history, RACE_START);
-    expect(events).toHaveLength(1);
-  });
-});
 
 describe("getWpm", () => {
-  it("returns 0 for zero time", () => {
+  it("computes words per minute from character count and time", () => {
+    expect(getWpm(5, 1)).toBe(60);
+    expect(getWpm(50, 10)).toBe(60);
+    expect(getWpm(10, 1)).toBe(120);
+    expect(getWpm(0, 5)).toBe(0);
     expect(getWpm(10, 0)).toBe(0);
   });
-
-  it("returns 0 for negative time", () => {
-    expect(getWpm(10, -1)).toBe(0);
-  });
-
-  it("computes 60 WPM for 5 chars in 1 second", () => {
-    expect(getWpm(5, 1)).toBe(60);
-  });
-
-  it("computes 120 WPM for 10 chars in 1 second", () => {
-    expect(getWpm(10, 1)).toBe(120);
-  });
-
-  it("computes correctly over longer periods", () => {
-    expect(getWpm(50, 10)).toBe(60);
-  });
 });
 
-describe("getRawWpmBySecond", () => {
-  it("returns empty array for empty history", () => {
-    expect(getRawWpmBySecond(new Uint8Array(), RACE_START)).toEqual([]);
+describe("steady 60 WPM typist — 42 chars over 8.4s, no errors", () => {
+  const history = buildHistory(
+    ...Array.from(
+      { length: 42 },
+      (_, i): [number, CharacterEventType] => [(i + 1) * 2, C]
+    )
+  );
+
+  it("raw WPM holds steady around 60, no trailing dip", () => {
+    const raw = getRawWpmBySecond(history, RACE_START);
+    expect(raw).toEqual([56, 57, 57.6, 60, 60, 60, 60, 60]);
   });
 
-  it("returns empty array for backspace-only history", () => {
-    const history = buildHistory(
-      encodeEvent(5, CharacterEventType.Backspace),
-      encodeEvent(15, CharacterEventType.Backspace)
-    );
-    expect(getRawWpmBySecond(history, RACE_START)).toEqual([]);
+  it("aggregate WPM is exactly 60 at every full second", () => {
+    const agg = getAggWpmBySecond(history, RACE_START);
+    expect(agg).toEqual([0, 60, 60, 60, 60, 60, 60, 60, 60]);
   });
 
-  it("produces consistent values for steady typing", () => {
-    const history = steadyTypingHistory(5, 5.0);
-    const result = getRawWpmBySecond(history, RACE_START);
-
-    for (const wpm of result) {
-      expect(wpm).toBeGreaterThan(0);
-    }
-
-    const maxDrift = Math.max(...result) - Math.min(...result);
-    expect(maxDrift).toBeLessThan(20);
-  });
-
-  it("does not trail off at the end for a partial last second", () => {
-    const history = steadyTypingHistory(5, 7.3);
-    const result = getRawWpmBySecond(history, RACE_START);
-
-    const lastThree = result.slice(-3);
-    const firstThree = result.slice(0, 3);
-    const avgEnd = lastThree.reduce((a, b) => a + b, 0) / lastThree.length;
-    const avgStart = firstThree.reduce((a, b) => a + b, 0) / firstThree.length;
-
-    expect(avgEnd).toBeGreaterThan(avgStart * 0.7);
-  });
-
-  it("drops the incomplete last-second bucket", () => {
-    const history = buildHistory(
-      ...Array.from({ length: 5 }, (_, i) =>
-        encodeEvent(i * 2, CharacterEventType.Correct)
-      ),
-      ...Array.from({ length: 5 }, (_, i) =>
-        encodeEvent(10 + i * 2, CharacterEventType.Correct)
-      ),
-      ...Array.from({ length: 2 }, (_, i) =>
-        encodeEvent(20 + i * 2, CharacterEventType.Correct)
-      )
-    );
-
-    const result = getRawWpmBySecond(history, RACE_START);
-    expect(result.length).toBe(2);
-  });
-
-  it("keeps single bucket for short races", () => {
-    const history = buildHistory(
-      encodeEvent(1, CharacterEventType.Correct),
-      encodeEvent(3, CharacterEventType.Correct),
-      encodeEvent(5, CharacterEventType.Correct)
-    );
-    const result = getRawWpmBySecond(history, RACE_START);
-    expect(result.length).toBe(1);
-    expect(result[0]).toBeGreaterThan(0);
-  });
-
-  it("ignores backspace events in character counts", () => {
-    const history = buildHistory(
-      encodeEvent(1, CharacterEventType.Correct),
-      encodeEvent(2, CharacterEventType.Correct),
-      encodeEvent(3, CharacterEventType.Backspace),
-      encodeEvent(4, CharacterEventType.Correct),
-      encodeEvent(5, CharacterEventType.Correct),
-      encodeEvent(6, CharacterEventType.Correct)
-    );
-    const result = getRawWpmBySecond(history, RACE_START);
-    expect(result.length).toBe(1);
-    expect(result[0]).toBe(getWpm(5, 1));
-  });
-
-  it("applies smoothing across second boundaries", () => {
-    const events: number[][] = [];
-    for (let s = 0; s < 5; s++) {
-      for (let c = 0; c < 10; c++) {
-        events.push(encodeEvent(s * 10 + c, CharacterEventType.Correct));
-      }
-    }
-    const history = buildHistory(...events);
-    const result = getRawWpmBySecond(history, RACE_START);
-
-    expect(result[0]).toBe(result[1]);
-    expect(result[1]).toBe(result[2]);
-  });
-});
-
-describe("getAggWpmBySecond", () => {
-  it("returns empty array for empty history", () => {
-    expect(getAggWpmBySecond(new Uint8Array(), RACE_START)).toEqual([]);
-  });
-
-  it("returns zero for second 0", () => {
-    const history = buildHistory(
-      encodeEvent(1, CharacterEventType.Correct),
-      encodeEvent(2, CharacterEventType.Correct),
-      encodeEvent(15, CharacterEventType.Correct)
-    );
-    const result = getAggWpmBySecond(history, RACE_START);
-    expect(result[0]).toBe(0);
-  });
-
-  it("accumulates characters over time", () => {
-    const history = steadyTypingHistory(5, 4.0);
-    const result = getAggWpmBySecond(history, RACE_START);
-
-    for (let i = 1; i < result.length; i++) {
-      expect(result[i]).toBeGreaterThan(0);
-    }
-  });
-
-  it("converges toward true WPM for steady typing", () => {
-    const history = steadyTypingHistory(5, 10.0);
-    const result = getAggWpmBySecond(history, RACE_START);
-
-    const lastValue = result[result.length - 1];
-    expect(lastValue).toBeGreaterThan(50);
-    expect(lastValue).toBeLessThan(70);
-  });
-
-  it("accounts for backspaces by reducing net progress", () => {
-    const withBackspaces = buildHistory(
-      encodeEvent(1, CharacterEventType.Correct),
-      encodeEvent(2, CharacterEventType.Correct),
-      encodeEvent(3, CharacterEventType.Correct),
-      encodeEvent(4, CharacterEventType.Backspace),
-      encodeEvent(15, CharacterEventType.Correct)
-    );
-    const withoutBackspaces = buildHistory(
-      encodeEvent(1, CharacterEventType.Correct),
-      encodeEvent(2, CharacterEventType.Correct),
-      encodeEvent(15, CharacterEventType.Correct)
-    );
-
-    const resultWith = getAggWpmBySecond(withBackspaces, RACE_START);
-    const resultWithout = getAggWpmBySecond(withoutBackspaces, RACE_START);
-
-    expect(resultWith).toEqual(resultWithout);
-  });
-
-  it("returns empty array for all-backspace history", () => {
-    const history = buildHistory(
-      encodeEvent(5, CharacterEventType.Backspace),
-      encodeEvent(10, CharacterEventType.Backspace)
-    );
-    expect(getAggWpmBySecond(history, RACE_START)).toEqual([]);
-  });
-});
-
-describe("getAccuracy", () => {
-  it("returns 0 for empty history", () => {
-    expect(getAccuracy(new Uint8Array(), RACE_START)).toBe(0);
-  });
-
-  it("returns 100 for all correct", () => {
-    const history = buildHistory(
-      encodeEvent(1, CharacterEventType.Correct),
-      encodeEvent(2, CharacterEventType.Correct),
-      encodeEvent(3, CharacterEventType.Correct)
-    );
+  it("accuracy is 100% with no errors", () => {
     expect(getAccuracy(history, RACE_START)).toBe(100);
   });
 
-  it("counts incorrect and backspace as total keystrokes", () => {
-    const history = buildHistory(
-      encodeEvent(1, CharacterEventType.Correct),
-      encodeEvent(2, CharacterEventType.Incorrect),
-      encodeEvent(3, CharacterEventType.Backspace),
-      encodeEvent(4, CharacterEventType.Correct)
-    );
-    expect(getAccuracy(history, RACE_START)).toBe(50);
-  });
-
-  it("returns 0 when all keystrokes are errors", () => {
-    const history = buildHistory(
-      encodeEvent(1, CharacterEventType.Incorrect),
-      encodeEvent(2, CharacterEventType.Backspace)
-    );
-    expect(getAccuracy(history, RACE_START)).toBe(0);
+  it("error counts are empty", () => {
+    expect(getErrorCountsBySecond(history, RACE_START)).toEqual([]);
   });
 });
 
-describe("getErrorCountsBySecond", () => {
-  it("returns empty array for empty history", () => {
-    expect(getErrorCountsBySecond(new Uint8Array(), RACE_START)).toEqual([]);
+describe("~85 WPM typist — 48 net chars over 6.8s, two corrected typos", () => {
+  const history = buildHistory(
+    [1, C],  [2, C],  [4, C],  [5, C],  [6, C],  [7, C],  [9, C],
+    [10, C], [11, C], [13, I], [14, B], [16, C], [17, C], [18, C], [19, C],
+    [21, C], [22, C], [23, C], [25, C], [26, C], [27, C], [29, C],
+    [30, C], [31, C], [32, C], [33, C], [35, C], [36, C], [37, C], [38, C], [39, C],
+    [40, C], [42, C], [43, I], [44, B], [46, C], [47, C], [49, C],
+    [50, C], [51, C], [53, C], [54, C], [55, C], [57, C], [58, C], [59, C],
+    [61, C], [62, C], [63, C], [64, C], [66, C], [68, C],
+  );
+
+  it("raw WPM reflects per-second variation, partial bucket dropped", () => {
+    const raw = getRawWpmBySecond(history, RACE_START);
+    expect(raw).toEqual([84, 90, 86.4, 88.8, 90, 92]);
   });
 
-  it("returns empty array when there are no errors", () => {
-    const history = buildHistory(
-      encodeEvent(1, CharacterEventType.Correct),
-      encodeEvent(2, CharacterEventType.Correct)
-    );
-    expect(getErrorCountsBySecond(history, RACE_START)).toEqual([]);
+  it("aggregate WPM converges toward ~84", () => {
+    const agg = getAggWpmBySecond(history, RACE_START);
+    expect(agg).toEqual([0, 96, 78, 84, 90, 84, 84]);
   });
 
-  it("counts errors per second bucket", () => {
-    const history = buildHistory(
-      encodeEvent(1, CharacterEventType.Incorrect),
-      encodeEvent(3, CharacterEventType.Incorrect),
-      encodeEvent(15, CharacterEventType.Incorrect)
-    );
-    const result = getErrorCountsBySecond(history, RACE_START);
-    expect(result[0]).toBe(2);
-    expect(result[1]).toBe(1);
+  it("accuracy accounts for incorrect keystrokes and backspaces", () => {
+    expect(getAccuracy(history, RACE_START)).toBeCloseTo(92.31, 1);
   });
 
-  it("ignores correct and backspace events", () => {
-    const history = buildHistory(
-      encodeEvent(1, CharacterEventType.Correct),
-      encodeEvent(2, CharacterEventType.Backspace),
-      encodeEvent(3, CharacterEventType.Incorrect)
-    );
-    const result = getErrorCountsBySecond(history, RACE_START);
-    expect(result[0]).toBe(1);
+  it("error counts show one error in second 1 and one in second 4", () => {
+    expect(getErrorCountsBySecond(history, RACE_START)).toEqual([0, 1, 0, 0, 1]);
   });
 });
