@@ -1,5 +1,4 @@
 import { Container, Graphics, Sprite, Text } from "pixi.js";
-import { NineSlicePanel } from "./NineSlicePanel";
 import { PIXEL_FONT_FAMILY } from "./constants";
 import type { AssetManager } from "./assetManager";
 import type { Item, ItemType } from "./itemConfig";
@@ -7,16 +6,20 @@ import { getItemDisplay } from "./itemConfig";
 import { RelicType, RELIC_CONFIGS } from "./relicConfig";
 import type { RelicTypeConfig } from "./relicConfig";
 
-const PANEL_WIDTH = 440;
-const PANEL_PADDING = 28;
-const ICON_SIZE = 128;
-const PANEL_SCALE = 4;
-const TITLE_FONT_SIZE = 18;
-const STAT_FONT_SIZE = 12;
-const DESC_FONT_SIZE = 11;
-const LINE_HEIGHT = 22;
-const SECTION_GAP = 14;
-const ICON_GAP = 8;
+const PANEL_WIDTH = 320;
+const PANEL_PADDING = 20;
+const ICON_SIZE = 96;
+const TITLE_FONT_SIZE = 16;
+const STAT_FONT_SIZE = 11;
+const DESC_FONT_SIZE = 10;
+const LINE_HEIGHT = 20;
+const SECTION_GAP = 10;
+const ICON_GAP = 6;
+
+const BG_COLOR = 0x111122;
+const BG_ALPHA = 0.92;
+const BORDER_COLOR = 0x8b7355;
+const INNER_BORDER_COLOR = 0x5a4a32;
 
 const TITLE_COLOR = 0xffd866;
 const DAMAGE_COLOR = 0xff4444;
@@ -239,7 +242,7 @@ function buildEffectLines(config: RelicTypeConfig): EffectLine[] {
 
 export class ItemTooltip {
   readonly container: Container;
-  private panel: NineSlicePanel | null = null;
+  private background: Graphics | null = null;
   private content: Container;
   private assets: AssetManager;
 
@@ -300,7 +303,7 @@ export class ItemTooltip {
     if (config) {
       const damageIcon = new Graphics();
       drawSwordIcon(damageIcon);
-      damageIcon.scale.set(2.5);
+      damageIcon.scale.set(2);
       damageIcon.x = PANEL_PADDING;
       damageIcon.y = cursorY;
       this.content.addChild(damageIcon);
@@ -313,8 +316,8 @@ export class ItemTooltip {
           fill: EFFECT_COLOR,
         },
       });
-      damageLabel.x = PANEL_PADDING + 38;
-      damageLabel.y = cursorY + 4;
+      damageLabel.x = PANEL_PADDING + 32;
+      damageLabel.y = cursorY + 3;
       this.content.addChild(damageLabel);
 
       const damageValue = new Text({
@@ -327,13 +330,13 @@ export class ItemTooltip {
       });
       damageValue.anchor.set(1, 0);
       damageValue.x = PANEL_WIDTH - PANEL_PADDING;
-      damageValue.y = cursorY + 4;
+      damageValue.y = cursorY + 3;
       this.content.addChild(damageValue);
       cursorY += LINE_HEIGHT + 4;
 
       const charsIcon = new Graphics();
       drawKeyboardIcon(charsIcon);
-      charsIcon.scale.set(2.5);
+      charsIcon.scale.set(2);
       charsIcon.x = PANEL_PADDING;
       charsIcon.y = cursorY;
       this.content.addChild(charsIcon);
@@ -346,8 +349,8 @@ export class ItemTooltip {
           fill: EFFECT_COLOR,
         },
       });
-      charsLabel.x = PANEL_PADDING + 38;
-      charsLabel.y = cursorY + 4;
+      charsLabel.x = PANEL_PADDING + 32;
+      charsLabel.y = cursorY + 3;
       this.content.addChild(charsLabel);
 
       const charsValue = new Text({
@@ -360,7 +363,7 @@ export class ItemTooltip {
       });
       charsValue.anchor.set(1, 0);
       charsValue.x = PANEL_WIDTH - PANEL_PADDING;
-      charsValue.y = cursorY + 4;
+      charsValue.y = cursorY + 3;
       this.content.addChild(charsValue);
       cursorY += LINE_HEIGHT + 4;
     }
@@ -373,7 +376,7 @@ export class ItemTooltip {
       for (const effect of effects) {
         const iconGraphics = new Graphics();
         effect.drawIcon(iconGraphics);
-        iconGraphics.scale.set(2.5);
+        iconGraphics.scale.set(2);
         iconGraphics.x = PANEL_PADDING;
         iconGraphics.y = cursorY;
         this.content.addChild(iconGraphics);
@@ -385,11 +388,11 @@ export class ItemTooltip {
             fontSize: DESC_FONT_SIZE,
             fill: effect.color,
             wordWrap: true,
-            wordWrapWidth: contentWidth - ICON_GAP - 38,
+            wordWrapWidth: contentWidth - ICON_GAP - 32,
           },
         });
-        effectText.x = PANEL_PADDING + 38;
-        effectText.y = cursorY + 4;
+        effectText.x = PANEL_PADDING + 32;
+        effectText.y = cursorY + 3;
         this.content.addChild(effectText);
         cursorY += Math.max(LINE_HEIGHT, effectText.height + 4) + 2;
       }
@@ -399,13 +402,15 @@ export class ItemTooltip {
 
     const panelHeight = cursorY;
 
-    this.panel = new NineSlicePanel({
-      texture: this.assets.uiPanel9Slice,
-      width: PANEL_WIDTH,
-      height: panelHeight,
-      scale: PANEL_SCALE,
-    });
-    this.container.addChild(this.panel.container);
+    this.background = new Graphics();
+    this.background.roundRect(0, 0, PANEL_WIDTH, panelHeight, 3);
+    this.background.fill({ color: BG_COLOR, alpha: BG_ALPHA });
+    this.background.roundRect(0, 0, PANEL_WIDTH, panelHeight, 3);
+    this.background.stroke({ color: BORDER_COLOR, width: 2 });
+    this.background.roundRect(3, 3, PANEL_WIDTH - 6, panelHeight - 6, 2);
+    this.background.stroke({ color: INNER_BORDER_COLOR, width: 1, alpha: 0.5 });
+
+    this.container.addChild(this.background);
     this.container.addChild(this.content);
 
     let posX = globalX + 16;
@@ -433,15 +438,15 @@ export class ItemTooltip {
 
   private drawSeparator(y: number): void {
     const line = new Graphics();
-    const x1 = PANEL_PADDING + 12;
-    const x2 = PANEL_WIDTH - PANEL_PADDING - 12;
+    const x1 = PANEL_PADDING + 8;
+    const x2 = PANEL_WIDTH - PANEL_PADDING - 8;
     const lineWidth = x2 - x1;
 
     line.moveTo(0, 0);
     line.lineTo(lineWidth, 0);
-    line.stroke({ color: SEPARATOR_COLOR, width: 2, alpha: 0.6 });
+    line.stroke({ color: SEPARATOR_COLOR, width: 1, alpha: 0.6 });
 
-    line.circle(lineWidth / 2, 0, 3);
+    line.circle(lineWidth / 2, 0, 2);
     line.fill({ color: SEPARATOR_COLOR, alpha: 0.8 });
 
     line.x = x1;
@@ -450,9 +455,9 @@ export class ItemTooltip {
   }
 
   private clear(): void {
-    if (this.panel) {
-      this.panel.destroy();
-      this.panel = null;
+    if (this.background) {
+      this.background.destroy();
+      this.background = null;
     }
     this.content.removeChildren();
     this.container.removeChildren();
