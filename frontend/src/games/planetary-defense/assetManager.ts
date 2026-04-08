@@ -230,7 +230,8 @@ export class AssetManager {
     const canvas = document.createElement("canvas");
     canvas.width = frame.width;
     canvas.height = frame.height;
-    const ctx = canvas.getContext("2d")!;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return "";;
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       source,

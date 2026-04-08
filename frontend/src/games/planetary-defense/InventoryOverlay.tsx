@@ -575,7 +575,9 @@ function getPositions(game: PlanetaryDefenseGame): InventoryPosition[] {
   positions.push({ inventory: playerInv, canvasX: playerX, canvasY: playerY });
 
   for (const ws of game.weaponSlotInventories) {
+    if (!ws.slot.startsWith("weapon-")) continue;
     const idx = parseInt(ws.slot.replace("weapon-", ""), 10);
+    if (Number.isNaN(idx)) continue;
     const relicPos = game.getWeaponSlotPosition(idx);
     const offset = GRID_PADDING + BORDER_WIDTH + CELL_SIZE / 2;
     positions.push({
