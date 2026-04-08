@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { PlanetaryDefenseGame } from "./game";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT } from "./constants";
 import { getItemDisplay, getItemConfig, type Item } from "./itemConfig";
@@ -40,6 +40,8 @@ interface InventoryGridProps {
   scale: number;
   left: number;
   top: number;
+  leftPct: number;
+  topPct: number;
   getTextureUrl: (alias: string) => string;
   dragState: DragState | null;
   onDragStart: (inv: InventoryState, slot: InventoryItem, e: React.PointerEvent) => void;
@@ -52,6 +54,8 @@ const InventoryGrid = ({
   scale,
   left,
   top,
+  leftPct,
+  topPct,
   getTextureUrl,
   dragState,
   onDragStart,
@@ -92,8 +96,8 @@ const InventoryGrid = ({
     <div
       style={{
         position: "absolute",
-        left,
-        top,
+        left: `${leftPct}%`,
+        top: `${topPct}%`,
         width: totalW * scale,
         height: totalH * scale,
         pointerEvents: "auto",
@@ -291,6 +295,18 @@ export const InventoryOverlay = ({
   const dragRef = useRef<DragState | null>(null);
   const inventoriesRef = useRef<InventoryState[]>([]);
 
+  useLayoutEffect(() => {
+    setTick((t) => t + 1);
+  }, []);
+
+  useEffect(() => {
+    const overlay = overlayRef.current;
+    if (!overlay) return;
+    const ro = new ResizeObserver(() => setTick((t) => t + 1));
+    ro.observe(overlay);
+    return () => ro.disconnect();
+  }, []);
+
   useEffect(() => {
     const game = gameRef.current;
     if (!game) return;
@@ -461,6 +477,8 @@ export const InventoryOverlay = ({
       }}
     >
       {positions.map((pos) => {
+        const leftPct = (pos.canvasX / CANVAS_WIDTH) * 100;
+        const topPct = (pos.canvasY / CANVAS_HEIGHT) * 100;
         const invLeft = overlay
           ? (pos.canvasX / CANVAS_WIDTH) * overlay.clientWidth
           : 0;
@@ -474,8 +492,8 @@ export const InventoryOverlay = ({
               <div
                 style={{
                   position: "absolute",
-                  left: invLeft,
-                  top: invTop - 30 * scale,
+                  left: `${leftPct}%`,
+                  top: `${topPct}%`,
                   width: gridWidth(pos.inventory.cols) * scale,
                   height: 26 * scale,
                   background: MERCHANT_TITLE_BG,
@@ -486,6 +504,7 @@ export const InventoryOverlay = ({
                   paddingLeft: 8 * scale,
                   boxSizing: "border-box",
                   pointerEvents: "none",
+                  transform: `translateY(${-30 * scale}px)`,
                 }}
               >
                 <span
@@ -504,6 +523,8 @@ export const InventoryOverlay = ({
               scale={scale}
               left={invLeft}
               top={invTop}
+              leftPct={leftPct}
+              topPct={topPct}
               getTextureUrl={getTextureUrl}
               dragState={dragState}
               onDragStart={onDragStart}
