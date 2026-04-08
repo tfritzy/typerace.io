@@ -19,25 +19,31 @@ function ThemeRow({
 }) {
     const preset = THEME_PRESETS[tag];
     const resolved = THEMES[tag];
+    const [hovered, setHovered] = useState(false);
 
     return (
         <button
             onClick={onSelect}
-            className={`flex items-center w-full px-4 py-3 cursor-pointer transition-opacity text-left ${
-                isSelected
-                    ? 'ring-2 ring-inset ring-accent'
-                    : 'hover:opacity-90'
-            }`}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            className="flex items-center w-full px-4 py-3 cursor-pointer text-left relative"
             style={{ background: resolved.colors.background }}
         >
+            <div
+                className="absolute inset-0 transition-opacity duration-150"
+                style={{
+                    background: resolved.colors.accent,
+                    opacity: hovered ? 0.1 : 0,
+                }}
+            />
             <span
-                className="flex-1 text-sm font-medium"
+                className="flex-1 text-sm font-medium relative"
                 style={{ color: resolved.colors.accent }}
             >
                 {preset.name}
             </span>
             <div
-                className="w-5 h-5 shrink-0 rounded border-2 flex items-center justify-center"
+                className="w-5 h-5 shrink-0 rounded border-2 flex items-center justify-center relative"
                 style={{
                     borderColor: resolved.colors.accent,
                     background: isSelected ? resolved.colors.accent : 'transparent',

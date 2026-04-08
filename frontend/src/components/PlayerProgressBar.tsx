@@ -119,7 +119,7 @@ export const PlayerProgressBar = memo(({
                         </span>
                     )}
                 </div>
-                <div className="w-full h-2.5 bg-secondary rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
                     <div
                         className="h-full rounded-full transition-all duration-200"
                         style={{
