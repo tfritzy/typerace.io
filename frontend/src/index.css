@@ -281,6 +281,28 @@ body {
   }
 }
 
+@keyframes dialogContentIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes dialogContentOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
 @keyframes slideUpFadeIn {
   from {
     opacity: 0;

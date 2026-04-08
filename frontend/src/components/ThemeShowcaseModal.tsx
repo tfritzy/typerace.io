@@ -8,7 +8,7 @@ import {
     type ThemeTag,
 } from '../utils/themes';
 
-function ThemeCard({
+function ThemeRow({
     tag,
     isSelected,
     onSelect,
@@ -17,55 +17,45 @@ function ThemeCard({
     isSelected: boolean;
     onSelect: () => void;
 }) {
+    const preset = THEME_PRESETS[tag];
     const resolved = THEMES[tag];
 
     return (
         <button
             onClick={onSelect}
-            className={`rounded-lg overflow-hidden cursor-pointer transition-all border-2 text-left w-full ${
+            className={`flex items-center w-full px-4 py-3 cursor-pointer transition-opacity text-left ${
                 isSelected
-                    ? 'border-accent ring-2 ring-accent/30 scale-[1.02]'
-                    : 'border-transparent hover:border-border-hover'
+                    ? 'ring-2 ring-inset ring-accent'
+                    : 'hover:opacity-90'
             }`}
+            style={{ background: resolved.colors.background }}
         >
+            <span
+                className="flex-1 text-sm font-medium"
+                style={{ color: resolved.colors.accent }}
+            >
+                {preset.name}
+            </span>
             <div
-                className="p-3"
+                className="w-5 h-5 shrink-0 rounded border-2 flex items-center justify-center"
                 style={{
-                    background: resolved.colors.background,
-                    borderRadius: `8px 8px 0 0`,
+                    borderColor: resolved.colors.accent,
+                    background: isSelected ? resolved.colors.accent : 'transparent',
                 }}
             >
-                <div
-                    className="p-2 mb-2"
-                    style={{
-                        background: resolved.colors.card,
-                        border: `1px solid ${resolved.colors.border}`,
-                        borderRadius: `6px`,
-                    }}
-                >
-                    <div className="text-xs leading-relaxed font-mono">
-                        <span style={{ color: resolved.colors.accent }}>the quick </span>
-                        <span style={{ color: resolved.colors.textUntyped }}>brown fox</span>
-                    </div>
-                </div>
-                <div className="flex gap-1 mt-2">
-                    {resolved.previewColors.slice(1).map((color) => (
-                        <div
-                            key={color}
-                            className="h-1.5 flex-1 rounded-full"
-                            style={{ background: color }}
-                        />
-                    ))}
-                </div>
-            </div>
-            <div
-                className="px-3 py-2 text-xs font-medium"
-                style={{
-                    background: resolved.colors.card,
-                    color: resolved.colors.foreground,
-                }}
-            >
-                {THEME_PRESETS[tag].name}
+                {isSelected && (
+                    <svg
+                        viewBox="0 0 12 12"
+                        className="w-3 h-3"
+                        fill="none"
+                        stroke={resolved.colors.background}
+                        strokeWidth={2.5}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M2.5 6l2.5 2.5 4.5-5" />
+                    </svg>
+                )}
             </div>
         </button>
     );
@@ -88,16 +78,16 @@ export const ThemeShowcaseModal = ({ open, onClose }: ThemeShowcaseModalProps) =
 
     return (
         <Dialog open={open} onOpenChange={(open) => { if (!open) onClose(); }}>
-            <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
+            <DialogContent className="max-w-sm max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
                 <DialogTitle className="sr-only">Theme Settings</DialogTitle>
-                <div className="px-6 pt-6 pb-3 border-b border-border shrink-0">
+                <div className="px-5 pt-5 pb-3 border-b border-border shrink-0">
                     <h2 className="text-lg font-semibold text-foreground">Themes</h2>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="flex-1 overflow-y-auto">
+                    <div className="flex flex-col">
                         {themeTags.map((tag) => (
-                            <ThemeCard
+                            <ThemeRow
                                 key={tag}
                                 tag={tag}
                                 isSelected={selectedTheme === tag}
