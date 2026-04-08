@@ -4,6 +4,7 @@ import type { PlanetaryDefenseGame } from "./game";
 import { startNextWave } from "./state";
 import { LabelOverlay } from "./LabelOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
+import { InventoryOverlay } from "./InventoryOverlay";
 import { PIXEL_FONT } from "./constants";
 
 const PlanetHealthBar = ({ ratio }: { ratio: number }) => {
@@ -69,6 +70,7 @@ export const GameCanvas = () => {
   const [healthRatio, setHealthRatio] = useState(1);
   const [waveNumber, setWaveNumber] = useState(0);
   const [waveActive, setWaveActive] = useState(false);
+  const [gameReady, setGameReady] = useState(false);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -77,6 +79,7 @@ export const GameCanvas = () => {
     let cancelled = false;
     let unsubDamage: (() => void) | null = null;
     let unsubWaveComplete: (() => void) | null = null;
+    let unsubWaveActive: (() => void) | null = null;
 
     createPlanetaryDefenseGame(div)
       .then((game) => {
@@ -85,12 +88,16 @@ export const GameCanvas = () => {
           return;
         }
         gameRef.current = game;
+        setGameReady(true);
         unsubDamage = game.state.onPlanetDamaged.subscribe(() => {
           setHealthRatio(game.state.planetHealth / game.state.maxPlanetHealth);
         });
         unsubWaveComplete = game.state.onWaveComplete.subscribe(() => {
           setWaveNumber(game.state.wave.wave);
           setWaveActive(false);
+        });
+        unsubWaveActive = game.onWaveActiveChanged(() => {
+          setWaveActive(game.isWaveActive);
         });
       })
       .catch((err) => {
@@ -101,6 +108,7 @@ export const GameCanvas = () => {
       cancelled = true;
       unsubDamage?.();
       unsubWaveComplete?.();
+      unsubWaveActive?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -139,6 +147,7 @@ export const GameCanvas = () => {
     >
       <LabelOverlay gameRef={gameRef} />
       <PhraseOverlay gameRef={gameRef} visible={waveActive} />
+      {gameReady && <InventoryOverlay gameRef={gameRef} visible={!waveActive} />}
       <PlanetHealthBar ratio={healthRatio} />
       <div className="absolute top-3 left-3 z-10">
         <div
