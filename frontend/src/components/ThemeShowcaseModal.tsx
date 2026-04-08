@@ -23,9 +23,9 @@ function ThemeRow({
     return (
         <button
             onClick={onSelect}
-            className={`flex items-center w-full rounded-lg px-4 py-3 cursor-pointer transition-opacity text-left ${
+            className={`flex items-center w-full px-4 py-3 cursor-pointer transition-opacity text-left ${
                 isSelected
-                    ? 'ring-2 ring-accent'
+                    ? 'ring-2 ring-inset ring-accent'
                     : 'hover:opacity-90'
             }`}
             style={{ background: resolved.colors.background }}
@@ -84,8 +84,8 @@ export const ThemeShowcaseModal = ({ open, onClose }: ThemeShowcaseModalProps) =
                     <h2 className="text-lg font-semibold text-foreground">Themes</h2>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-2">
-                    <div className="flex flex-col gap-1.5">
+                <div className="flex-1 overflow-y-auto">
+                    <div className="flex flex-col">
                         {themeTags.map((tag) => (
                             <ThemeRow
                                 key={tag}
