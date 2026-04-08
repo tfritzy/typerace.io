@@ -185,7 +185,7 @@ export class PlanetaryDefenseGame {
     this.projectileManager.update(this.state);
     this.damageNumberManager.update(dt);
     this.dropManager.update(this.state);
-    this.merchantManager.update(this.state, dt);
+    this.merchantManager.update(this.state);
 
     const waveActive = this.state.wave.phase !== WavePhase.Idle;
     this.inventory.container.visible = !waveActive;

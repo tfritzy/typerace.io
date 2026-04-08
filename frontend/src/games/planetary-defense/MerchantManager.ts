@@ -1,7 +1,7 @@
 import { Container, Circle, Graphics, Text } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, MerchantShipState } from "./state";
-import { createEntityState } from "./state";
+import { createEntityState, selectMerchant } from "./state";
 import { createShipContainer } from "./prefabs/shipPrefab";
 import {
   Inventory,
@@ -15,15 +15,7 @@ import { ColorPreset } from "./types";
 
 const CLICK_RADIUS = 50;
 const PANEL_WIDTH = CELL_SIZE * 3 + GRID_PADDING * 2 + BORDER_WIDTH * 2;
-const DEPART_SPEED = 300;
-const OFFSCREEN_BUFFER = 200;
 const NAME_LABEL_OFFSET_Y = -45;
-
-interface DepartingShip {
-  display: Container;
-  x: number;
-  y: number;
-}
 
 export class MerchantManager {
   readonly layer: Container;
@@ -35,10 +27,9 @@ export class MerchantManager {
   private shopInventory: Inventory | null = null;
   private inventoryManager: InventoryManager | null = null;
   private activeMerchantId: number | null = null;
-  private departingShips: DepartingShip[] = [];
   private knownMerchantIds = new Set<number>();
   private promptContainer: Container | null = null;
-  private selectedMerchantId: number | null = null;
+  private promptVisible = false;
 
   constructor(assets: AssetManager) {
     this.assets = assets;
@@ -52,15 +43,12 @@ export class MerchantManager {
 
   init(state: GameState): void {
     for (const merchant of state.merchants) {
-      this.createMerchantDisplay(merchant);
+      this.createMerchantDisplay(merchant, state);
       this.knownMerchantIds.add(merchant.id);
-    }
-    if (state.merchants.length > 0) {
-      this.showPrompt();
     }
   }
 
-  private createMerchantDisplay(merchant: MerchantShipState): void {
+  private createMerchantDisplay(merchant: MerchantShipState, state: GameState): void {
     const entity = createEntityState(
       merchant.id,
       merchant.entityType,
@@ -75,42 +63,19 @@ export class MerchantManager {
     display.hitArea = new Circle(0, 0, CLICK_RADIUS);
 
     display.on("pointerdown", () => {
-      this.selectMerchant(merchant);
+      if (merchant.departing) return;
+      if (!merchant.shopOpenable) {
+        selectMerchant(state, merchant.id);
+      }
+      if (merchant.shopOpenable) {
+        this.toggleShop(merchant);
+      }
     });
 
     this.layer.addChild(display);
     this.shipDisplays.set(merchant.id, display);
 
     this.createNameLabel(merchant);
-  }
-
-  private selectMerchant(merchant: MerchantShipState): void {
-    if (this.selectedMerchantId !== null && this.selectedMerchantId !== merchant.id) {
-      return;
-    }
-
-    if (this.selectedMerchantId === null) {
-      this.selectedMerchantId = merchant.id;
-      this.dismissUnselected(merchant.id);
-      this.hidePrompt();
-    }
-
-    this.toggleShop(merchant);
-  }
-
-  private dismissUnselected(selectedId: number): void {
-    for (const [id, display] of this.shipDisplays) {
-      if (id === selectedId) continue;
-      this.departingShips.push({ display, x: display.x, y: display.y });
-      this.shipDisplays.delete(id);
-      this.knownMerchantIds.delete(id);
-
-      const label = this.nameLabels.get(id);
-      if (label) {
-        label.destroy();
-        this.nameLabels.delete(id);
-      }
-    }
   }
 
   private createNameLabel(merchant: MerchantShipState): void {
@@ -135,7 +100,7 @@ export class MerchantManager {
   }
 
   private showPrompt(): void {
-    this.hidePrompt();
+    if (this.promptVisible) return;
 
     this.promptContainer = new Container();
 
@@ -174,6 +139,7 @@ export class MerchantManager {
     this.promptContainer.y = CANVAS_HEIGHT / 2 - 280;
 
     this.layer.addChild(this.promptContainer);
+    this.promptVisible = true;
   }
 
   private hidePrompt(): void {
@@ -181,6 +147,7 @@ export class MerchantManager {
       this.promptContainer.destroy();
       this.promptContainer = null;
     }
+    this.promptVisible = false;
   }
 
   private toggleShop(merchant: MerchantShipState): void {
@@ -193,34 +160,16 @@ export class MerchantManager {
     this.openShop(merchant);
   }
 
-  update(state: GameState, dt: number): void {
-    for (let i = this.departingShips.length - 1; i >= 0; i--) {
-      const ship = this.departingShips[i];
-      ship.x += DEPART_SPEED * dt;
-      ship.display.x = ship.x;
-      if (ship.x > CANVAS_WIDTH + OFFSCREEN_BUFFER) {
-        ship.display.destroy();
-        this.departingShips.splice(i, 1);
-      }
-    }
-
+  update(state: GameState): void {
     this.syncMerchants(state);
   }
 
   private syncMerchants(state: GameState): void {
     const currentIds = new Set(state.merchants.map((m) => m.id));
 
-    for (const [id, display] of this.shipDisplays) {
+    for (const [id] of this.shipDisplays) {
       if (!currentIds.has(id)) {
-        this.departingShips.push({ display, x: display.x, y: display.y });
-        this.shipDisplays.delete(id);
-        this.knownMerchantIds.delete(id);
-
-        const label = this.nameLabels.get(id);
-        if (label) {
-          label.destroy();
-          this.nameLabels.delete(id);
-        }
+        this.removeMerchantDisplay(id);
       }
     }
 
@@ -228,24 +177,54 @@ export class MerchantManager {
       this.closeShop();
     }
 
-    let hasNew = false;
+    const activeMerchant = this.activeMerchantId !== null
+      ? state.merchants.find((m) => m.id === this.activeMerchantId)
+      : null;
+    if (activeMerchant && !activeMerchant.shopOpenable) {
+      this.closeShop();
+    }
+
     for (const merchant of state.merchants) {
       if (!this.knownMerchantIds.has(merchant.id)) {
-        this.createMerchantDisplay(merchant);
+        this.createMerchantDisplay(merchant, state);
         this.knownMerchantIds.add(merchant.id);
-        hasNew = true;
+      }
+
+      const display = this.shipDisplays.get(merchant.id);
+      if (display) {
+        display.x = merchant.x;
+        display.y = merchant.y;
+      }
+
+      const label = this.nameLabels.get(merchant.id);
+      if (label) {
+        if (merchant.departing) {
+          label.x = merchant.x;
+        }
       }
     }
 
-    if (hasNew) {
-      this.closeShop();
-      this.selectedMerchantId = null;
+    const hasNonDeparting = state.merchants.some((m) => !m.departing);
+    const anySelected = state.merchants.some((m) => m.shopOpenable);
+    if (hasNonDeparting && !anySelected) {
       this.showPrompt();
-    }
-
-    if (state.merchants.length === 0) {
+    } else {
       this.hidePrompt();
-      this.selectedMerchantId = null;
+    }
+  }
+
+  private removeMerchantDisplay(id: number): void {
+    const display = this.shipDisplays.get(id);
+    if (display) {
+      display.destroy();
+      this.shipDisplays.delete(id);
+    }
+    this.knownMerchantIds.delete(id);
+
+    const label = this.nameLabels.get(id);
+    if (label) {
+      label.destroy();
+      this.nameLabels.delete(id);
     }
   }
 
@@ -320,9 +299,6 @@ export class MerchantManager {
   destroy(): void {
     for (const d of this.shipDisplays.values()) d.destroy();
     this.shipDisplays.clear();
-
-    for (const d of this.departingShips) d.display.destroy();
-    this.departingShips.length = 0;
 
     for (const d of this.nameLabels.values()) d.destroy();
     this.nameLabels.clear();

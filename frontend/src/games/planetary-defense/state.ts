@@ -155,6 +155,8 @@ export interface MerchantShipState {
   y: number;
   entityType: EntityType;
   items: Item[];
+  departing: boolean;
+  shopOpenable: boolean;
 }
 
 export interface GameState {
@@ -275,6 +277,8 @@ export function spawnMerchants(state: GameState): void {
     y: CANVAS_HEIGHT / 2 - 150,
     entityType: shuffled[0].entityType,
     items: generateShopItems(6),
+    departing: false,
+    shopOpenable: false,
   });
 
   state.merchants.push({
@@ -284,7 +288,34 @@ export function spawnMerchants(state: GameState): void {
     y: CANVAS_HEIGHT / 2 + 150,
     entityType: shuffled[1].entityType,
     items: generateShopItems(6),
+    departing: false,
+    shopOpenable: false,
   });
+}
+
+const MERCHANT_DEPART_SPEED = 300;
+const MERCHANT_OFFSCREEN_BUFFER = 200;
+
+export function selectMerchant(state: GameState, merchantId: number): void {
+  for (const m of state.merchants) {
+    if (m.id === merchantId) {
+      m.shopOpenable = true;
+    } else if (!m.shopOpenable) {
+      m.departing = true;
+    }
+  }
+}
+
+export function updateMerchants(state: GameState, dt: number): void {
+  for (let i = state.merchants.length - 1; i >= 0; i--) {
+    const m = state.merchants[i];
+    if (m.departing) {
+      m.x += MERCHANT_DEPART_SPEED * dt;
+      if (m.x > CANVAS_WIDTH + MERCHANT_OFFSCREEN_BUFFER) {
+        state.merchants.splice(i, 1);
+      }
+    }
+  }
 }
 
 export function createEntityState(
@@ -753,6 +784,7 @@ export function updateState(state: GameState, dt: number): void {
   checkCollisions(state);
   checkProjectileCollisions(state);
   resolveEntityDeaths(state);
+  updateMerchants(state, dt);
 }
 
 const PROJECTILE_HIT_RADIUS = 20;
@@ -952,7 +984,10 @@ function checkProjectileCollisions(state: GameState): void {
 }
 
 export function startNextWave(state: GameState): void {
-  state.merchants.length = 0;
+  for (const m of state.merchants) {
+    m.departing = true;
+    m.shopOpenable = false;
+  }
   state.wave.wave++;
   state.wave.spawnQueue = generateWaveSpawns(state.wave.wave);
   state.wave.spawnIndex = 0;
