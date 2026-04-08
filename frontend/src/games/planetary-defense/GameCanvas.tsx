@@ -4,6 +4,7 @@ import type { PlanetaryDefenseGame } from "./game";
 import { startNextWave } from "./state";
 import { LabelOverlay } from "./LabelOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
+import { MerchantOverlay } from "./MerchantOverlay";
 import { PIXEL_FONT } from "./constants";
 
 const PlanetHealthBar = ({ ratio }: { ratio: number }) => {
@@ -139,6 +140,7 @@ export const GameCanvas = () => {
     >
       <LabelOverlay gameRef={gameRef} />
       <PhraseOverlay gameRef={gameRef} visible={waveActive} />
+      <MerchantOverlay gameRef={gameRef} />
       <PlanetHealthBar ratio={healthRatio} />
       <div className="absolute top-3 left-3 z-10">
         <div

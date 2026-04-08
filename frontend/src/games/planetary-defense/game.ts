@@ -49,6 +49,10 @@ export class PlanetaryDefenseGame {
     return this.dropManager?.labels ?? [];
   }
 
+  get hoveredMerchantId(): number | null {
+    return this.merchantManager?.hoveredMerchantId ?? null;
+  }
+
   async init(): Promise<void> {
     await this.waitForPixelFont();
     this.assetManager = await AssetManager.load(MANIFEST);
