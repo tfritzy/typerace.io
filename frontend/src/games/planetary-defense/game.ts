@@ -9,17 +9,12 @@ import { ProjectileManager } from "./ProjectileManager";
 import { DamageNumberManager } from "./DamageNumberManager";
 import { DropManager } from "./DropManager";
 import type { LabelData } from "./DropManager";
-import { Inventory, CELL_SIZE, GRID_PADDING, BORDER_WIDTH } from "./Inventory";
-import { InventoryManager } from "./InventoryManager";
 import { MerchantManager } from "./MerchantManager";
 import { AssetManager } from "./assetManager";
-import { createGameState, updateState, getRelicPosition, WavePhase, handleTypedCharacter as stateHandleTypedCharacter, onCorrectKeystroke } from "./state";
-import type { GameState, RelicState } from "./state";
-import { RELIC_SLOT_COUNT, RelicType, RELIC_CONFIGS } from "./relicConfig";
+import { createGameState, updateState, WavePhase, handleTypedCharacter as stateHandleTypedCharacter, onCorrectKeystroke, toggleMerchantShop } from "./state";
+import type { GameState } from "./state";
 
 export type { LabelData };
-
-const WEAPON_SLOT_CENTER_OFFSET = GRID_PADDING + BORDER_WIDTH + CELL_SIZE / 2;
 
 export class PlanetaryDefenseGame {
   private app: Application;
@@ -33,9 +28,6 @@ export class PlanetaryDefenseGame {
   private projectileManager!: ProjectileManager;
   private damageNumberManager!: DamageNumberManager;
   private dropManager!: DropManager;
-  private inventory!: Inventory;
-  private weaponSlots: Inventory[] = [];
-  private inventoryManager!: InventoryManager;
   private merchantManager!: MerchantManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
@@ -104,68 +96,16 @@ export class PlanetaryDefenseGame {
     world.addChild(this.dropManager.layer);
 
     this.merchantManager = new MerchantManager(this.assetManager);
+    this.merchantManager.onShipClicked((merchant) => toggleMerchantShop(this.state, merchant));
     world.addChild(this.merchantManager.layer);
 
-    this.inventoryManager = new InventoryManager(this.app, this.assetManager);
-
-    this.inventory = new Inventory(this.assetManager);
-    world.addChild(this.inventory.container);
-    this.inventory.populateTestData();
-    this.inventory.addToFirstEmpty({ type: "Gold", amount: 100 });
-    this.inventoryManager.register(this.inventory);
-
-    this.merchantManager.setInventoryManager(this.inventoryManager);
     this.merchantManager.init(this.state);
-
-    this.buildWeaponSlots(world);
-  }
-
-  private buildWeaponSlots(world: Container): void {
-    for (let i = 0; i < RELIC_SLOT_COUNT; i++) {
-      const slot = this.state.relicSlots[i];
-      const { x, y } = getRelicPosition(slot);
-
-      const weaponSlot = new Inventory(this.assetManager, {
-        cols: 1,
-        rows: 1,
-        x: x - WEAPON_SLOT_CENTER_OFFSET,
-        y: y - WEAPON_SLOT_CENTER_OFFSET,
-      });
-
-      if (slot.relic) {
-        weaponSlot.addItem({ type: slot.relic.type, amount: 1 }, 0, 0);
-      }
-
-      const slotIndex = i;
-      weaponSlot.onItemAdded.subscribe((invItem) => {
-        if (!invItem.item) return;
-        const relicType = invItem.item.type as RelicType;
-        if (!(relicType in RELIC_CONFIGS)) return;
-        const relic: RelicState = {
-          type: relicType,
-          item: invItem.item,
-          level: 1,
-          charge: 0,
-          remainingShots: 0,
-          nextShotTime: 0,
-        };
-        this.state.relicSlots[slotIndex].relic = relic;
-      });
-
-      weaponSlot.onItemRemoved.subscribe(() => {
-        this.state.relicSlots[slotIndex].relic = null;
-      });
-
-      world.addChild(weaponSlot.container);
-      this.weaponSlots.push(weaponSlot);
-      this.inventoryManager.register(weaponSlot);
-    }
   }
 
   handleTypedCharacter(key: string): void {
     const collected = stateHandleTypedCharacter(this.state, key);
     for (const item of collected) {
-      this.inventory.addToFirstEmpty(item);
+      this.state.playerInventory.addToFirstEmpty(item);
     }
   }
 
@@ -184,8 +124,11 @@ export class PlanetaryDefenseGame {
     this.merchantManager.update(this.state);
 
     const waveActive = this.state.wave.phase !== WavePhase.Idle;
-    this.inventory.container.visible = !waveActive;
-    this.merchantManager.layer.visible = !waveActive;
+    if (waveActive !== this.state.waveActive) {
+      this.state.waveActive = waveActive;
+      this.merchantManager.layer.visible = !waveActive;
+      this.state.onWaveActiveChanged.emit();
+    }
   }
 
   destroy(): void {
@@ -201,10 +144,9 @@ export class PlanetaryDefenseGame {
     this.dropManager.destroy();
     this.enemyManager.destroy();
     this.merchantManager.destroy();
-    this.inventory.destroy();
-    for (const ws of this.weaponSlots) ws.destroy();
-    this.weaponSlots = [];
-    this.inventoryManager.destroy();
+    this.state.playerInventory.destroy();
+    if (this.state.activeMerchantInventory) this.state.activeMerchantInventory.destroy();
+    for (const m of this.state.merchants) m.shopInventory.destroy();
     this.app.destroy(true);
   }
 }
