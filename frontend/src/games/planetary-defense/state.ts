@@ -16,7 +16,7 @@ import {
 import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
 import {
-  type Item, GemType,
+  type Item, type ItemType, GemType,
   TOPAZ_TIERS, RUBY_TIERS, EMERALD_TIERS, SAPPHIRE_TIERS, AMETHYST_TIERS, DIAMOND_TIERS,
 } from "./itemConfig";
 import { InventoryState } from "./inventoryState";
@@ -58,7 +58,6 @@ export interface EntityState {
 
 export interface RelicState {
   type: RelicType;
-  item: Item;
   charge: number;
   remainingShots: number;
   nextShotTime: number;
@@ -66,6 +65,7 @@ export interface RelicState {
 
 export interface RelicSlot {
   angle: number;
+  inventory: InventoryState;
   relic: RelicState | null;
 }
 
@@ -183,6 +183,10 @@ export interface GameState {
   onMerchantChanged: GameEvent;
 }
 
+function isRelicType(itemType: ItemType): boolean {
+  return typeof itemType === "number" && itemType in RELIC_CONFIGS;
+}
+
 function createRelicSlots(): RelicSlot[] {
   const slots: RelicSlot[] = [];
   const startingRelics: (RelicType | null)[] = [
@@ -197,12 +201,31 @@ function createRelicSlots(): RelicSlot[] {
   ];
   for (let i = 0; i < RELIC_SLOT_COUNT; i++) {
     const angle = (i * 2 * Math.PI) / RELIC_SLOT_COUNT - Math.PI / 2;
+    const inventory = new InventoryState(1, 1, isRelicType);
     let relic: RelicState | null = null;
     const relicType = startingRelics[i] ?? null;
     if (relicType !== null) {
-      relic = { type: relicType, item: { type: relicType, amount: 1 }, charge: 0, remainingShots: 0, nextShotTime: 0 };
+      inventory.addItem({ type: relicType, amount: 1 }, 0, 0);
+      relic = { type: relicType, charge: 0, remainingShots: 0, nextShotTime: 0 };
     }
-    slots.push({ angle, relic });
+
+    inventory.onItemAdded((invItem) => {
+      const slot = slots[i];
+      if (invItem.item && isRelicType(invItem.item.type)) {
+        slot.relic = {
+          type: invItem.item.type as RelicType,
+          charge: 0,
+          remainingShots: 0,
+          nextShotTime: 0,
+        };
+      }
+    });
+
+    inventory.onItemRemoved(() => {
+      slots[i].relic = null;
+    });
+
+    slots.push({ angle, inventory, relic });
   }
   return slots;
 }
@@ -299,7 +322,7 @@ export function onStateCreated(cb: () => void): () => void {
 }
 
 export function createGameState(): GameState {
-  const playerInventory = new InventoryState("player", 10, 5);
+  const playerInventory = new InventoryState(10, 5);
 
   const state: GameState = {
     entities: [],
@@ -340,7 +363,7 @@ export function createGameState(): GameState {
   const shopItems = generateShopItems(6);
   const shopCols = 3;
   const shopRows = Math.ceil(shopItems.length / shopCols);
-  const shopInventory = new InventoryState("merchant", shopCols, shopRows);
+  const shopInventory = new InventoryState(shopCols, shopRows);
   for (let i = 0; i < shopItems.length; i++) {
     shopInventory.addItem(shopItems[i], i % shopCols, Math.floor(i / shopCols));
   }

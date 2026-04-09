@@ -4,7 +4,7 @@ import type { PlanetaryDefenseGame } from "./game";
 import { startNextWave } from "./state";
 import { LabelOverlay } from "./LabelOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
-import { InventoryOverlay } from "./InventoryOverlay";
+import { InventoryOverlay } from "./inventory";
 import { PIXEL_FONT } from "./constants";
 
 const PlanetHealthBar = ({ ratio }: { ratio: number }) => {

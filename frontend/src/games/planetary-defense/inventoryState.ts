@@ -1,8 +1,4 @@
-import { type Item, getItemConfig } from "./itemConfig";
-
-export const CELL_SIZE = 64;
-export const GRID_PADDING = 8;
-export const BORDER_WIDTH = 3;
+import { type Item, type ItemType, getItemConfig } from "./itemConfig";
 
 export interface InventoryItem {
   id: number;
@@ -11,15 +7,12 @@ export interface InventoryItem {
   gridY: number;
 }
 
-export type InventorySlot =
-  | "player"
-  | "merchant"
-  | `weapon-${number}`;
+export type ItemFilter = (itemType: ItemType) => boolean;
 
 export class InventoryState {
-  readonly slot: InventorySlot;
   readonly cols: number;
   readonly rows: number;
+  readonly acceptsItem: ItemFilter;
   private items: InventoryItem[] = [];
   private occupied: boolean[][];
   private nextItemId = 1;
@@ -27,10 +20,10 @@ export class InventoryState {
   private addListeners: Array<(item: InventoryItem) => void> = [];
   private removeListeners: Array<(item: InventoryItem) => void> = [];
 
-  constructor(slot: InventorySlot, cols: number, rows: number) {
-    this.slot = slot;
+  constructor(cols: number, rows: number, acceptsItem?: ItemFilter) {
     this.cols = cols;
     this.rows = rows;
+    this.acceptsItem = acceptsItem ?? (() => true);
     this.occupied = Array.from({ length: rows }, () =>
       Array<boolean>(cols).fill(false)
     );
@@ -80,6 +73,7 @@ export class InventoryState {
 
   addItem(item: Item, gridX: number, gridY: number): InventoryItem | null {
     if (!this.canPlace(gridX, gridY)) return null;
+    if (!this.acceptsItem(item.type)) return null;
 
     const slot: InventoryItem = {
       id: this.nextItemId++,
@@ -96,6 +90,7 @@ export class InventoryState {
   }
 
   addToFirstEmpty(item: Item): InventoryItem | null {
+    if (!this.acceptsItem(item.type)) return null;
     const config = getItemConfig(item.type);
     if (config.stackable) {
       const existing = this.items.find(
