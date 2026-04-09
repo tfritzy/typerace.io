@@ -4,7 +4,6 @@ import { getRandomWord } from "../../utils/wordLists";
 import { getLanguageFromSlug } from "../../utils/modes";
 
 const PHRASE_BUFFER_SIZE = 500;
-const CURSOR_LERP = 0.22;
 const CURSOR_BLINK_DELAY = 500;
 
 function getLangCode(): string {
@@ -21,34 +20,6 @@ function generatePhrase(wordCount: number): string {
   return words.join(" ");
 }
 
-function findFirstLineBreak(
-  typedNode: Text | null,
-  untypedNode: Text | null,
-  typedLen: number
-): number {
-  const range = document.createRange();
-  let firstTop: number | null = null;
-  if (typedNode && typedNode.textContent) {
-    for (let i = 0; i < typedNode.textContent.length; i++) {
-      range.setStart(typedNode, i);
-      range.setEnd(typedNode, i + 1);
-      const top = range.getBoundingClientRect().top;
-      if (firstTop === null) firstTop = top;
-      else if (top > firstTop) return i;
-    }
-  }
-  if (untypedNode && untypedNode.textContent) {
-    for (let i = 0; i < untypedNode.textContent.length; i++) {
-      range.setStart(untypedNode, i);
-      range.setEnd(untypedNode, i + 1);
-      const top = range.getBoundingClientRect().top;
-      if (firstTop === null) firstTop = top;
-      else if (top > firstTop) return typedLen + i;
-    }
-  }
-  return -1;
-}
-
 export const PhraseOverlay = ({
   gameRef,
   visible,
@@ -60,13 +31,9 @@ export const PhraseOverlay = ({
   const [typedCount, setTypedCount] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
-  const typedRef = useRef<HTMLSpanElement>(null);
-  const untypedRef = useRef<HTMLSpanElement>(null);
-  const cursorTargetRef = useRef<HTMLSpanElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const cursorCharRef = useRef<HTMLSpanElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
-  const cursorPos = useRef({ x: 0, y: 0 });
-  const cursorTargetXY = useRef({ x: 0, y: 0 });
-  const cursorInitialized = useRef(false);
   const lastCursorMoveTime = useRef(0);
   const isBlinking = useRef(false);
 
@@ -95,6 +62,11 @@ export const PhraseOverlay = ({
         const newTc = tc + 1;
         game.onCorrectKeystroke();
         setTypedCount(newTc);
+
+        if (newTc > PHRASE_BUFFER_SIZE && text.length - newTc < PHRASE_BUFFER_SIZE) {
+          const extra = generatePhrase(PHRASE_BUFFER_SIZE);
+          setPhrase(text + " " + extra);
+        }
       }
     };
 
@@ -109,25 +81,24 @@ export const PhraseOverlay = ({
     }
   }, [visible]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!visible) return;
-    const typedNode = typedRef.current?.firstChild as Text | null;
-    const untypedNode = untypedRef.current?.firstChild as Text | null;
-    const lineBreak = findFirstLineBreak(typedNode, untypedNode, typedCount);
-    if (lineBreak > 0 && typedCount >= lineBreak) {
-      const remaining = phraseRef.current.slice(lineBreak);
-      let newPhrase = remaining;
-      if (remaining.length < PHRASE_BUFFER_SIZE * 2) {
-        newPhrase = remaining + " " + generatePhrase(PHRASE_BUFFER_SIZE);
-      }
-      setPhrase(newPhrase);
-      setTypedCount(typedCount - lineBreak);
-    }
+
+    const box = boxRef.current;
+    const track = trackRef.current;
+    const charEl = cursorCharRef.current;
+    if (!box || !track || !charEl) return;
+
+    const boxRect = box.getBoundingClientRect();
+    const charRect = charEl.getBoundingClientRect();
+    const boxCenter = boxRect.width / 2;
+    const charCenter = charRect.left - boxRect.left + charRect.width / 2;
+    const offset = boxCenter - charCenter;
+    track.style.transform = `translateX(${offset}px)`;
   }, [typedCount, phrase, visible]);
 
   useLayoutEffect(() => {
     if (!visible) {
-      cursorInitialized.current = false;
       return;
     }
 
@@ -137,51 +108,22 @@ export const PhraseOverlay = ({
     let rafId = 0;
 
     const animate = () => {
-      const box = boxRef.current;
-      const target = cursorTargetRef.current;
       const cursor = cursorRef.current;
-      if (!box || !target || !cursor) {
+      const charEl = cursorCharRef.current;
+      const box = boxRef.current;
+      if (!cursor || !charEl || !box) {
         rafId = requestAnimationFrame(animate);
         return;
       }
 
       const boxRect = box.getBoundingClientRect();
-      const targetRect = target.getBoundingClientRect();
+      const charRect = charEl.getBoundingClientRect();
+      const x = charRect.left - boxRect.left;
+      const y = (boxRect.height - cursor.offsetHeight) / 2;
 
-      const newX = targetRect.left - boxRect.left;
-      const newY =
-        targetRect.top -
-        boxRect.top +
-        (targetRect.height - cursor.offsetHeight) / 2;
+      cursor.style.transform = `translate(${x}px, ${y}px)`;
 
-      const dx = Math.abs(newX - cursorTargetXY.current.x);
-      const dy = Math.abs(newY - cursorTargetXY.current.y);
-      if (dx > 0.5 || dy > 0.5) {
-        lastCursorMoveTime.current = Date.now();
-        if (isBlinking.current) {
-          isBlinking.current = false;
-          cursor.classList.remove("animate-blink");
-          cursor.style.opacity = "1";
-        }
-      }
-      cursorTargetXY.current = { x: newX, y: newY };
-
-      if (!cursorInitialized.current) {
-        cursorPos.current = { ...cursorTargetXY.current };
-        cursorInitialized.current = true;
-      } else {
-        cursorPos.current.x +=
-          (cursorTargetXY.current.x - cursorPos.current.x) * CURSOR_LERP;
-        cursorPos.current.y +=
-          (cursorTargetXY.current.y - cursorPos.current.y) * CURSOR_LERP;
-      }
-
-      cursor.style.transform = `translate(${cursorPos.current.x}px, ${cursorPos.current.y}px)`;
-
-      if (
-        !isBlinking.current &&
-        Date.now() - lastCursorMoveTime.current >= CURSOR_BLINK_DELAY
-      ) {
+      if (!isBlinking.current && Date.now() - lastCursorMoveTime.current >= CURSOR_BLINK_DELAY) {
         isBlinking.current = true;
         cursor.classList.add("animate-blink");
       }
@@ -196,6 +138,15 @@ export const PhraseOverlay = ({
     };
   }, [visible]);
 
+  useEffect(() => {
+    lastCursorMoveTime.current = Date.now();
+    if (isBlinking.current && cursorRef.current) {
+      isBlinking.current = false;
+      cursorRef.current.classList.remove("animate-blink");
+      cursorRef.current.style.opacity = "1";
+    }
+  }, [typedCount]);
+
   if (!visible) return null;
 
   return (
@@ -205,17 +156,18 @@ export const PhraseOverlay = ({
       style={{
         position: "absolute",
         bottom: "20px",
-        left: "10%",
-        right: "10%",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "320px",
         fontSize: "14px",
         lineHeight: "2.4",
-        height: "4.8em",
+        height: "2.4em",
         overflow: "hidden",
         background: "rgba(10, 10, 26, 0.9)",
-        padding: "10px 20px",
+        padding: "0 20px",
         border: "2px solid #4a5568",
         zIndex: 10,
-        overflowWrap: "break-word",
+        whiteSpace: "nowrap",
       }}
     >
       <input
@@ -232,13 +184,24 @@ export const PhraseOverlay = ({
           (e.target as HTMLInputElement).value = "";
         }}
       />
-      <span ref={typedRef} style={{ color: "#90ee90" }}>
-        {phrase.slice(0, typedCount)}
-      </span>
-      <span ref={cursorTargetRef}>{"\u200b"}</span>
-      <span ref={untypedRef} style={{ color: "#ffffff" }}>
-        {phrase.slice(typedCount)}
-      </span>
+      <div
+        ref={trackRef}
+        style={{
+          display: "inline-block",
+          whiteSpace: "nowrap",
+          transition: "transform 0.08s ease-out",
+        }}
+      >
+        <span style={{ color: "#90ee90" }}>
+          {phrase.slice(0, typedCount)}
+        </span>
+        <span ref={cursorCharRef} style={{ color: "#ffffff" }}>
+          {typedCount < phrase.length ? phrase[typedCount] : ""}
+        </span>
+        <span style={{ color: "#ffffff" }}>
+          {phrase.slice(typedCount + 1)}
+        </span>
+      </div>
       <div
         ref={cursorRef}
         style={{

@@ -20,7 +20,7 @@ import {
   TOPAZ_TIERS, RUBY_TIERS, EMERALD_TIERS, SAPPHIRE_TIERS, AMETHYST_TIERS, DIAMOND_TIERS,
 } from "./itemConfig";
 
-const DROP_SPEED = 80;
+const DROP_SPEED = 20;
 const DROP_CHANCE = 0.5;
 
 export const PLANET_X = CANVAS_WIDTH / 2;
