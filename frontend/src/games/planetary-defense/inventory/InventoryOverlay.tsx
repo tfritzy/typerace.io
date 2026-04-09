@@ -135,8 +135,6 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
     };
   }, []);
 
-  if (waveActive) return null;
-
   const state = getState();
   if (!state) return null;
   const isHolding = dragState !== null;
@@ -154,17 +152,19 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
       className="absolute inset-0 pointer-events-none overflow-hidden select-none"
       style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
     >
-      <div className="absolute bottom-[2%] left-1/2 -translate-x-1/2 pointer-events-auto" style={{ width: `${state.playerInventory.cols * 3.5}%`, maxWidth: '400px' }}>
-        <InventoryGrid
-          inventory={state.playerInventory}
-          isHolding={isHolding}
-          canAcceptHeld={heldItem ? state.playerInventory.acceptsItem(heldItem.type) : false}
-          draggingCol={dragState?.sourceInv === state.playerInventory ? dragState.origCol : undefined}
-          draggingRow={dragState?.sourceInv === state.playerInventory ? dragState.origRow : undefined}
-          onDragStart={onDragStart}
-          onDrop={onCellDrop}
-        />
-      </div>
+      {!waveActive && (
+        <div className="absolute bottom-[2%] left-1/2 -translate-x-1/2 pointer-events-auto" style={{ width: `${state.playerInventory.cols * 3.5}%`, maxWidth: '400px' }}>
+          <InventoryGrid
+            inventory={state.playerInventory}
+            isHolding={isHolding}
+            canAcceptHeld={heldItem ? state.playerInventory.acceptsItem(heldItem.type) : false}
+            draggingCol={dragState?.sourceInv === state.playerInventory ? dragState.origCol : undefined}
+            draggingRow={dragState?.sourceInv === state.playerInventory ? dragState.origRow : undefined}
+            onDragStart={onDragStart}
+            onDrop={onCellDrop}
+          />
+        </div>
+      )}
 
       {state.activeMerchantInventory && (
         <div
