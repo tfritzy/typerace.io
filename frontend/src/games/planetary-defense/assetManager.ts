@@ -164,7 +164,6 @@ export class AssetManager {
       "diamond-3": loaded["diamond-3"] as Texture,
       "coin-0": loaded["coin-0"] as Texture,
       "coin-1": loaded["coin-1"] as Texture,
-      "coin-2": loaded["coin-2"] as Texture,
     };
 
     this.applyNearestNeighbor();

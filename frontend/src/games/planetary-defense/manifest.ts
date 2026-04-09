@@ -62,7 +62,6 @@ export const MANIFEST: AssetsManifest = {
         { alias: "diamond-3", src: "/elv_item_icons/diamond_3.png" },
         { alias: "coin-0", src: "/elv_item_icons/coin_0.png" },
         { alias: "coin-1", src: "/elv_item_icons/coin_1.png" },
-        { alias: "coin-2", src: "/elv_item_icons/coin_2.png" },
       ],
     },
   ],
