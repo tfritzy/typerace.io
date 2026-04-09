@@ -153,7 +153,6 @@ export interface MerchantShipState {
   x: number;
   y: number;
   entityType: EntityType;
-  items: Item[];
   shopInventory: InventoryState;
 }
 
@@ -338,7 +337,6 @@ export function createGameState(): GameState {
     x: CANVAS_WIDTH - 250,
     y: CANVAS_HEIGHT / 2,
     entityType: "Clipper",
-    items: shopItems,
     shopInventory,
   });
 

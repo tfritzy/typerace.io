@@ -1,4 +1,5 @@
 import { type ItemType, ITEM_DISPLAY } from "./itemConfig";
+import { MANIFEST } from "./manifest";
 
 interface SpriteRef {
   src: string;
@@ -76,33 +77,17 @@ const SPRITE_FRAMES: Record<string, SpriteRef> = {
   "Granite Waraxe": { src: AXETOBER_SHEET, x: 0, y: 160, w: 32, h: 32 },
 };
 
-const STANDALONE_TEXTURES: Record<string, string> = {
-  "topaz-0": "/elv_item_icons/topaz_0.png",
-  "topaz-1": "/elv_item_icons/topaz_1.png",
-  "topaz-2": "/elv_item_icons/topaz_2.png",
-  "topaz-3": "/elv_item_icons/topaz_3.png",
-  "ruby-0": "/elv_item_icons/ruby_0.png",
-  "ruby-1": "/elv_item_icons/ruby_1.png",
-  "ruby-2": "/elv_item_icons/ruby_2.png",
-  "ruby-3": "/elv_item_icons/ruby_3.png",
-  "emerald-0": "/elv_item_icons/emerald_0.png",
-  "emerald-1": "/elv_item_icons/emerald_1.png",
-  "emerald-2": "/elv_item_icons/emerald_2.png",
-  "emerald-3": "/elv_item_icons/emerald_3.png",
-  "sapphire-0": "/elv_item_icons/sapphire_0.png",
-  "sapphire-1": "/elv_item_icons/sapphire_1.png",
-  "sapphire-2": "/elv_item_icons/sapphire_2.png",
-  "sapphire-3": "/elv_item_icons/sapphire_3.png",
-  "amethyst-0": "/elv_item_icons/amathyst_0.png",
-  "amethyst-1": "/elv_item_icons/amathyst_1.png",
-  "amethyst-2": "/elv_item_icons/amathyst_2.png",
-  "amethyst-3": "/elv_item_icons/amathyst_3.png",
-  "diamond-0": "/elv_item_icons/diamond_0.png",
-  "diamond-1": "/elv_item_icons/diamond_1.png",
-  "diamond-2": "/elv_item_icons/diamond_2.png",
-  "diamond-3": "/elv_item_icons/diamond_3.png",
-  "coin-1": "/elv_item_icons/coin_1.png",
-};
+const MANIFEST_SRC: Record<string, string> = {};
+for (const bundle of MANIFEST.bundles) {
+  if (!Array.isArray(bundle.assets)) continue;
+  for (const entry of bundle.assets) {
+    const alias = typeof entry.alias === "string" ? entry.alias : undefined;
+    const src = typeof entry.src === "string" ? entry.src : undefined;
+    if (alias && src) {
+      MANIFEST_SRC[alias] = src;
+    }
+  }
+}
 
 export interface ItemTextureInfo {
   src: string;
@@ -122,9 +107,9 @@ export function getItemTextureInfo(itemType: ItemType): ItemTextureInfo {
     };
   }
 
-  const standalone = STANDALONE_TEXTURES[display];
-  if (standalone) {
-    return { src: standalone };
+  const manifestPath = MANIFEST_SRC[display];
+  if (manifestPath) {
+    return { src: manifestPath };
   }
 
   return { src: "" };
