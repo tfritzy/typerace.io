@@ -16,13 +16,13 @@ interface DragData {
   cellSize: number;
 }
 
-export const InventoryOverlay = () => {
+interface InventoryOverlayProps {
+  waveActive: boolean;
+}
+
+export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [, setTick] = useState(0);
-  const [waveActive, setWaveActive] = useState(() => {
-    const state = getState();
-    return state ? state.waveActive : false;
-  });
   const dragRef = useRef<DragData | null>(null);
   const [dragState, setDragState] = useState<DragData | null>(null);
 
@@ -42,10 +42,6 @@ export const InventoryOverlay = () => {
       for (const slot of state.relicSlots) {
         unsubs.push(slot.inventory.onChange(refresh));
       }
-
-      unsubs.push(state.onWaveActiveChanged.subscribe(() => {
-        setWaveActive(state.waveActive);
-      }));
     };
 
     unsubs.push(onStateCreated(setup));
@@ -139,6 +135,8 @@ export const InventoryOverlay = () => {
     };
   }, []);
 
+  if (waveActive) return null;
+
   const state = getState();
   if (!state) return null;
   const isHolding = dragState !== null;
@@ -168,7 +166,7 @@ export const InventoryOverlay = () => {
         />
       </div>
 
-      {!waveActive && state.activeMerchantInventory && (
+      {state.activeMerchantInventory && (
         <div
           className="absolute pointer-events-auto -translate-x-1/2"
           style={{

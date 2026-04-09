@@ -147,7 +147,7 @@ export const GameCanvas = () => {
     >
       <LabelOverlay gameRef={gameRef} />
       <PhraseOverlay gameRef={gameRef} visible={waveActive} />
-      <InventoryOverlay />
+      <InventoryOverlay waveActive={waveActive} />
       <PlanetHealthBar ratio={healthRatio} />
       <div className="absolute top-3 left-3 z-10">
         <div
