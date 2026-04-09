@@ -44,4 +44,3 @@ scripts/model_comparison_*.txt
 *.sw?
 nohup.out
 node_modules/
-module_bindings/

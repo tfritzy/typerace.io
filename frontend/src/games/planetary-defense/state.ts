@@ -209,10 +209,10 @@ function createRelicSlots(): RelicSlot[] {
       relic = { type: relicType, charge: 0, remainingShots: 0, nextShotTime: 0 };
     }
 
+    const slotIndex = i;
     inventory.onItemAdded((invItem) => {
-      const slot = slots[i];
       if (invItem.item && isRelicType(invItem.item.type)) {
-        slot.relic = {
+        slots[slotIndex].relic = {
           type: invItem.item.type as RelicType,
           charge: 0,
           remainingShots: 0,
@@ -222,7 +222,7 @@ function createRelicSlots(): RelicSlot[] {
     });
 
     inventory.onItemRemoved(() => {
-      slots[i].relic = null;
+      slots[slotIndex].relic = null;
     });
 
     slots.push({ angle, inventory, relic });
