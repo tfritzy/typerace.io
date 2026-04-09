@@ -4,7 +4,6 @@ import { NineSlicePanel } from "./NineSlicePanel";
 import { ItemCell } from "./ItemCell";
 
 const SLOT_BG_SRC = "/elv_pixel_inventory_ui/Inventory_Slot_1.png";
-const CELL_PX = 64;
 
 interface InventoryGridProps {
   inventory: InventoryState;
@@ -41,43 +40,36 @@ export const InventoryGrid = memo(({
   );
 
   const items = inventory.getItems();
+  const itemMap = new Map<string, InventoryItem>();
+  for (const slot of items) {
+    if (slot.item) {
+      itemMap.set(`${slot.gridX},${slot.gridY}`, slot);
+    }
+  }
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-1 w-full">
       {label && (
         <div
           className="text-green-400 tracking-wider"
-          style={{
-            fontFamily: '"Press Start 2P", monospace',
-            fontSize: "10px",
-          }}
+          style={{ fontFamily: '"Press Start 2P", monospace', fontSize: "clamp(6px, 1.2vw, 10px)" }}
         >
           {label}
         </div>
       )}
-      <NineSlicePanel>
+      <NineSlicePanel className="w-full">
         <div
           ref={gridRef}
-          className="relative"
-          style={{
-            width: `${inventory.cols * CELL_PX}px`,
-            height: `${inventory.rows * CELL_PX}px`,
-          }}
+          className="grid w-full"
+          style={{ gridTemplateColumns: `repeat(${inventory.cols}, 1fr)` }}
         >
           {Array.from({ length: inventory.rows }, (_, r) =>
             Array.from({ length: inventory.cols }, (_, c) => {
               const isHighlight = highlightCol === c && highlightRow === r;
+              const cellItem = itemMap.get(`${c},${r}`);
+              const isDragging = cellItem?.id === draggingItemId;
               return (
-                <div
-                  key={`${r}-${c}`}
-                  className="absolute"
-                  style={{
-                    left: `${c * CELL_PX}px`,
-                    top: `${r * CELL_PX}px`,
-                    width: `${CELL_PX}px`,
-                    height: `${CELL_PX}px`,
-                  }}
-                >
+                <div key={`${r}-${c}`} className="aspect-square relative">
                   <img
                     src={SLOT_BG_SRC}
                     draggable={false}
@@ -97,19 +89,13 @@ export const InventoryGrid = memo(({
                       }`}
                     />
                   )}
+                  {cellItem && !isDragging && (
+                    <ItemCell slot={cellItem} onDragStart={handleDragStart} />
+                  )}
                 </div>
               );
             })
           )}
-          {items
-            .filter((slot) => slot.id !== draggingItemId)
-            .map((slot) => (
-            <ItemCell
-              key={slot.id}
-              slot={slot}
-              onDragStart={handleDragStart}
-            />
-          ))}
         </div>
       </NineSlicePanel>
     </div>

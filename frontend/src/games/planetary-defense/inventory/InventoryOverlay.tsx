@@ -6,8 +6,6 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from "../constants";
 import { InventoryGrid } from "./InventoryGrid";
 import { DragGhost } from "./DragGhost";
 
-const CELL_PX = 64;
-
 interface DragSource {
   inventory: InventoryState;
   slot: InventoryItem;
@@ -18,6 +16,7 @@ interface DragData {
   item: Item;
   ghostX: number;
   ghostY: number;
+  cellSize: number;
 }
 
 function hitTestInventory(
@@ -26,10 +25,12 @@ function hitTestInventory(
   px: number,
   py: number
 ): { col: number; row: number } | null {
+  const cellW = invRect.width / inv.cols;
+  const cellH = invRect.height / inv.rows;
   const localX = px - invRect.left;
   const localY = py - invRect.top;
-  const col = Math.floor(localX / CELL_PX);
-  const row = Math.floor(localY / CELL_PX);
+  const col = Math.floor(localX / cellW);
+  const row = Math.floor(localY / cellH);
   if (col >= 0 && col < inv.cols && row >= 0 && row < inv.rows) {
     return { col, row };
   }
@@ -101,11 +102,15 @@ export const InventoryOverlay = () => {
       if (!overlay) return;
       const rect = overlay.getBoundingClientRect();
 
+      const gridEl = inventoryRefs.current.get(inv);
+      const cellSize = gridEl ? gridEl.getBoundingClientRect().width / inv.cols : 48;
+
       const ds: DragData = {
         source: { inventory: inv, slot },
         item: slot.item,
         ghostX: e.clientX - rect.left,
         ghostY: e.clientY - rect.top,
+        cellSize,
       };
       dragRef.current = ds;
       setDragState(ds);
@@ -225,32 +230,29 @@ export const InventoryOverlay = () => {
       className="absolute inset-0 pointer-events-none overflow-hidden"
       style={{ fontFamily: '"Press Start 2P", monospace' }}
     >
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-auto">
+      <div className="absolute bottom-[2%] left-1/2 -translate-x-1/2 pointer-events-auto flex flex-col items-center gap-2 w-3/5 max-w-[640px]">
+        {state.activeMerchantInventory && (
           <InventoryGrid
-            inventory={state.playerInventory}
-            gridRef={registerRef(state.playerInventory)}
-            highlightCol={hoverTarget?.inventory === state.playerInventory ? hoverTarget.col : undefined}
-            highlightRow={hoverTarget?.inventory === state.playerInventory ? hoverTarget.row : undefined}
-            highlightValid={hoverTarget?.inventory === state.playerInventory ? hoverTarget.valid : undefined}
-            draggingItemId={draggingInv === state.playerInventory ? draggingId : undefined}
+            inventory={state.activeMerchantInventory}
+            gridRef={registerRef(state.activeMerchantInventory)}
+            label="Merchant"
+            highlightCol={hoverTarget?.inventory === state.activeMerchantInventory ? hoverTarget.col : undefined}
+            highlightRow={hoverTarget?.inventory === state.activeMerchantInventory ? hoverTarget.row : undefined}
+            highlightValid={hoverTarget?.inventory === state.activeMerchantInventory ? hoverTarget.valid : undefined}
+            draggingItemId={draggingInv === state.activeMerchantInventory ? draggingId : undefined}
             onDragStart={onDragStart}
           />
+        )}
+        <InventoryGrid
+          inventory={state.playerInventory}
+          gridRef={registerRef(state.playerInventory)}
+          highlightCol={hoverTarget?.inventory === state.playerInventory ? hoverTarget.col : undefined}
+          highlightRow={hoverTarget?.inventory === state.playerInventory ? hoverTarget.row : undefined}
+          highlightValid={hoverTarget?.inventory === state.playerInventory ? hoverTarget.valid : undefined}
+          draggingItemId={draggingInv === state.playerInventory ? draggingId : undefined}
+          onDragStart={onDragStart}
+        />
       </div>
-
-      {state.activeMerchantInventory && (
-        <div className="absolute bottom-[400px] left-1/2 -translate-x-1/2 pointer-events-auto">
-            <InventoryGrid
-              inventory={state.activeMerchantInventory}
-              gridRef={registerRef(state.activeMerchantInventory)}
-              label="Merchant"
-              highlightCol={hoverTarget?.inventory === state.activeMerchantInventory ? hoverTarget.col : undefined}
-              highlightRow={hoverTarget?.inventory === state.activeMerchantInventory ? hoverTarget.row : undefined}
-              highlightValid={hoverTarget?.inventory === state.activeMerchantInventory ? hoverTarget.valid : undefined}
-              draggingItemId={draggingInv === state.activeMerchantInventory ? draggingId : undefined}
-              onDragStart={onDragStart}
-            />
-        </div>
-      )}
 
       {state.relicSlots.map((slot, idx) => {
         const pos = getRelicPosition(slot);
@@ -259,27 +261,27 @@ export const InventoryOverlay = () => {
         return (
           <div
             key={`relic-${idx}`}
-            className="absolute pointer-events-auto -translate-x-1/2 -translate-y-1/2"
+            className="absolute pointer-events-auto -translate-x-1/2 -translate-y-1/2 w-[6%]"
             style={{
               left: `${leftPct}%`,
               top: `${topPct}%`,
             }}
           >
-              <InventoryGrid
-                inventory={slot.inventory}
-                gridRef={registerRef(slot.inventory)}
-                highlightCol={hoverTarget?.inventory === slot.inventory ? hoverTarget.col : undefined}
-                highlightRow={hoverTarget?.inventory === slot.inventory ? hoverTarget.row : undefined}
-                highlightValid={hoverTarget?.inventory === slot.inventory ? hoverTarget.valid : undefined}
-                draggingItemId={draggingInv === slot.inventory ? draggingId : undefined}
-                onDragStart={onDragStart}
-              />
+            <InventoryGrid
+              inventory={slot.inventory}
+              gridRef={registerRef(slot.inventory)}
+              highlightCol={hoverTarget?.inventory === slot.inventory ? hoverTarget.col : undefined}
+              highlightRow={hoverTarget?.inventory === slot.inventory ? hoverTarget.row : undefined}
+              highlightValid={hoverTarget?.inventory === slot.inventory ? hoverTarget.valid : undefined}
+              draggingItemId={draggingInv === slot.inventory ? draggingId : undefined}
+              onDragStart={onDragStart}
+            />
           </div>
         );
       })}
 
       {dragState && (
-        <DragGhost item={dragState.item} x={dragState.ghostX} y={dragState.ghostY} />
+        <DragGhost item={dragState.item} x={dragState.ghostX} y={dragState.ghostY} cellSize={dragState.cellSize} />
       )}
     </div>
   );
