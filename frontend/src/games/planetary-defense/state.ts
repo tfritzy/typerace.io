@@ -280,9 +280,22 @@ export function createEntityState(
 }
 
 let gameState: GameState | null = null;
+const stateCreatedListeners: Array<() => void> = [];
 
 export function getState(): GameState | null {
   return gameState;
+}
+
+export function onStateCreated(cb: () => void): () => void {
+  if (gameState) {
+    cb();
+  } else {
+    stateCreatedListeners.push(cb);
+  }
+  return () => {
+    const idx = stateCreatedListeners.indexOf(cb);
+    if (idx >= 0) stateCreatedListeners.splice(idx, 1);
+  };
 }
 
 export function createGameState(): GameState {
@@ -341,6 +354,8 @@ export function createGameState(): GameState {
   });
 
   gameState = state;
+  for (const cb of stateCreatedListeners) cb();
+  stateCreatedListeners.length = 0;
   return state;
 }
 

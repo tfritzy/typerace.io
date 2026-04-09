@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT } from "./constants";
 import { getItemConfig, type Item, type ItemType } from "./itemConfig";
 import { CELL_SIZE, GRID_PADDING, BORDER_WIDTH, type InventoryItem, type InventoryState } from "./inventoryState";
-import { getState, getRelicPosition } from "./state";
+import { getState, getRelicPosition, onStateCreated } from "./state";
 import type { GameState, RelicSlot } from "./state";
 import { getItemTextureInfo } from "./itemTextures";
 import { RELIC_SLOT_COUNT, RELIC_CONFIGS, type RelicType } from "./relicConfig";
@@ -372,18 +372,24 @@ export const InventoryOverlay = () => {
   }, []);
 
   useEffect(() => {
-    const state = getState();
-    if (!state) return;
     const unsubs: Array<() => void> = [];
 
-    const refresh = () => setTick((t) => t + 1);
+    const setup = () => {
+      const state = getState();
+      if (!state) return;
 
-    unsubs.push(state.playerInventory.onChange(refresh));
-    unsubs.push(state.onMerchantChanged.subscribe(refresh));
+      const refresh = () => setTick((t) => t + 1);
+      refresh();
 
-    unsubs.push(state.onWaveActiveChanged.subscribe(() => {
-      setVisible(!state.waveActive);
-    }));
+      unsubs.push(state.playerInventory.onChange(refresh));
+      unsubs.push(state.onMerchantChanged.subscribe(refresh));
+
+      unsubs.push(state.onWaveActiveChanged.subscribe(() => {
+        setVisible(!state.waveActive);
+      }));
+    };
+
+    unsubs.push(onStateCreated(setup));
 
     return () => {
       for (const u of unsubs) u();
