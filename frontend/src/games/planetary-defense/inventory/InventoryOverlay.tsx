@@ -6,6 +6,8 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from "../constants";
 import { InventoryGrid } from "./InventoryGrid";
 import { DragGhost } from "./DragGhost";
 
+const FALLBACK_CELL_PX = 48;
+
 interface DragSource {
   inventory: InventoryState;
   slot: InventoryItem;
@@ -103,7 +105,7 @@ export const InventoryOverlay = () => {
       const rect = overlay.getBoundingClientRect();
 
       const gridEl = inventoryRefs.current.get(inv);
-      const cellSize = gridEl ? gridEl.getBoundingClientRect().width / inv.cols : 48;
+      const cellSize = gridEl ? gridEl.getBoundingClientRect().width / inv.cols : FALLBACK_CELL_PX;
 
       const ds: DragData = {
         source: { inventory: inv, slot },
