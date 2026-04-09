@@ -279,7 +279,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             data-char-index={i}
             ref={isCursor ? cursorCharRef : undefined}
             className={`transition-all duration-150 ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
-            style={showCursorLine ? { borderLeft: "2px solid color-mix(in srgb, var(--accent) 50%, transparent)" } : undefined}
+            style={showCursorLine ? { borderLeft: "2px solid var(--border)", display: "inline-flex", alignItems: "center", height: "3rem" } : undefined}
           >
             {char}
           </span>
