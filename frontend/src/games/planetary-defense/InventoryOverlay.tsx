@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import type { PlanetaryDefenseGame } from "./game";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT } from "./constants";
 import { getItemDisplay, getItemConfig, type Item } from "./itemConfig";
 import { CELL_SIZE, GRID_PADDING, BORDER_WIDTH, type InventoryItem, type InventoryState } from "./inventoryState";
+import { getState, getRelicPosition } from "./state";
+import type { GameState } from "./state";
 
 const BG_COLOR = "rgba(17, 17, 34, 0.92)";
 const BORDER_COLOR = "#8b7355";
@@ -281,19 +282,13 @@ interface InventoryPosition {
   label?: string;
 }
 
-export const InventoryOverlay = ({
-  gameRef,
-  visible,
-}: {
-  gameRef: React.RefObject<PlanetaryDefenseGame | null>;
-  visible: boolean;
-}) => {
+export const InventoryOverlay = () => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [, setTick] = useState(0);
+  const [visible, setVisible] = useState(true);
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [pointerPos, setPointerPos] = useState<{ x: number; y: number } | null>(null);
   const dragRef = useRef<DragState | null>(null);
-  const inventoriesRef = useRef<InventoryState[]>([]);
 
   useLayoutEffect(() => {
     setTick((t) => t + 1);
@@ -308,32 +303,35 @@ export const InventoryOverlay = ({
   }, []);
 
   useEffect(() => {
-    const game = gameRef.current;
-    if (!game) return;
+    const state = getState();
     const unsubs: Array<() => void> = [];
-    const allInvs = game.getAllInventories();
-    inventoriesRef.current = allInvs;
-    for (const inv of allInvs) {
-      unsubs.push(inv.onChange(() => setTick((t) => t + 1)));
+
+    const refresh = () => setTick((t) => t + 1);
+
+    unsubs.push(state.playerInventory.onChange(refresh));
+    for (const ws of state.weaponSlots) {
+      unsubs.push(ws.onChange(refresh));
     }
+
+    unsubs.push(state.onMerchantChanged.subscribe(() => {
+      setTick((t) => t + 1);
+    }));
+
+    unsubs.push(state.onWaveActiveChanged.subscribe(() => {
+      setVisible(!state.waveActive);
+    }));
+
     return () => {
       for (const u of unsubs) u();
     };
-  }, [gameRef]);
-
-  useEffect(() => {
-    const game = gameRef.current;
-    if (!game) return;
-    return game.onMerchantChanged(() => setTick((t) => t + 1));
-  }, [gameRef]);
+  }, []);
 
   const getTextureUrl = useCallback(
     (alias: string): string => {
-      const game = gameRef.current;
-      if (!game) return "";
-      return game.getItemTextureUrl(alias);
+      const state = getState();
+      return state.itemTextureUrls[alias] ?? "";
     },
-    [gameRef]
+    []
   );
 
   const getScale = useCallback((): number => {
@@ -385,9 +383,9 @@ export const InventoryOverlay = ({
     const onUp = (e: PointerEvent) => {
       const ds = dragRef.current;
       if (!ds) return;
-      const game = gameRef.current;
+      const state = getState();
       const overlay = overlayRef.current;
-      if (!game || !overlay) {
+      if (!overlay) {
         ds.sourceInventory.cancelItemDrag(ds.slot.id);
         dragRef.current = null;
         setDragState(null);
@@ -399,7 +397,7 @@ export const InventoryOverlay = ({
       const px = e.clientX - rect.left;
       const py = e.clientY - rect.top;
       const scale = getScale();
-      const positions = getPositions(game);
+      const positions = getPositions(state);
 
       let placed = false;
       for (let i = positions.length - 1; i >= 0; i--) {
@@ -421,8 +419,7 @@ export const InventoryOverlay = ({
           inv.endItemDrag(ds.slot.id, col, row);
         } else if (ds.slot.item) {
           if (ds.slot.item.price != null && ds.slot.item.price > 0) {
-            const targetInv = findPlayerInventory(game);
-            if (targetInv && !targetInv.deductGold(ds.slot.item.price)) {
+            if (!state.playerInventory.deductGold(ds.slot.item.price)) {
               ds.sourceInventory.cancelItemDrag(ds.slot.id);
               dragRef.current = null;
               setDragState(null);
@@ -454,16 +451,14 @@ export const InventoryOverlay = ({
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
     };
-  }, [gameRef, getScale]);
+  }, [getScale]);
 
   if (!visible) return null;
 
-  const game = gameRef.current;
-  if (!game) return null;
-
+  const state = getState();
   const overlay = overlayRef.current;
   const scale = overlay ? overlay.clientWidth / CANVAS_WIDTH : 1;
-  const positions = getPositions(game);
+  const positions = getPositions(state);
 
   return (
     <div
@@ -585,21 +580,21 @@ export const InventoryOverlay = ({
   );
 };
 
-function getPositions(game: PlanetaryDefenseGame): InventoryPosition[] {
+function getPositions(state: GameState): InventoryPosition[] {
   const positions: InventoryPosition[] = [];
 
-  const playerInv = game.playerInventory;
+  const playerInv = state.playerInventory;
   const playerW = gridWidth(playerInv.cols);
   const playerH = gridHeight(playerInv.rows);
   const playerX = (CANVAS_WIDTH - playerW) / 2;
   const playerY = CANVAS_HEIGHT - playerH - 20;
   positions.push({ inventory: playerInv, canvasX: playerX, canvasY: playerY });
 
-  for (const ws of game.weaponSlotInventories) {
+  for (const ws of state.weaponSlots) {
     if (!ws.slot.startsWith("weapon-")) continue;
     const idx = parseInt(ws.slot.replace("weapon-", ""), 10);
     if (Number.isNaN(idx)) continue;
-    const relicPos = game.getWeaponSlotPosition(idx);
+    const relicPos = getRelicPosition(state.relicSlots[idx]);
     const offset = GRID_PADDING + BORDER_WIDTH + CELL_SIZE / 2;
     positions.push({
       inventory: ws,
@@ -608,7 +603,7 @@ function getPositions(game: PlanetaryDefenseGame): InventoryPosition[] {
     });
   }
 
-  const merchantInv = game.activeMerchantInventory;
+  const merchantInv = state.activeMerchantInventory;
   if (merchantInv) {
     const merchantW = gridWidth(merchantInv.cols);
     const merchantH = gridHeight(merchantInv.rows);
@@ -623,8 +618,4 @@ function getPositions(game: PlanetaryDefenseGame): InventoryPosition[] {
   }
 
   return positions;
-}
-
-function findPlayerInventory(game: PlanetaryDefenseGame): InventoryState | null {
-  return game.playerInventory;
 }

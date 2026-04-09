@@ -19,6 +19,7 @@ import {
   type Item, GemType,
   TOPAZ_TIERS, RUBY_TIERS, EMERALD_TIERS, SAPPHIRE_TIERS, AMETHYST_TIERS, DIAMOND_TIERS,
 } from "./itemConfig";
+import { InventoryState } from "./inventoryState";
 
 const DROP_SPEED = 80;
 const DROP_CHANCE = 0.5;
@@ -171,10 +172,18 @@ export interface GameState {
   planetHealth: number;
   maxPlanetHealth: number;
   wave: WaveState;
+  playerInventory: InventoryState;
+  weaponSlots: InventoryState[];
+  activeMerchantInventory: InventoryState | null;
+  activeMerchantId: number | null;
+  itemTextureUrls: Record<string, string>;
+  waveActive: boolean;
   onPlanetDamaged: GameEvent;
   onRelicFired: GameEvent;
   onWaveComplete: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
+  onWaveActiveChanged: GameEvent;
+  onMerchantChanged: GameEvent;
 }
 
 function createRelicSlots(): RelicSlot[] {
@@ -273,7 +282,15 @@ export function createEntityState(
   };
 }
 
+let _gameState: GameState | null = null;
+
+export function getState(): GameState {
+  return _gameState!;
+}
+
 export function createGameState(): GameState {
+  const playerInventory = new InventoryState("player", 10, 2);
+
   const state: GameState = {
     entities: [],
     relicSlots: createRelicSlots(),
@@ -295,11 +312,23 @@ export function createGameState(): GameState {
       spawnIndex: 0,
       waveTimer: 0,
     },
+    playerInventory,
+    weaponSlots: [],
+    activeMerchantInventory: null,
+    activeMerchantId: null,
+    itemTextureUrls: {},
+    waveActive: false,
     onPlanetDamaged: new GameEvent(),
     onRelicFired: new GameEvent(),
     onWaveComplete: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
+    onWaveActiveChanged: new GameEvent(),
+    onMerchantChanged: new GameEvent(),
   };
+
+  populateTestInventory(playerInventory);
+  playerInventory.addToFirstEmpty({ type: "Gold", amount: 100 });
+  buildWeaponSlots(state);
 
   state.merchants.push({
     id: state.nextId++,
@@ -309,7 +338,86 @@ export function createGameState(): GameState {
     items: generateShopItems(6),
   });
 
+  _gameState = state;
   return state;
+}
+
+function populateTestInventory(inventory: InventoryState): void {
+  inventory.addItem({ type: RelicType.StarfallStiletto, amount: 1 }, 0, 0);
+  inventory.addItem({ type: RelicType.BloodthornDirk, amount: 1 }, 1, 0);
+  inventory.addItem({ type: RelicType.EmbercrestBlade, amount: 1 }, 2, 0);
+  inventory.addItem({ type: RelicType.BriarthornSaber, amount: 1 }, 3, 0);
+  inventory.addItem({ type: RelicType.TwinflareCrossblades, amount: 1 }, 4, 0);
+  inventory.addItem({ type: RelicType.CloudveilLongsword, amount: 1 }, 5, 0);
+  inventory.addItem({ type: RelicType.SteelBattleaxe, amount: 1 }, 6, 0);
+  inventory.addItem({ type: RelicType.MoltenZweihander, amount: 1 }, 7, 0);
+  inventory.addItem({ type: RelicType.MoonlitHatchet, amount: 1 }, 8, 0);
+  inventory.addItem({ type: RelicType.FrostfangClaymore, amount: 1 }, 9, 0);
+}
+
+function buildWeaponSlots(state: GameState): void {
+  for (let i = 0; i < RELIC_SLOT_COUNT; i++) {
+    const slot = state.relicSlots[i];
+    const weaponSlot = new InventoryState(`weapon-${i}`, 1, 1);
+
+    if (slot.relic) {
+      weaponSlot.addItem({ type: slot.relic.type, amount: 1 }, 0, 0);
+    }
+
+    const slotIndex = i;
+    weaponSlot.onItemAdded((invItem) => {
+      if (!invItem.item) return;
+      const relicType = invItem.item.type as RelicType;
+      if (!(relicType in RELIC_CONFIGS)) return;
+      const relic: RelicState = {
+        type: relicType,
+        item: invItem.item,
+        level: 1,
+        charge: 0,
+        remainingShots: 0,
+        nextShotTime: 0,
+      };
+      state.relicSlots[slotIndex].relic = relic;
+    });
+
+    weaponSlot.onItemRemoved(() => {
+      state.relicSlots[slotIndex].relic = null;
+    });
+
+    state.weaponSlots.push(weaponSlot);
+  }
+}
+
+export function toggleMerchantShop(state: GameState, merchant: MerchantShipState): void {
+  if (state.activeMerchantId === merchant.id) {
+    closeMerchantShop(state);
+    return;
+  }
+
+  closeMerchantShop(state);
+
+  state.activeMerchantId = merchant.id;
+  const cols = 3;
+  const rows = Math.ceil(merchant.items.length / cols);
+  state.activeMerchantInventory = new InventoryState("merchant", cols, rows);
+
+  for (let i = 0; i < merchant.items.length; i++) {
+    const item = merchant.items[i];
+    const gridX = i % cols;
+    const gridY = Math.floor(i / cols);
+    state.activeMerchantInventory.addItem(item, gridX, gridY);
+  }
+
+  state.onMerchantChanged.emit();
+}
+
+export function closeMerchantShop(state: GameState): void {
+  if (state.activeMerchantInventory) {
+    state.activeMerchantInventory.destroy();
+    state.activeMerchantInventory = null;
+  }
+  state.activeMerchantId = null;
+  state.onMerchantChanged.emit();
 }
 
 function spawnFromEdge(): { x: number; y: number } {

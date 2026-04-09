@@ -214,37 +214,33 @@ export class AssetManager {
     return this.itemTextures_[alias];
   }
 
-  private itemTextureUrlCache_ = new Map<string, string>();
-
-  getItemTextureUrl(alias: string): string {
-    const cached = this.itemTextureUrlCache_.get(alias);
-    if (cached) return cached;
-
-    const texture = this.itemTextures_[alias];
-    if (!texture) return "";
-
-    const frame = texture.frame;
-    const source = texture.source.resource as HTMLImageElement | HTMLCanvasElement;
-    const canvas = document.createElement("canvas");
-    canvas.width = frame.width;
-    canvas.height = frame.height;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return "";
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(
-      source,
-      frame.x,
-      frame.y,
-      frame.width,
-      frame.height,
-      0,
-      0,
-      frame.width,
-      frame.height
-    );
-    const url = canvas.toDataURL();
-    this.itemTextureUrlCache_.set(alias, url);
-    return url;
+  getAllItemTextureUrls(): Record<string, string> {
+    const urls: Record<string, string> = {};
+    for (const alias of Object.keys(this.itemTextures_)) {
+      const texture = this.itemTextures_[alias];
+      if (!texture) continue;
+      const frame = texture.frame;
+      const source = texture.source.resource as HTMLImageElement | HTMLCanvasElement;
+      const canvas = document.createElement("canvas");
+      canvas.width = frame.width;
+      canvas.height = frame.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) continue;
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(
+        source,
+        frame.x,
+        frame.y,
+        frame.width,
+        frame.height,
+        0,
+        0,
+        frame.width,
+        frame.height
+      );
+      urls[alias] = canvas.toDataURL();
+    }
+    return urls;
   }
 
   static async load(manifest: AssetsManifest): Promise<AssetManager> {

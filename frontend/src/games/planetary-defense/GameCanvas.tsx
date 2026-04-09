@@ -70,7 +70,6 @@ export const GameCanvas = () => {
   const [healthRatio, setHealthRatio] = useState(1);
   const [waveNumber, setWaveNumber] = useState(0);
   const [waveActive, setWaveActive] = useState(false);
-  const [gameReady, setGameReady] = useState(false);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -88,7 +87,6 @@ export const GameCanvas = () => {
           return;
         }
         gameRef.current = game;
-        setGameReady(true);
         unsubDamage = game.state.onPlanetDamaged.subscribe(() => {
           setHealthRatio(game.state.planetHealth / game.state.maxPlanetHealth);
         });
@@ -96,8 +94,8 @@ export const GameCanvas = () => {
           setWaveNumber(game.state.wave.wave);
           setWaveActive(false);
         });
-        unsubWaveActive = game.onWaveActiveChanged(() => {
-          setWaveActive(game.isWaveActive);
+        unsubWaveActive = game.state.onWaveActiveChanged.subscribe(() => {
+          setWaveActive(game.state.waveActive);
         });
       })
       .catch((err) => {
@@ -147,7 +145,7 @@ export const GameCanvas = () => {
     >
       <LabelOverlay gameRef={gameRef} />
       <PhraseOverlay gameRef={gameRef} visible={waveActive} />
-      {gameReady && <InventoryOverlay gameRef={gameRef} visible={!waveActive} />}
+      <InventoryOverlay />
       <PlanetHealthBar ratio={healthRatio} />
       <div className="absolute top-3 left-3 z-10">
         <div

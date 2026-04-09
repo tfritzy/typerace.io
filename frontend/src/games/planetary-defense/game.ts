@@ -11,10 +11,8 @@ import { DropManager } from "./DropManager";
 import type { LabelData } from "./DropManager";
 import { MerchantManager } from "./MerchantManager";
 import { AssetManager } from "./assetManager";
-import { InventoryState } from "./inventoryState";
-import { createGameState, updateState, getRelicPosition, WavePhase, handleTypedCharacter as stateHandleTypedCharacter, onCorrectKeystroke } from "./state";
-import type { GameState, RelicState, MerchantShipState } from "./state";
-import { RELIC_SLOT_COUNT, RelicType, RELIC_CONFIGS } from "./relicConfig";
+import { createGameState, updateState, WavePhase, handleTypedCharacter as stateHandleTypedCharacter, onCorrectKeystroke, toggleMerchantShop } from "./state";
+import type { GameState } from "./state";
 
 export type { LabelData };
 
@@ -32,14 +30,6 @@ export class PlanetaryDefenseGame {
   private dropManager!: DropManager;
   private merchantManager!: MerchantManager;
 
-  private inventory_!: InventoryState;
-  private weaponSlots_: InventoryState[] = [];
-  private merchantInventory_: InventoryState | null = null;
-  private activeMerchant_: MerchantShipState | null = null;
-  private merchantChangeListeners_ = new Set<() => void>();
-  private waveActive_ = false;
-  private waveActiveListeners_ = new Set<() => void>();
-
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
   constructor(app: Application) {
@@ -49,47 +39,6 @@ export class PlanetaryDefenseGame {
 
   get labels(): LabelData[] {
     return this.dropManager?.labels ?? [];
-  }
-
-  get playerInventory(): InventoryState {
-    return this.inventory_;
-  }
-
-  get weaponSlotInventories(): InventoryState[] {
-    return this.weaponSlots_;
-  }
-
-  get activeMerchantInventory(): InventoryState | null {
-    return this.merchantInventory_;
-  }
-
-  get isWaveActive(): boolean {
-    return this.waveActive_;
-  }
-
-  onWaveActiveChanged(fn: () => void): () => void {
-    this.waveActiveListeners_.add(fn);
-    return () => this.waveActiveListeners_.delete(fn);
-  }
-
-  onMerchantChanged(fn: () => void): () => void {
-    this.merchantChangeListeners_.add(fn);
-    return () => this.merchantChangeListeners_.delete(fn);
-  }
-
-  getAllInventories(): InventoryState[] {
-    const invs: InventoryState[] = [this.inventory_, ...this.weaponSlots_];
-    if (this.merchantInventory_) invs.push(this.merchantInventory_);
-    return invs;
-  }
-
-  getItemTextureUrl(alias: string): string {
-    return this.assetManager.getItemTextureUrl(alias);
-  }
-
-  getWeaponSlotPosition(index: number): { x: number; y: number } {
-    const slot = this.state.relicSlots[index];
-    return getRelicPosition(slot);
   }
 
   async init(): Promise<void> {
@@ -147,103 +96,18 @@ export class PlanetaryDefenseGame {
     world.addChild(this.dropManager.layer);
 
     this.merchantManager = new MerchantManager(this.assetManager);
-    this.merchantManager.onShipClicked((merchant) => this.toggleMerchantShop(merchant));
+    this.merchantManager.onShipClicked((merchant) => toggleMerchantShop(this.state, merchant));
     world.addChild(this.merchantManager.layer);
-
-    this.inventory_ = new InventoryState("player", 10, 2);
-    this.populateTestData();
-    this.inventory_.addToFirstEmpty({ type: "Gold", amount: 100 });
 
     this.merchantManager.init(this.state);
 
-    this.buildWeaponSlots();
-  }
-
-  private populateTestData(): void {
-    this.inventory_.addItem({ type: RelicType.StarfallStiletto, amount: 1 }, 0, 0);
-    this.inventory_.addItem({ type: RelicType.BloodthornDirk, amount: 1 }, 1, 0);
-    this.inventory_.addItem({ type: RelicType.EmbercrestBlade, amount: 1 }, 2, 0);
-    this.inventory_.addItem({ type: RelicType.BriarthornSaber, amount: 1 }, 3, 0);
-    this.inventory_.addItem({ type: RelicType.TwinflareCrossblades, amount: 1 }, 4, 0);
-    this.inventory_.addItem({ type: RelicType.CloudveilLongsword, amount: 1 }, 5, 0);
-    this.inventory_.addItem({ type: RelicType.SteelBattleaxe, amount: 1 }, 6, 0);
-    this.inventory_.addItem({ type: RelicType.MoltenZweihander, amount: 1 }, 7, 0);
-    this.inventory_.addItem({ type: RelicType.MoonlitHatchet, amount: 1 }, 8, 0);
-    this.inventory_.addItem({ type: RelicType.FrostfangClaymore, amount: 1 }, 9, 0);
-  }
-
-  private buildWeaponSlots(): void {
-    for (let i = 0; i < RELIC_SLOT_COUNT; i++) {
-      const slot = this.state.relicSlots[i];
-      const weaponSlot = new InventoryState(`weapon-${i}`, 1, 1);
-
-      if (slot.relic) {
-        weaponSlot.addItem({ type: slot.relic.type, amount: 1 }, 0, 0);
-      }
-
-      const slotIndex = i;
-      weaponSlot.onItemAdded((invItem) => {
-        if (!invItem.item) return;
-        const relicType = invItem.item.type as RelicType;
-        if (!(relicType in RELIC_CONFIGS)) return;
-        const relic: RelicState = {
-          type: relicType,
-          item: invItem.item,
-          level: 1,
-          charge: 0,
-          remainingShots: 0,
-          nextShotTime: 0,
-        };
-        this.state.relicSlots[slotIndex].relic = relic;
-      });
-
-      weaponSlot.onItemRemoved(() => {
-        this.state.relicSlots[slotIndex].relic = null;
-      });
-
-      this.weaponSlots_.push(weaponSlot);
-    }
-  }
-
-  private toggleMerchantShop(merchant: MerchantShipState): void {
-    if (this.activeMerchant_?.id === merchant.id) {
-      this.closeMerchantShop();
-      return;
-    }
-
-    this.closeMerchantShop();
-    this.openMerchantShop(merchant);
-  }
-
-  private openMerchantShop(merchant: MerchantShipState): void {
-    this.activeMerchant_ = merchant;
-    const cols = 3;
-    const rows = Math.ceil(merchant.items.length / cols);
-    this.merchantInventory_ = new InventoryState("merchant", cols, rows);
-
-    for (let i = 0; i < merchant.items.length; i++) {
-      const item = merchant.items[i];
-      const gridX = i % cols;
-      const gridY = Math.floor(i / cols);
-      this.merchantInventory_.addItem(item, gridX, gridY);
-    }
-
-    for (const fn of this.merchantChangeListeners_) fn();
-  }
-
-  private closeMerchantShop(): void {
-    if (this.merchantInventory_) {
-      this.merchantInventory_.destroy();
-      this.merchantInventory_ = null;
-    }
-    this.activeMerchant_ = null;
-    for (const fn of this.merchantChangeListeners_) fn();
+    this.state.itemTextureUrls = this.assetManager.getAllItemTextureUrls();
   }
 
   handleTypedCharacter(key: string): void {
     const collected = stateHandleTypedCharacter(this.state, key);
     for (const item of collected) {
-      this.inventory_.addToFirstEmpty(item);
+      this.state.playerInventory.addToFirstEmpty(item);
     }
   }
 
@@ -262,10 +126,10 @@ export class PlanetaryDefenseGame {
     this.merchantManager.update(this.state);
 
     const waveActive = this.state.wave.phase !== WavePhase.Idle;
-    if (waveActive !== this.waveActive_) {
-      this.waveActive_ = waveActive;
+    if (waveActive !== this.state.waveActive) {
+      this.state.waveActive = waveActive;
       this.merchantManager.layer.visible = !waveActive;
-      for (const fn of this.waveActiveListeners_) fn();
+      this.state.onWaveActiveChanged.emit();
     }
   }
 
@@ -282,10 +146,9 @@ export class PlanetaryDefenseGame {
     this.dropManager.destroy();
     this.enemyManager.destroy();
     this.merchantManager.destroy();
-    this.inventory_.destroy();
-    for (const ws of this.weaponSlots_) ws.destroy();
-    this.weaponSlots_ = [];
-    if (this.merchantInventory_) this.merchantInventory_.destroy();
+    this.state.playerInventory.destroy();
+    for (const ws of this.state.weaponSlots) ws.destroy();
+    if (this.state.activeMerchantInventory) this.state.activeMerchantInventory.destroy();
     this.app.destroy(true);
   }
 }
