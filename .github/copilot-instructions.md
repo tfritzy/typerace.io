@@ -16,14 +16,11 @@ This is the single most important rule in this entire file. All other rules are 
 
 **You are 100% capable of setting up the full local environment.** Every previous agent succeeded. You will too. Do not stop, do not give up, do not fake it, do not use static HTML. Failure is not an option. If something breaks, fix it. If the server won't start, debug it. If the connection fails, retry it. You do NOT submit without a real screenshot. If you find yourself about to submit without a screenshot, STOP IMMEDIATELY and go set up the environment. There is no deadline more important than the screenshot. There is no shortcut. There is no excuse.
 
-**CRITICAL: You MUST verify your screenshot before submitting.** After taking it, confirm you can see the actual rendered UI of the page you are working on. For example:
-- For the main typing page: the starry background, typing box with text, header with "TypeRace.io" logo, game mode selectors, footer
-- For Planetary Defense: the game canvas with planet, health bar, wave indicator, type box with text, header, footer
-- For any page: the page must be FULLY LOADED with real content visible — not a loading spinner, not a blank page, not an error screen
+**CRITICAL: You MUST verify your screenshot before submitting.** After taking it, confirm you can see the actual rendered UI of the page you are working on. The screenshot must show the specific page your changes affect — fully loaded with real content visible. Not a loading spinner, not a blank page, not an error screen. If the page is not the one you changed, your screenshot is irrelevant. If the page is not fully rendered, your screenshot is invalid.
 
 If the page is not fully loaded, your screenshot is INVALID. Do NOT submit it. Fix the environment and retake it. A loading screen or spinner means something is broken — debug and fix the issue before screenshotting. Common fixes: create module_bindings stub, remove references to missing asset files, fix TypeScript errors. DO NOT CONVINCE YOURSELF THAT A PARTIAL SCREENSHOT IS ACCEPTABLE. IT IS NOT.
 
-**ASK YOURSELF: "Can I see the typing box with actual text in it?" If the answer is no, YOUR SCREENSHOT IS INVALID. Take it again.**
+**ASK YOURSELF: "Can I see the page I changed, fully rendered with real content?" If the answer is no, YOUR SCREENSHOT IS INVALID. Take it again.**
 
 Mandatory steps — execute all of them, every time, no shortcuts, no skipping, no "I'll do it later":
 
