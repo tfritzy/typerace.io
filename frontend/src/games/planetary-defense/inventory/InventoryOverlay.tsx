@@ -19,9 +19,9 @@ interface DragData {
 export const InventoryOverlay = () => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [, setTick] = useState(0);
-  const [visible, setVisible] = useState(() => {
+  const [waveActive, setWaveActive] = useState(() => {
     const state = getState();
-    return state ? !state.waveActive : true;
+    return state ? state.waveActive : false;
   });
   const dragRef = useRef<DragData | null>(null);
   const [dragState, setDragState] = useState<DragData | null>(null);
@@ -44,7 +44,7 @@ export const InventoryOverlay = () => {
       }
 
       unsubs.push(state.onWaveActiveChanged.subscribe(() => {
-        setVisible(!state.waveActive);
+        setWaveActive(state.waveActive);
       }));
     };
 
@@ -139,8 +139,6 @@ export const InventoryOverlay = () => {
     };
   }, []);
 
-  if (!visible) return null;
-
   const state = getState();
   if (!state) return null;
   const isHolding = dragState !== null;
@@ -170,7 +168,7 @@ export const InventoryOverlay = () => {
         />
       </div>
 
-      {state.activeMerchantInventory && (
+      {!waveActive && state.activeMerchantInventory && (
         <div
           className="absolute pointer-events-auto -translate-x-1/2"
           style={{

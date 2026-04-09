@@ -14,7 +14,7 @@ export const ItemSprite = memo(({ itemType, className = "" }: ItemSpriteProps) =
       <div
         className={`w-full h-full pointer-events-none select-none [image-rendering:pixelated] ${className}`}
         style={{
-          backgroundImage: `url(${textureInfo.src})`,
+          backgroundImage: `url("${textureInfo.src}")`,
           backgroundPosition: textureInfo.backgroundPosition,
           backgroundSize: textureInfo.backgroundSize,
           backgroundRepeat: "no-repeat",
