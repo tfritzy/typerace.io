@@ -16,30 +16,60 @@ This is the single most important rule in this entire file. All other rules are 
 
 **You are 100% capable of setting up the full local environment.** Every previous agent succeeded. You will too. Do not stop, do not give up, do not fake it, do not use static HTML. Failure is not an option. If something breaks, fix it. If the server won't start, debug it. If the connection fails, retry it. You do NOT submit without a real screenshot. If you find yourself about to submit without a screenshot, STOP IMMEDIATELY and go set up the environment. There is no deadline more important than the screenshot. There is no shortcut. There is no excuse.
 
-**CRITICAL: You MUST verify your screenshot before submitting.** After taking it, confirm you can see ALL of the following in the screenshot:
-- ✅ The starry background with visible stars and tree silhouettes
-- ✅ The typing box with actual text to type (NOT a loading spinner)
-- ✅ The header with "TypeRace.io" logo
-- ✅ The game mode selectors (Public Match, Private Lobby, Practice Mode)
-- ✅ The footer with links
+**CRITICAL: You MUST verify your screenshot before submitting.** After taking it, confirm you can see the actual rendered UI of the page you are working on. For example:
+- For the main typing page: the starry background, typing box with text, header with "TypeRace.io" logo, game mode selectors, footer
+- For Planetary Defense: the game canvas with planet, health bar, wave indicator, type box with text, header, footer
+- For any page: the page must be FULLY LOADED with real content visible — not a loading spinner, not a blank page, not an error screen
 
-If ANY of these elements are missing, your screenshot is INVALID. Do NOT submit it. Fix the environment and retake it. A loading screen or spinner means SpacetimeDB or Firebase Auth is not connected — debug and fix the connection before screenshotting. DO NOT CONVINCE YOURSELF THAT A PARTIAL SCREENSHOT IS ACCEPTABLE. IT IS NOT. DO NOT CONVINCE YOURSELF THE SCREENSHOT "LOOKS CLOSE ENOUGH." IT DOES NOT. EVERY ELEMENT LISTED ABOVE MUST BE PRESENT AND FULLY RENDERED.
+If the page is not fully loaded, your screenshot is INVALID. Do NOT submit it. Fix the environment and retake it. A loading screen or spinner means something is broken — debug and fix the issue before screenshotting. Common fixes: create module_bindings stub, remove references to missing asset files, fix TypeScript errors. DO NOT CONVINCE YOURSELF THAT A PARTIAL SCREENSHOT IS ACCEPTABLE. IT IS NOT.
 
 **ASK YOURSELF: "Can I see the typing box with actual text in it?" If the answer is no, YOUR SCREENSHOT IS INVALID. Take it again.**
 
 Mandatory steps — execute all of them, every time, no shortcuts, no skipping, no "I'll do it later":
-1. `spacetime start` — start the SpacetimeDB server
-2. `spacetime publish -c -y -p spacetimedb typerace -s local` — publish the module
-3. `npx firebase emulators:start --only auth` — start the Firebase Auth emulator
-4. `cd frontend && npm run dev` — start the Vite dev server
-5. Navigate to `http://localhost:5173` with Playwright
-6. **WAIT for the app to fully load** — wait at least 10 seconds and check console logs for "Connected to SpacetimeDB"
-7. **VERIFY the page snapshot** — confirm the typing box, header, footer, and mode selectors are all present in the accessibility tree before taking the screenshot
-8. Take the screenshot ONLY after verification passes
-9. **LOOK AT YOUR SCREENSHOT** — if it shows a loading screen, a spinner, a blank page, or any error, GO BACK TO STEP 1 and try again
-10. **LOOK AT YOUR SCREENSHOT AGAIN** — seriously, look at it one more time. Is the typing box there? Are there actual words to type? Is the header there? If not, GO BACK TO STEP 1.
 
-**DO NOT STOP until you have a real screenshot from the live app** — with the starry background visible, the SpacetimeDB connection established, and the typing box fully rendered. Static HTML, blank pages, loading spinners, or connection-error screens are NOT acceptable. Keep retrying until you succeed. If you see a loading spinner, that means something is wrong with your backend setup — go back and fix it. YOU ARE NOT DONE UNTIL THE SCREENSHOT IS IN THE PR.
+### Step 1: Install dependencies
+```
+cd frontend && npm install
+```
+
+### Step 2: Create module_bindings stub (if directory doesn't exist)
+The `frontend/module_bindings/` directory is gitignored and won't exist in a fresh clone. You MUST create a stub so the app compiles. Create `frontend/module_bindings/index.ts` with stub exports for all the bindings the app imports (GameMode, Game, Player, GameRecord, PlayerProgress, XpGain, GameState, GameType, GlobalStats, PersonalRecord, CharacterEventType, DbConnection). Check `frontend/src/` for all `module_bindings` imports to know what to stub.
+
+### Step 3: Fix ALL build errors
+Run `cd frontend && npx tsc -b` and fix every error. Common issues:
+- Missing asset files referenced in `manifest.ts` or `assetManager.ts` — remove the broken references
+- Missing types from module_bindings — add them to the stub
+- Any other TypeScript errors — fix them before proceeding
+**DO NOT proceed to the next step until `tsc -b` passes with zero errors.**
+
+### Step 4: Start the Vite dev server
+```
+cd frontend && npx vite --host --port 5173
+```
+Run this in a **synchronous** bash shell with `initial_wait: 15` so the server stays alive while you take the screenshot. Do NOT use background processes (`&`) — they get killed before Playwright can connect.
+
+### Step 5: Navigate with Playwright
+While the Vite shell is still running, use Playwright to navigate to the page you're working on:
+- Main typing game: `http://localhost:5173`
+- Planetary Defense: `http://localhost:5173/games/planetary-defense`
+- Any other page relevant to your changes
+
+### Step 6: Wait and verify
+Wait at least 3-5 seconds for the page to load. Check the Playwright page snapshot (accessibility tree) to confirm the UI elements are present. For Planetary Defense, click the START button and wait for the game canvas to render.
+
+### Step 7: Take the screenshot
+Use Playwright's screenshot tool. **LOOK AT THE SCREENSHOT.** If it shows a blank page, loading spinner, or error — go back and fix the issue. Do not submit a broken screenshot.
+
+### Step 8: Include the screenshot in the PR description
+Every PR description MUST contain a screenshot image. Use the GitHub asset URL format.
+
+### Troubleshooting
+- **Playwright ERR_CONNECTION_REFUSED**: The Vite server died. Restart it in a sync shell with sufficient `initial_wait`.
+- **Game canvas doesn't render / PixiJS crash**: Check for missing asset files. Run `ls frontend/public/elv_item_icons/` and compare against `manifest.ts`. Remove any references to files that don't exist.
+- **Module import errors**: Your module_bindings stub is incomplete. Check all `import ... from "../../module_bindings"` statements and add missing exports.
+- **WebGL warnings**: These are normal in headless environments and don't prevent screenshots.
+
+**DO NOT STOP until you have a real screenshot from the live app.** Static HTML mocks, blank pages, loading spinners, or connection-error screens are NOT acceptable. Keep retrying until you succeed. If something is broken, FIX IT and commit the fix. YOU ARE NOT DONE UNTIL THE SCREENSHOT IS IN THE PR.
 
 **FINAL WARNING: If you are reading this and thinking "maybe I can skip the screenshot for this PR," you are WRONG. Take the screenshot. Now. Before you do anything else. The screenshot comes first. The screenshot comes last. The screenshot is everything.**
 
