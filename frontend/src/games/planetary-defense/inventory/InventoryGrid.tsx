@@ -3,8 +3,6 @@ import { type InventoryState, type InventoryItem } from "../inventoryState";
 import { NineSlicePanel } from "./NineSlicePanel";
 import { ItemCell } from "./ItemCell";
 
-const SLOT_BG_SRC = "/elv_pixel_inventory_ui/Inventory_Slot_1.png";
-
 interface InventoryGridProps {
   inventory: InventoryState;
   label?: string;
@@ -50,17 +48,14 @@ export const InventoryGrid = memo(({
   return (
     <div className="flex flex-col items-center gap-1 w-full">
       {label && (
-        <div
-          className="text-green-400 tracking-wider"
-          style={{ fontFamily: '"Press Start 2P", monospace', fontSize: "clamp(6px, 1.2vw, 10px)" }}
-        >
+        <div className="text-indigo-200 text-xs font-semibold tracking-wide uppercase">
           {label}
         </div>
       )}
       <NineSlicePanel className="w-full">
         <div
           ref={gridRef}
-          className="grid w-full"
+          className="grid w-full gap-px"
           style={{ gridTemplateColumns: `repeat(${inventory.cols}, 1fr)` }}
         >
           {Array.from({ length: inventory.rows }, (_, r) =>
@@ -69,26 +64,16 @@ export const InventoryGrid = memo(({
               const cellItem = itemMap.get(`${c},${r}`);
               const isDragging = cellItem?.id === draggingItemId;
               return (
-                <div key={`${r}-${c}`} className="aspect-square relative">
-                  <img
-                    src={SLOT_BG_SRC}
-                    draggable={false}
-                    className={`w-full h-full [image-rendering:pixelated] pointer-events-none ${
-                      isHighlight
-                        ? highlightValid
-                          ? "brightness-150"
-                          : "brightness-50 hue-rotate-180"
-                        : ""
-                    }`}
-                    alt=""
-                  />
-                  {isHighlight && (
-                    <div
-                      className={`absolute inset-0 ${
-                        highlightValid ? "bg-green-400/30" : "bg-red-500/30"
-                      }`}
-                    />
-                  )}
+                <div
+                  key={`${r}-${c}`}
+                  className={`aspect-square relative rounded-sm border border-indigo-400/10 bg-slate-800/60 ${
+                    isHighlight
+                      ? highlightValid
+                        ? "bg-emerald-500/25 border-emerald-400/40"
+                        : "bg-red-500/25 border-red-400/40"
+                      : "hover:bg-slate-700/40"
+                  }`}
+                >
                   {cellItem && !isDragging && (
                     <ItemCell slot={cellItem} onDragStart={handleDragStart} />
                   )}

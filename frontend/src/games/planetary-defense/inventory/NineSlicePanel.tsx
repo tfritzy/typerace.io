@@ -1,7 +1,5 @@
 import { type ReactNode } from "react";
 
-const NINE_SLICE_SRC = "/elv_pixel_inventory_ui/Inventory_9Slices.png";
-
 interface NineSlicePanelProps {
   children: ReactNode;
   className?: string;
@@ -10,13 +8,7 @@ interface NineSlicePanelProps {
 export const NineSlicePanel = ({ children, className = "" }: NineSlicePanelProps) => {
   return (
     <div
-      className={`relative ${className}`}
-      style={{
-        borderImage: `url(${NINE_SLICE_SRC}) 8 fill / 16px / 0 round`,
-        imageRendering: "pixelated",
-        borderStyle: "solid",
-        borderWidth: "16px",
-      }}
+      className={`relative rounded-lg border border-indigo-400/20 bg-slate-900/85 backdrop-blur-sm shadow-lg shadow-indigo-950/40 p-1.5 ${className}`}
     >
       {children}
     </div>

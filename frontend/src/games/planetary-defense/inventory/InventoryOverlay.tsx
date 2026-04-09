@@ -230,7 +230,7 @@ export const InventoryOverlay = () => {
     <div
       ref={overlayRef}
       className="absolute inset-0 pointer-events-none overflow-hidden"
-      style={{ fontFamily: '"Press Start 2P", monospace' }}
+      style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
     >
       <div className="absolute bottom-[2%] left-1/2 -translate-x-1/2 pointer-events-auto flex flex-col items-center gap-2 w-3/5 max-w-[640px]">
         {state.activeMerchantInventory && (
