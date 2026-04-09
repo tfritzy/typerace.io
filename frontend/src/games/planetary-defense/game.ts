@@ -100,8 +100,6 @@ export class PlanetaryDefenseGame {
     world.addChild(this.merchantManager.layer);
 
     this.merchantManager.init(this.state);
-
-    this.state.itemTextureUrls = this.assetManager.getAllItemTextureUrls();
   }
 
   handleTypedCharacter(key: string): void {
@@ -147,8 +145,8 @@ export class PlanetaryDefenseGame {
     this.enemyManager.destroy();
     this.merchantManager.destroy();
     this.state.playerInventory.destroy();
-    for (const ws of this.state.weaponSlots) ws.destroy();
     if (this.state.activeMerchantInventory) this.state.activeMerchantInventory.destroy();
+    for (const m of this.state.merchants) m.shopInventory.destroy();
     this.app.destroy(true);
   }
 }

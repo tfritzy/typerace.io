@@ -59,7 +59,6 @@ export interface EntityState {
 export interface RelicState {
   type: RelicType;
   item: Item;
-  level: number;
   charge: number;
   remainingShots: number;
   nextShotTime: number;
@@ -155,6 +154,7 @@ export interface MerchantShipState {
   y: number;
   entityType: EntityType;
   items: Item[];
+  shopInventory: InventoryState;
 }
 
 export interface GameState {
@@ -173,10 +173,8 @@ export interface GameState {
   maxPlanetHealth: number;
   wave: WaveState;
   playerInventory: InventoryState;
-  weaponSlots: InventoryState[];
   activeMerchantInventory: InventoryState | null;
   activeMerchantId: number | null;
-  itemTextureUrls: Record<string, string>;
   waveActive: boolean;
   onPlanetDamaged: GameEvent;
   onRelicFired: GameEvent;
@@ -190,12 +188,12 @@ function createRelicSlots(): RelicSlot[] {
   const slots: RelicSlot[] = [];
   const startingRelics: (RelicType | null)[] = [
     RelicType.SteelBattleaxe,
-    RelicType.EmbercrestBlade,
-    RelicType.RavenplumeEdge,
-    RelicType.GildedPlumeblade,
-    RelicType.CloudveilLongsword,
     null,
-    RelicType.DarkwoodHatchet,
+    null,
+    null,
+    null,
+    null,
+    null,
     null,
   ];
   for (let i = 0; i < RELIC_SLOT_COUNT; i++) {
@@ -203,7 +201,7 @@ function createRelicSlots(): RelicSlot[] {
     let relic: RelicState | null = null;
     const relicType = startingRelics[i] ?? null;
     if (relicType !== null) {
-      relic = { type: relicType, item: { type: relicType, amount: 1 }, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
+      relic = { type: relicType, item: { type: relicType, amount: 1 }, charge: 0, remainingShots: 0, nextShotTime: 0 };
     }
     slots.push({ angle, relic });
   }
@@ -289,7 +287,7 @@ export function getState(): GameState | null {
 }
 
 export function createGameState(): GameState {
-  const playerInventory = new InventoryState("player", 10, 2);
+  const playerInventory = new InventoryState("player", 10, 5);
 
   const state: GameState = {
     entities: [],
@@ -313,10 +311,8 @@ export function createGameState(): GameState {
       waveTimer: 0,
     },
     playerInventory,
-    weaponSlots: [],
     activeMerchantInventory: null,
     activeMerchantId: null,
-    itemTextureUrls: {},
     waveActive: false,
     onPlanetDamaged: new GameEvent(),
     onRelicFired: new GameEvent(),
@@ -326,66 +322,28 @@ export function createGameState(): GameState {
     onMerchantChanged: new GameEvent(),
   };
 
-  populateTestInventory(playerInventory);
+  playerInventory.addItem({ type: RelicType.EmbercrestBlade, amount: 1 }, 0, 0);
   playerInventory.addToFirstEmpty({ type: "Gold", amount: 100 });
-  buildWeaponSlots(state);
+
+  const shopItems = generateShopItems(6);
+  const shopCols = 3;
+  const shopRows = Math.ceil(shopItems.length / shopCols);
+  const shopInventory = new InventoryState("merchant", shopCols, shopRows);
+  for (let i = 0; i < shopItems.length; i++) {
+    shopInventory.addItem(shopItems[i], i % shopCols, Math.floor(i / shopCols));
+  }
 
   state.merchants.push({
     id: state.nextId++,
     x: CANVAS_WIDTH - 250,
     y: CANVAS_HEIGHT / 2,
     entityType: "Clipper",
-    items: generateShopItems(6),
+    items: shopItems,
+    shopInventory,
   });
 
   gameState = state;
   return state;
-}
-
-function populateTestInventory(inventory: InventoryState): void {
-  inventory.addItem({ type: RelicType.StarfallStiletto, amount: 1 }, 0, 0);
-  inventory.addItem({ type: RelicType.BloodthornDirk, amount: 1 }, 1, 0);
-  inventory.addItem({ type: RelicType.EmbercrestBlade, amount: 1 }, 2, 0);
-  inventory.addItem({ type: RelicType.BriarthornSaber, amount: 1 }, 3, 0);
-  inventory.addItem({ type: RelicType.TwinflareCrossblades, amount: 1 }, 4, 0);
-  inventory.addItem({ type: RelicType.CloudveilLongsword, amount: 1 }, 5, 0);
-  inventory.addItem({ type: RelicType.SteelBattleaxe, amount: 1 }, 6, 0);
-  inventory.addItem({ type: RelicType.MoltenZweihander, amount: 1 }, 7, 0);
-  inventory.addItem({ type: RelicType.MoonlitHatchet, amount: 1 }, 8, 0);
-  inventory.addItem({ type: RelicType.FrostfangClaymore, amount: 1 }, 9, 0);
-}
-
-function buildWeaponSlots(state: GameState): void {
-  for (let i = 0; i < RELIC_SLOT_COUNT; i++) {
-    const slot = state.relicSlots[i];
-    const weaponSlot = new InventoryState(`weapon-${i}`, 1, 1);
-
-    if (slot.relic) {
-      weaponSlot.addItem({ type: slot.relic.type, amount: 1 }, 0, 0);
-    }
-
-    const slotIndex = i;
-    weaponSlot.onItemAdded((invItem) => {
-      if (!invItem.item) return;
-      const relicType = invItem.item.type as RelicType;
-      if (!(relicType in RELIC_CONFIGS)) return;
-      const relic: RelicState = {
-        type: relicType,
-        item: invItem.item,
-        level: 1,
-        charge: 0,
-        remainingShots: 0,
-        nextShotTime: 0,
-      };
-      state.relicSlots[slotIndex].relic = relic;
-    });
-
-    weaponSlot.onItemRemoved(() => {
-      state.relicSlots[slotIndex].relic = null;
-    });
-
-    state.weaponSlots.push(weaponSlot);
-  }
 }
 
 export function toggleMerchantShop(state: GameState, merchant: MerchantShipState): void {
@@ -397,25 +355,13 @@ export function toggleMerchantShop(state: GameState, merchant: MerchantShipState
   closeMerchantShop(state);
 
   state.activeMerchantId = merchant.id;
-  const cols = 3;
-  const rows = Math.ceil(merchant.items.length / cols);
-  state.activeMerchantInventory = new InventoryState("merchant", cols, rows);
-
-  for (let i = 0; i < merchant.items.length; i++) {
-    const item = merchant.items[i];
-    const gridX = i % cols;
-    const gridY = Math.floor(i / cols);
-    state.activeMerchantInventory.addItem(item, gridX, gridY);
-  }
+  state.activeMerchantInventory = merchant.shopInventory;
 
   state.onMerchantChanged.emit();
 }
 
 export function closeMerchantShop(state: GameState): void {
-  if (state.activeMerchantInventory) {
-    state.activeMerchantInventory.destroy();
-    state.activeMerchantInventory = null;
-  }
+  state.activeMerchantInventory = null;
   state.activeMerchantId = null;
   state.onMerchantChanged.emit();
 }

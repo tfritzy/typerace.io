@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT } from "./constants";
-import { getItemDisplay, getItemConfig, type Item } from "./itemConfig";
+import { getItemConfig, type Item, type ItemType } from "./itemConfig";
 import { CELL_SIZE, GRID_PADDING, BORDER_WIDTH, type InventoryItem, type InventoryState } from "./inventoryState";
 import { getState, getRelicPosition } from "./state";
-import type { GameState } from "./state";
+import type { GameState, RelicSlot } from "./state";
+import { getItemTextureInfo } from "./itemTextures";
+import { RELIC_SLOT_COUNT, RELIC_CONFIGS, type RelicType } from "./relicConfig";
 
 const BG_COLOR = "rgba(17, 17, 34, 0.92)";
 const BORDER_COLOR = "#8b7355";
@@ -17,15 +19,15 @@ const MERCHANT_TITLE_BG = "rgba(17, 17, 34, 0.95)";
 const MERCHANT_TITLE_BORDER = "#66ff88";
 const MERCHANT_TITLE_COLOR = "#66ff88";
 
+type DragSource =
+  | { kind: "inventory"; inventory: InventoryState; slot: InventoryItem; originalCol: number; originalRow: number }
+  | { kind: "relic"; slotIndex: number; item: Item };
+
 interface DragState {
-  sourceInventory: InventoryState;
-  slot: InventoryItem;
-  originalCol: number;
-  originalRow: number;
+  source: DragSource;
+  item: Item;
   ghostX: number;
   ghostY: number;
-  offsetX: number;
-  offsetY: number;
 }
 
 function gridWidth(cols: number): number {
@@ -36,6 +38,38 @@ function gridHeight(rows: number): number {
   return rows * CELL_SIZE + GRID_PADDING * 2 + BORDER_WIDTH * 2;
 }
 
+const ItemSprite = ({ itemType, size }: { itemType: ItemType; size: number }) => {
+  const textureInfo = getItemTextureInfo(itemType);
+  if (textureInfo.backgroundPosition) {
+    return (
+      <div
+        style={{
+          width: size,
+          height: size,
+          backgroundImage: `url(${textureInfo.src})`,
+          backgroundPosition: textureInfo.backgroundPosition,
+          backgroundSize: textureInfo.backgroundSize,
+          backgroundRepeat: "no-repeat",
+          imageRendering: "pixelated",
+          pointerEvents: "none",
+        }}
+      />
+    );
+  }
+  return (
+    <img
+      src={textureInfo.src}
+      draggable={false}
+      style={{
+        width: size,
+        height: size,
+        imageRendering: "pixelated",
+        pointerEvents: "none",
+      }}
+    />
+  );
+};
+
 interface InventoryGridProps {
   inventory: InventoryState;
   scale: number;
@@ -43,11 +77,9 @@ interface InventoryGridProps {
   top: number;
   leftPct: number;
   topPct: number;
-  getTextureUrl: (alias: string) => string;
   dragState: DragState | null;
-  onDragStart: (inv: InventoryState, slot: InventoryItem, e: React.PointerEvent) => void;
+  onDragStartFromInventory: (inv: InventoryState, slot: InventoryItem, e: React.PointerEvent) => void;
   pointerPos: { x: number; y: number } | null;
-  visible?: boolean;
 }
 
 const InventoryGrid = ({
@@ -57,19 +89,15 @@ const InventoryGrid = ({
   top,
   leftPct,
   topPct,
-  getTextureUrl,
   dragState,
-  onDragStart,
+  onDragStartFromInventory,
   pointerPos,
-  visible = true,
 }: InventoryGridProps) => {
   const [, setTick] = useState(0);
 
   useEffect(() => {
     return inventory.onChange(() => setTick((t) => t + 1));
   }, [inventory]);
-
-  if (!visible) return null;
 
   const totalW = gridWidth(inventory.cols);
   const totalH = gridHeight(inventory.rows);
@@ -147,20 +175,56 @@ const InventoryGrid = ({
         {items.map((slot) => {
           if (!slot.item) return null;
           const isDragging =
-            dragState &&
-            dragState.sourceInventory === inventory &&
-            dragState.slot.id === slot.id;
+            dragState?.source.kind === "inventory" &&
+            dragState.source.inventory === inventory &&
+            dragState.source.slot.id === slot.id;
           if (isDragging) return null;
 
           return (
-            <ItemCell
+            <div
               key={slot.id}
-              slot={slot}
-              left={GRID_PADDING + slot.gridX * CELL_SIZE - BORDER_WIDTH}
-              top={GRID_PADDING + slot.gridY * CELL_SIZE - BORDER_WIDTH}
-              getTextureUrl={getTextureUrl}
-              onPointerDown={(e) => onDragStart(inventory, slot, e)}
-            />
+              onPointerDown={(e) => onDragStartFromInventory(inventory, slot, e)}
+              style={{
+                position: "absolute",
+                left: GRID_PADDING + slot.gridX * CELL_SIZE - BORDER_WIDTH,
+                top: GRID_PADDING + slot.gridY * CELL_SIZE - BORDER_WIDTH,
+                width: CELL_SIZE,
+                height: CELL_SIZE,
+                cursor: "grab",
+                touchAction: "none",
+              }}
+            >
+              <div style={{ position: "absolute", inset: 2, background: ITEM_BG_COLOR, border: `1px solid ${ITEM_BORDER_COLOR}`, borderRadius: 3 }} />
+              <div style={{ position: "absolute", left: 4, top: 4 }}>
+                <ItemSprite itemType={slot.item.type} size={CELL_SIZE - 8} />
+              </div>
+              {getItemConfig(slot.item.type).stackable && slot.item.amount > 1 && (
+                <span
+                  style={{
+                    position: "absolute", right: 6, bottom: 4,
+                    fontFamily: PIXEL_FONT, fontSize: 10, color: "#ffffff",
+                    WebkitTextStroke: "2px #000", paintOrder: "stroke fill",
+                    pointerEvents: "none",
+                  }}
+                >
+                  {slot.item.amount}
+                </span>
+              )}
+              {slot.item.price != null && (
+                <div
+                  style={{
+                    position: "absolute", left: 2, bottom: 2,
+                    width: CELL_SIZE - 4, height: 16,
+                    background: "rgba(0, 0, 0, 0.8)", borderRadius: 3,
+                    display: "flex", alignItems: "center", paddingLeft: 4,
+                  }}
+                >
+                  <span style={{ fontFamily: PIXEL_FONT, fontSize: 8, color: "#ffd700", pointerEvents: "none" }}>
+                    {slot.item.price}g
+                  </span>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>
@@ -168,109 +232,111 @@ const InventoryGrid = ({
   );
 };
 
-interface ItemCellProps {
-  slot: InventoryItem;
-  left: number;
-  top: number;
-  getTextureUrl: (alias: string) => string;
-  onPointerDown?: (e: React.PointerEvent) => void;
-  opacity?: number;
+interface RelicSlotCellProps {
+  slotIndex: number;
+  relicSlot: RelicSlot;
+  scale: number;
+  overlay: HTMLDivElement;
+  dragState: DragState | null;
+  onDragStartFromRelic: (slotIndex: number, item: Item, e: React.PointerEvent) => void;
+  pointerPos: { x: number; y: number } | null;
 }
 
-const ItemCell = ({
-  slot,
-  left,
-  top,
-  getTextureUrl,
-  onPointerDown,
-  opacity = 1,
-}: ItemCellProps) => {
-  if (!slot.item) return null;
+const RelicSlotCell = ({
+  slotIndex,
+  relicSlot,
+  scale,
+  overlay,
+  dragState,
+  onDragStartFromRelic,
+  pointerPos,
+}: RelicSlotCellProps) => {
+  const pos = getRelicPosition(relicSlot);
+  const offset = GRID_PADDING + BORDER_WIDTH + CELL_SIZE / 2;
+  const canvasX = pos.x - offset;
+  const canvasY = pos.y - offset;
+  const leftPct = (canvasX / CANVAS_WIDTH) * 100;
+  const topPct = (canvasY / CANVAS_HEIGHT) * 100;
+  const totalW = gridWidth(1);
+  const totalH = gridHeight(1);
 
-  const config = getItemConfig(slot.item.type);
-  const display = getItemDisplay(slot.item.type);
-  const textureUrl = getTextureUrl(display);
+  const isDragging =
+    dragState?.source.kind === "relic" &&
+    dragState.source.slotIndex === slotIndex;
+
+  const isDropTarget = dragState && !relicSlot.relic && !isDragging;
+  let isHovered = false;
+  if (isDropTarget && pointerPos) {
+    const slotLeft = (canvasX / CANVAS_WIDTH) * overlay.clientWidth;
+    const slotTop = (canvasY / CANVAS_HEIGHT) * overlay.clientHeight;
+    const localX = pointerPos.x - slotLeft;
+    const localY = pointerPos.y - slotTop;
+    isHovered = localX >= 0 && localX < totalW * scale && localY >= 0 && localY < totalH * scale;
+  }
 
   return (
     <div
-      onPointerDown={onPointerDown}
       style={{
         position: "absolute",
-        left,
-        top,
-        width: CELL_SIZE,
-        height: CELL_SIZE,
-        cursor: "grab",
-        opacity,
-        touchAction: "none",
+        left: `${leftPct}%`,
+        top: `${topPct}%`,
+        width: totalW * scale,
+        height: totalH * scale,
+        pointerEvents: "auto",
       }}
     >
       <div
         style={{
-          position: "absolute",
-          inset: 2,
-          background: ITEM_BG_COLOR,
-          border: `1px solid ${ITEM_BORDER_COLOR}`,
-          borderRadius: 3,
-        }}
-      />
-      <img
-        src={textureUrl}
-        draggable={false}
-        style={{
-          position: "absolute",
-          left: 4,
-          top: 4,
-          width: CELL_SIZE - 8,
-          height: CELL_SIZE - 8,
+          width: totalW,
+          height: totalH,
+          transformOrigin: "top left",
+          transform: `scale(${scale})`,
+          background: BG_COLOR,
+          border: `${BORDER_WIDTH}px solid ${BORDER_COLOR}`,
+          borderRadius: 4,
+          padding: GRID_PADDING,
+          boxSizing: "border-box",
+          position: "relative",
           imageRendering: "pixelated",
-          pointerEvents: "none",
         }}
-      />
-      {config.stackable && slot.item.amount > 1 && (
-        <span
-          style={{
-            position: "absolute",
-            right: 6,
-            bottom: 4,
-            fontFamily: PIXEL_FONT,
-            fontSize: 10,
-            color: "#ffffff",
-            WebkitTextStroke: "2px #000",
-            paintOrder: "stroke fill",
-            pointerEvents: "none",
-          }}
-        >
-          {slot.item.amount}
-        </span>
-      )}
-      {slot.item.price != null && (
+      >
         <div
           style={{
             position: "absolute",
-            left: 2,
-            bottom: 2,
-            width: CELL_SIZE - 4,
-            height: 16,
-            background: "rgba(0, 0, 0, 0.8)",
-            borderRadius: 3,
-            display: "flex",
-            alignItems: "center",
-            paddingLeft: 4,
+            left: GRID_PADDING - BORDER_WIDTH,
+            top: GRID_PADDING - BORDER_WIDTH,
+            width: CELL_SIZE,
+            height: CELL_SIZE,
+            background: isHovered ? VALID_COLOR : CELL_BG_COLOR,
+            border: `1px solid ${CELL_LINE_COLOR}`,
+            boxSizing: "border-box",
           }}
-        >
-          <span
+        />
+
+        {relicSlot.relic && !isDragging && (
+          <div
+            onPointerDown={(e) => {
+              if (relicSlot.relic) {
+                onDragStartFromRelic(slotIndex, relicSlot.relic.item, e);
+              }
+            }}
             style={{
-              fontFamily: PIXEL_FONT,
-              fontSize: 8,
-              color: "#ffd700",
-              pointerEvents: "none",
+              position: "absolute",
+              left: GRID_PADDING - BORDER_WIDTH,
+              top: GRID_PADDING - BORDER_WIDTH,
+              width: CELL_SIZE,
+              height: CELL_SIZE,
+              cursor: "grab",
+              touchAction: "none",
             }}
           >
-            {slot.item.price}g
-          </span>
-        </div>
-      )}
+            <div style={{ position: "absolute", inset: 2, background: ITEM_BG_COLOR, border: `1px solid ${ITEM_BORDER_COLOR}`, borderRadius: 3 }} />
+            <div style={{ position: "absolute", left: 4, top: 4 }}>
+              <ItemSprite itemType={relicSlot.relic.item.type} size={CELL_SIZE - 8} />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -313,10 +379,6 @@ export const InventoryOverlay = () => {
     const refresh = () => setTick((t) => t + 1);
 
     unsubs.push(state.playerInventory.onChange(refresh));
-    for (const ws of state.weaponSlots) {
-      unsubs.push(ws.onChange(refresh));
-    }
-
     unsubs.push(state.onMerchantChanged.subscribe(refresh));
 
     unsubs.push(state.onWaveActiveChanged.subscribe(() => {
@@ -328,21 +390,13 @@ export const InventoryOverlay = () => {
     };
   }, []);
 
-  const getTextureUrl = useCallback(
-    (alias: string): string => {
-      const state = getState();
-      return state?.itemTextureUrls[alias] ?? "";
-    },
-    []
-  );
-
   const getScale = useCallback((): number => {
     const overlay = overlayRef.current;
     if (!overlay) return 1;
     return overlay.clientWidth / CANVAS_WIDTH;
   }, []);
 
-  const onDragStart = useCallback(
+  const onDragStartFromInventory = useCallback(
     (inv: InventoryState, slot: InventoryItem, e: React.PointerEvent) => {
       if (!slot.item) return;
       inv.beginItemDrag(slot.id);
@@ -351,18 +405,37 @@ export const InventoryOverlay = () => {
       if (!overlay) return;
       const rect = overlay.getBoundingClientRect();
 
-      const state: DragState = {
-        sourceInventory: inv,
-        slot,
-        originalCol: slot.gridX,
-        originalRow: slot.gridY,
+      const ds: DragState = {
+        source: { kind: "inventory", inventory: inv, slot, originalCol: slot.gridX, originalRow: slot.gridY },
+        item: slot.item,
         ghostX: e.clientX - rect.left,
         ghostY: e.clientY - rect.top,
-        offsetX: 0,
-        offsetY: 0,
       };
-      dragRef.current = state;
-      setDragState(state);
+      dragRef.current = ds;
+      setDragState(ds);
+      setPointerPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    },
+    []
+  );
+
+  const onDragStartFromRelic = useCallback(
+    (slotIndex: number, item: Item, e: React.PointerEvent) => {
+      const state = getState();
+      if (!state) return;
+      state.relicSlots[slotIndex].relic = null;
+
+      const overlay = overlayRef.current;
+      if (!overlay) return;
+      const rect = overlay.getBoundingClientRect();
+
+      const ds: DragState = {
+        source: { kind: "relic", slotIndex, item },
+        item,
+        ghostX: e.clientX - rect.left,
+        ghostY: e.clientY - rect.top,
+      };
+      dragRef.current = ds;
+      setDragState(ds);
       setPointerPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
     },
     []
@@ -388,7 +461,7 @@ export const InventoryOverlay = () => {
       const state = getState();
       const overlay = overlayRef.current;
       if (!state || !overlay) {
-        ds.sourceInventory.cancelItemDrag(ds.slot.id);
+        cancelDrag(ds);
         dragRef.current = null;
         setDragState(null);
         setPointerPos(null);
@@ -399,47 +472,98 @@ export const InventoryOverlay = () => {
       const px = e.clientX - rect.left;
       const py = e.clientY - rect.top;
       const scale = getScale();
-      const positions = getPositions(state);
 
       let placed = false;
-      for (let i = positions.length - 1; i >= 0; i--) {
-        const pos = positions[i];
-        const inv = pos.inventory;
-        const invLeft = (pos.canvasX / CANVAS_WIDTH) * overlay.clientWidth;
-        const invTop = (pos.canvasY / CANVAS_HEIGHT) * overlay.clientHeight;
 
-        const localX = (px - invLeft) / scale;
-        const localY = (py - invTop) / scale;
-        const gridOffX = GRID_PADDING + BORDER_WIDTH;
-        const gridOffY = GRID_PADDING + BORDER_WIDTH;
-        const col = Math.floor((localX - gridOffX) / CELL_SIZE);
-        const row = Math.floor((localY - gridOffY) / CELL_SIZE);
+      for (let si = 0; si < RELIC_SLOT_COUNT; si++) {
+        const relicSlot = state.relicSlots[si];
+        if (relicSlot.relic) continue;
+        const relicPos = getRelicPosition(relicSlot);
+        const offset = GRID_PADDING + BORDER_WIDTH + CELL_SIZE / 2;
+        const canvasX = relicPos.x - offset;
+        const canvasY = relicPos.y - offset;
+        const slotLeft = (canvasX / CANVAS_WIDTH) * overlay.clientWidth;
+        const slotTop = (canvasY / CANVAS_HEIGHT) * overlay.clientHeight;
+        const totalW = gridWidth(1) * scale;
+        const totalH = gridHeight(1) * scale;
 
-        if (!inv.canPlace(col, row)) continue;
-
-        if (inv === ds.sourceInventory) {
-          inv.endItemDrag(ds.slot.id, col, row);
-        } else if (ds.slot.item) {
-          if (ds.slot.item.price != null && ds.slot.item.price > 0) {
-            if (!state.playerInventory.deductGold(ds.slot.item.price)) {
-              ds.sourceInventory.cancelItemDrag(ds.slot.id);
-              dragRef.current = null;
-              setDragState(null);
-              setPointerPos(null);
-              return;
+        if (px >= slotLeft && px < slotLeft + totalW && py >= slotTop && py < slotTop + totalH) {
+          const relicType = ds.item.type as RelicType;
+          if (relicType in RELIC_CONFIGS) {
+            if (ds.item.price != null && ds.item.price > 0) {
+              if (!state.playerInventory.deductGold(ds.item.price)) {
+                cancelDrag(ds);
+                dragRef.current = null;
+                setDragState(null);
+                setPointerPos(null);
+                return;
+              }
             }
-          }
-          ds.sourceInventory.removeItem(ds.slot.id);
-          const purchased: Item = { type: ds.slot.item.type, amount: ds.slot.item.amount };
-          inv.addItem(purchased, col, row);
-        }
 
-        placed = true;
-        break;
+            if (ds.source.kind === "inventory") {
+              ds.source.inventory.removeItem(ds.source.slot.id);
+            }
+
+            const newItem: Item = { type: ds.item.type, amount: ds.item.amount };
+            relicSlot.relic = {
+              type: relicType,
+              item: newItem,
+              charge: 0,
+              remainingShots: 0,
+              nextShotTime: 0,
+            };
+            placed = true;
+            break;
+          }
+        }
       }
 
       if (!placed) {
-        ds.sourceInventory.cancelItemDrag(ds.slot.id);
+        const positions = getInventoryPositions(state);
+
+        for (let i = positions.length - 1; i >= 0; i--) {
+          const pos = positions[i];
+          const inv = pos.inventory;
+          const invLeft = (pos.canvasX / CANVAS_WIDTH) * overlay.clientWidth;
+          const invTop = (pos.canvasY / CANVAS_HEIGHT) * overlay.clientHeight;
+
+          const localX = (px - invLeft) / scale;
+          const localY = (py - invTop) / scale;
+          const gridOffX = GRID_PADDING + BORDER_WIDTH;
+          const gridOffY = GRID_PADDING + BORDER_WIDTH;
+          const col = Math.floor((localX - gridOffX) / CELL_SIZE);
+          const row = Math.floor((localY - gridOffY) / CELL_SIZE);
+
+          if (!inv.canPlace(col, row)) continue;
+
+          if (ds.source.kind === "inventory" && inv === ds.source.inventory) {
+            inv.endItemDrag(ds.source.slot.id, col, row);
+          } else {
+            if (ds.item.price != null && ds.item.price > 0) {
+              if (!state.playerInventory.deductGold(ds.item.price)) {
+                cancelDrag(ds);
+                dragRef.current = null;
+                setDragState(null);
+                setPointerPos(null);
+                return;
+              }
+            }
+
+            if (ds.source.kind === "inventory") {
+              ds.source.inventory.removeItem(ds.source.slot.id);
+            }
+
+            const purchased: Item = { type: ds.item.type, amount: ds.item.amount };
+            inv.addItem(purchased, col, row);
+          }
+
+          placed = true;
+          break;
+        }
+      }
+
+      if (!placed) {
+        cancelDrag(ds);
       }
 
       dragRef.current = null;
@@ -461,7 +585,7 @@ export const InventoryOverlay = () => {
   if (!state) return null;
   const overlay = overlayRef.current;
   const scale = overlay ? overlay.clientWidth / CANVAS_WIDTH : 1;
-  const positions = getPositions(state);
+  const positions = getInventoryPositions(state);
 
   return (
     <div
@@ -523,16 +647,28 @@ export const InventoryOverlay = () => {
               top={invTop}
               leftPct={leftPct}
               topPct={topPct}
-              getTextureUrl={getTextureUrl}
               dragState={dragState}
-              onDragStart={onDragStart}
+              onDragStartFromInventory={onDragStartFromInventory}
               pointerPos={pointerPos}
             />
           </div>
         );
       })}
 
-      {dragState && dragState.slot.item && (
+      {overlay && state.relicSlots.map((relicSlot, idx) => (
+        <RelicSlotCell
+          key={`relic-${idx}`}
+          slotIndex={idx}
+          relicSlot={relicSlot}
+          scale={scale}
+          overlay={overlay}
+          dragState={dragState}
+          onDragStartFromRelic={onDragStartFromRelic}
+          pointerPos={pointerPos}
+        />
+      ))}
+
+      {dragState && (
         <div
           style={{
             position: "absolute",
@@ -564,18 +700,9 @@ export const InventoryOverlay = () => {
                 borderRadius: 3,
               }}
             />
-            <img
-              src={getTextureUrl(getItemDisplay(dragState.slot.item.type))}
-              draggable={false}
-              style={{
-                position: "absolute",
-                left: 4,
-                top: 4,
-                width: CELL_SIZE - 8,
-                height: CELL_SIZE - 8,
-                imageRendering: "pixelated",
-              }}
-            />
+            <div style={{ position: "absolute", left: 4, top: 4 }}>
+              <ItemSprite itemType={dragState.item.type} size={CELL_SIZE - 8} />
+            </div>
           </div>
         </div>
       )}
@@ -583,7 +710,25 @@ export const InventoryOverlay = () => {
   );
 };
 
-function getPositions(state: GameState): InventoryPosition[] {
+function cancelDrag(ds: DragState): void {
+  if (ds.source.kind === "inventory") {
+    ds.source.inventory.cancelItemDrag(ds.source.slot.id);
+  } else {
+    const state = getState();
+    if (state) {
+      const relicType = ds.source.item.type as RelicType;
+      state.relicSlots[ds.source.slotIndex].relic = {
+        type: relicType,
+        item: ds.source.item,
+        charge: 0,
+        remainingShots: 0,
+        nextShotTime: 0,
+      };
+    }
+  }
+}
+
+function getInventoryPositions(state: GameState): InventoryPosition[] {
   const positions: InventoryPosition[] = [];
 
   const playerInv = state.playerInventory;
@@ -592,19 +737,6 @@ function getPositions(state: GameState): InventoryPosition[] {
   const playerX = (CANVAS_WIDTH - playerW) / 2;
   const playerY = CANVAS_HEIGHT - playerH - 20;
   positions.push({ inventory: playerInv, canvasX: playerX, canvasY: playerY });
-
-  for (const ws of state.weaponSlots) {
-    if (!ws.slot.startsWith("weapon-")) continue;
-    const idx = parseInt(ws.slot.replace("weapon-", ""), 10);
-    if (Number.isNaN(idx)) continue;
-    const relicPos = getRelicPosition(state.relicSlots[idx]);
-    const offset = GRID_PADDING + BORDER_WIDTH + CELL_SIZE / 2;
-    positions.push({
-      inventory: ws,
-      canvasX: relicPos.x - offset,
-      canvasY: relicPos.y - offset,
-    });
-  }
 
   const merchantInv = state.activeMerchantInventory;
   if (merchantInv) {
