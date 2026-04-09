@@ -454,13 +454,28 @@ function spawnDrops(state: GameState, entity: EntityState): void {
   }
 }
 
+function dropAngleTowardPlanet(x: number, y: number): number {
+  const dx = PLANET_X - x;
+  const dy = PLANET_Y - y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const baseAngle = Math.atan2(dy, dx);
+
+  const minMiss = PLANET_HIT_RADIUS;
+  const maxMiss = PLANET_HIT_RADIUS + 100;
+  const missDistance = minMiss + Math.random() * (maxMiss - minMiss);
+  const offsetAngle = Math.asin(Math.min(missDistance / dist, 1));
+  const side = Math.random() < 0.5 ? 1 : -1;
+
+  return baseAngle + side * offsetAngle;
+}
+
 function spawnDrop(
   state: GameState,
   x: number,
   y: number,
   item: Item
 ): void {
-  const angle = Math.random() * Math.PI * 2;
+  const angle = dropAngleTowardPlanet(x, y);
   const speed = DROP_SPEED * (0.5 + Math.random() * 0.5);
   const usedWords = new Set(
     state.drops.map((d) => d.word)
