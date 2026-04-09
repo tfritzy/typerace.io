@@ -282,10 +282,10 @@ export function createEntityState(
   };
 }
 
-let _gameState: GameState | null = null;
+let gameState: GameState | null = null;
 
-export function getState(): GameState {
-  return _gameState!;
+export function getState(): GameState | null {
+  return gameState;
 }
 
 export function createGameState(): GameState {
@@ -338,7 +338,7 @@ export function createGameState(): GameState {
     items: generateShopItems(6),
   });
 
-  _gameState = state;
+  gameState = state;
   return state;
 }
 

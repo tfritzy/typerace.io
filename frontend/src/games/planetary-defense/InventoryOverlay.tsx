@@ -285,7 +285,10 @@ interface InventoryPosition {
 export const InventoryOverlay = () => {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [, setTick] = useState(0);
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(() => {
+    const state = getState();
+    return state ? !state.waveActive : true;
+  });
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [pointerPos, setPointerPos] = useState<{ x: number; y: number } | null>(null);
   const dragRef = useRef<DragState | null>(null);
@@ -304,6 +307,7 @@ export const InventoryOverlay = () => {
 
   useEffect(() => {
     const state = getState();
+    if (!state) return;
     const unsubs: Array<() => void> = [];
 
     const refresh = () => setTick((t) => t + 1);
@@ -313,9 +317,7 @@ export const InventoryOverlay = () => {
       unsubs.push(ws.onChange(refresh));
     }
 
-    unsubs.push(state.onMerchantChanged.subscribe(() => {
-      setTick((t) => t + 1);
-    }));
+    unsubs.push(state.onMerchantChanged.subscribe(refresh));
 
     unsubs.push(state.onWaveActiveChanged.subscribe(() => {
       setVisible(!state.waveActive);
@@ -329,7 +331,7 @@ export const InventoryOverlay = () => {
   const getTextureUrl = useCallback(
     (alias: string): string => {
       const state = getState();
-      return state.itemTextureUrls[alias] ?? "";
+      return state?.itemTextureUrls[alias] ?? "";
     },
     []
   );
@@ -385,7 +387,7 @@ export const InventoryOverlay = () => {
       if (!ds) return;
       const state = getState();
       const overlay = overlayRef.current;
-      if (!overlay) {
+      if (!state || !overlay) {
         ds.sourceInventory.cancelItemDrag(ds.slot.id);
         dragRef.current = null;
         setDragState(null);
@@ -456,6 +458,7 @@ export const InventoryOverlay = () => {
   if (!visible) return null;
 
   const state = getState();
+  if (!state) return null;
   const overlay = overlayRef.current;
   const scale = overlay ? overlay.clientWidth / CANVAS_WIDTH : 1;
   const positions = getPositions(state);
