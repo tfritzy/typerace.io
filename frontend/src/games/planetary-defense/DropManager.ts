@@ -47,7 +47,7 @@ export class DropManager {
         word: drop.word,
         typedCount: drop.typedCount,
         x: drop.x,
-        y: drop.y - 16,
+        y: drop.y - DROP_SIZE,
         color: DROP_LABEL_COLOR,
       });
     }
