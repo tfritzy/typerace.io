@@ -146,25 +146,19 @@ export const InventoryOverlay = () => {
   const isHolding = dragState !== null;
   const heldItem = dragState?.item ?? null;
 
+  const merchantShip = state.activeMerchantId != null
+    ? state.merchants.find((m) => m.id === state.activeMerchantId)
+    : null;
+  const merchantLeftPct = merchantShip ? (merchantShip.x / CANVAS_WIDTH) * 100 : 0;
+  const merchantTopPct = merchantShip ? (merchantShip.y / CANVAS_HEIGHT) * 100 : 0;
+
   return (
     <div
       ref={overlayRef}
-      className="absolute inset-0 pointer-events-none overflow-hidden"
+      className="absolute inset-0 pointer-events-none overflow-hidden select-none"
       style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
     >
-      <div className="absolute bottom-[2%] left-1/2 -translate-x-1/2 pointer-events-auto flex flex-col items-center gap-2 w-[35%] max-w-[400px]">
-        {state.activeMerchantInventory && (
-          <InventoryGrid
-            inventory={state.activeMerchantInventory}
-            label="Merchant"
-            isHolding={isHolding}
-            canAcceptHeld={heldItem ? state.activeMerchantInventory.acceptsItem(heldItem.type) : false}
-            draggingCol={dragState?.sourceInv === state.activeMerchantInventory ? dragState.origCol : undefined}
-            draggingRow={dragState?.sourceInv === state.activeMerchantInventory ? dragState.origRow : undefined}
-            onDragStart={onDragStart}
-            onDrop={onCellDrop}
-          />
-        )}
+      <div className="absolute bottom-[2%] left-1/2 -translate-x-1/2 pointer-events-auto" style={{ width: `${state.playerInventory.cols * 3.5}%`, maxWidth: '400px' }}>
         <InventoryGrid
           inventory={state.playerInventory}
           isHolding={isHolding}
@@ -176,6 +170,29 @@ export const InventoryOverlay = () => {
         />
       </div>
 
+      {state.activeMerchantInventory && (
+        <div
+          className="absolute pointer-events-auto -translate-x-1/2"
+          style={{
+            left: `${merchantLeftPct}%`,
+            top: `${merchantTopPct - 15}%`,
+            width: `${state.activeMerchantInventory.cols * 3.5}%`,
+            maxWidth: `${state.activeMerchantInventory.cols * 40}px`,
+          }}
+        >
+          <InventoryGrid
+            inventory={state.activeMerchantInventory}
+            label="Merchant"
+            isHolding={isHolding}
+            canAcceptHeld={heldItem ? state.activeMerchantInventory.acceptsItem(heldItem.type) : false}
+            draggingCol={dragState?.sourceInv === state.activeMerchantInventory ? dragState.origCol : undefined}
+            draggingRow={dragState?.sourceInv === state.activeMerchantInventory ? dragState.origRow : undefined}
+            onDragStart={onDragStart}
+            onDrop={onCellDrop}
+          />
+        </div>
+      )}
+
       {state.relicSlots.map((slot, idx) => {
         const pos = getRelicPosition(slot);
         const leftPct = (pos.x / CANVAS_WIDTH) * 100;
@@ -183,10 +200,12 @@ export const InventoryOverlay = () => {
         return (
           <div
             key={`relic-${idx}`}
-            className="absolute pointer-events-auto -translate-x-1/2 -translate-y-1/2 w-[4%]"
+            className="absolute pointer-events-auto -translate-x-1/2 -translate-y-1/2"
             style={{
               left: `${leftPct}%`,
               top: `${topPct}%`,
+              width: '3.5%',
+              maxWidth: '40px',
             }}
           >
             <InventoryGrid

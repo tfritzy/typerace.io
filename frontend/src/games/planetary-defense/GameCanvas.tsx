@@ -140,8 +140,10 @@ export const GameCanvas = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full relative"
-      style={{ fontFamily: PIXEL_FONT }}
+      className="w-full h-full relative select-none"
+      style={{ fontFamily: PIXEL_FONT, WebkitUserDrag: 'none' } as React.CSSProperties}
+      onDragStart={(e) => e.preventDefault()}
+      onContextMenu={(e) => e.preventDefault()}
     >
       <LabelOverlay gameRef={gameRef} />
       <PhraseOverlay gameRef={gameRef} visible={waveActive} />

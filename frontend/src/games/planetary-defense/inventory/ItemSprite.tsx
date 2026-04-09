@@ -12,7 +12,7 @@ export const ItemSprite = memo(({ itemType, className = "" }: ItemSpriteProps) =
   if (textureInfo.backgroundPosition) {
     return (
       <div
-        className={`w-full h-full pointer-events-none [image-rendering:pixelated] ${className}`}
+        className={`w-full h-full pointer-events-none select-none [image-rendering:pixelated] ${className}`}
         style={{
           backgroundImage: `url(${textureInfo.src})`,
           backgroundPosition: textureInfo.backgroundPosition,
@@ -26,7 +26,7 @@ export const ItemSprite = memo(({ itemType, className = "" }: ItemSpriteProps) =
     <img
       src={textureInfo.src}
       draggable={false}
-      className={`w-full h-full pointer-events-none [image-rendering:pixelated] ${className}`}
+      className={`w-full h-full pointer-events-none select-none [image-rendering:pixelated] ${className}`}
       alt=""
     />
   );

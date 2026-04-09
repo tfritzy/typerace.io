@@ -320,7 +320,7 @@ export function onStateCreated(cb: () => void): () => void {
 }
 
 export function createGameState(): GameState {
-  const playerInventory = new InventoryState(10, 5);
+  const playerInventory = new InventoryState(10, 3);
 
   const state: GameState = {
     entities: [],

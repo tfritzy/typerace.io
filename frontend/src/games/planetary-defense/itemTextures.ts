@@ -1,80 +1,93 @@
 import { type ItemType, ITEM_DISPLAY } from "./itemConfig";
 import { MANIFEST } from "./manifest";
 
-interface SpriteRef {
+interface SheetDef {
   src: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+  cols: number;
+  rows: number;
 }
 
-const SWORDTEMBER_SHEET = "/Swordtember 2024 - Sheet/Swordtember_2024.png";
-const AXETOBER_SHEET = "/Axetober Sheet/Axetober 2024.png";
+const SWORDTEMBER: SheetDef = {
+  src: "/Swordtember 2024 - Sheet/Swordtember_2024.png",
+  cols: 5,
+  rows: 6,
+};
+
+const AXETOBER: SheetDef = {
+  src: "/Axetober Sheet/Axetober 2024.png",
+  cols: 6,
+  rows: 6,
+};
+
+interface SpriteRef {
+  sheet: SheetDef;
+  col: number;
+  row: number;
+}
 
 const SPRITE_FRAMES: Record<string, SpriteRef> = {
-  "Embercrest Blade": { src: SWORDTEMBER_SHEET, x: 0, y: 0, w: 32, h: 32 },
-  "Briarthorn Saber": { src: SWORDTEMBER_SHEET, x: 32, y: 0, w: 32, h: 32 },
-  "Ravenplume Edge": { src: SWORDTEMBER_SHEET, x: 64, y: 0, w: 32, h: 32 },
-  "Rubyguard Greatsword": { src: SWORDTEMBER_SHEET, x: 96, y: 0, w: 32, h: 32 },
-  "Sunfire Scimitar": { src: SWORDTEMBER_SHEET, x: 128, y: 0, w: 32, h: 32 },
-  "Cloudveil Longsword": { src: SWORDTEMBER_SHEET, x: 0, y: 32, w: 32, h: 32 },
-  "Voidthorn Blade": { src: SWORDTEMBER_SHEET, x: 32, y: 32, w: 32, h: 32 },
-  "Gilded Plumeblade": { src: SWORDTEMBER_SHEET, x: 64, y: 32, w: 32, h: 32 },
-  "Glacial Crusader": { src: SWORDTEMBER_SHEET, x: 96, y: 32, w: 32, h: 32 },
-  "Bloodthorn Dirk": { src: SWORDTEMBER_SHEET, x: 128, y: 32, w: 32, h: 32 },
-  "Twinflare Crossblades": { src: SWORDTEMBER_SHEET, x: 0, y: 64, w: 32, h: 32 },
-  "Molten Zweihander": { src: SWORDTEMBER_SHEET, x: 32, y: 64, w: 32, h: 32 },
-  "Frostfang Claymore": { src: SWORDTEMBER_SHEET, x: 64, y: 64, w: 32, h: 32 },
-  "Sporespark Glaive": { src: SWORDTEMBER_SHEET, x: 96, y: 64, w: 32, h: 32 },
-  "Azure Crescent": { src: SWORDTEMBER_SHEET, x: 128, y: 64, w: 32, h: 32 },
-  "Rosevine Rapier": { src: SWORDTEMBER_SHEET, x: 0, y: 96, w: 32, h: 32 },
-  "Crystalbreak Saber": { src: SWORDTEMBER_SHEET, x: 32, y: 96, w: 32, h: 32 },
-  "Cinderstone Blade": { src: SWORDTEMBER_SHEET, x: 64, y: 96, w: 32, h: 32 },
-  "Emerald Fang": { src: SWORDTEMBER_SHEET, x: 96, y: 96, w: 32, h: 32 },
-  "Starfall Stiletto": { src: SWORDTEMBER_SHEET, x: 128, y: 96, w: 32, h: 32 },
-  "Crimson Cleaver": { src: SWORDTEMBER_SHEET, x: 0, y: 128, w: 32, h: 32 },
-  "Tigerstripe Falchion": { src: SWORDTEMBER_SHEET, x: 32, y: 128, w: 32, h: 32 },
-  "Dawnfire Cutlass": { src: SWORDTEMBER_SHEET, x: 64, y: 128, w: 32, h: 32 },
-  "Jadecross Broadsword": { src: SWORDTEMBER_SHEET, x: 96, y: 128, w: 32, h: 32 },
-  "Chainlink Estoc": { src: SWORDTEMBER_SHEET, x: 128, y: 128, w: 32, h: 32 },
-  "Permafrost Greatsword": { src: SWORDTEMBER_SHEET, x: 0, y: 160, w: 32, h: 32 },
-  "Mistral Sabre": { src: SWORDTEMBER_SHEET, x: 32, y: 160, w: 32, h: 32 },
-  "Tidecaller Blade": { src: SWORDTEMBER_SHEET, x: 64, y: 160, w: 32, h: 32 },
-  "Solaris Edge": { src: SWORDTEMBER_SHEET, x: 96, y: 160, w: 32, h: 32 },
-  "Infernal Ravager": { src: SWORDTEMBER_SHEET, x: 128, y: 160, w: 32, h: 32 },
+  "Embercrest Blade": { sheet: SWORDTEMBER, col: 0, row: 0 },
+  "Briarthorn Saber": { sheet: SWORDTEMBER, col: 1, row: 0 },
+  "Ravenplume Edge": { sheet: SWORDTEMBER, col: 2, row: 0 },
+  "Rubyguard Greatsword": { sheet: SWORDTEMBER, col: 3, row: 0 },
+  "Sunfire Scimitar": { sheet: SWORDTEMBER, col: 4, row: 0 },
+  "Cloudveil Longsword": { sheet: SWORDTEMBER, col: 0, row: 1 },
+  "Voidthorn Blade": { sheet: SWORDTEMBER, col: 1, row: 1 },
+  "Gilded Plumeblade": { sheet: SWORDTEMBER, col: 2, row: 1 },
+  "Glacial Crusader": { sheet: SWORDTEMBER, col: 3, row: 1 },
+  "Bloodthorn Dirk": { sheet: SWORDTEMBER, col: 4, row: 1 },
+  "Twinflare Crossblades": { sheet: SWORDTEMBER, col: 0, row: 2 },
+  "Molten Zweihander": { sheet: SWORDTEMBER, col: 1, row: 2 },
+  "Frostfang Claymore": { sheet: SWORDTEMBER, col: 2, row: 2 },
+  "Sporespark Glaive": { sheet: SWORDTEMBER, col: 3, row: 2 },
+  "Azure Crescent": { sheet: SWORDTEMBER, col: 4, row: 2 },
+  "Rosevine Rapier": { sheet: SWORDTEMBER, col: 0, row: 3 },
+  "Crystalbreak Saber": { sheet: SWORDTEMBER, col: 1, row: 3 },
+  "Cinderstone Blade": { sheet: SWORDTEMBER, col: 2, row: 3 },
+  "Emerald Fang": { sheet: SWORDTEMBER, col: 3, row: 3 },
+  "Starfall Stiletto": { sheet: SWORDTEMBER, col: 4, row: 3 },
+  "Crimson Cleaver": { sheet: SWORDTEMBER, col: 0, row: 4 },
+  "Tigerstripe Falchion": { sheet: SWORDTEMBER, col: 1, row: 4 },
+  "Dawnfire Cutlass": { sheet: SWORDTEMBER, col: 2, row: 4 },
+  "Jadecross Broadsword": { sheet: SWORDTEMBER, col: 3, row: 4 },
+  "Chainlink Estoc": { sheet: SWORDTEMBER, col: 4, row: 4 },
+  "Permafrost Greatsword": { sheet: SWORDTEMBER, col: 0, row: 5 },
+  "Mistral Sabre": { sheet: SWORDTEMBER, col: 1, row: 5 },
+  "Tidecaller Blade": { sheet: SWORDTEMBER, col: 2, row: 5 },
+  "Solaris Edge": { sheet: SWORDTEMBER, col: 3, row: 5 },
+  "Infernal Ravager": { sheet: SWORDTEMBER, col: 4, row: 5 },
 
-  "Steel Battleaxe": { src: AXETOBER_SHEET, x: 0, y: 0, w: 32, h: 32 },
-  "Moonlit Hatchet": { src: AXETOBER_SHEET, x: 32, y: 0, w: 32, h: 32 },
-  "Obsidian Reaver": { src: AXETOBER_SHEET, x: 64, y: 0, w: 32, h: 32 },
-  "Rubyflare Greataxe": { src: AXETOBER_SHEET, x: 96, y: 0, w: 32, h: 32 },
-  "Gilded Waraxe": { src: AXETOBER_SHEET, x: 128, y: 0, w: 32, h: 32 },
-  "Copperhead Cleaver": { src: AXETOBER_SHEET, x: 160, y: 0, w: 32, h: 32 },
-  "Bonecrest Axe": { src: AXETOBER_SHEET, x: 0, y: 32, w: 32, h: 32 },
-  "Darkwood Hatchet": { src: AXETOBER_SHEET, x: 32, y: 32, w: 32, h: 32 },
-  "Duskforge Halberd": { src: AXETOBER_SHEET, x: 64, y: 32, w: 32, h: 32 },
-  "Rosegold Broadaxe": { src: AXETOBER_SHEET, x: 96, y: 32, w: 32, h: 32 },
-  "Frostbite Cleaver": { src: AXETOBER_SHEET, x: 128, y: 32, w: 32, h: 32 },
-  "Bloodmoon Reaver": { src: AXETOBER_SHEET, x: 160, y: 32, w: 32, h: 32 },
-  "Tidebreak Axe": { src: AXETOBER_SHEET, x: 0, y: 64, w: 32, h: 32 },
-  "Ironwood Tomahawk": { src: AXETOBER_SHEET, x: 32, y: 64, w: 32, h: 32 },
-  "Greystone Broadaxe": { src: AXETOBER_SHEET, x: 64, y: 64, w: 32, h: 32 },
-  "Sandstone Hatchet": { src: AXETOBER_SHEET, x: 96, y: 64, w: 32, h: 32 },
-  "Crimson Waraxe": { src: AXETOBER_SHEET, x: 128, y: 64, w: 32, h: 32 },
-  "Goldscar Halberd": { src: AXETOBER_SHEET, x: 160, y: 64, w: 32, h: 32 },
-  "Flamecrest Greataxe": { src: AXETOBER_SHEET, x: 0, y: 96, w: 32, h: 32 },
-  "Wrought Iron Chopper": { src: AXETOBER_SHEET, x: 32, y: 96, w: 32, h: 32 },
-  "Spectral Cleaver": { src: AXETOBER_SHEET, x: 64, y: 96, w: 32, h: 32 },
-  "Bloodrune Axe": { src: AXETOBER_SHEET, x: 96, y: 96, w: 32, h: 32 },
-  "Pearlsteel Hatchet": { src: AXETOBER_SHEET, x: 128, y: 96, w: 32, h: 32 },
-  "Emberstrike Tomahawk": { src: AXETOBER_SHEET, x: 160, y: 96, w: 32, h: 32 },
-  "Nightbloom Reaver": { src: AXETOBER_SHEET, x: 0, y: 128, w: 32, h: 32 },
-  "Blackiron Splitter": { src: AXETOBER_SHEET, x: 32, y: 128, w: 32, h: 32 },
-  "Verdant Waraxe": { src: AXETOBER_SHEET, x: 64, y: 128, w: 32, h: 32 },
-  "Ashen Broadaxe": { src: AXETOBER_SHEET, x: 96, y: 128, w: 32, h: 32 },
-  "Prismatic Greataxe": { src: AXETOBER_SHEET, x: 128, y: 128, w: 32, h: 32 },
-  "Hellforged Cleaver": { src: AXETOBER_SHEET, x: 160, y: 128, w: 32, h: 32 },
-  "Granite Waraxe": { src: AXETOBER_SHEET, x: 0, y: 160, w: 32, h: 32 },
+  "Steel Battleaxe": { sheet: AXETOBER, col: 0, row: 0 },
+  "Moonlit Hatchet": { sheet: AXETOBER, col: 1, row: 0 },
+  "Obsidian Reaver": { sheet: AXETOBER, col: 2, row: 0 },
+  "Rubyflare Greataxe": { sheet: AXETOBER, col: 3, row: 0 },
+  "Gilded Waraxe": { sheet: AXETOBER, col: 4, row: 0 },
+  "Copperhead Cleaver": { sheet: AXETOBER, col: 5, row: 0 },
+  "Bonecrest Axe": { sheet: AXETOBER, col: 0, row: 1 },
+  "Darkwood Hatchet": { sheet: AXETOBER, col: 1, row: 1 },
+  "Duskforge Halberd": { sheet: AXETOBER, col: 2, row: 1 },
+  "Rosegold Broadaxe": { sheet: AXETOBER, col: 3, row: 1 },
+  "Frostbite Cleaver": { sheet: AXETOBER, col: 4, row: 1 },
+  "Bloodmoon Reaver": { sheet: AXETOBER, col: 5, row: 1 },
+  "Tidebreak Axe": { sheet: AXETOBER, col: 0, row: 2 },
+  "Ironwood Tomahawk": { sheet: AXETOBER, col: 1, row: 2 },
+  "Greystone Broadaxe": { sheet: AXETOBER, col: 2, row: 2 },
+  "Sandstone Hatchet": { sheet: AXETOBER, col: 3, row: 2 },
+  "Crimson Waraxe": { sheet: AXETOBER, col: 4, row: 2 },
+  "Goldscar Halberd": { sheet: AXETOBER, col: 5, row: 2 },
+  "Flamecrest Greataxe": { sheet: AXETOBER, col: 0, row: 3 },
+  "Wrought Iron Chopper": { sheet: AXETOBER, col: 1, row: 3 },
+  "Spectral Cleaver": { sheet: AXETOBER, col: 2, row: 3 },
+  "Bloodrune Axe": { sheet: AXETOBER, col: 3, row: 3 },
+  "Pearlsteel Hatchet": { sheet: AXETOBER, col: 4, row: 3 },
+  "Emberstrike Tomahawk": { sheet: AXETOBER, col: 5, row: 3 },
+  "Nightbloom Reaver": { sheet: AXETOBER, col: 0, row: 4 },
+  "Blackiron Splitter": { sheet: AXETOBER, col: 1, row: 4 },
+  "Verdant Waraxe": { sheet: AXETOBER, col: 2, row: 4 },
+  "Ashen Broadaxe": { sheet: AXETOBER, col: 3, row: 4 },
+  "Prismatic Greataxe": { sheet: AXETOBER, col: 4, row: 4 },
+  "Hellforged Cleaver": { sheet: AXETOBER, col: 5, row: 4 },
+  "Granite Waraxe": { sheet: AXETOBER, col: 0, row: 5 },
 };
 
 const MANIFEST_SRC: Record<string, string> = {};
@@ -100,10 +113,13 @@ export function getItemTextureInfo(itemType: ItemType): ItemTextureInfo {
 
   const sprite = SPRITE_FRAMES[display];
   if (sprite) {
+    const { sheet, col, row } = sprite;
+    const posX = sheet.cols > 1 ? (col / (sheet.cols - 1)) * 100 : 0;
+    const posY = sheet.rows > 1 ? (row / (sheet.rows - 1)) * 100 : 0;
     return {
-      src: sprite.src,
-      backgroundPosition: `-${sprite.x}px -${sprite.y}px`,
-      backgroundSize: "auto",
+      src: sheet.src,
+      backgroundPosition: `${posX}% ${posY}%`,
+      backgroundSize: `${sheet.cols * 100}% ${sheet.rows * 100}%`,
     };
   }
 

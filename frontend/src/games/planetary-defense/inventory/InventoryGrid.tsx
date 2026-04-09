@@ -45,15 +45,15 @@ export const InventoryGrid = memo(({
   );
 
   return (
-    <div className="flex flex-col items-center gap-1 w-full">
+    <div className="flex flex-col items-center w-full select-none">
       {label && (
-        <div className="text-slate-300 text-[length:clamp(8px,1.2vw,12px)] font-medium tracking-wider uppercase">
+        <div className="text-slate-400 text-[length:clamp(7px,0.9vw,10px)] font-medium tracking-wider uppercase mb-0.5">
           {label}
         </div>
       )}
-      <div className="relative rounded-lg border border-slate-600/30 bg-slate-900/90 backdrop-blur-md shadow-2xl p-1.5 w-full">
+      <div className="relative border border-slate-500/40 bg-slate-900/90 w-full">
         <div
-          className="grid w-full gap-0.5"
+          className="grid w-full"
           style={{ gridTemplateColumns: `repeat(${inventory.cols}, 1fr)` }}
         >
           {Array.from({ length: inventory.rows }, (_, r) =>
@@ -64,15 +64,15 @@ export const InventoryGrid = memo(({
               const hasItem = cellItem !== null && !isDragging;
               const hoverClass = isHolding
                 ? isEmpty && canAcceptHeld
-                  ? "hover:bg-emerald-500/20 hover:border-emerald-400/30"
-                  : "hover:bg-red-500/15 hover:border-red-400/30"
+                  ? "hover:bg-emerald-500/20"
+                  : "hover:bg-red-500/15"
                 : hasItem
-                  ? "hover:bg-slate-700/60"
+                  ? "hover:bg-slate-700/50"
                   : "";
               return (
                 <div
                   key={`${r}-${c}`}
-                  className={`aspect-square relative rounded border border-slate-700/30 bg-slate-800/50 transition-colors duration-75 ${hasItem ? "cursor-grab" : ""} ${hoverClass}`}
+                  className={`aspect-square relative border border-slate-700/30 bg-slate-800/40 transition-colors duration-75 ${hasItem ? "cursor-grab" : ""} ${hoverClass}`}
                   onPointerDown={hasItem ? (e) => {
                     const cellSize = e.currentTarget.getBoundingClientRect().width;
                     handleDragStart(c, r, cellItem!, e, cellSize);

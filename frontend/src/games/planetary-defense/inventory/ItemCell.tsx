@@ -10,8 +10,8 @@ export const ItemCell = memo(({ item }: ItemCellProps) => {
   const config = getItemConfig(item.type);
 
   return (
-    <div className="absolute inset-0 pointer-events-none touch-none">
-      <div className="absolute inset-[10%]">
+    <div className="absolute inset-0 pointer-events-none touch-none select-none">
+      <div className="absolute inset-[8%]">
         <ItemSprite itemType={item.type} />
       </div>
       {config.stackable && item.amount > 1 && (
@@ -22,7 +22,7 @@ export const ItemCell = memo(({ item }: ItemCellProps) => {
         </span>
       )}
       {item.price != null && (
-        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-black/60 rounded-b-sm py-px">
+        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-black/60 py-px">
           <span className="text-amber-300 pointer-events-none text-[length:clamp(5px,0.8vw,9px)] font-semibold">
             {item.price}g
           </span>
