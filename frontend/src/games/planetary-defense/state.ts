@@ -16,7 +16,7 @@ import {
 import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
 import {
-  type Item, type ItemType, GemType,
+  type Item, type ItemType, GemType, createItem,
   TOPAZ_TIERS, RUBY_TIERS, EMERALD_TIERS, SAPPHIRE_TIERS, AMETHYST_TIERS, DIAMOND_TIERS,
 } from "./itemConfig";
 import { InventoryState } from "./inventoryState";
@@ -205,15 +205,15 @@ function createRelicSlots(): RelicSlot[] {
     let relic: RelicState | null = null;
     const relicType = startingRelics[i] ?? null;
     if (relicType !== null) {
-      inventory.addItem({ type: relicType, amount: 1 }, 0, 0);
+      inventory.addItem(createItem(relicType, 1), 0, 0);
       relic = { type: relicType, charge: 0, remainingShots: 0, nextShotTime: 0 };
     }
 
     const slotIndex = i;
-    inventory.onItemAdded((invItem) => {
-      if (invItem.item && isRelicType(invItem.item.type)) {
+    inventory.onItemAdded((item) => {
+      if (isRelicType(item.type)) {
         slots[slotIndex].relic = {
-          type: invItem.item.type as RelicType,
+          type: item.type as RelicType,
           charge: 0,
           remainingShots: 0,
           nextShotTime: 0,
@@ -268,11 +268,9 @@ function generateShopItems(count: number): Item[] {
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
   const selected = pool.slice(0, count);
-  return selected.map((relicType) => ({
-    type: relicType,
-    amount: 1,
-    price: 10 + Math.floor(Math.random() * 40) * 5,
-  }));
+  return selected.map((relicType) =>
+    createItem(relicType, 1, 10 + Math.floor(Math.random() * 40) * 5)
+  );
 }
 
 export function createEntityState(
@@ -357,8 +355,8 @@ export function createGameState(): GameState {
     onMerchantChanged: new GameEvent(),
   };
 
-  playerInventory.addItem({ type: RelicType.EmbercrestBlade, amount: 1 }, 0, 0);
-  playerInventory.addToFirstEmpty({ type: "Gold", amount: 100 });
+  playerInventory.addItem(createItem(RelicType.EmbercrestBlade, 1), 0, 0);
+  playerInventory.addToFirstEmpty(createItem("Gold", 100));
 
   const shopItems = generateShopItems(6);
   const shopCols = 3;
@@ -537,10 +535,10 @@ function spawnDrops(state: GameState, entity: EntityState): void {
 
   const gemType = rollGemDrop(entity.power);
   if (gemType !== null) {
-    spawnDrop(state, entity.x, entity.y, { type: gemType, amount: 1 });
+    spawnDrop(state, entity.x, entity.y, createItem(gemType, 1));
   } else {
     const goldAmount = calculateGoldDrop(entity.power);
-    spawnDrop(state, entity.x, entity.y, { type: "Gold", amount: goldAmount });
+    spawnDrop(state, entity.x, entity.y, createItem("Gold", goldAmount));
   }
 }
 

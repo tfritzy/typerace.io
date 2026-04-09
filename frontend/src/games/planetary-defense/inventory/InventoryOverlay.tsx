@@ -1,21 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getState, getRelicPosition, onStateCreated } from "../state";
-import { type InventoryState, type InventoryItem } from "../inventoryState";
-import { type Item } from "../itemConfig";
+import { type InventoryState } from "../inventoryState";
+import { type Item, createItem } from "../itemConfig";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "../constants";
 import { InventoryGrid } from "./InventoryGrid";
 import { DragGhost } from "./DragGhost";
 
 const FALLBACK_CELL_PX = 48;
 
-interface DragSource {
-  inventory: InventoryState;
-  slot: InventoryItem;
-}
-
 interface DragData {
-  source: DragSource;
+  sourceInv: InventoryState;
   item: Item;
+  origCol: number;
+  origRow: number;
   ghostX: number;
   ghostY: number;
   cellSize: number;
@@ -49,12 +46,6 @@ export const InventoryOverlay = () => {
   });
   const dragRef = useRef<DragData | null>(null);
   const [dragState, setDragState] = useState<DragData | null>(null);
-  const [hoverTarget, setHoverTarget] = useState<{
-    inventory: InventoryState;
-    col: number;
-    row: number;
-    valid: boolean;
-  } | null>(null);
 
   useEffect(() => {
     const unsubs: Array<() => void> = [];
@@ -96,9 +87,8 @@ export const InventoryOverlay = () => {
   }, []);
 
   const onDragStart = useCallback(
-    (inv: InventoryState, slot: InventoryItem, e: React.PointerEvent) => {
-      if (!slot.item) return;
-      inv.beginItemDrag(slot.id);
+    (inv: InventoryState, col: number, row: number, item: Item, e: React.PointerEvent) => {
+      inv.removeAt(col, row);
 
       const overlay = overlayRef.current;
       if (!overlay) return;
@@ -108,8 +98,10 @@ export const InventoryOverlay = () => {
       const cellSize = gridEl ? gridEl.getBoundingClientRect().width / inv.cols : FALLBACK_CELL_PX;
 
       const ds: DragData = {
-        source: { inventory: inv, slot },
-        item: slot.item,
+        sourceInv: inv,
+        item,
+        origCol: col,
+        origRow: row,
         ghostX: e.clientX - rect.left,
         ghostY: e.clientY - rect.top,
         cellSize,
@@ -148,22 +140,6 @@ export const InventoryOverlay = () => {
       ds.ghostX = e.clientX - rect.left;
       ds.ghostY = e.clientY - rect.top;
       setDragState({ ...ds });
-
-      const target = findDropTarget(e.clientX, e.clientY);
-      if (target) {
-        const isDragSource =
-          target.inventory === ds.source.inventory &&
-          ds.source.slot.gridX === target.col &&
-          ds.source.slot.gridY === target.row;
-        setHoverTarget({
-          inventory: target.inventory,
-          col: target.col,
-          row: target.row,
-          valid: isDragSource || target.inventory.canPlace(target.col, target.row),
-        });
-      } else {
-        setHoverTarget(null);
-      }
     };
 
     const onUp = (e: PointerEvent) => {
@@ -171,10 +147,9 @@ export const InventoryOverlay = () => {
       if (!ds) return;
       const state = getState();
       if (!state) {
-        ds.source.inventory.cancelItemDrag(ds.source.slot.id);
+        ds.sourceInv.addItem(ds.item, ds.origCol, ds.origRow);
         dragRef.current = null;
         setDragState(null);
-        setHoverTarget(null);
         return;
       }
 
@@ -183,32 +158,29 @@ export const InventoryOverlay = () => {
 
       if (target) {
         const inv = target.inventory;
-        if (inv === ds.source.inventory) {
-          placed = inv.endItemDrag(ds.source.slot.id, target.col, target.row);
+        if (inv === ds.sourceInv) {
+          placed = inv.addItem(ds.item, target.col, target.row);
         } else if (inv.canPlace(target.col, target.row) && inv.acceptsItem(ds.item.type)) {
           if (ds.item.price != null && ds.item.price > 0) {
             if (!state.playerInventory.deductGold(ds.item.price)) {
-              ds.source.inventory.cancelItemDrag(ds.source.slot.id);
+              ds.sourceInv.addItem(ds.item, ds.origCol, ds.origRow);
               dragRef.current = null;
               setDragState(null);
-              setHoverTarget(null);
               return;
             }
           }
-          ds.source.inventory.removeItem(ds.source.slot.id);
-          const purchased: Item = { type: ds.item.type, amount: ds.item.amount };
+          const purchased = createItem(ds.item.type, ds.item.amount);
           inv.addItem(purchased, target.col, target.row);
           placed = true;
         }
       }
 
       if (!placed) {
-        ds.source.inventory.cancelItemDrag(ds.source.slot.id);
+        ds.sourceInv.addItem(ds.item, ds.origCol, ds.origRow);
       }
 
       dragRef.current = null;
       setDragState(null);
-      setHoverTarget(null);
     };
 
     window.addEventListener("pointermove", onMove);
@@ -223,8 +195,8 @@ export const InventoryOverlay = () => {
 
   const state = getState();
   if (!state) return null;
-  const draggingInv = dragState?.source.inventory ?? null;
-  const draggingId = dragState?.source.slot.id;
+  const isHolding = dragState !== null;
+  const heldItem = dragState?.item ?? null;
 
   return (
     <div
@@ -238,20 +210,20 @@ export const InventoryOverlay = () => {
             inventory={state.activeMerchantInventory}
             gridRef={registerRef(state.activeMerchantInventory)}
             label="Merchant"
-            highlightCol={hoverTarget?.inventory === state.activeMerchantInventory ? hoverTarget.col : undefined}
-            highlightRow={hoverTarget?.inventory === state.activeMerchantInventory ? hoverTarget.row : undefined}
-            highlightValid={hoverTarget?.inventory === state.activeMerchantInventory ? hoverTarget.valid : undefined}
-            draggingItemId={draggingInv === state.activeMerchantInventory ? draggingId : undefined}
+            isHolding={isHolding}
+            canAcceptHeld={heldItem ? state.activeMerchantInventory.acceptsItem(heldItem.type) : false}
+            draggingCol={dragState?.sourceInv === state.activeMerchantInventory ? dragState.origCol : undefined}
+            draggingRow={dragState?.sourceInv === state.activeMerchantInventory ? dragState.origRow : undefined}
             onDragStart={onDragStart}
           />
         )}
         <InventoryGrid
           inventory={state.playerInventory}
           gridRef={registerRef(state.playerInventory)}
-          highlightCol={hoverTarget?.inventory === state.playerInventory ? hoverTarget.col : undefined}
-          highlightRow={hoverTarget?.inventory === state.playerInventory ? hoverTarget.row : undefined}
-          highlightValid={hoverTarget?.inventory === state.playerInventory ? hoverTarget.valid : undefined}
-          draggingItemId={draggingInv === state.playerInventory ? draggingId : undefined}
+          isHolding={isHolding}
+          canAcceptHeld={heldItem ? state.playerInventory.acceptsItem(heldItem.type) : false}
+          draggingCol={dragState?.sourceInv === state.playerInventory ? dragState.origCol : undefined}
+          draggingRow={dragState?.sourceInv === state.playerInventory ? dragState.origRow : undefined}
           onDragStart={onDragStart}
         />
       </div>
@@ -272,10 +244,10 @@ export const InventoryOverlay = () => {
             <InventoryGrid
               inventory={slot.inventory}
               gridRef={registerRef(slot.inventory)}
-              highlightCol={hoverTarget?.inventory === slot.inventory ? hoverTarget.col : undefined}
-              highlightRow={hoverTarget?.inventory === slot.inventory ? hoverTarget.row : undefined}
-              highlightValid={hoverTarget?.inventory === slot.inventory ? hoverTarget.valid : undefined}
-              draggingItemId={draggingInv === slot.inventory ? draggingId : undefined}
+              isHolding={isHolding}
+              canAcceptHeld={heldItem ? slot.inventory.acceptsItem(heldItem.type) : false}
+              draggingCol={dragState?.sourceInv === slot.inventory ? dragState.origCol : undefined}
+              draggingRow={dragState?.sourceInv === slot.inventory ? dragState.origRow : undefined}
               onDragStart={onDragStart}
             />
           </div>

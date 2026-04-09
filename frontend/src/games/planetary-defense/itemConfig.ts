@@ -35,9 +35,15 @@ export interface ItemConfig {
 }
 
 export interface Item {
+  id: number;
   type: ItemType;
   amount: number;
   price?: number;
+}
+
+let nextItemId = 1;
+export function createItem(type: ItemType, amount: number, price?: number): Item {
+  return { id: nextItemId++, type, amount, price };
 }
 
 export const ITEM_DISPLAY: Record<ItemType, string> = {

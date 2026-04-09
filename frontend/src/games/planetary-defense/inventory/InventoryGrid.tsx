@@ -1,26 +1,26 @@
 import { memo, useCallback, useEffect, useState } from "react";
-import { type InventoryState, type InventoryItem } from "../inventoryState";
-import { NineSlicePanel } from "./NineSlicePanel";
+import { type InventoryState } from "../inventoryState";
+import { type Item } from "../itemConfig";
 import { ItemCell } from "./ItemCell";
 
 interface InventoryGridProps {
   inventory: InventoryState;
   label?: string;
-  highlightCol?: number;
-  highlightRow?: number;
-  highlightValid?: boolean;
-  draggingItemId?: number;
+  isHolding: boolean;
+  canAcceptHeld: boolean;
+  draggingCol?: number;
+  draggingRow?: number;
   gridRef?: (el: HTMLDivElement | null) => void;
-  onDragStart: (inventory: InventoryState, slot: InventoryItem, e: React.PointerEvent) => void;
+  onDragStart: (inventory: InventoryState, col: number, row: number, item: Item, e: React.PointerEvent) => void;
 }
 
 export const InventoryGrid = memo(({
   inventory,
   label,
-  highlightCol,
-  highlightRow,
-  highlightValid,
-  draggingItemId,
+  isHolding,
+  canAcceptHeld,
+  draggingCol,
+  draggingRow,
   gridRef,
   onDragStart,
 }: InventoryGridProps) => {
@@ -31,19 +31,11 @@ export const InventoryGrid = memo(({
   }, [inventory]);
 
   const handleDragStart = useCallback(
-    (slot: InventoryItem, e: React.PointerEvent) => {
-      onDragStart(inventory, slot, e);
+    (col: number, row: number, item: Item, e: React.PointerEvent) => {
+      onDragStart(inventory, col, row, item, e);
     },
     [inventory, onDragStart]
   );
-
-  const items = inventory.getItems();
-  const itemMap = new Map<string, InventoryItem>();
-  for (const slot of items) {
-    if (slot.item) {
-      itemMap.set(`${slot.gridX},${slot.gridY}`, slot);
-    }
-  }
 
   return (
     <div className="flex flex-col items-center gap-1 w-full">
@@ -52,7 +44,7 @@ export const InventoryGrid = memo(({
           {label}
         </div>
       )}
-      <NineSlicePanel className="w-full">
+      <div className="relative rounded-lg border border-indigo-400/20 bg-slate-900/85 backdrop-blur-sm shadow-lg shadow-indigo-950/40 p-1.5 w-full">
         <div
           ref={gridRef}
           className="grid w-full gap-px"
@@ -60,29 +52,30 @@ export const InventoryGrid = memo(({
         >
           {Array.from({ length: inventory.rows }, (_, r) =>
             Array.from({ length: inventory.cols }, (_, c) => {
-              const isHighlight = highlightCol === c && highlightRow === r;
-              const cellItem = itemMap.get(`${c},${r}`);
-              const isDragging = cellItem?.id === draggingItemId;
+              const cellItem = inventory.getItem(c, r);
+              const isDragging = draggingCol === c && draggingRow === r;
+              const isEmpty = cellItem === null || isDragging;
+              const hoverClass = isHolding
+                ? isEmpty && canAcceptHeld
+                  ? "hover:bg-emerald-500/25 hover:border-emerald-400/40"
+                  : "hover:bg-red-500/25 hover:border-red-400/40"
+                : cellItem
+                  ? "hover:bg-slate-700/40"
+                  : "";
               return (
                 <div
                   key={`${r}-${c}`}
-                  className={`aspect-square relative rounded-sm border border-indigo-400/10 bg-slate-800/60 ${
-                    isHighlight
-                      ? highlightValid
-                        ? "bg-emerald-500/25 border-emerald-400/40"
-                        : "bg-red-500/25 border-red-400/40"
-                      : "hover:bg-slate-700/40"
-                  }`}
+                  className={`aspect-square relative rounded-sm border border-indigo-400/10 bg-slate-800/60 ${hoverClass}`}
                 >
                   {cellItem && !isDragging && (
-                    <ItemCell slot={cellItem} onDragStart={handleDragStart} />
+                    <ItemCell item={cellItem} col={c} row={r} onDragStart={handleDragStart} />
                   )}
                 </div>
               );
             })
           )}
         </div>
-      </NineSlicePanel>
+      </div>
     </div>
   );
 });
