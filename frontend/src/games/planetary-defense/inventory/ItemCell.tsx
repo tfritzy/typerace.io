@@ -1,29 +1,16 @@
-import { memo, useCallback } from "react";
+import { memo } from "react";
 import { type Item, getItemConfig } from "../itemConfig";
 import { ItemSprite } from "./ItemSprite";
 
 interface ItemCellProps {
   item: Item;
-  col: number;
-  row: number;
-  onDragStart: (col: number, row: number, item: Item, e: React.PointerEvent) => void;
 }
 
-export const ItemCell = memo(({ item, col, row, onDragStart }: ItemCellProps) => {
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      onDragStart(col, row, item, e);
-    },
-    [col, row, item, onDragStart]
-  );
-
+export const ItemCell = memo(({ item }: ItemCellProps) => {
   const config = getItemConfig(item.type);
 
   return (
-    <div
-      onPointerDown={handlePointerDown}
-      className="absolute inset-0 cursor-grab touch-none"
-    >
+    <div className="absolute inset-0 pointer-events-none touch-none">
       <div className="absolute inset-[10%]">
         <ItemSprite itemType={item.type} />
       </div>
@@ -35,7 +22,7 @@ export const ItemCell = memo(({ item, col, row, onDragStart }: ItemCellProps) =>
         </span>
       )}
       {item.price != null && (
-        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-black/70 rounded-b-sm py-px">
+        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center bg-black/60 rounded-b-sm py-px">
           <span className="text-amber-300 pointer-events-none text-[length:clamp(5px,0.8vw,9px)] font-semibold">
             {item.price}g
           </span>

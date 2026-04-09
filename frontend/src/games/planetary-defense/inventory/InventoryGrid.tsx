@@ -10,8 +10,8 @@ interface InventoryGridProps {
   canAcceptHeld: boolean;
   draggingCol?: number;
   draggingRow?: number;
-  gridRef?: (el: HTMLDivElement | null) => void;
-  onDragStart: (inventory: InventoryState, col: number, row: number, item: Item, e: React.PointerEvent) => void;
+  onDragStart: (inventory: InventoryState, col: number, row: number, item: Item, e: React.PointerEvent, cellSize: number) => void;
+  onDrop: (inventory: InventoryState, col: number, row: number) => void;
 }
 
 export const InventoryGrid = memo(({
@@ -21,8 +21,8 @@ export const InventoryGrid = memo(({
   canAcceptHeld,
   draggingCol,
   draggingRow,
-  gridRef,
   onDragStart,
+  onDrop,
 }: InventoryGridProps) => {
   const [, setTick] = useState(0);
 
@@ -31,23 +31,29 @@ export const InventoryGrid = memo(({
   }, [inventory]);
 
   const handleDragStart = useCallback(
-    (col: number, row: number, item: Item, e: React.PointerEvent) => {
-      onDragStart(inventory, col, row, item, e);
+    (col: number, row: number, item: Item, e: React.PointerEvent, cellSize: number) => {
+      onDragStart(inventory, col, row, item, e, cellSize);
     },
     [inventory, onDragStart]
+  );
+
+  const handleDrop = useCallback(
+    (col: number, row: number) => {
+      onDrop(inventory, col, row);
+    },
+    [inventory, onDrop]
   );
 
   return (
     <div className="flex flex-col items-center gap-1 w-full">
       {label && (
-        <div className="text-indigo-100 text-xs font-semibold tracking-wide uppercase">
+        <div className="text-slate-300 text-[length:clamp(8px,1.2vw,12px)] font-medium tracking-wider uppercase">
           {label}
         </div>
       )}
-      <div className="relative rounded-lg border border-indigo-400/20 bg-slate-900/85 backdrop-blur-sm shadow-lg shadow-indigo-950/40 p-1.5 w-full">
+      <div className="relative rounded-lg border border-slate-600/30 bg-slate-900/90 backdrop-blur-md shadow-2xl p-1.5 w-full">
         <div
-          ref={gridRef}
-          className="grid w-full gap-px"
+          className="grid w-full gap-0.5"
           style={{ gridTemplateColumns: `repeat(${inventory.cols}, 1fr)` }}
         >
           {Array.from({ length: inventory.rows }, (_, r) =>
@@ -55,21 +61,25 @@ export const InventoryGrid = memo(({
               const cellItem = inventory.getItem(c, r);
               const isDragging = draggingCol === c && draggingRow === r;
               const isEmpty = cellItem === null || isDragging;
+              const hasItem = cellItem !== null && !isDragging;
               const hoverClass = isHolding
                 ? isEmpty && canAcceptHeld
-                  ? "hover:bg-emerald-500/25 hover:border-emerald-400/40"
-                  : "hover:bg-red-500/25 hover:border-red-400/40"
-                : cellItem
-                  ? "hover:bg-slate-700/40"
+                  ? "hover:bg-emerald-500/20 hover:border-emerald-400/30"
+                  : "hover:bg-red-500/15 hover:border-red-400/30"
+                : hasItem
+                  ? "hover:bg-slate-700/60"
                   : "";
               return (
                 <div
                   key={`${r}-${c}`}
-                  className={`aspect-square relative rounded-sm border border-indigo-400/10 bg-slate-800/60 ${hoverClass}`}
+                  className={`aspect-square relative rounded border border-slate-700/30 bg-slate-800/50 transition-colors duration-75 ${hasItem ? "cursor-grab" : ""} ${hoverClass}`}
+                  onPointerDown={hasItem ? (e) => {
+                    const cellSize = e.currentTarget.getBoundingClientRect().width;
+                    handleDragStart(c, r, cellItem!, e, cellSize);
+                  } : undefined}
+                  onPointerUp={isHolding ? () => handleDrop(c, r) : undefined}
                 >
-                  {cellItem && !isDragging && (
-                    <ItemCell item={cellItem} col={c} row={r} onDragStart={handleDragStart} />
-                  )}
+                  {hasItem && <ItemCell item={cellItem!} />}
                 </div>
               );
             })
