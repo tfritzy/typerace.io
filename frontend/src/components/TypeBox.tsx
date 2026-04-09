@@ -5,7 +5,6 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from "react";
-import { Cursor } from "./Cursor";
 
 type TypeBoxProps = {
   phrase: string;
@@ -50,13 +49,13 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const [isComplete, setIsComplete] = useState(false);
     const [hasReachedErrorLimit, setHasReachedErrorLimit] = useState(false);
 
-    const targetRef = useRef<HTMLElement>(null);
+    const cursorCharRef = useRef<HTMLSpanElement>(null);
     const phraseRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
     React.useEffect(() => {
-      if (targetRef.current && focused && !isComplete) {
-        targetRef.current.scrollIntoView({
+      if (cursorCharRef.current && focused && !isComplete) {
+        cursorCharRef.current.scrollIntoView({
           behavior: "smooth",
           block: "center",
           inline: "center",
@@ -272,14 +271,16 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
 
         const isError = isTyped && !isCorrect;
+        const showCursorLine = isCursor && focused && !isComplete && !hideCursor;
 
         return (
           <span
             key={i}
             data-char-index={i}
+            ref={isCursor ? cursorCharRef : undefined}
             className={`transition-all duration-150 ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
+            style={showCursorLine ? { borderLeft: "2px solid color-mix(in srgb, var(--accent) 50%, transparent)" } : undefined}
           >
-            {isCursor && <span id="target" ref={targetRef} />}
             {char}
           </span>
         );
@@ -305,13 +306,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             >
               {renderText()}
             </div>
-
-            <Cursor
-              targetRef={targetRef}
-              lerp={0.3}
-              fadeDelay={500}
-              visible={focused && !isComplete && !hideCursor}
-            />
 
             <textarea
               ref={inputRef}
