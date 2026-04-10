@@ -83,11 +83,11 @@ export class InventoryState {
             const maxStack = config.maxStack ?? Infinity;
             const spaceLeft = maxStack - existing.amount;
             if (spaceLeft >= item.amount) {
-              existing.amount += item.amount;
+              this.grid[r][c] = { ...existing, amount: existing.amount + item.amount };
               this.notify();
               return true;
             } else if (spaceLeft > 0) {
-              existing.amount = maxStack;
+              this.grid[r][c] = { ...existing, amount: maxStack };
               this.notify();
               return this.addToFirstEmpty(
                 createItem(item.type, item.amount - spaceLeft, item.price)
@@ -142,7 +142,7 @@ export class InventoryState {
           remaining -= item.amount;
           this.removeAt(c, r);
         } else {
-          item.amount -= remaining;
+          this.grid[r][c] = { ...item, amount: item.amount - remaining };
           remaining = 0;
           this.notify();
         }
