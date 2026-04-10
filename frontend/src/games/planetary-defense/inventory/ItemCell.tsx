@@ -6,7 +6,7 @@ interface ItemCellProps {
   item: Item;
 }
 
-export const ItemCell = memo(({ item }: ItemCellProps) => {
+export const ItemCell = memo(function ItemCell({ item }: ItemCellProps) {
   const config = getItemConfig(item.type);
 
   return (
@@ -30,4 +30,8 @@ export const ItemCell = memo(({ item }: ItemCellProps) => {
       )}
     </div>
   );
-});
+}, (prev, next) =>
+  prev.item.type === next.item.type &&
+  prev.item.amount === next.item.amount &&
+  prev.item.price === next.item.price
+);
