@@ -74,10 +74,11 @@ export const InventoryGrid = memo(({
                   key={`${r}-${c}`}
                   className={`aspect-square relative border border-slate-700/30 bg-slate-800/40 transition-colors duration-75 ${hasItem ? "cursor-grab" : ""} ${hoverClass}`}
                   onPointerDown={hasItem ? (e) => {
+                    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
                     const cellSize = e.currentTarget.getBoundingClientRect().width;
                     handleDragStart(c, r, cellItem!, e, cellSize);
                   } : undefined}
-                  onPointerUp={isHolding ? () => handleDrop(c, r) : undefined}
+                  onPointerUp={() => handleDrop(c, r)}
                 >
                   {hasItem && <ItemCell item={cellItem!} />}
                 </div>
