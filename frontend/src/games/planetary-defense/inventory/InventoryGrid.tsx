@@ -78,13 +78,15 @@ export const InventoryGrid = memo(({
               const isEmpty = cellItem === null || isDragging;
               const hasItem = cellItem !== null && !isDragging;
               const isHovered = hoverCol === c && hoverRow === r;
-              const hoverClass = isHolding && isHovered
-                ? isEmpty && canAcceptHeld
-                  ? "bg-emerald-500/20"
-                  : "bg-red-500/15"
-                : !isHolding && hasItem
-                  ? "hover:bg-slate-700/50"
-                  : "";
+              const hoverClass = isHovered
+                ? isHolding
+                  ? isEmpty && canAcceptHeld
+                    ? "bg-emerald-500/20"
+                    : "bg-red-500/15"
+                  : hasItem
+                    ? "bg-slate-700/50"
+                    : ""
+                : "";
               return (
                 <div
                   key={`${r}-${c}`}
