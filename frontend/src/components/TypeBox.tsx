@@ -3,6 +3,7 @@ import React, {
   useRef,
   useState,
   useImperativeHandle,
+  useLayoutEffect,
   forwardRef,
 } from "react";
 
@@ -51,17 +52,29 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     const cursorCharRef = useRef<HTMLSpanElement>(null);
     const phraseRef = useRef<HTMLDivElement>(null);
+    const trackRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
-    React.useEffect(() => {
-      if (cursorCharRef.current && focused && !isComplete) {
-        cursorCharRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-          inline: "center",
-        });
-      }
-    }, [input.length, focused, isComplete]);
+    useLayoutEffect(() => {
+      const track = trackRef.current;
+      const charEl = cursorCharRef.current;
+      const container = phraseRef.current;
+      if (!track || !charEl || !container) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const charRect = charEl.getBoundingClientRect();
+      const trackRect = track.getBoundingClientRect();
+
+      const charTopInTrack = charRect.top - trackRect.top;
+      const lineHeight = charRect.height;
+      const visibleHeight = containerRect.height;
+
+      const targetY = charTopInTrack - visibleHeight / 2 + lineHeight / 2;
+      const maxOffset = track.scrollHeight - visibleHeight;
+      const clampedY = Math.max(0, Math.min(targetY, maxOffset));
+
+      track.style.transform = `translateY(${-clampedY}px)`;
+    }, [input.length, focused, isComplete, phrase]);
 
     useImperativeHandle(ref, () => ({
       focus: () => {
@@ -169,8 +182,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             }
             const wordLength = wordEndIndex - wordStartIndex + 1;
 
-            if (phraseRef.current && wordLength > 0) {
-              const spans = phraseRef.current.querySelectorAll("span");
+            if (trackRef.current && wordLength > 0) {
+              const spans = trackRef.current.querySelectorAll("span");
               const startSpan = spans[wordStartIndex];
               const endSpan = spans[wordEndIndex];
               if (startSpan && endSpan) {
@@ -301,10 +314,16 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         <div className="relative select-none flex-1">
           <div className="type-box">
             <div
-              className="whitespace-pre-wrap text-start text-[28px] leading-12"
               ref={phraseRef}
+              style={{ overflow: "hidden", height: height || undefined }}
             >
-              {renderText()}
+              <div
+                ref={trackRef}
+                className="whitespace-pre-wrap text-start text-[28px] leading-12"
+                style={{ transition: "transform 0.12s ease-out" }}
+              >
+                {renderText()}
+              </div>
             </div>
 
             <textarea
