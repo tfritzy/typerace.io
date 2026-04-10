@@ -1,7 +1,7 @@
 import { Container, Graphics } from "pixi.js";
 import type { GameState } from "./state";
-import { getRelicPosition } from "./state";
-import { RELIC_CONFIGS, type RelicType } from "./relicConfig";
+import { getRelicPosition, getRelicType } from "./state";
+import { RELIC_CONFIGS } from "./relicConfig";
 
 const CHARGE_DOT_RADIUS = 4;
 const CHARGE_DOT_SPACING = 12;
@@ -23,21 +23,23 @@ export class RelicManager {
   private syncRelics(state: GameState): void {
     for (let i = 0; i < state.relicSlots.length; i++) {
       const slot = state.relicSlots[i];
-      if (!slot.relic) {
+      const relicType = getRelicType(slot);
+      if (!relicType) {
         this.removeChargeGraphic(i);
         continue;
       }
 
       const { x, y } = getRelicPosition(slot);
-      this.drawCharge(i, slot, x, y);
+      this.drawCharge(i, slot, x, y, relicType);
     }
   }
 
   private drawCharge(
     index: number,
-    slot: { relic: { type: number; charge: number } | null },
+    slot: { relic: { charge: number } | null },
     relicX: number,
-    relicY: number
+    relicY: number,
+    relicType: number
   ): void {
     if (!slot.relic) return;
 
@@ -50,7 +52,7 @@ export class RelicManager {
 
     g.clear();
 
-    const config = RELIC_CONFIGS[slot.relic.type as RelicType];
+    const config = RELIC_CONFIGS[relicType as keyof typeof RELIC_CONFIGS];
     const count = config.charsToFire;
 
     const totalWidth = (count - 1) * CHARGE_DOT_SPACING;

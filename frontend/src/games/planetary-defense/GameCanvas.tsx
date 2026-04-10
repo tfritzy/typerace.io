@@ -141,7 +141,7 @@ export const GameCanvas = () => {
     <div
       ref={containerRef}
       className="w-full h-full relative select-none"
-      style={{ fontFamily: PIXEL_FONT }}
+      style={{ fontFamily: PIXEL_FONT, touchAction: 'none' }}
       onDragStart={(e) => e.preventDefault()}
       onContextMenu={(e) => e.preventDefault()}
     >

@@ -57,7 +57,6 @@ export interface EntityState {
 }
 
 export interface RelicState {
-  type: RelicType;
   charge: number;
   remainingShots: number;
   nextShotTime: number;
@@ -67,6 +66,11 @@ export interface RelicSlot {
   angle: number;
   inventory: InventoryState;
   relic: RelicState | null;
+}
+
+export function getRelicType(slot: RelicSlot): RelicType | null {
+  const item = slot.inventory.getItem(0, 0);
+  return item ? (item.type as RelicType) : null;
 }
 
 export interface ProjectileState {
@@ -206,14 +210,13 @@ function createRelicSlots(): RelicSlot[] {
     const relicType = startingRelics[i] ?? null;
     if (relicType !== null) {
       inventory.addItem(createItem(relicType, 1), 0, 0);
-      relic = { type: relicType, charge: 0, remainingShots: 0, nextShotTime: 0 };
+      relic = { charge: 0, remainingShots: 0, nextShotTime: 0 };
     }
 
     const slotIndex = i;
     inventory.onItemAdded((item) => {
       if (isRelicType(item.type)) {
         slots[slotIndex].relic = {
-          type: item.type as RelicType,
           charge: 0,
           remainingShots: 0,
           nextShotTime: 0,
@@ -612,7 +615,7 @@ function getDamageBuffMultiplier(state: GameState, slotIndex: number): number {
   for (let j = 0; j < count; j++) {
     const slot = state.relicSlots[j];
     if (!slot.relic) continue;
-    const config: RelicTypeConfig = RELIC_CONFIGS[slot.relic.type];
+    const config: RelicTypeConfig = RELIC_CONFIGS[getRelicType(slot)!];
     if (config.damageBuffMultiplier === 0) continue;
     if (config.damageBuffAll && j !== slotIndex) {
       multiplier += config.damageBuffMultiplier;
@@ -634,7 +637,7 @@ function tryFireSlot(
   slot: RelicSlot,
   slotIndex: number
 ): void {
-  const config = RELIC_CONFIGS[slot.relic!.type];
+  const config = RELIC_CONFIGS[getRelicType(slot)!];
   if (slot.relic!.charge < config.charsToFire) return;
 
   slot.relic!.charge = 0;
@@ -675,7 +678,7 @@ function spawnProjectile(
   target: { x: number; y: number }
 ): boolean {
   const { x: relicX, y: relicY } = getRelicPosition(slot);
-  const config = RELIC_CONFIGS[slot.relic!.type];
+  const config = RELIC_CONFIGS[getRelicType(slot)!];
   const dx = target.x - relicX;
   const dy = target.y - relicY;
   const dist = Math.sqrt(dx * dx + dy * dy);
@@ -710,7 +713,7 @@ function fireRelic(
 ): void {
   if (!spawnProjectile(state, slot, slotIndex, target)) return;
 
-  const config = RELIC_CONFIGS[slot.relic!.type];
+  const config = RELIC_CONFIGS[getRelicType(slot)!];
   if (config.multiShotCount > 1) {
     slot.relic!.remainingShots = config.multiShotCount - 1;
     slot.relic!.nextShotTime = state.time.time + MULTI_SHOT_DELAY;

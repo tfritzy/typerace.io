@@ -53,6 +53,7 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
 
   const onDragStart = useCallback(
     (inv: InventoryState, col: number, row: number, item: Item, e: React.PointerEvent, cellSize: number) => {
+      if (dragRef.current) return;
       inv.removeAt(col, row);
 
       const overlay = overlayRef.current;
