@@ -4,6 +4,7 @@ import { type Item } from "../itemConfig";
 import { ItemCell } from "./ItemCell";
 
 interface InventoryGridProps {
+  inventoryId: string;
   inventory: InventoryState;
   label?: string;
   isHolding: boolean;
@@ -14,11 +15,10 @@ interface InventoryGridProps {
   hoverRow?: number;
   onDragStart: (inventory: InventoryState, col: number, row: number, item: Item, e: React.PointerEvent, cellSize: number) => void;
   onDrop: (inventory: InventoryState, col: number, row: number) => void;
-  onHoverEnter: (inventory: InventoryState, col: number, row: number) => void;
-  onHoverLeave: () => void;
 }
 
 export const InventoryGrid = memo(({
+  inventoryId,
   inventory,
   label,
   isHolding,
@@ -29,8 +29,6 @@ export const InventoryGrid = memo(({
   hoverRow,
   onDragStart,
   onDrop,
-  onHoverEnter,
-  onHoverLeave,
 }: InventoryGridProps) => {
   const [, setTick] = useState(0);
 
@@ -50,13 +48,6 @@ export const InventoryGrid = memo(({
       onDrop(inventory, col, row);
     },
     [inventory, onDrop]
-  );
-
-  const handleHoverEnter = useCallback(
-    (col: number, row: number) => {
-      onHoverEnter(inventory, col, row);
-    },
-    [inventory, onHoverEnter]
   );
 
   return (
@@ -90,6 +81,9 @@ export const InventoryGrid = memo(({
               return (
                 <div
                   key={`${r}-${c}`}
+                  data-inv-id={inventoryId}
+                  data-col={c}
+                  data-row={r}
                   className={`aspect-square relative border border-slate-700/30 bg-slate-800/40 transition-colors duration-75 ${hasItem ? "cursor-grab" : ""} ${hoverClass}`}
                   onPointerDown={hasItem ? (e) => {
                     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
@@ -97,8 +91,6 @@ export const InventoryGrid = memo(({
                     handleDragStart(c, r, cellItem!, e, cellSize);
                   } : undefined}
                   onPointerUp={() => handleDrop(c, r)}
-                  onPointerEnter={() => handleHoverEnter(c, r)}
-                  onPointerLeave={onHoverLeave}
                 >
                   {hasItem && <ItemCell item={cellItem!} />}
                 </div>
