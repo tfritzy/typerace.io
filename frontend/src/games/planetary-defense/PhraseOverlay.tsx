@@ -141,7 +141,7 @@ export const PhraseOverlay = ({
         <span style={{ color: "#90ee90" }}>
           {phrase.slice(0, typedCount)}
         </span>
-        <span ref={cursorCharRef} style={{ color: "#ffffff", borderLeft: "2px solid #4a5568" }}>
+        <span ref={cursorCharRef} style={{ color: "#ffffff", boxShadow: "-2px 0 0 0 #4a5568" }}>
           {typedCount < phrase.length ? phrase[typedCount] : ""}
         </span>
         <span style={{ color: "#ffffff" }}>
