@@ -25,6 +25,7 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
   const [, setTick] = useState(0);
   const dragRef = useRef<DragData | null>(null);
   const [dragState, setDragState] = useState<DragData | null>(null);
+  const [hoverTarget, setHoverTarget] = useState<{ inv: InventoryState; col: number; row: number } | null>(null);
 
   useEffect(() => {
     const unsubs: Array<() => void> = [];
@@ -90,6 +91,7 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
             ds.sourceInv.addItem(ds.item, ds.origCol, ds.origRow);
             dragRef.current = null;
             setDragState(null);
+            setHoverTarget(null);
             return;
           }
         }
@@ -104,9 +106,21 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
 
       dragRef.current = null;
       setDragState(null);
+      setHoverTarget(null);
     },
     []
   );
+
+  const onHoverEnter = useCallback(
+    (inv: InventoryState, col: number, row: number) => {
+      setHoverTarget({ inv, col, row });
+    },
+    []
+  );
+
+  const onHoverLeave = useCallback(() => {
+    setHoverTarget(null);
+  }, []);
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -126,6 +140,7 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
       ds.sourceInv.addItem(ds.item, ds.origCol, ds.origRow);
       dragRef.current = null;
       setDragState(null);
+      setHoverTarget(null);
     };
 
     window.addEventListener("pointermove", onMove);
@@ -160,8 +175,12 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
             canAcceptHeld={heldItem ? state.playerInventory.acceptsItem(heldItem.type) : false}
             draggingCol={dragState?.sourceInv === state.playerInventory ? dragState.origCol : undefined}
             draggingRow={dragState?.sourceInv === state.playerInventory ? dragState.origRow : undefined}
+            hoverCol={hoverTarget?.inv === state.playerInventory ? hoverTarget.col : undefined}
+            hoverRow={hoverTarget?.inv === state.playerInventory ? hoverTarget.row : undefined}
             onDragStart={onDragStart}
             onDrop={onCellDrop}
+            onHoverEnter={onHoverEnter}
+            onHoverLeave={onHoverLeave}
           />
         </div>
       )}
@@ -183,8 +202,12 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
             canAcceptHeld={heldItem ? state.activeMerchantInventory.acceptsItem(heldItem.type) : false}
             draggingCol={dragState?.sourceInv === state.activeMerchantInventory ? dragState.origCol : undefined}
             draggingRow={dragState?.sourceInv === state.activeMerchantInventory ? dragState.origRow : undefined}
+            hoverCol={hoverTarget?.inv === state.activeMerchantInventory ? hoverTarget.col : undefined}
+            hoverRow={hoverTarget?.inv === state.activeMerchantInventory ? hoverTarget.row : undefined}
             onDragStart={onDragStart}
             onDrop={onCellDrop}
+            onHoverEnter={onHoverEnter}
+            onHoverLeave={onHoverLeave}
           />
         </div>
       )}
@@ -210,8 +233,12 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
               canAcceptHeld={heldItem ? slot.inventory.acceptsItem(heldItem.type) : false}
               draggingCol={dragState?.sourceInv === slot.inventory ? dragState.origCol : undefined}
               draggingRow={dragState?.sourceInv === slot.inventory ? dragState.origRow : undefined}
+              hoverCol={hoverTarget?.inv === slot.inventory ? hoverTarget.col : undefined}
+              hoverRow={hoverTarget?.inv === slot.inventory ? hoverTarget.row : undefined}
               onDragStart={onDragStart}
               onDrop={onCellDrop}
+              onHoverEnter={onHoverEnter}
+              onHoverLeave={onHoverLeave}
             />
           </div>
         );
