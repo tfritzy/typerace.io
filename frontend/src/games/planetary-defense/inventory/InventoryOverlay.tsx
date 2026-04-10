@@ -25,8 +25,6 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
   const [, setTick] = useState(0);
   const dragRef = useRef<DragData | null>(null);
   const [dragState, setDragState] = useState<DragData | null>(null);
-  const [hoverTarget, setHoverTarget] = useState<{ inv: InventoryState; col: number; row: number } | null>(null);
-  const inventoryMapRef = useRef(new Map<string, InventoryState>());
 
   useEffect(() => {
     const unsubs: Array<() => void> = [];
@@ -92,7 +90,6 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
             ds.sourceInv.addItem(ds.item, ds.origCol, ds.origRow);
             dragRef.current = null;
             setDragState(null);
-            setHoverTarget(null);
             return;
           }
         }
@@ -107,7 +104,6 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
 
       dragRef.current = null;
       setDragState(null);
-      setHoverTarget(null);
     },
     []
   );
@@ -122,22 +118,6 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
       ds.ghostX = e.clientX - rect.left;
       ds.ghostY = e.clientY - rect.top;
 
-      const el = document.elementFromPoint(e.clientX, e.clientY);
-      const cell = el?.closest?.("[data-inv-id]") as HTMLElement | null;
-      if (cell) {
-        const invId = cell.getAttribute("data-inv-id")!;
-        const col = parseInt(cell.getAttribute("data-col")!, 10);
-        const row = parseInt(cell.getAttribute("data-row")!, 10);
-        const inv = inventoryMapRef.current.get(invId);
-        if (inv) {
-          setHoverTarget({ inv, col, row });
-        } else {
-          setHoverTarget(null);
-        }
-      } else {
-        setHoverTarget(null);
-      }
-
       setDragState({ ...ds });
     };
 
@@ -147,7 +127,6 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
       ds.sourceInv.addItem(ds.item, ds.origCol, ds.origRow);
       dragRef.current = null;
       setDragState(null);
-      setHoverTarget(null);
     };
 
     window.addEventListener("pointermove", onMove);
@@ -160,17 +139,6 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
 
   const state = getState();
   if (!state) return null;
-  const isHolding = dragState !== null;
-  const heldItem = dragState?.item ?? null;
-
-  inventoryMapRef.current.clear();
-  inventoryMapRef.current.set("player", state.playerInventory);
-  if (state.activeMerchantInventory) {
-    inventoryMapRef.current.set("merchant", state.activeMerchantInventory);
-  }
-  state.relicSlots.forEach((slot, idx) => {
-    inventoryMapRef.current.set(`relic-${idx}`, slot.inventory);
-  });
 
   const merchantShip = state.activeMerchantId != null
     ? state.merchants.find((m) => m.id === state.activeMerchantId)
@@ -186,14 +154,9 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
       {!waveActive && (
         <div className="absolute bottom-[2%] left-1/2 -translate-x-1/2 pointer-events-auto" style={{ width: `${state.playerInventory.cols * 3.5}%`, maxWidth: '400px' }}>
           <InventoryGrid
-            inventoryId="player"
             inventory={state.playerInventory}
-            isHolding={isHolding}
-            canAcceptHeld={heldItem ? state.playerInventory.acceptsItem(heldItem.type) : false}
             draggingCol={dragState?.sourceInv === state.playerInventory ? dragState.origCol : undefined}
             draggingRow={dragState?.sourceInv === state.playerInventory ? dragState.origRow : undefined}
-            hoverCol={hoverTarget?.inv === state.playerInventory ? hoverTarget.col : undefined}
-            hoverRow={hoverTarget?.inv === state.playerInventory ? hoverTarget.row : undefined}
             onDragStart={onDragStart}
             onDrop={onCellDrop}
           />
@@ -211,15 +174,10 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
           }}
         >
           <InventoryGrid
-            inventoryId="merchant"
             inventory={state.activeMerchantInventory}
             label="Merchant"
-            isHolding={isHolding}
-            canAcceptHeld={heldItem ? state.activeMerchantInventory.acceptsItem(heldItem.type) : false}
             draggingCol={dragState?.sourceInv === state.activeMerchantInventory ? dragState.origCol : undefined}
             draggingRow={dragState?.sourceInv === state.activeMerchantInventory ? dragState.origRow : undefined}
-            hoverCol={hoverTarget?.inv === state.activeMerchantInventory ? hoverTarget.col : undefined}
-            hoverRow={hoverTarget?.inv === state.activeMerchantInventory ? hoverTarget.row : undefined}
             onDragStart={onDragStart}
             onDrop={onCellDrop}
           />
@@ -242,14 +200,9 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
             }}
           >
             <InventoryGrid
-              inventoryId={`relic-${idx}`}
               inventory={slot.inventory}
-              isHolding={isHolding}
-              canAcceptHeld={heldItem ? slot.inventory.acceptsItem(heldItem.type) : false}
               draggingCol={dragState?.sourceInv === slot.inventory ? dragState.origCol : undefined}
               draggingRow={dragState?.sourceInv === slot.inventory ? dragState.origRow : undefined}
-              hoverCol={hoverTarget?.inv === slot.inventory ? hoverTarget.col : undefined}
-              hoverRow={hoverTarget?.inv === slot.inventory ? hoverTarget.row : undefined}
               onDragStart={onDragStart}
               onDrop={onCellDrop}
             />
