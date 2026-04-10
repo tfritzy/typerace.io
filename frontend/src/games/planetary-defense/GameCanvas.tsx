@@ -4,6 +4,7 @@ import type { PlanetaryDefenseGame } from "./game";
 import { startNextWave } from "./state";
 import { LabelOverlay } from "./LabelOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
+import { InventoryOverlay } from "./inventory";
 import { PIXEL_FONT } from "./constants";
 
 const PlanetHealthBar = ({ ratio }: { ratio: number }) => {
@@ -77,6 +78,7 @@ export const GameCanvas = () => {
     let cancelled = false;
     let unsubDamage: (() => void) | null = null;
     let unsubWaveComplete: (() => void) | null = null;
+    let unsubWaveActive: (() => void) | null = null;
 
     createPlanetaryDefenseGame(div)
       .then((game) => {
@@ -92,6 +94,9 @@ export const GameCanvas = () => {
           setWaveNumber(game.state.wave.wave);
           setWaveActive(false);
         });
+        unsubWaveActive = game.state.onWaveActiveChanged.subscribe(() => {
+          setWaveActive(game.state.waveActive);
+        });
       })
       .catch((err) => {
         console.error("Failed to initialize Planetary Defense:", err);
@@ -101,6 +106,7 @@ export const GameCanvas = () => {
       cancelled = true;
       unsubDamage?.();
       unsubWaveComplete?.();
+      unsubWaveActive?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -134,11 +140,14 @@ export const GameCanvas = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full relative"
-      style={{ fontFamily: PIXEL_FONT }}
+      className="w-full h-full relative select-none"
+      style={{ fontFamily: PIXEL_FONT, touchAction: 'none' }}
+      onDragStart={(e) => e.preventDefault()}
+      onContextMenu={(e) => e.preventDefault()}
     >
       <LabelOverlay gameRef={gameRef} />
       <PhraseOverlay gameRef={gameRef} visible={waveActive} />
+      <InventoryOverlay waveActive={waveActive} />
       <PlanetHealthBar ratio={healthRatio} />
       <div className="absolute top-3 left-3 z-10">
         <div

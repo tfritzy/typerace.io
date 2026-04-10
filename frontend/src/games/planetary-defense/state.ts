@@ -16,9 +16,10 @@ import {
 import { type EnemyConfig } from "./enemyConfig";
 import { generateWaveSpawns, type SpawnEntry } from "./waveConfig";
 import {
-  type Item, GemType,
+  type Item, type ItemType, GemType, createItem,
   TOPAZ_TIERS, RUBY_TIERS, EMERALD_TIERS, SAPPHIRE_TIERS, AMETHYST_TIERS, DIAMOND_TIERS,
 } from "./itemConfig";
+import { InventoryState } from "./inventoryState";
 
 const DROP_SPEED = 20;
 const DROP_CHANCE = 0.5;
@@ -56,9 +57,6 @@ export interface EntityState {
 }
 
 export interface RelicState {
-  type: RelicType;
-  item: Item;
-  level: number;
   charge: number;
   remainingShots: number;
   nextShotTime: number;
@@ -66,7 +64,13 @@ export interface RelicState {
 
 export interface RelicSlot {
   angle: number;
+  inventory: InventoryState;
   relic: RelicState | null;
+}
+
+export function getRelicType(slot: RelicSlot): RelicType | null {
+  const item = slot.inventory.getItem(0, 0);
+  return item ? (item.type as RelicType) : null;
 }
 
 export interface ProjectileState {
@@ -153,7 +157,7 @@ export interface MerchantShipState {
   x: number;
   y: number;
   entityType: EntityType;
-  items: Item[];
+  shopInventory: InventoryState;
 }
 
 export interface GameState {
@@ -171,32 +175,60 @@ export interface GameState {
   planetHealth: number;
   maxPlanetHealth: number;
   wave: WaveState;
+  playerInventory: InventoryState;
+  activeMerchantInventory: InventoryState | null;
+  activeMerchantId: number | null;
+  waveActive: boolean;
   onPlanetDamaged: GameEvent;
   onRelicFired: GameEvent;
   onWaveComplete: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
+  onWaveActiveChanged: GameEvent;
+  onMerchantChanged: GameEvent;
+}
+
+function isRelicType(itemType: ItemType): boolean {
+  return typeof itemType === "number" && itemType in RELIC_CONFIGS;
 }
 
 function createRelicSlots(): RelicSlot[] {
   const slots: RelicSlot[] = [];
   const startingRelics: (RelicType | null)[] = [
     RelicType.SteelBattleaxe,
-    RelicType.EmbercrestBlade,
-    RelicType.RavenplumeEdge,
-    RelicType.GildedPlumeblade,
-    RelicType.CloudveilLongsword,
     null,
-    RelicType.DarkwoodHatchet,
+    null,
+    null,
+    null,
+    null,
+    null,
     null,
   ];
   for (let i = 0; i < RELIC_SLOT_COUNT; i++) {
     const angle = (i * 2 * Math.PI) / RELIC_SLOT_COUNT - Math.PI / 2;
+    const inventory = new InventoryState(1, 1, isRelicType);
     let relic: RelicState | null = null;
     const relicType = startingRelics[i] ?? null;
     if (relicType !== null) {
-      relic = { type: relicType, item: { type: relicType, amount: 1 }, level: 1, charge: 0, remainingShots: 0, nextShotTime: 0 };
+      inventory.addItem(createItem(relicType, 1), 0, 0);
+      relic = { charge: 0, remainingShots: 0, nextShotTime: 0 };
     }
-    slots.push({ angle, relic });
+
+    const slotIndex = i;
+    inventory.onItemAdded((item) => {
+      if (isRelicType(item.type)) {
+        slots[slotIndex].relic = {
+          charge: 0,
+          remainingShots: 0,
+          nextShotTime: 0,
+        };
+      }
+    });
+
+    inventory.onItemRemoved(() => {
+      slots[slotIndex].relic = null;
+    });
+
+    slots.push({ angle, inventory, relic });
   }
   return slots;
 }
@@ -239,11 +271,9 @@ function generateShopItems(count: number): Item[] {
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
   const selected = pool.slice(0, count);
-  return selected.map((relicType) => ({
-    type: relicType,
-    amount: 1,
-    price: 10 + Math.floor(Math.random() * 40) * 5,
-  }));
+  return selected.map((relicType) =>
+    createItem(relicType, 1, 10 + Math.floor(Math.random() * 40) * 5)
+  );
 }
 
 export function createEntityState(
@@ -273,7 +303,28 @@ export function createEntityState(
   };
 }
 
+let gameState: GameState | null = null;
+const stateCreatedListeners: Array<() => void> = [];
+
+export function getState(): GameState | null {
+  return gameState;
+}
+
+export function onStateCreated(cb: () => void): () => void {
+  if (gameState) {
+    cb();
+  } else {
+    stateCreatedListeners.push(cb);
+  }
+  return () => {
+    const idx = stateCreatedListeners.indexOf(cb);
+    if (idx >= 0) stateCreatedListeners.splice(idx, 1);
+  };
+}
+
 export function createGameState(): GameState {
+  const playerInventory = new InventoryState(10, 3);
+
   const state: GameState = {
     entities: [],
     relicSlots: createRelicSlots(),
@@ -295,21 +346,61 @@ export function createGameState(): GameState {
       spawnIndex: 0,
       waveTimer: 0,
     },
+    playerInventory,
+    activeMerchantInventory: null,
+    activeMerchantId: null,
+    waveActive: false,
     onPlanetDamaged: new GameEvent(),
     onRelicFired: new GameEvent(),
     onWaveComplete: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
+    onWaveActiveChanged: new GameEvent(),
+    onMerchantChanged: new GameEvent(),
   };
+
+  playerInventory.addItem(createItem(RelicType.EmbercrestBlade, 1), 0, 0);
+  playerInventory.addToFirstEmpty(createItem("Gold", 100));
+
+  const shopItems = generateShopItems(6);
+  const shopCols = 3;
+  const shopRows = Math.ceil(shopItems.length / shopCols);
+  const shopInventory = new InventoryState(shopCols, shopRows);
+  for (let i = 0; i < shopItems.length; i++) {
+    shopInventory.addItem(shopItems[i], i % shopCols, Math.floor(i / shopCols));
+  }
 
   state.merchants.push({
     id: state.nextId++,
     x: CANVAS_WIDTH - 250,
     y: CANVAS_HEIGHT / 2,
     entityType: "Clipper",
-    items: generateShopItems(6),
+    shopInventory,
   });
 
+  gameState = state;
+  for (const cb of stateCreatedListeners) cb();
+  stateCreatedListeners.length = 0;
   return state;
+}
+
+export function toggleMerchantShop(state: GameState, merchant: MerchantShipState): void {
+  if (state.activeMerchantId === merchant.id) {
+    closeMerchantShop(state);
+    return;
+  }
+
+  closeMerchantShop(state);
+
+  state.activeMerchantId = merchant.id;
+  state.activeMerchantInventory = merchant.shopInventory;
+
+  state.onMerchantChanged.emit();
+}
+
+export function closeMerchantShop(state: GameState): void {
+  state.activeMerchantInventory = null;
+  state.activeMerchantId = null;
+  state.onMerchantChanged.emit();
 }
 
 function spawnFromEdge(): { x: number; y: number } {
@@ -447,10 +538,10 @@ function spawnDrops(state: GameState, entity: EntityState): void {
 
   const gemType = rollGemDrop(entity.power);
   if (gemType !== null) {
-    spawnDrop(state, entity.x, entity.y, { type: gemType, amount: 1 });
+    spawnDrop(state, entity.x, entity.y, createItem(gemType, 1));
   } else {
     const goldAmount = calculateGoldDrop(entity.power);
-    spawnDrop(state, entity.x, entity.y, { type: "Gold", amount: goldAmount });
+    spawnDrop(state, entity.x, entity.y, createItem("Gold", goldAmount));
   }
 }
 
@@ -539,7 +630,7 @@ function getDamageBuffMultiplier(state: GameState, slotIndex: number): number {
   for (let j = 0; j < count; j++) {
     const slot = state.relicSlots[j];
     if (!slot.relic) continue;
-    const config: RelicTypeConfig = RELIC_CONFIGS[slot.relic.type];
+    const config: RelicTypeConfig = RELIC_CONFIGS[getRelicType(slot)!];
     if (config.damageBuffMultiplier === 0) continue;
     if (config.damageBuffAll && j !== slotIndex) {
       multiplier += config.damageBuffMultiplier;
@@ -561,7 +652,7 @@ function tryFireSlot(
   slot: RelicSlot,
   slotIndex: number
 ): void {
-  const config = RELIC_CONFIGS[slot.relic!.type];
+  const config = RELIC_CONFIGS[getRelicType(slot)!];
   if (slot.relic!.charge < config.charsToFire) return;
 
   slot.relic!.charge = 0;
@@ -602,7 +693,7 @@ function spawnProjectile(
   target: { x: number; y: number }
 ): boolean {
   const { x: relicX, y: relicY } = getRelicPosition(slot);
-  const config = RELIC_CONFIGS[slot.relic!.type];
+  const config = RELIC_CONFIGS[getRelicType(slot)!];
   const dx = target.x - relicX;
   const dy = target.y - relicY;
   const dist = Math.sqrt(dx * dx + dy * dy);
@@ -637,7 +728,7 @@ function fireRelic(
 ): void {
   if (!spawnProjectile(state, slot, slotIndex, target)) return;
 
-  const config = RELIC_CONFIGS[slot.relic!.type];
+  const config = RELIC_CONFIGS[getRelicType(slot)!];
   if (config.multiShotCount > 1) {
     slot.relic!.remainingShots = config.multiShotCount - 1;
     slot.relic!.nextShotTime = state.time.time + MULTI_SHOT_DELAY;
