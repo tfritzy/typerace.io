@@ -32,6 +32,7 @@ export const PhraseOverlay = ({
   const boxRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const cursorCharRef = useRef<HTMLSpanElement>(null);
+  const offsetRef = useRef(0);
 
   const phraseRef = useRef(phrase);
   const typedCountRef = useRef(typedCount);
@@ -85,12 +86,20 @@ export const PhraseOverlay = ({
     const charEl = cursorCharRef.current;
     if (!box || !track || !charEl) return;
 
+    if (typedCount === 0) {
+      offsetRef.current = 0;
+    }
+
     const boxRect = box.getBoundingClientRect();
     const charRect = charEl.getBoundingClientRect();
     const boxCenter = boxRect.width / 2;
-    const charCenter = charRect.left - boxRect.left + charRect.width / 2;
-    const offset = boxCenter - charCenter;
-    track.style.transform = `translateX(${offset}px)`;
+    const prevOffset = offsetRef.current;
+    const naturalCharCenter =
+      charRect.left - prevOffset - boxRect.left + charRect.width / 2;
+    const newOffset = boxCenter - naturalCharCenter;
+
+    offsetRef.current = newOffset;
+    track.style.transform = `translateX(${newOffset}px)`;
   }, [typedCount, phrase, visible]);
 
   if (!visible) return null;
