@@ -3,9 +3,9 @@ import React, {
   useRef,
   useState,
   useImperativeHandle,
-  useLayoutEffect,
   forwardRef,
 } from "react";
+import { Cursor } from "./Cursor";
 
 type TypeBoxProps = {
   phrase: string;
@@ -50,31 +50,19 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const [isComplete, setIsComplete] = useState(false);
     const [hasReachedErrorLimit, setHasReachedErrorLimit] = useState(false);
 
-    const cursorCharRef = useRef<HTMLSpanElement>(null);
+    const targetRef = useRef<HTMLElement>(null);
     const phraseRef = useRef<HTMLDivElement>(null);
-    const trackRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
-    useLayoutEffect(() => {
-      const track = trackRef.current;
-      const charEl = cursorCharRef.current;
-      const container = phraseRef.current;
-      if (!track || !charEl || !container) return;
-
-      const containerRect = container.getBoundingClientRect();
-      const charRect = charEl.getBoundingClientRect();
-      const trackRect = track.getBoundingClientRect();
-
-      const charTopInTrack = charRect.top - trackRect.top;
-      const lineHeight = charRect.height;
-      const visibleHeight = containerRect.height;
-
-      const targetY = charTopInTrack - visibleHeight / 2 + lineHeight / 2;
-      const maxOffset = track.scrollHeight - visibleHeight;
-      const clampedY = Math.max(0, Math.min(targetY, maxOffset));
-
-      track.style.transform = `translateY(${-clampedY}px)`;
-    }, [input.length, focused, isComplete, phrase]);
+    React.useEffect(() => {
+      if (targetRef.current && focused && !isComplete) {
+        targetRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "center",
+        });
+      }
+    }, [input.length, focused, isComplete]);
 
     useImperativeHandle(ref, () => ({
       focus: () => {
@@ -182,8 +170,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             }
             const wordLength = wordEndIndex - wordStartIndex + 1;
 
-            if (trackRef.current && wordLength > 0) {
-              const spans = trackRef.current.querySelectorAll("span");
+            if (phraseRef.current && wordLength > 0) {
+              const spans = phraseRef.current.querySelectorAll("span");
               const startSpan = spans[wordStartIndex];
               const endSpan = spans[wordEndIndex];
               if (startSpan && endSpan) {
@@ -284,16 +272,14 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
 
         const isError = isTyped && !isCorrect;
-        const showCursorLine = isCursor && focused && !isComplete && !hideCursor;
 
         return (
           <span
             key={i}
             data-char-index={i}
-            ref={isCursor ? cursorCharRef : undefined}
             className={`transition-all duration-150 ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
-            style={showCursorLine ? { boxShadow: "-2px 0 0 0 var(--color-box-border)" } : undefined}
           >
+            {isCursor && <span id="target" ref={targetRef} />}
             {char}
           </span>
         );
@@ -314,17 +300,18 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         <div className="relative select-none flex-1">
           <div className="type-box">
             <div
+              className="whitespace-pre-wrap text-start text-[28px] leading-12"
               ref={phraseRef}
-              style={{ overflow: "hidden", height: height || undefined }}
             >
-              <div
-                ref={trackRef}
-                className="whitespace-pre-wrap text-start text-[28px] leading-12"
-                style={{ transition: "transform 0.12s ease-out" }}
-              >
-                {renderText()}
-              </div>
+              {renderText()}
             </div>
+
+            <Cursor
+              targetRef={targetRef}
+              lerp={0.3}
+              fadeDelay={500}
+              visible={focused && !isComplete && !hideCursor}
+            />
 
             <textarea
               ref={inputRef}
