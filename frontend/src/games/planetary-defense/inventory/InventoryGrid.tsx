@@ -47,7 +47,7 @@ export const InventoryGrid = memo(({
   return (
     <div className="flex flex-col items-center w-full select-none">
       {label && (
-        <div className="text-slate-400 text-[length:clamp(7px,0.9vw,10px)] font-medium tracking-wider uppercase mb-0.5">
+        <div className="text-slate-400 text-[length:clamp(5px,0.6vw,7px)] tracking-wider uppercase mb-0.5">
           {label}
         </div>
       )}

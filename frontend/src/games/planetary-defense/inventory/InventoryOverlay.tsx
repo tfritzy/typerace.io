@@ -151,7 +151,6 @@ export const InventoryOverlay = ({ waveActive }: InventoryOverlayProps) => {
     <div
       ref={overlayRef}
       className="absolute inset-0 pointer-events-none overflow-hidden select-none"
-      style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
     >
       {!waveActive && (
         <div className="absolute bottom-[2%] left-1/2 -translate-x-1/2 pointer-events-auto" style={{ width: `${state.playerInventory.cols * 3.5}%`, maxWidth: '400px' }}>
