@@ -1,0 +1,25 @@
+name: Deploy Firestore Rules
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Deploy Firestore Rules
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-sa.json
+        run: |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_TYPERACE_160D3 }}' > /tmp/firebase-sa.json
+          chmod 600 /tmp/firebase-sa.json
+          npx firebase-tools deploy --only firestore:rules --project typerace-160d3
+          rm -f /tmp/firebase-sa.json
