@@ -3,16 +3,17 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 import fs from 'fs'
 
+const iconsSourceDir = path.resolve(__dirname, '../frontend/public/futuristic_pixel_icons')
+const iconsDestDir = path.resolve(__dirname, 'public/icons')
+
 function copyIcons() {
-  const src = path.resolve(__dirname, '../frontend/public/futuristic_pixel_icons')
-  const dest = path.resolve(__dirname, 'public/icons')
-  if (!fs.existsSync(src)) return
-  if (!fs.existsSync(dest)) {
-    fs.mkdirSync(dest, { recursive: true })
+  if (!fs.existsSync(iconsSourceDir)) return
+  if (!fs.existsSync(iconsDestDir)) {
+    fs.mkdirSync(iconsDestDir, { recursive: true })
   }
-  for (const file of fs.readdirSync(src)) {
+  for (const file of fs.readdirSync(iconsSourceDir)) {
     if (file.endsWith('.png')) {
-      fs.copyFileSync(path.join(src, file), path.join(dest, file))
+      fs.copyFileSync(path.join(iconsSourceDir, file), path.join(iconsDestDir, file))
     }
   }
 }
@@ -21,11 +22,22 @@ export default defineConfig({
   plugins: [
     react(),
     {
-      name: 'copy-icons-on-build',
-      buildStart() {
-        copyIcons()
+      name: 'serve-icons',
+      configureServer(server) {
+        server.middlewares.use('/icons', (req, res, next) => {
+          if (!req.url) return next()
+          const fileName = decodeURIComponent(req.url.replace(/^\//, ''))
+          const filePath = path.join(iconsSourceDir, fileName)
+          if (fs.existsSync(filePath)) {
+            res.setHeader('Content-Type', 'image/png')
+            res.setHeader('Cache-Control', 'max-age=31536000, immutable')
+            fs.createReadStream(filePath).pipe(res)
+          } else {
+            next()
+          }
+        })
       },
-      configureServer() {
+      buildStart() {
         copyIcons()
       },
     },
