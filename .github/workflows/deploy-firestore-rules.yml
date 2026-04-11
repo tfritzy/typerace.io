@@ -3,6 +3,9 @@ name: Deploy Firestore Rules
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   deploy-rules:
     runs-on: ubuntu-latest
