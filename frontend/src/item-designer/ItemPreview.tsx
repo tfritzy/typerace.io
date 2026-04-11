@@ -76,20 +76,33 @@ export function ItemPreview({
         <div
           style={{
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
-            gap: 6,
+            gap: 4,
             background: "rgba(224,175,104,0.08)",
             borderRadius: 6,
-            padding: "4px 12px",
+            padding: "6px 12px",
           }}
         >
-          <span style={{ fontSize: 14 }}>⚡</span>
+          <div style={{ display: "flex", gap: 3, flexWrap: "wrap", justifyContent: "center" }}>
+            {Array.from({ length: charges }, (_, i) => (
+              <div
+                key={i}
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  background: "#e0af68",
+                  border: "1px solid rgba(224,175,104,0.4)",
+                  boxShadow: "0 0 4px rgba(224,175,104,0.3)",
+                }}
+              />
+            ))}
+          </div>
           <span
             style={{
-              fontSize: 13,
-              color: "#e0af68",
-              fontWeight: 600,
+              fontSize: 11,
+              color: "rgba(224,175,104,0.6)",
               fontFamily: "'Inter', sans-serif",
             }}
           >

@@ -118,6 +118,7 @@ export function NoteEditor({
   const [itemAttrs, setItemAttrs] = useState<ItemAttribute[]>([]);
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(displayName);
+  const [attrSaveError, setAttrSaveError] = useState<string | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentItemRef = useRef(icon.defaultName);
   const pendingAttrSave = useRef<ItemAttribute[] | null>(null);
@@ -185,12 +186,16 @@ export function NoteEditor({
   const persistAttrs = useCallback(
     (next: ItemAttribute[]) => {
       setItemAttrs(next);
+      setAttrSaveError(null);
       pendingAttrSave.current = next;
       saveItemAttributes(icon.defaultName, next)
         .then(() => {
           pendingAttrSave.current = null;
         })
-        .catch((err) => console.error("Failed to save item attributes:", err));
+        .catch((err) => {
+          console.error("Failed to save item attributes:", err);
+          setAttrSaveError(String(err?.message || err));
+        });
     },
     [icon.defaultName]
   );
@@ -417,6 +422,21 @@ export function NoteEditor({
             >
               Attributes
             </div>
+            {attrSaveError && (
+              <div
+                style={{
+                  background: "rgba(247,118,142,0.15)",
+                  border: "1px solid rgba(247,118,142,0.3)",
+                  borderRadius: 6,
+                  padding: "6px 10px",
+                  fontSize: 11,
+                  color: "#f7768e",
+                  fontFamily: "'Inter', sans-serif",
+                }}
+              >
+                Save failed: {attrSaveError}
+              </div>
+            )}
             {itemAttrs.map((attr) => {
               const def = defMap.get(attr.attributeId);
               if (!def) return null;

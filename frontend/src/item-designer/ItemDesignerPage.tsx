@@ -32,6 +32,7 @@ export function ItemDesignerPage() {
   const [activeView, setActiveView] = useState<View>("items");
   const [exporting, setExporting] = useState(false);
   const [charges, setCharges] = useState<Record<string, number>>({});
+  const [loadError, setLoadError] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const nameOverrideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null
@@ -46,19 +47,31 @@ export function ItemDesignerPage() {
 
     loadExcluded()
       .then(setExcluded)
-      .catch((err) => console.error("Failed to load exclusions:", err));
+      .catch((err) => {
+        console.error("Failed to load exclusions:", err);
+        setLoadError(String(err?.message || err));
+      });
 
     loadAttributeDefinitions()
       .then(setDefinitions)
-      .catch((err) => console.error("Failed to load attribute definitions:", err));
+      .catch((err) => {
+        console.error("Failed to load attribute definitions:", err);
+        setLoadError(String(err?.message || err));
+      });
 
     loadNameOverrides()
       .then(setNameOverrides)
-      .catch((err) => console.error("Failed to load name overrides:", err));
+      .catch((err) => {
+        console.error("Failed to load name overrides:", err);
+        setLoadError(String(err?.message || err));
+      });
 
     loadCharges()
       .then(setCharges)
-      .catch((err) => console.error("Failed to load charges:", err));
+      .catch((err) => {
+        console.error("Failed to load charges:", err);
+        setLoadError(String(err?.message || err));
+      });
   }, []);
 
   const getDisplayName = useCallback(
@@ -187,7 +200,7 @@ export function ItemDesignerPage() {
             name: displayName,
             defaultName: icon.defaultName,
             filePath: icon.filePath,
-            charges: charges[icon.defaultName] ?? 0,
+            charges: charges[icon.defaultName] ?? 4,
             notes,
             attributes: resolvedAttrs,
           };
@@ -289,6 +302,22 @@ export function ItemDesignerPage() {
           </button>
         </div>
       </div>
+      {loadError && (
+        <div
+          style={{
+            background: "rgba(247,118,142,0.15)",
+            border: "1px solid rgba(247,118,142,0.3)",
+            borderRadius: 6,
+            padding: "8px 12px",
+            margin: "8px 12px",
+            fontSize: 11,
+            color: "#f7768e",
+            fontFamily: "'Inter', sans-serif",
+          }}
+        >
+          Firestore error: {loadError}
+        </div>
+      )}
       {included.map((icon) => (
         <ItemRow
           key={icon.defaultName}
@@ -354,7 +383,7 @@ export function ItemDesignerPage() {
         onBack={isMobile ? handleBack : undefined}
         compact={isMobile}
         onNameChange={handleNameChange}
-        charges={charges[selectedIcon.defaultName] ?? 0}
+        charges={charges[selectedIcon.defaultName] ?? 4}
         onChargesChange={handleChargesChange}
       />
     ) : (

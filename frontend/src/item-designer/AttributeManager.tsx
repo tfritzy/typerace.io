@@ -20,13 +20,16 @@ export function AttributeManager({
   const [newName, setNewName] = useState("");
   const [newIcon, setNewIcon] = useState<string>(AVAILABLE_ICONS[0]);
   const [newColor, setNewColor] = useState<string>(ATTRIBUTE_COLORS[0] ?? "#f7768e");
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const persist = useCallback(
     (next: AttributeDefinition[]) => {
       onChange(next);
-      saveAttributeDefinitions(next).catch((err) =>
-        console.error("Failed to save attribute definitions:", err)
-      );
+      setSaveError(null);
+      saveAttributeDefinitions(next).catch((err) => {
+        console.error("Failed to save attribute definitions:", err);
+        setSaveError(String(err?.message || err));
+      });
     },
     [onChange]
   );
@@ -92,6 +95,23 @@ export function AttributeManager({
           Attribute Definitions
         </h2>
       </div>
+
+      {saveError && (
+        <div
+          style={{
+            background: "rgba(247,118,142,0.15)",
+            border: "1px solid rgba(247,118,142,0.3)",
+            borderRadius: 6,
+            padding: "8px 12px",
+            marginBottom: 12,
+            fontSize: 12,
+            color: "#f7768e",
+            fontFamily: "'Inter', sans-serif",
+          }}
+        >
+          Save failed: {saveError}
+        </div>
+      )}
 
       <div
         style={{
