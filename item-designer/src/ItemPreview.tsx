@@ -1,11 +1,10 @@
-import { SwordFrame } from "./spriteData";
-import { SpriteIcon } from "./SpriteIcon";
+import { IconImage } from "./SpriteIcon";
 import { AttributeDefinition, ItemAttribute } from "./attributes";
 import { LucideIcon } from "./LucideIcon";
 
 interface ItemPreviewProps {
   itemName: string;
-  frame: SwordFrame;
+  filePath: string;
   attributes: ItemAttribute[];
   definitions: AttributeDefinition[];
   compact?: boolean;
@@ -13,7 +12,7 @@ interface ItemPreviewProps {
 
 export function ItemPreview({
   itemName,
-  frame,
+  filePath,
   attributes,
   definitions,
   compact,
@@ -55,7 +54,7 @@ export function ItemPreview({
           border: "1px solid rgba(205,214,244,0.08)",
         }}
       >
-        <SpriteIcon frame={frame} size={compact ? 64 : 80} />
+        <IconImage filePath={filePath} size={compact ? 64 : 80} />
       </div>
 
       <div

@@ -1,33 +1,44 @@
-import { useState, useEffect, useCallback } from "react";
-import { SpriteSheet, SwordFrame, SPRITESHEET_JSON_PATH } from "./spriteData";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { ICONS, ItemIcon } from "./iconData";
 import { ItemRow, NoteEditor } from "./ItemRow";
-import { loadExcluded, saveExcluded } from "./notes";
-import { AttributeDefinition, loadAttributeDefinitions } from "./attributes";
+import {
+  loadExcluded,
+  saveExcluded,
+  loadNameOverrides,
+  saveNameOverrides,
+  loadNote,
+} from "./notes";
+import {
+  AttributeDefinition,
+  loadAttributeDefinitions,
+  loadItemAttributes,
+} from "./attributes";
 import { AttributeManager } from "./AttributeManager";
 import { useIsMobile } from "./useIsMobile";
-import { Settings } from "lucide-react";
+import { Settings, Download } from "lucide-react";
 
 type View = "items" | "attributes";
 
 export default function App() {
-  const [spriteSheet, setSpriteSheet] = useState<SpriteSheet | null>(null);
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
   const [definitions, setDefinitions] = useState<AttributeDefinition[]>([]);
+  const [nameOverrides, setNameOverrides] = useState<Record<string, string>>(
+    {}
+  );
   const [mobileShowEditor, setMobileShowEditor] = useState(false);
   const [activeView, setActiveView] = useState<View>("items");
+  const [exporting, setExporting] = useState(false);
   const isMobile = useIsMobile();
+  const nameOverrideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   useEffect(() => {
-    fetch(SPRITESHEET_JSON_PATH)
-      .then((r) => r.json())
-      .then((data: SpriteSheet) => {
-        setSpriteSheet(data);
-        const firstItem = Object.keys(data.frames)[0];
-        if (firstItem) {
-          setSelectedItem(firstItem);
-        }
-      });
+    const first = ICONS[0];
+    if (first && !selectedKey) {
+      setSelectedKey(first.defaultName);
+    }
 
     loadExcluded()
       .then(setExcluded)
@@ -36,15 +47,47 @@ export default function App() {
     loadAttributeDefinitions()
       .then(setDefinitions)
       .catch(() => {});
+
+    loadNameOverrides()
+      .then(setNameOverrides)
+      .catch(() => {});
   }, []);
 
-  const toggleExclude = useCallback((name: string) => {
+  const getDisplayName = useCallback(
+    (icon: ItemIcon) => nameOverrides[icon.defaultName] || icon.defaultName,
+    [nameOverrides]
+  );
+
+  const handleNameChange = useCallback(
+    (defaultName: string, newName: string) => {
+      setNameOverrides((prev) => {
+        const next =
+          newName === defaultName
+            ? ((() => {
+                const copy = { ...prev };
+                delete copy[defaultName];
+                return copy;
+              })() as Record<string, string>)
+            : { ...prev, [defaultName]: newName };
+        if (nameOverrideTimerRef.current) {
+          clearTimeout(nameOverrideTimerRef.current);
+        }
+        nameOverrideTimerRef.current = setTimeout(() => {
+          saveNameOverrides(next).catch(() => {});
+        }, 400);
+        return next;
+      });
+    },
+    []
+  );
+
+  const toggleExclude = useCallback((defaultName: string) => {
     setExcluded((prev) => {
       const next = new Set(prev);
-      if (next.has(name)) {
-        next.delete(name);
+      if (next.has(defaultName)) {
+        next.delete(defaultName);
       } else {
-        next.add(name);
+        next.add(defaultName);
       }
       saveExcluded(next).catch(() => {});
       return next;
@@ -52,8 +95,8 @@ export default function App() {
   }, []);
 
   const handleSelect = useCallback(
-    (name: string) => {
-      setSelectedItem(name);
+    (defaultName: string) => {
+      setSelectedKey(defaultName);
       if (isMobile) {
         setMobileShowEditor(true);
       }
@@ -72,28 +115,70 @@ export default function App() {
     }
   }, [isMobile]);
 
-  if (!spriteSheet) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100dvh",
-          color: "rgba(205,214,244,0.5)",
-        }}
-      >
-        Loading...
-      </div>
-    );
-  }
+  const handleExport = useCallback(async () => {
+    setExporting(true);
+    try {
+      const includedIcons = ICONS.filter(
+        (icon) => !excluded.has(icon.defaultName)
+      );
+      const defMap = new Map(definitions.map((d) => [d.id, d]));
 
-  const entries = Object.entries(spriteSheet.frames);
-  const included = entries.filter(([name]) => !excluded.has(name));
-  const excludedItems = entries.filter(([name]) => excluded.has(name));
-  const selectedFrame: SwordFrame | undefined = selectedItem
-    ? spriteSheet.frames[selectedItem]
-    : undefined;
+      const items = await Promise.all(
+        includedIcons.map(async (icon) => {
+          const displayName =
+            nameOverrides[icon.defaultName] || icon.defaultName;
+          let notes = "";
+          try {
+            notes = await loadNote(icon.defaultName);
+          } catch {
+            /* offline */
+          }
+          let attrs: { attributeId: string; value: string }[] = [];
+          try {
+            attrs = await loadItemAttributes(icon.defaultName);
+          } catch {
+            /* offline */
+          }
+
+          const resolvedAttrs = attrs
+            .map((a) => {
+              const def = defMap.get(a.attributeId);
+              if (!def) return null;
+              return {
+                name: def.name,
+                icon: def.icon,
+                color: def.color,
+                value: a.value,
+              };
+            })
+            .filter(Boolean);
+
+          return {
+            name: displayName,
+            defaultName: icon.defaultName,
+            filePath: icon.filePath,
+            notes,
+            attributes: resolvedAttrs,
+          };
+        })
+      );
+
+      const json = JSON.stringify(items, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "items-export.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExporting(false);
+    }
+  }, [excluded, definitions, nameOverrides]);
+
+  const included = ICONS.filter((icon) => !excluded.has(icon.defaultName));
+  const excludedItems = ICONS.filter((icon) => excluded.has(icon.defaultName));
+  const selectedIcon = ICONS.find((icon) => icon.defaultName === selectedKey);
 
   const sidebar = (
     <div
@@ -125,35 +210,64 @@ export default function App() {
             letterSpacing: 1,
           }}
         >
-          Swordtember
+          Items
         </span>
-        <button
-          onClick={handleToggleView}
-          title={activeView === "items" ? "Manage attributes" : "Back to items"}
-          style={{
-            background: activeView === "attributes" ? "rgba(122,162,247,0.15)" : "transparent",
-            border: "none",
-            cursor: "pointer",
-            color: activeView === "attributes" ? "#7aa2f7" : "rgba(205,214,244,0.4)",
-            padding: 6,
-            borderRadius: 6,
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <Settings size={18} />
-        </button>
+        <div style={{ display: "flex", gap: 4 }}>
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            title="Export items as JSON"
+            style={{
+              background: "transparent",
+              border: "none",
+              cursor: exporting ? "wait" : "pointer",
+              color: exporting
+                ? "rgba(205,214,244,0.2)"
+                : "rgba(205,214,244,0.4)",
+              padding: 6,
+              borderRadius: 6,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <Download size={18} />
+          </button>
+          <button
+            onClick={handleToggleView}
+            title={
+              activeView === "items" ? "Manage attributes" : "Back to items"
+            }
+            style={{
+              background:
+                activeView === "attributes"
+                  ? "rgba(122,162,247,0.15)"
+                  : "transparent",
+              border: "none",
+              cursor: "pointer",
+              color:
+                activeView === "attributes"
+                  ? "#7aa2f7"
+                  : "rgba(205,214,244,0.4)",
+              padding: 6,
+              borderRadius: 6,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <Settings size={18} />
+          </button>
+        </div>
       </div>
-      {included.map(([name, data]) => (
+      {included.map((icon) => (
         <ItemRow
-          key={name}
-          name={name}
-          frame={data}
-          selected={name === selectedItem && activeView === "items"}
+          key={icon.defaultName}
+          icon={icon}
+          displayName={getDisplayName(icon)}
+          selected={icon.defaultName === selectedKey && activeView === "items"}
           excluded={false}
           compact={isMobile}
-          onSelect={() => handleSelect(name)}
-          onToggleExclude={() => toggleExclude(name)}
+          onSelect={() => handleSelect(icon.defaultName)}
+          onToggleExclude={() => toggleExclude(icon.defaultName)}
         />
       ))}
       {excludedItems.length > 0 && (
@@ -173,16 +287,18 @@ export default function App() {
           >
             Excluded ({excludedItems.length})
           </div>
-          {excludedItems.map(([name, data]) => (
+          {excludedItems.map((icon) => (
             <ItemRow
-              key={name}
-              name={name}
-              frame={data}
-              selected={name === selectedItem && activeView === "items"}
+              key={icon.defaultName}
+              icon={icon}
+              displayName={getDisplayName(icon)}
+              selected={
+                icon.defaultName === selectedKey && activeView === "items"
+              }
               excluded={true}
               compact={isMobile}
-              onSelect={() => handleSelect(name)}
-              onToggleExclude={() => toggleExclude(name)}
+              onSelect={() => handleSelect(icon.defaultName)}
+              onToggleExclude={() => toggleExclude(icon.defaultName)}
             />
           ))}
         </>
@@ -198,14 +314,15 @@ export default function App() {
         onBack={isMobile ? () => setActiveView("items") : undefined}
         compact={isMobile}
       />
-    ) : selectedItem && selectedFrame ? (
+    ) : selectedIcon ? (
       <NoteEditor
-        key={selectedItem}
-        itemName={selectedItem}
-        frame={selectedFrame}
+        key={selectedIcon.defaultName}
+        icon={selectedIcon}
+        displayName={getDisplayName(selectedIcon)}
         definitions={definitions}
         onBack={isMobile ? handleBack : undefined}
         compact={isMobile}
+        onNameChange={handleNameChange}
       />
     ) : (
       <div

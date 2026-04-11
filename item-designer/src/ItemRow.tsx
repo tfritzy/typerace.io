@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { SwordFrame } from "./spriteData";
-import { SpriteIcon } from "./SpriteIcon";
+import { ItemIcon } from "./iconData";
+import { IconImage } from "./SpriteIcon";
 import { loadNote, saveNote } from "./notes";
 import {
   AttributeDefinition,
@@ -13,8 +13,8 @@ import { LucideIcon } from "./LucideIcon";
 import { Plus, X } from "lucide-react";
 
 interface ItemRowProps {
-  name: string;
-  frame: SwordFrame;
+  icon: ItemIcon;
+  displayName: string;
   selected: boolean;
   excluded: boolean;
   compact?: boolean;
@@ -23,8 +23,8 @@ interface ItemRowProps {
 }
 
 export function ItemRow({
-  name,
-  frame,
+  icon,
+  displayName,
   selected,
   excluded,
   compact,
@@ -58,7 +58,7 @@ export function ItemRow({
           opacity: excluded ? 0.5 : 1,
         }}
       >
-        <SpriteIcon frame={frame} size={iconSize} />
+        <IconImage filePath={icon.filePath} size={iconSize} />
         <span
           style={{
             fontSize: 13,
@@ -66,7 +66,7 @@ export function ItemRow({
             textDecoration: excluded ? "line-through" : "none",
           }}
         >
-          {name}
+          {displayName}
         </span>
       </button>
       <button
@@ -92,51 +92,57 @@ export function ItemRow({
 }
 
 interface NoteEditorProps {
-  itemName: string;
-  frame: SwordFrame;
+  icon: ItemIcon;
+  displayName: string;
   definitions: AttributeDefinition[];
   onBack?: () => void;
   compact?: boolean;
+  onNameChange: (defaultName: string, newName: string) => void;
 }
 
 export function NoteEditor({
-  itemName,
-  frame,
+  icon,
+  displayName,
   definitions,
   onBack,
   compact,
+  onNameChange,
 }: NoteEditorProps) {
   const [text, setText] = useState("");
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [itemAttrs, setItemAttrs] = useState<ItemAttribute[]>([]);
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState(displayName);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const attrSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const currentItemRef = useRef(itemName);
+  const currentItemRef = useRef(icon.defaultName);
 
   useEffect(() => {
-    currentItemRef.current = itemName;
+    currentItemRef.current = icon.defaultName;
     setLoaded(false);
-    loadNote(itemName)
+    setEditingName(false);
+    setNameInput(displayName);
+    loadNote(icon.defaultName)
       .then((note) => {
-        if (currentItemRef.current === itemName) {
+        if (currentItemRef.current === icon.defaultName) {
           setText(note);
           setLoaded(true);
         }
       })
       .catch(() => {
-        if (currentItemRef.current === itemName) {
+        if (currentItemRef.current === icon.defaultName) {
           setLoaded(true);
         }
       });
-    loadItemAttributes(itemName)
+    loadItemAttributes(icon.defaultName)
       .then((attrs) => {
-        if (currentItemRef.current === itemName) {
+        if (currentItemRef.current === icon.defaultName) {
           setItemAttrs(attrs);
         }
       })
       .catch(() => {});
-  }, [itemName]);
+  }, [icon.defaultName, displayName]);
 
   const handleSave = useCallback(
     (value: string) => {
@@ -145,10 +151,10 @@ export function NoteEditor({
       }
       saveTimerRef.current = setTimeout(() => {
         setSaving(true);
-        saveNote(itemName, value).finally(() => setSaving(false));
+        saveNote(icon.defaultName, value).finally(() => setSaving(false));
       }, 400);
     },
-    [itemName]
+    [icon.defaultName]
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -164,10 +170,10 @@ export function NoteEditor({
         clearTimeout(attrSaveTimerRef.current);
       }
       attrSaveTimerRef.current = setTimeout(() => {
-        saveItemAttributes(itemName, next).catch(() => {});
+        saveItemAttributes(icon.defaultName, next).catch(() => {});
       }, 400);
     },
-    [itemName]
+    [icon.defaultName]
   );
 
   const addAttribute = (defId: string) => {
@@ -183,6 +189,16 @@ export function NoteEditor({
     persistAttrs(
       itemAttrs.map((a) => (a.attributeId === defId ? { ...a, value } : a))
     );
+  };
+
+  const commitNameEdit = () => {
+    setEditingName(false);
+    const trimmed = nameInput.trim();
+    if (trimmed && trimmed !== displayName) {
+      onNameChange(icon.defaultName, trimmed);
+    } else {
+      setNameInput(displayName);
+    }
   };
 
   const unassigned = definitions.filter(
@@ -224,26 +240,71 @@ export function NoteEditor({
             ←
           </button>
         )}
-        <SpriteIcon frame={frame} size={compact ? 48 : 64} />
-        <div>
-          <h2
-            style={{
-              fontSize: compact ? 15 : 18,
-              fontWeight: 600,
-              margin: 0,
-              color: "#cdd6f4",
-            }}
-          >
-            {itemName}
-          </h2>
-          <span
-            style={{
-              fontSize: 12,
-              color: saving ? "#f7768e" : "rgba(205,214,244,0.4)",
-            }}
-          >
-            {saving ? "saving..." : "saved"}
-          </span>
+        <IconImage filePath={icon.filePath} size={compact ? 48 : 64} />
+        <div style={{ flex: 1 }}>
+          {editingName ? (
+            <input
+              value={nameInput}
+              onChange={(e) => setNameInput(e.target.value)}
+              onBlur={commitNameEdit}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitNameEdit();
+                if (e.key === "Escape") {
+                  setNameInput(displayName);
+                  setEditingName(false);
+                }
+              }}
+              autoFocus
+              style={{
+                fontSize: compact ? 15 : 18,
+                fontWeight: 600,
+                color: "#cdd6f4",
+                background: "rgba(205,214,244,0.06)",
+                border: "1px solid rgba(122,162,247,0.4)",
+                borderRadius: 4,
+                padding: "2px 6px",
+                fontFamily: "'Inter', sans-serif",
+                outline: "none",
+                width: "100%",
+              }}
+            />
+          ) : (
+            <h2
+              onClick={() => {
+                setNameInput(displayName);
+                setEditingName(true);
+              }}
+              style={{
+                fontSize: compact ? 15 : 18,
+                fontWeight: 600,
+                margin: 0,
+                color: "#cdd6f4",
+                cursor: "pointer",
+              }}
+              title="Click to rename"
+            >
+              {displayName}
+            </h2>
+          )}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span
+              style={{
+                fontSize: 12,
+                color: saving ? "#f7768e" : "rgba(205,214,244,0.4)",
+              }}
+            >
+              {saving ? "saving..." : "saved"}
+            </span>
+            <span
+              style={{
+                fontSize: 11,
+                color: "rgba(205,214,244,0.2)",
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
+              {icon.filePath}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -403,8 +464,8 @@ export function NoteEditor({
           }}
         >
           <ItemPreview
-            itemName={itemName}
-            frame={frame}
+            itemName={displayName}
+            filePath={icon.filePath}
             attributes={itemAttrs}
             definitions={definitions}
             compact={compact}
