@@ -17,37 +17,26 @@ function PreviewChargesBadge({ charges }: { charges: number }) {
   return (
     <div
       style={{
-        position: "relative",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
-        width: 44,
-        height: 44,
+        gap: 5,
+        flexWrap: "wrap",
+        justifyContent: "flex-end",
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "linear-gradient(135deg, #e0af68 0%, #c49a52 100%)",
-          borderRadius: "50%",
-          border: "2px solid rgba(224,175,104,0.6)",
-          boxShadow:
-            "0 0 10px rgba(224,175,104,0.4), inset 0 1px 2px rgba(255,255,255,0.2)",
-        }}
-      />
-      <span
-        style={{
-          position: "relative",
-          fontSize: charges >= 10 ? 13 : 16,
-          fontWeight: 800,
-          color: "#1a1b26",
-          fontFamily: "'Inter', sans-serif",
-          lineHeight: 1,
-        }}
-      >
-        {charges}
-      </span>
+      {Array.from({ length: charges }, (_, i) => (
+        <div
+          key={i}
+          style={{
+            width: 10,
+            height: 10,
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #e0af68 0%, #c49a52 100%)",
+            border: "1.5px solid rgba(224,175,104,0.6)",
+            boxShadow: "0 0 6px rgba(224,175,104,0.4)",
+          }}
+        />
+      ))}
     </div>
   );
 }
