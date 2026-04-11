@@ -8,7 +8,6 @@ import {
   loadItemAttributes,
   saveItemAttributes,
 } from "./attributes";
-import { ItemPreview } from "./ItemPreview";
 import { LucideIcon } from "./LucideIcon";
 import { Plus, X } from "lucide-react";
 
@@ -100,6 +99,7 @@ interface NoteEditorProps {
   onNameChange: (defaultName: string, newName: string) => void;
   charges: number;
   onChargesChange: (defaultName: string, charges: number) => void;
+  onItemAttrsChange?: (defaultName: string, attrs: ItemAttribute[]) => void;
 }
 
 export function NoteEditor({
@@ -111,6 +111,7 @@ export function NoteEditor({
   onNameChange,
   charges,
   onChargesChange,
+  onItemAttrsChange,
 }: NoteEditorProps) {
   const [text, setText] = useState("");
   const [saving, setSaving] = useState(false);
@@ -188,6 +189,7 @@ export function NoteEditor({
       setItemAttrs(next);
       setAttrSaveError(null);
       pendingAttrSave.current = next;
+      onItemAttrsChange?.(icon.defaultName, next);
       saveItemAttributes(icon.defaultName, next)
         .then(() => {
           pendingAttrSave.current = null;
@@ -197,7 +199,7 @@ export function NoteEditor({
           setAttrSaveError(String(err?.message || err));
         });
     },
-    [icon.defaultName]
+    [icon.defaultName, onItemAttrsChange]
   );
 
   const addAttribute = (defId: string) => {
@@ -236,8 +238,9 @@ export function NoteEditor({
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        padding: compact ? 16 : 24,
+        padding: compact ? 16 : 20,
         overflow: "auto",
+        gap: compact ? 12 : 16,
       }}
     >
       <div
@@ -245,7 +248,6 @@ export function NoteEditor({
           display: "flex",
           alignItems: "center",
           gap: compact ? 10 : 16,
-          marginBottom: compact ? 12 : 16,
         }}
       >
         {onBack && (
@@ -264,7 +266,7 @@ export function NoteEditor({
             ←
           </button>
         )}
-        <IconImage filePath={icon.filePath} size={compact ? 48 : 64} />
+        <IconImage filePath={icon.filePath} size={compact ? 40 : 48} />
         <div style={{ flex: 1 }}>
           {editingName ? (
             <input
@@ -280,7 +282,7 @@ export function NoteEditor({
               }}
               autoFocus
               style={{
-                fontSize: compact ? 15 : 18,
+                fontSize: compact ? 14 : 16,
                 fontWeight: 600,
                 color: "#cdd6f4",
                 background: "rgba(205,214,244,0.06)",
@@ -299,7 +301,7 @@ export function NoteEditor({
                 setEditingName(true);
               }}
               style={{
-                fontSize: compact ? 15 : 18,
+                fontSize: compact ? 14 : 16,
                 fontWeight: 600,
                 margin: 0,
                 color: "#cdd6f4",
@@ -313,7 +315,7 @@ export function NoteEditor({
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span
               style={{
-                fontSize: 12,
+                fontSize: 11,
                 color: saving ? "#f7768e" : "rgba(205,214,244,0.4)",
               }}
             >
@@ -321,7 +323,7 @@ export function NoteEditor({
             </span>
             <span
               style={{
-                fontSize: 11,
+                fontSize: 10,
                 color: "rgba(205,214,244,0.2)",
                 fontFamily: "'Inter', sans-serif",
               }}
@@ -335,237 +337,191 @@ export function NoteEditor({
       <div
         style={{
           display: "flex",
-          gap: compact ? 16 : 24,
-          flex: 1,
-          minHeight: 0,
-          flexDirection: compact ? "column" : "row",
+          alignItems: "center",
+          gap: 10,
+          background: "rgba(205,214,244,0.04)",
+          borderRadius: 6,
+          padding: "8px 12px",
+        }}
+      >
+        <span style={{ fontSize: 16 }}>⚡</span>
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: "#e0af68",
+            fontFamily: "'Inter', sans-serif",
+            minWidth: 60,
+          }}
+        >
+          Charges
+        </span>
+        <input
+          type="number"
+          min={0}
+          value={charges}
+          onChange={(e) => {
+            const val = parseInt(e.target.value, 10);
+            onChargesChange(icon.defaultName, isNaN(val) || val < 0 ? 0 : val);
+          }}
+          style={{
+            width: 70,
+            background: "rgba(205,214,244,0.06)",
+            border: "1px solid rgba(205,214,244,0.1)",
+            borderRadius: 4,
+            color: "#cdd6f4",
+            padding: "4px 8px",
+            fontSize: 13,
+            fontFamily: "'Inter', sans-serif",
+            outline: "none",
+            textAlign: "center",
+          }}
+        />
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
         }}
       >
         <div
           style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            gap: 12,
-            minWidth: 0,
+            fontSize: 11,
+            fontWeight: 600,
+            color: "rgba(205,214,244,0.4)",
+            textTransform: "uppercase",
+            letterSpacing: 1.2,
           }}
         >
+          Attributes
+        </div>
+        {attrSaveError && (
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              background: "rgba(205,214,244,0.04)",
+              background: "rgba(247,118,142,0.15)",
+              border: "1px solid rgba(247,118,142,0.3)",
               borderRadius: 6,
-              padding: "8px 12px",
+              padding: "6px 10px",
+              fontSize: 11,
+              color: "#f7768e",
+              fontFamily: "'Inter', sans-serif",
             }}
           >
-            <span style={{ fontSize: 16 }}>⚡</span>
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: "#e0af68",
-                fontFamily: "'Inter', sans-serif",
-                minWidth: 60,
-              }}
-            >
-              Charges
-            </span>
-            <input
-              type="number"
-              min={0}
-              value={charges}
-              onChange={(e) => {
-                const val = parseInt(e.target.value, 10);
-                onChargesChange(icon.defaultName, isNaN(val) || val < 0 ? 0 : val);
-              }}
-              style={{
-                width: 80,
-                background: "rgba(205,214,244,0.06)",
-                border: "1px solid rgba(205,214,244,0.1)",
-                borderRadius: 4,
-                color: "#cdd6f4",
-                padding: "4px 8px",
-                fontSize: 14,
-                fontFamily: "'Inter', sans-serif",
-                outline: "none",
-                textAlign: "center",
-              }}
-            />
-            <span
-              style={{
-                fontSize: 12,
-                color: "rgba(205,214,244,0.3)",
-                fontFamily: "'Inter', sans-serif",
-              }}
-            >
-              characters to fire
-            </span>
+            Save failed: {attrSaveError}
           </div>
-
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-            }}
-          >
+        )}
+        {itemAttrs.map((attr) => {
+          const def = defMap.get(attr.attributeId);
+          if (!def) return null;
+          return (
             <div
+              key={attr.attributeId}
               style={{
-                fontSize: 11,
-                fontWeight: 600,
-                color: "rgba(205,214,244,0.4)",
-                textTransform: "uppercase",
-                letterSpacing: 1.2,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                background: "rgba(205,214,244,0.04)",
+                borderRadius: 6,
+                padding: "6px 10px",
               }}
             >
-              Attributes
-            </div>
-            {attrSaveError && (
-              <div
+              <LucideIcon name={def.icon} size={16} color={def.color} />
+              <span
                 style={{
-                  background: "rgba(247,118,142,0.15)",
-                  border: "1px solid rgba(247,118,142,0.3)",
-                  borderRadius: 6,
-                  padding: "6px 10px",
-                  fontSize: 11,
-                  color: "#f7768e",
+                  fontSize: 13,
+                  color: def.color,
                   fontFamily: "'Inter', sans-serif",
+                  minWidth: 70,
                 }}
               >
-                Save failed: {attrSaveError}
-              </div>
-            )}
-            {itemAttrs.map((attr) => {
-              const def = defMap.get(attr.attributeId);
-              if (!def) return null;
-              return (
-                <div
-                  key={attr.attributeId}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    background: "rgba(205,214,244,0.04)",
-                    borderRadius: 6,
-                    padding: "6px 10px",
-                  }}
-                >
-                  <LucideIcon name={def.icon} size={16} color={def.color} />
-                  <span
-                    style={{
-                      fontSize: 13,
-                      color: def.color,
-                      fontFamily: "'Inter', sans-serif",
-                      minWidth: 80,
-                    }}
-                  >
-                    {def.name}
-                  </span>
-                  <input
-                    value={attr.value}
-                    onChange={(e) =>
-                      updateAttributeValue(attr.attributeId, e.target.value)
-                    }
-                    placeholder="value..."
-                    style={{
-                      flex: 1,
-                      background: "rgba(205,214,244,0.06)",
-                      border: "1px solid rgba(205,214,244,0.1)",
-                      borderRadius: 4,
-                      color: "#cdd6f4",
-                      padding: "4px 8px",
-                      fontSize: 13,
-                      fontFamily: "'Inter', sans-serif",
-                      outline: "none",
-                    }}
-                  />
-                  <button
-                    onClick={() => removeAttribute(attr.attributeId)}
-                    style={{
-                      background: "transparent",
-                      border: "none",
-                      cursor: "pointer",
-                      color: "rgba(205,214,244,0.3)",
-                      padding: 2,
-                      display: "flex",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              );
-            })}
-            {unassigned.length > 0 && (
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                {unassigned.map((def) => (
-                  <button
-                    key={def.id}
-                    onClick={() => addAttribute(def.id)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 4,
-                      background: "rgba(205,214,244,0.04)",
-                      border: "1px dashed rgba(205,214,244,0.15)",
-                      borderRadius: 4,
-                      color: "rgba(205,214,244,0.5)",
-                      padding: "4px 8px",
-                      fontSize: 12,
-                      fontFamily: "'Inter', sans-serif",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <Plus size={12} />
-                    <LucideIcon name={def.icon} size={12} color={def.color} />
-                    {def.name}
-                  </button>
-                ))}
-              </div>
-            )}
+                {def.name}
+              </span>
+              <input
+                value={attr.value}
+                onChange={(e) =>
+                  updateAttributeValue(attr.attributeId, e.target.value)
+                }
+                placeholder="value..."
+                style={{
+                  flex: 1,
+                  background: "rgba(205,214,244,0.06)",
+                  border: "1px solid rgba(205,214,244,0.1)",
+                  borderRadius: 4,
+                  color: "#cdd6f4",
+                  padding: "4px 8px",
+                  fontSize: 13,
+                  fontFamily: "'Inter', sans-serif",
+                  outline: "none",
+                }}
+              />
+              <button
+                onClick={() => removeAttribute(attr.attributeId)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "rgba(205,214,244,0.3)",
+                  padding: 2,
+                  display: "flex",
+                  flexShrink: 0,
+                }}
+              >
+                <X size={14} />
+              </button>
+            </div>
+          );
+        })}
+        {unassigned.length > 0 && (
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {unassigned.map((def) => (
+              <button
+                key={def.id}
+                onClick={() => addAttribute(def.id)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  background: "rgba(205,214,244,0.04)",
+                  border: "1px dashed rgba(205,214,244,0.15)",
+                  borderRadius: 4,
+                  color: "rgba(205,214,244,0.5)",
+                  padding: "4px 8px",
+                  fontSize: 12,
+                  fontFamily: "'Inter', sans-serif",
+                  cursor: "pointer",
+                }}
+              >
+                <Plus size={12} />
+                <LucideIcon name={def.icon} size={12} color={def.color} />
+                {def.name}
+              </button>
+            ))}
           </div>
-
-          <textarea
-            value={text}
-            onChange={handleChange}
-            disabled={!loaded}
-            placeholder="Type notes here..."
-            style={{
-              flex: 1,
-              background: "rgba(205,214,244,0.04)",
-              border: "1px solid rgba(205,214,244,0.1)",
-              borderRadius: 6,
-              color: "#cdd6f4",
-              padding: 12,
-              fontSize: 14,
-              fontFamily: "'Inter', sans-serif",
-              resize: "none",
-              outline: "none",
-              lineHeight: 1.6,
-              minHeight: compact ? 120 : 200,
-            }}
-          />
-        </div>
-
-        <div
-          style={{
-            flexShrink: 0,
-            display: "flex",
-            justifyContent: compact ? "center" : "flex-start",
-          }}
-        >
-          <ItemPreview
-            itemName={displayName}
-            filePath={icon.filePath}
-            attributes={itemAttrs}
-            definitions={definitions}
-            charges={charges}
-            compact={compact}
-          />
-        </div>
+        )}
       </div>
+
+      <textarea
+        value={text}
+        onChange={handleChange}
+        disabled={!loaded}
+        placeholder="Type notes here..."
+        style={{
+          flex: 1,
+          background: "rgba(205,214,244,0.04)",
+          border: "1px solid rgba(205,214,244,0.1)",
+          borderRadius: 6,
+          color: "#cdd6f4",
+          padding: 12,
+          fontSize: 13,
+          fontFamily: "'Inter', sans-serif",
+          resize: "none",
+          outline: "none",
+          lineHeight: 1.6,
+          minHeight: compact ? 80 : 120,
+        }}
+      />
     </div>
   );
 }

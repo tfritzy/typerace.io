@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ICONS, type ItemIcon } from "./iconData";
-import { ItemRow, NoteEditor } from "./ItemRow";
+import { NoteEditor } from "./ItemRow";
+import { ItemCard } from "./ItemCard";
 import {
   loadExcluded,
   saveExcluded,
@@ -12,8 +13,10 @@ import {
 } from "./notes";
 import {
   type AttributeDefinition,
+  type ItemAttribute,
   loadAttributeDefinitions,
   loadItemAttributes,
+  loadAllItemAttributes,
 } from "./attributes";
 import { AttributeManager } from "./AttributeManager";
 import { useIsMobile } from "./useIsMobile";
@@ -32,6 +35,7 @@ export function ItemDesignerPage() {
   const [activeView, setActiveView] = useState<View>("items");
   const [exporting, setExporting] = useState(false);
   const [charges, setCharges] = useState<Record<string, number>>({});
+  const [allItemAttrs, setAllItemAttrs] = useState<Record<string, ItemAttribute[]>>({});
   const [loadError, setLoadError] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const nameOverrideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
@@ -72,6 +76,13 @@ export function ItemDesignerPage() {
       .then(setCharges)
       .catch((err) => {
         console.error("Failed to load charges:", err);
+        setLoadError(String(err?.message || err));
+      });
+
+    loadAllItemAttributes()
+      .then(setAllItemAttrs)
+      .catch((err) => {
+        console.error("Failed to load all item attributes:", err);
         setLoadError(String(err?.message || err));
       });
   }, []);
@@ -155,6 +166,13 @@ export function ItemDesignerPage() {
   const handleBack = useCallback(() => {
     setMobileShowEditor(false);
   }, []);
+
+  const handleItemAttrsChange = useCallback(
+    (defaultName: string, attrs: ItemAttribute[]) => {
+      setAllItemAttrs((prev) => ({ ...prev, [defaultName]: attrs }));
+    },
+    []
+  );
 
   const handleToggleView = useCallback(() => {
     setActiveView((v) => (v === "items" ? "attributes" : "items"));
@@ -243,9 +261,7 @@ export function ItemDesignerPage() {
     <div
       ref={sidebarCallbackRef}
       style={{
-        width: isMobile ? "100%" : 280,
-        minWidth: isMobile ? undefined : 280,
-        borderRight: isMobile ? "none" : "1px solid rgba(205,214,244,0.1)",
+        flex: 1,
         overflowY: "auto",
         display: "flex",
         flexDirection: "column",
@@ -254,7 +270,7 @@ export function ItemDesignerPage() {
     >
       <div
         style={{
-          padding: isMobile ? "14px 16px" : "16px 12px",
+          padding: isMobile ? "14px 16px" : "16px 16px",
           borderBottom: "1px solid rgba(205,214,244,0.1)",
           display: "flex",
           alignItems: "center",
@@ -325,7 +341,7 @@ export function ItemDesignerPage() {
             border: "1px solid rgba(247,118,142,0.3)",
             borderRadius: 6,
             padding: "8px 12px",
-            margin: "8px 12px",
+            margin: "8px 16px",
             fontSize: 11,
             color: "#f7768e",
             fontFamily: "'Inter', sans-serif",
@@ -334,23 +350,36 @@ export function ItemDesignerPage() {
           Firestore error: {loadError}
         </div>
       )}
-      {included.map((icon) => (
-        <ItemRow
-          key={icon.defaultName}
-          icon={icon}
-          displayName={getDisplayName(icon)}
-          selected={icon.defaultName === selectedKey && activeView === "items"}
-          excluded={false}
-          compact={isMobile}
-          onSelect={() => handleSelect(icon.defaultName)}
-          onToggleExclude={() => toggleExclude(icon.defaultName)}
-        />
-      ))}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: isMobile
+            ? "repeat(auto-fill, minmax(140px, 1fr))"
+            : "repeat(auto-fill, minmax(170px, 1fr))",
+          gap: 12,
+          padding: 16,
+        }}
+      >
+        {included.map((icon) => (
+          <ItemCard
+            key={icon.defaultName}
+            itemName={getDisplayName(icon)}
+            filePath={icon.filePath}
+            attributes={allItemAttrs[icon.defaultName] ?? []}
+            definitions={definitions}
+            charges={charges[icon.defaultName] ?? 4}
+            selected={icon.defaultName === selectedKey && activeView === "items"}
+            excluded={false}
+            onSelect={() => handleSelect(icon.defaultName)}
+            onToggleExclude={() => toggleExclude(icon.defaultName)}
+          />
+        ))}
+      </div>
       {excludedItems.length > 0 && (
         <>
           <div
             style={{
-              padding: "12px 12px 6px",
+              padding: "12px 16px 6px",
               fontSize: 10,
               fontWeight: 600,
               color: "rgba(205,214,244,0.25)",
@@ -363,20 +392,33 @@ export function ItemDesignerPage() {
           >
             Excluded ({excludedItems.length})
           </div>
-          {excludedItems.map((icon) => (
-            <ItemRow
-              key={icon.defaultName}
-              icon={icon}
-              displayName={getDisplayName(icon)}
-              selected={
-                icon.defaultName === selectedKey && activeView === "items"
-              }
-              excluded={true}
-              compact={isMobile}
-              onSelect={() => handleSelect(icon.defaultName)}
-              onToggleExclude={() => toggleExclude(icon.defaultName)}
-            />
-          ))}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: isMobile
+                ? "repeat(auto-fill, minmax(140px, 1fr))"
+                : "repeat(auto-fill, minmax(170px, 1fr))",
+              gap: 12,
+              padding: 16,
+            }}
+          >
+            {excludedItems.map((icon) => (
+              <ItemCard
+                key={icon.defaultName}
+                itemName={getDisplayName(icon)}
+                filePath={icon.filePath}
+                attributes={allItemAttrs[icon.defaultName] ?? []}
+                definitions={definitions}
+                charges={charges[icon.defaultName] ?? 4}
+                selected={
+                  icon.defaultName === selectedKey && activeView === "items"
+                }
+                excluded={true}
+                onSelect={() => handleSelect(icon.defaultName)}
+                onToggleExclude={() => toggleExclude(icon.defaultName)}
+              />
+            ))}
+          </div>
         </>
       )}
     </div>
@@ -401,6 +443,7 @@ export function ItemDesignerPage() {
         onNameChange={handleNameChange}
         charges={charges[selectedIcon.defaultName] ?? 4}
         onChargesChange={handleChargesChange}
+        onItemAttrsChange={handleItemAttrsChange}
       />
     ) : (
       <div
@@ -438,7 +481,30 @@ export function ItemDesignerPage() {
       }}
     >
       {sidebar}
-      <div style={{ flex: 1, overflow: "hidden" }}>{mainPanel}</div>
+      {selectedIcon && activeView === "items" && (
+        <div
+          style={{
+            width: 420,
+            minWidth: 380,
+            overflow: "hidden",
+            borderLeft: "1px solid rgba(205,214,244,0.1)",
+          }}
+        >
+          {mainPanel}
+        </div>
+      )}
+      {activeView === "attributes" && (
+        <div
+          style={{
+            width: 480,
+            minWidth: 400,
+            overflow: "hidden",
+            borderLeft: "1px solid rgba(205,214,244,0.1)",
+          }}
+        >
+          {mainPanel}
+        </div>
+      )}
     </div>
   );
 }
