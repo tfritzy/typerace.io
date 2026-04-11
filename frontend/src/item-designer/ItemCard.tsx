@@ -2,16 +2,19 @@ import { IconImage } from "./SpriteIcon";
 import { type AttributeDefinition, type ItemAttribute } from "./attributes";
 import { LucideIcon } from "./LucideIcon";
 
-interface ItemPreviewProps {
+interface ItemCardProps {
   itemName: string;
   filePath: string;
   attributes: ItemAttribute[];
   definitions: AttributeDefinition[];
   charges: number;
-  compact?: boolean;
+  selected: boolean;
+  excluded: boolean;
+  onSelect: () => void;
+  onToggleExclude: () => void;
 }
 
-function PreviewChargesBadge({ charges }: { charges: number }) {
+function ChargesBadge({ charges }: { charges: number }) {
   if (charges <= 0) return null;
 
   return (
@@ -21,8 +24,8 @@ function PreviewChargesBadge({ charges }: { charges: number }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        width: 44,
-        height: 44,
+        width: 36,
+        height: 36,
       }}
     >
       <div
@@ -33,13 +36,13 @@ function PreviewChargesBadge({ charges }: { charges: number }) {
           borderRadius: "50%",
           border: "2px solid rgba(224,175,104,0.6)",
           boxShadow:
-            "0 0 10px rgba(224,175,104,0.4), inset 0 1px 2px rgba(255,255,255,0.2)",
+            "0 0 8px rgba(224,175,104,0.4), inset 0 1px 2px rgba(255,255,255,0.2)",
         }}
       />
       <span
         style={{
           position: "relative",
-          fontSize: charges >= 10 ? 13 : 16,
+          fontSize: charges >= 10 ? 11 : 14,
           fontWeight: 800,
           color: "#1a1b26",
           fontFamily: "'Inter', sans-serif",
@@ -52,7 +55,7 @@ function PreviewChargesBadge({ charges }: { charges: number }) {
   );
 }
 
-function PreviewAttackBadge({ value }: { value: string }) {
+function AttackBadge({ value }: { value: string }) {
   if (!value) return null;
 
   return (
@@ -62,8 +65,8 @@ function PreviewAttackBadge({ value }: { value: string }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        width: 44,
-        height: 44,
+        width: 36,
+        height: 36,
       }}
     >
       <div
@@ -74,13 +77,13 @@ function PreviewAttackBadge({ value }: { value: string }) {
           borderRadius: "50%",
           border: "2px solid rgba(247,118,142,0.6)",
           boxShadow:
-            "0 0 10px rgba(247,118,142,0.4), inset 0 1px 2px rgba(255,255,255,0.2)",
+            "0 0 8px rgba(247,118,142,0.4), inset 0 1px 2px rgba(255,255,255,0.2)",
         }}
       />
       <span
         style={{
           position: "relative",
-          fontSize: value.length > 2 ? 11 : 16,
+          fontSize: value.length > 2 ? 10 : 14,
           fontWeight: 800,
           color: "#1a1b26",
           fontFamily: "'Inter', sans-serif",
@@ -93,14 +96,17 @@ function PreviewAttackBadge({ value }: { value: string }) {
   );
 }
 
-export function ItemPreview({
+export function ItemCard({
   itemName,
   filePath,
   attributes,
   definitions,
   charges,
-  compact,
-}: ItemPreviewProps) {
+  selected,
+  excluded,
+  onSelect,
+  onToggleExclude,
+}: ItemCardProps) {
   const defMap = new Map(definitions.map((d) => [d.id, d]));
   const resolved = attributes
     .map((a) => {
@@ -119,28 +125,57 @@ export function ItemPreview({
 
   return (
     <div
+      onClick={onSelect}
       style={{
         position: "relative",
-        background:
-          "linear-gradient(180deg, rgba(30,30,46,0.95) 0%, rgba(24,24,37,0.98) 100%)",
-        border: "1px solid rgba(205,214,244,0.12)",
+        background: selected
+          ? "linear-gradient(180deg, rgba(122,162,247,0.12) 0%, rgba(30,30,46,0.95) 100%)"
+          : "linear-gradient(180deg, rgba(30,30,46,0.95) 0%, rgba(24,24,37,0.98) 100%)",
+        border: selected
+          ? "2px solid rgba(122,162,247,0.5)"
+          : "1px solid rgba(205,214,244,0.12)",
         borderRadius: 10,
-        padding: compact ? "16px 16px 24px" : "24px 24px 32px",
-        width: compact ? "100%" : 280,
-        minWidth: compact ? undefined : 280,
+        padding: "16px 12px 20px",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: compact ? 10 : 14,
-        boxShadow:
-          "0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(205,214,244,0.05)",
-        alignSelf: "flex-start",
+        gap: 8,
+        cursor: "pointer",
+        opacity: excluded ? 0.4 : 1,
+        boxShadow: selected
+          ? "0 4px 20px rgba(122,162,247,0.2), inset 0 1px 0 rgba(205,214,244,0.08)"
+          : "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(205,214,244,0.05)",
+        transition: "box-shadow 0.15s, border-color 0.15s",
+        minHeight: 200,
       }}
     >
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleExclude();
+        }}
+        title={excluded ? "Include in pack" : "Exclude from pack"}
+        style={{
+          position: "absolute",
+          top: 4,
+          right: 4,
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          padding: "2px 6px",
+          fontSize: 12,
+          color: excluded ? "#9ece6a" : "rgba(205,214,244,0.2)",
+          lineHeight: 1,
+          zIndex: 1,
+        }}
+      >
+        {excluded ? "↩" : "✕"}
+      </button>
+
       <div
         style={{
-          width: compact ? 72 : 96,
-          height: compact ? 72 : 96,
+          width: 56,
+          height: 56,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -149,17 +184,19 @@ export function ItemPreview({
           border: "1px solid rgba(205,214,244,0.08)",
         }}
       >
-        <IconImage filePath={filePath} size={compact ? 64 : 80} />
+        <IconImage filePath={filePath} size={48} />
       </div>
 
       <div
         style={{
-          fontSize: compact ? 14 : 16,
+          fontSize: 12,
           fontWeight: 700,
-          color: "#c0caf5",
+          color: excluded ? "rgba(205,214,244,0.4)" : "#c0caf5",
           textAlign: "center",
           fontFamily: "'Inter', sans-serif",
-          letterSpacing: 0.3,
+          letterSpacing: 0.2,
+          lineHeight: 1.3,
+          textDecoration: excluded ? "line-through" : "none",
         }}
       >
         {itemName}
@@ -169,11 +206,11 @@ export function ItemPreview({
         <div
           style={{
             width: "100%",
-            borderTop: "1px solid rgba(205,214,244,0.1)",
-            paddingTop: compact ? 8 : 12,
+            borderTop: "1px solid rgba(205,214,244,0.08)",
+            paddingTop: 6,
             display: "flex",
             flexDirection: "column",
-            gap: compact ? 6 : 8,
+            gap: 3,
           }}
         >
           {otherAttrs.map((attr) => (
@@ -182,24 +219,25 @@ export function ItemPreview({
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 10,
-                padding: "4px 0",
+                gap: 6,
+                padding: "2px 0",
               }}
             >
-              <LucideIcon name={attr.icon} size={16} color={attr.color} />
+              <LucideIcon name={attr.icon} size={12} color={attr.color} />
               <span
                 style={{
-                  fontSize: 13,
+                  fontSize: 10,
                   color: attr.color,
                   fontFamily: "'Inter', sans-serif",
                   flex: 1,
+                  opacity: 0.8,
                 }}
               >
                 {attr.name}
               </span>
               <span
                 style={{
-                  fontSize: 13,
+                  fontSize: 10,
                   color: "#cdd6f4",
                   fontFamily: "'Inter', sans-serif",
                   fontWeight: 600,
@@ -212,17 +250,7 @@ export function ItemPreview({
         </div>
       )}
 
-      {otherAttrs.length === 0 && !attackAttr && charges <= 0 && (
-        <div
-          style={{
-            fontSize: 12,
-            color: "rgba(205,214,244,0.2)",
-            fontStyle: "italic",
-          }}
-        >
-          No attributes assigned
-        </div>
-      )}
+      <div style={{ flex: 1 }} />
 
       {(attackAttr || charges > 0) && (
         <div
@@ -234,15 +262,13 @@ export function ItemPreview({
                 : attackAttr
                   ? "flex-start"
                   : "flex-end",
-            alignItems: "center",
+            alignItems: "flex-end",
             width: "100%",
-            marginTop: 8,
-            paddingTop: 8,
-            borderTop: "1px solid rgba(205,214,244,0.08)",
+            marginTop: 4,
           }}
         >
-          {attackAttr && <PreviewAttackBadge value={attackAttr.value} />}
-          {charges > 0 && <PreviewChargesBadge charges={charges} />}
+          {attackAttr && <AttackBadge value={attackAttr.value} />}
+          {charges > 0 && <ChargesBadge charges={charges} />}
         </div>
       )}
     </div>

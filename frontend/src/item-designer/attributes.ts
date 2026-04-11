@@ -1,5 +1,5 @@
 import { db } from "./firestore";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
 
 export interface AttributeDefinition {
   id: string;
@@ -62,4 +62,15 @@ export async function saveItemAttributes(
     console.error(`Failed to save attributes for ${itemName}:`, err);
     throw err;
   }
+}
+
+export async function loadAllItemAttributes(): Promise<Record<string, ItemAttribute[]>> {
+  const colRef = collection(db, ITEM_ATTRS_COLLECTION);
+  const snap = await getDocs(colRef);
+  const result: Record<string, ItemAttribute[]> = {};
+  snap.forEach((docSnap) => {
+    const data = docSnap.data() as { attrs?: ItemAttribute[] };
+    result[docSnap.id] = data.attrs ?? [];
+  });
+  return result;
 }
