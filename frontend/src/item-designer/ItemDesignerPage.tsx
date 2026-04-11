@@ -46,19 +46,19 @@ export function ItemDesignerPage() {
 
     loadExcluded()
       .then(setExcluded)
-      .catch(() => {});
+      .catch((err) => console.error("Failed to load exclusions:", err));
 
     loadAttributeDefinitions()
       .then(setDefinitions)
-      .catch(() => {});
+      .catch((err) => console.error("Failed to load attribute definitions:", err));
 
     loadNameOverrides()
       .then(setNameOverrides)
-      .catch(() => {});
+      .catch((err) => console.error("Failed to load name overrides:", err));
 
     loadCharges()
       .then(setCharges)
-      .catch(() => {});
+      .catch((err) => console.error("Failed to load charges:", err));
   }, []);
 
   const getDisplayName = useCallback(
@@ -81,7 +81,9 @@ export function ItemDesignerPage() {
           clearTimeout(nameOverrideTimerRef.current);
         }
         nameOverrideTimerRef.current = setTimeout(() => {
-          saveNameOverrides(next).catch(() => {});
+          saveNameOverrides(next).catch((err) =>
+            console.error("Failed to save name overrides:", err)
+          );
         }, 400);
         return next;
       });
@@ -97,7 +99,9 @@ export function ItemDesignerPage() {
           clearTimeout(chargesTimerRef.current);
         }
         chargesTimerRef.current = setTimeout(() => {
-          saveCharges(next).catch(() => {});
+          saveCharges(next).catch((err) =>
+            console.error("Failed to save charges:", err)
+          );
         }, 400);
         return next;
       });
@@ -113,7 +117,9 @@ export function ItemDesignerPage() {
       } else {
         next.add(defaultName);
       }
-      saveExcluded(next).catch(() => {});
+      saveExcluded(next).catch((err) =>
+        console.error("Failed to save exclusions:", err)
+      );
       return next;
     });
   }, []);

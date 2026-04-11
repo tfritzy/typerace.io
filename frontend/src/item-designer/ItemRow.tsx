@@ -119,8 +119,8 @@ export function NoteEditor({
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(displayName);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const attrSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentItemRef = useRef(icon.defaultName);
+  const pendingAttrSave = useRef<ItemAttribute[] | null>(null);
 
   useEffect(() => {
     currentItemRef.current = icon.defaultName;
@@ -134,7 +134,8 @@ export function NoteEditor({
           setLoaded(true);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Failed to load note:", err);
         if (currentItemRef.current === icon.defaultName) {
           setLoaded(true);
         }
@@ -145,8 +146,22 @@ export function NoteEditor({
           setItemAttrs(attrs);
         }
       })
-      .catch(() => {});
-  }, [icon.defaultName, displayName]);
+      .catch((err) => console.error("Failed to load item attributes:", err));
+  }, [icon.defaultName]);
+
+  useEffect(() => {
+    setNameInput(displayName);
+  }, [displayName]);
+
+  useEffect(() => {
+    return () => {
+      if (pendingAttrSave.current) {
+        saveItemAttributes(currentItemRef.current, pendingAttrSave.current).catch(
+          (err) => console.error("Failed to flush attributes on unmount:", err)
+        );
+      }
+    };
+  }, []);
 
   const handleSave = useCallback(
     (value: string) => {
@@ -170,12 +185,12 @@ export function NoteEditor({
   const persistAttrs = useCallback(
     (next: ItemAttribute[]) => {
       setItemAttrs(next);
-      if (attrSaveTimerRef.current) {
-        clearTimeout(attrSaveTimerRef.current);
-      }
-      attrSaveTimerRef.current = setTimeout(() => {
-        saveItemAttributes(icon.defaultName, next).catch(() => {});
-      }, 400);
+      pendingAttrSave.current = next;
+      saveItemAttributes(icon.defaultName, next)
+        .then(() => {
+          pendingAttrSave.current = null;
+        })
+        .catch((err) => console.error("Failed to save item attributes:", err));
     },
     [icon.defaultName]
   );

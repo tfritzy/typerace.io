@@ -30,8 +30,13 @@ export async function loadAttributeDefinitions(): Promise<AttributeDefinition[]>
 export async function saveAttributeDefinitions(
   defs: AttributeDefinition[]
 ): Promise<void> {
-  const ref = doc(db, META_COLLECTION, ATTR_DEFS_DOC);
-  await setDoc(ref, { definitions: defs });
+  try {
+    const ref = doc(db, META_COLLECTION, ATTR_DEFS_DOC);
+    await setDoc(ref, { definitions: defs });
+  } catch (err) {
+    console.error("Failed to save attribute definitions:", err);
+    throw err;
+  }
 }
 
 export async function loadItemAttributes(
@@ -50,6 +55,11 @@ export async function saveItemAttributes(
   itemName: string,
   attrs: ItemAttribute[]
 ): Promise<void> {
-  const ref = doc(db, ITEM_ATTRS_COLLECTION, itemName);
-  await setDoc(ref, { attrs });
+  try {
+    const ref = doc(db, ITEM_ATTRS_COLLECTION, itemName);
+    await setDoc(ref, { attrs });
+  } catch (err) {
+    console.error(`Failed to save attributes for ${itemName}:`, err);
+    throw err;
+  }
 }

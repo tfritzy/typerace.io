@@ -24,7 +24,9 @@ export function AttributeManager({
   const persist = useCallback(
     (next: AttributeDefinition[]) => {
       onChange(next);
-      saveAttributeDefinitions(next).catch(() => {});
+      saveAttributeDefinitions(next).catch((err) =>
+        console.error("Failed to save attribute definitions:", err)
+      );
     },
     [onChange]
   );
