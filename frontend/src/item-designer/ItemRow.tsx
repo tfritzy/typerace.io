@@ -98,6 +98,8 @@ interface NoteEditorProps {
   onBack?: () => void;
   compact?: boolean;
   onNameChange: (defaultName: string, newName: string) => void;
+  charges: number;
+  onChargesChange: (defaultName: string, charges: number) => void;
 }
 
 export function NoteEditor({
@@ -107,6 +109,8 @@ export function NoteEditor({
   onBack,
   compact,
   onNameChange,
+  charges,
+  onChargesChange,
 }: NoteEditorProps) {
   const [text, setText] = useState("");
   const [saving, setSaving] = useState(false);
@@ -329,6 +333,60 @@ export function NoteEditor({
           <div
             style={{
               display: "flex",
+              alignItems: "center",
+              gap: 10,
+              background: "rgba(205,214,244,0.04)",
+              borderRadius: 6,
+              padding: "8px 12px",
+            }}
+          >
+            <span style={{ fontSize: 16 }}>⚡</span>
+            <span
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: "#e0af68",
+                fontFamily: "'Inter', sans-serif",
+                minWidth: 60,
+              }}
+            >
+              Charges
+            </span>
+            <input
+              type="number"
+              min={0}
+              value={charges}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
+                onChargesChange(icon.defaultName, isNaN(val) ? 0 : val);
+              }}
+              style={{
+                width: 80,
+                background: "rgba(205,214,244,0.06)",
+                border: "1px solid rgba(205,214,244,0.1)",
+                borderRadius: 4,
+                color: "#cdd6f4",
+                padding: "4px 8px",
+                fontSize: 14,
+                fontFamily: "'Inter', sans-serif",
+                outline: "none",
+                textAlign: "center",
+              }}
+            />
+            <span
+              style={{
+                fontSize: 12,
+                color: "rgba(205,214,244,0.3)",
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
+              characters to fire
+            </span>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
               flexDirection: "column",
               gap: 8,
             }}
@@ -468,6 +526,7 @@ export function NoteEditor({
             filePath={icon.filePath}
             attributes={itemAttrs}
             definitions={definitions}
+            charges={charges}
             compact={compact}
           />
         </div>

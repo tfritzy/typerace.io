@@ -7,6 +7,7 @@ interface ItemPreviewProps {
   filePath: string;
   attributes: ItemAttribute[];
   definitions: AttributeDefinition[];
+  charges: number;
   compact?: boolean;
 }
 
@@ -15,6 +16,7 @@ export function ItemPreview({
   filePath,
   attributes,
   definitions,
+  charges,
   compact,
 }: ItemPreviewProps) {
   const defMap = new Map(definitions.map((d) => [d.id, d]));
@@ -69,6 +71,32 @@ export function ItemPreview({
       >
         {itemName}
       </div>
+
+      {charges > 0 && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+            background: "rgba(224,175,104,0.08)",
+            borderRadius: 6,
+            padding: "4px 12px",
+          }}
+        >
+          <span style={{ fontSize: 14 }}>⚡</span>
+          <span
+            style={{
+              fontSize: 13,
+              color: "#e0af68",
+              fontWeight: 600,
+              fontFamily: "'Inter', sans-serif",
+            }}
+          >
+            {charges} charges
+          </span>
+        </div>
+      )}
 
       {resolved.length > 0 && (
         <div

@@ -50,3 +50,21 @@ export async function saveNameOverrides(
   const ref = doc(db, META_COLLECTION, NAME_OVERRIDES_DOC);
   await setDoc(ref, { names });
 }
+
+const CHARGES_DOC = "charges";
+
+export async function loadCharges(): Promise<Record<string, number>> {
+  const ref = doc(db, META_COLLECTION, CHARGES_DOC);
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    return (snap.data() as { values: Record<string, number> }).values ?? {};
+  }
+  return {};
+}
+
+export async function saveCharges(
+  values: Record<string, number>
+): Promise<void> {
+  const ref = doc(db, META_COLLECTION, CHARGES_DOC);
+  await setDoc(ref, { values });
+}

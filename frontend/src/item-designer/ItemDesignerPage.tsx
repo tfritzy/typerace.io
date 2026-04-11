@@ -7,6 +7,8 @@ import {
   loadNameOverrides,
   saveNameOverrides,
   loadNote,
+  loadCharges,
+  saveCharges,
 } from "./notes";
 import {
   type AttributeDefinition,
@@ -29,10 +31,12 @@ export function ItemDesignerPage() {
   const [mobileShowEditor, setMobileShowEditor] = useState(false);
   const [activeView, setActiveView] = useState<View>("items");
   const [exporting, setExporting] = useState(false);
+  const [charges, setCharges] = useState<Record<string, number>>({});
   const isMobile = useIsMobile();
   const nameOverrideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null
   );
+  const chargesTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const first = ICONS[0];
@@ -50,6 +54,10 @@ export function ItemDesignerPage() {
 
     loadNameOverrides()
       .then(setNameOverrides)
+      .catch(() => {});
+
+    loadCharges()
+      .then(setCharges)
       .catch(() => {});
   }, []);
 
@@ -74,6 +82,22 @@ export function ItemDesignerPage() {
         }
         nameOverrideTimerRef.current = setTimeout(() => {
           saveNameOverrides(next).catch(() => {});
+        }, 400);
+        return next;
+      });
+    },
+    []
+  );
+
+  const handleChargesChange = useCallback(
+    (defaultName: string, value: number) => {
+      setCharges((prev) => {
+        const next = { ...prev, [defaultName]: value };
+        if (chargesTimerRef.current) {
+          clearTimeout(chargesTimerRef.current);
+        }
+        chargesTimerRef.current = setTimeout(() => {
+          saveCharges(next).catch(() => {});
         }, 400);
         return next;
       });
@@ -157,6 +181,7 @@ export function ItemDesignerPage() {
             name: displayName,
             defaultName: icon.defaultName,
             filePath: icon.filePath,
+            charges: charges[icon.defaultName] ?? 0,
             notes,
             attributes: resolvedAttrs,
           };
@@ -174,7 +199,7 @@ export function ItemDesignerPage() {
     } finally {
       setExporting(false);
     }
-  }, [excluded, definitions, nameOverrides]);
+  }, [excluded, definitions, nameOverrides, charges]);
 
   const included = ICONS.filter((icon) => !excluded.has(icon.defaultName));
   const excludedItems = ICONS.filter((icon) => excluded.has(icon.defaultName));
@@ -323,6 +348,8 @@ export function ItemDesignerPage() {
         onBack={isMobile ? handleBack : undefined}
         compact={isMobile}
         onNameChange={handleNameChange}
+        charges={charges[selectedIcon.defaultName] ?? 0}
+        onChargesChange={handleChargesChange}
       />
     ) : (
       <div
