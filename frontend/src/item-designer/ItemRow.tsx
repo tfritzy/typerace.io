@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { type ItemIcon } from "./iconData";
 import { IconImage } from "./SpriteIcon";
-import { loadNote, saveNote, type Rarity } from "./notes";
+import { loadNote, saveNote, type Rarity, RARITIES, RARITY_COLORS } from "./notes";
 import {
   type AttributeDefinition,
   type ItemAttribute,
@@ -10,14 +10,6 @@ import {
 } from "./attributes";
 import { LucideIcon } from "./LucideIcon";
 import { Plus, X } from "lucide-react";
-
-const RARITIES: Rarity[] = ["common", "rare", "legendary"];
-
-const RARITY_COLORS: Record<Rarity, string> = {
-  common: "#9ece6a",
-  rare: "#7aa2f7",
-  legendary: "#e0af68",
-};
 
 interface ItemRowProps {
   icon: ItemIcon;

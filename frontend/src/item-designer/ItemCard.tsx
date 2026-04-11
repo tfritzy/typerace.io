@@ -1,13 +1,7 @@
 import { IconImage } from "./SpriteIcon";
 import { type AttributeDefinition, type ItemAttribute } from "./attributes";
-import { type Rarity } from "./notes";
+import { type Rarity, RARITY_COLORS } from "./notes";
 import { LucideIcon } from "./LucideIcon";
-
-const RARITY_COLORS: Record<Rarity, string> = {
-  common: "#9ece6a",
-  rare: "#7aa2f7",
-  legendary: "#e0af68",
-};
 
 const RARITY_BORDER: Record<Rarity, string> = {
   common: "rgba(158,206,106,0.25)",
@@ -16,9 +10,9 @@ const RARITY_BORDER: Record<Rarity, string> = {
 };
 
 const RARITY_GLOW: Record<Rarity, string> = {
-  common: "none",
-  rare: "0 0 8px rgba(122,162,247,0.15)",
-  legendary: "0 0 12px rgba(224,175,104,0.25), 0 0 4px rgba(224,175,104,0.15)",
+  common: "",
+  rare: ", 0 0 8px rgba(122,162,247,0.15)",
+  legendary: ", 0 0 12px rgba(224,175,104,0.25), 0 0 4px rgba(224,175,104,0.15)",
 };
 
 interface ItemCardProps {
@@ -154,7 +148,7 @@ export function ItemCard({
         opacity: excluded ? 0.4 : 1,
         boxShadow: selected
           ? "0 4px 20px rgba(122,162,247,0.2), inset 0 1px 0 rgba(205,214,244,0.08)"
-          : `0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(205,214,244,0.05)${rarity !== "common" ? `, ${RARITY_GLOW[rarity]}` : ""}`,
+          : `0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(205,214,244,0.05)${RARITY_GLOW[rarity]}`,
         transition: "box-shadow 0.15s, border-color 0.15s",
         minHeight: 200,
       }}
