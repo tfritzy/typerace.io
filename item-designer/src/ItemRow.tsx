@@ -46,7 +46,7 @@ export function NoteEditor({ itemName, frame }: NoteEditorProps) {
   const [text, setText] = useState("");
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentItemRef = useRef(itemName);
 
   useEffect(() => {
