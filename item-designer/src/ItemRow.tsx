@@ -8,6 +8,7 @@ interface ItemRowProps {
   frame: SwordFrame;
   selected: boolean;
   excluded: boolean;
+  compact?: boolean;
   onSelect: () => void;
   onToggleExclude: () => void;
 }
@@ -17,9 +18,11 @@ export function ItemRow({
   frame,
   selected,
   excluded,
+  compact,
   onSelect,
   onToggleExclude,
 }: ItemRowProps) {
+  const iconSize = compact ? 36 : 48;
   return (
     <div
       style={{
@@ -35,8 +38,8 @@ export function ItemRow({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 12,
-          padding: "8px 12px",
+          gap: compact ? 10 : 12,
+          padding: compact ? "6px 10px" : "8px 12px",
           background: "transparent",
           border: "none",
           cursor: "pointer",
@@ -46,7 +49,7 @@ export function ItemRow({
           opacity: excluded ? 0.5 : 1,
         }}
       >
-        <SpriteIcon frame={frame} size={48} />
+        <SpriteIcon frame={frame} size={iconSize} />
         <span
           style={{
             fontSize: 13,
@@ -67,8 +70,8 @@ export function ItemRow({
           background: "transparent",
           border: "none",
           cursor: "pointer",
-          padding: "4px 10px",
-          fontSize: 16,
+          padding: compact ? "4px 12px" : "4px 10px",
+          fontSize: compact ? 18 : 16,
           color: excluded ? "#9ece6a" : "rgba(205,214,244,0.3)",
           flexShrink: 0,
         }}
@@ -82,9 +85,16 @@ export function ItemRow({
 interface NoteEditorProps {
   itemName: string;
   frame: SwordFrame;
+  onBack?: () => void;
+  compact?: boolean;
 }
 
-export function NoteEditor({ itemName, frame }: NoteEditorProps) {
+export function NoteEditor({
+  itemName,
+  frame,
+  onBack,
+  compact,
+}: NoteEditorProps) {
   const [text, setText] = useState("");
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -133,22 +143,38 @@ export function NoteEditor({ itemName, frame }: NoteEditorProps) {
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        padding: 24,
+        padding: compact ? 16 : 24,
       }}
     >
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 16,
-          marginBottom: 16,
+          gap: compact ? 10 : 16,
+          marginBottom: compact ? 12 : 16,
         }}
       >
-        <SpriteIcon frame={frame} size={64} />
+        {onBack && (
+          <button
+            onClick={onBack}
+            style={{
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              color: "#7aa2f7",
+              fontSize: 22,
+              padding: "4px 8px 4px 0",
+              flexShrink: 0,
+            }}
+          >
+            ←
+          </button>
+        )}
+        <SpriteIcon frame={frame} size={compact ? 48 : 64} />
         <div>
           <h2
             style={{
-              fontSize: 18,
+              fontSize: compact ? 15 : 18,
               fontWeight: 600,
               margin: 0,
               color: "#cdd6f4",
