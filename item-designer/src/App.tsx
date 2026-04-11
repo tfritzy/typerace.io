@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
-import { SpriteSheet, SPRITESHEET_JSON_PATH } from "./spriteData";
+import { useState, useEffect, useCallback } from "react";
+import { SpriteSheet, SwordFrame, SPRITESHEET_JSON_PATH } from "./spriteData";
 import { ItemRow, NoteEditor } from "./ItemRow";
+import { loadExcluded, saveExcluded } from "./notes";
 
 export default function App() {
   const [spriteSheet, setSpriteSheet] = useState<SpriteSheet | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [excluded, setExcluded] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch(SPRITESHEET_JSON_PATH)
@@ -16,7 +18,27 @@ export default function App() {
           setSelectedItem(firstItem);
         }
       });
+
+    loadExcluded()
+      .then(setExcluded)
+      .catch(() => {});
   }, []);
+
+  const toggleExclude = useCallback(
+    (name: string) => {
+      setExcluded((prev) => {
+        const next = new Set(prev);
+        if (next.has(name)) {
+          next.delete(name);
+        } else {
+          next.add(name);
+        }
+        saveExcluded(next).catch(() => {});
+        return next;
+      });
+    },
+    []
+  );
 
   if (!spriteSheet) {
     return (
@@ -35,7 +57,11 @@ export default function App() {
   }
 
   const entries = Object.entries(spriteSheet.frames);
-  const selectedFrame = selectedItem ? spriteSheet.frames[selectedItem] : null;
+  const included = entries.filter(([name]) => !excluded.has(name));
+  const excludedItems = entries.filter(([name]) => excluded.has(name));
+  const selectedFrame: SwordFrame | undefined = selectedItem
+    ? spriteSheet.frames[selectedItem]
+    : undefined;
 
   return (
     <div
@@ -68,15 +94,47 @@ export default function App() {
         >
           Swordtember
         </div>
-        {entries.map(([name, data]) => (
+        {included.map(([name, data]) => (
           <ItemRow
             key={name}
             name={name}
             frame={data}
             selected={name === selectedItem}
+            excluded={false}
             onSelect={() => setSelectedItem(name)}
+            onToggleExclude={() => toggleExclude(name)}
           />
         ))}
+        {excludedItems.length > 0 && (
+          <>
+            <div
+              style={{
+                padding: "12px 12px 6px",
+                fontSize: 10,
+                fontWeight: 600,
+                color: "rgba(205,214,244,0.25)",
+                fontFamily: "'Inter', sans-serif",
+                textTransform: "uppercase",
+                letterSpacing: 1.5,
+                borderTop: "1px solid rgba(205,214,244,0.06)",
+                marginTop: 8,
+              }}
+            >
+              Excluded ({excludedItems.length})
+            </div>
+            {excludedItems.map(([name, data]) => (
+              <ItemRow
+                key={name}
+                name={name}
+                frame={data}
+                selected={name === selectedItem}
+                excluded={true}
+                onSelect={() => setSelectedItem(name)}
+                onToggleExclude={() => toggleExclude(name)}
+              />
+            ))}
+          </>
+        )}
       </div>
       <div style={{ flex: 1, overflow: "hidden" }}>
         {selectedItem && selectedFrame ? (

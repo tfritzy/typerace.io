@@ -7,33 +7,75 @@ interface ItemRowProps {
   name: string;
   frame: SwordFrame;
   selected: boolean;
+  excluded: boolean;
   onSelect: () => void;
+  onToggleExclude: () => void;
 }
 
-export function ItemRow({ name, frame, selected, onSelect }: ItemRowProps) {
+export function ItemRow({
+  name,
+  frame,
+  selected,
+  excluded,
+  onSelect,
+  onToggleExclude,
+}: ItemRowProps) {
   return (
-    <button
-      onClick={onSelect}
+    <div
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 12,
-        padding: "8px 12px",
-        background: selected ? "rgba(205,214,244,0.1)" : "transparent",
-        border: "none",
         borderLeft: selected ? "3px solid #7aa2f7" : "3px solid transparent",
-        cursor: "pointer",
-        width: "100%",
-        textAlign: "left",
-        color: "#cdd6f4",
+        background: selected ? "rgba(205,214,244,0.1)" : "transparent",
         transition: "background 0.15s",
       }}
     >
-      <SpriteIcon frame={frame} size={48} />
-      <span style={{ fontSize: 13, fontFamily: "'Inter', sans-serif" }}>
-        {name}
-      </span>
-    </button>
+      <button
+        onClick={onSelect}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          padding: "8px 12px",
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          flex: 1,
+          textAlign: "left",
+          color: excluded ? "rgba(205,214,244,0.3)" : "#cdd6f4",
+          opacity: excluded ? 0.5 : 1,
+        }}
+      >
+        <SpriteIcon frame={frame} size={48} />
+        <span
+          style={{
+            fontSize: 13,
+            fontFamily: "'Inter', sans-serif",
+            textDecoration: excluded ? "line-through" : "none",
+          }}
+        >
+          {name}
+        </span>
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleExclude();
+        }}
+        title={excluded ? "Include in pack" : "Exclude from pack"}
+        style={{
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          padding: "4px 10px",
+          fontSize: 16,
+          color: excluded ? "#9ece6a" : "rgba(205,214,244,0.3)",
+          flexShrink: 0,
+        }}
+      >
+        {excluded ? "↩" : "✕"}
+      </button>
+    </div>
   );
 }
 
