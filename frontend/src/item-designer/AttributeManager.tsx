@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { type AttributeDefinition, saveAttributeDefinitions } from "./attributes";
 import { AVAILABLE_ICONS, ATTRIBUTE_COLORS } from "./iconPicker";
 import { LucideIcon } from "./LucideIcon";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Pencil, Check } from "lucide-react";
 
 interface AttributeManagerProps {
   definitions: AttributeDefinition[];
@@ -21,6 +21,10 @@ export function AttributeManager({
   const [newIcon, setNewIcon] = useState<string>(AVAILABLE_ICONS[0]);
   const [newColor, setNewColor] = useState<string>(ATTRIBUTE_COLORS[0] ?? "#f7768e");
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editIcon, setEditIcon] = useState<string>(AVAILABLE_ICONS[0]);
+  const [editColor, setEditColor] = useState<string>(ATTRIBUTE_COLORS[0] ?? "#f7768e");
 
   const persist = useCallback(
     (next: AttributeDefinition[]) => {
@@ -44,11 +48,45 @@ export function AttributeManager({
   };
 
   const handleRemove = (id: string) => {
+    if (editingId === id) setEditingId(null);
     persist(definitions.filter((d) => d.id !== id));
+  };
+
+  const startEditing = (def: AttributeDefinition) => {
+    setEditingId(def.id);
+    setEditName(def.name);
+    setEditIcon(def.icon);
+    setEditColor(def.color);
+  };
+
+  const commitEdit = () => {
+    if (!editingId) return;
+    const trimmed = editName.trim();
+    if (!trimmed) {
+      setEditingId(null);
+      return;
+    }
+    persist(
+      definitions.map((d) =>
+        d.id === editingId
+          ? { ...d, name: trimmed, icon: editIcon, color: editColor }
+          : d
+      )
+    );
+    setEditingId(null);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleAdd();
+  };
+
+  const handleEditKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") commitEdit();
+    if (e.key === "Escape") cancelEdit();
   };
 
   return (
@@ -213,43 +251,155 @@ export function AttributeManager({
             No attributes defined yet
           </div>
         )}
-        {definitions.map((def) => (
-          <div
-            key={def.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              padding: "10px 12px",
-              borderBottom: "1px solid rgba(205,214,244,0.06)",
-            }}
-          >
-            <LucideIcon name={def.icon} size={20} color={def.color} />
-            <span
+        {definitions.map((def) => {
+          const isEditing = editingId === def.id;
+          return (
+            <div
+              key={def.id}
               style={{
-                flex: 1,
-                fontSize: 14,
-                color: def.color,
-                fontFamily: "'Inter', sans-serif",
-              }}
-            >
-              {def.name}
-            </span>
-            <button
-              onClick={() => handleRemove(def.id)}
-              style={{
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                color: "rgba(205,214,244,0.3)",
-                padding: 4,
                 display: "flex",
+                flexDirection: "column",
+                borderBottom: "1px solid rgba(205,214,244,0.06)",
               }}
             >
-              <Trash2 size={16} />
-            </button>
-          </div>
-        ))}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "10px 12px",
+                }}
+              >
+                {isEditing ? (
+                  <>
+                    <select
+                      value={editIcon}
+                      onChange={(e) => setEditIcon(e.target.value)}
+                      style={{
+                        background: "rgba(205,214,244,0.06)",
+                        border: "1px solid rgba(122,162,247,0.4)",
+                        borderRadius: 4,
+                        color: "#cdd6f4",
+                        padding: "4px 6px",
+                        fontSize: 12,
+                        fontFamily: "'Inter', sans-serif",
+                        outline: "none",
+                      }}
+                    >
+                      {AVAILABLE_ICONS.map((icon) => (
+                        <option key={icon} value={icon}>
+                          {icon}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      onKeyDown={handleEditKeyDown}
+                      autoFocus
+                      style={{
+                        flex: 1,
+                        fontSize: 14,
+                        color: editColor,
+                        fontFamily: "'Inter', sans-serif",
+                        background: "rgba(205,214,244,0.06)",
+                        border: "1px solid rgba(122,162,247,0.4)",
+                        borderRadius: 4,
+                        padding: "4px 8px",
+                        outline: "none",
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <LucideIcon name={def.icon} size={20} color={def.color} />
+                    <span
+                      style={{
+                        flex: 1,
+                        fontSize: 14,
+                        color: def.color,
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      {def.name}
+                    </span>
+                  </>
+                )}
+                {isEditing ? (
+                  <button
+                    onClick={commitEdit}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "#9ece6a",
+                      padding: 4,
+                      display: "flex",
+                    }}
+                  >
+                    <Check size={16} />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => startEditing(def)}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "rgba(205,214,244,0.3)",
+                      padding: 4,
+                      display: "flex",
+                    }}
+                  >
+                    <Pencil size={16} />
+                  </button>
+                )}
+                <button
+                  onClick={() => handleRemove(def.id)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "rgba(205,214,244,0.3)",
+                    padding: 4,
+                    display: "flex",
+                  }}
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+              {isEditing && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 4,
+                    flexWrap: "wrap",
+                    padding: "0 12px 10px",
+                  }}
+                >
+                  {ATTRIBUTE_COLORS.map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => setEditColor(c)}
+                      style={{
+                        width: 22,
+                        height: 22,
+                        borderRadius: 4,
+                        background: c,
+                        border:
+                          editColor === c
+                            ? "2px solid #cdd6f4"
+                            : "2px solid transparent",
+                        cursor: "pointer",
+                        padding: 0,
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
