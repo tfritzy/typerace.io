@@ -93,7 +93,7 @@ export function ItemPreview({
               fontFamily: "'Inter', sans-serif",
             }}
           >
-            {charges} charges
+            {charges} {charges === 1 ? "charge" : "charges"}
           </span>
         </div>
       )}

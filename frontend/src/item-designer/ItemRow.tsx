@@ -358,7 +358,7 @@ export function NoteEditor({
               value={charges}
               onChange={(e) => {
                 const val = parseInt(e.target.value, 10);
-                onChargesChange(icon.defaultName, isNaN(val) ? 0 : val);
+                onChargesChange(icon.defaultName, isNaN(val) || val < 0 ? 0 : val);
               }}
               style={{
                 width: 80,
