@@ -10,9 +10,6 @@
         ],
         "qa": [
           "typerace-qa"
-        ],
-        "item-designer": [
-          "typerace-item-designer"
         ]
       }
     }

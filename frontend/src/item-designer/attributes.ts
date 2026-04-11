@@ -1,4 +1,4 @@
-import { db } from "./firebase";
+import { db } from "./firestore";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export interface AttributeDefinition {

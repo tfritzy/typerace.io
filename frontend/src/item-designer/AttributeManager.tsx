@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { AttributeDefinition, saveAttributeDefinitions } from "./attributes";
+import { type AttributeDefinition, saveAttributeDefinitions } from "./attributes";
 import { AVAILABLE_ICONS, ATTRIBUTE_COLORS } from "./iconPicker";
 import { LucideIcon } from "./LucideIcon";
 import { Trash2, Plus } from "lucide-react";

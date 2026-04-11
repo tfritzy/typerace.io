@@ -1,5 +1,5 @@
 import { IconImage } from "./SpriteIcon";
-import { AttributeDefinition, ItemAttribute } from "./attributes";
+import { type AttributeDefinition, type ItemAttribute } from "./attributes";
 import { LucideIcon } from "./LucideIcon";
 
 interface ItemPreviewProps {

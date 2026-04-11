@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { ItemIcon } from "./iconData";
+import { type ItemIcon } from "./iconData";
 import { IconImage } from "./SpriteIcon";
 import { loadNote, saveNote } from "./notes";
 import {
-  AttributeDefinition,
-  ItemAttribute,
+  type AttributeDefinition,
+  type ItemAttribute,
   loadItemAttributes,
   saveItemAttributes,
 } from "./attributes";

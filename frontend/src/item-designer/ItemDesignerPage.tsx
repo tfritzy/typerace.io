@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { ICONS, ItemIcon } from "./iconData";
+import { ICONS, type ItemIcon } from "./iconData";
 import { ItemRow, NoteEditor } from "./ItemRow";
 import {
   loadExcluded,
@@ -9,7 +9,7 @@ import {
   loadNote,
 } from "./notes";
 import {
-  AttributeDefinition,
+  type AttributeDefinition,
   loadAttributeDefinitions,
   loadItemAttributes,
 } from "./attributes";
@@ -19,7 +19,7 @@ import { Settings, Download } from "lucide-react";
 
 type View = "items" | "attributes";
 
-export default function App() {
+export function ItemDesignerPage() {
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
   const [definitions, setDefinitions] = useState<AttributeDefinition[]>([]);
