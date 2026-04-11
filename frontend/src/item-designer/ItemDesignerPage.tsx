@@ -38,6 +38,8 @@ export function ItemDesignerPage() {
     null
   );
   const chargesTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sidebarRef = useRef<HTMLDivElement | null>(null);
+  const savedScrollTop = useRef(0);
 
   useEffect(() => {
     const first = ICONS[0];
@@ -139,6 +141,9 @@ export function ItemDesignerPage() {
 
   const handleSelect = useCallback(
     (defaultName: string) => {
+      if (isMobile && sidebarRef.current) {
+        savedScrollTop.current = sidebarRef.current.scrollTop;
+      }
       setSelectedKey(defaultName);
       if (isMobile) {
         setMobileShowEditor(true);
@@ -224,8 +229,19 @@ export function ItemDesignerPage() {
   const excludedItems = ICONS.filter((icon) => excluded.has(icon.defaultName));
   const selectedIcon = ICONS.find((icon) => icon.defaultName === selectedKey);
 
+  const sidebarCallbackRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      sidebarRef.current = node;
+      if (node && savedScrollTop.current > 0) {
+        node.scrollTop = savedScrollTop.current;
+      }
+    },
+    [mobileShowEditor]
+  );
+
   const sidebar = (
     <div
+      ref={sidebarCallbackRef}
       style={{
         width: isMobile ? "100%" : 280,
         minWidth: isMobile ? undefined : 280,
