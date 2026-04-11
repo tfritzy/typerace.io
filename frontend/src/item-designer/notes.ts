@@ -68,3 +68,23 @@ export async function saveCharges(
   const ref = doc(db, META_COLLECTION, CHARGES_DOC);
   await setDoc(ref, { values });
 }
+
+export type Rarity = "common" | "rare" | "legendary";
+
+const RARITIES_DOC = "rarities";
+
+export async function loadRarities(): Promise<Record<string, Rarity>> {
+  const ref = doc(db, META_COLLECTION, RARITIES_DOC);
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    return (snap.data() as { values: Record<string, Rarity> }).values ?? {};
+  }
+  return {};
+}
+
+export async function saveRarities(
+  values: Record<string, Rarity>
+): Promise<void> {
+  const ref = doc(db, META_COLLECTION, RARITIES_DOC);
+  await setDoc(ref, { values });
+}

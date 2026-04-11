@@ -1,6 +1,25 @@
 import { IconImage } from "./SpriteIcon";
 import { type AttributeDefinition, type ItemAttribute } from "./attributes";
+import { type Rarity } from "./notes";
 import { LucideIcon } from "./LucideIcon";
+
+const RARITY_COLORS: Record<Rarity, string> = {
+  common: "#9ece6a",
+  rare: "#7aa2f7",
+  legendary: "#e0af68",
+};
+
+const RARITY_BORDER: Record<Rarity, string> = {
+  common: "rgba(158,206,106,0.25)",
+  rare: "rgba(122,162,247,0.4)",
+  legendary: "rgba(224,175,104,0.5)",
+};
+
+const RARITY_GLOW: Record<Rarity, string> = {
+  common: "none",
+  rare: "0 0 8px rgba(122,162,247,0.15)",
+  legendary: "0 0 12px rgba(224,175,104,0.25), 0 0 4px rgba(224,175,104,0.15)",
+};
 
 interface ItemCardProps {
   itemName: string;
@@ -8,6 +27,7 @@ interface ItemCardProps {
   attributes: ItemAttribute[];
   definitions: AttributeDefinition[];
   charges: number;
+  rarity: Rarity;
   selected: boolean;
   excluded: boolean;
   onSelect: () => void;
@@ -91,6 +111,7 @@ export function ItemCard({
   attributes,
   definitions,
   charges,
+  rarity,
   selected,
   excluded,
   onSelect,
@@ -122,7 +143,7 @@ export function ItemCard({
           : "linear-gradient(180deg, rgba(30,30,46,0.95) 0%, rgba(24,24,37,0.98) 100%)",
         border: selected
           ? "2px solid rgba(122,162,247,0.5)"
-          : "1px solid rgba(205,214,244,0.12)",
+          : `1px solid ${RARITY_BORDER[rarity]}`,
         borderRadius: 10,
         padding: "16px 12px 20px",
         display: "flex",
@@ -133,7 +154,7 @@ export function ItemCard({
         opacity: excluded ? 0.4 : 1,
         boxShadow: selected
           ? "0 4px 20px rgba(122,162,247,0.2), inset 0 1px 0 rgba(205,214,244,0.08)"
-          : "0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(205,214,244,0.05)",
+          : `0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(205,214,244,0.05)${rarity !== "common" ? `, ${RARITY_GLOW[rarity]}` : ""}`,
         transition: "box-shadow 0.15s, border-color 0.15s",
         minHeight: 200,
       }}
@@ -190,6 +211,20 @@ export function ItemCard({
       >
         {itemName}
       </div>
+
+      <span
+        style={{
+          fontSize: 9,
+          fontWeight: 700,
+          color: RARITY_COLORS[rarity],
+          textTransform: "uppercase",
+          letterSpacing: 1.5,
+          fontFamily: "'Inter', sans-serif",
+          opacity: rarity === "common" ? 0.5 : 0.9,
+        }}
+      >
+        {rarity}
+      </span>
 
       {otherAttrs.length > 0 && (
         <div

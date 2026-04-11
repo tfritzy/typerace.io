@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { type ItemIcon } from "./iconData";
 import { IconImage } from "./SpriteIcon";
-import { loadNote, saveNote } from "./notes";
+import { loadNote, saveNote, type Rarity } from "./notes";
 import {
   type AttributeDefinition,
   type ItemAttribute,
@@ -10,6 +10,14 @@ import {
 } from "./attributes";
 import { LucideIcon } from "./LucideIcon";
 import { Plus, X } from "lucide-react";
+
+const RARITIES: Rarity[] = ["common", "rare", "legendary"];
+
+const RARITY_COLORS: Record<Rarity, string> = {
+  common: "#9ece6a",
+  rare: "#7aa2f7",
+  legendary: "#e0af68",
+};
 
 interface ItemRowProps {
   icon: ItemIcon;
@@ -99,6 +107,8 @@ interface NoteEditorProps {
   onNameChange: (defaultName: string, newName: string) => void;
   charges: number;
   onChargesChange: (defaultName: string, charges: number) => void;
+  rarity: Rarity;
+  onRarityChange: (defaultName: string, rarity: Rarity) => void;
   onItemAttrsChange?: (defaultName: string, attrs: ItemAttribute[]) => void;
 }
 
@@ -111,6 +121,8 @@ export function NoteEditor({
   onNameChange,
   charges,
   onChargesChange,
+  rarity,
+  onRarityChange,
   onItemAttrsChange,
 }: NoteEditorProps) {
   const [text, setText] = useState("");
@@ -377,6 +389,58 @@ export function NoteEditor({
             textAlign: "center",
           }}
         />
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          background: "rgba(205,214,244,0.04)",
+          borderRadius: 6,
+          padding: "8px 12px",
+        }}
+      >
+        <span style={{ fontSize: 16 }}>💎</span>
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: RARITY_COLORS[rarity],
+            fontFamily: "'Inter', sans-serif",
+            minWidth: 60,
+          }}
+        >
+          Rarity
+        </span>
+        <div style={{ display: "flex", gap: 6 }}>
+          {RARITIES.map((r) => (
+            <button
+              key={r}
+              onClick={() => onRarityChange(icon.defaultName, r)}
+              style={{
+                background:
+                  rarity === r
+                    ? `${RARITY_COLORS[r]}22`
+                    : "rgba(205,214,244,0.06)",
+                border:
+                  rarity === r
+                    ? `1.5px solid ${RARITY_COLORS[r]}`
+                    : "1px solid rgba(205,214,244,0.1)",
+                borderRadius: 4,
+                color: rarity === r ? RARITY_COLORS[r] : "rgba(205,214,244,0.5)",
+                padding: "4px 10px",
+                fontSize: 12,
+                fontFamily: "'Inter', sans-serif",
+                cursor: "pointer",
+                fontWeight: rarity === r ? 700 : 400,
+                textTransform: "capitalize",
+              }}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div
