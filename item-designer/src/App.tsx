@@ -2,13 +2,20 @@ import { useState, useEffect, useCallback } from "react";
 import { SpriteSheet, SwordFrame, SPRITESHEET_JSON_PATH } from "./spriteData";
 import { ItemRow, NoteEditor } from "./ItemRow";
 import { loadExcluded, saveExcluded } from "./notes";
+import { AttributeDefinition, loadAttributeDefinitions } from "./attributes";
+import { AttributeManager } from "./AttributeManager";
 import { useIsMobile } from "./useIsMobile";
+import { Settings } from "lucide-react";
+
+type View = "items" | "attributes";
 
 export default function App() {
   const [spriteSheet, setSpriteSheet] = useState<SpriteSheet | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
+  const [definitions, setDefinitions] = useState<AttributeDefinition[]>([]);
   const [mobileShowEditor, setMobileShowEditor] = useState(false);
+  const [activeView, setActiveView] = useState<View>("items");
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -24,6 +31,10 @@ export default function App() {
 
     loadExcluded()
       .then(setExcluded)
+      .catch(() => {});
+
+    loadAttributeDefinitions()
+      .then(setDefinitions)
       .catch(() => {});
   }, []);
 
@@ -53,6 +64,13 @@ export default function App() {
   const handleBack = useCallback(() => {
     setMobileShowEditor(false);
   }, []);
+
+  const handleToggleView = useCallback(() => {
+    setActiveView((v) => (v === "items" ? "attributes" : "items"));
+    if (isMobile) {
+      setMobileShowEditor(false);
+    }
+  }, [isMobile]);
 
   if (!spriteSheet) {
     return (
@@ -93,21 +111,45 @@ export default function App() {
         style={{
           padding: isMobile ? "14px 16px" : "16px 12px",
           borderBottom: "1px solid rgba(205,214,244,0.1)",
-          fontSize: isMobile ? 12 : 14,
-          fontWeight: 600,
-          color: "#7aa2f7",
-          fontFamily: "'Press Start 2P', monospace",
-          letterSpacing: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        Swordtember
+        <span
+          style={{
+            fontSize: isMobile ? 12 : 14,
+            fontWeight: 600,
+            color: "#7aa2f7",
+            fontFamily: "'Press Start 2P', monospace",
+            letterSpacing: 1,
+          }}
+        >
+          Swordtember
+        </span>
+        <button
+          onClick={handleToggleView}
+          title={activeView === "items" ? "Manage attributes" : "Back to items"}
+          style={{
+            background: activeView === "attributes" ? "rgba(122,162,247,0.15)" : "transparent",
+            border: "none",
+            cursor: "pointer",
+            color: activeView === "attributes" ? "#7aa2f7" : "rgba(205,214,244,0.4)",
+            padding: 6,
+            borderRadius: 6,
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Settings size={18} />
+        </button>
       </div>
       {included.map(([name, data]) => (
         <ItemRow
           key={name}
           name={name}
           frame={data}
-          selected={name === selectedItem}
+          selected={name === selectedItem && activeView === "items"}
           excluded={false}
           compact={isMobile}
           onSelect={() => handleSelect(name)}
@@ -136,7 +178,7 @@ export default function App() {
               key={name}
               name={name}
               frame={data}
-              selected={name === selectedItem}
+              selected={name === selectedItem && activeView === "items"}
               excluded={true}
               compact={isMobile}
               onSelect={() => handleSelect(name)}
@@ -148,12 +190,20 @@ export default function App() {
     </div>
   );
 
-  const editor =
-    selectedItem && selectedFrame ? (
+  const mainPanel =
+    activeView === "attributes" ? (
+      <AttributeManager
+        definitions={definitions}
+        onChange={setDefinitions}
+        onBack={isMobile ? () => setActiveView("items") : undefined}
+        compact={isMobile}
+      />
+    ) : selectedItem && selectedFrame ? (
       <NoteEditor
         key={selectedItem}
         itemName={selectedItem}
         frame={selectedFrame}
+        definitions={definitions}
         onBack={isMobile ? handleBack : undefined}
         compact={isMobile}
       />
@@ -172,8 +222,13 @@ export default function App() {
     );
 
   if (isMobile) {
+    if (activeView === "attributes") {
+      return (
+        <div style={{ height: "100dvh", overflow: "hidden" }}>{mainPanel}</div>
+      );
+    }
     return mobileShowEditor ? (
-      <div style={{ height: "100dvh", overflow: "hidden" }}>{editor}</div>
+      <div style={{ height: "100dvh", overflow: "hidden" }}>{mainPanel}</div>
     ) : (
       sidebar
     );
@@ -188,7 +243,7 @@ export default function App() {
       }}
     >
       {sidebar}
-      <div style={{ flex: 1, overflow: "hidden" }}>{editor}</div>
+      <div style={{ flex: 1, overflow: "hidden" }}>{mainPanel}</div>
     </div>
   );
 }

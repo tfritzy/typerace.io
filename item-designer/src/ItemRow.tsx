@@ -2,6 +2,15 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { SwordFrame } from "./spriteData";
 import { SpriteIcon } from "./SpriteIcon";
 import { loadNote, saveNote } from "./notes";
+import {
+  AttributeDefinition,
+  ItemAttribute,
+  loadItemAttributes,
+  saveItemAttributes,
+} from "./attributes";
+import { ItemPreview } from "./ItemPreview";
+import { LucideIcon } from "./LucideIcon";
+import { Plus, X } from "lucide-react";
 
 interface ItemRowProps {
   name: string;
@@ -85,6 +94,7 @@ export function ItemRow({
 interface NoteEditorProps {
   itemName: string;
   frame: SwordFrame;
+  definitions: AttributeDefinition[];
   onBack?: () => void;
   compact?: boolean;
 }
@@ -92,13 +102,16 @@ interface NoteEditorProps {
 export function NoteEditor({
   itemName,
   frame,
+  definitions,
   onBack,
   compact,
 }: NoteEditorProps) {
   const [text, setText] = useState("");
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [itemAttrs, setItemAttrs] = useState<ItemAttribute[]>([]);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const attrSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentItemRef = useRef(itemName);
 
   useEffect(() => {
@@ -116,6 +129,13 @@ export function NoteEditor({
           setLoaded(true);
         }
       });
+    loadItemAttributes(itemName)
+      .then((attrs) => {
+        if (currentItemRef.current === itemName) {
+          setItemAttrs(attrs);
+        }
+      })
+      .catch(() => {});
   }, [itemName]);
 
   const handleSave = useCallback(
@@ -137,6 +157,39 @@ export function NoteEditor({
     handleSave(value);
   };
 
+  const persistAttrs = useCallback(
+    (next: ItemAttribute[]) => {
+      setItemAttrs(next);
+      if (attrSaveTimerRef.current) {
+        clearTimeout(attrSaveTimerRef.current);
+      }
+      attrSaveTimerRef.current = setTimeout(() => {
+        saveItemAttributes(itemName, next).catch(() => {});
+      }, 400);
+    },
+    [itemName]
+  );
+
+  const addAttribute = (defId: string) => {
+    if (itemAttrs.some((a) => a.attributeId === defId)) return;
+    persistAttrs([...itemAttrs, { attributeId: defId, value: "" }]);
+  };
+
+  const removeAttribute = (defId: string) => {
+    persistAttrs(itemAttrs.filter((a) => a.attributeId !== defId));
+  };
+
+  const updateAttributeValue = (defId: string, value: string) => {
+    persistAttrs(
+      itemAttrs.map((a) => (a.attributeId === defId ? { ...a, value } : a))
+    );
+  };
+
+  const unassigned = definitions.filter(
+    (d) => !itemAttrs.some((a) => a.attributeId === d.id)
+  );
+  const defMap = new Map(definitions.map((d) => [d.id, d]));
+
   return (
     <div
       style={{
@@ -144,6 +197,7 @@ export function NoteEditor({
         flexDirection: "column",
         height: "100%",
         padding: compact ? 16 : 24,
+        overflow: "auto",
       }}
     >
       <div
@@ -192,25 +246,171 @@ export function NoteEditor({
           </span>
         </div>
       </div>
-      <textarea
-        value={text}
-        onChange={handleChange}
-        disabled={!loaded}
-        placeholder="Type notes here..."
+
+      <div
         style={{
+          display: "flex",
+          gap: compact ? 16 : 24,
           flex: 1,
-          background: "rgba(205,214,244,0.04)",
-          border: "1px solid rgba(205,214,244,0.1)",
-          borderRadius: 6,
-          color: "#cdd6f4",
-          padding: 12,
-          fontSize: 14,
-          fontFamily: "'Inter', sans-serif",
-          resize: "none",
-          outline: "none",
-          lineHeight: 1.6,
+          minHeight: 0,
+          flexDirection: compact ? "column" : "row",
         }}
-      />
+      >
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
+            minWidth: 0,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: "rgba(205,214,244,0.4)",
+                textTransform: "uppercase",
+                letterSpacing: 1.2,
+              }}
+            >
+              Attributes
+            </div>
+            {itemAttrs.map((attr) => {
+              const def = defMap.get(attr.attributeId);
+              if (!def) return null;
+              return (
+                <div
+                  key={attr.attributeId}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    background: "rgba(205,214,244,0.04)",
+                    borderRadius: 6,
+                    padding: "6px 10px",
+                  }}
+                >
+                  <LucideIcon name={def.icon} size={16} color={def.color} />
+                  <span
+                    style={{
+                      fontSize: 13,
+                      color: def.color,
+                      fontFamily: "'Inter', sans-serif",
+                      minWidth: 80,
+                    }}
+                  >
+                    {def.name}
+                  </span>
+                  <input
+                    value={attr.value}
+                    onChange={(e) =>
+                      updateAttributeValue(attr.attributeId, e.target.value)
+                    }
+                    placeholder="value..."
+                    style={{
+                      flex: 1,
+                      background: "rgba(205,214,244,0.06)",
+                      border: "1px solid rgba(205,214,244,0.1)",
+                      borderRadius: 4,
+                      color: "#cdd6f4",
+                      padding: "4px 8px",
+                      fontSize: 13,
+                      fontFamily: "'Inter', sans-serif",
+                      outline: "none",
+                    }}
+                  />
+                  <button
+                    onClick={() => removeAttribute(attr.attributeId)}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "rgba(205,214,244,0.3)",
+                      padding: 2,
+                      display: "flex",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              );
+            })}
+            {unassigned.length > 0 && (
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {unassigned.map((def) => (
+                  <button
+                    key={def.id}
+                    onClick={() => addAttribute(def.id)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 4,
+                      background: "rgba(205,214,244,0.04)",
+                      border: "1px dashed rgba(205,214,244,0.15)",
+                      borderRadius: 4,
+                      color: "rgba(205,214,244,0.5)",
+                      padding: "4px 8px",
+                      fontSize: 12,
+                      fontFamily: "'Inter', sans-serif",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <Plus size={12} />
+                    <LucideIcon name={def.icon} size={12} color={def.color} />
+                    {def.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <textarea
+            value={text}
+            onChange={handleChange}
+            disabled={!loaded}
+            placeholder="Type notes here..."
+            style={{
+              flex: 1,
+              background: "rgba(205,214,244,0.04)",
+              border: "1px solid rgba(205,214,244,0.1)",
+              borderRadius: 6,
+              color: "#cdd6f4",
+              padding: 12,
+              fontSize: 14,
+              fontFamily: "'Inter', sans-serif",
+              resize: "none",
+              outline: "none",
+              lineHeight: 1.6,
+              minHeight: compact ? 120 : 200,
+            }}
+          />
+        </div>
+
+        <div
+          style={{
+            flexShrink: 0,
+            display: "flex",
+            justifyContent: compact ? "center" : "flex-start",
+          }}
+        >
+          <ItemPreview
+            itemName={itemName}
+            frame={frame}
+            attributes={itemAttrs}
+            definitions={definitions}
+            compact={compact}
+          />
+        </div>
+      </div>
     </div>
   );
 }
