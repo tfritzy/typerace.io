@@ -27,7 +27,9 @@ export default defineConfig({
         server.middlewares.use('/icons', (req, res, next) => {
           if (!req.url) return next()
           const fileName = decodeURIComponent(req.url.replace(/^\//, ''))
-          const filePath = path.join(iconsSourceDir, fileName)
+          if (!fileName.endsWith('.png') || fileName.includes('..')) return next()
+          const filePath = path.resolve(iconsSourceDir, fileName)
+          if (!filePath.startsWith(iconsSourceDir)) return next()
           if (fs.existsSync(filePath)) {
             res.setHeader('Content-Type', 'image/png')
             res.setHeader('Cache-Control', 'max-age=31536000, immutable')
