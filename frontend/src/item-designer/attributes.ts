@@ -6,6 +6,7 @@ export interface AttributeDefinition {
   name: string;
   icon: string;
   color: string;
+  powerRatio: number;
 }
 
 export interface ItemAttribute {
@@ -73,4 +74,25 @@ export async function loadAllItemAttributes(): Promise<Record<string, ItemAttrib
     result[docSnap.id] = data.attrs ?? [];
   });
   return result;
+}
+
+export function calculateItemPower(
+  attributes: ItemAttribute[],
+  definitions: AttributeDefinition[],
+  charges: number
+): number {
+  const defMap = new Map(definitions.map((d) => [d.id, d]));
+  let total = 0;
+  for (const attr of attributes) {
+    const def = defMap.get(attr.attributeId);
+    if (!def) continue;
+    const parsed = parseFloat(attr.value);
+    if (!isNaN(parsed)) {
+      total += parsed * def.powerRatio;
+    } else {
+      total += def.powerRatio;
+    }
+  }
+  const divisor = Math.max(charges, 1);
+  return Math.round((total / divisor) * 100) / 100;
 }

@@ -20,11 +20,13 @@ export function AttributeManager({
   const [newName, setNewName] = useState("");
   const [newIcon, setNewIcon] = useState<string>(AVAILABLE_ICONS[0]);
   const [newColor, setNewColor] = useState<string>(ATTRIBUTE_COLORS[0] ?? "#f7768e");
+  const [newPowerRatio, setNewPowerRatio] = useState<number>(1);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editIcon, setEditIcon] = useState<string>(AVAILABLE_ICONS[0]);
   const [editColor, setEditColor] = useState<string>(ATTRIBUTE_COLORS[0] ?? "#f7768e");
+  const [editPowerRatio, setEditPowerRatio] = useState<number>(1);
 
   const persist = useCallback(
     (next: AttributeDefinition[]) => {
@@ -42,9 +44,10 @@ export function AttributeManager({
     const trimmed = newName.trim();
     if (!trimmed) return;
     const id = crypto.randomUUID();
-    const next = [...definitions, { id, name: trimmed, icon: newIcon, color: newColor }];
+    const next = [...definitions, { id, name: trimmed, icon: newIcon, color: newColor, powerRatio: newPowerRatio }];
     persist(next);
     setNewName("");
+    setNewPowerRatio(1);
   };
 
   const handleRemove = (id: string) => {
@@ -57,6 +60,7 @@ export function AttributeManager({
     setEditName(def.name);
     setEditIcon(def.icon);
     setEditColor(def.color);
+    setEditPowerRatio(def.powerRatio ?? 1);
   };
 
   const commitEdit = () => {
@@ -69,7 +73,7 @@ export function AttributeManager({
     persist(
       definitions.map((d) =>
         d.id === editingId
-          ? { ...d, name: trimmed, icon: editIcon, color: editColor }
+          ? { ...d, name: trimmed, icon: editIcon, color: editColor, powerRatio: editPowerRatio }
           : d
       )
     );
@@ -215,6 +219,29 @@ export function AttributeManager({
             />
           ))}
         </div>
+        <input
+          type="number"
+          step="any"
+          value={newPowerRatio}
+          onChange={(e) => {
+            const val = parseFloat(e.target.value);
+            setNewPowerRatio(isNaN(val) ? 0 : val);
+          }}
+          placeholder="Power ratio"
+          title="Power ratio"
+          style={{
+            width: 80,
+            background: "rgba(205,214,244,0.06)",
+            border: "1px solid rgba(205,214,244,0.15)",
+            borderRadius: 6,
+            color: "#cdd6f4",
+            padding: "8px 10px",
+            fontSize: 13,
+            fontFamily: "'Inter', sans-serif",
+            outline: "none",
+            textAlign: "center",
+          }}
+        />
         <button
           onClick={handleAdd}
           disabled={!newName.trim()}
@@ -309,6 +336,28 @@ export function AttributeManager({
                         outline: "none",
                       }}
                     />
+                    <input
+                      type="number"
+                      step="any"
+                      value={editPowerRatio}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        setEditPowerRatio(isNaN(val) ? 0 : val);
+                      }}
+                      title="Power ratio"
+                      style={{
+                        width: 60,
+                        fontSize: 12,
+                        color: "#cdd6f4",
+                        fontFamily: "'Inter', sans-serif",
+                        background: "rgba(205,214,244,0.06)",
+                        border: "1px solid rgba(122,162,247,0.4)",
+                        borderRadius: 4,
+                        padding: "4px 6px",
+                        outline: "none",
+                        textAlign: "center",
+                      }}
+                    />
                   </>
                 ) : (
                   <>
@@ -322,6 +371,15 @@ export function AttributeManager({
                       }}
                     >
                       {def.name}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: "rgba(205,214,244,0.35)",
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      ×{def.powerRatio ?? 1}
                     </span>
                   </>
                 )}

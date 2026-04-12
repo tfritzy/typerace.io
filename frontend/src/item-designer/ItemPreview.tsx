@@ -1,5 +1,5 @@
 import { IconImage } from "./SpriteIcon";
-import { type AttributeDefinition, type ItemAttribute } from "./attributes";
+import { type AttributeDefinition, type ItemAttribute, calculateItemPower } from "./attributes";
 import { LucideIcon } from "./LucideIcon";
 
 interface ItemPreviewProps {
@@ -234,6 +234,41 @@ export function ItemPreview({
           {charges > 0 && <PreviewChargesBadge charges={charges} />}
         </div>
       )}
+
+      <div
+        style={{
+          width: "100%",
+          marginTop: 8,
+          paddingTop: 8,
+          borderTop: "1px solid rgba(205,214,244,0.08)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 6,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 11,
+            color: "rgba(205,214,244,0.35)",
+            fontFamily: "'Inter', sans-serif",
+            textTransform: "uppercase",
+            letterSpacing: 1,
+          }}
+        >
+          Power
+        </span>
+        <span
+          style={{
+            fontSize: 14,
+            fontWeight: 700,
+            color: "#bb9af7",
+            fontFamily: "'Inter', sans-serif",
+          }}
+        >
+          {calculateItemPower(attributes, definitions, charges)}
+        </span>
+      </div>
     </div>
   );
 }
