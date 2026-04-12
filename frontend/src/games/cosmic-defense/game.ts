@@ -1,6 +1,6 @@
 import { Application, Container } from "pixi.js";
 import { MANIFEST } from "./manifest";
-import { CANVAS_WIDTH, CANVAS_HEIGHT, PIXEL_FONT_FAMILY } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { Background } from "./Background";
 import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
@@ -24,30 +24,11 @@ export class CosmicDefenseGame {
   }
 
   async init(): Promise<void> {
-    await this.waitForPixelFont();
     const assetManager = await AssetManager.load(MANIFEST);
     this.buildScene(assetManager);
 
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
     this.app.ticker.add(this.tickerCallback);
-  }
-
-  private async waitForPixelFont(): Promise<void> {
-    if (typeof document === "undefined" || !("fonts" in document)) return;
-    try {
-      const font = new FontFace(
-        PIXEL_FONT_FAMILY,
-        "url(/fonts/press-start-2p.ttf)"
-      );
-      const loaded = await Promise.race([
-        font.load(),
-        new Promise<null>((resolve) => setTimeout(() => resolve(null), 2000)),
-      ]);
-      if (loaded) {
-        document.fonts.add(font);
-      }
-    } catch {
-    }
   }
 
   private buildScene(assetManager: AssetManager): void {

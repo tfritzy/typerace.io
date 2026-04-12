@@ -20,7 +20,7 @@ const GAMES = [
     slug: "cosmic-defense",
     title: "Cosmic Defense",
     description:
-      "Defend your planet from waves of enemy ships approaching from the right. Same engine as Planetary Defense with a left-side planet layout.",
+      "Defend your planet from waves of incoming enemy ships. Survive as long as you can.",
   },
 ];
 

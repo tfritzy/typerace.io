@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset } from "./types";
-import type { EnemyConfig } from "./enemyConfig";
+import { ENEMY_CATALOG, type EnemyConfig } from "./enemyConfig";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -92,8 +92,8 @@ export function createGameState(): GameState {
     entities: [],
     time: { time: 0, deltaTime: 0 },
     nextId: 1,
-    planetHealth: 100,
-    maxPlanetHealth: 100,
+    planetHealth: 1000,
+    maxPlanetHealth: 1000,
     wave: {
       wave: 0,
       phase: WavePhase.Idle,
@@ -121,27 +121,17 @@ function spawnFromRight(): { x: number; y: number } {
   };
 }
 
-function aimAtPlanet(
-  x: number,
-  y: number,
-  speed: number
-): { vx: number; vy: number } {
-  const angle = Math.atan2(PLANET_Y - y, PLANET_X - x);
-  return { vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed };
-}
-
 export function spawnEntity(state: GameState, config: EnemyConfig): void {
   const { x, y } = spawnFromRight();
   const speed = 20 + Math.random() * 35;
-  const { vx, vy } = aimAtPlanet(x, y, speed);
 
   const entity: EntityState = {
     id: state.nextId++,
     entityType: config.entityType,
     x,
     y,
-    vx,
-    vy,
+    vx: -speed,
+    vy: 0,
     health: config.health,
     power: config.power,
     colorPreset: ColorPreset.Preset4,
@@ -235,29 +225,3 @@ export function startNextWave(state: GameState): void {
   state.wave.waveTimer = 0;
   state.wave.phase = WavePhase.Spawning;
 }
-
-const ENEMY_CATALOG: EnemyConfig[] = [
-  { entityType: "Dot", health: 50, power: 50 },
-  { entityType: "Speck", health: 60, power: 60 },
-  { entityType: "Pip", health: 70, power: 70 },
-  { entityType: "Mite", health: 80, power: 80 },
-  { entityType: "Gnat", health: 90, power: 90 },
-  { entityType: "Flea", health: 100, power: 100 },
-  { entityType: "Flicker", health: 110, power: 110 },
-  { entityType: "Needle", health: 130, power: 130 },
-  { entityType: "Barb", health: 150, power: 150 },
-  { entityType: "Spur", health: 170, power: 170 },
-  { entityType: "Bolt", health: 190, power: 190 },
-  { entityType: "Sliver", health: 225, power: 225 },
-  { entityType: "Cricket", health: 250, power: 250 },
-  { entityType: "Moth", health: 300, power: 300 },
-  { entityType: "Robin", health: 325, power: 325 },
-  { entityType: "Finch", health: 375, power: 375 },
-  { entityType: "Sparrow", health: 450, power: 450 },
-  { entityType: "Wasp", health: 500, power: 500 },
-  { entityType: "Hornet", health: 575, power: 575 },
-  { entityType: "Stinger", health: 650, power: 650 },
-  { entityType: "Dart", health: 750, power: 750 },
-  { entityType: "Arrow", health: 875, power: 875 },
-  { entityType: "Scout", health: 1000, power: 1000 },
-];
