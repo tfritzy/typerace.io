@@ -16,6 +16,12 @@ const GAMES = [
     description:
       "A space scene featuring ships from the Pixel Starships kit with color presets, animated engines, drifting asteroids, star particles, and a tiled space background.",
   },
+  {
+    slug: "cosmic-defense",
+    title: "Cosmic Defense",
+    description:
+      "Defend your planet from waves of incoming enemy ships. Survive as long as you can.",
+  },
 ];
 
 export const GamesPage = () => {
