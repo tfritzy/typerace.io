@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { type AttributeDefinition, saveAttributeDefinitions } from "./attributes";
+import { type AttributeDefinition, calculateItemPower, saveAttributeDefinitions } from "./attributes";
 import { AVAILABLE_ICONS, ATTRIBUTE_COLORS } from "./iconPicker";
 import { LucideIcon } from "./LucideIcon";
 import { Trash2, Plus, Check, X } from "lucide-react";
@@ -10,6 +10,7 @@ interface AttrFormState {
   color: string;
   powerRatio: string;
   divideByCharges: boolean;
+  multiplier: boolean;
 }
 
 function defaultFormState(): AttrFormState {
@@ -19,6 +20,7 @@ function defaultFormState(): AttrFormState {
     color: ATTRIBUTE_COLORS[0] ?? "#f7768e",
     powerRatio: "1",
     divideByCharges: true,
+    multiplier: false,
   };
 }
 
@@ -29,6 +31,7 @@ function formStateFromDef(def: AttributeDefinition): AttrFormState {
     color: def.color,
     powerRatio: String(def.powerRatio ?? 1),
     divideByCharges: def.perCharge !== false,
+    multiplier: def.multiplier === true,
   };
 }
 
@@ -40,7 +43,8 @@ function formStateToDef(form: AttrFormState, id: string): AttributeDefinition {
     icon: form.icon,
     color: form.color,
     powerRatio: isNaN(parsed) ? 1 : parsed,
-    perCharge: form.divideByCharges,
+    perCharge: form.multiplier ? false : form.divideByCharges,
+    multiplier: form.multiplier,
   };
 }
 
@@ -175,30 +179,53 @@ function AttributeForm({ form, onChange, onSubmit, onCancel, submitLabel, submit
       <div>
         <FieldLabel>Power Scaling</FieldLabel>
         <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span
+          {!form.multiplier && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span
+                style={{
+                  fontSize: 12,
+                  color: "rgba(205,214,244,0.4)",
+                  fontFamily: "'Inter', sans-serif",
+                }}
+              >
+                Weight
+              </span>
+              <input
+                type="number"
+                step="any"
+                value={form.powerRatio}
+                onChange={(e) => onChange({ ...form, powerRatio: e.target.value })}
+                onKeyDown={handleKeyDown}
+                style={{
+                  ...inputStyle,
+                  width: 56,
+                  padding: "5px 6px",
+                  textAlign: "center",
+                }}
+              />
+            </div>
+          )}
+          {!form.multiplier && (
+            <label
               style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                cursor: "pointer",
                 fontSize: 12,
-                color: "rgba(205,214,244,0.4)",
                 fontFamily: "'Inter', sans-serif",
+                color: form.divideByCharges ? "#9ece6a" : "rgba(205,214,244,0.4)",
               }}
             >
-              Weight
-            </span>
-            <input
-              type="number"
-              step="any"
-              value={form.powerRatio}
-              onChange={(e) => onChange({ ...form, powerRatio: e.target.value })}
-              onKeyDown={handleKeyDown}
-              style={{
-                ...inputStyle,
-                width: 56,
-                padding: "5px 6px",
-                textAlign: "center",
-              }}
-            />
-          </div>
+              <input
+                type="checkbox"
+                checked={form.divideByCharges}
+                onChange={(e) => onChange({ ...form, divideByCharges: e.target.checked })}
+                style={{ accentColor: "#9ece6a" }}
+              />
+              ÷ Charges
+            </label>
+          )}
           <label
             style={{
               display: "flex",
@@ -207,16 +234,16 @@ function AttributeForm({ form, onChange, onSubmit, onCancel, submitLabel, submit
               cursor: "pointer",
               fontSize: 12,
               fontFamily: "'Inter', sans-serif",
-              color: form.divideByCharges ? "#9ece6a" : "rgba(205,214,244,0.4)",
+              color: form.multiplier ? "#bb9af7" : "rgba(205,214,244,0.4)",
             }}
           >
             <input
               type="checkbox"
-              checked={form.divideByCharges}
-              onChange={(e) => onChange({ ...form, divideByCharges: e.target.checked })}
-              style={{ accentColor: "#9ece6a" }}
+              checked={form.multiplier}
+              onChange={(e) => onChange({ ...form, multiplier: e.target.checked })}
+              style={{ accentColor: "#bb9af7" }}
             />
-            ÷ Charges
+            Multiplier
           </label>
         </div>
       </div>
@@ -276,6 +303,11 @@ interface AttributeRowProps {
 }
 
 function AttributeRow({ def, onEdit, onRemove }: AttributeRowProps) {
+  const badgeText = def.multiplier
+    ? "multiplier"
+    : `${def.powerRatio ?? 1}×${def.perCharge !== false ? " ÷ charges" : ""}`;
+  const badgeColor = def.multiplier ? "#bb9af7" : "rgba(205,214,244,0.4)";
+
   return (
     <div
       onClick={onEdit}
@@ -311,7 +343,7 @@ function AttributeRow({ def, onEdit, onRemove }: AttributeRowProps) {
       <span
         style={{
           fontSize: 11,
-          color: "rgba(205,214,244,0.4)",
+          color: badgeColor,
           fontFamily: "'Inter', sans-serif",
           background: "rgba(205,214,244,0.06)",
           padding: "2px 8px",
@@ -319,7 +351,7 @@ function AttributeRow({ def, onEdit, onRemove }: AttributeRowProps) {
           whiteSpace: "nowrap",
         }}
       >
-        {def.powerRatio ?? 1}×{def.perCharge !== false ? " ÷ charges" : ""}
+        {badgeText}
       </span>
       <button
         onClick={(e) => {
@@ -360,6 +392,31 @@ export function AttributeManager({
   const [editForm, setEditForm] = useState<AttrFormState>(defaultFormState);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+
+  const [calcCharges, setCalcCharges] = useState("4");
+  const [calcValues, setCalcValues] = useState<Record<string, string>>({});
+
+  const calcInputStyle = {
+    background: "rgba(205,214,244,0.06)",
+    border: "1px solid rgba(205,214,244,0.12)",
+    borderRadius: 4,
+    color: "#cdd6f4",
+    fontSize: 12,
+    fontFamily: "'Inter', sans-serif",
+    outline: "none",
+    width: 48,
+    padding: "4px 6px",
+    textAlign: "center" as const,
+  };
+
+  const calcAttrs = definitions.map((def) => ({
+    attributeId: def.id,
+    value: calcValues[def.id] ?? "1",
+  }));
+  const parsedCalcCharges = parseInt(calcCharges) || 1;
+  const calcPower = definitions.length > 0
+    ? calculateItemPower(calcAttrs, definitions, parsedCalcCharges)
+    : 0;
 
   const persist = useCallback(
     (next: AttributeDefinition[]) => {
@@ -550,6 +607,101 @@ export function AttributeManager({
           )
         )}
       </div>
+
+      {definitions.length > 0 && (
+        <div
+          style={{
+            marginTop: 24,
+            padding: 16,
+            background: "rgba(205,214,244,0.03)",
+            borderRadius: 8,
+            border: "1px solid rgba(205,214,244,0.06)",
+          }}
+        >
+          <FieldLabel>Power Calculator</FieldLabel>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+            <span
+              style={{
+                fontSize: 12,
+                color: "rgba(205,214,244,0.4)",
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
+              Charges
+            </span>
+            <input
+              type="number"
+              min="1"
+              value={calcCharges}
+              onChange={(e) => setCalcCharges(e.target.value)}
+              style={calcInputStyle}
+            />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {definitions.map((def) => (
+              <div
+                key={def.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <LucideIcon name={def.icon} size={14} color={def.color} />
+                <span
+                  style={{
+                    fontSize: 12,
+                    color: def.color,
+                    fontFamily: "'Inter', sans-serif",
+                    minWidth: 80,
+                  }}
+                >
+                  {def.name}
+                </span>
+                <input
+                  type="number"
+                  step="any"
+                  value={calcValues[def.id] ?? "1"}
+                  onChange={(e) =>
+                    setCalcValues((prev) => ({ ...prev, [def.id]: e.target.value }))
+                  }
+                  style={calcInputStyle}
+                />
+              </div>
+            ))}
+          </div>
+          <div
+            style={{
+              marginTop: 12,
+              paddingTop: 10,
+              borderTop: "1px solid rgba(205,214,244,0.08)",
+              display: "flex",
+              alignItems: "baseline",
+              gap: 6,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 12,
+                color: "rgba(205,214,244,0.4)",
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
+              Power =
+            </span>
+            <span
+              style={{
+                fontSize: 18,
+                fontWeight: 700,
+                color: "#7aa2f7",
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
+              {calcPower}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
