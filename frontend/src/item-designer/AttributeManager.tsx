@@ -1,8 +1,14 @@
 import { useState, useCallback } from "react";
-import { type AttributeDefinition, saveAttributeDefinitions } from "./attributes";
+import { type AttributeDefinition, type PowerCalculation, saveAttributeDefinitions, resolvePowerCalculation } from "./attributes";
 import { AVAILABLE_ICONS, ATTRIBUTE_COLORS } from "./iconPicker";
 import { LucideIcon } from "./LucideIcon";
 import { Trash2, Plus, Pencil, Check } from "lucide-react";
+
+const POWER_CALC_OPTIONS: { value: PowerCalculation; label: string; icon: string }[] = [
+  { value: "perCharge", label: "/chg", icon: "⚡" },
+  { value: "flat", label: "flat", icon: "―" },
+  { value: "multiplier", label: "×mult", icon: "×" },
+];
 
 interface AttributeManagerProps {
   definitions: AttributeDefinition[];
@@ -21,14 +27,14 @@ export function AttributeManager({
   const [newIcon, setNewIcon] = useState<string>(AVAILABLE_ICONS[0]);
   const [newColor, setNewColor] = useState<string>(ATTRIBUTE_COLORS[0] ?? "#f7768e");
   const [newPowerRatio, setNewPowerRatio] = useState("1");
-  const [newPerCharge, setNewPerCharge] = useState<boolean>(true);
+  const [newPowerCalc, setNewPowerCalc] = useState<PowerCalculation>("perCharge");
   const [saveError, setSaveError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editIcon, setEditIcon] = useState<string>(AVAILABLE_ICONS[0]);
   const [editColor, setEditColor] = useState<string>(ATTRIBUTE_COLORS[0] ?? "#f7768e");
   const [editPowerRatio, setEditPowerRatio] = useState("1");
-  const [editPerCharge, setEditPerCharge] = useState<boolean>(true);
+  const [editPowerCalc, setEditPowerCalc] = useState<PowerCalculation>("perCharge");
 
   const persist = useCallback(
     (next: AttributeDefinition[]) => {
@@ -47,11 +53,11 @@ export function AttributeManager({
     if (!trimmed) return;
     const id = crypto.randomUUID();
     const parsed = parseFloat(newPowerRatio);
-    const next = [...definitions, { id, name: trimmed, icon: newIcon, color: newColor, powerRatio: isNaN(parsed) ? 1 : parsed, perCharge: newPerCharge }];
+    const next = [...definitions, { id, name: trimmed, icon: newIcon, color: newColor, powerRatio: isNaN(parsed) ? 1 : parsed, perCharge: newPowerCalc === "perCharge", powerCalculation: newPowerCalc }];
     persist(next);
     setNewName("");
     setNewPowerRatio("1");
-    setNewPerCharge(true);
+    setNewPowerCalc("perCharge");
   };
 
   const handleRemove = (id: string) => {
@@ -65,7 +71,7 @@ export function AttributeManager({
     setEditIcon(def.icon);
     setEditColor(def.color);
     setEditPowerRatio(String(def.powerRatio ?? 1));
-    setEditPerCharge(def.perCharge ?? true);
+    setEditPowerCalc(resolvePowerCalculation(def));
   };
 
   const commitEdit = () => {
@@ -79,7 +85,7 @@ export function AttributeManager({
     persist(
       definitions.map((d) =>
         d.id === editingId
-          ? { ...d, name: trimmed, icon: editIcon, color: editColor, powerRatio: isNaN(parsedRatio) ? 1 : parsedRatio, perCharge: editPerCharge }
+          ? { ...d, name: trimmed, icon: editIcon, color: editColor, powerRatio: isNaN(parsedRatio) ? 1 : parsedRatio, perCharge: editPowerCalc === "perCharge", powerCalculation: editPowerCalc }
           : d
       )
     );
@@ -245,26 +251,31 @@ export function AttributeManager({
             textAlign: "center",
           }}
         />
-        <button
-          onClick={() => setNewPerCharge((v) => !v)}
-          title={newPerCharge ? "Per charge (divides by charges)" : "Flat (not divided by charges)"}
-          style={{
-            background: newPerCharge ? "rgba(158,206,106,0.15)" : "rgba(205,214,244,0.06)",
-            border: newPerCharge
-              ? "1px solid rgba(158,206,106,0.4)"
-              : "1px solid rgba(205,214,244,0.15)",
-            borderRadius: 6,
-            color: newPerCharge ? "#9ece6a" : "rgba(205,214,244,0.5)",
-            padding: "8px 10px",
-            fontSize: 11,
-            fontFamily: "'Inter', sans-serif",
-            cursor: "pointer",
-            fontWeight: 600,
-            whiteSpace: "nowrap",
-          }}
-        >
-          {newPerCharge ? "⚡ /chg" : "― flat"}
-        </button>
+        <div style={{ display: "flex", gap: 2 }}>
+          {POWER_CALC_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setNewPowerCalc(opt.value)}
+              title={opt.value === "perCharge" ? "Per charge (divides by charges)" : opt.value === "flat" ? "Flat (not divided by charges)" : "Multiplier (multiplies total power)"}
+              style={{
+                background: newPowerCalc === opt.value ? "rgba(158,206,106,0.15)" : "rgba(205,214,244,0.06)",
+                border: newPowerCalc === opt.value
+                  ? "1px solid rgba(158,206,106,0.4)"
+                  : "1px solid rgba(205,214,244,0.15)",
+                borderRadius: 6,
+                color: newPowerCalc === opt.value ? "#9ece6a" : "rgba(205,214,244,0.5)",
+                padding: "8px 8px",
+                fontSize: 11,
+                fontFamily: "'Inter', sans-serif",
+                cursor: "pointer",
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {opt.icon} {opt.label}
+            </button>
+          ))}
+        </div>
         <button
           onClick={handleAdd}
           disabled={!newName.trim()}
@@ -378,26 +389,31 @@ export function AttributeManager({
                         textAlign: "center",
                       }}
                     />
-                    <button
-                      onClick={() => setEditPerCharge((v) => !v)}
-                      title={editPerCharge ? "Per charge" : "Flat"}
-                      style={{
-                        background: editPerCharge ? "rgba(158,206,106,0.15)" : "rgba(205,214,244,0.06)",
-                        border: editPerCharge
-                          ? "1px solid rgba(158,206,106,0.4)"
-                          : "1px solid rgba(205,214,244,0.15)",
-                        borderRadius: 4,
-                        color: editPerCharge ? "#9ece6a" : "rgba(205,214,244,0.5)",
-                        padding: "4px 6px",
-                        fontSize: 10,
-                        fontFamily: "'Inter', sans-serif",
-                        cursor: "pointer",
-                        fontWeight: 600,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {editPerCharge ? "⚡/chg" : "flat"}
-                    </button>
+                    <div style={{ display: "flex", gap: 2 }}>
+                      {POWER_CALC_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          onClick={() => setEditPowerCalc(opt.value)}
+                          title={opt.value}
+                          style={{
+                            background: editPowerCalc === opt.value ? "rgba(158,206,106,0.15)" : "rgba(205,214,244,0.06)",
+                            border: editPowerCalc === opt.value
+                              ? "1px solid rgba(158,206,106,0.4)"
+                              : "1px solid rgba(205,214,244,0.15)",
+                            borderRadius: 4,
+                            color: editPowerCalc === opt.value ? "#9ece6a" : "rgba(205,214,244,0.5)",
+                            padding: "4px 5px",
+                            fontSize: 10,
+                            fontFamily: "'Inter', sans-serif",
+                            cursor: "pointer",
+                            fontWeight: 600,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {opt.icon}{opt.label}
+                        </button>
+                      ))}
+                    </div>
                   </>
                 ) : (
                   <>
@@ -424,11 +440,11 @@ export function AttributeManager({
                     <span
                       style={{
                         fontSize: 9,
-                        color: def.perCharge ? "rgba(158,206,106,0.5)" : "rgba(205,214,244,0.25)",
+                        color: resolvePowerCalculation(def) === "multiplier" ? "rgba(187,154,247,0.5)" : resolvePowerCalculation(def) === "perCharge" ? "rgba(158,206,106,0.5)" : "rgba(205,214,244,0.25)",
                         fontFamily: "'Inter', sans-serif",
                       }}
                     >
-                      {def.perCharge ? "/chg" : "flat"}
+                      {POWER_CALC_OPTIONS.find((o) => o.value === resolvePowerCalculation(def))?.label ?? "flat"}
                     </span>
                   </>
                 )}
