@@ -306,6 +306,10 @@ export function ItemDesignerPage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+          background: "#1a1b26",
         }}
       >
         <span
