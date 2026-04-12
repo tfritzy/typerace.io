@@ -10,6 +10,9 @@ import {
   loadNote,
   loadCharges,
   saveCharges,
+  loadRarities,
+  saveRarities,
+  type Rarity,
 } from "./notes";
 import {
   type AttributeDefinition,
@@ -35,6 +38,7 @@ export function ItemDesignerPage() {
   const [activeView, setActiveView] = useState<View>("items");
   const [exporting, setExporting] = useState(false);
   const [charges, setCharges] = useState<Record<string, number>>({});
+  const [rarities, setRarities] = useState<Record<string, Rarity>>({});
   const [allItemAttrs, setAllItemAttrs] = useState<Record<string, ItemAttribute[]>>({});
   const [loadError, setLoadError] = useState<string | null>(null);
   const isMobile = useIsMobile();
@@ -42,6 +46,7 @@ export function ItemDesignerPage() {
     null
   );
   const chargesTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const rarityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   const savedScrollTop = useRef(0);
 
@@ -76,6 +81,13 @@ export function ItemDesignerPage() {
       .then(setCharges)
       .catch((err) => {
         console.error("Failed to load charges:", err);
+        setLoadError(String(err?.message || err));
+      });
+
+    loadRarities()
+      .then(setRarities)
+      .catch((err) => {
+        console.error("Failed to load rarities:", err);
         setLoadError(String(err?.message || err));
       });
 
@@ -127,6 +139,24 @@ export function ItemDesignerPage() {
         chargesTimerRef.current = setTimeout(() => {
           saveCharges(next).catch((err) =>
             console.error("Failed to save charges:", err)
+          );
+        }, 400);
+        return next;
+      });
+    },
+    []
+  );
+
+  const handleRarityChange = useCallback(
+    (defaultName: string, value: Rarity) => {
+      setRarities((prev) => {
+        const next = { ...prev, [defaultName]: value };
+        if (rarityTimerRef.current) {
+          clearTimeout(rarityTimerRef.current);
+        }
+        rarityTimerRef.current = setTimeout(() => {
+          saveRarities(next).catch((err) =>
+            console.error("Failed to save rarities:", err)
           );
         }, 400);
         return next;
@@ -224,6 +254,7 @@ export function ItemDesignerPage() {
             defaultName: icon.defaultName,
             filePath: icon.filePath,
             charges: charges[icon.defaultName] ?? 4,
+            rarity: rarities[icon.defaultName] ?? "common",
             notes,
             attributes: resolvedAttrs,
           };
@@ -241,7 +272,7 @@ export function ItemDesignerPage() {
     } finally {
       setExporting(false);
     }
-  }, [excluded, definitions, nameOverrides, charges]);
+  }, [excluded, definitions, nameOverrides, charges, rarities]);
 
   const included = ICONS.filter((icon) => !excluded.has(icon.defaultName));
   const excludedItems = ICONS.filter((icon) => excluded.has(icon.defaultName));
@@ -368,6 +399,7 @@ export function ItemDesignerPage() {
             attributes={allItemAttrs[icon.defaultName] ?? []}
             definitions={definitions}
             charges={charges[icon.defaultName] ?? 4}
+            rarity={rarities[icon.defaultName] ?? "common"}
             selected={icon.defaultName === selectedKey && activeView === "items"}
             excluded={false}
             onSelect={() => handleSelect(icon.defaultName)}
@@ -410,6 +442,7 @@ export function ItemDesignerPage() {
                 attributes={allItemAttrs[icon.defaultName] ?? []}
                 definitions={definitions}
                 charges={charges[icon.defaultName] ?? 4}
+                rarity={rarities[icon.defaultName] ?? "common"}
                 selected={
                   icon.defaultName === selectedKey && activeView === "items"
                 }
@@ -443,6 +476,8 @@ export function ItemDesignerPage() {
         onNameChange={handleNameChange}
         charges={charges[selectedIcon.defaultName] ?? 4}
         onChargesChange={handleChargesChange}
+        rarity={rarities[selectedIcon.defaultName] ?? "common"}
+        onRarityChange={handleRarityChange}
         onItemAttrsChange={handleItemAttrsChange}
       />
     ) : (
