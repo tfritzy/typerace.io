@@ -1,5 +1,5 @@
 import { IconImage } from "./SpriteIcon";
-import { type AttributeDefinition, type ItemAttribute } from "./attributes";
+import { type AttributeDefinition, type ItemAttribute, calculateItemPower } from "./attributes";
 import { type Rarity, RARITY_COLORS } from "./notes";
 import { LucideIcon } from "./LucideIcon";
 
@@ -289,6 +289,41 @@ export function ItemCard({
           {charges > 0 && <ChargesBadge charges={charges} />}
         </div>
       )}
+
+      <div
+        style={{
+          width: "100%",
+          marginTop: 4,
+          paddingTop: 4,
+          borderTop: "1px solid rgba(205,214,244,0.06)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 4,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 9,
+            color: "rgba(205,214,244,0.3)",
+            fontFamily: "'Inter', sans-serif",
+            textTransform: "uppercase",
+            letterSpacing: 0.8,
+          }}
+        >
+          PWR
+        </span>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            color: "#bb9af7",
+            fontFamily: "'Inter', sans-serif",
+          }}
+        >
+          {calculateItemPower(attributes, definitions, charges)}
+        </span>
+      </div>
     </div>
   );
 }
