@@ -4,7 +4,6 @@ import type { GameState, ProjectileState } from "./state";
 
 const PROJECTILE_SCALE = 2;
 const ANIMATION_SPEED = 0.15;
-const RED_TINT = 0xff4444;
 
 export class ProjectileManager {
   readonly layer: Container;
@@ -48,7 +47,6 @@ export class ProjectileManager {
     sprite.anchor.set(0.5);
     sprite.scale.set(PROJECTILE_SCALE);
     sprite.animationSpeed = ANIMATION_SPEED;
-    sprite.tint = RED_TINT;
     sprite.play();
     return sprite;
   }
