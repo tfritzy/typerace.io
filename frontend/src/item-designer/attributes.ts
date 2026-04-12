@@ -1,8 +1,6 @@
 import { db } from "./firestore";
 import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
 
-export type PowerCalculation = "perCharge" | "flat" | "multiplier";
-
 export interface AttributeDefinition {
   id: string;
   name: string;
@@ -10,7 +8,6 @@ export interface AttributeDefinition {
   color: string;
   powerRatio: number;
   perCharge: boolean;
-  powerCalculation: PowerCalculation;
 }
 
 export interface ItemAttribute {
@@ -80,11 +77,6 @@ export async function loadAllItemAttributes(): Promise<Record<string, ItemAttrib
   return result;
 }
 
-export function resolvePowerCalculation(def: AttributeDefinition): PowerCalculation {
-  if (def.powerCalculation) return def.powerCalculation;
-  return def.perCharge ? "perCharge" : "flat";
-}
-
 export function calculateItemPower(
   attributes: ItemAttribute[],
   definitions: AttributeDefinition[],
@@ -93,25 +85,18 @@ export function calculateItemPower(
   const defMap = new Map(definitions.map((d) => [d.id, d]));
   let perChargePower = 0;
   let flatPower = 0;
-  let multiplier = 1;
   for (const attr of attributes) {
     const def = defMap.get(attr.attributeId);
     if (!def) continue;
     const parsed = parseFloat(attr.value);
-    const calc = resolvePowerCalculation(def);
-    if (calc === "multiplier") {
-      const mult = !isNaN(parsed) ? parsed : 1;
-      multiplier *= mult;
+    const raw = !isNaN(parsed) ? parsed * def.powerRatio : def.powerRatio;
+    if (def.perCharge) {
+      perChargePower += raw;
     } else {
-      const raw = !isNaN(parsed) ? parsed * def.powerRatio : def.powerRatio;
-      if (calc === "perCharge") {
-        perChargePower += raw;
-      } else {
-        flatPower += raw;
-      }
+      flatPower += raw;
     }
   }
   const divisor = Math.max(charges, 1);
-  const total = (perChargePower / divisor + flatPower) * multiplier;
+  const total = perChargePower / divisor + flatPower;
   return Math.round(total * 100) / 100;
 }

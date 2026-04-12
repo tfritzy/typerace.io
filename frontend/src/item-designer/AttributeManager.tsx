@@ -1,27 +1,15 @@
 import { useState, useCallback } from "react";
-import { type AttributeDefinition, type PowerCalculation, saveAttributeDefinitions, resolvePowerCalculation } from "./attributes";
+import { type AttributeDefinition, saveAttributeDefinitions } from "./attributes";
 import { AVAILABLE_ICONS, ATTRIBUTE_COLORS } from "./iconPicker";
 import { LucideIcon } from "./LucideIcon";
 import { Trash2, Plus, Check, X } from "lucide-react";
-
-const CALC_OPTIONS: { value: PowerCalculation; label: string; hint: string }[] = [
-  { value: "perCharge", label: "÷ Charges", hint: "value × weight is divided by charges — more charges = weaker per shot" },
-  { value: "flat", label: "Flat", hint: "value × weight — unaffected by number of charges" },
-  { value: "multiplier", label: "Multiplier", hint: "multiplies the total power from all other attributes" },
-];
-
-const CALC_COLORS: Record<PowerCalculation, string> = {
-  perCharge: "#9ece6a",
-  flat: "rgba(205,214,244,0.5)",
-  multiplier: "#bb9af7",
-};
 
 interface AttrFormState {
   name: string;
   icon: string;
   color: string;
   powerRatio: string;
-  powerCalc: PowerCalculation;
+  divideByCharges: boolean;
 }
 
 function defaultFormState(): AttrFormState {
@@ -30,7 +18,7 @@ function defaultFormState(): AttrFormState {
     icon: AVAILABLE_ICONS[0],
     color: ATTRIBUTE_COLORS[0] ?? "#f7768e",
     powerRatio: "1",
-    powerCalc: "perCharge",
+    divideByCharges: true,
   };
 }
 
@@ -40,7 +28,7 @@ function formStateFromDef(def: AttributeDefinition): AttrFormState {
     icon: def.icon,
     color: def.color,
     powerRatio: String(def.powerRatio ?? 1),
-    powerCalc: resolvePowerCalculation(def),
+    divideByCharges: def.perCharge !== false,
   };
 }
 
@@ -52,8 +40,7 @@ function formStateToDef(form: AttrFormState, id: string): AttributeDefinition {
     icon: form.icon,
     color: form.color,
     powerRatio: isNaN(parsed) ? 1 : parsed,
-    perCharge: form.powerCalc === "perCharge",
-    powerCalculation: form.powerCalc,
+    perCharge: form.divideByCharges,
   };
 }
 
@@ -212,45 +199,25 @@ function AttributeForm({ form, onChange, onSubmit, onCancel, submitLabel, submit
               }}
             />
           </div>
-          <div style={{ display: "flex", gap: 2 }}>
-            {CALC_OPTIONS.map((opt) => {
-              const active = form.powerCalc === opt.value;
-              const color = CALC_COLORS[opt.value];
-              return (
-                <button
-                  key={opt.value}
-                  onClick={() => onChange({ ...form, powerCalc: opt.value })}
-                  style={{
-                    background: active ? `${color}18` : "rgba(205,214,244,0.04)",
-                    border: active
-                      ? `1px solid ${color}55`
-                      : "1px solid rgba(205,214,244,0.1)",
-                    borderRadius: 4,
-                    color: active ? color : "rgba(205,214,244,0.35)",
-                    padding: "5px 10px",
-                    fontSize: 12,
-                    fontFamily: "'Inter', sans-serif",
-                    cursor: "pointer",
-                    fontWeight: active ? 600 : 400,
-                  }}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        <div
-          style={{
-            marginTop: 6,
-            fontSize: 11,
-            color: CALC_COLORS[form.powerCalc],
-            fontFamily: "'Inter', sans-serif",
-            opacity: 0.7,
-            lineHeight: 1.4,
-          }}
-        >
-          {CALC_OPTIONS.find((o) => o.value === form.powerCalc)?.hint}
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              cursor: "pointer",
+              fontSize: 12,
+              fontFamily: "'Inter', sans-serif",
+              color: form.divideByCharges ? "#9ece6a" : "rgba(205,214,244,0.4)",
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={form.divideByCharges}
+              onChange={(e) => onChange({ ...form, divideByCharges: e.target.checked })}
+              style={{ accentColor: "#9ece6a" }}
+            />
+            ÷ Charges
+          </label>
         </div>
       </div>
 
@@ -309,10 +276,6 @@ interface AttributeRowProps {
 }
 
 function AttributeRow({ def, onEdit, onRemove }: AttributeRowProps) {
-  const calc = resolvePowerCalculation(def);
-  const calcLabel = CALC_OPTIONS.find((o) => o.value === calc)?.label ?? "Flat";
-  const calcColor = CALC_COLORS[calc];
-
   return (
     <div
       onClick={onEdit}
@@ -348,15 +311,15 @@ function AttributeRow({ def, onEdit, onRemove }: AttributeRowProps) {
       <span
         style={{
           fontSize: 11,
-          color: calcColor,
+          color: "rgba(205,214,244,0.4)",
           fontFamily: "'Inter', sans-serif",
-          background: `${calcColor}12`,
+          background: "rgba(205,214,244,0.06)",
           padding: "2px 8px",
           borderRadius: 4,
           whiteSpace: "nowrap",
         }}
       >
-        {def.powerRatio ?? 1}× {calcLabel}
+        {def.powerRatio ?? 1}×{def.perCharge !== false ? " ÷ chg" : ""}
       </span>
       <button
         onClick={(e) => {
