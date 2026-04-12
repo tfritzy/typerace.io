@@ -20,14 +20,14 @@ export function AttributeManager({
   const [newName, setNewName] = useState("");
   const [newIcon, setNewIcon] = useState<string>(AVAILABLE_ICONS[0]);
   const [newColor, setNewColor] = useState<string>(ATTRIBUTE_COLORS[0] ?? "#f7768e");
-  const [newPowerRatio, setNewPowerRatio] = useState<number>(1);
+  const [newPowerRatio, setNewPowerRatio] = useState("1");
   const [newPerCharge, setNewPerCharge] = useState<boolean>(true);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editIcon, setEditIcon] = useState<string>(AVAILABLE_ICONS[0]);
   const [editColor, setEditColor] = useState<string>(ATTRIBUTE_COLORS[0] ?? "#f7768e");
-  const [editPowerRatio, setEditPowerRatio] = useState<number>(1);
+  const [editPowerRatio, setEditPowerRatio] = useState("1");
   const [editPerCharge, setEditPerCharge] = useState<boolean>(true);
 
   const persist = useCallback(
@@ -46,10 +46,11 @@ export function AttributeManager({
     const trimmed = newName.trim();
     if (!trimmed) return;
     const id = crypto.randomUUID();
-    const next = [...definitions, { id, name: trimmed, icon: newIcon, color: newColor, powerRatio: newPowerRatio, perCharge: newPerCharge }];
+    const parsed = parseFloat(newPowerRatio);
+    const next = [...definitions, { id, name: trimmed, icon: newIcon, color: newColor, powerRatio: isNaN(parsed) ? 1 : parsed, perCharge: newPerCharge }];
     persist(next);
     setNewName("");
-    setNewPowerRatio(1);
+    setNewPowerRatio("1");
     setNewPerCharge(true);
   };
 
@@ -63,7 +64,7 @@ export function AttributeManager({
     setEditName(def.name);
     setEditIcon(def.icon);
     setEditColor(def.color);
-    setEditPowerRatio(def.powerRatio ?? 1);
+    setEditPowerRatio(String(def.powerRatio ?? 1));
     setEditPerCharge(def.perCharge ?? true);
   };
 
@@ -74,10 +75,11 @@ export function AttributeManager({
       setEditingId(null);
       return;
     }
+    const parsedRatio = parseFloat(editPowerRatio);
     persist(
       definitions.map((d) =>
         d.id === editingId
-          ? { ...d, name: trimmed, icon: editIcon, color: editColor, powerRatio: editPowerRatio, perCharge: editPerCharge }
+          ? { ...d, name: trimmed, icon: editIcon, color: editColor, powerRatio: isNaN(parsedRatio) ? 1 : parsedRatio, perCharge: editPerCharge }
           : d
       )
     );
@@ -227,10 +229,7 @@ export function AttributeManager({
           type="number"
           step="any"
           value={newPowerRatio}
-          onChange={(e) => {
-            const val = parseFloat(e.target.value);
-            setNewPowerRatio(isNaN(val) ? 0 : val);
-          }}
+          onChange={(e) => setNewPowerRatio(e.target.value)}
           placeholder="Power ratio"
           title="Power ratio"
           style={{
@@ -364,10 +363,7 @@ export function AttributeManager({
                       type="number"
                       step="any"
                       value={editPowerRatio}
-                      onChange={(e) => {
-                        const val = parseFloat(e.target.value);
-                        setEditPowerRatio(isNaN(val) ? 0 : val);
-                      }}
+                      onChange={(e) => setEditPowerRatio(e.target.value)}
                       title="Power ratio"
                       style={{
                         width: 60,
