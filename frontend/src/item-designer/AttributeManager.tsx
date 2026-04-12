@@ -4,10 +4,10 @@ import { AVAILABLE_ICONS, ATTRIBUTE_COLORS } from "./iconPicker";
 import { LucideIcon } from "./LucideIcon";
 import { Trash2, Plus, Check, X } from "lucide-react";
 
-const CALC_OPTIONS: { value: PowerCalculation; label: string }[] = [
-  { value: "perCharge", label: "Per Charge" },
-  { value: "flat", label: "Flat" },
-  { value: "multiplier", label: "Multiplier" },
+const CALC_OPTIONS: { value: PowerCalculation; label: string; hint: string }[] = [
+  { value: "perCharge", label: "÷ Charges", hint: "value × weight is divided by charges — more charges = weaker per shot" },
+  { value: "flat", label: "Flat", hint: "value × weight — unaffected by number of charges" },
+  { value: "multiplier", label: "Multiplier", hint: "multiplies the total power from all other attributes" },
 ];
 
 const CALC_COLORS: Record<PowerCalculation, string> = {
@@ -240,6 +240,18 @@ function AttributeForm({ form, onChange, onSubmit, onCancel, submitLabel, submit
               );
             })}
           </div>
+        </div>
+        <div
+          style={{
+            marginTop: 6,
+            fontSize: 11,
+            color: CALC_COLORS[form.powerCalc],
+            fontFamily: "'Inter', sans-serif",
+            opacity: 0.7,
+            lineHeight: 1.4,
+          }}
+        >
+          {CALC_OPTIONS.find((o) => o.value === form.powerCalc)?.hint}
         </div>
       </div>
 
