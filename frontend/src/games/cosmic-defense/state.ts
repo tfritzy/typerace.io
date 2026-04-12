@@ -5,6 +5,7 @@ import { ENEMY_CATALOG, type EnemyConfig } from "./enemyConfig";
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLANET_HIT_RADIUS = 100;
+const PROJECTILE_HIT_RADIUS = 20;
 
 export interface EntityState {
   id: number;
@@ -16,6 +17,20 @@ export interface EntityState {
   health: number;
   power: number;
   colorPreset: ColorPreset;
+  firingRange: number;
+  fireRate: number;
+  projectileSpeed: number;
+  projectileType: number;
+  fireTimer: number;
+}
+
+export interface ProjectileState {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  projectileType: number;
 }
 
 export enum WavePhase {
@@ -54,6 +69,7 @@ export class GameEvent {
 
 export interface GameState {
   entities: EntityState[];
+  projectiles: ProjectileState[];
   time: {
     time: number;
     deltaTime: number;
@@ -90,6 +106,7 @@ export function onStateCreated(cb: () => void): () => void {
 export function createGameState(): GameState {
   const state: GameState = {
     entities: [],
+    projectiles: [],
     time: { time: 0, deltaTime: 0 },
     nextId: 1,
     planetHealth: 1000,
@@ -135,6 +152,11 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
     health: config.health,
     power: config.power,
     colorPreset: ColorPreset.Preset4,
+    firingRange: config.firingRange,
+    fireRate: config.fireRate,
+    projectileSpeed: config.projectileSpeed,
+    projectileType: config.projectileType,
+    fireTimer: Math.random() * config.fireRate,
   };
 
   state.entities.push(entity);
@@ -152,6 +174,7 @@ function isInBounds(x: number, y: number): boolean {
 
 function checkCollisions(state: GameState): void {
   const r2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
+  const pr2 = PROJECTILE_HIT_RADIUS * PROJECTILE_HIT_RADIUS;
   let damaged = false;
 
   for (let i = state.entities.length - 1; i >= 0; i--) {
@@ -167,7 +190,45 @@ function checkCollisions(state: GameState): void {
     }
   }
 
+  for (let i = state.projectiles.length - 1; i >= 0; i--) {
+    const p = state.projectiles[i];
+    const dx = p.x - PLANET_X;
+    const dy = p.y - PLANET_Y;
+    if (dx * dx + dy * dy < pr2) {
+      state.planetHealth = Math.max(0, state.planetHealth - 1);
+      state.projectiles.splice(i, 1);
+      damaged = true;
+    } else if (!isInBounds(p.x, p.y)) {
+      state.projectiles.splice(i, 1);
+    }
+  }
+
   if (damaged) state.onPlanetDamaged.emit();
+}
+
+function updateFiring(state: GameState, dt: number): void {
+  for (const e of state.entities) {
+    const dx = e.x - PLANET_X;
+    const dy = e.y - PLANET_Y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist > e.firingRange) continue;
+
+    e.fireTimer -= dt;
+    if (e.fireTimer <= 0) {
+      e.fireTimer += e.fireRate;
+
+      const angle = Math.atan2(PLANET_Y - e.y, PLANET_X - e.x);
+      state.projectiles.push({
+        id: state.nextId++,
+        x: e.x,
+        y: e.y,
+        vx: Math.cos(angle) * e.projectileSpeed,
+        vy: Math.sin(angle) * e.projectileSpeed,
+        projectileType: e.projectileType,
+      });
+    }
+  }
 }
 
 export function updateState(state: GameState, dt: number): void {
@@ -179,6 +240,12 @@ export function updateState(state: GameState, dt: number): void {
     e.y += e.vy * dt;
   }
 
+  for (const p of state.projectiles) {
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+  }
+
+  updateFiring(state, dt);
   checkCollisions(state);
 }
 

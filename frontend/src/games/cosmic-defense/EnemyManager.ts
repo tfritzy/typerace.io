@@ -3,6 +3,8 @@ import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState } from "./state";
 import { WavePhase, spawnEntity } from "./state";
 
+const RED_TINT = 0xff4444;
+
 export class EnemyManager {
   readonly layer: Container;
 
@@ -43,7 +45,7 @@ export class EnemyManager {
     }
 
     if (wave.phase === WavePhase.Clearing) {
-      if (state.entities.length === 0) {
+      if (state.entities.length === 0 && state.projectiles.length === 0) {
         wave.phase = WavePhase.Idle;
         state.onWaveComplete.emit();
       }
@@ -56,6 +58,7 @@ export class EnemyManager {
     const shipTexture = this.assets.getShipTexture(entity.entityType, entity.colorPreset);
     const shipSprite = new Sprite(shipTexture);
     shipSprite.anchor.set(0.5);
+    shipSprite.tint = RED_TINT;
 
     const container = new Container();
     container.addChild(shipSprite);
