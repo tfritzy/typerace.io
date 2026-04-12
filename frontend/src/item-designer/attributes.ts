@@ -92,7 +92,7 @@ export function calculateItemPower(
     if (!def) continue;
     const parsed = parseFloat(attr.value);
     if (def.multiplier) {
-      const mult = !isNaN(parsed) ? parsed : 1;
+      const mult = !isNaN(parsed) ? parsed : def.powerRatio;
       multiplier *= mult;
     } else {
       const raw = !isNaN(parsed) ? parsed * def.powerRatio : def.powerRatio;

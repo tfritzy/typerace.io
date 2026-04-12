@@ -179,32 +179,30 @@ function AttributeForm({ form, onChange, onSubmit, onCancel, submitLabel, submit
       <div>
         <FieldLabel>Power Scaling</FieldLabel>
         <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          {!form.multiplier && (
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span
-                style={{
-                  fontSize: 12,
-                  color: "rgba(205,214,244,0.4)",
-                  fontFamily: "'Inter', sans-serif",
-                }}
-              >
-                Weight
-              </span>
-              <input
-                type="number"
-                step="any"
-                value={form.powerRatio}
-                onChange={(e) => onChange({ ...form, powerRatio: e.target.value })}
-                onKeyDown={handleKeyDown}
-                style={{
-                  ...inputStyle,
-                  width: 56,
-                  padding: "5px 6px",
-                  textAlign: "center",
-                }}
-              />
-            </div>
-          )}
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span
+              style={{
+                fontSize: 12,
+                color: "rgba(205,214,244,0.4)",
+                fontFamily: "'Inter', sans-serif",
+              }}
+            >
+              {form.multiplier ? "Multiplier" : "Weight"}
+            </span>
+            <input
+              type="number"
+              step="any"
+              value={form.powerRatio}
+              onChange={(e) => onChange({ ...form, powerRatio: e.target.value })}
+              onKeyDown={handleKeyDown}
+              style={{
+                ...inputStyle,
+                width: 56,
+                padding: "5px 6px",
+                textAlign: "center",
+              }}
+            />
+          </div>
           {!form.multiplier && (
             <label
               style={{
@@ -304,7 +302,7 @@ interface AttributeRowProps {
 
 function AttributeRow({ def, onEdit, onRemove }: AttributeRowProps) {
   const badgeText = def.multiplier
-    ? "multiplier"
+    ? `×${def.powerRatio ?? 1} multiplier`
     : `${def.powerRatio ?? 1}×${def.perCharge !== false ? " ÷ charges" : ""}`;
   const badgeColor = def.multiplier ? "#bb9af7" : "rgba(205,214,244,0.4)";
 
