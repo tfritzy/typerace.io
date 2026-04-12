@@ -319,7 +319,7 @@ function AttributeRow({ def, onEdit, onRemove }: AttributeRowProps) {
           whiteSpace: "nowrap",
         }}
       >
-        {def.powerRatio ?? 1}×{def.perCharge !== false ? " ÷ chg" : ""}
+        {def.powerRatio ?? 1}×{def.perCharge !== false ? " ÷ charges" : ""}
       </span>
       <button
         onClick={(e) => {
