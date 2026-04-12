@@ -410,7 +410,7 @@ export function AttributeManager({
                             whiteSpace: "nowrap",
                           }}
                         >
-                          {opt.icon}{opt.label}
+                          {opt.icon} {opt.label}
                         </button>
                       ))}
                     </div>
