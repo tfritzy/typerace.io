@@ -123,6 +123,7 @@ export function NoteEditor({
   const [itemAttrs, setItemAttrs] = useState<ItemAttribute[]>([]);
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(displayName);
+  const [chargesInput, setChargesInput] = useState(String(charges));
   const [attrSaveError, setAttrSaveError] = useState<string | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentItemRef = useRef(icon.defaultName);
@@ -133,6 +134,7 @@ export function NoteEditor({
     setLoaded(false);
     setEditingName(false);
     setNameInput(displayName);
+    setChargesInput(String(charges));
     loadNote(icon.defaultName)
       .then((note) => {
         if (currentItemRef.current === icon.defaultName) {
@@ -158,6 +160,10 @@ export function NoteEditor({
   useEffect(() => {
     setNameInput(displayName);
   }, [displayName]);
+
+  useEffect(() => {
+    setChargesInput(String(charges));
+  }, [charges]);
 
   useEffect(() => {
     return () => {
@@ -363,10 +369,19 @@ export function NoteEditor({
         <input
           type="number"
           min={0}
-          value={charges}
+          value={chargesInput}
           onChange={(e) => {
+            setChargesInput(e.target.value);
             const val = parseInt(e.target.value, 10);
-            onChargesChange(icon.defaultName, isNaN(val) || val < 0 ? 0 : val);
+            if (!isNaN(val) && val >= 0) {
+              onChargesChange(icon.defaultName, val);
+            }
+          }}
+          onBlur={() => {
+            const val = parseInt(chargesInput, 10);
+            const resolved = isNaN(val) || val < 0 ? 0 : val;
+            setChargesInput(String(resolved));
+            onChargesChange(icon.defaultName, resolved);
           }}
           style={{
             width: 70,
