@@ -10,6 +10,305 @@ const POWER_CALC_OPTIONS: { value: PowerCalculation; label: string; icon: string
   { value: "multiplier", label: "×mult", icon: "×" },
 ];
 
+const POWER_CALC_COLORS: Record<PowerCalculation, string> = {
+  perCharge: "rgba(158,206,106,0.5)",
+  flat: "rgba(205,214,244,0.25)",
+  multiplier: "rgba(187,154,247,0.5)",
+};
+
+interface AttrFormState {
+  name: string;
+  icon: string;
+  color: string;
+  powerRatio: string;
+  powerCalc: PowerCalculation;
+}
+
+function defaultFormState(): AttrFormState {
+  return {
+    name: "",
+    icon: AVAILABLE_ICONS[0],
+    color: ATTRIBUTE_COLORS[0] ?? "#f7768e",
+    powerRatio: "1",
+    powerCalc: "perCharge",
+  };
+}
+
+function formStateFromDef(def: AttributeDefinition): AttrFormState {
+  return {
+    name: def.name,
+    icon: def.icon,
+    color: def.color,
+    powerRatio: String(def.powerRatio ?? 1),
+    powerCalc: resolvePowerCalculation(def),
+  };
+}
+
+function formStateToDef(form: AttrFormState, id: string): AttributeDefinition {
+  const parsed = parseFloat(form.powerRatio);
+  return {
+    id,
+    name: form.name.trim(),
+    icon: form.icon,
+    color: form.color,
+    powerRatio: isNaN(parsed) ? 1 : parsed,
+    perCharge: form.powerCalc === "perCharge",
+    powerCalculation: form.powerCalc,
+  };
+}
+
+interface AttributeFormProps {
+  form: AttrFormState;
+  onChange: (form: AttrFormState) => void;
+  onSubmit: () => void;
+  onCancel?: () => void;
+  submitLabel: string;
+  submitIcon: React.ReactNode;
+  compact?: boolean;
+  autoFocusName?: boolean;
+}
+
+function AttributeForm({ form, onChange, onSubmit, onCancel, submitLabel, submitIcon, compact, autoFocusName }: AttributeFormProps) {
+  const canSubmit = form.name.trim().length > 0;
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && canSubmit) onSubmit();
+    if (e.key === "Escape" && onCancel) onCancel();
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        <input
+          value={form.name}
+          onChange={(e) => onChange({ ...form, name: e.target.value })}
+          onKeyDown={handleKeyDown}
+          autoFocus={autoFocusName}
+          placeholder="Attribute name..."
+          style={{
+            background: "rgba(205,214,244,0.06)",
+            border: "1px solid rgba(205,214,244,0.15)",
+            borderRadius: 6,
+            color: form.color,
+            padding: compact ? "6px 10px" : "8px 12px",
+            fontSize: 14,
+            fontFamily: "'Inter', sans-serif",
+            outline: "none",
+            flex: 1,
+            minWidth: 120,
+          }}
+        />
+        <select
+          value={form.icon}
+          onChange={(e) => onChange({ ...form, icon: e.target.value })}
+          style={{
+            background: "rgba(205,214,244,0.06)",
+            border: "1px solid rgba(205,214,244,0.15)",
+            borderRadius: 6,
+            color: "#cdd6f4",
+            padding: compact ? "6px 8px" : "8px 10px",
+            fontSize: 13,
+            fontFamily: "'Inter', sans-serif",
+            outline: "none",
+          }}
+        >
+          {AVAILABLE_ICONS.map((icon) => (
+            <option key={icon} value={icon}>
+              {icon}
+            </option>
+          ))}
+        </select>
+        <input
+          type="number"
+          step="any"
+          value={form.powerRatio}
+          onChange={(e) => onChange({ ...form, powerRatio: e.target.value })}
+          onKeyDown={handleKeyDown}
+          placeholder="Power ratio"
+          title="Power ratio"
+          style={{
+            width: 80,
+            background: "rgba(205,214,244,0.06)",
+            border: "1px solid rgba(205,214,244,0.15)",
+            borderRadius: 6,
+            color: "#cdd6f4",
+            padding: compact ? "6px 8px" : "8px 10px",
+            fontSize: 13,
+            fontFamily: "'Inter', sans-serif",
+            outline: "none",
+            textAlign: "center",
+          }}
+        />
+        <div style={{ display: "flex", gap: 2 }}>
+          {POWER_CALC_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => onChange({ ...form, powerCalc: opt.value })}
+              title={opt.value === "perCharge" ? "Per charge (divides by charges)" : opt.value === "flat" ? "Flat (not divided by charges)" : "Multiplier (multiplies total power)"}
+              style={{
+                background: form.powerCalc === opt.value ? "rgba(158,206,106,0.15)" : "rgba(205,214,244,0.06)",
+                border: form.powerCalc === opt.value
+                  ? "1px solid rgba(158,206,106,0.4)"
+                  : "1px solid rgba(205,214,244,0.15)",
+                borderRadius: 6,
+                color: form.powerCalc === opt.value ? "#9ece6a" : "rgba(205,214,244,0.5)",
+                padding: compact ? "6px 6px" : "8px 8px",
+                fontSize: 11,
+                fontFamily: "'Inter', sans-serif",
+                cursor: "pointer",
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {opt.icon} {opt.label}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={onSubmit}
+          disabled={!canSubmit}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            background: "#7aa2f7",
+            border: "none",
+            borderRadius: 6,
+            color: "#1a1b26",
+            padding: compact ? "6px 10px" : "8px 14px",
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: canSubmit ? "pointer" : "not-allowed",
+            opacity: canSubmit ? 1 : 0.4,
+          }}
+        >
+          {submitIcon}
+          {submitLabel}
+        </button>
+        {onCancel && (
+          <button
+            onClick={onCancel}
+            style={{
+              background: "transparent",
+              border: "1px solid rgba(205,214,244,0.15)",
+              borderRadius: 6,
+              color: "rgba(205,214,244,0.5)",
+              padding: compact ? "6px 10px" : "8px 14px",
+              fontSize: 13,
+              fontFamily: "'Inter', sans-serif",
+              cursor: "pointer",
+            }}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
+      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+        {ATTRIBUTE_COLORS.map((c) => (
+          <button
+            key={c}
+            onClick={() => onChange({ ...form, color: c })}
+            style={{
+              width: compact ? 22 : 24,
+              height: compact ? 22 : 24,
+              borderRadius: 4,
+              background: c,
+              border: form.color === c ? "2px solid #cdd6f4" : "2px solid transparent",
+              cursor: "pointer",
+              padding: 0,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+interface AttributeRowProps {
+  def: AttributeDefinition;
+  onEdit: () => void;
+  onRemove: () => void;
+}
+
+function AttributeRow({ def, onEdit, onRemove }: AttributeRowProps) {
+  const calc = resolvePowerCalculation(def);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: "10px 12px",
+        borderBottom: "1px solid rgba(205,214,244,0.06)",
+      }}
+    >
+      <LucideIcon name={def.icon} size={20} color={def.color} />
+      <span
+        style={{
+          flex: 1,
+          fontSize: 14,
+          color: def.color,
+          fontFamily: "'Inter', sans-serif",
+        }}
+      >
+        {def.name}
+      </span>
+      <span
+        style={{
+          fontSize: 11,
+          color: "rgba(205,214,244,0.35)",
+          fontFamily: "'Inter', sans-serif",
+        }}
+      >
+        ×{def.powerRatio ?? 1}
+      </span>
+      <span
+        style={{
+          fontSize: 9,
+          color: POWER_CALC_COLORS[calc],
+          fontFamily: "'Inter', sans-serif",
+        }}
+      >
+        {POWER_CALC_OPTIONS.find((o) => o.value === calc)?.label ?? "flat"}
+      </span>
+      <button
+        onClick={onEdit}
+        style={{
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          color: "rgba(205,214,244,0.3)",
+          padding: 4,
+          display: "flex",
+        }}
+      >
+        <Pencil size={16} />
+      </button>
+      <button
+        onClick={onRemove}
+        style={{
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          color: "rgba(205,214,244,0.3)",
+          padding: 4,
+          display: "flex",
+        }}
+      >
+        <Trash2 size={16} />
+      </button>
+    </div>
+  );
+}
+
 interface AttributeManagerProps {
   definitions: AttributeDefinition[];
   onChange: (defs: AttributeDefinition[]) => void;
@@ -23,18 +322,10 @@ export function AttributeManager({
   onBack,
   compact,
 }: AttributeManagerProps) {
-  const [newName, setNewName] = useState("");
-  const [newIcon, setNewIcon] = useState<string>(AVAILABLE_ICONS[0]);
-  const [newColor, setNewColor] = useState<string>(ATTRIBUTE_COLORS[0] ?? "#f7768e");
-  const [newPowerRatio, setNewPowerRatio] = useState("1");
-  const [newPowerCalc, setNewPowerCalc] = useState<PowerCalculation>("perCharge");
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const [addForm, setAddForm] = useState<AttrFormState>(defaultFormState);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState("");
-  const [editIcon, setEditIcon] = useState<string>(AVAILABLE_ICONS[0]);
-  const [editColor, setEditColor] = useState<string>(ATTRIBUTE_COLORS[0] ?? "#f7768e");
-  const [editPowerRatio, setEditPowerRatio] = useState("1");
-  const [editPowerCalc, setEditPowerCalc] = useState<PowerCalculation>("perCharge");
+  const [editForm, setEditForm] = useState<AttrFormState>(defaultFormState);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const persist = useCallback(
     (next: AttributeDefinition[]) => {
@@ -49,60 +340,33 @@ export function AttributeManager({
   );
 
   const handleAdd = () => {
-    const trimmed = newName.trim();
-    if (!trimmed) return;
-    const id = crypto.randomUUID();
-    const parsed = parseFloat(newPowerRatio);
-    const next = [...definitions, { id, name: trimmed, icon: newIcon, color: newColor, powerRatio: isNaN(parsed) ? 1 : parsed, perCharge: newPowerCalc === "perCharge", powerCalculation: newPowerCalc }];
-    persist(next);
-    setNewName("");
-    setNewPowerRatio("1");
-    setNewPowerCalc("perCharge");
-  };
-
-  const handleRemove = (id: string) => {
-    if (editingId === id) setEditingId(null);
-    persist(definitions.filter((d) => d.id !== id));
+    if (!addForm.name.trim()) return;
+    const def = formStateToDef(addForm, crypto.randomUUID());
+    persist([...definitions, def]);
+    setAddForm(defaultFormState());
   };
 
   const startEditing = (def: AttributeDefinition) => {
     setEditingId(def.id);
-    setEditName(def.name);
-    setEditIcon(def.icon);
-    setEditColor(def.color);
-    setEditPowerRatio(String(def.powerRatio ?? 1));
-    setEditPowerCalc(resolvePowerCalculation(def));
+    setEditForm(formStateFromDef(def));
   };
 
   const commitEdit = () => {
-    if (!editingId) return;
-    const trimmed = editName.trim();
-    if (!trimmed) {
+    if (!editingId || !editForm.name.trim()) {
       setEditingId(null);
       return;
     }
-    const parsedRatio = parseFloat(editPowerRatio);
     persist(
       definitions.map((d) =>
-        d.id === editingId
-          ? { ...d, name: trimmed, icon: editIcon, color: editColor, powerRatio: isNaN(parsedRatio) ? 1 : parsedRatio, perCharge: editPowerCalc === "perCharge", powerCalculation: editPowerCalc }
-          : d
+        d.id === editingId ? formStateToDef(editForm, editingId) : d
       )
     );
     setEditingId(null);
   };
 
-  const cancelEdit = () => {
-    setEditingId(null);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") handleAdd();
-  };
-
-  const handleEditKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") commitEdit();
-    if (e.key === "Escape") cancelEdit();
+  const handleRemove = (id: string) => {
+    if (editingId === id) setEditingId(null);
+    persist(definitions.filter((d) => d.id !== id));
   };
 
   return (
@@ -167,136 +431,15 @@ export function AttributeManager({
         </div>
       )}
 
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          marginBottom: 20,
-          flexWrap: "wrap",
-          alignItems: "center",
-        }}
-      >
-        <input
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Attribute name..."
-          style={{
-            background: "rgba(205,214,244,0.06)",
-            border: "1px solid rgba(205,214,244,0.15)",
-            borderRadius: 6,
-            color: "#cdd6f4",
-            padding: "8px 12px",
-            fontSize: 14,
-            fontFamily: "'Inter', sans-serif",
-            outline: "none",
-            flex: 1,
-            minWidth: 120,
-          }}
+      <div style={{ marginBottom: 20 }}>
+        <AttributeForm
+          form={addForm}
+          onChange={setAddForm}
+          onSubmit={handleAdd}
+          submitLabel="Add"
+          submitIcon={<Plus size={16} />}
+          compact={compact}
         />
-        <select
-          value={newIcon}
-          onChange={(e) => setNewIcon(e.target.value)}
-          style={{
-            background: "rgba(205,214,244,0.06)",
-            border: "1px solid rgba(205,214,244,0.15)",
-            borderRadius: 6,
-            color: "#cdd6f4",
-            padding: "8px 10px",
-            fontSize: 13,
-            fontFamily: "'Inter', sans-serif",
-            outline: "none",
-          }}
-        >
-          {AVAILABLE_ICONS.map((icon) => (
-            <option key={icon} value={icon}>
-              {icon}
-            </option>
-          ))}
-        </select>
-        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-          {ATTRIBUTE_COLORS.map((c) => (
-            <button
-              key={c}
-              onClick={() => setNewColor(c)}
-              style={{
-                width: 24,
-                height: 24,
-                borderRadius: 4,
-                background: c,
-                border: newColor === c ? "2px solid #cdd6f4" : "2px solid transparent",
-                cursor: "pointer",
-                padding: 0,
-              }}
-            />
-          ))}
-        </div>
-        <input
-          type="number"
-          step="any"
-          value={newPowerRatio}
-          onChange={(e) => setNewPowerRatio(e.target.value)}
-          placeholder="Power ratio"
-          title="Power ratio"
-          style={{
-            width: 80,
-            background: "rgba(205,214,244,0.06)",
-            border: "1px solid rgba(205,214,244,0.15)",
-            borderRadius: 6,
-            color: "#cdd6f4",
-            padding: "8px 10px",
-            fontSize: 13,
-            fontFamily: "'Inter', sans-serif",
-            outline: "none",
-            textAlign: "center",
-          }}
-        />
-        <div style={{ display: "flex", gap: 2 }}>
-          {POWER_CALC_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setNewPowerCalc(opt.value)}
-              title={opt.value === "perCharge" ? "Per charge (divides by charges)" : opt.value === "flat" ? "Flat (not divided by charges)" : "Multiplier (multiplies total power)"}
-              style={{
-                background: newPowerCalc === opt.value ? "rgba(158,206,106,0.15)" : "rgba(205,214,244,0.06)",
-                border: newPowerCalc === opt.value
-                  ? "1px solid rgba(158,206,106,0.4)"
-                  : "1px solid rgba(205,214,244,0.15)",
-                borderRadius: 6,
-                color: newPowerCalc === opt.value ? "#9ece6a" : "rgba(205,214,244,0.5)",
-                padding: "8px 8px",
-                fontSize: 11,
-                fontFamily: "'Inter', sans-serif",
-                cursor: "pointer",
-                fontWeight: 600,
-                whiteSpace: "nowrap",
-              }}
-            >
-              {opt.icon} {opt.label}
-            </button>
-          ))}
-        </div>
-        <button
-          onClick={handleAdd}
-          disabled={!newName.trim()}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            background: "#7aa2f7",
-            border: "none",
-            borderRadius: 6,
-            color: "#1a1b26",
-            padding: "8px 14px",
-            fontSize: 13,
-            fontWeight: 600,
-            cursor: newName.trim() ? "pointer" : "not-allowed",
-            opacity: newName.trim() ? 1 : 0.4,
-          }}
-        >
-          <Plus size={16} />
-          Add
-        </button>
       </div>
 
       <div style={{ flex: 1, overflowY: "auto" }}>
@@ -312,217 +455,35 @@ export function AttributeManager({
             No attributes defined yet
           </div>
         )}
-        {definitions.map((def) => {
-          const isEditing = editingId === def.id;
-          return (
+        {definitions.map((def) =>
+          editingId === def.id ? (
             <div
               key={def.id}
               style={{
-                display: "flex",
-                flexDirection: "column",
+                padding: "10px 12px",
                 borderBottom: "1px solid rgba(205,214,244,0.06)",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  padding: "10px 12px",
-                }}
-              >
-                {isEditing ? (
-                  <>
-                    <select
-                      value={editIcon}
-                      onChange={(e) => setEditIcon(e.target.value)}
-                      style={{
-                        background: "rgba(205,214,244,0.06)",
-                        border: "1px solid rgba(122,162,247,0.4)",
-                        borderRadius: 4,
-                        color: "#cdd6f4",
-                        padding: "4px 6px",
-                        fontSize: 12,
-                        fontFamily: "'Inter', sans-serif",
-                        outline: "none",
-                      }}
-                    >
-                      {AVAILABLE_ICONS.map((icon) => (
-                        <option key={icon} value={icon}>
-                          {icon}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      onKeyDown={handleEditKeyDown}
-                      autoFocus
-                      style={{
-                        flex: 1,
-                        fontSize: 14,
-                        color: editColor,
-                        fontFamily: "'Inter', sans-serif",
-                        background: "rgba(205,214,244,0.06)",
-                        border: "1px solid rgba(122,162,247,0.4)",
-                        borderRadius: 4,
-                        padding: "4px 8px",
-                        outline: "none",
-                      }}
-                    />
-                    <input
-                      type="number"
-                      step="any"
-                      value={editPowerRatio}
-                      onChange={(e) => setEditPowerRatio(e.target.value)}
-                      title="Power ratio"
-                      style={{
-                        width: 60,
-                        fontSize: 12,
-                        color: "#cdd6f4",
-                        fontFamily: "'Inter', sans-serif",
-                        background: "rgba(205,214,244,0.06)",
-                        border: "1px solid rgba(122,162,247,0.4)",
-                        borderRadius: 4,
-                        padding: "4px 6px",
-                        outline: "none",
-                        textAlign: "center",
-                      }}
-                    />
-                    <div style={{ display: "flex", gap: 2 }}>
-                      {POWER_CALC_OPTIONS.map((opt) => (
-                        <button
-                          key={opt.value}
-                          onClick={() => setEditPowerCalc(opt.value)}
-                          title={opt.value}
-                          style={{
-                            background: editPowerCalc === opt.value ? "rgba(158,206,106,0.15)" : "rgba(205,214,244,0.06)",
-                            border: editPowerCalc === opt.value
-                              ? "1px solid rgba(158,206,106,0.4)"
-                              : "1px solid rgba(205,214,244,0.15)",
-                            borderRadius: 4,
-                            color: editPowerCalc === opt.value ? "#9ece6a" : "rgba(205,214,244,0.5)",
-                            padding: "4px 5px",
-                            fontSize: 10,
-                            fontFamily: "'Inter', sans-serif",
-                            cursor: "pointer",
-                            fontWeight: 600,
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {opt.icon} {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <LucideIcon name={def.icon} size={20} color={def.color} />
-                    <span
-                      style={{
-                        flex: 1,
-                        fontSize: 14,
-                        color: def.color,
-                        fontFamily: "'Inter', sans-serif",
-                      }}
-                    >
-                      {def.name}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 11,
-                        color: "rgba(205,214,244,0.35)",
-                        fontFamily: "'Inter', sans-serif",
-                      }}
-                    >
-                      ×{def.powerRatio ?? 1}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: 9,
-                        color: resolvePowerCalculation(def) === "multiplier" ? "rgba(187,154,247,0.5)" : resolvePowerCalculation(def) === "perCharge" ? "rgba(158,206,106,0.5)" : "rgba(205,214,244,0.25)",
-                        fontFamily: "'Inter', sans-serif",
-                      }}
-                    >
-                      {POWER_CALC_OPTIONS.find((o) => o.value === resolvePowerCalculation(def))?.label ?? "flat"}
-                    </span>
-                  </>
-                )}
-                {isEditing ? (
-                  <button
-                    onClick={commitEdit}
-                    style={{
-                      background: "transparent",
-                      border: "none",
-                      cursor: "pointer",
-                      color: "#9ece6a",
-                      padding: 4,
-                      display: "flex",
-                    }}
-                  >
-                    <Check size={16} />
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => startEditing(def)}
-                    style={{
-                      background: "transparent",
-                      border: "none",
-                      cursor: "pointer",
-                      color: "rgba(205,214,244,0.3)",
-                      padding: 4,
-                      display: "flex",
-                    }}
-                  >
-                    <Pencil size={16} />
-                  </button>
-                )}
-                <button
-                  onClick={() => handleRemove(def.id)}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "rgba(205,214,244,0.3)",
-                    padding: 4,
-                    display: "flex",
-                  }}
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-              {isEditing && (
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 4,
-                    flexWrap: "wrap",
-                    padding: "0 12px 10px",
-                  }}
-                >
-                  {ATTRIBUTE_COLORS.map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => setEditColor(c)}
-                      style={{
-                        width: 22,
-                        height: 22,
-                        borderRadius: 4,
-                        background: c,
-                        border:
-                          editColor === c
-                            ? "2px solid #cdd6f4"
-                            : "2px solid transparent",
-                        cursor: "pointer",
-                        padding: 0,
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
+              <AttributeForm
+                form={editForm}
+                onChange={setEditForm}
+                onSubmit={commitEdit}
+                onCancel={() => setEditingId(null)}
+                submitLabel="Save"
+                submitIcon={<Check size={16} />}
+                compact={compact}
+                autoFocusName
+              />
             </div>
-          );
-        })}
+          ) : (
+            <AttributeRow
+              key={def.id}
+              def={def}
+              onEdit={() => startEditing(def)}
+              onRemove={() => handleRemove(def.id)}
+            />
+          )
+        )}
       </div>
     </div>
   );
