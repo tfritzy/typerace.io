@@ -7,6 +7,7 @@ export interface AttributeDefinition {
   icon: string;
   color: string;
   powerRatio: number;
+  perCharge: boolean;
 }
 
 export interface ItemAttribute {
@@ -82,17 +83,20 @@ export function calculateItemPower(
   charges: number
 ): number {
   const defMap = new Map(definitions.map((d) => [d.id, d]));
-  let total = 0;
+  let perChargePower = 0;
+  let flatPower = 0;
   for (const attr of attributes) {
     const def = defMap.get(attr.attributeId);
     if (!def) continue;
     const parsed = parseFloat(attr.value);
-    if (!isNaN(parsed)) {
-      total += parsed * def.powerRatio;
+    const raw = !isNaN(parsed) ? parsed * def.powerRatio : def.powerRatio;
+    if (def.perCharge) {
+      perChargePower += raw;
     } else {
-      total += def.powerRatio;
+      flatPower += raw;
     }
   }
   const divisor = Math.max(charges, 1);
-  return Math.round((total / divisor) * 100) / 100;
+  const total = perChargePower / divisor + flatPower;
+  return Math.round(total * 100) / 100;
 }

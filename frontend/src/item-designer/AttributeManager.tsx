@@ -21,12 +21,14 @@ export function AttributeManager({
   const [newIcon, setNewIcon] = useState<string>(AVAILABLE_ICONS[0]);
   const [newColor, setNewColor] = useState<string>(ATTRIBUTE_COLORS[0] ?? "#f7768e");
   const [newPowerRatio, setNewPowerRatio] = useState<number>(1);
+  const [newPerCharge, setNewPerCharge] = useState<boolean>(true);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editIcon, setEditIcon] = useState<string>(AVAILABLE_ICONS[0]);
   const [editColor, setEditColor] = useState<string>(ATTRIBUTE_COLORS[0] ?? "#f7768e");
   const [editPowerRatio, setEditPowerRatio] = useState<number>(1);
+  const [editPerCharge, setEditPerCharge] = useState<boolean>(true);
 
   const persist = useCallback(
     (next: AttributeDefinition[]) => {
@@ -44,10 +46,11 @@ export function AttributeManager({
     const trimmed = newName.trim();
     if (!trimmed) return;
     const id = crypto.randomUUID();
-    const next = [...definitions, { id, name: trimmed, icon: newIcon, color: newColor, powerRatio: newPowerRatio }];
+    const next = [...definitions, { id, name: trimmed, icon: newIcon, color: newColor, powerRatio: newPowerRatio, perCharge: newPerCharge }];
     persist(next);
     setNewName("");
     setNewPowerRatio(1);
+    setNewPerCharge(true);
   };
 
   const handleRemove = (id: string) => {
@@ -61,6 +64,7 @@ export function AttributeManager({
     setEditIcon(def.icon);
     setEditColor(def.color);
     setEditPowerRatio(def.powerRatio ?? 1);
+    setEditPerCharge(def.perCharge ?? true);
   };
 
   const commitEdit = () => {
@@ -73,7 +77,7 @@ export function AttributeManager({
     persist(
       definitions.map((d) =>
         d.id === editingId
-          ? { ...d, name: trimmed, icon: editIcon, color: editColor, powerRatio: editPowerRatio }
+          ? { ...d, name: trimmed, icon: editIcon, color: editColor, powerRatio: editPowerRatio, perCharge: editPerCharge }
           : d
       )
     );
@@ -243,6 +247,26 @@ export function AttributeManager({
           }}
         />
         <button
+          onClick={() => setNewPerCharge((v) => !v)}
+          title={newPerCharge ? "Per charge (divides by charges)" : "Flat (not divided by charges)"}
+          style={{
+            background: newPerCharge ? "rgba(158,206,106,0.15)" : "rgba(205,214,244,0.06)",
+            border: newPerCharge
+              ? "1px solid rgba(158,206,106,0.4)"
+              : "1px solid rgba(205,214,244,0.15)",
+            borderRadius: 6,
+            color: newPerCharge ? "#9ece6a" : "rgba(205,214,244,0.5)",
+            padding: "8px 10px",
+            fontSize: 11,
+            fontFamily: "'Inter', sans-serif",
+            cursor: "pointer",
+            fontWeight: 600,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {newPerCharge ? "⚡ /chg" : "― flat"}
+        </button>
+        <button
           onClick={handleAdd}
           disabled={!newName.trim()}
           style={{
@@ -358,6 +382,26 @@ export function AttributeManager({
                         textAlign: "center",
                       }}
                     />
+                    <button
+                      onClick={() => setEditPerCharge((v) => !v)}
+                      title={editPerCharge ? "Per charge" : "Flat"}
+                      style={{
+                        background: editPerCharge ? "rgba(158,206,106,0.15)" : "rgba(205,214,244,0.06)",
+                        border: editPerCharge
+                          ? "1px solid rgba(158,206,106,0.4)"
+                          : "1px solid rgba(205,214,244,0.15)",
+                        borderRadius: 4,
+                        color: editPerCharge ? "#9ece6a" : "rgba(205,214,244,0.5)",
+                        padding: "4px 6px",
+                        fontSize: 10,
+                        fontFamily: "'Inter', sans-serif",
+                        cursor: "pointer",
+                        fontWeight: 600,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {editPerCharge ? "⚡/chg" : "flat"}
+                    </button>
                   </>
                 ) : (
                   <>
@@ -380,6 +424,15 @@ export function AttributeManager({
                       }}
                     >
                       ×{def.powerRatio ?? 1}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 9,
+                        color: def.perCharge ? "rgba(158,206,106,0.5)" : "rgba(205,214,244,0.25)",
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      {def.perCharge ? "/chg" : "flat"}
                     </span>
                   </>
                 )}
