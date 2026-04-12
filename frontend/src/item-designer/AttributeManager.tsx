@@ -16,6 +16,18 @@ const POWER_CALC_COLORS: Record<PowerCalculation, string> = {
   multiplier: "rgba(187,154,247,0.5)",
 };
 
+const POWER_CALC_ACTIVE_COLORS: Record<PowerCalculation, { bg: string; border: string; text: string }> = {
+  perCharge: { bg: "rgba(158,206,106,0.15)", border: "rgba(158,206,106,0.4)", text: "#9ece6a" },
+  flat: { bg: "rgba(205,214,244,0.1)", border: "rgba(205,214,244,0.3)", text: "#cdd6f4" },
+  multiplier: { bg: "rgba(187,154,247,0.15)", border: "rgba(187,154,247,0.4)", text: "#bb9af7" },
+};
+
+const POWER_CALC_TOOLTIPS: Record<PowerCalculation, string> = {
+  perCharge: "Per charge (divides by charges)",
+  flat: "Flat (not divided by charges)",
+  multiplier: "Multiplier (multiplies total power)",
+};
+
 interface AttrFormState {
   name: string;
   icon: string;
@@ -147,29 +159,33 @@ function AttributeForm({ form, onChange, onSubmit, onCancel, submitLabel, submit
           }}
         />
         <div style={{ display: "flex", gap: 2 }}>
-          {POWER_CALC_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => onChange({ ...form, powerCalc: opt.value })}
-              title={opt.value === "perCharge" ? "Per charge (divides by charges)" : opt.value === "flat" ? "Flat (not divided by charges)" : "Multiplier (multiplies total power)"}
-              style={{
-                background: form.powerCalc === opt.value ? "rgba(158,206,106,0.15)" : "rgba(205,214,244,0.06)",
-                border: form.powerCalc === opt.value
-                  ? "1px solid rgba(158,206,106,0.4)"
-                  : "1px solid rgba(205,214,244,0.15)",
-                borderRadius: 6,
-                color: form.powerCalc === opt.value ? "#9ece6a" : "rgba(205,214,244,0.5)",
-                padding: compact ? "6px 6px" : "8px 8px",
-                fontSize: 11,
-                fontFamily: "'Inter', sans-serif",
-                cursor: "pointer",
-                fontWeight: 600,
-                whiteSpace: "nowrap",
-              }}
-            >
-              {opt.icon} {opt.label}
-            </button>
-          ))}
+          {POWER_CALC_OPTIONS.map((opt) => {
+            const isActive = form.powerCalc === opt.value;
+            const colors = POWER_CALC_ACTIVE_COLORS[opt.value];
+            return (
+              <button
+                key={opt.value}
+                onClick={() => onChange({ ...form, powerCalc: opt.value })}
+                title={POWER_CALC_TOOLTIPS[opt.value]}
+                style={{
+                  background: isActive ? colors.bg : "rgba(205,214,244,0.06)",
+                  border: isActive
+                    ? `1px solid ${colors.border}`
+                    : "1px solid rgba(205,214,244,0.15)",
+                  borderRadius: 6,
+                  color: isActive ? colors.text : "rgba(205,214,244,0.5)",
+                  padding: compact ? "6px 6px" : "8px 8px",
+                  fontSize: 11,
+                  fontFamily: "'Inter', sans-serif",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {opt.icon} {opt.label}
+              </button>
+            );
+          })}
         </div>
         <button
           onClick={onSubmit}
