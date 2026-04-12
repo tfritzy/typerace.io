@@ -1,0 +1,85 @@
+import { Assets, type AssetsManifest, type Spritesheet, type Texture } from "pixi.js";
+import { ColorPreset, type EntityType, getShipEntityIndex } from "./types";
+import { applyPaletteSwap } from "../planetary-defense/ships";
+
+const COLOR_PRESET_ALIASES: Record<ColorPreset, string> = {
+  [ColorPreset.Preset1]: "color-preset-1",
+  [ColorPreset.Preset2]: "color-preset-2",
+  [ColorPreset.Preset3]: "color-preset-3",
+  [ColorPreset.Preset4]: "color-preset-4",
+};
+
+function setNearestNeighbor(sheet: Spritesheet): void {
+  sheet.textureSource.style.scaleMode = "nearest";
+}
+
+function setTextureNearest(tex: Texture): void {
+  tex.source.style.scaleMode = "nearest";
+}
+
+export class AssetManager {
+  private background_: Texture;
+  private planets_: Spritesheet;
+  private spaceships_: Spritesheet;
+  private spaceshipsColormap_: Spritesheet;
+  private spaceshipsShield_: Spritesheet;
+  private colorPresets_: Record<string, Texture>;
+
+  constructor(loaded: Record<string, unknown>) {
+    const presetAliasValues = Object.values(COLOR_PRESET_ALIASES);
+
+    this.background_ = loaded["background"] as Texture;
+    this.planets_ = loaded["planets"] as Spritesheet;
+    this.spaceships_ = loaded["spaceships"] as Spritesheet;
+    this.spaceshipsColormap_ = loaded["spaceships-colormap"] as Spritesheet;
+    this.spaceshipsShield_ = loaded["spaceships-shield"] as Spritesheet;
+    this.colorPresets_ = Object.fromEntries(
+      presetAliasValues.map((a) => [a, loaded[a] as Texture])
+    );
+
+    this.applyNearestNeighbor();
+  }
+
+  get background(): Texture {
+    return this.background_;
+  }
+
+  get planets(): Spritesheet {
+    return this.planets_;
+  }
+
+  getShipTexture(entityType: EntityType, colorPreset: ColorPreset): Texture {
+    const frameIndex = getShipEntityIndex(entityType);
+    const shipFrame = `ship-${frameIndex}`;
+    const cmFrame = `cm-${frameIndex}`;
+    const presetAlias = COLOR_PRESET_ALIASES[colorPreset];
+    return applyPaletteSwap(
+      this.spaceships_.textures[shipFrame],
+      this.spaceshipsColormap_.textures[cmFrame],
+      this.colorPresets_[presetAlias]
+    );
+  }
+
+  getShieldTexture(entityType: EntityType): Texture {
+    const frameIndex = getShipEntityIndex(entityType);
+    return this.spaceshipsShield_.textures[`shield-${frameIndex}`];
+  }
+
+  static async load(manifest: AssetsManifest): Promise<AssetManager> {
+    const bundle = manifest.bundles[0];
+    Assets.addBundle(bundle.name, bundle.assets);
+    const loaded = await Assets.loadBundle(bundle.name);
+    return new AssetManager(loaded);
+  }
+
+  private applyNearestNeighbor(): void {
+    setTextureNearest(this.background_);
+    setNearestNeighbor(this.planets_);
+    setNearestNeighbor(this.spaceships_);
+    setNearestNeighbor(this.spaceshipsColormap_);
+    setNearestNeighbor(this.spaceshipsShield_);
+    for (const tex of Object.values(this.colorPresets_)) {
+      setTextureNearest(tex);
+    }
+  }
+}

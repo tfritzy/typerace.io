@@ -8,6 +8,7 @@ import { GamesPage } from "./games/GamesPage";
 import { WordDefensePage } from "./games/word-defense/WordDefensePage";
 import { PlanetaryDefensePage } from "./games/planetary-defense/PlanetaryDefensePage";
 import { ShipGridPage } from "./games/planetary-defense/ShipGridPage";
+import { CosmicDefensePage } from "./games/cosmic-defense/CosmicDefensePage";
 import { ItemDesignerPage } from "./item-designer/ItemDesignerPage";
 import { SpacetimeProvider } from "./contexts/SpacetimeContext";
 import { ToastProvider } from "./hooks/useToast";
@@ -38,6 +39,7 @@ function App() {
           <Route path="/games" element={<GamesPage />} />
           <Route path="/games/word-defense" element={<WordDefensePage />} />
           <Route path="/games/planetary-defense" element={<PlanetaryDefensePage />} />
+          <Route path="/games/cosmic-defense" element={<CosmicDefensePage />} />
           <Route path="/games/ship-grid" element={<ShipGridPage />} />
           <Route path="/item-designer" element={<ItemDesignerPage />} />
           <Route path="*" element={<ConnectedRoutes />} />
