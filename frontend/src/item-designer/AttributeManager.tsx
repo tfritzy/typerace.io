@@ -116,52 +116,51 @@ function AttributeForm({ form, onChange, onSubmit, onCancel, submitLabel, submit
       }}
     >
       <div>
-        <FieldLabel>Name &amp; Icon</FieldLabel>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 34,
-              height: 34,
-              borderRadius: 6,
-              background: "rgba(205,214,244,0.06)",
-              border: "1px solid rgba(205,214,244,0.1)",
-              flexShrink: 0,
-            }}
-          >
-            <LucideIcon name={form.icon} size={18} color={form.color} />
-          </div>
-          <select
-            value={form.icon}
-            onChange={(e) => onChange({ ...form, icon: e.target.value })}
-            style={{
-              ...inputStyle,
-              padding: "6px 8px",
-              width: 100,
-            }}
-          >
-            {AVAILABLE_ICONS.map((icon) => (
-              <option key={icon} value={icon}>
-                {icon}
-              </option>
-            ))}
-          </select>
-          <input
-            value={form.name}
-            onChange={(e) => onChange({ ...form, name: e.target.value })}
-            onKeyDown={handleKeyDown}
-            autoFocus={autoFocusName}
-            placeholder="Attribute name..."
-            style={{
-              ...inputStyle,
-              flex: 1,
-              minWidth: 100,
-              padding: "6px 10px",
-              color: form.color,
-            }}
-          />
+        <FieldLabel>Name</FieldLabel>
+        <input
+          value={form.name}
+          onChange={(e) => onChange({ ...form, name: e.target.value })}
+          onKeyDown={handleKeyDown}
+          autoFocus={autoFocusName}
+          placeholder="Attribute name..."
+          style={{
+            ...inputStyle,
+            width: "100%",
+            padding: "6px 10px",
+            color: form.color,
+            boxSizing: "border-box",
+          }}
+        />
+      </div>
+
+      <div>
+        <FieldLabel>Icon</FieldLabel>
+        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+          {AVAILABLE_ICONS.map((icon) => (
+            <button
+              key={icon}
+              onClick={() => onChange({ ...form, icon })}
+              title={icon}
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 4,
+                background: form.icon === icon ? "rgba(205,214,244,0.12)" : "transparent",
+                border: form.icon === icon ? `2px solid ${form.color}` : "2px solid transparent",
+                cursor: "pointer",
+                padding: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <LucideIcon
+                name={icon}
+                size={16}
+                color={form.icon === icon ? form.color : "rgba(205,214,244,0.35)"}
+              />
+            </button>
+          ))}
         </div>
       </div>
 
