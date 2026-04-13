@@ -5,9 +5,12 @@ import { Background } from "./Background";
 import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
 import { ProjectileManager } from "./ProjectileManager";
+import { BuildingManager } from "./BuildingManager";
+import { PlacementGrid } from "./PlacementGrid";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, WavePhase } from "./state";
 import type { GameState } from "./state";
+import type { ShipBlueprint } from "./shipCatalog";
 
 export class CosmicDefenseGame {
   private app: Application;
@@ -17,6 +20,8 @@ export class CosmicDefenseGame {
   private planetManager!: PlanetManager;
   private enemyManager!: EnemyManager;
   private projectileManager!: ProjectileManager;
+  buildingManager!: BuildingManager;
+  placementGrid!: PlacementGrid;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
@@ -44,11 +49,21 @@ export class CosmicDefenseGame {
     this.planetManager = new PlanetManager(assetManager);
     world.addChild(this.planetManager.container);
 
+    this.buildingManager = new BuildingManager(assetManager);
+    world.addChild(this.buildingManager.layer);
+
     this.projectileManager = new ProjectileManager(assetManager);
     world.addChild(this.projectileManager.layer);
 
     this.enemyManager = new EnemyManager(assetManager);
     world.addChild(this.enemyManager.layer);
+
+    this.placementGrid = new PlacementGrid(assetManager);
+    world.addChild(this.placementGrid.layer);
+  }
+
+  startPlacement(blueprint: ShipBlueprint): void {
+    this.placementGrid.startPlacement(blueprint);
   }
 
   private update(dt: number): void {
@@ -72,6 +87,8 @@ export class CosmicDefenseGame {
     this.planetManager.destroy();
     this.enemyManager.destroy();
     this.projectileManager.destroy();
+    this.buildingManager.destroy();
+    this.placementGrid.destroy();
     this.app.destroy(true);
   }
 }
