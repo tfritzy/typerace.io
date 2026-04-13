@@ -80,7 +80,7 @@ export class EnemyManager {
       }
       display.x = entity.x;
       display.y = entity.y;
-      display.rotation = Math.atan2(entity.vy, entity.vx);
+      display.rotation = entity.rotation;
     }
 
     for (const [id, display] of this.entityDisplayObjects) {

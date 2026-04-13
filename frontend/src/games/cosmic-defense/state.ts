@@ -22,6 +22,7 @@ export interface EntityState {
   projectileSpeed: number;
   projectileType: ProjectileType;
   fireTimer: number;
+  rotation: number;
 }
 
 export interface ProjectileState {
@@ -158,6 +159,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     projectileSpeed: config.projectileSpeed,
     projectileType: config.projectileType,
     fireTimer: Math.random() * config.fireRate,
+    rotation: Math.PI,
   };
 
   state.entities.push(entity);
@@ -189,7 +191,7 @@ function checkCollisions(state: GameState): void {
     const dx = p.x - PLANET_X;
     const dy = p.y - PLANET_Y;
     if (dx * dx + dy * dy < pr2) {
-      state.planetHealth = Math.max(0, state.planetHealth - 1);
+      state.planetHealth = Math.max(0, state.planetHealth - 10);
       state.projectiles.splice(i, 1);
       damaged = true;
     } else if (!isInBounds(p.x, p.y)) {
@@ -250,6 +252,7 @@ export function updateState(state: GameState, dt: number): void {
       inRange = dist <= e.firingRange;
 
       if (inRange) {
+        e.rotation = Math.atan2(target.y - e.y, target.x - e.x);
         e.fireTimer -= dt;
         if (e.fireTimer <= 0) {
           e.fireTimer += e.fireRate;
@@ -270,6 +273,7 @@ export function updateState(state: GameState, dt: number): void {
     if (!inRange) {
       e.x += e.vx * dt;
       e.y += e.vy * dt;
+      e.rotation = Math.atan2(e.vy, e.vx);
     }
   }
 
