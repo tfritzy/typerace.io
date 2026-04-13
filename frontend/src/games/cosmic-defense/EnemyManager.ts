@@ -2,6 +2,7 @@ import { Container, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState } from "./state";
 import { WavePhase, spawnEntity } from "./state";
+import { Team } from "./types";
 
 export class EnemyManager {
   readonly layer: Container;
@@ -33,7 +34,7 @@ export class EnemyManager {
         wave.waveTimer >= wave.spawnQueue[wave.spawnIndex].spawnTime
       ) {
         const entry = wave.spawnQueue[wave.spawnIndex];
-        spawnEntity(state, entry.config);
+        spawnEntity(state, entry.config, Team.Enemy);
         wave.spawnIndex++;
       }
 
@@ -43,7 +44,7 @@ export class EnemyManager {
     }
 
     if (wave.phase === WavePhase.Clearing) {
-      if (state.entities.length === 0) {
+      if (state.entities.length === 0 && state.projectiles.length === 0) {
         wave.phase = WavePhase.Idle;
         state.onWaveComplete.emit();
       }
@@ -79,7 +80,7 @@ export class EnemyManager {
       }
       display.x = entity.x;
       display.y = entity.y;
-      display.rotation = Math.atan2(entity.vy, entity.vx);
+      display.rotation = entity.rotation;
     }
 
     for (const [id, display] of this.entityDisplayObjects) {
