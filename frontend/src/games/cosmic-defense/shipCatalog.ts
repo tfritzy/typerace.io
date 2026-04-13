@@ -1,78 +1,153 @@
-import { type EntityType, ColorPreset, ProjectileType } from "./types";
+import { type EntityType, ColorPreset } from "./types";
 
-export const GRID_CELL = 24;
+export const GRID_CELL = 36;
 
 export interface ShipBlueprint {
   entityType: EntityType;
   cost: number;
-  health: number;
   colorPreset: ColorPreset;
-  firingRange: number;
-  fireRate: number;
-  projectileSpeed: number;
-  projectileType: ProjectileType;
   occupancy: boolean[][];
 }
 
 export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   {
+    entityType: "Mite",
+    cost: 25,
+    colorPreset: ColorPreset.Preset1,
+    occupancy: [
+      [true, true],
+    ],
+  },
+  {
+    entityType: "Speck",
+    cost: 30,
+    colorPreset: ColorPreset.Preset1,
+    occupancy: [
+      [true, true],
+      [true, true],
+    ],
+  },
+  {
+    entityType: "Gnat",
+    cost: 35,
+    colorPreset: ColorPreset.Preset1,
+    occupancy: [
+      [true, true],
+      [true, true],
+    ],
+  },
+  {
+    entityType: "Flicker",
+    cost: 40,
+    colorPreset: ColorPreset.Preset1,
+    occupancy: [
+      [true, true],
+      [true, true],
+    ],
+  },
+  {
     entityType: "Clipper",
     cost: 50,
-    health: 5800,
     colorPreset: ColorPreset.Preset1,
-    firingRange: 400,
-    fireRate: 1.5,
-    projectileSpeed: 200,
-    projectileType: ProjectileType.Projectile1,
     occupancy: [
-      [false, true, false],
+      [true, true],
+      [true, true],
+    ],
+  },
+  {
+    entityType: "Stinger",
+    cost: 60,
+    colorPreset: ColorPreset.Preset1,
+    occupancy: [
+      [true, true],
+      [true, true],
+    ],
+  },
+  {
+    entityType: "Crest",
+    cost: 75,
+    colorPreset: ColorPreset.Preset1,
+    occupancy: [
+      [true, true],
+      [true, true],
+    ],
+  },
+  {
+    entityType: "Osprey",
+    cost: 100,
+    colorPreset: ColorPreset.Preset1,
+    occupancy: [
+      [true, true],
+      [true, true],
+      [true, true],
+    ],
+  },
+  {
+    entityType: "Kestrel",
+    cost: 120,
+    colorPreset: ColorPreset.Preset1,
+    occupancy: [
+      [true, true, true],
       [true, true, true],
     ],
   },
   {
-    entityType: "Sentinel",
-    cost: 150,
-    health: 34000,
+    entityType: "Vulture",
+    cost: 140,
     colorPreset: ColorPreset.Preset1,
-    firingRange: 550,
-    fireRate: 1.2,
-    projectileSpeed: 260,
-    projectileType: ProjectileType.Projectile3,
     occupancy: [
-      [false, true, false],
-      [true, true, true],
-      [true, true, true],
-      [false, true, false],
-    ],
-  },
-  {
-    entityType: "Phoenix",
-    cost: 300,
-    health: 59000,
-    colorPreset: ColorPreset.Preset1,
-    firingRange: 650,
-    fireRate: 1.0,
-    projectileSpeed: 300,
-    projectileType: ProjectileType.Projectile4,
-    occupancy: [
-      [false, true, false],
       [true, true, true],
       [true, true, true],
     ],
   },
   {
-    entityType: "Aegis",
+    entityType: "Talon",
+    cost: 175,
+    colorPreset: ColorPreset.Preset1,
+    occupancy: [
+      [true, true, true],
+      [true, true, true],
+      [true, true, true],
+    ],
+  },
+  {
+    entityType: "Warden",
+    cost: 225,
+    colorPreset: ColorPreset.Preset1,
+    occupancy: [
+      [true, true, true],
+      [true, true, true],
+      [true, true, true],
+    ],
+  },
+  {
+    entityType: "Behemoth",
+    cost: 350,
+    colorPreset: ColorPreset.Preset1,
+    occupancy: [
+      [true, true, true],
+      [true, true, true],
+      [true, true, true],
+    ],
+  },
+  {
+    entityType: "Juggernaut",
     cost: 500,
-    health: 77000,
     colorPreset: ColorPreset.Preset1,
-    firingRange: 750,
-    fireRate: 0.8,
-    projectileSpeed: 340,
-    projectileType: ProjectileType.Projectile5,
     occupancy: [
-      [false, true, false],
-      [true, true, true],
-      [false, true, false],
+      [true, true, true, true],
+      [true, true, true, true],
+      [true, true, true, true],
+    ],
+  },
+  {
+    entityType: "Colossus",
+    cost: 650,
+    colorPreset: ColorPreset.Preset1,
+    occupancy: [
+      [true, true, true, true],
+      [true, true, true, true],
+      [true, true, true, true],
     ],
   },
 ];
