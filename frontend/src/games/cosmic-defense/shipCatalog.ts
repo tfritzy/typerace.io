@@ -4,7 +4,6 @@ export const GRID_CELL = 24;
 
 export interface ShipBlueprint {
   entityType: EntityType;
-  name: string;
   cost: number;
   health: number;
   colorPreset: ColorPreset;
@@ -18,7 +17,6 @@ export interface ShipBlueprint {
 export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   {
     entityType: "Clipper",
-    name: "Clipper",
     cost: 50,
     health: 5800,
     colorPreset: ColorPreset.Preset1,
@@ -33,7 +31,6 @@ export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   },
   {
     entityType: "Sentinel",
-    name: "Sentinel",
     cost: 150,
     health: 34000,
     colorPreset: ColorPreset.Preset1,
@@ -50,7 +47,6 @@ export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   },
   {
     entityType: "Phoenix",
-    name: "Phoenix",
     cost: 300,
     health: 59000,
     colorPreset: ColorPreset.Preset1,
@@ -66,7 +62,6 @@ export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   },
   {
     entityType: "Aegis",
-    name: "Aegis",
     cost: 500,
     health: 77000,
     colorPreset: ColorPreset.Preset1,

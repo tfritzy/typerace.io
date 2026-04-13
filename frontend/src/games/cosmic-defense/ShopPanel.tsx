@@ -90,7 +90,7 @@ export const ShopPanel = ({ onSelectShip, onClose }: ShopPanelProps) => {
             }}
             onClick={() => onSelectShip(bp)}
           >
-            <span style={nameStyle}>{bp.name}</span>
+            <span style={nameStyle}>{bp.entityType}</span>
             <span style={costStyle}>{bp.cost} gold</span>
           </div>
         ))}

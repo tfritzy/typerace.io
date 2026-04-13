@@ -148,10 +148,10 @@ export class PlacementGrid {
     for (let r = 0; r < occ.length; r++) {
       for (let c = 0; c < occ[r].length; c++) {
         if (!occ[r][c]) continue;
-        const gc = col + c;
-        const gr = row + r;
-        if (gc < MIN_PLACE_COL || gc >= GRID_COLS || gr < 0 || gr >= GRID_ROWS) return false;
-        if (this.occupied[gr][gc]) return false;
+        const globalCol = col + c;
+        const globalRow = row + r;
+        if (globalCol < MIN_PLACE_COL || globalCol >= GRID_COLS || globalRow < 0 || globalRow >= GRID_ROWS) return false;
+        if (this.occupied[globalRow][globalCol]) return false;
       }
     }
     return true;
@@ -171,11 +171,11 @@ export class PlacementGrid {
 
     const local = this.layer.toLocal(e.global);
     const occ = this.activeBlueprint.occupancy;
-    const occW = occ[0].length;
-    const occH = occ.length;
+    const occupancyWidth = occ[0].length;
+    const occupancyHeight = occ.length;
 
-    const col = Math.floor(local.x / GRID_CELL) - Math.floor(occW / 2);
-    const row = Math.floor(local.y / GRID_CELL) - Math.floor(occH / 2);
+    const col = Math.floor(local.x / GRID_CELL) - Math.floor(occupancyWidth / 2);
+    const row = Math.floor(local.y / GRID_CELL) - Math.floor(occupancyHeight / 2);
 
     if (col === this.cursorCol && row === this.cursorRow) return;
     this.cursorCol = col;
@@ -184,8 +184,8 @@ export class PlacementGrid {
     const valid = this.canPlace(col, row, occ);
 
     this.previewCells.clear();
-    for (let r = 0; r < occH; r++) {
-      for (let c = 0; c < occW; c++) {
+    for (let r = 0; r < occupancyHeight; r++) {
+      for (let c = 0; c < occupancyWidth; c++) {
         if (!occ[r][c]) continue;
         const cx = (col + c) * GRID_CELL;
         const cy = (row + r) * GRID_CELL;
@@ -197,8 +197,8 @@ export class PlacementGrid {
     this.previewCells.fill({ color: fillColor, alpha: fillAlpha });
 
     if (this.previewSprite) {
-      const centerX = (col + occW / 2) * GRID_CELL;
-      const centerY = (row + occH / 2) * GRID_CELL;
+      const centerX = (col + occupancyWidth / 2) * GRID_CELL;
+      const centerY = (row + occupancyHeight / 2) * GRID_CELL;
       this.previewSprite.x = centerX;
       this.previewSprite.y = centerY;
     }
