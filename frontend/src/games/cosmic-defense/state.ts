@@ -4,7 +4,7 @@ import { ENEMY_CATALOG, type EnemyConfig } from "./enemyConfig";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
-const PROJECTILE_HIT_RADIUS = 20;
+const PLANET_HIT_RADIUS = 100;
 
 export interface EntityState {
   id: number;
@@ -131,7 +131,7 @@ export function createGameState(): GameState {
 }
 
 function spawnFromRight(): { x: number; y: number } {
-  const pad = 60;
+  const pad = 120;
   return {
     x: CANVAS_WIDTH + pad,
     y: pad + Math.random() * (CANVAS_HEIGHT - pad * 2),
@@ -140,7 +140,7 @@ function spawnFromRight(): { x: number; y: number } {
 
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
   const { x, y } = spawnFromRight();
-  const speed = 20 + Math.random() * 35;
+  const speed = 30 + Math.random() * 52.5;
 
   const entity: EntityState = {
     id: state.nextId++,
@@ -174,7 +174,7 @@ function isInBounds(x: number, y: number): boolean {
 }
 
 function checkCollisions(state: GameState): void {
-  const pr2 = PROJECTILE_HIT_RADIUS * PROJECTILE_HIT_RADIUS;
+  const pr2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
   let damaged = false;
 
   for (let i = state.entities.length - 1; i >= 0; i--) {
