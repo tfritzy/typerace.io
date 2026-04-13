@@ -12,6 +12,7 @@ const POINT_RADIUS = 12;
 const POINT_COLOR = 0x788cc8;
 const POINT_ALPHA = 0.35;
 const POINT_HOVER_ALPHA = 0.7;
+const HIT_RADIUS = POINT_RADIUS * 2;
 const MARGIN = 70;
 
 export interface PlacementSlot {
@@ -91,7 +92,7 @@ export class PlacementPoints {
       g.y = slot.y;
       g.eventMode = "static";
       g.cursor = "pointer";
-      g.hitArea = { contains: (px: number, py: number) => px * px + py * py <= POINT_RADIUS * POINT_RADIUS * 4 };
+      g.hitArea = { contains: (px: number, py: number) => px * px + py * py <= HIT_RADIUS * HIT_RADIUS };
 
       g.on("pointerenter", () => {
         g.clear();
