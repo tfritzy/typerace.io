@@ -24,4 +24,3 @@ dist-ssr
 *.sw?
 nohup.out
 module_bindings/
-module_bindings/
