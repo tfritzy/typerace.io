@@ -1,5 +1,5 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
-import { type EntityType, ColorPreset } from "./types";
+import { type EntityType, ColorPreset, type ProjectileType } from "./types";
 import { ENEMY_CATALOG, type EnemyConfig } from "./enemyConfig";
 
 export const PLANET_X = 200;
@@ -20,7 +20,7 @@ export interface EntityState {
   firingRange: number;
   fireRate: number;
   projectileSpeed: number;
-  projectileType: number;
+  projectileType: ProjectileType;
   fireTimer: number;
 }
 
@@ -30,7 +30,7 @@ export interface ProjectileState {
   y: number;
   vx: number;
   vy: number;
-  projectileType: number;
+  projectileType: ProjectileType;
 }
 
 export enum WavePhase {

@@ -1,5 +1,5 @@
 import { Assets, type AssetsManifest, type Spritesheet, type Texture } from "pixi.js";
-import { ColorPreset, type EntityType, getShipEntityIndex } from "./types";
+import { ColorPreset, type EntityType, type ProjectileType, getShipEntityIndex } from "./types";
 import { applyPaletteSwap } from "../planetary-defense/ships";
 
 const COLOR_PRESET_ALIASES: Record<ColorPreset, string> = {
@@ -70,7 +70,7 @@ export class AssetManager {
     return this.spaceshipsShield_.textures[`shield-${frameIndex}`];
   }
 
-  getProjectileTextures(projectileType: number): Texture[] {
+  getProjectileTextures(projectileType: ProjectileType): Texture[] {
     const sheet = this.projectileSheets_[projectileType - 1];
     const textures: Texture[] = [];
     for (let i = 0; i < 5; i++) {

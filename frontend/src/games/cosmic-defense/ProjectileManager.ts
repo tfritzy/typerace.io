@@ -2,7 +2,7 @@ import { AnimatedSprite, Container } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, ProjectileState } from "./state";
 
-const PROJECTILE_SCALE = 2;
+const PROJECTILE_SCALE = 3;
 const ANIMATION_SPEED = 0.15;
 
 export class ProjectileManager {

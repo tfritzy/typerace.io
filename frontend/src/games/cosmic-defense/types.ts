@@ -5,6 +5,15 @@ export enum ColorPreset {
   Preset4,
 }
 
+export enum ProjectileType {
+  Projectile1 = 1,
+  Projectile2 = 2,
+  Projectile3 = 3,
+  Projectile4 = 4,
+  Projectile5 = 5,
+  Projectile6 = 6,
+}
+
 export const SHIP_ENTITY_TYPES = [
   "Vanguard", "Sentinel", "Corsair", "Falcon", "Scout", "Dart", "Wasp",
   "Phoenix", "Hawk", "Sparrow", "Gnat", "Stinger", "Needle", "Mite",
