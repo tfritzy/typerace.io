@@ -1,12 +1,12 @@
 import { Container, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
-import type { ShipBlueprint } from "./shipCatalog";
+import type { EntityType } from "./types";
+import { ColorPreset } from "./types";
+import { SHIP_BLUEPRINTS } from "./shipCatalog";
 
-export interface PlacedShip {
-  blueprint: ShipBlueprint;
-  x: number;
-  y: number;
-}
+const BLUEPRINT_MAP = new Map(
+  SHIP_BLUEPRINTS.map((bp) => [bp.entityType, bp])
+);
 
 export class BuildingManager {
   readonly layer: Container;
@@ -17,14 +17,15 @@ export class BuildingManager {
     this.layer = new Container();
   }
 
-  addShip(placed: PlacedShip): void {
-    const bp = placed.blueprint;
-    const tex = this.assets.getShipTexture(bp.entityType, bp.colorPreset);
+  addShip(entityType: EntityType, x: number, y: number): void {
+    const bp = BLUEPRINT_MAP.get(entityType);
+    const preset = bp?.colorPreset ?? ColorPreset.Preset1;
+    const tex = this.assets.getShipTexture(entityType, preset);
     const sprite = new Sprite(tex);
     sprite.anchor.set(0.5);
     sprite.scale.set(3);
-    sprite.x = placed.x;
-    sprite.y = placed.y;
+    sprite.x = x;
+    sprite.y = y;
     this.layer.addChild(sprite);
   }
 

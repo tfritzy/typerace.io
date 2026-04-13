@@ -1,7 +1,7 @@
 import { Container, Graphics } from "pixi.js";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { PLANET_X, PLANET_Y } from "./state";
-import type { ShipBlueprint } from "./shipCatalog";
+import type { EntityType } from "./types";
 
 const COL_SPACING = 130;
 const ROW_SPACING = 110;
@@ -19,7 +19,7 @@ export interface PlacementSlot {
   index: number;
   x: number;
   y: number;
-  occupant: ShipBlueprint | null;
+  occupant: EntityType | null;
 }
 
 export class PlacementPoints {
@@ -104,7 +104,7 @@ export class PlacementPoints {
         g.circle(0, 0, POINT_RADIUS);
         g.fill({ color: POINT_COLOR, alpha: POINT_ALPHA });
       });
-      g.on("pointerdown", () => {
+      g.on("pointerup", () => {
         this.onSlotClicked?.(slot);
       });
 
@@ -113,10 +113,10 @@ export class PlacementPoints {
     }
   }
 
-  placeShip(slotIndex: number, blueprint: ShipBlueprint): void {
+  placeShip(slotIndex: number, entityType: EntityType): void {
     const slot = this.slots.find((s) => s.index === slotIndex);
     if (!slot) return;
-    slot.occupant = blueprint;
+    slot.occupant = entityType;
 
     const g = this.pointGraphics.get(slotIndex);
     if (g) {

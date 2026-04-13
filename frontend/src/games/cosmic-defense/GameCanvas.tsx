@@ -4,7 +4,6 @@ import type { CosmicDefenseGame } from "./game";
 import { startNextWave } from "./state";
 import { PlanetHealthBar } from "./PlanetHealthBar";
 import { ShopPanel } from "./ShopPanel";
-import type { ShipBlueprint } from "./shipCatalog";
 import type { PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
@@ -76,16 +75,12 @@ export const GameCanvas = () => {
     }
   }, []);
 
-  const handleSelectShip = useCallback((blueprint: ShipBlueprint) => {
+  const handleSelectShip = useCallback((entityType: EntityType) => {
     const game = gameRef.current;
     if (!game || !selectedSlot) return;
 
-    game.placementPoints.placeShip(selectedSlot.index, blueprint);
-    game.buildingManager.addShip({
-      blueprint,
-      x: selectedSlot.x,
-      y: selectedSlot.y,
-    });
+    game.placementPoints.placeShip(selectedSlot.index, entityType);
+    game.buildingManager.addShip(entityType, selectedSlot.x, selectedSlot.y);
 
     setSelectedSlot(null);
   }, [selectedSlot]);
