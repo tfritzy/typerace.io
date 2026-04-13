@@ -236,8 +236,13 @@ export function updateState(state: GameState, dt: number): void {
   state.time.time += dt;
 
   for (const e of state.entities) {
-    e.x += e.vx * dt;
-    e.y += e.vy * dt;
+    const dx = e.x - PLANET_X;
+    const dy = e.y - PLANET_Y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > e.firingRange) {
+      e.x += e.vx * dt;
+      e.y += e.vy * dt;
+    }
   }
 
   for (const p of state.projectiles) {
