@@ -13,7 +13,7 @@ const POINT_COLOR = 0x788cc8;
 const POINT_ALPHA = 0.35;
 const POINT_HOVER_ALPHA = 0.7;
 const HIT_RADIUS = POINT_RADIUS * 2;
-const MARGIN = 70;
+const MARGIN = 120;
 
 export interface PlacementSlot {
   index: number;
