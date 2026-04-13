@@ -1,5 +1,5 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
-import { type EntityType, ColorPreset, type ProjectileType } from "./types";
+import { type EntityType, ColorPreset, type ProjectileType, Team } from "./types";
 import { ENEMY_CATALOG, type EnemyConfig } from "./enemyConfig";
 
 export const PLANET_X = 200;
@@ -16,6 +16,7 @@ export interface EntityState {
   health: number;
   power: number;
   colorPreset: ColorPreset;
+  team: Team;
   firingRange: number;
   fireRate: number;
   projectileSpeed: number;
@@ -137,7 +138,7 @@ function spawnFromRight(): { x: number; y: number } {
   };
 }
 
-export function spawnEntity(state: GameState, config: EnemyConfig): void {
+export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
   const { x, y } = spawnFromRight();
   const speed = 20 + Math.random() * 35;
 
@@ -151,6 +152,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig): void {
     health: config.health,
     power: config.power,
     colorPreset: ColorPreset.Preset4,
+    team,
     firingRange: config.firingRange,
     fireRate: config.fireRate,
     projectileSpeed: config.projectileSpeed,
@@ -198,10 +200,49 @@ function checkCollisions(state: GameState): void {
   if (damaged) state.onPlanetDamaged.emit();
 }
 
+function findNearestTarget(
+  state: GameState,
+  entity: EntityState
+): { x: number; y: number } | null {
+  const opposingTeam =
+    entity.team === Team.Enemy ? Team.Allied : Team.Enemy;
+
+  let bestDist = Infinity;
+  let bestTarget: { x: number; y: number } | null = null;
+
+  if (entity.team === Team.Enemy) {
+    const dx = entity.x - PLANET_X;
+    const dy = entity.y - PLANET_Y;
+    const d2 = dx * dx + dy * dy;
+    if (d2 < bestDist) {
+      bestDist = d2;
+      bestTarget = { x: PLANET_X, y: PLANET_Y };
+    }
+  }
+
+  for (const other of state.entities) {
+    if (other.team !== opposingTeam) continue;
+    const dx = entity.x - other.x;
+    const dy = entity.y - other.y;
+    const d2 = dx * dx + dy * dy;
+    if (d2 < bestDist) {
+      bestDist = d2;
+      bestTarget = { x: other.x, y: other.y };
+    }
+  }
+
+  return bestTarget;
+}
+
 function updateFiring(state: GameState, dt: number): void {
   for (const e of state.entities) {
-    const dx = e.x - PLANET_X;
-    const dy = e.y - PLANET_Y;
+    if (e.firingRange <= 0) continue;
+
+    const target = findNearestTarget(state, e);
+    if (!target) continue;
+
+    const dx = e.x - target.x;
+    const dy = e.y - target.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
     if (dist > e.firingRange) continue;
@@ -210,7 +251,7 @@ function updateFiring(state: GameState, dt: number): void {
     if (e.fireTimer <= 0) {
       e.fireTimer += e.fireRate;
 
-      const angle = Math.atan2(PLANET_Y - e.y, PLANET_X - e.x);
+      const angle = Math.atan2(target.y - e.y, target.x - e.x);
       state.projectiles.push({
         id: state.nextId++,
         x: e.x,
@@ -228,13 +269,17 @@ export function updateState(state: GameState, dt: number): void {
   state.time.time += dt;
 
   for (const e of state.entities) {
-    const dx = e.x - PLANET_X;
-    const dy = e.y - PLANET_Y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist > e.firingRange) {
-      e.x += e.vx * dt;
-      e.y += e.vy * dt;
+    if (e.firingRange > 0) {
+      const target = findNearestTarget(state, e);
+      if (target) {
+        const dx = e.x - target.x;
+        const dy = e.y - target.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist <= e.firingRange) continue;
+      }
     }
+    e.x += e.vx * dt;
+    e.y += e.vy * dt;
   }
 
   for (const p of state.projectiles) {

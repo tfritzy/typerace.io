@@ -5,6 +5,11 @@ export enum ColorPreset {
   Preset4,
 }
 
+export enum Team {
+  Allied,
+  Enemy,
+}
+
 export enum ProjectileType {
   Projectile1 = 1,
   Projectile2 = 2,

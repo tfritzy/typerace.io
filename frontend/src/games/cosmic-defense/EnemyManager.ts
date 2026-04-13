@@ -2,6 +2,7 @@ import { Container, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState } from "./state";
 import { WavePhase, spawnEntity } from "./state";
+import { Team } from "./types";
 
 export class EnemyManager {
   readonly layer: Container;
@@ -33,7 +34,7 @@ export class EnemyManager {
         wave.waveTimer >= wave.spawnQueue[wave.spawnIndex].spawnTime
       ) {
         const entry = wave.spawnQueue[wave.spawnIndex];
-        spawnEntity(state, entry.config);
+        spawnEntity(state, entry.config, Team.Enemy);
         wave.spawnIndex++;
       }
 
