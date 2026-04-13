@@ -4,7 +4,6 @@ import { ENEMY_CATALOG, type EnemyConfig } from "./enemyConfig";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
-const PLANET_HIT_RADIUS = 100;
 const PROJECTILE_HIT_RADIUS = 20;
 
 export interface EntityState {
@@ -173,19 +172,12 @@ function isInBounds(x: number, y: number): boolean {
 }
 
 function checkCollisions(state: GameState): void {
-  const r2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
   const pr2 = PROJECTILE_HIT_RADIUS * PROJECTILE_HIT_RADIUS;
   let damaged = false;
 
   for (let i = state.entities.length - 1; i >= 0; i--) {
     const e = state.entities[i];
-    const dx = e.x - PLANET_X;
-    const dy = e.y - PLANET_Y;
-    if (dx * dx + dy * dy < r2) {
-      state.planetHealth = Math.max(0, state.planetHealth - 3);
-      state.entities.splice(i, 1);
-      damaged = true;
-    } else if (!isInBounds(e.x, e.y)) {
+    if (!isInBounds(e.x, e.y)) {
       state.entities.splice(i, 1);
     }
   }
