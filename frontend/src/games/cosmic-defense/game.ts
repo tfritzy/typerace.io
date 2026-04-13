@@ -6,7 +6,6 @@ import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { BuildingManager } from "./BuildingManager";
-import { PlacementPoints } from "./PlacementPoints";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, WavePhase } from "./state";
 import type { GameState } from "./state";
@@ -24,7 +23,6 @@ export class CosmicDefenseGame {
   private enemyManager!: EnemyManager;
   private projectileManager!: ProjectileManager;
   buildingManager!: BuildingManager;
-  placementPoints!: PlacementPoints;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
@@ -77,9 +75,6 @@ export class CosmicDefenseGame {
 
     this.enemyManager = new EnemyManager(assetManager);
     world.addChild(this.enemyManager.layer);
-
-    this.placementPoints = new PlacementPoints();
-    world.addChild(this.placementPoints.layer);
   }
 
   private update(dt: number): void {
@@ -104,7 +99,6 @@ export class CosmicDefenseGame {
     this.enemyManager.destroy();
     this.projectileManager.destroy();
     this.buildingManager.destroy();
-    this.placementPoints.destroy();
     this.app.destroy(true);
   }
 }

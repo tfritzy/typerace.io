@@ -4,7 +4,8 @@ import type { CosmicDefenseGame } from "./game";
 import { startNextWave } from "./state";
 import { PlanetHealthBar } from "./PlanetHealthBar";
 import { ShopPanel } from "./ShopPanel";
-import type { PlacementSlot } from "./PlacementPoints";
+import { PlacementOverlay } from "./PlacementOverlay";
+import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
 export const GameCanvas = () => {
@@ -15,6 +16,7 @@ export const GameCanvas = () => {
   const [waveActive, setWaveActive] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
+  const [slots, setSlots] = useState<PlacementSlot[]>(() => generateSlots());
 
   useEffect(() => {
     const div = containerRef.current;
@@ -39,17 +41,10 @@ export const GameCanvas = () => {
         unsubWaveComplete = game.state.onWaveComplete.subscribe(() => {
           setWaveNumber(game.state.wave.wave);
           setWaveActive(false);
-          game.placementPoints.show();
         });
         unsubWaveActive = game.state.onWaveActiveChanged.subscribe(() => {
           setWaveActive(game.state.waveActive);
         });
-
-        game.placementPoints.onPointClicked((slot) => {
-          setSelectedSlot(slot);
-        });
-
-        game.placementPoints.show();
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -68,20 +63,27 @@ export const GameCanvas = () => {
   const handleNextWave = useCallback(() => {
     const game = gameRef.current;
     if (game) {
-      game.placementPoints.hide();
       startNextWave(game.state);
       setWaveNumber(game.state.wave.wave);
       setWaveActive(true);
     }
   }, []);
 
+  const handleSlotClick = useCallback((slot: PlacementSlot) => {
+    setSelectedSlot(slot);
+  }, []);
+
   const handleSelectShip = useCallback((entityType: EntityType) => {
     const game = gameRef.current;
     if (!game || !selectedSlot) return;
 
-    game.placementPoints.placeShip(selectedSlot.index, entityType);
     game.buildingManager.addShip(entityType, selectedSlot.x, selectedSlot.y);
 
+    setSlots((prev) =>
+      prev.map((s) =>
+        s.index === selectedSlot.index ? { ...s, occupant: entityType } : s
+      )
+    );
     setSelectedSlot(null);
   }, [selectedSlot]);
 
@@ -118,6 +120,9 @@ export const GameCanvas = () => {
           </button>
         )}
       </div>
+      {!waveActive && (
+        <PlacementOverlay slots={slots} onSlotClick={handleSlotClick} />
+      )}
       {selectedSlot && (
         <ShopPanel
           onSelectShip={handleSelectShip}
