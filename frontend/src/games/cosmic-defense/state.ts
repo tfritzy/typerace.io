@@ -234,52 +234,43 @@ function findNearestTarget(
   return bestTarget;
 }
 
-function updateFiring(state: GameState, dt: number): void {
-  for (const e of state.entities) {
-    if (e.firingRange <= 0) continue;
-
-    const target = findNearestTarget(state, e);
-    if (!target) continue;
-
-    const dx = e.x - target.x;
-    const dy = e.y - target.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    if (dist > e.firingRange) continue;
-
-    e.fireTimer -= dt;
-    if (e.fireTimer <= 0) {
-      e.fireTimer += e.fireRate;
-
-      const angle = Math.atan2(target.y - e.y, target.x - e.x);
-      state.projectiles.push({
-        id: state.nextId++,
-        x: e.x,
-        y: e.y,
-        vx: Math.cos(angle) * e.projectileSpeed,
-        vy: Math.sin(angle) * e.projectileSpeed,
-        projectileType: e.projectileType,
-      });
-    }
-  }
-}
-
 export function updateState(state: GameState, dt: number): void {
   state.time.deltaTime = dt;
   state.time.time += dt;
 
   for (const e of state.entities) {
-    if (e.firingRange > 0) {
-      const target = findNearestTarget(state, e);
-      if (target) {
-        const dx = e.x - target.x;
-        const dy = e.y - target.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist <= e.firingRange) continue;
+    const target =
+      e.firingRange > 0 ? findNearestTarget(state, e) : null;
+    let inRange = false;
+
+    if (target) {
+      const dx = e.x - target.x;
+      const dy = e.y - target.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      inRange = dist <= e.firingRange;
+
+      if (inRange) {
+        e.fireTimer -= dt;
+        if (e.fireTimer <= 0) {
+          e.fireTimer += e.fireRate;
+
+          const angle = Math.atan2(target.y - e.y, target.x - e.x);
+          state.projectiles.push({
+            id: state.nextId++,
+            x: e.x,
+            y: e.y,
+            vx: Math.cos(angle) * e.projectileSpeed,
+            vy: Math.sin(angle) * e.projectileSpeed,
+            projectileType: e.projectileType,
+          });
+        }
       }
     }
-    e.x += e.vx * dt;
-    e.y += e.vy * dt;
+
+    if (!inRange) {
+      e.x += e.vx * dt;
+      e.y += e.vy * dt;
+    }
   }
 
   for (const p of state.projectiles) {
@@ -287,7 +278,6 @@ export function updateState(state: GameState, dt: number): void {
     p.y += p.vy * dt;
   }
 
-  updateFiring(state, dt);
   checkCollisions(state);
 }
 
