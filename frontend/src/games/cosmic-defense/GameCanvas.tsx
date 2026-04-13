@@ -5,6 +5,7 @@ import { startNextWave } from "./state";
 import { PlanetHealthBar } from "./PlanetHealthBar";
 import { ShopPanel } from "./ShopPanel";
 import type { ShipBlueprint } from "./shipCatalog";
+import type { EntityType } from "./types";
 
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -14,6 +15,7 @@ export const GameCanvas = () => {
   const [waveActive, setWaveActive] = useState(false);
   const [shopOpen, setShopOpen] = useState(false);
   const [placing, setPlacing] = useState(false);
+  const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
 
   useEffect(() => {
     const div = containerRef.current;
@@ -31,6 +33,7 @@ export const GameCanvas = () => {
           return;
         }
         gameRef.current = game;
+        setShipPreviews(game.shipPreviews);
         unsubDamage = game.state.onPlanetDamaged.subscribe(() => {
           setHealthRatio(game.state.planetHealth / game.state.maxPlanetHealth);
         });
@@ -137,7 +140,11 @@ export const GameCanvas = () => {
         )}
       </div>
       {shopOpen && (
-        <ShopPanel onSelectShip={handleSelectShip} onClose={handleCloseShop} />
+        <ShopPanel
+          onSelectShip={handleSelectShip}
+          onClose={handleCloseShop}
+          shipPreviews={shipPreviews}
+        />
       )}
     </div>
   );

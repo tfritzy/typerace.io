@@ -1,4 +1,4 @@
-import { Application, Container } from "pixi.js";
+import { Application, Container, Sprite } from "pixi.js";
 import { MANIFEST } from "./manifest";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { Background } from "./Background";
@@ -10,11 +10,14 @@ import { PlacementGrid } from "./PlacementGrid";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, WavePhase } from "./state";
 import type { GameState } from "./state";
-import type { ShipBlueprint } from "./shipCatalog";
+import { SHIP_BLUEPRINTS, type ShipBlueprint } from "./shipCatalog";
+import type { EntityType } from "./types";
 
 export class CosmicDefenseGame {
   private app: Application;
+  private assetManager!: AssetManager;
   state: GameState;
+  shipPreviews: Map<EntityType, string> = new Map();
 
   private background!: Background;
   private planetManager!: PlanetManager;
@@ -31,11 +34,28 @@ export class CosmicDefenseGame {
   }
 
   async init(): Promise<void> {
-    const assetManager = await AssetManager.load(MANIFEST);
-    this.buildScene(assetManager);
+    this.assetManager = await AssetManager.load(MANIFEST);
+    this.buildScene(this.assetManager);
+    await this.generateShipPreviews();
 
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
     this.app.ticker.add(this.tickerCallback);
+  }
+
+  private async generateShipPreviews(): Promise<void> {
+    for (const bp of SHIP_BLUEPRINTS) {
+      const tex = this.assetManager.getShipTexture(bp.entityType, bp.colorPreset);
+      const sprite = new Sprite(tex);
+      sprite.anchor.set(0.5);
+      sprite.scale.set(3);
+      const img = await this.app.renderer.extract.image({
+        target: sprite,
+        format: "png",
+        resolution: 2,
+      });
+      this.shipPreviews.set(bp.entityType, img.src);
+      sprite.destroy();
+    }
   }
 
   private buildScene(assetManager: AssetManager): void {
