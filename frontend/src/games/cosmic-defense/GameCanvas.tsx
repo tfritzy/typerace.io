@@ -5,6 +5,7 @@ import { startNextWave } from "./state";
 import { PlanetHealthBar } from "./PlanetHealthBar";
 import { ShopPanel } from "./ShopPanel";
 import type { ShipBlueprint } from "./shipCatalog";
+import type { PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
 export const GameCanvas = () => {
@@ -13,8 +14,7 @@ export const GameCanvas = () => {
   const [healthRatio, setHealthRatio] = useState(1);
   const [waveNumber, setWaveNumber] = useState(0);
   const [waveActive, setWaveActive] = useState(false);
-  const [shopOpen, setShopOpen] = useState(false);
-  const [placing, setPlacing] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
 
   useEffect(() => {
@@ -40,21 +40,17 @@ export const GameCanvas = () => {
         unsubWaveComplete = game.state.onWaveComplete.subscribe(() => {
           setWaveNumber(game.state.wave.wave);
           setWaveActive(false);
+          game.placementPoints.show();
         });
         unsubWaveActive = game.state.onWaveActiveChanged.subscribe(() => {
           setWaveActive(game.state.waveActive);
         });
 
-        game.placementGrid.onShipPlaced((placed) => {
-          game.buildingManager.addShip(placed);
-          setPlacing(false);
-          setShopOpen(true);
+        game.placementPoints.onPointClicked((slot) => {
+          setSelectedSlot(slot);
         });
 
-        game.placementGrid.onPlacementCancelled(() => {
-          setPlacing(false);
-          setShopOpen(true);
-        });
+        game.placementPoints.show();
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -73,26 +69,29 @@ export const GameCanvas = () => {
   const handleNextWave = useCallback(() => {
     const game = gameRef.current;
     if (game) {
+      game.placementPoints.hide();
       startNextWave(game.state);
       setWaveNumber(game.state.wave.wave);
       setWaveActive(true);
     }
   }, []);
 
-  const handleOpenShop = useCallback(() => {
-    setShopOpen(true);
-  }, []);
-
   const handleSelectShip = useCallback((blueprint: ShipBlueprint) => {
     const game = gameRef.current;
-    if (!game) return;
-    setShopOpen(false);
-    setPlacing(true);
-    game.startPlacement(blueprint);
-  }, []);
+    if (!game || !selectedSlot) return;
+
+    game.placementPoints.placeShip(selectedSlot.index, blueprint);
+    game.buildingManager.addShip({
+      blueprint,
+      x: selectedSlot.x,
+      y: selectedSlot.y,
+    });
+
+    setSelectedSlot(null);
+  }, [selectedSlot]);
 
   const handleCloseShop = useCallback(() => {
-    setShopOpen(false);
+    setSelectedSlot(null);
   }, []);
 
   return (
@@ -108,38 +107,23 @@ export const GameCanvas = () => {
         <span style={{ fontSize: 11, color: "#a6adc8" }}>
           Wave {waveNumber}
         </span>
-        {!waveActive && !placing && (
-          <>
-            <button
-              onClick={handleOpenShop}
-              style={{
-                fontSize: 11,
-                background: "rgba(249, 226, 175, 0.85)",
-                color: "#0a0a1a",
-                padding: "4px 10px",
-                borderRadius: 4,
-              }}
-              className="cursor-pointer hover:brightness-125"
-            >
-              Shop
-            </button>
-            <button
-              onClick={handleNextWave}
-              style={{
-                fontSize: 11,
-                background: "rgba(74, 222, 128, 0.85)",
-                color: "#0a0a1a",
-                padding: "4px 10px",
-                borderRadius: 4,
-              }}
-              className="cursor-pointer hover:brightness-125"
-            >
-              {waveNumber === 0 ? "Start" : "Next wave"}
-            </button>
-          </>
+        {!waveActive && (
+          <button
+            onClick={handleNextWave}
+            style={{
+              fontSize: 11,
+              background: "rgba(74, 222, 128, 0.85)",
+              color: "#0a0a1a",
+              padding: "4px 10px",
+              borderRadius: 4,
+            }}
+            className="cursor-pointer hover:brightness-125"
+          >
+            {waveNumber === 0 ? "Start" : "Next wave"}
+          </button>
         )}
       </div>
-      {shopOpen && (
+      {selectedSlot && (
         <ShopPanel
           onSelectShip={handleSelectShip}
           onClose={handleCloseShop}
