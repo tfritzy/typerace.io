@@ -1,3 +1,4 @@
+import { Plus } from "lucide-react";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import type { PlacementSlot } from "./PlacementPoints";
 
@@ -6,7 +7,7 @@ interface PlacementOverlayProps {
   onSlotClick: (slot: PlacementSlot) => void;
 }
 
-const BUTTON_SIZE = (100 / CANVAS_WIDTH) * 100;
+const BUTTON_SIZE = (140 / CANVAS_WIDTH) * 100;
 
 export const PlacementOverlay = ({ slots, onSlotClick }: PlacementOverlayProps) => {
   return (
@@ -25,7 +26,7 @@ export const PlacementOverlay = ({ slots, onSlotClick }: PlacementOverlayProps) 
             }}
             onClick={() => onSlotClick(slot)}
           >
-            <span className="block w-2.5 h-2.5 rounded-full bg-[#788cc8]/40 pointer-events-none" />
+            <Plus className="w-3 h-3 text-[#788cc8]/40 pointer-events-none" />
           </button>
         )
       )}

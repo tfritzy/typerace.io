@@ -25,6 +25,7 @@ export interface EntityState {
   projectileType: ProjectileType;
   fireTimer: number;
   rotation: number;
+  moving: boolean;
 }
 
 export interface ProjectileState {
@@ -165,6 +166,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     projectileType: config.projectileType,
     fireTimer: Math.random() * config.fireRate,
     rotation: Math.PI,
+    moving: true,
   };
 
   state.entities.push(entity);
@@ -195,6 +197,7 @@ export function spawnAlliedEntity(
     projectileType: config.projectileType,
     fireTimer: Math.random() * config.fireRate,
     rotation: 0,
+    moving: false,
   };
 
   state.entities.push(entity);
@@ -297,8 +300,8 @@ function findNearestTarget(
       bestDist = d2;
       _targetResult.x = other.x;
       _targetResult.y = other.y;
-      _targetResult.vx = other.vx;
-      _targetResult.vy = other.vy;
+      _targetResult.vx = other.moving ? other.vx : 0;
+      _targetResult.vy = other.moving ? other.vy : 0;
       found = true;
     }
   }
@@ -360,6 +363,7 @@ export function updateState(state: GameState, dt: number): void {
       inRange = dist <= e.firingRange;
 
       if (inRange) {
+        e.moving = false;
         e.rotation = Math.atan2(target.y - e.y, target.x - e.x);
         e.fireTimer -= dt;
         if (e.fireTimer <= 0) {
@@ -386,6 +390,7 @@ export function updateState(state: GameState, dt: number): void {
     }
 
     if (!inRange) {
+      e.moving = true;
       e.x += e.vx * dt;
       e.y += e.vy * dt;
       e.rotation = Math.atan2(e.vy, e.vx);
