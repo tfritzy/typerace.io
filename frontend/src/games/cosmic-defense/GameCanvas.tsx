@@ -5,6 +5,7 @@ import { startNextWave } from "./state";
 import { PlanetHealthBar } from "./PlanetHealthBar";
 import { ShopPanel } from "./ShopPanel";
 import { PlacementOverlay } from "./PlacementOverlay";
+import { PhraseOverlay } from "./PhraseOverlay";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
@@ -123,6 +124,7 @@ export const GameCanvas = () => {
           shipPreviews={shipPreviews}
         />
       )}
+      <PhraseOverlay gameRef={gameRef} visible={waveActive} />
     </div>
   );
 };

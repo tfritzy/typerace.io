@@ -7,7 +7,7 @@ import { EnemyManager } from "./EnemyManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { ShipManager } from "./ShipManager";
 import { AssetManager } from "./assetManager";
-import { createGameState, updateState, WavePhase } from "./state";
+import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, WavePhase } from "./state";
 import type { GameState } from "./state";
 import type { EntityType } from "./types";
 
@@ -37,6 +37,10 @@ export class CosmicDefenseGame {
 
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
     this.app.ticker.add(this.tickerCallback);
+  }
+
+  onCorrectKeystroke(): void {
+    stateOnCorrectKeystroke(this.state);
   }
 
   private buildScene(assetManager: AssetManager): void {
