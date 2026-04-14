@@ -22,6 +22,7 @@ export interface FriendlyConfig {
 }
 
 export const ENEMY_CATALOG: EnemyConfig[] = [
+  { entityType: "Mite", health: 40, power: 40, firingRange: 400, fireRate: 2.2, projectileSpeed: 170, projectileDamage: 4, projectileType: ProjectileType.Tiny },
   { entityType: "Speck", health: 50, power: 50, firingRange: 400, fireRate: 2.0, projectileSpeed: 180, projectileDamage: 5, projectileType: ProjectileType.Tiny },
   { entityType: "Pip", health: 70, power: 70, firingRange: 400, fireRate: 1.8, projectileSpeed: 190, projectileDamage: 7, projectileType: ProjectileType.Tiny },
   { entityType: "Flea", health: 100, power: 100, firingRange: 420, fireRate: 1.6, projectileSpeed: 200, projectileDamage: 10, projectileType: ProjectileType.Tiny },
@@ -47,7 +48,7 @@ export const ENEMY_CATALOG: EnemyConfig[] = [
 ];
 
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [
-  { entityType: "Mite", health: 200, firingRange: 525, projectileSpeed: 200, projectileDamage: 8, projectileType: ProjectileType.Tiny, chargesRequired: 3 },
+  { entityType: "Moth", health: 200, firingRange: 525, projectileSpeed: 200, projectileDamage: 8, projectileType: ProjectileType.Tiny, chargesRequired: 3 },
   { entityType: "Dot", health: 300, firingRange: 555, projectileSpeed: 220, projectileDamage: 12, projectileType: ProjectileType.Tiny, chargesRequired: 3 },
   { entityType: "Gnat", health: 400, firingRange: 570, projectileSpeed: 190, projectileDamage: 15, projectileType: ProjectileType.Tiny, chargesRequired: 4 },
   { entityType: "Flicker", health: 500, firingRange: 600, projectileSpeed: 250, projectileDamage: 18, projectileType: ProjectileType.Tiny, chargesRequired: 4 },
