@@ -70,13 +70,13 @@ export class ShipManager {
     const totalWidth = (count - 1) * CHARGE_DOT_SPACING;
 
     for (let d = 0; d < count; d++) {
-      const cx = -totalWidth / 2 + d * CHARGE_DOT_SPACING;
+      const offsetX = -totalWidth / 2 + d * CHARGE_DOT_SPACING;
 
       if (d < entity.charge) {
-        g.circle(cx, 0, CHARGE_DOT_RADIUS);
+        g.circle(offsetX, 0, CHARGE_DOT_RADIUS);
         g.fill({ color: 0x4ade80 });
       } else {
-        g.circle(cx, 0, CHARGE_DOT_RADIUS);
+        g.circle(offsetX, 0, CHARGE_DOT_RADIUS);
         g.fill({ color: 0x333333 });
         g.stroke({ color: 0x555555, width: 1 });
       }
