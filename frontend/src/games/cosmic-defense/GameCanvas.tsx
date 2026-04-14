@@ -3,6 +3,10 @@ import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { startNextWave } from "./state";
 import { PlanetHealthBar } from "./PlanetHealthBar";
+import { ShopPanel } from "./ShopPanel";
+import { PlacementOverlay } from "./PlacementOverlay";
+import { generateSlots, type PlacementSlot } from "./PlacementPoints";
+import type { EntityType } from "./types";
 
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -10,6 +14,9 @@ export const GameCanvas = () => {
   const [healthRatio, setHealthRatio] = useState(1);
   const [waveNumber, setWaveNumber] = useState(0);
   const [waveActive, setWaveActive] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
+  const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
+  const [slots, setSlots] = useState<PlacementSlot[]>(() => generateSlots());
 
   useEffect(() => {
     const div = containerRef.current;
@@ -27,6 +34,7 @@ export const GameCanvas = () => {
           return;
         }
         gameRef.current = game;
+        setShipPreviews(game.shipPreviews);
         unsubDamage = game.state.onPlanetDamaged.subscribe(() => {
           setHealthRatio(game.state.planetHealth / game.state.maxPlanetHealth);
         });
@@ -61,6 +69,28 @@ export const GameCanvas = () => {
     }
   }, []);
 
+  const handleSlotClick = useCallback((slot: PlacementSlot) => {
+    setSelectedSlot(slot);
+  }, []);
+
+  const handleSelectShip = useCallback((entityType: EntityType) => {
+    const game = gameRef.current;
+    if (!game || !selectedSlot) return;
+
+    game.shipManager.addShip(game.state, entityType, selectedSlot.x, selectedSlot.y);
+
+    setSlots((prev) =>
+      prev.map((s) =>
+        s.index === selectedSlot.index ? { ...s, occupant: entityType } : s
+      )
+    );
+    setSelectedSlot(null);
+  }, [selectedSlot]);
+
+  const handleCloseShop = useCallback(() => {
+    setSelectedSlot(null);
+  }, []);
+
   return (
     <div
       ref={containerRef}
@@ -71,25 +101,28 @@ export const GameCanvas = () => {
     >
       <PlanetHealthBar ratio={healthRatio} />
       <div className="absolute top-3 right-3 z-10 flex items-center gap-3">
-        <span style={{ fontSize: 11, color: "#a6adc8" }}>
+        <span className="text-[11px] text-[#a6adc8]">
           Wave {waveNumber}
         </span>
         {!waveActive && (
           <button
             onClick={handleNextWave}
-            style={{
-              fontSize: 11,
-              background: "rgba(74, 222, 128, 0.85)",
-              color: "#0a0a1a",
-              padding: "4px 10px",
-              borderRadius: 4,
-            }}
-            className="cursor-pointer hover:brightness-125"
+            className="text-[11px] bg-green-400/85 text-[#0a0a1a] px-2.5 py-1 rounded cursor-pointer hover:brightness-125"
           >
             {waveNumber === 0 ? "Start" : "Next wave"}
           </button>
         )}
       </div>
+      {!waveActive && (
+        <PlacementOverlay slots={slots} onSlotClick={handleSlotClick} />
+      )}
+      {selectedSlot && (
+        <ShopPanel
+          onSelectShip={handleSelectShip}
+          onClose={handleCloseShop}
+          shipPreviews={shipPreviews}
+        />
+      )}
     </div>
   );
 };

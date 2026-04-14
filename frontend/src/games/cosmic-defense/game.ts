@@ -5,18 +5,23 @@ import { Background } from "./Background";
 import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
 import { ProjectileManager } from "./ProjectileManager";
+import { ShipManager } from "./ShipManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, WavePhase } from "./state";
 import type { GameState } from "./state";
+import type { EntityType } from "./types";
 
 export class CosmicDefenseGame {
   private app: Application;
+  private assetManager!: AssetManager;
   state: GameState;
+  shipPreviews: Map<EntityType, string> = new Map();
 
   private background!: Background;
   private planetManager!: PlanetManager;
   private enemyManager!: EnemyManager;
   private projectileManager!: ProjectileManager;
+  shipManager!: ShipManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
@@ -26,8 +31,9 @@ export class CosmicDefenseGame {
   }
 
   async init(): Promise<void> {
-    const assetManager = await AssetManager.load(MANIFEST);
-    this.buildScene(assetManager);
+    this.assetManager = await AssetManager.load(MANIFEST);
+    this.buildScene(this.assetManager);
+    this.shipPreviews = await this.assetManager.generateShipPreviews(this.app);
 
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
     this.app.ticker.add(this.tickerCallback);
@@ -44,6 +50,9 @@ export class CosmicDefenseGame {
     this.planetManager = new PlanetManager(assetManager);
     world.addChild(this.planetManager.container);
 
+    this.shipManager = new ShipManager(assetManager);
+    world.addChild(this.shipManager.layer);
+
     this.projectileManager = new ProjectileManager(assetManager);
     world.addChild(this.projectileManager.layer);
 
@@ -55,6 +64,7 @@ export class CosmicDefenseGame {
     updateState(this.state, dt);
     this.enemyManager.update(this.state, dt);
     this.projectileManager.update(this.state);
+    this.shipManager.update(this.state);
 
     const waveActive = this.state.wave.phase !== WavePhase.Idle;
     if (waveActive !== this.state.waveActive) {
@@ -72,6 +82,7 @@ export class CosmicDefenseGame {
     this.planetManager.destroy();
     this.enemyManager.destroy();
     this.projectileManager.destroy();
+    this.shipManager.destroy();
     this.app.destroy(true);
   }
 }

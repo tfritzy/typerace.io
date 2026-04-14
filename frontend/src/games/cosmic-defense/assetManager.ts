@@ -1,6 +1,7 @@
-import { Assets, type AssetsManifest, type Spritesheet, type Texture } from "pixi.js";
+import { Assets, type Application, type AssetsManifest, Sprite, type Spritesheet, type Texture } from "pixi.js";
 import { ColorPreset, type EntityType, type ProjectileType, getShipEntityIndex } from "./types";
 import { applyPaletteSwap } from "../planetary-defense/ships";
+import { SHIP_BLUEPRINTS } from "./shipCatalog";
 
 const COLOR_PRESET_ALIASES: Record<ColorPreset, string> = {
   [ColorPreset.Preset1]: "color-preset-1",
@@ -84,6 +85,24 @@ export class AssetManager {
     Assets.addBundle(bundle.name, bundle.assets);
     const loaded = await Assets.loadBundle(bundle.name);
     return new AssetManager(loaded);
+  }
+
+  async generateShipPreviews(app: Application): Promise<Map<EntityType, string>> {
+    const previews = new Map<EntityType, string>();
+    for (const bp of SHIP_BLUEPRINTS) {
+      const tex = this.getShipTexture(bp.entityType, bp.colorPreset);
+      const sprite = new Sprite(tex);
+      sprite.anchor.set(0.5);
+      sprite.scale.set(3);
+      const img = await app.renderer.extract.image({
+        target: sprite,
+        format: "png",
+        resolution: 2,
+      });
+      previews.set(bp.entityType, img.src);
+      sprite.destroy();
+    }
+    return previews;
   }
 
   private applyNearestNeighbor(): void {
