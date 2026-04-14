@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, type ProjectileType, Team } from "./types";
-import { ENEMY_CATALOG, type EnemyConfig } from "./enemyConfig";
+import { ENEMY_CATALOG, type EnemyConfig, type FriendlyConfig } from "./enemyConfig";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -178,7 +178,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
 
 export function spawnAlliedEntity(
   state: GameState,
-  config: EnemyConfig,
+  config: FriendlyConfig,
   colorPreset: ColorPreset,
   x: number,
   y: number
@@ -195,7 +195,7 @@ export function spawnAlliedEntity(
     colorPreset,
     team: Team.Allied,
     firingRange: config.firingRange,
-    fireRate: config.fireRate,
+    fireRate: 0,
     projectileSpeed: config.projectileSpeed,
     projectileDamage: config.projectileDamage,
     projectileType: config.projectileType,

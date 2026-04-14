@@ -57,6 +57,7 @@ export const PhraseOverlay = ({
         const newTc = tc + 1;
         game.onCorrectKeystroke();
         setTypedCount(newTc);
+        if (inputRef.current) inputRef.current.value = "";
 
         if (newTc > PHRASE_BUFFER_SIZE && text.length - newTc < PHRASE_BUFFER_SIZE) {
           const extra = generatePhrase(PHRASE_BUFFER_SIZE);
@@ -124,7 +125,7 @@ export const PhraseOverlay = ({
         <span className="text-[#90ee90]">
           {phrase.slice(0, typedCount)}
         </span>
-        <span ref={cursorCharRef} className="text-white shadow-[-2px_0_0_0_#4a5568]">
+        <span ref={cursorCharRef} className="text-white shadow-[-1px_0_0_0_#4a5568]">
           {typedCount < phrase.length ? phrase[typedCount] : ""}
         </span>
         <span className="text-white">
