@@ -144,6 +144,60 @@ public static partial class Module
     private const double BOT_RECOVERY_DELAY_MIN_MULTIPLIER = 0.5;
     private const double BOT_RECOVERY_DELAY_RANGE_MULTIPLIER = 0.5;
 
+    private static double GetLanguageTypingSpeedModifier(GameMode mode)
+    {
+        switch (mode)
+        {
+            case GameMode.English500:
+            case GameMode.EnglishQuotes:
+                return 1.0;
+            case GameMode.Spanish500:
+            case GameMode.SpanishQuotes:
+                return 40.0 / 35.0;
+            case GameMode.French500:
+            case GameMode.FrenchQuotes:
+                return 40.0 / 35.0;
+            case GameMode.German500:
+            case GameMode.GermanQuotes:
+                return 40.0 / 35.0;
+            case GameMode.Italian500:
+            case GameMode.ItalianQuotes:
+                return 40.0 / 35.0;
+            case GameMode.Portuguese500:
+            case GameMode.PortugueseQuotes:
+                return 40.0 / 35.0;
+            case GameMode.Japanese500:
+            case GameMode.JapaneseQuotes:
+                return 40.0 / 30.0;
+            case GameMode.Korean500:
+            case GameMode.KoreanQuotes:
+                return 40.0 / 25.0;
+            case GameMode.Chinese500:
+            case GameMode.ChineseQuotes:
+                return 40.0 / 20.0;
+            case GameMode.Ukrainian500:
+            case GameMode.UkrainianQuotes:
+                return 40.0 / 30.0;
+            case GameMode.Arabic500:
+            case GameMode.ArabicQuotes:
+                return 40.0 / 25.0;
+            case GameMode.Hindi500:
+            case GameMode.HindiQuotes:
+                return 40.0 / 25.0;
+            case GameMode.Dutch500:
+            case GameMode.DutchQuotes:
+                return 40.0 / 38.0;
+            case GameMode.Swedish500:
+            case GameMode.SwedishQuotes:
+                return 40.0 / 38.0;
+            case GameMode.Turkish500:
+            case GameMode.TurkishQuotes:
+                return 40.0 / 32.0;
+            default:
+                return 1.0;
+        }
+    }
+
     private static byte[] EncodeCharacterEvent(long gameStartMicros, long eventMicros, CharacterEventType eventType)
     {
         var elapsedMicros = eventMicros - gameStartMicros;
@@ -935,6 +989,8 @@ public static partial class Module
                 }
 
                 var botConfig = botPlayer.Value.BotConfig.Value;
+                var langModifier = GetLanguageTypingSpeedModifier(game.Value.GameMode);
+                var adjustedTypingRate = botConfig.TypingRate * langModifier;
                 var shouldError = ctx.Rng.NextDouble() < botConfig.ErrorRate / 4;
 
                 if (shouldError)
@@ -953,7 +1009,7 @@ public static partial class Module
                     AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, CharacterEventType.Incorrect);
 
                     long recognitionDelay = BOT_RECOGNITION_DELAY_MIN_MICROSECONDS + (long)(ctx.Rng.NextDouble() * BOT_RECOGNITION_DELAY_RANGE_MICROSECONDS);
-                    long backspaceInterval = (long)(botConfig.TypingRate * BOT_BACKSPACE_SPEED_MULTIPLIER);
+                    long backspaceInterval = (long)(adjustedTypingRate * BOT_BACKSPACE_SPEED_MULTIPLIER);
 
                     for (int i = 0; i <= charsToDelete; i++)
                     {
@@ -965,7 +1021,7 @@ public static partial class Module
                     ctx.Db.playerprogress.Id.Update(updatedProgress);
 
                     long totalBackspaceTime = recognitionDelay + (charsToDelete + 1) * backspaceInterval;
-                    long recoveryDelay = (long)(botConfig.TypingRate * (BOT_RECOVERY_DELAY_MIN_MULTIPLIER + ctx.Rng.NextDouble() * BOT_RECOVERY_DELAY_RANGE_MULTIPLIER));
+                    long recoveryDelay = (long)(adjustedTypingRate * (BOT_RECOVERY_DELAY_MIN_MULTIPLIER + ctx.Rng.NextDouble() * BOT_RECOVERY_DELAY_RANGE_MULTIPLIER));
                     ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
                     {
                         ScheduledId = 0,
@@ -984,7 +1040,7 @@ public static partial class Module
                         bool justTypedSpace = progress.Value.ProgressIndex < game.Value.Phrase.Length &&
                                               game.Value.Phrase[progress.Value.ProgressIndex] == ' ';
 
-                        var delay = GenerateRealisticBotDelay(ctx.Rng, botConfig.TypingRate, justTypedSpace);
+                        var delay = GenerateRealisticBotDelay(ctx.Rng, adjustedTypingRate, justTypedSpace);
                         ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
                         {
                             ScheduledId = 0,
@@ -1089,7 +1145,9 @@ public static partial class Module
                     if (botPlayer != null && botPlayer.Value.BotConfig != null)
                     {
                         var botConfig = botPlayer.Value.BotConfig.Value;
-                        delayMicroseconds = GenerateBotDelayWithVariance(ctx.Rng, botConfig.TypingRate);
+                        var langModifier = GetLanguageTypingSpeedModifier(updatedGame.GameMode);
+                        var adjustedRate = botConfig.TypingRate * langModifier;
+                        delayMicroseconds = GenerateBotDelayWithVariance(ctx.Rng, adjustedRate);
                     }
                     else
                     {
