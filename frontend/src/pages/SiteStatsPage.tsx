@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Header } from "../components/Header";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import { getThemePlayerColorList } from "../utils/colorMapping";
+import { languages, Language, getLanguageFromMode } from "../utils/modes";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -56,6 +57,7 @@ export const SiteStatsPage = () => {
     const conn = useDatabase();
     const [globalStats, setGlobalStats] = useState<GlobalStats[]>([]);
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('1month');
+    const [completionLanguage, setCompletionLanguage] = useState<Language | 'All'>('All');
     const [themeTick, setThemeTick] = useState(0);
 
     const onThemeChange = useCallback(() => setThemeTick(t => t + 1), []);
@@ -283,8 +285,20 @@ export const SiteStatsPage = () => {
         const incompletePercentages: number[] = [];
 
         filteredStats.forEach(stat => {
-            const started = stat.total.startedGames;
-            const finished = stat.total.finishedGames;
+            let started: number;
+            let finished: number;
+
+            if (completionLanguage === 'All') {
+                started = stat.total.startedGames;
+                finished = stat.total.finishedGames;
+            } else {
+                const matching = stat.stats.filter(
+                    mc => getLanguageFromMode(mc.gameMode.tag) === completionLanguage
+                );
+                started = matching.reduce((sum, mc) => sum + mc.startedGames, 0);
+                finished = matching.reduce((sum, mc) => sum + mc.finishedGames, 0);
+            }
+
             const completionPercent = started > 0 ? (finished / started) * 100 : 0;
             completionPercentages.push(completionPercent);
             incompletePercentages.push(100 - completionPercent);
@@ -530,6 +544,29 @@ export const SiteStatsPage = () => {
                         <p className="text-sm text-muted-foreground mb-4">
                             Percentage of started games that were completed
                         </p>
+                        <div className="flex flex-wrap gap-1.5 mb-4">
+                            <button
+                                onClick={() => setCompletionLanguage('All')}
+                                className={`px-3 py-1 rounded text-sm transition-all ${completionLanguage === 'All'
+                                    ? 'bg-primary text-primary-foreground font-semibold'
+                                    : 'bg-muted text-secondary-foreground hover:bg-secondary'
+                                    }`}
+                            >
+                                All
+                            </button>
+                            {languages.map(lang => (
+                                <button
+                                    key={lang.language}
+                                    onClick={() => setCompletionLanguage(lang.language)}
+                                    className={`px-3 py-1 rounded text-sm transition-all ${completionLanguage === lang.language
+                                        ? 'bg-primary text-primary-foreground font-semibold'
+                                        : 'bg-muted text-secondary-foreground hover:bg-secondary'
+                                        }`}
+                                >
+                                    {lang.flag} {lang.language}
+                                </button>
+                            ))}
+                        </div>
                         <div className="h-[280px]">
                             <Line data={completionRateData} options={areaChartOptions} />
                         </div>
