@@ -13,7 +13,7 @@ const BLUEPRINT_MAP = new Map(
 
 const CHARGE_DOT_RADIUS = 3;
 const CHARGE_DOT_SPACING = 10;
-const CHARGE_DOT_OFFSET = 30;
+const CHARGE_DOT_OFFSET = 45;
 
 export class ShipManager {
   readonly layer: Container;
