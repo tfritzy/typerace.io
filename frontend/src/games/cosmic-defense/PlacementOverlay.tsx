@@ -6,7 +6,7 @@ interface PlacementOverlayProps {
   onSlotClick: (slot: PlacementSlot) => void;
 }
 
-const POINT_SIZE = (24 / CANVAS_WIDTH) * 100;
+const BUTTON_SIZE = (100 / CANVAS_WIDTH) * 100;
 
 export const PlacementOverlay = ({ slots, onSlotClick }: PlacementOverlayProps) => {
   return (
@@ -15,15 +15,15 @@ export const PlacementOverlay = ({ slots, onSlotClick }: PlacementOverlayProps) 
         slot.occupant ? null : (
           <button
             key={slot.index}
-            className="absolute rounded-full pointer-events-auto cursor-pointer bg-[#788cc8]/35 hover:bg-[#788cc8]/70 transition-colors border-none p-0"
+            className="absolute rounded-full pointer-events-auto cursor-pointer bg-[#788cc8]/25 hover:bg-[#788cc8]/60 transition-colors border border-[#788cc8]/20 hover:border-[#788cc8]/50 p-0"
             style={{
               left: `${(slot.x / CANVAS_WIDTH) * 100}%`,
               top: `${(slot.y / CANVAS_HEIGHT) * 100}%`,
-              width: `${POINT_SIZE}%`,
+              width: `${BUTTON_SIZE}%`,
               aspectRatio: "1",
               transform: "translate(-50%, -50%)",
             }}
-            onPointerUp={() => onSlotClick(slot)}
+            onClick={() => onSlotClick(slot)}
           />
         )
       )}

@@ -20,6 +20,7 @@ export interface EntityState {
   firingRange: number;
   fireRate: number;
   projectileSpeed: number;
+  projectileDamage: number;
   projectileType: ProjectileType;
   fireTimer: number;
   rotation: number;
@@ -31,6 +32,8 @@ export interface ProjectileState {
   y: number;
   vx: number;
   vy: number;
+  damage: number;
+  team: Team;
   projectileType: ProjectileType;
 }
 
@@ -157,9 +160,40 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     firingRange: config.firingRange,
     fireRate: config.fireRate,
     projectileSpeed: config.projectileSpeed,
+    projectileDamage: config.projectileDamage,
     projectileType: config.projectileType,
     fireTimer: Math.random() * config.fireRate,
     rotation: Math.PI,
+  };
+
+  state.entities.push(entity);
+}
+
+export function spawnAlliedEntity(
+  state: GameState,
+  config: EnemyConfig,
+  colorPreset: ColorPreset,
+  x: number,
+  y: number
+): void {
+  const entity: EntityState = {
+    id: state.nextId++,
+    entityType: config.entityType,
+    x,
+    y,
+    vx: 0,
+    vy: 0,
+    health: config.health,
+    power: 0,
+    colorPreset,
+    team: Team.Allied,
+    firingRange: config.firingRange,
+    fireRate: config.fireRate,
+    projectileSpeed: config.projectileSpeed,
+    projectileDamage: config.projectileDamage,
+    projectileType: config.projectileType,
+    fireTimer: Math.random() * config.fireRate,
+    rotation: 0,
   };
 
   state.entities.push(entity);
@@ -177,24 +211,50 @@ function isInBounds(x: number, y: number): boolean {
 
 function checkCollisions(state: GameState): void {
   const pr2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
+  const entityHitRadius = 30;
+  const entityHr2 = entityHitRadius * entityHitRadius;
   let damaged = false;
 
   for (let i = state.entities.length - 1; i >= 0; i--) {
     const e = state.entities[i];
-    if (!isInBounds(e.x, e.y)) {
+    if (e.team === Team.Enemy && !isInBounds(e.x, e.y)) {
       state.entities.splice(i, 1);
     }
   }
 
   for (let i = state.projectiles.length - 1; i >= 0; i--) {
     const p = state.projectiles[i];
-    const dx = p.x - PLANET_X;
-    const dy = p.y - PLANET_Y;
-    if (dx * dx + dy * dy < pr2) {
-      state.planetHealth = Math.max(0, state.planetHealth - 10);
-      state.projectiles.splice(i, 1);
-      damaged = true;
-    } else if (!isInBounds(p.x, p.y)) {
+    let hit = false;
+
+    if (p.team === Team.Enemy) {
+      const dx = p.x - PLANET_X;
+      const dy = p.y - PLANET_Y;
+      if (dx * dx + dy * dy < pr2) {
+        state.planetHealth = Math.max(0, state.planetHealth - p.damage);
+        hit = true;
+        damaged = true;
+      }
+    }
+
+    if (!hit) {
+      const opposingTeam = p.team === Team.Enemy ? Team.Allied : Team.Enemy;
+      for (let j = state.entities.length - 1; j >= 0; j--) {
+        const e = state.entities[j];
+        if (e.team !== opposingTeam) continue;
+        const dx = p.x - e.x;
+        const dy = p.y - e.y;
+        if (dx * dx + dy * dy < entityHr2) {
+          e.health -= p.damage;
+          if (e.health <= 0) {
+            state.entities.splice(j, 1);
+          }
+          hit = true;
+          break;
+        }
+      }
+    }
+
+    if (hit || !isInBounds(p.x, p.y)) {
       state.projectiles.splice(i, 1);
     }
   }
@@ -264,6 +324,8 @@ export function updateState(state: GameState, dt: number): void {
             y: e.y,
             vx: Math.cos(angle) * e.projectileSpeed,
             vy: Math.sin(angle) * e.projectileSpeed,
+            damage: e.projectileDamage,
+            team: e.team,
             projectileType: e.projectileType,
           });
         }

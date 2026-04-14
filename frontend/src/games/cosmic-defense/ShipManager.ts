@@ -1,12 +1,18 @@
 import { Container, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState } from "./state";
-import { WavePhase, spawnEntity } from "./state";
+import { spawnAlliedEntity } from "./state";
+import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
+import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { Team } from "./types";
+import type { EntityType } from "./types";
 
-export class EnemyManager {
+const BLUEPRINT_MAP = new Map(
+  SHIP_BLUEPRINTS.map((bp) => [bp.entityType, bp])
+);
+
+export class ShipManager {
   readonly layer: Container;
-
   private assets: AssetManager;
   private entityDisplayObjects = new Map<number, Container>();
   private activeEntityIds = new Set<number>();
@@ -16,41 +22,14 @@ export class EnemyManager {
     this.layer = new Container();
   }
 
-  update(state: GameState, dt: number): void {
-    const wave = state.wave;
+  addShip(state: GameState, entityType: EntityType, x: number, y: number): void {
+    const config = FRIENDLY_CONFIG_MAP.get(entityType);
+    if (!config) return;
+    const bp = BLUEPRINT_MAP.get(entityType);
+    spawnAlliedEntity(state, config, bp?.colorPreset ?? 0, x, y);
+  }
 
-    if (wave.phase === WavePhase.Spawning) {
-      wave.waveTimer += dt;
-
-      if (
-        state.entities.filter((e) => e.team === Team.Enemy).length === 0 &&
-        wave.spawnIndex < wave.spawnQueue.length
-      ) {
-        wave.waveTimer = wave.spawnQueue[wave.spawnIndex].spawnTime;
-      }
-
-      while (
-        wave.spawnIndex < wave.spawnQueue.length &&
-        wave.waveTimer >= wave.spawnQueue[wave.spawnIndex].spawnTime
-      ) {
-        const entry = wave.spawnQueue[wave.spawnIndex];
-        spawnEntity(state, entry.config, Team.Enemy);
-        wave.spawnIndex++;
-      }
-
-      if (wave.spawnIndex >= wave.spawnQueue.length) {
-        wave.phase = WavePhase.Clearing;
-      }
-    }
-
-    if (wave.phase === WavePhase.Clearing) {
-      const enemyCount = state.entities.filter((e) => e.team === Team.Enemy).length;
-      if (enemyCount === 0 && state.projectiles.length === 0) {
-        wave.phase = WavePhase.Idle;
-        state.onWaveComplete.emit();
-      }
-    }
-
+  update(state: GameState): void {
     this.syncRendering(state);
   }
 
@@ -72,7 +51,7 @@ export class EnemyManager {
     this.activeEntityIds.clear();
 
     for (const entity of state.entities) {
-      if (entity.team !== Team.Enemy) continue;
+      if (entity.team !== Team.Allied) continue;
       this.activeEntityIds.add(entity.id);
       let display = this.entityDisplayObjects.get(entity.id);
       if (!display) {

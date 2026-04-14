@@ -1,15 +1,14 @@
-import { Application, Container, Sprite } from "pixi.js";
+import { Application, Container } from "pixi.js";
 import { MANIFEST } from "./manifest";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { Background } from "./Background";
 import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
 import { ProjectileManager } from "./ProjectileManager";
-import { BuildingManager } from "./BuildingManager";
+import { ShipManager } from "./ShipManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, WavePhase } from "./state";
 import type { GameState } from "./state";
-import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import type { EntityType } from "./types";
 
 export class CosmicDefenseGame {
@@ -22,7 +21,7 @@ export class CosmicDefenseGame {
   private planetManager!: PlanetManager;
   private enemyManager!: EnemyManager;
   private projectileManager!: ProjectileManager;
-  buildingManager!: BuildingManager;
+  shipManager!: ShipManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
@@ -34,26 +33,10 @@ export class CosmicDefenseGame {
   async init(): Promise<void> {
     this.assetManager = await AssetManager.load(MANIFEST);
     this.buildScene(this.assetManager);
-    await this.generateShipPreviews();
+    this.shipPreviews = await this.assetManager.generateShipPreviews(this.app);
 
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
     this.app.ticker.add(this.tickerCallback);
-  }
-
-  private async generateShipPreviews(): Promise<void> {
-    for (const bp of SHIP_BLUEPRINTS) {
-      const tex = this.assetManager.getShipTexture(bp.entityType, bp.colorPreset);
-      const sprite = new Sprite(tex);
-      sprite.anchor.set(0.5);
-      sprite.scale.set(3);
-      const img = await this.app.renderer.extract.image({
-        target: sprite,
-        format: "png",
-        resolution: 2,
-      });
-      this.shipPreviews.set(bp.entityType, img.src);
-      sprite.destroy();
-    }
   }
 
   private buildScene(assetManager: AssetManager): void {
@@ -67,8 +50,8 @@ export class CosmicDefenseGame {
     this.planetManager = new PlanetManager(assetManager);
     world.addChild(this.planetManager.container);
 
-    this.buildingManager = new BuildingManager(assetManager);
-    world.addChild(this.buildingManager.layer);
+    this.shipManager = new ShipManager(assetManager);
+    world.addChild(this.shipManager.layer);
 
     this.projectileManager = new ProjectileManager(assetManager);
     world.addChild(this.projectileManager.layer);
@@ -81,6 +64,7 @@ export class CosmicDefenseGame {
     updateState(this.state, dt);
     this.enemyManager.update(this.state, dt);
     this.projectileManager.update(this.state);
+    this.shipManager.update(this.state);
 
     const waveActive = this.state.wave.phase !== WavePhase.Idle;
     if (waveActive !== this.state.waveActive) {
@@ -98,7 +82,7 @@ export class CosmicDefenseGame {
     this.planetManager.destroy();
     this.enemyManager.destroy();
     this.projectileManager.destroy();
-    this.buildingManager.destroy();
+    this.shipManager.destroy();
     this.app.destroy(true);
   }
 }

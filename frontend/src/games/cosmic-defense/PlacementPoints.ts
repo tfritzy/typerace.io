@@ -7,7 +7,6 @@ const ROW_SPACING = 110;
 const HALF_COL = COL_SPACING / 2;
 const PLANET_EXCLUSION = 170;
 const MAX_X = CANVAS_WIDTH / 2;
-const MARGIN = 120;
 
 export interface PlacementSlot {
   index: number;
@@ -19,14 +18,16 @@ export interface PlacementSlot {
 export function generateSlots(): PlacementSlot[] {
   const slots: PlacementSlot[] = [];
   let index = 0;
-  let row = 0;
-  let y = MARGIN;
+  const rows = [-2, -1, 0, 1, 2];
 
-  while (y < CANVAS_HEIGHT - MARGIN) {
-    const isOddRow = row % 2 === 1;
-    const offsetX = isOddRow ? HALF_COL : 0;
-    let x = MARGIN + offsetX;
+  for (const rowOffset of rows) {
+    const y = PLANET_Y + rowOffset * ROW_SPACING;
+    if (y < 60 || y > CANVAS_HEIGHT - 60) continue;
 
+    const isOddRow = ((rowOffset % 2) + 2) % 2 === 1;
+    const startX = isOddRow ? HALF_COL : 0;
+
+    let x = startX + 60;
     while (x <= MAX_X) {
       const dx = x - PLANET_X;
       const dy = y - PLANET_Y;
@@ -39,9 +40,6 @@ export function generateSlots(): PlacementSlot[] {
 
       x += COL_SPACING;
     }
-
-    row++;
-    y += ROW_SPACING;
   }
 
   return slots;

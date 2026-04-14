@@ -77,7 +77,7 @@ export const GameCanvas = () => {
     const game = gameRef.current;
     if (!game || !selectedSlot) return;
 
-    game.buildingManager.addShip(entityType, selectedSlot.x, selectedSlot.y);
+    game.shipManager.addShip(game.state, entityType, selectedSlot.x, selectedSlot.y);
 
     setSlots((prev) =>
       prev.map((s) =>
@@ -101,20 +101,13 @@ export const GameCanvas = () => {
     >
       <PlanetHealthBar ratio={healthRatio} />
       <div className="absolute top-3 right-3 z-10 flex items-center gap-3">
-        <span style={{ fontSize: 11, color: "#a6adc8" }}>
+        <span className="text-[11px] text-[#a6adc8]">
           Wave {waveNumber}
         </span>
         {!waveActive && (
           <button
             onClick={handleNextWave}
-            style={{
-              fontSize: 11,
-              background: "rgba(74, 222, 128, 0.85)",
-              color: "#0a0a1a",
-              padding: "4px 10px",
-              borderRadius: 4,
-            }}
-            className="cursor-pointer hover:brightness-125"
+            className="text-[11px] bg-green-400/85 text-[#0a0a1a] px-2.5 py-1 rounded cursor-pointer hover:brightness-125"
           >
             {waveNumber === 0 ? "Start" : "Next wave"}
           </button>

@@ -14,7 +14,7 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews }: ShopPanelProp
       onClick={onClose}
     >
       <div
-        className="rounded-lg p-3.5 max-w-[560px] w-[90%] border border-white/10"
+        className="rounded-lg p-3.5 max-w-[560px] w-[90%] max-h-[80vh] border border-white/10 flex flex-col"
         style={{ background: "linear-gradient(180deg, rgba(12,14,30,0.97) 0%, rgba(8,10,24,0.97) 100%)" }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -29,7 +29,7 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews }: ShopPanelProp
             ✕
           </button>
         </div>
-        <div className="grid grid-cols-5 gap-1.5">
+        <div className="grid grid-cols-5 gap-1.5 overflow-y-auto">
           {SHIP_BLUEPRINTS.map((bp) => (
             <button
               key={bp.entityType}
