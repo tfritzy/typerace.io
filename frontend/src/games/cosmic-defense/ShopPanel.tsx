@@ -29,7 +29,7 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews }: ShopPanelProp
             ✕
           </button>
         </div>
-        <div className="grid grid-cols-5 gap-1.5 overflow-y-auto">
+        <div className="grid grid-cols-5 gap-1.5 overflow-y-auto min-h-0">
           {SHIP_BLUEPRINTS.map((bp) => (
             <button
               key={bp.entityType}

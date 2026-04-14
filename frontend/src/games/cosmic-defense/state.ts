@@ -262,15 +262,17 @@ function checkCollisions(state: GameState): void {
   if (damaged) state.onPlanetDamaged.emit();
 }
 
+const _targetResult = { x: 0, y: 0, vx: 0, vy: 0 };
+
 function findNearestTarget(
   state: GameState,
   entity: EntityState
-): { x: number; y: number } | null {
+): { x: number; y: number; vx: number; vy: number } | null {
   const opposingTeam =
     entity.team === Team.Enemy ? Team.Allied : Team.Enemy;
 
   let bestDist = Infinity;
-  let bestTarget: { x: number; y: number } | null = null;
+  let found = false;
 
   if (entity.team === Team.Enemy) {
     const dx = entity.x - PLANET_X;
@@ -278,7 +280,11 @@ function findNearestTarget(
     const d2 = dx * dx + dy * dy;
     if (d2 < bestDist) {
       bestDist = d2;
-      bestTarget = { x: PLANET_X, y: PLANET_Y };
+      _targetResult.x = PLANET_X;
+      _targetResult.y = PLANET_Y;
+      _targetResult.vx = 0;
+      _targetResult.vy = 0;
+      found = true;
     }
   }
 
@@ -289,11 +295,53 @@ function findNearestTarget(
     const d2 = dx * dx + dy * dy;
     if (d2 < bestDist) {
       bestDist = d2;
-      bestTarget = { x: other.x, y: other.y };
+      _targetResult.x = other.x;
+      _targetResult.y = other.y;
+      _targetResult.vx = other.vx;
+      _targetResult.vy = other.vy;
+      found = true;
     }
   }
 
-  return bestTarget;
+  return found ? _targetResult : null;
+}
+
+function computeLeadAngle(
+  sx: number,
+  sy: number,
+  tx: number,
+  ty: number,
+  tvx: number,
+  tvy: number,
+  projectileSpeed: number
+): number {
+  const dx = tx - sx;
+  const dy = ty - sy;
+  const a = tvx * tvx + tvy * tvy - projectileSpeed * projectileSpeed;
+  const b = 2 * (dx * tvx + dy * tvy);
+  const c = dx * dx + dy * dy;
+
+  let t = 0;
+  if (Math.abs(a) < 1e-6) {
+    if (Math.abs(b) > 1e-6) {
+      t = -c / b;
+    }
+  } else {
+    const disc = b * b - 4 * a * c;
+    if (disc >= 0) {
+      const sqrtDisc = Math.sqrt(disc);
+      const t1 = (-b - sqrtDisc) / (2 * a);
+      const t2 = (-b + sqrtDisc) / (2 * a);
+      if (t1 > 0) t = t1;
+      else if (t2 > 0) t = t2;
+    }
+  }
+
+  if (t <= 0) {
+    return Math.atan2(dy, dx);
+  }
+
+  return Math.atan2(dy + tvy * t, dx + tvx * t);
 }
 
 export function updateState(state: GameState, dt: number): void {
@@ -317,7 +365,12 @@ export function updateState(state: GameState, dt: number): void {
         if (e.fireTimer <= 0) {
           e.fireTimer += e.fireRate;
 
-          const angle = Math.atan2(target.y - e.y, target.x - e.x);
+          const angle = computeLeadAngle(
+            e.x, e.y,
+            target.x, target.y,
+            target.vx, target.vy,
+            e.projectileSpeed
+          );
           state.projectiles.push({
             id: state.nextId++,
             x: e.x,

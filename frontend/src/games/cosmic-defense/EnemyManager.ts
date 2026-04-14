@@ -23,7 +23,7 @@ export class EnemyManager {
       wave.waveTimer += dt;
 
       if (
-        state.entities.filter((e) => e.team === Team.Enemy).length === 0 &&
+        !state.entities.some((e) => e.team === Team.Enemy) &&
         wave.spawnIndex < wave.spawnQueue.length
       ) {
         wave.waveTimer = wave.spawnQueue[wave.spawnIndex].spawnTime;
@@ -44,8 +44,7 @@ export class EnemyManager {
     }
 
     if (wave.phase === WavePhase.Clearing) {
-      const enemyCount = state.entities.filter((e) => e.team === Team.Enemy).length;
-      if (enemyCount === 0 && state.projectiles.length === 0) {
+      if (!state.entities.some((e) => e.team === Team.Enemy) && state.projectiles.length === 0) {
         wave.phase = WavePhase.Idle;
         state.onWaveComplete.emit();
       }
