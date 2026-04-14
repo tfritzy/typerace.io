@@ -11,6 +11,7 @@ export enum Team {
 }
 
 export enum ProjectileType {
+  Tiny = 0,
   Projectile1 = 1,
   Projectile2 = 2,
   Projectile3 = 3,

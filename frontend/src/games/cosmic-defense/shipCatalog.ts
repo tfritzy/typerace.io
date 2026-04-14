@@ -7,8 +7,8 @@ export interface ShipBlueprint {
 }
 
 export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
-  { entityType: "Mite", cost: 25, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Speck", cost: 30, colorPreset: ColorPreset.Preset1 },
+  { entityType: "Moth", cost: 25, colorPreset: ColorPreset.Preset1 },
+  { entityType: "Dot", cost: 30, colorPreset: ColorPreset.Preset1 },
   { entityType: "Gnat", cost: 35, colorPreset: ColorPreset.Preset1 },
   { entityType: "Flicker", cost: 40, colorPreset: ColorPreset.Preset1 },
   { entityType: "Clipper", cost: 50, colorPreset: ColorPreset.Preset1 },
