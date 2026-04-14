@@ -1,6 +1,7 @@
-import { AnimatedSprite, Container } from "pixi.js";
+import { AnimatedSprite, Container, Graphics } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, ProjectileState } from "./state";
+import { ProjectileType } from "./types";
 
 const PROJECTILE_SCALE = 3;
 const ANIMATION_SPEED = 0.15;
@@ -9,7 +10,7 @@ export class ProjectileManager {
   readonly layer: Container;
 
   private assets: AssetManager;
-  private displayObjects = new Map<number, AnimatedSprite>();
+  private displayObjects = new Map<number, Container>();
   private activeIds = new Set<number>();
 
   constructor(assets: AssetManager) {
@@ -22,26 +23,34 @@ export class ProjectileManager {
 
     for (const p of state.projectiles) {
       this.activeIds.add(p.id);
-      let sprite = this.displayObjects.get(p.id);
-      if (!sprite) {
-        sprite = this.createSprite(p);
-        this.layer.addChild(sprite);
-        this.displayObjects.set(p.id, sprite);
+      let obj = this.displayObjects.get(p.id);
+      if (!obj) {
+        obj = this.createDisplayObject(p);
+        this.layer.addChild(obj);
+        this.displayObjects.set(p.id, obj);
       }
-      sprite.x = p.x;
-      sprite.y = p.y;
-      sprite.rotation = Math.atan2(p.vy, p.vx);
+      obj.x = p.x;
+      obj.y = p.y;
+      obj.rotation = Math.atan2(p.vy, p.vx);
     }
 
-    for (const [id, sprite] of this.displayObjects) {
+    for (const [id, obj] of this.displayObjects) {
       if (!this.activeIds.has(id)) {
-        sprite.destroy();
+        obj.destroy();
         this.displayObjects.delete(id);
       }
     }
   }
 
-  private createSprite(p: ProjectileState): AnimatedSprite {
+  private createDisplayObject(p: ProjectileState): Container {
+    if (p.projectileType === ProjectileType.Tiny) {
+      const g = new Graphics();
+      g.rect(-1, -1, 2, 2);
+      g.fill(0xcccccc);
+      g.scale.set(PROJECTILE_SCALE);
+      return g;
+    }
+
     const textures = this.assets.getProjectileTextures(p.projectileType);
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);

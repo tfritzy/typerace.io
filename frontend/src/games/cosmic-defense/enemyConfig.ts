@@ -22,9 +22,9 @@ export interface FriendlyConfig {
 }
 
 export const ENEMY_CATALOG: EnemyConfig[] = [
-  { entityType: "Dot", health: 50, power: 50, firingRange: 400, fireRate: 2.0, projectileSpeed: 180, projectileDamage: 5, projectileType: ProjectileType.Projectile1 },
-  { entityType: "Pip", health: 70, power: 70, firingRange: 400, fireRate: 1.8, projectileSpeed: 190, projectileDamage: 7, projectileType: ProjectileType.Projectile1 },
-  { entityType: "Flea", health: 100, power: 100, firingRange: 420, fireRate: 1.6, projectileSpeed: 200, projectileDamage: 10, projectileType: ProjectileType.Projectile1 },
+  { entityType: "Speck", health: 50, power: 50, firingRange: 400, fireRate: 2.0, projectileSpeed: 180, projectileDamage: 5, projectileType: ProjectileType.Tiny },
+  { entityType: "Pip", health: 70, power: 70, firingRange: 400, fireRate: 1.8, projectileSpeed: 190, projectileDamage: 7, projectileType: ProjectileType.Tiny },
+  { entityType: "Flea", health: 100, power: 100, firingRange: 420, fireRate: 1.6, projectileSpeed: 200, projectileDamage: 10, projectileType: ProjectileType.Tiny },
   { entityType: "Needle", health: 130, power: 130, firingRange: 440, fireRate: 1.5, projectileSpeed: 220, projectileDamage: 12, projectileType: ProjectileType.Projectile2 },
   { entityType: "Bolt", health: 190, power: 190, firingRange: 460, fireRate: 1.4, projectileSpeed: 230, projectileDamage: 15, projectileType: ProjectileType.Projectile2 },
   { entityType: "Cricket", health: 250, power: 250, firingRange: 480, fireRate: 1.3, projectileSpeed: 240, projectileDamage: 18, projectileType: ProjectileType.Projectile2 },
@@ -48,7 +48,7 @@ export const ENEMY_CATALOG: EnemyConfig[] = [
 
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [
   { entityType: "Mite", health: 200, firingRange: 525, projectileSpeed: 200, projectileDamage: 8, projectileType: ProjectileType.Projectile1, chargesRequired: 3 },
-  { entityType: "Speck", health: 300, firingRange: 555, projectileSpeed: 220, projectileDamage: 12, projectileType: ProjectileType.Projectile1, chargesRequired: 3 },
+  { entityType: "Dot", health: 300, firingRange: 555, projectileSpeed: 220, projectileDamage: 12, projectileType: ProjectileType.Projectile1, chargesRequired: 3 },
   { entityType: "Gnat", health: 400, firingRange: 570, projectileSpeed: 190, projectileDamage: 15, projectileType: ProjectileType.Projectile1, chargesRequired: 4 },
   { entityType: "Flicker", health: 500, firingRange: 600, projectileSpeed: 250, projectileDamage: 18, projectileType: ProjectileType.Projectile1, chargesRequired: 4 },
   { entityType: "Clipper", health: 650, firingRange: 630, projectileSpeed: 210, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 5 },
