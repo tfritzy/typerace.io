@@ -1,12 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import "tailwindcss";
-
-@font-face {
-  font-family: "Press Start 2P";
-  src: url("/fonts/press-start-2p.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
 
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
 
@@ -50,6 +43,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 @layer base {
@@ -144,6 +138,8 @@ html {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  font-family: var(--font-sans);
 }
 
 body {

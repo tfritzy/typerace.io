@@ -81,7 +81,7 @@ export const Cursor = memo(({ targetRef, lerp = .3, fadeDelay = 2000, visible = 
     return (
         <div
             ref={followerRef}
-            className={`max-w-0 h-8 -translate-y-px fixed -top-0.5 left-0 ${isBlinking && visible ? 'animate-blink' : ''}`}
+            className={`max-w-0 h-10 -translate-y-px fixed top-0 -translate-x-0.5 left-0  ${isBlinking && visible ? 'animate-blink' : ''}`}
             style={{ opacity: visible ? 1 : 0 }}
         >
             <div className="h-full rounded-full border-r border-r-accent" />
