@@ -1,0 +1,13 @@
+{
+  "frames": {
+    "exp-1-0": { "frame": { "x": 0, "y": 0, "w": 32, "h": 32 } },
+    "exp-1-1": { "frame": { "x": 32, "y": 0, "w": 32, "h": 32 } },
+    "exp-1-2": { "frame": { "x": 64, "y": 0, "w": 32, "h": 32 } }
+  },
+  "meta": {
+    "image": "Projectile_1_Explosion.png",
+    "format": "RGBA8888",
+    "size": { "w": 96, "h": 32 },
+    "scale": 1
+  }
+}
