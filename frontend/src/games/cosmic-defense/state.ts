@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, type ProjectileType, Team } from "./types";
-import { ENEMY_CATALOG, type EnemyConfig } from "./enemyConfig";
+import { ENEMY_CATALOG, type EnemyConfig, type FriendlyConfig } from "./enemyConfig";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -26,6 +26,8 @@ export interface EntityState {
   fireTimer: number;
   rotation: number;
   speed: number;
+  chargesRequired: number;
+  charge: number;
 }
 
 export interface ProjectileState {
@@ -167,6 +169,8 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     fireTimer: Math.random() * config.fireRate,
     rotation: Math.PI,
     speed,
+    chargesRequired: 0,
+    charge: 0,
   };
 
   state.entities.push(entity);
@@ -174,7 +178,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
 
 export function spawnAlliedEntity(
   state: GameState,
-  config: EnemyConfig,
+  config: FriendlyConfig,
   colorPreset: ColorPreset,
   x: number,
   y: number
@@ -191,13 +195,15 @@ export function spawnAlliedEntity(
     colorPreset,
     team: Team.Allied,
     firingRange: config.firingRange,
-    fireRate: config.fireRate,
+    fireRate: 0,
     projectileSpeed: config.projectileSpeed,
     projectileDamage: config.projectileDamage,
     projectileType: config.projectileType,
-    fireTimer: Math.random() * config.fireRate,
+    fireTimer: 0,
     rotation: 0,
     speed: 0,
+    chargesRequired: config.chargesRequired,
+    charge: 0,
   };
 
   state.entities.push(entity);
@@ -366,26 +372,29 @@ export function updateState(state: GameState, dt: number): void {
         e.vx = 0;
         e.vy = 0;
         e.rotation = Math.atan2(target.y - e.y, target.x - e.x);
-        e.fireTimer -= dt;
-        if (e.fireTimer <= 0) {
-          e.fireTimer += e.fireRate;
 
-          const angle = computeLeadAngle(
-            e.x, e.y,
-            target.x, target.y,
-            target.vx, target.vy,
-            e.projectileSpeed
-          );
-          state.projectiles.push({
-            id: state.nextId++,
-            x: e.x,
-            y: e.y,
-            vx: Math.cos(angle) * e.projectileSpeed,
-            vy: Math.sin(angle) * e.projectileSpeed,
-            damage: e.projectileDamage,
-            team: e.team,
-            projectileType: e.projectileType,
-          });
+        if (e.chargesRequired <= 0) {
+          e.fireTimer -= dt;
+          if (e.fireTimer <= 0) {
+            e.fireTimer += e.fireRate;
+
+            const angle = computeLeadAngle(
+              e.x, e.y,
+              target.x, target.y,
+              target.vx, target.vy,
+              e.projectileSpeed
+            );
+            state.projectiles.push({
+              id: state.nextId++,
+              x: e.x,
+              y: e.y,
+              vx: Math.cos(angle) * e.projectileSpeed,
+              vy: Math.sin(angle) * e.projectileSpeed,
+              damage: e.projectileDamage,
+              team: e.team,
+              projectileType: e.projectileType,
+            });
+          }
         }
       }
     }
@@ -405,6 +414,46 @@ export function updateState(state: GameState, dt: number): void {
   }
 
   checkCollisions(state);
+}
+
+function tryFireEntity(state: GameState, e: EntityState): void {
+  if (e.charge < e.chargesRequired) return;
+
+  const target = findNearestTarget(state, e);
+  if (!target) return;
+
+  const dx = e.x - target.x;
+  const dy = e.y - target.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist > e.firingRange) return;
+
+  e.charge = 0;
+
+  const angle = computeLeadAngle(
+    e.x, e.y,
+    target.x, target.y,
+    target.vx, target.vy,
+    e.projectileSpeed
+  );
+
+  state.projectiles.push({
+    id: state.nextId++,
+    x: e.x,
+    y: e.y,
+    vx: Math.cos(angle) * e.projectileSpeed,
+    vy: Math.sin(angle) * e.projectileSpeed,
+    damage: e.projectileDamage,
+    team: e.team,
+    projectileType: e.projectileType,
+  });
+}
+
+export function onCorrectKeystroke(state: GameState): void {
+  for (const e of state.entities) {
+    if (e.chargesRequired <= 0) continue;
+    e.charge++;
+    tryFireEntity(state, e);
+  }
 }
 
 const WAVE_SPAWN_DURATION = 15;
