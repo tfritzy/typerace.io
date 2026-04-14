@@ -38,21 +38,21 @@ export const ENEMY_CATALOG: EnemyConfig[] = [
 ];
 
 export const FRIENDLY_CATALOG: EnemyConfig[] = [
-  { entityType: "Mite", health: 200, power: 0, firingRange: 350, fireRate: 0, projectileSpeed: 200, projectileDamage: 8, projectileType: ProjectileType.Projectile1, chargesRequired: 3 },
-  { entityType: "Speck", health: 300, power: 0, firingRange: 370, fireRate: 0, projectileSpeed: 220, projectileDamage: 12, projectileType: ProjectileType.Projectile1, chargesRequired: 3 },
-  { entityType: "Gnat", health: 400, power: 0, firingRange: 380, fireRate: 0, projectileSpeed: 190, projectileDamage: 15, projectileType: ProjectileType.Projectile1, chargesRequired: 4 },
-  { entityType: "Flicker", health: 500, power: 0, firingRange: 400, fireRate: 0, projectileSpeed: 250, projectileDamage: 18, projectileType: ProjectileType.Projectile1, chargesRequired: 4 },
-  { entityType: "Clipper", health: 650, power: 0, firingRange: 420, fireRate: 0, projectileSpeed: 210, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 5 },
-  { entityType: "Stinger", health: 900, power: 0, firingRange: 450, fireRate: 0, projectileSpeed: 280, projectileDamage: 32, projectileType: ProjectileType.Projectile2, chargesRequired: 5 },
-  { entityType: "Crest", health: 1200, power: 0, firingRange: 480, fireRate: 0, projectileSpeed: 230, projectileDamage: 40, projectileType: ProjectileType.Projectile2, chargesRequired: 6 },
-  { entityType: "Osprey", health: 1800, power: 0, firingRange: 520, fireRate: 0, projectileSpeed: 260, projectileDamage: 55, projectileType: ProjectileType.Projectile3, chargesRequired: 6 },
-  { entityType: "Kestrel", health: 2500, power: 0, firingRange: 550, fireRate: 0, projectileSpeed: 240, projectileDamage: 70, projectileType: ProjectileType.Projectile3, chargesRequired: 7 },
-  { entityType: "Vulture", health: 3200, power: 0, firingRange: 580, fireRate: 0, projectileSpeed: 300, projectileDamage: 90, projectileType: ProjectileType.Projectile3, chargesRequired: 8 },
-  { entityType: "Talon", health: 4500, power: 0, firingRange: 620, fireRate: 0, projectileSpeed: 270, projectileDamage: 120, projectileType: ProjectileType.Projectile4, chargesRequired: 8 },
-  { entityType: "Warden", health: 6500, power: 0, firingRange: 660, fireRate: 0, projectileSpeed: 320, projectileDamage: 160, projectileType: ProjectileType.Projectile4, chargesRequired: 9 },
-  { entityType: "Behemoth", health: 10000, power: 0, firingRange: 700, fireRate: 0, projectileSpeed: 250, projectileDamage: 250, projectileType: ProjectileType.Projectile5, chargesRequired: 10 },
-  { entityType: "Juggernaut", health: 15000, power: 0, firingRange: 740, fireRate: 0, projectileSpeed: 350, projectileDamage: 400, projectileType: ProjectileType.Projectile5, chargesRequired: 11 },
-  { entityType: "Colossus", health: 22000, power: 0, firingRange: 780, fireRate: 0, projectileSpeed: 290, projectileDamage: 600, projectileType: ProjectileType.Projectile6, chargesRequired: 12 },
+  { entityType: "Mite", health: 200, power: 0, firingRange: 525, fireRate: 0, projectileSpeed: 200, projectileDamage: 8, projectileType: ProjectileType.Projectile1, chargesRequired: 3 },
+  { entityType: "Speck", health: 300, power: 0, firingRange: 555, fireRate: 0, projectileSpeed: 220, projectileDamage: 12, projectileType: ProjectileType.Projectile1, chargesRequired: 3 },
+  { entityType: "Gnat", health: 400, power: 0, firingRange: 570, fireRate: 0, projectileSpeed: 190, projectileDamage: 15, projectileType: ProjectileType.Projectile1, chargesRequired: 4 },
+  { entityType: "Flicker", health: 500, power: 0, firingRange: 600, fireRate: 0, projectileSpeed: 250, projectileDamage: 18, projectileType: ProjectileType.Projectile1, chargesRequired: 4 },
+  { entityType: "Clipper", health: 650, power: 0, firingRange: 630, fireRate: 0, projectileSpeed: 210, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 5 },
+  { entityType: "Stinger", health: 900, power: 0, firingRange: 675, fireRate: 0, projectileSpeed: 280, projectileDamage: 32, projectileType: ProjectileType.Projectile2, chargesRequired: 5 },
+  { entityType: "Crest", health: 1200, power: 0, firingRange: 720, fireRate: 0, projectileSpeed: 230, projectileDamage: 40, projectileType: ProjectileType.Projectile2, chargesRequired: 6 },
+  { entityType: "Osprey", health: 1800, power: 0, firingRange: 780, fireRate: 0, projectileSpeed: 260, projectileDamage: 55, projectileType: ProjectileType.Projectile3, chargesRequired: 6 },
+  { entityType: "Kestrel", health: 2500, power: 0, firingRange: 825, fireRate: 0, projectileSpeed: 240, projectileDamage: 70, projectileType: ProjectileType.Projectile3, chargesRequired: 7 },
+  { entityType: "Vulture", health: 3200, power: 0, firingRange: 870, fireRate: 0, projectileSpeed: 300, projectileDamage: 90, projectileType: ProjectileType.Projectile3, chargesRequired: 8 },
+  { entityType: "Talon", health: 4500, power: 0, firingRange: 930, fireRate: 0, projectileSpeed: 270, projectileDamage: 120, projectileType: ProjectileType.Projectile4, chargesRequired: 8 },
+  { entityType: "Warden", health: 6500, power: 0, firingRange: 990, fireRate: 0, projectileSpeed: 320, projectileDamage: 160, projectileType: ProjectileType.Projectile4, chargesRequired: 9 },
+  { entityType: "Behemoth", health: 10000, power: 0, firingRange: 1050, fireRate: 0, projectileSpeed: 250, projectileDamage: 250, projectileType: ProjectileType.Projectile5, chargesRequired: 10 },
+  { entityType: "Juggernaut", health: 15000, power: 0, firingRange: 1110, fireRate: 0, projectileSpeed: 350, projectileDamage: 400, projectileType: ProjectileType.Projectile5, chargesRequired: 11 },
+  { entityType: "Colossus", health: 22000, power: 0, firingRange: 1170, fireRate: 0, projectileSpeed: 290, projectileDamage: 600, projectileType: ProjectileType.Projectile6, chargesRequired: 12 },
 ];
 
 export const FRIENDLY_CONFIG_MAP = new Map<string, EnemyConfig>(
