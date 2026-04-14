@@ -18,7 +18,7 @@ export interface PlacementSlot {
 export function generateSlots(): PlacementSlot[] {
   const slots: PlacementSlot[] = [];
   let index = 0;
-  const rows = [-2, -1, 0, 1, 2];
+  const rows = [-3, -2, -1, 0, 1, 2, 3];
 
   for (const rowOffset of rows) {
     const y = PLANET_Y + rowOffset * ROW_SPACING;

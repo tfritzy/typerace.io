@@ -15,7 +15,7 @@ export const PlacementOverlay = ({ slots, onSlotClick }: PlacementOverlayProps) 
         slot.occupant ? null : (
           <button
             key={slot.index}
-            className="absolute rounded-full pointer-events-auto cursor-pointer bg-[#788cc8]/25 hover:bg-[#788cc8]/60 transition-colors border border-[#788cc8]/20 hover:border-[#788cc8]/50 p-0"
+            className="absolute rounded-full pointer-events-auto cursor-pointer hover:bg-[#788cc8]/15 transition-colors p-0 flex items-center justify-center"
             style={{
               left: `${(slot.x / CANVAS_WIDTH) * 100}%`,
               top: `${(slot.y / CANVAS_HEIGHT) * 100}%`,
@@ -24,7 +24,9 @@ export const PlacementOverlay = ({ slots, onSlotClick }: PlacementOverlayProps) 
               transform: "translate(-50%, -50%)",
             }}
             onClick={() => onSlotClick(slot)}
-          />
+          >
+            <span className="block w-2.5 h-2.5 rounded-full bg-[#788cc8]/40 pointer-events-none" />
+          </button>
         )
       )}
     </div>
