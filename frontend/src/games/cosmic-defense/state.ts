@@ -418,7 +418,6 @@ export function updateState(state: GameState, dt: number): void {
 
 function tryFireEntity(state: GameState, e: EntityState): void {
   if (e.charge < e.chargesRequired) return;
-  e.charge = 0;
 
   const target = findNearestTarget(state, e);
   if (!target) return;
@@ -427,6 +426,8 @@ function tryFireEntity(state: GameState, e: EntityState): void {
   const dy = e.y - target.y;
   const dist = Math.sqrt(dx * dx + dy * dy);
   if (dist > e.firingRange) return;
+
+  e.charge = 0;
 
   const angle = computeLeadAngle(
     e.x, e.y,
