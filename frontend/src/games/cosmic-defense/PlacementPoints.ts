@@ -24,7 +24,7 @@ export function generateSlots(): PlacementSlot[] {
     const y = PLANET_Y + rowOffset * ROW_SPACING;
     if (y < 60 || y > CANVAS_HEIGHT - 60) continue;
 
-    const isOddRow = ((rowOffset % 2) + 2) % 2 === 1;
+    const isOddRow = Math.abs(rowOffset) % 2 === 1;
     const startX = isOddRow ? HALF_COL : 0;
 
     let x = startX + 60;
