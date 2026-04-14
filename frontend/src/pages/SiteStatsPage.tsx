@@ -295,8 +295,12 @@ export const SiteStatsPage = () => {
                 const matching = stat.stats.filter(
                     mc => getLanguageFromMode(mc.gameMode.tag) === completionLanguage
                 );
-                started = matching.reduce((sum, mc) => sum + mc.startedGames, 0);
-                finished = matching.reduce((sum, mc) => sum + mc.finishedGames, 0);
+                const totals = matching.reduce(
+                    (acc, mc) => ({ started: acc.started + mc.startedGames, finished: acc.finished + mc.finishedGames }),
+                    { started: 0, finished: 0 }
+                );
+                started = totals.started;
+                finished = totals.finished;
             }
 
             const completionPercent = started > 0 ? (finished / started) * 100 : 0;
