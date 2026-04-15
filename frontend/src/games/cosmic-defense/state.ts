@@ -28,6 +28,7 @@ export interface EntityState {
   speed: number;
   chargesRequired: number;
   charge: number;
+  gold: number;
 }
 
 export interface ProjectileState {
@@ -93,11 +94,13 @@ export interface GameState {
   nextId: number;
   planetHealth: number;
   maxPlanetHealth: number;
+  gold: number;
   wave: WaveState;
   waveActive: boolean;
   onPlanetDamaged: GameEvent;
   onWaveComplete: GameEvent;
   onWaveActiveChanged: GameEvent;
+  onGoldChanged: GameEvent;
 }
 
 let gameState: GameState | null = null;
@@ -128,6 +131,7 @@ export function createGameState(): GameState {
     nextId: 1,
     planetHealth: 1000,
     maxPlanetHealth: 1000,
+    gold: 0,
     wave: {
       wave: 0,
       phase: WavePhase.Idle,
@@ -139,6 +143,7 @@ export function createGameState(): GameState {
     onPlanetDamaged: new GameEvent(),
     onWaveComplete: new GameEvent(),
     onWaveActiveChanged: new GameEvent(),
+    onGoldChanged: new GameEvent(),
   };
 
   gameState = state;
@@ -180,6 +185,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     speed,
     chargesRequired: 0,
     charge: 0,
+    gold: config.gold,
   };
 
   state.entities.push(entity);
@@ -213,6 +219,7 @@ export function spawnAlliedEntity(
     speed: 0,
     chargesRequired: config.chargesRequired,
     charge: 0,
+    gold: 0,
   };
 
   state.entities.push(entity);
@@ -232,6 +239,7 @@ function checkCollisions(state: GameState): void {
   const pr2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
   const entityHr2 = ENTITY_HIT_RADIUS * ENTITY_HIT_RADIUS;
   let damaged = false;
+  let goldGained = false;
 
   for (let i = state.entities.length - 1; i >= 0; i--) {
     const e = state.entities[i];
@@ -270,6 +278,10 @@ function checkCollisions(state: GameState): void {
         if (dx * dx + dy * dy < entityHr2) {
           e.health -= p.damage;
           if (e.health <= 0) {
+            if (e.gold > 0) {
+              state.gold += e.gold;
+              goldGained = true;
+            }
             state.entities.splice(j, 1);
           }
           hit = true;
@@ -290,6 +302,7 @@ function checkCollisions(state: GameState): void {
   }
 
   if (damaged) state.onPlanetDamaged.emit();
+  if (goldGained) state.onGoldChanged.emit();
 }
 
 const _targetResult = { x: 0, y: 0, vx: 0, vy: 0 };
