@@ -45,7 +45,6 @@ export interface ExplosionState {
   id: number;
   x: number;
   y: number;
-  age: number;
   projectileType: ProjectileType;
 }
 
@@ -256,7 +255,6 @@ function checkCollisions(state: GameState): void {
           id: state.nextId++,
           x: p.x,
           y: p.y,
-          age: 0,
           projectileType: p.projectileType,
         });
       }
@@ -279,7 +277,6 @@ function checkCollisions(state: GameState): void {
             id: state.nextId++,
             x: p.x,
             y: p.y,
-            age: 0,
             projectileType: p.projectileType,
           });
           break;

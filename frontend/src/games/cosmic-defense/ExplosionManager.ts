@@ -4,7 +4,6 @@ import type { GameState, ExplosionState } from "./state";
 import { ProjectileType } from "./types";
 
 const EXPLOSION_SCALE = 3;
-const EXPLOSION_DURATION = 0.3;
 const EXPLOSION_ANIMATION_SPEED = 0.15;
 
 export class ExplosionManager {
@@ -12,6 +11,7 @@ export class ExplosionManager {
 
   private assets: AssetManager;
   private displayObjects = new Map<number, Container>();
+  private completedIds = new Set<number>();
   private activeIds = new Set<number>();
 
   constructor(assets: AssetManager) {
@@ -19,15 +19,15 @@ export class ExplosionManager {
     this.layer = new Container();
   }
 
-  update(state: GameState, dt: number): void {
+  update(state: GameState): void {
     this.activeIds.clear();
 
     for (let i = state.explosions.length - 1; i >= 0; i--) {
       const exp = state.explosions[i];
-      exp.age += dt;
 
-      if (exp.age >= EXPLOSION_DURATION) {
+      if (this.completedIds.has(exp.id)) {
         state.explosions.splice(i, 1);
+        this.completedIds.delete(exp.id);
         continue;
       }
 
@@ -40,7 +40,6 @@ export class ExplosionManager {
       }
       obj.x = exp.x;
       obj.y = exp.y;
-      obj.alpha = 1 - exp.age / EXPLOSION_DURATION;
     }
 
     for (const [id, obj] of this.displayObjects) {
@@ -57,6 +56,7 @@ export class ExplosionManager {
       g.circle(0, 0, 3);
       g.fill(0xffffff);
       g.scale.set(EXPLOSION_SCALE);
+      this.completedIds.add(exp.id);
       return g;
     }
 
@@ -66,6 +66,9 @@ export class ExplosionManager {
     sprite.scale.set(EXPLOSION_SCALE);
     sprite.animationSpeed = EXPLOSION_ANIMATION_SPEED;
     sprite.loop = false;
+    sprite.onComplete = () => {
+      this.completedIds.add(exp.id);
+    };
     sprite.play();
     return sprite;
   }
@@ -73,6 +76,7 @@ export class ExplosionManager {
   destroy(): void {
     for (const s of this.displayObjects.values()) s.destroy();
     this.displayObjects.clear();
+    this.completedIds.clear();
     this.layer.destroy();
   }
 }
