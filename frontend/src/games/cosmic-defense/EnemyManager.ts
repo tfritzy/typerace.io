@@ -1,8 +1,9 @@
-import { Container, Sprite } from "pixi.js";
+import { Container, Graphics, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState } from "./state";
-import { WavePhase, spawnEntity } from "./state";
+import { WavePhase, spawnEntity, completeWave } from "./state";
 import { Team } from "./types";
+import { drawExpression } from "./expressions";
 
 export class EnemyManager {
   readonly layer: Container;
@@ -45,8 +46,7 @@ export class EnemyManager {
 
     if (wave.phase === WavePhase.Clearing) {
       if (!state.entities.some((e) => e.team === Team.Enemy) && state.projectiles.length === 0) {
-        wave.phase = WavePhase.Idle;
-        state.onWaveComplete.emit();
+        completeWave(state);
       }
     }
 
@@ -58,8 +58,12 @@ export class EnemyManager {
     const shipSprite = new Sprite(shipTexture);
     shipSprite.anchor.set(0.5);
 
+    const expression = new Graphics();
+    drawExpression(expression, Team.Enemy, shipTexture.width, shipTexture.height);
+
     const container = new Container();
     container.addChild(shipSprite);
+    container.addChild(expression);
     container.scale.set(3);
     container.x = entity.x;
     container.y = entity.y;

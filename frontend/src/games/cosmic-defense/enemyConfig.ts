@@ -12,7 +12,7 @@ export interface EnemyConfig {
 }
 
 export function goldForEnemy(config: EnemyConfig): number {
-  return Math.round(Math.pow(config.health, 0.55));
+  return Math.round(Math.pow(config.health, 0.6));
 }
 
 export interface FriendlyConfig {
@@ -27,28 +27,28 @@ export interface FriendlyConfig {
 
 export const ENEMY_CATALOG: EnemyConfig[] = [
   { entityType: "Mite", health: 40, power: 40, firingRange: 400, fireRate: 2.2, projectileSpeed: 170, projectileDamage: 4, projectileType: ProjectileType.Tiny },
-  { entityType: "Speck", health: 50, power: 50, firingRange: 400, fireRate: 2.0, projectileSpeed: 180, projectileDamage: 5, projectileType: ProjectileType.Tiny },
-  { entityType: "Pip", health: 70, power: 70, firingRange: 400, fireRate: 1.8, projectileSpeed: 190, projectileDamage: 7, projectileType: ProjectileType.Tiny },
-  { entityType: "Flea", health: 100, power: 100, firingRange: 420, fireRate: 1.6, projectileSpeed: 200, projectileDamage: 10, projectileType: ProjectileType.Tiny },
-  { entityType: "Needle", health: 130, power: 130, firingRange: 440, fireRate: 1.5, projectileSpeed: 220, projectileDamage: 12, projectileType: ProjectileType.Projectile2 },
-  { entityType: "Bolt", health: 190, power: 190, firingRange: 460, fireRate: 1.4, projectileSpeed: 230, projectileDamage: 15, projectileType: ProjectileType.Projectile2 },
-  { entityType: "Cricket", health: 250, power: 250, firingRange: 480, fireRate: 1.3, projectileSpeed: 240, projectileDamage: 18, projectileType: ProjectileType.Projectile2 },
-  { entityType: "Robin", health: 325, power: 325, firingRange: 500, fireRate: 1.3, projectileSpeed: 240, projectileDamage: 22, projectileType: ProjectileType.Projectile2 },
-  { entityType: "Sparrow", health: 450, power: 450, firingRange: 530, fireRate: 1.2, projectileSpeed: 250, projectileDamage: 28, projectileType: ProjectileType.Projectile3 },
-  { entityType: "Hornet", health: 575, power: 575, firingRange: 550, fireRate: 1.1, projectileSpeed: 260, projectileDamage: 35, projectileType: ProjectileType.Projectile3 },
-  { entityType: "Dart", health: 750, power: 750, firingRange: 580, fireRate: 1.0, projectileSpeed: 280, projectileDamage: 45, projectileType: ProjectileType.Projectile3 },
-  { entityType: "Scout", health: 1000, power: 1000, firingRange: 600, fireRate: 1.0, projectileSpeed: 280, projectileDamage: 55, projectileType: ProjectileType.Projectile3 },
-  { entityType: "Hawk", health: 1500, power: 1500, firingRange: 630, fireRate: 0.9, projectileSpeed: 300, projectileDamage: 70, projectileType: ProjectileType.Projectile4 },
-  { entityType: "Falcon", health: 1700, power: 1700, firingRange: 650, fireRate: 0.9, projectileSpeed: 300, projectileDamage: 85, projectileType: ProjectileType.Projectile4 },
-  { entityType: "Harrier", health: 2250, power: 2250, firingRange: 670, fireRate: 0.8, projectileSpeed: 320, projectileDamage: 100, projectileType: ProjectileType.Projectile4 },
-  { entityType: "Raptor", health: 2950, power: 2950, firingRange: 690, fireRate: 0.8, projectileSpeed: 320, projectileDamage: 120, projectileType: ProjectileType.Projectile4 },
-  { entityType: "Eagle", health: 4450, power: 4450, firingRange: 710, fireRate: 0.7, projectileSpeed: 340, projectileDamage: 150, projectileType: ProjectileType.Projectile5 },
-  { entityType: "Corsair", health: 30000, power: 30000, firingRange: 730, fireRate: 2.5, projectileSpeed: 350, projectileDamage: 500, projectileType: ProjectileType.Projectile5 },
-  { entityType: "Vanguard", health: 39000, power: 39000, firingRange: 750, fireRate: 2.2, projectileSpeed: 360, projectileDamage: 650, projectileType: ProjectileType.Projectile5 },
-  { entityType: "Titan", health: 88500, power: 88500, firingRange: 770, fireRate: 3.0, projectileSpeed: 370, projectileDamage: 1200, projectileType: ProjectileType.Projectile6 },
-  { entityType: "Dreadnought", health: 101000, power: 101000, firingRange: 780, fireRate: 3.0, projectileSpeed: 380, projectileDamage: 1500, projectileType: ProjectileType.Projectile6 },
-  { entityType: "Leviathan", health: 152000, power: 152000, firingRange: 790, fireRate: 3.5, projectileSpeed: 390, projectileDamage: 2000, projectileType: ProjectileType.Projectile6 },
-  { entityType: "Flagship", health: 200000, power: 200000, firingRange: 800, fireRate: 4.0, projectileSpeed: 400, projectileDamage: 3000, projectileType: ProjectileType.Projectile6 },
+  { entityType: "Speck", health: 55, power: 55, firingRange: 400, fireRate: 2.1, projectileSpeed: 180, projectileDamage: 5, projectileType: ProjectileType.Tiny },
+  { entityType: "Pip", health: 70, power: 70, firingRange: 400, fireRate: 2.0, projectileSpeed: 190, projectileDamage: 7, projectileType: ProjectileType.Tiny },
+  { entityType: "Flea", health: 95, power: 95, firingRange: 420, fireRate: 1.9, projectileSpeed: 200, projectileDamage: 9, projectileType: ProjectileType.Tiny },
+  { entityType: "Needle", health: 125, power: 125, firingRange: 440, fireRate: 1.8, projectileSpeed: 210, projectileDamage: 11, projectileType: ProjectileType.Projectile2 },
+  { entityType: "Bolt", health: 170, power: 170, firingRange: 450, fireRate: 1.7, projectileSpeed: 220, projectileDamage: 14, projectileType: ProjectileType.Projectile2 },
+  { entityType: "Cricket", health: 225, power: 225, firingRange: 460, fireRate: 1.6, projectileSpeed: 230, projectileDamage: 18, projectileType: ProjectileType.Projectile2 },
+  { entityType: "Robin", health: 300, power: 300, firingRange: 480, fireRate: 1.5, projectileSpeed: 235, projectileDamage: 22, projectileType: ProjectileType.Projectile2 },
+  { entityType: "Sparrow", health: 400, power: 400, firingRange: 500, fireRate: 1.4, projectileSpeed: 240, projectileDamage: 28, projectileType: ProjectileType.Projectile3 },
+  { entityType: "Hornet", health: 530, power: 530, firingRange: 520, fireRate: 1.3, projectileSpeed: 250, projectileDamage: 35, projectileType: ProjectileType.Projectile3 },
+  { entityType: "Dart", health: 700, power: 700, firingRange: 540, fireRate: 1.2, projectileSpeed: 260, projectileDamage: 42, projectileType: ProjectileType.Projectile3 },
+  { entityType: "Scout", health: 940, power: 940, firingRange: 560, fireRate: 1.1, projectileSpeed: 270, projectileDamage: 52, projectileType: ProjectileType.Projectile3 },
+  { entityType: "Hawk", health: 1250, power: 1250, firingRange: 580, fireRate: 1.0, projectileSpeed: 280, projectileDamage: 62, projectileType: ProjectileType.Projectile4 },
+  { entityType: "Falcon", health: 1675, power: 1675, firingRange: 600, fireRate: 0.95, projectileSpeed: 290, projectileDamage: 80, projectileType: ProjectileType.Projectile4 },
+  { entityType: "Harrier", health: 2225, power: 2225, firingRange: 620, fireRate: 0.9, projectileSpeed: 300, projectileDamage: 100, projectileType: ProjectileType.Projectile4 },
+  { entityType: "Raptor", health: 2950, power: 2950, firingRange: 640, fireRate: 0.85, projectileSpeed: 310, projectileDamage: 125, projectileType: ProjectileType.Projectile4 },
+  { entityType: "Eagle", health: 3925, power: 3925, firingRange: 660, fireRate: 0.8, projectileSpeed: 320, projectileDamage: 155, projectileType: ProjectileType.Projectile5 },
+  { entityType: "Corsair", health: 5225, power: 5225, firingRange: 680, fireRate: 0.8, projectileSpeed: 330, projectileDamage: 190, projectileType: ProjectileType.Projectile5 },
+  { entityType: "Vanguard", health: 6950, power: 6950, firingRange: 700, fireRate: 0.75, projectileSpeed: 340, projectileDamage: 235, projectileType: ProjectileType.Projectile5 },
+  { entityType: "Titan", health: 9250, power: 9250, firingRange: 720, fireRate: 0.7, projectileSpeed: 350, projectileDamage: 290, projectileType: ProjectileType.Projectile6 },
+  { entityType: "Dreadnought", health: 12300, power: 12300, firingRange: 740, fireRate: 0.7, projectileSpeed: 360, projectileDamage: 355, projectileType: ProjectileType.Projectile6 },
+  { entityType: "Leviathan", health: 16350, power: 16350, firingRange: 760, fireRate: 0.65, projectileSpeed: 370, projectileDamage: 430, projectileType: ProjectileType.Projectile6 },
+  { entityType: "Flagship", health: 21750, power: 21750, firingRange: 800, fireRate: 0.6, projectileSpeed: 380, projectileDamage: 530, projectileType: ProjectileType.Projectile6 },
 ];
 
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [

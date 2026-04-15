@@ -6,6 +6,7 @@ import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { Team } from "./types";
 import type { EntityType } from "./types";
+import { drawExpression } from "./expressions";
 
 const BLUEPRINT_MAP = new Map(
   SHIP_BLUEPRINTS.map((bp) => [bp.entityType, bp])
@@ -43,8 +44,12 @@ export class ShipManager {
     const shipSprite = new Sprite(shipTexture);
     shipSprite.anchor.set(0.5);
 
+    const expression = new Graphics();
+    drawExpression(expression, Team.Allied, shipTexture.width, shipTexture.height);
+
     const container = new Container();
     container.addChild(shipSprite);
+    container.addChild(expression);
     container.scale.set(3);
     container.x = entity.x;
     container.y = entity.y;
