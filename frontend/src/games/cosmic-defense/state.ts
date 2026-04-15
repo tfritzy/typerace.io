@@ -133,7 +133,7 @@ export function createGameState(): GameState {
     maxPlanetHealth: 1000,
     gold: 15,
     wave: {
-      wave: 0,
+      wave: 1,
       phase: WavePhase.Idle,
       spawnQueue: [],
       spawnIndex: 0,
@@ -526,7 +526,6 @@ export function generateWaveSpawns(wave: number, catalog: EnemyConfig[]): SpawnE
 }
 
 export function startNextWave(state: GameState): void {
-  state.wave.wave++;
   state.wave.spawnQueue = generateWaveSpawns(state.wave.wave, ENEMY_CATALOG);
   state.wave.spawnIndex = 0;
   state.wave.waveTimer = 0;
@@ -536,6 +535,7 @@ export function startNextWave(state: GameState): void {
 export function completeWave(state: GameState): void {
   const bonus = 10 + state.wave.wave * 5;
   state.gold += bonus;
+  state.wave.wave++;
   state.wave.phase = WavePhase.Idle;
   state.onWaveComplete.emit();
   state.onGoldChanged.emit();
