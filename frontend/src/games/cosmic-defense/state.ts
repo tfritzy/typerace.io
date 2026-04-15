@@ -492,7 +492,7 @@ const WAVE_SPAWN_DURATION = 15;
 
 export function generateWaveSpawns(wave: number, catalog: EnemyConfig[]): SpawnEntry[] {
   const totalPower = Math.round(80 * Math.pow(wave, 1.5));
-  const minCatalogPower = catalog.length > 0 ? catalog[0].power : 10;
+  const minCatalogPower = catalog.length > 0 ? Math.min(...catalog.map(e => e.power)) : 10;
   const maxSinglePower = Math.max(minCatalogPower, Math.floor(totalPower * 0.4));
 
   const eligible = catalog.filter((e) => e.power <= maxSinglePower);
