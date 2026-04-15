@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { startNextWave } from "./state";
+import { formatGold } from "./constants";
 import { PlanetHealthBar } from "./PlanetHealthBar";
 import { ShopPanel } from "./ShopPanel";
 import { PlacementOverlay } from "./PlacementOverlay";
@@ -117,7 +118,7 @@ export const GameCanvas = () => {
       <PlanetHealthBar ratio={healthRatio} />
       <div className="absolute top-3 right-3 z-10 flex items-center gap-3">
         <span className="text-[11px] text-[#f9e2af]">
-          {gold} gold
+          {formatGold(gold)} gold
         </span>
         <span className="text-[11px] text-[#a6adc8]">
           Wave {waveNumber}
