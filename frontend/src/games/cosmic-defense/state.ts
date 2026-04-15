@@ -41,6 +41,13 @@ export interface ProjectileState {
   projectileType: ProjectileType;
 }
 
+export interface ExplosionState {
+  id: number;
+  x: number;
+  y: number;
+  projectileType: ProjectileType;
+}
+
 export enum WavePhase {
   Idle,
   Spawning,
@@ -78,6 +85,7 @@ export class GameEvent {
 export interface GameState {
   entities: EntityState[];
   projectiles: ProjectileState[];
+  explosions: ExplosionState[];
   time: {
     time: number;
     deltaTime: number;
@@ -115,6 +123,7 @@ export function createGameState(): GameState {
   const state: GameState = {
     entities: [],
     projectiles: [],
+    explosions: [],
     time: { time: 0, deltaTime: 0 },
     nextId: 1,
     planetHealth: 1000,
@@ -242,6 +251,12 @@ function checkCollisions(state: GameState): void {
         state.planetHealth = Math.max(0, state.planetHealth - p.damage);
         hit = true;
         damaged = true;
+        state.explosions.push({
+          id: state.nextId++,
+          x: p.x,
+          y: p.y,
+          projectileType: p.projectileType,
+        });
       }
     }
 
@@ -258,6 +273,12 @@ function checkCollisions(state: GameState): void {
             state.entities.splice(j, 1);
           }
           hit = true;
+          state.explosions.push({
+            id: state.nextId++,
+            x: p.x,
+            y: p.y,
+            projectileType: p.projectileType,
+          });
           break;
         }
       }

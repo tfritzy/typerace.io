@@ -5,6 +5,7 @@ import { Background } from "./Background";
 import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
 import { ProjectileManager } from "./ProjectileManager";
+import { ExplosionManager } from "./ExplosionManager";
 import { ShipManager } from "./ShipManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, WavePhase } from "./state";
@@ -21,6 +22,7 @@ export class CosmicDefenseGame {
   private planetManager!: PlanetManager;
   private enemyManager!: EnemyManager;
   private projectileManager!: ProjectileManager;
+  private explosionManager!: ExplosionManager;
   shipManager!: ShipManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
@@ -60,6 +62,9 @@ export class CosmicDefenseGame {
     this.projectileManager = new ProjectileManager(assetManager);
     world.addChild(this.projectileManager.layer);
 
+    this.explosionManager = new ExplosionManager(assetManager);
+    world.addChild(this.explosionManager.layer);
+
     this.enemyManager = new EnemyManager(assetManager);
     world.addChild(this.enemyManager.layer);
   }
@@ -68,6 +73,7 @@ export class CosmicDefenseGame {
     updateState(this.state, dt);
     this.enemyManager.update(this.state, dt);
     this.projectileManager.update(this.state);
+    this.explosionManager.update(this.state);
     this.shipManager.update(this.state);
 
     const waveActive = this.state.wave.phase !== WavePhase.Idle;
@@ -86,6 +92,7 @@ export class CosmicDefenseGame {
     this.planetManager.destroy();
     this.enemyManager.destroy();
     this.projectileManager.destroy();
+    this.explosionManager.destroy();
     this.shipManager.destroy();
     this.app.destroy(true);
   }

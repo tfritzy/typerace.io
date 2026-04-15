@@ -26,6 +26,7 @@ export class AssetManager {
   private spaceshipsShield_: Spritesheet;
   private colorPresets_: Record<string, Texture>;
   private projectileSheets_: Spritesheet[];
+  private explosionSheets_: Spritesheet[];
 
   constructor(loaded: Record<string, unknown>) {
     const presetAliasValues = Object.values(COLOR_PRESET_ALIASES);
@@ -41,6 +42,10 @@ export class AssetManager {
     this.projectileSheets_ = [];
     for (let i = 1; i <= 6; i++) {
       this.projectileSheets_.push(loaded[`projectile-${i}`] as Spritesheet);
+    }
+    this.explosionSheets_ = [];
+    for (let i = 1; i <= 6; i++) {
+      this.explosionSheets_.push(loaded[`explosion-${i}`] as Spritesheet);
     }
 
     this.applyNearestNeighbor();
@@ -80,6 +85,15 @@ export class AssetManager {
     return textures;
   }
 
+  getExplosionTextures(projectileType: ProjectileType): Texture[] {
+    const sheet = this.explosionSheets_[projectileType - 1];
+    const textures: Texture[] = [];
+    for (let i = 0; i < 3; i++) {
+      textures.push(sheet.textures[`exp-${projectileType}-${i}`]);
+    }
+    return textures;
+  }
+
   static async load(manifest: AssetsManifest): Promise<AssetManager> {
     const bundle = manifest.bundles[0];
     Assets.addBundle(bundle.name, bundle.assets);
@@ -115,6 +129,9 @@ export class AssetManager {
       setTextureNearest(tex);
     }
     for (const sheet of this.projectileSheets_) {
+      setNearestNeighbor(sheet);
+    }
+    for (const sheet of this.explosionSheets_) {
       setNearestNeighbor(sheet);
     }
   }
