@@ -1,7 +1,7 @@
 import { Container, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState } from "./state";
-import { WavePhase, spawnEntity } from "./state";
+import { WavePhase, spawnEntity, completeWave } from "./state";
 import { Team } from "./types";
 
 export class EnemyManager {
@@ -45,8 +45,7 @@ export class EnemyManager {
 
     if (wave.phase === WavePhase.Clearing) {
       if (!state.entities.some((e) => e.team === Team.Enemy) && state.projectiles.length === 0) {
-        wave.phase = WavePhase.Idle;
-        state.onWaveComplete.emit();
+        completeWave(state);
       }
     }
 

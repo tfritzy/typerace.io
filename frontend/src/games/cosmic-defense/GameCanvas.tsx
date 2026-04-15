@@ -39,6 +39,7 @@ export const GameCanvas = () => {
         }
         gameRef.current = game;
         setShipPreviews(game.shipPreviews);
+        setGold(game.state.gold);
         unsubDamage = game.state.onPlanetDamaged.subscribe(() => {
           setHealthRatio(game.state.planetHealth / game.state.maxPlanetHealth);
         });

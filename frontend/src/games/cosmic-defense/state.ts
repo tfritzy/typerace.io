@@ -131,7 +131,7 @@ export function createGameState(): GameState {
     nextId: 1,
     planetHealth: 1000,
     maxPlanetHealth: 1000,
-    gold: 0,
+    gold: 15,
     wave: {
       wave: 0,
       phase: WavePhase.Idle,
@@ -530,4 +530,12 @@ export function startNextWave(state: GameState): void {
   state.wave.spawnIndex = 0;
   state.wave.waveTimer = 0;
   state.wave.phase = WavePhase.Spawning;
+}
+
+export function completeWave(state: GameState): void {
+  const bonus = 10 + state.wave.wave * 5;
+  state.gold += bonus;
+  state.wave.phase = WavePhase.Idle;
+  state.onWaveComplete.emit();
+  state.onGoldChanged.emit();
 }
