@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, type ProjectileType, Team } from "./types";
-import { ENEMY_CATALOG, type EnemyConfig, type FriendlyConfig, goldForHealth } from "./enemyConfig";
+import { ENEMY_CATALOG, type EnemyConfig, type FriendlyConfig, goldForEnemy } from "./enemyConfig";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -185,7 +185,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     speed,
     chargesRequired: 0,
     charge: 0,
-    gold: goldForHealth(config.health),
+    gold: goldForEnemy(config),
   };
 
   state.entities.push(entity);
