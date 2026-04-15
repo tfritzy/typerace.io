@@ -131,7 +131,7 @@ export function createGameState(): GameState {
     nextId: 1,
     planetHealth: 1000,
     maxPlanetHealth: 1000,
-    gold: 50,
+    gold: 15,
     wave: {
       wave: 0,
       phase: WavePhase.Idle,
