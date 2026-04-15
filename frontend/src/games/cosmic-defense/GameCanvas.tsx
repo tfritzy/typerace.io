@@ -7,7 +7,7 @@ import { ShopPanel } from "./ShopPanel";
 import { PlacementOverlay } from "./PlacementOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
-import { SHIP_BLUEPRINTS } from "./shipCatalog";
+import { SHIP_BLUEPRINT_MAP } from "./shipCatalog";
 import type { EntityType } from "./types";
 
 export const GameCanvas = () => {
@@ -85,7 +85,7 @@ export const GameCanvas = () => {
     const game = gameRef.current;
     if (!game || !selectedSlot) return;
 
-    const bp = SHIP_BLUEPRINTS.find((b) => b.entityType === entityType);
+    const bp = SHIP_BLUEPRINT_MAP.get(entityType);
     if (!bp || game.state.gold < bp.cost) return;
 
     game.state.gold -= bp.cost;

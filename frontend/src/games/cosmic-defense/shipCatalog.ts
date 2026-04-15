@@ -6,6 +6,8 @@ export interface ShipBlueprint {
   colorPreset: ColorPreset;
 }
 
+export const SHIP_BLUEPRINT_MAP = new Map<string, ShipBlueprint>();
+
 export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   { entityType: "Moth", cost: 25, colorPreset: ColorPreset.Preset1 },
   { entityType: "Dot", cost: 30, colorPreset: ColorPreset.Preset1 },
@@ -23,3 +25,7 @@ export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   { entityType: "Juggernaut", cost: 500, colorPreset: ColorPreset.Preset1 },
   { entityType: "Colossus", cost: 650, colorPreset: ColorPreset.Preset1 },
 ];
+
+for (const bp of SHIP_BLUEPRINTS) {
+  SHIP_BLUEPRINT_MAP.set(bp.entityType, bp);
+}
