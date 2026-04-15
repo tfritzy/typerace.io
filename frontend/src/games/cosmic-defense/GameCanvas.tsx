@@ -90,7 +90,6 @@ export const GameCanvas = () => {
 
     game.state.gold -= bp.cost;
     game.state.onGoldChanged.emit();
-    setGold(game.state.gold);
 
     game.shipManager.addShip(game.state, entityType, selectedSlot.x, selectedSlot.y);
 

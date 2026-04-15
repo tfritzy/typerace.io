@@ -278,10 +278,8 @@ function checkCollisions(state: GameState): void {
         if (dx * dx + dy * dy < entityHr2) {
           e.health -= p.damage;
           if (e.health <= 0) {
-            if (e.gold > 0) {
-              state.gold += e.gold;
-              goldGained = true;
-            }
+            state.gold += e.gold;
+            goldGained = true;
             state.entities.splice(j, 1);
           }
           hit = true;
