@@ -107,7 +107,7 @@ export async function createCosmicDefenseGame(
     width: CANVAS_WIDTH,
     height: CANVAS_HEIGHT,
     background: 0x0a0a1a,
-    antialias: false,
+    antialias: true,
     resolution,
     autoDensity: true,
     roundPixels: true,
@@ -117,7 +117,7 @@ export async function createCosmicDefenseGame(
   app.canvas.style.width = "100%";
   app.canvas.style.height = "auto";
   app.canvas.style.aspectRatio = "16/9";
-  app.canvas.style.imageRendering = "pixelated";
+
   container.appendChild(app.canvas);
 
   const game = new CosmicDefenseGame(app);
