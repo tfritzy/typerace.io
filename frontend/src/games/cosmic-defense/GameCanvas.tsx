@@ -14,9 +14,8 @@ export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
   const [healthRatio, setHealthRatio] = useState(1);
-  const [waveNumber, setWaveNumber] = useState(1);
+  const [waveNumber, setWaveNumber] = useState(0);
   const [waveActive, setWaveActive] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
   const [gold, setGold] = useState(0);
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
@@ -76,7 +75,6 @@ export const GameCanvas = () => {
       startNextWave(game.state);
       setWaveNumber(game.state.wave.wave);
       setWaveActive(true);
-      setHasStarted(true);
     }
   }, []);
 
@@ -122,14 +120,14 @@ export const GameCanvas = () => {
           {gold} gold
         </span>
         <span className="text-[11px] text-[#a6adc8]">
-          Wave {waveNumber}
+          Wave {waveNumber + 1}
         </span>
         {!waveActive && (
           <button
             onClick={handleNextWave}
             className="text-[11px] bg-green-400/85 text-[#0a0a1a] px-2.5 py-1 rounded cursor-pointer hover:brightness-125"
           >
-            {!hasStarted ? "Start" : "Next wave"}
+            {waveNumber === 0 ? "Start" : "Next wave"}
           </button>
         )}
       </div>
