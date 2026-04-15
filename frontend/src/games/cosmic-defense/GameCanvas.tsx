@@ -7,6 +7,7 @@ import { ShopPanel } from "./ShopPanel";
 import { PlacementOverlay } from "./PlacementOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
+import { SHIP_BLUEPRINT_MAP } from "./shipCatalog";
 import type { EntityType } from "./types";
 
 export const GameCanvas = () => {
@@ -15,6 +16,7 @@ export const GameCanvas = () => {
   const [healthRatio, setHealthRatio] = useState(1);
   const [waveNumber, setWaveNumber] = useState(0);
   const [waveActive, setWaveActive] = useState(false);
+  const [gold, setGold] = useState(0);
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
   const [slots, setSlots] = useState<PlacementSlot[]>(() => generateSlots());
@@ -27,6 +29,7 @@ export const GameCanvas = () => {
     let unsubDamage: (() => void) | null = null;
     let unsubWaveComplete: (() => void) | null = null;
     let unsubWaveActive: (() => void) | null = null;
+    let unsubGold: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -46,6 +49,9 @@ export const GameCanvas = () => {
         unsubWaveActive = game.state.onWaveActiveChanged.subscribe(() => {
           setWaveActive(game.state.waveActive);
         });
+        unsubGold = game.state.onGoldChanged.subscribe(() => {
+          setGold(game.state.gold);
+        });
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -56,6 +62,7 @@ export const GameCanvas = () => {
       unsubDamage?.();
       unsubWaveComplete?.();
       unsubWaveActive?.();
+      unsubGold?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -77,6 +84,12 @@ export const GameCanvas = () => {
   const handleSelectShip = useCallback((entityType: EntityType) => {
     const game = gameRef.current;
     if (!game || !selectedSlot) return;
+
+    const bp = SHIP_BLUEPRINT_MAP.get(entityType);
+    if (!bp || game.state.gold < bp.cost) return;
+
+    game.state.gold -= bp.cost;
+    game.state.onGoldChanged.emit();
 
     game.shipManager.addShip(game.state, entityType, selectedSlot.x, selectedSlot.y);
 
@@ -102,6 +115,9 @@ export const GameCanvas = () => {
     >
       <PlanetHealthBar ratio={healthRatio} />
       <div className="absolute top-3 right-3 z-10 flex items-center gap-3">
+        <span className="text-[11px] text-[#f9e2af]">
+          {gold} gold
+        </span>
         <span className="text-[11px] text-[#a6adc8]">
           Wave {waveNumber}
         </span>
@@ -122,6 +138,7 @@ export const GameCanvas = () => {
           onSelectShip={handleSelectShip}
           onClose={handleCloseShop}
           shipPreviews={shipPreviews}
+          gold={gold}
         />
       )}
       <PhraseOverlay gameRef={gameRef} visible={waveActive} />

@@ -11,6 +11,10 @@ export interface EnemyConfig {
   projectileType: ProjectileType;
 }
 
+export function goldForEnemy(config: EnemyConfig): number {
+  return Math.round(Math.pow(config.health, 0.55));
+}
+
 export interface FriendlyConfig {
   entityType: EntityType;
   health: number;
