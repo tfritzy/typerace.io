@@ -1,4 +1,5 @@
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
+import { formatGold } from "./constants";
 import type { EntityType } from "./types";
 
 interface ShopPanelProps {
@@ -24,7 +25,7 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold }: ShopPan
             Defensive Fleet
           </span>
           <span className="text-[#f9e2af] text-xs font-medium">
-            {gold} gold
+            {formatGold(gold)} gold
           </span>
           <button
             onClick={onClose}
@@ -63,7 +64,7 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold }: ShopPan
                   {bp.entityType}
                 </span>
                 <span className={`text-[9px] font-medium ${canAfford ? "text-[#f9e2af]" : "text-[#585b70]"}`}>
-                  {bp.cost} gold
+                  {formatGold(bp.cost)} gold
                 </span>
               </button>
             );
