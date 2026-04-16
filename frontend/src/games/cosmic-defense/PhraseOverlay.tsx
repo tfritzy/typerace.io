@@ -121,13 +121,13 @@ export const PhraseOverlay = ({
         ref={trackRef}
         className="inline-block whitespace-nowrap transition-transform duration-[80ms] ease-out"
       >
-        <span className="text-[#90ee90]">
+        <span className="text-text-completed">
           {phrase.slice(0, typedCount)}
         </span>
-        <span ref={cursorCharRef} className="text-white shadow-[-1px_0_0_0_#4a5568]">
+        <span ref={cursorCharRef} className="text-foreground shadow-[-1px_0_0_0_#4a5568]">
           {typedCount < phrase.length ? phrase[typedCount] : ""}
         </span>
-        <span className="text-white">
+        <span className="text-text-untyped">
           {phrase.slice(typedCount + 1)}
         </span>
       </div>
