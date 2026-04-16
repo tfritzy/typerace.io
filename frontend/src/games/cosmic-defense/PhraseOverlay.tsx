@@ -107,8 +107,7 @@ export const PhraseOverlay = ({
     <div
       ref={boxRef}
       onClick={() => inputRef.current?.focus()}
-      className="absolute bottom-5 left-1/2 -translate-x-1/2 w-80 text-sm leading-[2.4] h-[2.4em] overflow-hidden px-5 border-2 border-[#4a5568] z-10 whitespace-nowrap"
-      style={{ background: "rgba(10, 10, 26, 0.9)" }}
+      className="absolute bottom-5 left-1/2 -translate-x-1/2 w-80 text-[32px] font-light tracking-wide leading-[2.4] h-[2.4em] overflow-hidden px-5 z-10 whitespace-nowrap"
     >
       <input
         ref={inputRef}

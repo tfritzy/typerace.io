@@ -1,5 +1,5 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
-import { type EntityType, ColorPreset, type ProjectileType, Team } from "./types";
+import { type EntityType, ColorPreset, ProjectileType, Team } from "./types";
 import { ENEMY_CATALOG, type EnemyConfig, type FriendlyConfig, goldForEnemy } from "./enemyConfig";
 
 export const PLANET_X = 200;
@@ -18,7 +18,6 @@ export interface EntityState {
   power: number;
   colorPreset: ColorPreset;
   team: Team;
-  firingRange: number;
   fireRate: number;
   projectileSpeed: number;
   projectileDamage: number;
@@ -175,7 +174,6 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     power: config.power,
     colorPreset: ColorPreset.Preset4,
     team,
-    firingRange: config.firingRange,
     fireRate: config.fireRate,
     projectileSpeed: config.projectileSpeed,
     projectileDamage: config.projectileDamage,
@@ -209,7 +207,6 @@ export function spawnAlliedEntity(
     power: 0,
     colorPreset,
     team: Team.Allied,
-    firingRange: config.firingRange,
     fireRate: 0,
     projectileSpeed: config.projectileSpeed,
     projectileDamage: config.projectileDamage,
@@ -259,12 +256,14 @@ function checkCollisions(state: GameState): void {
         state.planetHealth = Math.max(0, state.planetHealth - p.damage);
         hit = true;
         damaged = true;
-        state.explosions.push({
-          id: state.nextId++,
-          x: p.x,
-          y: p.y,
-          projectileType: p.projectileType,
-        });
+        if (p.projectileType !== ProjectileType.Tiny) {
+          state.explosions.push({
+            id: state.nextId++,
+            x: p.x,
+            y: p.y,
+            projectileType: p.projectileType,
+          });
+        }
       }
     }
 
@@ -283,12 +282,14 @@ function checkCollisions(state: GameState): void {
             state.entities.splice(j, 1);
           }
           hit = true;
-          state.explosions.push({
-            id: state.nextId++,
-            x: p.x,
-            y: p.y,
-            projectileType: p.projectileType,
-          });
+          if (p.projectileType !== ProjectileType.Tiny) {
+            state.explosions.push({
+              id: state.nextId++,
+              x: p.x,
+              y: p.y,
+              projectileType: p.projectileType,
+            });
+          }
           break;
         }
       }
@@ -390,48 +391,39 @@ export function updateState(state: GameState, dt: number): void {
   state.time.time += dt;
 
   for (const e of state.entities) {
-    const target =
-      e.firingRange > 0 ? findNearestTarget(state, e) : null;
-    let inRange = false;
+    const target = findNearestTarget(state, e);
 
     if (target) {
-      const dx = e.x - target.x;
-      const dy = e.y - target.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      inRange = dist <= e.firingRange;
-
-      if (inRange) {
+      if (e.speed > 0) {
         e.vx = 0;
         e.vy = 0;
-        e.rotation = Math.atan2(target.y - e.y, target.x - e.x);
+      }
+      e.rotation = Math.atan2(target.y - e.y, target.x - e.x);
 
-        if (e.chargesRequired <= 0) {
-          e.fireTimer -= dt;
-          if (e.fireTimer <= 0) {
-            e.fireTimer += e.fireRate;
+      if (e.chargesRequired <= 0) {
+        e.fireTimer -= dt;
+        if (e.fireTimer <= 0) {
+          e.fireTimer += e.fireRate;
 
-            const angle = computeLeadAngle(
-              e.x, e.y,
-              target.x, target.y,
-              target.vx, target.vy,
-              e.projectileSpeed
-            );
-            state.projectiles.push({
-              id: state.nextId++,
-              x: e.x,
-              y: e.y,
-              vx: Math.cos(angle) * e.projectileSpeed,
-              vy: Math.sin(angle) * e.projectileSpeed,
-              damage: e.projectileDamage,
-              team: e.team,
-              projectileType: e.projectileType,
-            });
-          }
+          const angle = computeLeadAngle(
+            e.x, e.y,
+            target.x, target.y,
+            target.vx, target.vy,
+            e.projectileSpeed
+          );
+          state.projectiles.push({
+            id: state.nextId++,
+            x: e.x,
+            y: e.y,
+            vx: Math.cos(angle) * e.projectileSpeed,
+            vy: Math.sin(angle) * e.projectileSpeed,
+            damage: e.projectileDamage,
+            team: e.team,
+            projectileType: e.projectileType,
+          });
         }
       }
-    }
-
-    if (!inRange && e.speed > 0) {
+    } else if (e.speed > 0) {
       e.vx = -e.speed;
       e.vy = 0;
       e.x += e.vx * dt;
@@ -453,11 +445,6 @@ function tryFireEntity(state: GameState, e: EntityState): void {
 
   const target = findNearestTarget(state, e);
   if (!target) return;
-
-  const dx = e.x - target.x;
-  const dy = e.y - target.y;
-  const dist = Math.sqrt(dx * dx + dy * dy);
-  if (dist > e.firingRange) return;
 
   e.charge = 0;
 

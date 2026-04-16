@@ -1,6 +1,7 @@
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { formatGold } from "./constants";
 import type { EntityType } from "./types";
+import { Coins } from "lucide-react";
 
 interface ShopPanelProps {
   onSelectShip: (entityType: EntityType) => void;
@@ -24,8 +25,9 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold }: ShopPan
           <span className="text-[#cdd6f4] text-sm font-semibold tracking-wide">
             Defensive Fleet
           </span>
-          <span className="text-[#f9e2af] text-xs font-medium">
-            {formatGold(gold)} gold
+          <span className="text-[#f9e2af] text-xs font-medium flex items-center gap-1">
+            <Coins className="w-3.5 h-3.5" />
+            {formatGold(gold)}
           </span>
           <button
             onClick={onClose}
@@ -63,8 +65,9 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold }: ShopPan
                 <span className={`text-[10px] font-medium mb-0.5 text-center ${canAfford ? "text-[#bac2de]" : "text-[#585b70]"}`}>
                   {bp.entityType}
                 </span>
-                <span className={`text-[9px] font-medium ${canAfford ? "text-[#f9e2af]" : "text-[#585b70]"}`}>
-                  {formatGold(bp.cost)} gold
+                <span className={`text-[9px] font-medium flex items-center gap-0.5 ${canAfford ? "text-[#f9e2af]" : "text-[#585b70]"}`}>
+                  <Coins className="w-2.5 h-2.5" />
+                  {formatGold(bp.cost)}
                 </span>
               </button>
             );

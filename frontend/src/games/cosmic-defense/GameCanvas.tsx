@@ -10,6 +10,7 @@ import { PhraseOverlay } from "./PhraseOverlay";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import { SHIP_BLUEPRINT_MAP } from "./shipCatalog";
 import type { EntityType } from "./types";
+import { Coins } from "lucide-react";
 
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -117,8 +118,9 @@ export const GameCanvas = () => {
     >
       <PlanetHealthBar ratio={healthRatio} />
       <div className="absolute top-3 right-3 z-10 flex items-center gap-3">
-        <span className="text-[11px] text-[#f9e2af]">
-          {formatGold(gold)} gold
+        <span className="text-[11px] text-[#f9e2af] flex items-center gap-1">
+          <Coins className="w-3.5 h-3.5" />
+          {formatGold(gold)}
         </span>
         <span className="text-[11px] text-[#a6adc8]">
           Wave {waveNumber + 1}
