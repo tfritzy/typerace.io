@@ -28,6 +28,7 @@ export interface EntityState {
   chargesRequired: number;
   charge: number;
   gold: number;
+  range: number;
 }
 
 export interface ProjectileState {
@@ -184,6 +185,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     chargesRequired: 0,
     charge: 0,
     gold: goldForEnemy(config),
+    range: config.range,
   };
 
   state.entities.push(entity);
@@ -217,6 +219,7 @@ export function spawnAlliedEntity(
     chargesRequired: config.chargesRequired,
     charge: 0,
     gold: 0,
+    range: 0,
   };
 
   state.entities.push(entity);
@@ -394,34 +397,47 @@ export function updateState(state: GameState, dt: number): void {
     const target = findNearestTarget(state, e);
 
     if (target) {
-      if (e.speed > 0) {
-        e.vx = 0;
-        e.vy = 0;
-      }
-      e.rotation = Math.atan2(target.y - e.y, target.x - e.x);
+      const dx = target.x - e.x;
+      const dy = target.y - e.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const inRange = e.range <= 0 || dist <= e.range;
 
-      if (e.chargesRequired <= 0) {
-        e.fireTimer -= dt;
-        if (e.fireTimer <= 0) {
-          e.fireTimer += e.fireRate;
-
-          const angle = computeLeadAngle(
-            e.x, e.y,
-            target.x, target.y,
-            target.vx, target.vy,
-            e.projectileSpeed
-          );
-          state.projectiles.push({
-            id: state.nextId++,
-            x: e.x,
-            y: e.y,
-            vx: Math.cos(angle) * e.projectileSpeed,
-            vy: Math.sin(angle) * e.projectileSpeed,
-            damage: e.projectileDamage,
-            team: e.team,
-            projectileType: e.projectileType,
-          });
+      if (inRange) {
+        if (e.speed > 0) {
+          e.vx = 0;
+          e.vy = 0;
         }
+        e.rotation = Math.atan2(dy, dx);
+
+        if (e.chargesRequired <= 0) {
+          e.fireTimer -= dt;
+          if (e.fireTimer <= 0) {
+            e.fireTimer += e.fireRate;
+
+            const angle = computeLeadAngle(
+              e.x, e.y,
+              target.x, target.y,
+              target.vx, target.vy,
+              e.projectileSpeed
+            );
+            state.projectiles.push({
+              id: state.nextId++,
+              x: e.x,
+              y: e.y,
+              vx: Math.cos(angle) * e.projectileSpeed,
+              vy: Math.sin(angle) * e.projectileSpeed,
+              damage: e.projectileDamage,
+              team: e.team,
+              projectileType: e.projectileType,
+            });
+          }
+        }
+      } else if (e.speed > 0) {
+        e.vx = -e.speed;
+        e.vy = 0;
+        e.x += e.vx * dt;
+        e.y += e.vy * dt;
+        e.rotation = Math.atan2(dy, dx);
       }
     } else if (e.speed > 0) {
       e.vx = -e.speed;
