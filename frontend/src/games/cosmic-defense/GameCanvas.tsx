@@ -121,7 +121,7 @@ export const GameCanvas = () => {
           {formatGold(gold)} gold
         </span>
         <span className="text-[11px] text-[#a6adc8]">
-          Wave {waveNumber}
+          Wave {waveNumber + 1}
         </span>
         {!waveActive && (
           <button
