@@ -27,8 +27,7 @@ export const PhraseOverlay = ({
   visible: boolean;
 }) => {
   const [phrase, setPhrase] = useState(() => generatePhrase(PHRASE_BUFFER_SIZE));
-  const [typedCount, setTypedCount] = useState(0);
-  const [incorrectChar, setIncorrectChar] = useState<string | null>(null);
+  const [typedText, setTypedText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -36,11 +35,9 @@ export const PhraseOverlay = ({
   const offsetRef = useRef(0);
 
   const phraseRef = useRef(phrase);
-  const typedCountRef = useRef(typedCount);
-  const incorrectCharRef = useRef(incorrectChar);
+  const typedTextRef = useRef(typedText);
   phraseRef.current = phrase;
-  typedCountRef.current = typedCount;
-  incorrectCharRef.current = incorrectChar;
+  typedTextRef.current = typedText;
 
   useEffect(() => {
     if (!visible) return;
@@ -51,34 +48,28 @@ export const PhraseOverlay = ({
       if (e.ctrlKey || e.altKey || e.metaKey) return;
       if (e.key === "Backspace") {
         e.preventDefault();
-        if (incorrectCharRef.current !== null) {
-          setIncorrectChar(null);
-          if (inputRef.current) inputRef.current.value = "";
-        }
         return;
       }
       if (e.key.length !== 1) return;
       e.preventDefault();
 
       const text = phraseRef.current;
-      const tc = typedCountRef.current;
+      const tc = typedTextRef.current.length;
+      if (tc >= text.length) return;
       const normalizedKey = e.key.toLowerCase();
       const correct = tc < text.length && normalizedKey === text[tc].toLowerCase();
+      const newTypedText = typedTextRef.current + e.key;
 
       if (correct) {
-        const newTc = tc + 1;
         game.onCorrectKeystroke();
-        setIncorrectChar(null);
-        setTypedCount(newTc);
-        if (inputRef.current) inputRef.current.value = "";
+      }
 
-        if (newTc > PHRASE_BUFFER_SIZE && text.length - newTc < PHRASE_BUFFER_SIZE) {
-          const extra = generatePhrase(PHRASE_BUFFER_SIZE);
-          setPhrase(text + " " + extra);
-        }
-      } else {
-        setIncorrectChar(e.key);
-        if (inputRef.current) inputRef.current.value = "";
+      setTypedText(newTypedText);
+      if (inputRef.current) inputRef.current.value = "";
+
+      if (newTypedText.length > PHRASE_BUFFER_SIZE && text.length - newTypedText.length < PHRASE_BUFFER_SIZE) {
+        const extra = generatePhrase(PHRASE_BUFFER_SIZE);
+        setPhrase(text + " " + extra);
       }
     };
 
@@ -89,8 +80,7 @@ export const PhraseOverlay = ({
   useEffect(() => {
     if (visible) {
       setPhrase(generatePhrase(PHRASE_BUFFER_SIZE));
-      setTypedCount(0);
-      setIncorrectChar(null);
+      setTypedText("");
     }
   }, [visible]);
 
@@ -102,7 +92,7 @@ export const PhraseOverlay = ({
     const charEl = cursorCharRef.current;
     if (!box || !track || !charEl) return;
 
-    if (typedCount === 0) {
+    if (typedText.length === 0) {
       offsetRef.current = 0;
     }
 
@@ -116,12 +106,13 @@ export const PhraseOverlay = ({
 
     offsetRef.current = newOffset;
     track.style.transform = `translateX(${newOffset}px)`;
-  }, [typedCount, phrase, visible]);
+  }, [phrase, typedText.length, visible]);
 
   if (!visible) return null;
 
   let lastCompletedWordEnd = 0;
-  for (let i = 0; i < typedCount; i++) {
+  for (let i = 0; i < typedText.length && i < phrase.length; i++) {
+    if (typedText[i] !== phrase[i]) break;
     if (phrase[i] === " ") lastCompletedWordEnd = i + 1;
   }
 
@@ -143,21 +134,33 @@ export const PhraseOverlay = ({
         ref={trackRef}
         className="inline-block whitespace-nowrap transition-transform duration-[80ms] ease-out"
       >
-        <span className="text-text-completed">
-          {phrase.slice(0, lastCompletedWordEnd)}
-        </span>
-        <span className="text-foreground">
-          {phrase.slice(lastCompletedWordEnd, typedCount)}
-        </span>
-        <span
-          ref={cursorCharRef}
-          className={`${incorrectChar ? "text-destructive underline decoration-2 decoration-destructive" : "text-text-untyped"} shadow-[-1px_0_0_0_#4a5568]`}
-        >
-          {incorrectChar ?? (typedCount < phrase.length ? phrase[typedCount] : "")}
-        </span>
-        <span className="text-text-untyped">
-          {phrase.slice(typedCount + (incorrectChar ? 0 : 1))}
-        </span>
+        {phrase.split("").map((char, i) => {
+          const isTyped = i < typedText.length;
+          const isCorrect = typedText[i] === char;
+          const isCursor = i === typedText.length;
+          const isInCompletedWord = i < lastCompletedWordEnd;
+          const isInCurrentWord =
+            i >= lastCompletedWordEnd && i < typedText.length && isCorrect;
+
+          let colorClass = "text-text-untyped";
+          if (isTyped && !isCorrect) {
+            colorClass = "text-destructive";
+          } else if (isInCompletedWord) {
+            colorClass = "text-text-completed";
+          } else if (isInCurrentWord) {
+            colorClass = "text-foreground";
+          }
+
+          return (
+            <span
+              key={i}
+              ref={isCursor ? cursorCharRef : null}
+              className={`${colorClass} ${isTyped && !isCorrect ? "underline decoration-2 decoration-destructive" : ""} ${isCursor ? "shadow-[-1px_0_0_0_#4a5568]" : ""}`}
+            >
+              {char}
+            </span>
+          );
+        })}
       </div>
     </div>
   );

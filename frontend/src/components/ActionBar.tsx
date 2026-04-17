@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import type { DbConnection } from "../module_bindings";
+import type { DbConnection } from "../../module_bindings";
 import { type GameMode } from "../types/stdb";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { useFindGame } from "../hooks/useFindGame";

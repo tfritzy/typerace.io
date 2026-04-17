@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
-import { DbConnection } from '../module_bindings';
+import { DbConnection } from '../../module_bindings';
 import { useAuth } from '../firebase/AuthContext';
 import { LoadingDots } from '../components/LoadingDots';
 

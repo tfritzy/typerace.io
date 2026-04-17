@@ -10,4 +10,4 @@ export type {
   Player,
   PlayerProgress,
   XpGain,
-} from "../module_bindings";
+} from "../../module_bindings";
