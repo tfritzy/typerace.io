@@ -46,7 +46,7 @@ export class EnemyManager {
     }
 
     if (wave.phase === WavePhase.Clearing) {
-      if (!state.entities.some((e) => e.team === Team.Enemy) && state.projectiles.length === 0) {
+      if (!state.entities.some((e) => e.team === Team.Enemy)) {
         completeWave(state);
       }
     }
