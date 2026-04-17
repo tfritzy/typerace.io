@@ -14,7 +14,6 @@ import { getMaxPlayerCount } from "../utils/modes";
 import { GhostCursor } from "../components/GhostCursor";
 import { getPlayerColorHex } from "../utils/colorMapping";
 import { getTranslations } from "../utils/translations";
-import { GameState } from "../../module_bindings";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -164,7 +163,7 @@ export const GamePage = () => {
   }, [conn, game, gamePlayerProgress]);
 
   useEffect(() => {
-    if (game?.state == GameState.Archived) {
+    if (game?.state?.tag === "Archived") {
       setHasFinished(true);
     }
   }, [game]);
