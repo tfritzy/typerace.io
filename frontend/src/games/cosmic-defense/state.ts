@@ -24,6 +24,7 @@ export interface EntityState {
   projectileType: ProjectileType;
   fireTimer: number;
   rotation: number;
+  displayRotation: number;
   speed: number;
   chargesRequired: number;
   charge: number;
@@ -181,6 +182,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     projectileType: config.projectileType,
     fireTimer: Math.random() * config.fireRate,
     rotation: Math.PI,
+    displayRotation: Math.PI,
     speed,
     chargesRequired: 0,
     charge: 0,
@@ -215,6 +217,7 @@ export function spawnAlliedEntity(
     projectileType: config.projectileType,
     fireTimer: 0,
     rotation: 0,
+    displayRotation: 0,
     speed: 0,
     chargesRequired: config.chargesRequired,
     charge: 0,

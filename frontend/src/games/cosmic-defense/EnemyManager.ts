@@ -3,6 +3,8 @@ import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState } from "./state";
 import { WavePhase, spawnEntity, completeWave } from "./state";
 import { Team } from "./types";
+import { SHIP_TURN_SPEED } from "./constants";
+import { approachAngle } from "./utils";
 
 export class EnemyManager {
   readonly layer: Container;
@@ -49,7 +51,7 @@ export class EnemyManager {
       }
     }
 
-    this.syncRendering(state);
+    this.syncRendering(state, dt);
   }
 
   private createDisplayObject(entity: EntityState): Container {
@@ -66,8 +68,9 @@ export class EnemyManager {
     return container;
   }
 
-  private syncRendering(state: GameState): void {
+  private syncRendering(state: GameState, dt: number): void {
     this.activeEntityIds.clear();
+    const maxStep = SHIP_TURN_SPEED * dt;
 
     for (const entity of state.entities) {
       if (entity.team !== Team.Enemy) continue;
@@ -80,7 +83,8 @@ export class EnemyManager {
       }
       display.x = entity.x;
       display.y = entity.y;
-      display.rotation = entity.rotation;
+      entity.displayRotation = approachAngle(entity.displayRotation, entity.rotation, maxStep);
+      display.rotation = entity.displayRotation;
     }
 
     for (const [id, display] of this.entityDisplayObjects) {

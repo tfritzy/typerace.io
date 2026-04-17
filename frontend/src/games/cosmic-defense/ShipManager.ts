@@ -6,6 +6,8 @@ import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { Team } from "./types";
 import type { EntityType } from "./types";
+import { SHIP_TURN_SPEED } from "./constants";
+import { approachAngle } from "./utils";
 
 const BLUEPRINT_MAP = new Map(
   SHIP_BLUEPRINTS.map((bp) => [bp.entityType, bp])
@@ -34,8 +36,8 @@ export class ShipManager {
     spawnAlliedEntity(state, config, bp?.colorPreset ?? 0, x, y);
   }
 
-  update(state: GameState): void {
-    this.syncRendering(state);
+  update(state: GameState, dt: number): void {
+    this.syncRendering(state, dt);
   }
 
   private createDisplayObject(entity: EntityState): Container {
@@ -83,8 +85,9 @@ export class ShipManager {
     }
   }
 
-  private syncRendering(state: GameState): void {
+  private syncRendering(state: GameState, dt: number): void {
     this.activeEntityIds.clear();
+    const maxStep = SHIP_TURN_SPEED * dt;
 
     for (const entity of state.entities) {
       if (entity.team !== Team.Allied) continue;
@@ -97,7 +100,8 @@ export class ShipManager {
       }
       display.x = entity.x;
       display.y = entity.y;
-      display.rotation = entity.rotation;
+      entity.displayRotation = approachAngle(entity.displayRotation, entity.rotation, maxStep);
+      display.rotation = entity.displayRotation;
 
       this.drawChargeDots(entity);
     }
