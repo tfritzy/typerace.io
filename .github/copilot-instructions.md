@@ -18,7 +18,7 @@ This is the single most important rule in this entire file. All other rules are 
 
 **CRITICAL: You MUST verify your screenshot before submitting.** After taking it, confirm you can see the actual rendered UI of the page you are working on. The screenshot must show the specific page your changes affect — fully loaded with real content visible. Not a loading spinner, not a blank page, not an error screen. If the page is not the one you changed, your screenshot is irrelevant. If the page is not fully rendered, your screenshot is invalid.
 
-If the page is not fully loaded, your screenshot is INVALID. Do NOT submit it. Fix the environment and retake it. A loading screen or spinner means something is broken — debug and fix the issue before screenshotting. Common fixes: create module_bindings stub, remove references to missing asset files, fix TypeScript errors. DO NOT CONVINCE YOURSELF THAT A PARTIAL SCREENSHOT IS ACCEPTABLE. IT IS NOT.
+If the page is not fully loaded, your screenshot is INVALID. Do NOT submit it. Fix the environment and retake it. A loading screen or spinner means something is broken — debug and fix the issue before screenshotting. Common fixes: regenerate checked-in module_bindings, remove references to missing asset files, fix TypeScript errors. DO NOT CONVINCE YOURSELF THAT A PARTIAL SCREENSHOT IS ACCEPTABLE. IT IS NOT.
 
 **ASK YOURSELF: "Can I see the page I changed, fully rendered with real content?" If the answer is no, YOUR SCREENSHOT IS INVALID. Take it again.**
 
@@ -29,13 +29,13 @@ Mandatory steps — execute all of them, every time, no shortcuts, no skipping, 
 cd frontend && npm install
 ```
 
-### Step 2: Generate local module_bindings with the repo's SpacetimeDB version (if directory doesn't exist)
-The `frontend/module_bindings/` directory is gitignored and won't exist in a fresh clone. Do NOT create a tracked bindings file, do NOT hand-write a stub for committed code, and do NOT change tracked imports or types to work around missing generated bindings. After `cd frontend && npm install`, use the frontend dependency lockfile as the compatibility source of truth: `frontend/package-lock.json` currently resolves `spacetimedb` to `1.12.0` even though `frontend/package.json` has the broader range `^1.10.0`. Generate bindings locally into `frontend/module_bindings/` with a compatible `spacetime` CLI version (1.12.x). If your local CLI version does not match that compatibility target, update the CLI before generating bindings.
+### Step 2: Regenerate checked-in module_bindings with the repo's SpacetimeDB version when needed
+The `frontend/module_bindings/` directory is checked into the repository and should contain real generated bindings, not a handwritten stub. Do NOT create a fake bindings file, and do NOT change tracked imports or types to work around stale or missing generated bindings. After `cd frontend && npm install`, use the frontend dependency lockfile as the compatibility source of truth: `frontend/package-lock.json` currently resolves `spacetimedb` to `1.12.0` even though `frontend/package.json` has the broader range `^1.10.0`. Generate bindings into `frontend/module_bindings/` with a compatible `spacetime` CLI version (1.12.x), then commit the regenerated files if they changed.
 
 ### Step 3: Fix ALL build errors
 Run `cd frontend && npx tsc -b` and fix every error. Common issues:
 - Missing asset files referenced in `manifest.ts` or `assetManager.ts` — remove the broken references
-- Missing `module_bindings` imports usually mean the local generated bindings are absent or stale — regenerate them with the compatible SpacetimeDB version instead of editing tracked source files
+- Missing `module_bindings` imports usually mean the checked-in generated bindings are absent or stale — regenerate them with the compatible SpacetimeDB version instead of editing tracked source files
 - Any other TypeScript errors — fix them before proceeding
 **DO NOT proceed to the next step until `tsc -b` passes with zero errors.**
 
@@ -63,7 +63,7 @@ Every PR description MUST contain a screenshot image. Use the GitHub asset URL f
 ### Troubleshooting
 - **Playwright ERR_CONNECTION_REFUSED**: The Vite server died. Restart it in a sync shell with sufficient `initial_wait`.
 - **Game canvas doesn't render / PixiJS crash**: Check for missing asset files. Run `ls frontend/public/elv_item_icons/` and compare against `manifest.ts`. Remove any references to files that don't exist.
-- **Module import errors**: Your module_bindings stub is incomplete. Check all `import ... from "../../module_bindings"` statements and add missing exports.
+- **Module import errors**: The checked-in generated bindings are missing or stale. Regenerate `frontend/module_bindings/` with the compatible SpacetimeDB version and commit the result.
 - **WebGL warnings**: These are normal in headless environments and don't prevent screenshots.
 
 **DO NOT STOP until you have a real screenshot from the live app.** Static HTML mocks, blank pages, loading spinners, or connection-error screens are NOT acceptable. Keep retrying until you succeed. If something is broken, FIX IT and commit the fix. YOU ARE NOT DONE UNTIL THE SCREENSHOT IS IN THE PR.
@@ -179,9 +179,9 @@ Always check the table definition for available indexes before writing queries.
 ### Local dev commands
 
 Generate bindings with a compatible `spacetime` CLI version:
-Use the frontend lockfile's resolved SpacetimeDB version as the compatibility target first. Right now `frontend/package-lock.json` resolves the frontend package to `spacetimedb@1.12.0`, so use a compatible `spacetime` CLI (1.12.x) when generating local gitignored bindings. Do not commit generated bindings or handwritten stubs.
+Use the frontend lockfile's resolved SpacetimeDB version as the compatibility target first. Right now `frontend/package-lock.json` resolves the frontend package to `spacetimedb@1.12.0`, so use a compatible `spacetime` CLI (1.12.x) when regenerating the checked-in frontend bindings.
 
-spacetime generate --lang typescript --out-dir frontend/module_bindings --module-path spacetimedb
+spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
 
 If you're curious about the state of a table:
 spacetime sql typerace "SELECT \* from player"

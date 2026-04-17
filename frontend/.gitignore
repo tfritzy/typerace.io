@@ -23,4 +23,3 @@ dist-ssr
 *.sln
 *.sw?
 nohup.out
-module_bindings/
