@@ -55,7 +55,6 @@ export const PhraseOverlay = ({
 
       const text = phraseRef.current;
       const tc = typedTextRef.current.length;
-      if (tc >= text.length) return;
       const normalizedKey = e.key.toLowerCase();
       const correct = tc < text.length && normalizedKey === text[tc].toLowerCase();
       const newTypedText = typedTextRef.current + e.key;
@@ -136,7 +135,7 @@ export const PhraseOverlay = ({
       >
         {phrase.split("").map((char, i) => {
           const isTyped = i < typedText.length;
-          const isCorrect = typedText[i] === char;
+          const isCorrect = isTyped && typedText[i] === char;
           const isCursor = i === typedText.length;
           const isInCompletedWord = i < lastCompletedWordEnd;
           const isInCurrentWord =
