@@ -103,6 +103,11 @@ export const PhraseOverlay = ({
 
   if (!visible) return null;
 
+  let lastCompletedWordEnd = 0;
+  for (let i = 0; i < typedCount; i++) {
+    if (phrase[i] === " ") lastCompletedWordEnd = i + 1;
+  }
+
   return (
     <div
       ref={boxRef}
@@ -122,9 +127,12 @@ export const PhraseOverlay = ({
         className="inline-block whitespace-nowrap transition-transform duration-[80ms] ease-out"
       >
         <span className="text-text-completed">
-          {phrase.slice(0, typedCount)}
+          {phrase.slice(0, lastCompletedWordEnd)}
         </span>
-        <span ref={cursorCharRef} className="text-foreground shadow-[-1px_0_0_0_#4a5568]">
+        <span className="text-foreground">
+          {phrase.slice(lastCompletedWordEnd, typedCount)}
+        </span>
+        <span ref={cursorCharRef} className="text-text-untyped shadow-[-1px_0_0_0_#4a5568]">
           {typedCount < phrase.length ? phrase[typedCount] : ""}
         </span>
         <span className="text-text-untyped">
