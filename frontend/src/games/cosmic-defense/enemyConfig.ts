@@ -5,7 +5,7 @@ export interface ShipHitbox {
   hitHeight: number;
 }
 
-export const SHIP_HITBOX_MAP: Record<EntityType, ShipHitbox> = {
+export const SHIP_HITBOX_MAP: Record<string, ShipHitbox> = {
   Vanguard: { hitWidth: 96, hitHeight: 87 },
   Sentinel: { hitWidth: 66, hitHeight: 84 },
   Corsair: { hitWidth: 99, hitHeight: 72 },

@@ -4,6 +4,7 @@ import type { GameState, ProjectileState } from "./state";
 import { ProjectileType } from "./types";
 
 const PROJECTILE_SCALE = 3;
+const TINY_PROJECTILE_SCALE = PROJECTILE_SCALE / 4;
 const ANIMATION_SPEED = 0.15;
 
 export class ProjectileManager {
@@ -47,7 +48,7 @@ export class ProjectileManager {
       const g = new Graphics();
       g.rect(-1, -1, 2, 2);
       g.fill(0xcccccc);
-      g.scale.set(PROJECTILE_SCALE);
+      g.scale.set(TINY_PROJECTILE_SCALE);
       return g;
     }
 

@@ -5,6 +5,7 @@ import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLANET_HIT_RADIUS = 100;
+const PROJECTILE_SPEED = 600;
 
 export interface EntityState {
   id: number;
@@ -205,7 +206,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     colorPreset: ColorPreset.Preset4,
     team,
     fireRate: config.fireRate,
-    projectileSpeed: config.projectileSpeed,
+    projectileSpeed: PROJECTILE_SPEED,
     projectileDamage: config.projectileDamage,
     projectileType: config.projectileType,
     fireTimer: Math.random() * config.fireRate,
@@ -245,7 +246,7 @@ export function spawnAlliedEntity(
     colorPreset,
     team: Team.Allied,
     fireRate: 0,
-    projectileSpeed: config.projectileSpeed,
+    projectileSpeed: PROJECTILE_SPEED,
     projectileDamage: config.projectileDamage,
     projectileType: config.projectileType,
     fireTimer: 0,
