@@ -1,18 +1,19 @@
 import { Container, Text } from "pixi.js";
 import type { GameState, DamageData } from "./state";
 
-const DURATION_S = 0.9;
-const FLY_DISTANCE = 60;
+const LIFETIME_S = 1.0;
+const GRAVITY = 280;
+const INITIAL_SPEED = 160;
+const FADE_START = 0.6;
+const POP_DURATION = 0.08;
 const FONT_SIZE = 24;
 const STROKE_WIDTH = 4;
 
 interface ActiveNumber {
   text: Text;
   elapsed: number;
-  startX: number;
-  startY: number;
-  dx: number;
-  dy: number;
+  vx: number;
+  vy: number;
 }
 
 export class DamageNumberManager {
@@ -32,9 +33,9 @@ export class DamageNumberManager {
   }
 
   private spawn(data: DamageData): void {
-    const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI;
-    const dx = Math.cos(angle) * FLY_DISTANCE;
-    const dy = Math.sin(angle) * FLY_DISTANCE;
+    const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.2;
+    const vx = Math.cos(angle) * INITIAL_SPEED;
+    const vy = Math.sin(angle) * INITIAL_SPEED;
 
     const text = new Text({
       text: String(Math.round(data.amount)),
@@ -53,21 +54,14 @@ export class DamageNumberManager {
     text.alpha = 0;
 
     this.container.addChild(text);
-    this.active.push({
-      text,
-      elapsed: 0,
-      startX: data.x,
-      startY: data.y,
-      dx,
-      dy,
-    });
+    this.active.push({ text, elapsed: 0, vx, vy });
   }
 
   update(dt: number): void {
     for (let i = this.active.length - 1; i >= 0; i--) {
       const n = this.active[i];
       n.elapsed += dt;
-      const t = n.elapsed / DURATION_S;
+      const t = n.elapsed / LIFETIME_S;
 
       if (t >= 1) {
         n.text.destroy();
@@ -75,22 +69,18 @@ export class DamageNumberManager {
         continue;
       }
 
-      if (t < 0.12) {
-        const p = t / 0.12;
-        n.text.scale.set(p * 1.5);
+      if (t < POP_DURATION) {
+        const p = t / POP_DURATION;
+        n.text.scale.set(p * 1.3);
         n.text.alpha = p;
-      } else if (t < 0.25) {
-        const p = (t - 0.12) / (0.25 - 0.12);
-        n.text.scale.set(1.5 - 0.5 * p);
-        n.text.alpha = 1;
       } else {
-        const p = (t - 0.25) / (1 - 0.25);
-        const ease = 1 - (1 - p) * (1 - p);
-        n.text.x = n.startX + n.dx * ease;
-        n.text.y = n.startY + n.dy * ease;
-        n.text.scale.set(1 - 0.6 * ease);
-        n.text.alpha = 1 - p;
+        n.text.scale.set(1);
+        n.text.alpha = t < FADE_START ? 1 : 1 - (t - FADE_START) / (1 - FADE_START);
       }
+
+      n.vy += GRAVITY * dt;
+      n.text.x += n.vx * dt;
+      n.text.y += n.vy * dt;
     }
   }
 
