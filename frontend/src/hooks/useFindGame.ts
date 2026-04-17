@@ -43,8 +43,8 @@ export const useFindGame = () => {
     if (!conn) return;
 
     const handleJoinGameResult: Parameters<typeof conn.reducers.onJoinGame>[0] = (
-      ctx,
-      args
+      ctx: any,
+      args: any
     ) => {
       if (!ctx.event.callerIdentity.isEqual(conn.identity!)) return;
       if (pendingJoinCodeRef.current !== args.joinCode) return;
