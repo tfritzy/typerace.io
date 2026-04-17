@@ -7,6 +7,7 @@ import { EnemyManager } from "./EnemyManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { ExplosionManager } from "./ExplosionManager";
 import { ShipManager } from "./ShipManager";
+import { DamageNumberManager } from "./DamageNumberManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, WavePhase } from "./state";
 import type { GameState } from "./state";
@@ -23,6 +24,7 @@ export class CosmicDefenseGame {
   private enemyManager!: EnemyManager;
   private projectileManager!: ProjectileManager;
   private explosionManager!: ExplosionManager;
+  private damageNumberManager!: DamageNumberManager;
   shipManager!: ShipManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
@@ -67,6 +69,10 @@ export class CosmicDefenseGame {
 
     this.enemyManager = new EnemyManager(assetManager);
     world.addChild(this.enemyManager.layer);
+
+    this.damageNumberManager = new DamageNumberManager();
+    this.damageNumberManager.subscribe(this.state);
+    world.addChild(this.damageNumberManager.container);
   }
 
   private update(dt: number): void {
@@ -75,6 +81,7 @@ export class CosmicDefenseGame {
     this.projectileManager.update(this.state);
     this.explosionManager.update(this.state);
     this.shipManager.update(this.state, dt);
+    this.damageNumberManager.update(dt);
 
     const waveActive = this.state.wave.phase !== WavePhase.Idle;
     if (waveActive !== this.state.waveActive) {
@@ -93,6 +100,7 @@ export class CosmicDefenseGame {
     this.enemyManager.destroy();
     this.projectileManager.destroy();
     this.explosionManager.destroy();
+    this.damageNumberManager.destroy();
     this.shipManager.destroy();
     this.app.destroy(true);
   }

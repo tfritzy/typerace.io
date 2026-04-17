@@ -16,12 +16,16 @@ const BLUEPRINT_MAP = new Map(
 const CHARGE_DOT_RADIUS = 3;
 const CHARGE_DOT_SPACING = 10;
 const CHARGE_DOT_OFFSET = 45;
+const HEALTH_BAR_WIDTH = 40;
+const HEALTH_BAR_HEIGHT = 4;
+const HEALTH_BAR_OFFSET = -30;
 
 export class ShipManager {
   readonly layer: Container;
   private assets: AssetManager;
   private entityDisplayObjects = new Map<number, Container>();
   private chargeGraphics = new Map<number, Graphics>();
+  private healthBarGraphics = new Map<number, Graphics>();
   private activeEntityIds = new Set<number>();
 
   constructor(assets: AssetManager) {
@@ -85,6 +89,32 @@ export class ShipManager {
     }
   }
 
+  private drawHealthBar(entity: EntityState): void {
+    let g = this.healthBarGraphics.get(entity.id);
+    if (!g) {
+      g = new Graphics();
+      this.layer.addChild(g);
+      this.healthBarGraphics.set(entity.id, g);
+    }
+
+    g.clear();
+    g.x = entity.x;
+    g.y = entity.y + HEALTH_BAR_OFFSET;
+
+    const ratio = Math.max(0, entity.health / entity.maxHealth);
+    if (ratio >= 1) return;
+
+    const barColor = ratio > 0.6 ? 0x4ade80 : ratio > 0.3 ? 0xfbbf24 : 0xef4444;
+
+    g.rect(-HEALTH_BAR_WIDTH / 2, 0, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
+    g.fill({ color: 0x000000, alpha: 0.5 });
+
+    if (ratio > 0) {
+      g.rect(-HEALTH_BAR_WIDTH / 2, 0, HEALTH_BAR_WIDTH * ratio, HEALTH_BAR_HEIGHT);
+      g.fill({ color: barColor });
+    }
+  }
+
   private syncRendering(state: GameState, dt: number): void {
     this.activeEntityIds.clear();
     const maxStep = SHIP_TURN_SPEED * dt;
@@ -104,6 +134,7 @@ export class ShipManager {
       display.rotation = entity.displayRotation;
 
       this.drawChargeDots(entity);
+      this.drawHealthBar(entity);
     }
 
     for (const [id, display] of this.entityDisplayObjects) {
@@ -115,6 +146,11 @@ export class ShipManager {
           cg.destroy();
           this.chargeGraphics.delete(id);
         }
+        const hb = this.healthBarGraphics.get(id);
+        if (hb) {
+          hb.destroy();
+          this.healthBarGraphics.delete(id);
+        }
       }
     }
   }
@@ -124,6 +160,8 @@ export class ShipManager {
     this.entityDisplayObjects.clear();
     for (const g of this.chargeGraphics.values()) g.destroy();
     this.chargeGraphics.clear();
+    for (const g of this.healthBarGraphics.values()) g.destroy();
+    this.healthBarGraphics.clear();
     this.layer.destroy();
   }
 }
