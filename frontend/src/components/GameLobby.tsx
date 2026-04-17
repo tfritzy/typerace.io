@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Check, Clipboard } from "lucide-react";
-import type { DbConnection } from "../../module_bindings";
+import type { DbConnection } from "../module_bindings";
 import { getTranslations } from "../utils/translations";
 
 type GameLobbyProps = {

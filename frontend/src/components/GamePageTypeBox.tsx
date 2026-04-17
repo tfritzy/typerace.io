@@ -1,6 +1,6 @@
 import { memo, useCallback, useRef, useState } from "react";
 import { TypeBox, type TypeBoxRef } from "./TypeBox";
-import type { DbConnection } from "../../module_bindings";
+import type { DbConnection } from "../module_bindings";
 import { WordXpIndicator } from "./WordXpIndicator";
 
 interface XpIndicatorInstance {
