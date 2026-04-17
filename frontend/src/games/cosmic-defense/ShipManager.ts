@@ -6,7 +6,8 @@ import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { Team } from "./types";
 import type { EntityType } from "./types";
-import { SHIP_TURN_SPEED, approachAngle } from "./constants";
+import { SHIP_TURN_SPEED } from "./constants";
+import { approachAngle } from "./utils";
 
 const BLUEPRINT_MAP = new Map(
   SHIP_BLUEPRINTS.map((bp) => [bp.entityType, bp])
@@ -21,7 +22,6 @@ export class ShipManager {
   private assets: AssetManager;
   private entityDisplayObjects = new Map<number, Container>();
   private chargeGraphics = new Map<number, Graphics>();
-  private displayRotations = new Map<number, number>();
   private activeEntityIds = new Set<number>();
 
   constructor(assets: AssetManager) {
@@ -97,14 +97,11 @@ export class ShipManager {
         display = this.createDisplayObject(entity);
         this.layer.addChild(display);
         this.entityDisplayObjects.set(entity.id, display);
-        this.displayRotations.set(entity.id, entity.rotation);
       }
       display.x = entity.x;
       display.y = entity.y;
-      const current = this.displayRotations.get(entity.id) ?? entity.rotation;
-      const next = approachAngle(current, entity.rotation, maxStep);
-      this.displayRotations.set(entity.id, next);
-      display.rotation = next;
+      entity.displayRotation = approachAngle(entity.displayRotation, entity.rotation, maxStep);
+      display.rotation = entity.displayRotation;
 
       this.drawChargeDots(entity);
     }
@@ -113,7 +110,6 @@ export class ShipManager {
       if (!this.activeEntityIds.has(id)) {
         display.destroy();
         this.entityDisplayObjects.delete(id);
-        this.displayRotations.delete(id);
         const cg = this.chargeGraphics.get(id);
         if (cg) {
           cg.destroy();
@@ -128,7 +124,6 @@ export class ShipManager {
     this.entityDisplayObjects.clear();
     for (const g of this.chargeGraphics.values()) g.destroy();
     this.chargeGraphics.clear();
-    this.displayRotations.clear();
     this.layer.destroy();
   }
 }

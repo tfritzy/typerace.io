@@ -3,14 +3,14 @@ import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState } from "./state";
 import { WavePhase, spawnEntity, completeWave } from "./state";
 import { Team } from "./types";
-import { SHIP_TURN_SPEED, approachAngle } from "./constants";
+import { SHIP_TURN_SPEED } from "./constants";
+import { approachAngle } from "./utils";
 
 export class EnemyManager {
   readonly layer: Container;
 
   private assets: AssetManager;
   private entityDisplayObjects = new Map<number, Container>();
-  private displayRotations = new Map<number, number>();
   private activeEntityIds = new Set<number>();
 
   constructor(assets: AssetManager) {
@@ -80,21 +80,17 @@ export class EnemyManager {
         display = this.createDisplayObject(entity);
         this.layer.addChild(display);
         this.entityDisplayObjects.set(entity.id, display);
-        this.displayRotations.set(entity.id, entity.rotation);
       }
       display.x = entity.x;
       display.y = entity.y;
-      const current = this.displayRotations.get(entity.id) ?? entity.rotation;
-      const next = approachAngle(current, entity.rotation, maxStep);
-      this.displayRotations.set(entity.id, next);
-      display.rotation = next;
+      entity.displayRotation = approachAngle(entity.displayRotation, entity.rotation, maxStep);
+      display.rotation = entity.displayRotation;
     }
 
     for (const [id, display] of this.entityDisplayObjects) {
       if (!this.activeEntityIds.has(id)) {
         display.destroy();
         this.entityDisplayObjects.delete(id);
-        this.displayRotations.delete(id);
       }
     }
   }
@@ -102,7 +98,6 @@ export class EnemyManager {
   destroy(): void {
     for (const d of this.entityDisplayObjects.values()) d.destroy();
     this.entityDisplayObjects.clear();
-    this.displayRotations.clear();
     this.layer.destroy();
   }
 }
