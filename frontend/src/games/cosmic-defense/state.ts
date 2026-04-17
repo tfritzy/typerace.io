@@ -542,6 +542,7 @@ export function startNextWave(state: GameState): void {
 export function completeWave(state: GameState): void {
   const bonus = 10 + state.wave.wave * 5;
   state.gold += bonus;
+  state.projectiles.length = 0;
   state.wave.phase = WavePhase.Idle;
   state.onWaveComplete.emit();
   state.onGoldChanged.emit();
