@@ -14,6 +14,7 @@ export interface EntityState {
   vx: number;
   vy: number;
   health: number;
+  maxHealth: number;
   power: number;
   colorPreset: ColorPreset;
   team: Team;
@@ -85,6 +86,28 @@ export class GameEvent {
   }
 }
 
+export class GameDataEvent<T> {
+  private listeners = new Set<(data: T) => void>();
+
+  subscribe(listener: (data: T) => void): () => void {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  emit(data: T): void {
+    for (const listener of this.listeners) listener(data);
+  }
+}
+
+export interface DamageData {
+  amount: number;
+  x: number;
+  y: number;
+  killed: boolean;
+}
+
 export interface GameState {
   entities: EntityState[];
   projectiles: ProjectileState[];
@@ -103,6 +126,7 @@ export interface GameState {
   onWaveComplete: GameEvent;
   onWaveActiveChanged: GameEvent;
   onGoldChanged: GameEvent;
+  onDamageDealt: GameDataEvent<DamageData>;
 }
 
 let gameState: GameState | null = null;
@@ -146,6 +170,7 @@ export function createGameState(): GameState {
     onWaveComplete: new GameEvent(),
     onWaveActiveChanged: new GameEvent(),
     onGoldChanged: new GameEvent(),
+    onDamageDealt: new GameDataEvent<DamageData>(),
   };
 
   gameState = state;
@@ -175,6 +200,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     vx: -speed,
     vy: 0,
     health: config.health,
+    maxHealth: config.health,
     power: config.power,
     colorPreset: ColorPreset.Preset4,
     team,
@@ -214,6 +240,7 @@ export function spawnAlliedEntity(
     vx: 0,
     vy: 0,
     health: config.health,
+    maxHealth: config.health,
     power: 0,
     colorPreset,
     team: Team.Allied,
@@ -289,7 +316,9 @@ function checkCollisions(state: GameState): void {
         const dy = Math.abs(p.y - e.y);
         if (dx < e.hitHalfW && dy < e.hitHalfH) {
           e.health -= p.damage;
-          if (e.health <= 0) {
+          const killed = e.health <= 0;
+          state.onDamageDealt.emit({ amount: p.damage, x: e.x, y: e.y, killed });
+          if (killed) {
             state.gold += e.gold;
             goldGained = true;
             state.entities.splice(j, 1);
