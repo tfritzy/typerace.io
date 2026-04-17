@@ -13,7 +13,6 @@ const ROW_SPACING = 110;
 const HEX_HALF_W = COL_SPACING / 2;
 const HEX_VERT = (ROW_SPACING * 2) / 3;
 const HEX_HALF_VERT = HEX_VERT / 2;
-const CROSS_SIZE = 8;
 
 function hexPoints(cx: number, cy: number): string {
   return [
@@ -79,7 +78,7 @@ export const PlacementOverlay = ({
       <path
         d={gridPath}
         fill="none"
-        stroke="rgba(120,140,200,0.25)"
+        stroke="rgba(120,140,200,0.2)"
         strokeWidth={1}
       />
 
@@ -87,40 +86,36 @@ export const PlacementOverlay = ({
         if (slot.occupant) return null;
         const isActive = activeSlotIndex === slot.index;
         const isHovered = hoveredIndex === slot.index;
-        const fillColor = isActive
-          ? "rgba(120,140,200,0.15)"
-          : isHovered
-            ? "rgba(120,140,200,0.08)"
-            : "transparent";
-        const crossColor = isActive
-          ? "rgba(120,140,200,0.5)"
-          : "rgba(120,140,200,0.3)";
         return (
           <g key={slot.index}>
             <polygon
               points={hexPoints(slot.x, slot.y)}
-              fill={fillColor}
+              fill="transparent"
               style={{ pointerEvents: "auto", cursor: "pointer" }}
               onClick={() => onSlotClick(slot)}
               onMouseEnter={() => setHoveredIndex(slot.index)}
               onMouseLeave={() => setHoveredIndex(null)}
             />
-            <line
-              x1={slot.x - CROSS_SIZE}
-              y1={slot.y}
-              x2={slot.x + CROSS_SIZE}
-              y2={slot.y}
-              stroke={crossColor}
-              strokeWidth={1}
-              style={{ pointerEvents: "none" }}
-            />
-            <line
-              x1={slot.x}
-              y1={slot.y - CROSS_SIZE}
-              x2={slot.x}
-              y2={slot.y + CROSS_SIZE}
-              stroke={crossColor}
-              strokeWidth={1}
+            {(isHovered || isActive) && (
+              <polygon
+                points={hexPoints(slot.x, slot.y)}
+                fill="none"
+                stroke={isActive ? "rgba(120,140,200,0.5)" : "rgba(120,140,200,0.35)"}
+                strokeWidth={1}
+                style={{ pointerEvents: "none" }}
+              />
+            )}
+            <circle
+              cx={slot.x}
+              cy={slot.y}
+              r={3}
+              fill={
+                isActive
+                  ? "rgba(120,140,200,0.5)"
+                  : isHovered
+                    ? "rgba(120,140,200,0.4)"
+                    : "rgba(120,140,200,0.15)"
+              }
               style={{ pointerEvents: "none" }}
             />
           </g>
