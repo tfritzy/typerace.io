@@ -5,7 +5,6 @@ import { ENEMY_CATALOG, type EnemyConfig, type FriendlyConfig, goldForEnemy } fr
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLANET_HIT_RADIUS = 100;
-const ENTITY_HIT_RADIUS = 30;
 
 export interface EntityState {
   id: number;
@@ -30,6 +29,7 @@ export interface EntityState {
   charge: number;
   gold: number;
   range: number;
+  hitRadius: number;
 }
 
 export interface ProjectileState {
@@ -188,6 +188,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     charge: 0,
     gold: goldForEnemy(config),
     range: config.range,
+    hitRadius: config.hitRadius,
   };
 
   state.entities.push(entity);
@@ -223,6 +224,7 @@ export function spawnAlliedEntity(
     charge: 0,
     gold: 0,
     range: 0,
+    hitRadius: config.hitRadius,
   };
 
   state.entities.push(entity);
@@ -240,7 +242,6 @@ function isInBounds(x: number, y: number): boolean {
 
 function checkCollisions(state: GameState): void {
   const pr2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
-  const entityHr2 = ENTITY_HIT_RADIUS * ENTITY_HIT_RADIUS;
   let damaged = false;
   let goldGained = false;
 
@@ -280,7 +281,8 @@ function checkCollisions(state: GameState): void {
         if (e.team !== opposingTeam) continue;
         const dx = p.x - e.x;
         const dy = p.y - e.y;
-        if (dx * dx + dy * dy < entityHr2) {
+        const hr = e.hitRadius;
+        if (dx * dx + dy * dy < hr * hr) {
           e.health -= p.damage;
           if (e.health <= 0) {
             state.gold += e.gold;
