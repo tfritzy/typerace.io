@@ -104,6 +104,11 @@ export const PhraseOverlay = ({
 
   if (!visible) return null;
 
+  let lastCompletedWordEnd = 0;
+  for (let i = 0; i < typedCount; i++) {
+    if (phrase[i] === " ") lastCompletedWordEnd = i + 1;
+  }
+
   return (
     <div
       ref={boxRef}
@@ -147,13 +152,16 @@ export const PhraseOverlay = ({
           transition: "transform 0.08s ease-out",
         }}
       >
-        <span style={{ color: "#90ee90" }}>
-          {phrase.slice(0, typedCount)}
-        </span>
-        <span ref={cursorCharRef} style={{ color: "#ffffff", boxShadow: "-2px 0 0 0 #4a5568" }}>
-          {typedCount < phrase.length ? phrase[typedCount] : ""}
+        <span style={{ color: "rgba(255, 255, 255, 0.35)" }}>
+          {phrase.slice(0, lastCompletedWordEnd)}
         </span>
         <span style={{ color: "#ffffff" }}>
+          {phrase.slice(lastCompletedWordEnd, typedCount)}
+        </span>
+        <span ref={cursorCharRef} style={{ color: "rgba(255, 255, 255, 0.65)", boxShadow: "-2px 0 0 0 #4a5568" }}>
+          {typedCount < phrase.length ? phrase[typedCount] : ""}
+        </span>
+        <span style={{ color: "rgba(255, 255, 255, 0.65)" }}>
           {phrase.slice(typedCount + 1)}
         </span>
       </div>
