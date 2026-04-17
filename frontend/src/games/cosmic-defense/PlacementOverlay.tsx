@@ -8,7 +8,7 @@ interface PlacementOverlayProps {
   activeSlotIndex: number | null;
 }
 
-const BUTTON_SIZE_PX = 48;
+const SLOT_BUTTON_DIAMETER = 48;
 
 export const PlacementOverlay = ({ slots, onSlotClick, activeSlotIndex }: PlacementOverlayProps) => {
   return (
@@ -32,7 +32,7 @@ export const PlacementOverlay = ({ slots, onSlotClick, activeSlotIndex }: Placem
                   ? "border-2 border-solid border-[#8ba4e8]/70 bg-[#788cc8]/15 shadow-[0_0_16px_4px_rgba(120,140,200,0.25)]"
                   : "border-2 border-dashed slot-marker"
               }`}
-              style={{ width: BUTTON_SIZE_PX, height: BUTTON_SIZE_PX }}
+              style={{ width: SLOT_BUTTON_DIAMETER, height: SLOT_BUTTON_DIAMETER }}
               onClick={() => onSlotClick(slot)}
             >
               <Plus

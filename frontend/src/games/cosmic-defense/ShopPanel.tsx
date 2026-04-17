@@ -12,12 +12,18 @@ interface ShopPanelProps {
   slot: PlacementSlot;
 }
 
+const PANEL_OFFSET_LEFT = 5;
+const PANEL_OFFSET_TOP = 22;
+const PANEL_MIN_TOP = 3;
+const PANEL_MAX_TOP = 55;
+const PANEL_WIDTH = 260;
+
 export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold, slot }: ShopPanelProps) => {
   const slotLeftPct = (slot.x / CANVAS_WIDTH) * 100;
   const slotTopPct = (slot.y / CANVAS_HEIGHT) * 100;
 
-  const panelLeft = slotLeftPct + 5;
-  const panelTop = Math.max(3, Math.min(55, slotTopPct - 22));
+  const panelLeft = slotLeftPct + PANEL_OFFSET_LEFT;
+  const panelTop = Math.max(PANEL_MIN_TOP, Math.min(PANEL_MAX_TOP, slotTopPct - PANEL_OFFSET_TOP));
 
   return (
     <>
@@ -27,7 +33,7 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold, slot }: S
         style={{
           left: `${panelLeft}%`,
           top: `${panelTop}%`,
-          width: 260,
+          width: PANEL_WIDTH,
           maxHeight: "46%",
           background: "linear-gradient(180deg, rgba(12,14,30,0.96) 0%, rgba(8,10,24,0.96) 100%)",
           backdropFilter: "blur(12px)",
