@@ -1,11 +1,10 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, Team } from "./types";
-import { ENEMY_CATALOG, type EnemyConfig, type FriendlyConfig, goldForEnemy } from "./enemyConfig";
+import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, goldForEnemy } from "./enemyConfig";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLANET_HIT_RADIUS = 100;
-const ENTITY_HIT_RADIUS = 30;
 
 export interface EntityState {
   id: number;
@@ -30,6 +29,8 @@ export interface EntityState {
   charge: number;
   gold: number;
   range: number;
+  hitHalfW: number;
+  hitHalfH: number;
 }
 
 export interface ProjectileState {
@@ -164,6 +165,7 @@ function spawnFromRight(): { x: number; y: number } {
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
   const { x, y } = spawnFromRight();
   const speed = 30 + Math.random() * 52.5;
+  const hitbox = SHIP_HITBOX_MAP[config.entityType];
 
   const entity: EntityState = {
     id: state.nextId++,
@@ -188,6 +190,8 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     charge: 0,
     gold: goldForEnemy(config),
     range: config.range,
+    hitHalfW: hitbox.hitWidth / 2,
+    hitHalfH: hitbox.hitHeight / 2,
   };
 
   state.entities.push(entity);
@@ -200,6 +204,8 @@ export function spawnAlliedEntity(
   x: number,
   y: number
 ): void {
+  const hitbox = SHIP_HITBOX_MAP[config.entityType];
+
   const entity: EntityState = {
     id: state.nextId++,
     entityType: config.entityType,
@@ -223,6 +229,8 @@ export function spawnAlliedEntity(
     charge: 0,
     gold: 0,
     range: 0,
+    hitHalfW: hitbox.hitWidth / 2,
+    hitHalfH: hitbox.hitHeight / 2,
   };
 
   state.entities.push(entity);
@@ -240,7 +248,6 @@ function isInBounds(x: number, y: number): boolean {
 
 function checkCollisions(state: GameState): void {
   const pr2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
-  const entityHr2 = ENTITY_HIT_RADIUS * ENTITY_HIT_RADIUS;
   let damaged = false;
   let goldGained = false;
 
@@ -278,9 +285,9 @@ function checkCollisions(state: GameState): void {
       for (let j = state.entities.length - 1; j >= 0; j--) {
         const e = state.entities[j];
         if (e.team !== opposingTeam) continue;
-        const dx = p.x - e.x;
-        const dy = p.y - e.y;
-        if (dx * dx + dy * dy < entityHr2) {
+        const dx = Math.abs(p.x - e.x);
+        const dy = Math.abs(p.y - e.y);
+        if (dx < e.hitHalfW && dy < e.hitHalfH) {
           e.health -= p.damage;
           if (e.health <= 0) {
             state.gold += e.gold;
