@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, Team } from "./types";
-import { ENEMY_CATALOG, type EnemyConfig, type FriendlyConfig, goldForEnemy } from "./enemyConfig";
+import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, goldForEnemy } from "./enemyConfig";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -165,6 +165,7 @@ function spawnFromRight(): { x: number; y: number } {
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
   const { x, y } = spawnFromRight();
   const speed = 30 + Math.random() * 52.5;
+  const hitbox = SHIP_HITBOX_MAP[config.entityType];
 
   const entity: EntityState = {
     id: state.nextId++,
@@ -189,8 +190,8 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     charge: 0,
     gold: goldForEnemy(config),
     range: config.range,
-    hitHalfW: config.hitWidth / 2,
-    hitHalfH: config.hitHeight / 2,
+    hitHalfW: hitbox.hitWidth / 2,
+    hitHalfH: hitbox.hitHeight / 2,
   };
 
   state.entities.push(entity);
@@ -203,6 +204,8 @@ export function spawnAlliedEntity(
   x: number,
   y: number
 ): void {
+  const hitbox = SHIP_HITBOX_MAP[config.entityType];
+
   const entity: EntityState = {
     id: state.nextId++,
     entityType: config.entityType,
@@ -226,8 +229,8 @@ export function spawnAlliedEntity(
     charge: 0,
     gold: 0,
     range: 0,
-    hitHalfW: config.hitWidth / 2,
-    hitHalfH: config.hitHeight / 2,
+    hitHalfW: hitbox.hitWidth / 2,
+    hitHalfH: hitbox.hitHeight / 2,
   };
 
   state.entities.push(entity);
