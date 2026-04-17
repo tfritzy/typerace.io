@@ -29,7 +29,8 @@ export interface EntityState {
   charge: number;
   gold: number;
   range: number;
-  hitRadius: number;
+  hitHalfW: number;
+  hitHalfH: number;
 }
 
 export interface ProjectileState {
@@ -188,7 +189,8 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     charge: 0,
     gold: goldForEnemy(config),
     range: config.range,
-    hitRadius: config.hitRadius,
+    hitHalfW: config.hitWidth / 2,
+    hitHalfH: config.hitHeight / 2,
   };
 
   state.entities.push(entity);
@@ -224,7 +226,8 @@ export function spawnAlliedEntity(
     charge: 0,
     gold: 0,
     range: 0,
-    hitRadius: config.hitRadius,
+    hitHalfW: config.hitWidth / 2,
+    hitHalfH: config.hitHeight / 2,
   };
 
   state.entities.push(entity);
@@ -279,10 +282,9 @@ function checkCollisions(state: GameState): void {
       for (let j = state.entities.length - 1; j >= 0; j--) {
         const e = state.entities[j];
         if (e.team !== opposingTeam) continue;
-        const dx = p.x - e.x;
-        const dy = p.y - e.y;
-        const hr = e.hitRadius;
-        if (dx * dx + dy * dy < hr * hr) {
+        const dx = Math.abs(p.x - e.x);
+        const dy = Math.abs(p.y - e.y);
+        if (dx < e.hitHalfW && dy < e.hitHalfH) {
           e.health -= p.damage;
           if (e.health <= 0) {
             state.gold += e.gold;
