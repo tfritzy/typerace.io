@@ -386,35 +386,3 @@ body {
 .logo-io {
   color: var(--accent-primary);
 }
-
-@keyframes slotPulse {
-  0%, 100% {
-    border-color: rgba(120, 140, 200, 0.25);
-  }
-  50% {
-    border-color: rgba(120, 140, 200, 0.5);
-    box-shadow: 0 0 10px 2px rgba(120, 140, 200, 0.1);
-  }
-}
-
-.slot-marker {
-  animation: slotPulse 3s ease-in-out infinite;
-}
-
-.slot-marker:hover {
-  animation: none;
-  border-style: solid !important;
-  border-color: rgba(140, 165, 232, 0.6) !important;
-  background: rgba(120, 140, 200, 0.12);
-  box-shadow: 0 0 16px 4px rgba(120, 140, 200, 0.2);
-  transform: scale(1.15);
-}
-
-.slot-marker .slot-icon {
-  opacity: 0.4;
-  transition: opacity 0.2s ease;
-}
-
-.slot-marker:hover .slot-icon {
-  opacity: 0.8;
-}
