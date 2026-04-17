@@ -11,8 +11,8 @@ if [ -n "$winid" ]; then
 fi
 
 # Generate module bindings and publish module before starting frontend dev server
-npx spacetime generate frontend/module_bindings
-spacetime publish -c -y
+spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
+spacetime publish -c -y --project-path spacetimedb
 
 # Launch frontend dev server in a new terminal
 alacritty --title "Frontend Dev" -e bash -c "cd frontend && npm run dev" &

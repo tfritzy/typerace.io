@@ -8,6 +8,7 @@ import { Team } from "./types";
 import type { EntityType } from "./types";
 import { SHIP_TURN_SPEED } from "./constants";
 import { approachAngle } from "./utils";
+import { drawHealthBar } from "./healthBar";
 
 const BLUEPRINT_MAP = new Map(
   SHIP_BLUEPRINTS.map((bp) => [bp.entityType, bp])
@@ -22,6 +23,7 @@ export class ShipManager {
   private assets: AssetManager;
   private entityDisplayObjects = new Map<number, Container>();
   private chargeGraphics = new Map<number, Graphics>();
+  private healthBarGraphics = new Map<number, Graphics>();
   private activeEntityIds = new Set<number>();
 
   constructor(assets: AssetManager) {
@@ -85,6 +87,16 @@ export class ShipManager {
     }
   }
 
+  private updateHealthBar(entity: EntityState): void {
+    let g = this.healthBarGraphics.get(entity.id);
+    if (!g) {
+      g = new Graphics();
+      this.layer.addChild(g);
+      this.healthBarGraphics.set(entity.id, g);
+    }
+    drawHealthBar(g, entity);
+  }
+
   private syncRendering(state: GameState, dt: number): void {
     this.activeEntityIds.clear();
     const maxStep = SHIP_TURN_SPEED * dt;
@@ -104,6 +116,7 @@ export class ShipManager {
       display.rotation = entity.displayRotation;
 
       this.drawChargeDots(entity);
+      this.updateHealthBar(entity);
     }
 
     for (const [id, display] of this.entityDisplayObjects) {
@@ -115,6 +128,11 @@ export class ShipManager {
           cg.destroy();
           this.chargeGraphics.delete(id);
         }
+        const hb = this.healthBarGraphics.get(id);
+        if (hb) {
+          hb.destroy();
+          this.healthBarGraphics.delete(id);
+        }
       }
     }
   }
@@ -124,6 +142,8 @@ export class ShipManager {
     this.entityDisplayObjects.clear();
     for (const g of this.chargeGraphics.values()) g.destroy();
     this.chargeGraphics.clear();
+    for (const g of this.healthBarGraphics.values()) g.destroy();
+    this.healthBarGraphics.clear();
     this.layer.destroy();
   }
 }
