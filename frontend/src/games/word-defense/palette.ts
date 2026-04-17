@@ -13,7 +13,7 @@ export const ACCENT_DARK_INDEX = 9;
 export const DESTRUCTIVE_INDEX = 10;
 export const BORDER_INDEX = 11;
 
-let globalPalette: Palette = [
+const globalPalette: Palette = [
   [30, 30, 46],
   [205, 214, 244],
   [42, 42, 62],
