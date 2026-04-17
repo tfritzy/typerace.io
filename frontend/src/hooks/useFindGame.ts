@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { type GameMode } from "../types/stdb";
+import { type GameMode, type GameType } from "../types/stdb";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { useToast } from "./useToast";
 import { useDatabase } from "../contexts/SpacetimeContext";
@@ -77,11 +77,11 @@ export const useFindGame = () => {
     const newJoinCode = `join_${uniqueId}`;
     pendingJoinCodeRef.current = newJoinCode;
 
-    const gameTypeEnum = { tag: gameType };
+    const gameTypeEnum: GameType = { tag: gameType };
     conn.reducers.joinGame({
       gameMode: mode,
       joinCode: newJoinCode,
-      gameType: gameTypeEnum as any
+      gameType: gameTypeEnum
     });
   }, [conn, isSearching]);
 

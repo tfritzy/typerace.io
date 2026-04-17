@@ -15,6 +15,8 @@ import { GhostCursor } from "../components/GhostCursor";
 import { getPlayerColorHex } from "../utils/colorMapping";
 import { getTranslations } from "../utils/translations";
 
+type UiGameType = "Public" | "Private" | "Practice";
+
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
@@ -221,6 +223,8 @@ export const GamePage = () => {
   }
 
   const gameTypeTag = game.gameType?.tag ?? "Public";
+  const actionBarGameType: UiGameType =
+    gameTypeTag === "Private" || gameTypeTag === "Practice" ? gameTypeTag : "Public";
   const maxPlayers =
     gameTypeTag === "Private"
       ? gamePlayerProgress.length
@@ -343,7 +347,7 @@ export const GamePage = () => {
                   {currentPP && (
                     <ActionBar
                       mode={game.gameMode}
-                      gameType={game.gameType?.tag as any}
+                      gameType={actionBarGameType}
                       gameId={gameId}
                       rematchDisabled={rematchDisabled}
                       conn={conn || undefined}

@@ -28,6 +28,7 @@ export const PhraseOverlay = ({
 }) => {
   const [phrase, setPhrase] = useState(() => generatePhrase(PHRASE_BUFFER_SIZE));
   const [typedCount, setTypedCount] = useState(0);
+  const [incorrectChar, setIncorrectChar] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -36,8 +37,10 @@ export const PhraseOverlay = ({
 
   const phraseRef = useRef(phrase);
   const typedCountRef = useRef(typedCount);
+  const incorrectCharRef = useRef(incorrectChar);
   phraseRef.current = phrase;
   typedCountRef.current = typedCount;
+  incorrectCharRef.current = incorrectChar;
 
   useEffect(() => {
     if (!visible) return;
@@ -46,7 +49,16 @@ export const PhraseOverlay = ({
       const game = gameRef.current;
       if (!game) return;
       if (e.ctrlKey || e.altKey || e.metaKey) return;
+      if (e.key === "Backspace") {
+        e.preventDefault();
+        if (incorrectCharRef.current !== null) {
+          setIncorrectChar(null);
+          if (inputRef.current) inputRef.current.value = "";
+        }
+        return;
+      }
       if (e.key.length !== 1) return;
+      e.preventDefault();
 
       const text = phraseRef.current;
       const tc = typedCountRef.current;
@@ -56,6 +68,7 @@ export const PhraseOverlay = ({
       if (correct) {
         const newTc = tc + 1;
         game.onCorrectKeystroke();
+        setIncorrectChar(null);
         setTypedCount(newTc);
         if (inputRef.current) inputRef.current.value = "";
 
@@ -63,6 +76,9 @@ export const PhraseOverlay = ({
           const extra = generatePhrase(PHRASE_BUFFER_SIZE);
           setPhrase(text + " " + extra);
         }
+      } else {
+        setIncorrectChar(e.key);
+        if (inputRef.current) inputRef.current.value = "";
       }
     };
 
@@ -74,6 +90,7 @@ export const PhraseOverlay = ({
     if (visible) {
       setPhrase(generatePhrase(PHRASE_BUFFER_SIZE));
       setTypedCount(0);
+      setIncorrectChar(null);
     }
   }, [visible]);
 
@@ -132,11 +149,14 @@ export const PhraseOverlay = ({
         <span className="text-foreground">
           {phrase.slice(lastCompletedWordEnd, typedCount)}
         </span>
-        <span ref={cursorCharRef} className="text-text-untyped shadow-[-1px_0_0_0_#4a5568]">
-          {typedCount < phrase.length ? phrase[typedCount] : ""}
+        <span
+          ref={cursorCharRef}
+          className={`${incorrectChar ? "text-destructive underline decoration-2 decoration-destructive" : "text-text-untyped"} shadow-[-1px_0_0_0_#4a5568]`}
+        >
+          {incorrectChar ?? (typedCount < phrase.length ? phrase[typedCount] : "")}
         </span>
         <span className="text-text-untyped">
-          {phrase.slice(typedCount + 1)}
+          {phrase.slice(typedCount + (incorrectChar ? 0 : 1))}
         </span>
       </div>
     </div>
