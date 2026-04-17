@@ -102,16 +102,14 @@ export async function createCosmicDefenseGame(
   container: HTMLElement
 ): Promise<CosmicDefenseGame> {
   const app = new Application();
-  const resolution = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
   await app.init({
     width: CANVAS_WIDTH,
     height: CANVAS_HEIGHT,
     background: 0x0a0a1a,
-    antialias: true,
-    resolution,
+    antialias: false,
+    resolution: 1,
     autoDensity: true,
     roundPixels: true,
-    preserveDrawingBuffer: true,
   });
 
   app.canvas.style.width = "100%";
