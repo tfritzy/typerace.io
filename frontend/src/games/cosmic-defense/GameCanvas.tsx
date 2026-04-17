@@ -135,7 +135,11 @@ export const GameCanvas = () => {
         )}
       </div>
       {!waveActive && (
-        <PlacementOverlay slots={slots} onSlotClick={handleSlotClick} />
+        <PlacementOverlay
+          slots={slots}
+          onSlotClick={handleSlotClick}
+          activeSlotIndex={selectedSlot?.index ?? null}
+        />
       )}
       {selectedSlot && (
         <ShopPanel
@@ -143,6 +147,7 @@ export const GameCanvas = () => {
           onClose={handleCloseShop}
           shipPreviews={shipPreviews}
           gold={gold}
+          slot={selectedSlot}
         />
       )}
       <PhraseOverlay gameRef={gameRef} visible={waveActive} />

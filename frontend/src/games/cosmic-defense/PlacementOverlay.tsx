@@ -5,31 +5,45 @@ import type { PlacementSlot } from "./PlacementPoints";
 interface PlacementOverlayProps {
   slots: PlacementSlot[];
   onSlotClick: (slot: PlacementSlot) => void;
+  activeSlotIndex: number | null;
 }
 
-const BUTTON_SIZE = (140 / CANVAS_WIDTH) * 100;
+const BUTTON_SIZE_PX = 48;
 
-export const PlacementOverlay = ({ slots, onSlotClick }: PlacementOverlayProps) => {
+export const PlacementOverlay = ({ slots, onSlotClick, activeSlotIndex }: PlacementOverlayProps) => {
   return (
     <div className="absolute inset-0 z-10 pointer-events-none">
-      {slots.map((slot) =>
-        slot.occupant ? null : (
-          <button
+      {slots.map((slot) => {
+        if (slot.occupant) return null;
+        const isActive = activeSlotIndex === slot.index;
+        return (
+          <div
             key={slot.index}
-            className="absolute rounded-full pointer-events-auto cursor-pointer hover:bg-[#788cc8]/15 transition-colors p-0 flex items-center justify-center"
+            className="absolute"
             style={{
               left: `${(slot.x / CANVAS_WIDTH) * 100}%`,
               top: `${(slot.y / CANVAS_HEIGHT) * 100}%`,
-              width: `${BUTTON_SIZE}%`,
-              aspectRatio: "1",
               transform: "translate(-50%, -50%)",
             }}
-            onClick={() => onSlotClick(slot)}
           >
-            <Plus className="w-3 h-3 text-[#788cc8]/40 pointer-events-none" />
-          </button>
-        )
-      )}
+            <button
+              className={`pointer-events-auto cursor-pointer rounded-full flex items-center justify-center transition-all duration-200 ease-out ${
+                isActive
+                  ? "border-2 border-solid border-[#8ba4e8]/70 bg-[#788cc8]/15 shadow-[0_0_16px_4px_rgba(120,140,200,0.25)]"
+                  : "border-2 border-dashed slot-marker"
+              }`}
+              style={{ width: BUTTON_SIZE_PX, height: BUTTON_SIZE_PX }}
+              onClick={() => onSlotClick(slot)}
+            >
+              <Plus
+                className={`w-4 h-4 pointer-events-none ${
+                  isActive ? "text-[#8ba4e8]/80" : "slot-icon text-[#8ba4e8]"
+                }`}
+              />
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 };
