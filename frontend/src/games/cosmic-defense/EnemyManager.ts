@@ -5,10 +5,7 @@ import { WavePhase, spawnEntity, completeWave } from "./state";
 import { Team } from "./types";
 import { SHIP_TURN_SPEED } from "./constants";
 import { approachAngle } from "./utils";
-
-const HEALTH_BAR_WIDTH = 40;
-const HEALTH_BAR_HEIGHT = 4;
-const HEALTH_BAR_OFFSET = -30;
+import { drawHealthBar } from "./healthBar";
 
 export class EnemyManager {
   readonly layer: Container;
@@ -73,30 +70,14 @@ export class EnemyManager {
     return container;
   }
 
-  private drawHealthBar(entity: EntityState): void {
+  private updateHealthBar(entity: EntityState): void {
     let g = this.healthBarGraphics.get(entity.id);
     if (!g) {
       g = new Graphics();
       this.layer.addChild(g);
       this.healthBarGraphics.set(entity.id, g);
     }
-
-    g.clear();
-    g.x = entity.x;
-    g.y = entity.y + HEALTH_BAR_OFFSET;
-
-    const ratio = Math.max(0, entity.health / entity.maxHealth);
-    if (ratio >= 1) return;
-
-    const barColor = ratio > 0.6 ? 0x4ade80 : ratio > 0.3 ? 0xfbbf24 : 0xef4444;
-
-    g.rect(-HEALTH_BAR_WIDTH / 2, 0, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
-    g.fill({ color: 0x000000, alpha: 0.5 });
-
-    if (ratio > 0) {
-      g.rect(-HEALTH_BAR_WIDTH / 2, 0, HEALTH_BAR_WIDTH * ratio, HEALTH_BAR_HEIGHT);
-      g.fill({ color: barColor });
-    }
+    drawHealthBar(g, entity);
   }
 
   private syncRendering(state: GameState, dt: number): void {
@@ -117,7 +98,7 @@ export class EnemyManager {
       entity.displayRotation = approachAngle(entity.displayRotation, entity.rotation, maxStep);
       display.rotation = entity.displayRotation;
 
-      this.drawHealthBar(entity);
+      this.updateHealthBar(entity);
     }
 
     for (const [id, display] of this.entityDisplayObjects) {

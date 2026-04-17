@@ -1,6 +1,5 @@
 import { Container, Text } from "pixi.js";
 import type { GameState, DamageData } from "./state";
-import { PIXEL_FONT_FAMILY } from "./constants";
 
 const DURATION_S = 0.9;
 const FLY_DISTANCE = 60;
@@ -40,10 +39,10 @@ export class DamageNumberManager {
     const text = new Text({
       text: String(Math.round(data.amount)),
       style: {
-        fontFamily: PIXEL_FONT_FAMILY,
+        fontFamily: "Arial",
         fontSize: FONT_SIZE,
-        fontWeight: "400",
-        fill: data.killed ? 0xfbbf24 : 0xffffff,
+        fontWeight: "700",
+        fill: 0xffffff,
         stroke: { color: 0x000000, width: STROKE_WIDTH },
       },
     });
