@@ -440,7 +440,7 @@ export function updateState(state: GameState, dt: number): void {
         e.vy = 0;
         e.x += e.vx * dt;
         e.y += e.vy * dt;
-        e.rotation = Math.atan2(dy, dx);
+        e.rotation = Math.atan2(e.vy, e.vx);
       }
     } else if (e.speed > 0) {
       e.vx = -e.speed;
