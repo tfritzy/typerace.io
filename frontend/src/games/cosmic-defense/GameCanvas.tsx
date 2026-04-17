@@ -128,7 +128,7 @@ export const GameCanvas = () => {
         {!waveActive && (
           <button
             onClick={handleNextWave}
-            className="text-[11px] bg-green-400/85 text-[#0a0a1a] px-2.5 py-1 rounded cursor-pointer hover:brightness-125"
+            className="text-[11px] bg-accent text-accent-foreground px-2.5 py-1 rounded cursor-pointer hover:brightness-125"
           >
             {waveNumber === 0 ? "Start" : "Next wave"}
           </button>

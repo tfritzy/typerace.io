@@ -7,10 +7,10 @@ export interface GameTheme extends ThemeSettings {
 export const GAME_THEMES: Record<string, GameTheme> = {
     "cosmic-defense": {
         name: "Cosmic Defense",
-        backgroundColor: "#18051e",
+        backgroundColor: "#0a0210",
         textColor: "#ede4f7",
         borderColor: "rgba(237, 228, 247, 0.14)",
-        accentColor: "#c084fc",
+        accentColor: "#fbbf24",
     },
 };
 
