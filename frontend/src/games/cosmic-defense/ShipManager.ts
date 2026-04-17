@@ -6,6 +6,7 @@ import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { Team } from "./types";
 import type { EntityType } from "./types";
+import { SHIP_TURN_SPEED, approachAngle } from "./constants";
 
 const BLUEPRINT_MAP = new Map(
   SHIP_BLUEPRINTS.map((bp) => [bp.entityType, bp])
@@ -20,6 +21,7 @@ export class ShipManager {
   private assets: AssetManager;
   private entityDisplayObjects = new Map<number, Container>();
   private chargeGraphics = new Map<number, Graphics>();
+  private displayRotations = new Map<number, number>();
   private activeEntityIds = new Set<number>();
 
   constructor(assets: AssetManager) {
@@ -34,8 +36,8 @@ export class ShipManager {
     spawnAlliedEntity(state, config, bp?.colorPreset ?? 0, x, y);
   }
 
-  update(state: GameState): void {
-    this.syncRendering(state);
+  update(state: GameState, dt: number): void {
+    this.syncRendering(state, dt);
   }
 
   private createDisplayObject(entity: EntityState): Container {
@@ -83,8 +85,9 @@ export class ShipManager {
     }
   }
 
-  private syncRendering(state: GameState): void {
+  private syncRendering(state: GameState, dt: number): void {
     this.activeEntityIds.clear();
+    const maxStep = SHIP_TURN_SPEED * dt;
 
     for (const entity of state.entities) {
       if (entity.team !== Team.Allied) continue;
@@ -94,10 +97,14 @@ export class ShipManager {
         display = this.createDisplayObject(entity);
         this.layer.addChild(display);
         this.entityDisplayObjects.set(entity.id, display);
+        this.displayRotations.set(entity.id, entity.rotation);
       }
       display.x = entity.x;
       display.y = entity.y;
-      display.rotation = entity.rotation;
+      const current = this.displayRotations.get(entity.id) ?? entity.rotation;
+      const next = approachAngle(current, entity.rotation, maxStep);
+      this.displayRotations.set(entity.id, next);
+      display.rotation = next;
 
       this.drawChargeDots(entity);
     }
@@ -106,6 +113,7 @@ export class ShipManager {
       if (!this.activeEntityIds.has(id)) {
         display.destroy();
         this.entityDisplayObjects.delete(id);
+        this.displayRotations.delete(id);
         const cg = this.chargeGraphics.get(id);
         if (cg) {
           cg.destroy();
@@ -120,6 +128,7 @@ export class ShipManager {
     this.entityDisplayObjects.clear();
     for (const g of this.chargeGraphics.values()) g.destroy();
     this.chargeGraphics.clear();
+    this.displayRotations.clear();
     this.layer.destroy();
   }
 }

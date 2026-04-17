@@ -3,12 +3,14 @@ import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState } from "./state";
 import { WavePhase, spawnEntity, completeWave } from "./state";
 import { Team } from "./types";
+import { SHIP_TURN_SPEED, approachAngle } from "./constants";
 
 export class EnemyManager {
   readonly layer: Container;
 
   private assets: AssetManager;
   private entityDisplayObjects = new Map<number, Container>();
+  private displayRotations = new Map<number, number>();
   private activeEntityIds = new Set<number>();
 
   constructor(assets: AssetManager) {
@@ -49,7 +51,7 @@ export class EnemyManager {
       }
     }
 
-    this.syncRendering(state);
+    this.syncRendering(state, dt);
   }
 
   private createDisplayObject(entity: EntityState): Container {
@@ -66,8 +68,9 @@ export class EnemyManager {
     return container;
   }
 
-  private syncRendering(state: GameState): void {
+  private syncRendering(state: GameState, dt: number): void {
     this.activeEntityIds.clear();
+    const maxStep = SHIP_TURN_SPEED * dt;
 
     for (const entity of state.entities) {
       if (entity.team !== Team.Enemy) continue;
@@ -77,16 +80,21 @@ export class EnemyManager {
         display = this.createDisplayObject(entity);
         this.layer.addChild(display);
         this.entityDisplayObjects.set(entity.id, display);
+        this.displayRotations.set(entity.id, entity.rotation);
       }
       display.x = entity.x;
       display.y = entity.y;
-      display.rotation = entity.rotation;
+      const current = this.displayRotations.get(entity.id) ?? entity.rotation;
+      const next = approachAngle(current, entity.rotation, maxStep);
+      this.displayRotations.set(entity.id, next);
+      display.rotation = next;
     }
 
     for (const [id, display] of this.entityDisplayObjects) {
       if (!this.activeEntityIds.has(id)) {
         display.destroy();
         this.entityDisplayObjects.delete(id);
+        this.displayRotations.delete(id);
       }
     }
   }
@@ -94,6 +102,7 @@ export class EnemyManager {
   destroy(): void {
     for (const d of this.entityDisplayObjects.values()) d.destroy();
     this.entityDisplayObjects.clear();
+    this.displayRotations.clear();
     this.layer.destroy();
   }
 }

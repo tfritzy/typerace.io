@@ -74,7 +74,7 @@ export class CosmicDefenseGame {
     this.enemyManager.update(this.state, dt);
     this.projectileManager.update(this.state);
     this.explosionManager.update(this.state);
-    this.shipManager.update(this.state);
+    this.shipManager.update(this.state, dt);
 
     const waveActive = this.state.wave.phase !== WavePhase.Idle;
     if (waveActive !== this.state.waveActive) {
