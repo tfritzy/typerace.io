@@ -54,7 +54,7 @@ export const FRIENDLY_CATALOG: FriendlyConfig[] = [
   { entityType: "Moth", health: 200, projectileSpeed: 200, projectileDamage: 8, projectileType: ProjectileType.Tiny, chargesRequired: 3 },
   { entityType: "Dot", health: 400, projectileSpeed: 220, projectileDamage: 15, projectileType: ProjectileType.Tiny, chargesRequired: 3 },
   { entityType: "Gnat", health: 700, projectileSpeed: 240, projectileDamage: 30, projectileType: ProjectileType.Tiny, chargesRequired: 3 },
-  { entityType: "Flicker", health: 1200, projectileSpeed: 260, projectileDamage: 55, projectileType: ProjectileType.Projectile2, chargesRequired: 4 },
+  { entityType: "Ward", health: 1200, projectileSpeed: 260, projectileDamage: 55, projectileType: ProjectileType.Projectile2, chargesRequired: 4 },
   { entityType: "Clipper", health: 2000, projectileSpeed: 280, projectileDamage: 100, projectileType: ProjectileType.Projectile2, chargesRequired: 4 },
   { entityType: "Stinger", health: 3500, projectileSpeed: 300, projectileDamage: 200, projectileType: ProjectileType.Projectile2, chargesRequired: 5 },
   { entityType: "Crest", health: 6000, projectileSpeed: 320, projectileDamage: 375, projectileType: ProjectileType.Projectile3, chargesRequired: 5 },
@@ -62,9 +62,9 @@ export const FRIENDLY_CATALOG: FriendlyConfig[] = [
   { entityType: "Kestrel", health: 17000, projectileSpeed: 360, projectileDamage: 1300, projectileType: ProjectileType.Projectile3, chargesRequired: 6 },
   { entityType: "Vulture", health: 28000, projectileSpeed: 380, projectileDamage: 2400, projectileType: ProjectileType.Projectile4, chargesRequired: 7 },
   { entityType: "Talon", health: 45000, projectileSpeed: 400, projectileDamage: 4500, projectileType: ProjectileType.Projectile4, chargesRequired: 7 },
-  { entityType: "Warden", health: 75000, projectileSpeed: 420, projectileDamage: 8000, projectileType: ProjectileType.Projectile5, chargesRequired: 8 },
-  { entityType: "Behemoth", health: 120000, projectileSpeed: 440, projectileDamage: 15000, projectileType: ProjectileType.Projectile5, chargesRequired: 9 },
-  { entityType: "Juggernaut", health: 200000, projectileSpeed: 460, projectileDamage: 30000, projectileType: ProjectileType.Projectile6, chargesRequired: 10 },
+  { entityType: "Broadside", health: 75000, projectileSpeed: 420, projectileDamage: 8000, projectileType: ProjectileType.Projectile5, chargesRequired: 8 },
+  { entityType: "Bastion", health: 120000, projectileSpeed: 440, projectileDamage: 15000, projectileType: ProjectileType.Projectile5, chargesRequired: 9 },
+  { entityType: "Haven", health: 200000, projectileSpeed: 460, projectileDamage: 30000, projectileType: ProjectileType.Projectile6, chargesRequired: 10 },
   { entityType: "Colossus", health: 325000, projectileSpeed: 480, projectileDamage: 55000, projectileType: ProjectileType.Projectile6, chargesRequired: 11 },
 ];
 
