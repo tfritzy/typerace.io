@@ -319,7 +319,17 @@ export function applyCustomTheme(settings: ThemeSettings): void {
     applyResolvedTheme(theme, 'custom');
 }
 
-function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
+export function applyThemeOverride(settings: ThemeSettings, name: string): void {
+    const theme = resolveTheme(settings, name, [settings.backgroundColor, settings.accentColor]);
+    applyResolvedTheme(theme, name, { persist: false });
+}
+
+export function restoreSelectedTheme(): void {
+    applyTheme(getInitialTheme());
+}
+
+function applyResolvedTheme(theme: ResolvedTheme, tag: string, options: { persist?: boolean } = {}): void {
+    const { persist = true } = options;
     const root = document.documentElement;
     const fg = hexToRgb(theme.colors.foreground);
 
@@ -370,7 +380,9 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     root.dataset.mode = theme.mode;
 
     try {
-        localStorage.setItem('selectedTheme', tag);
+        if (persist) {
+            localStorage.setItem('selectedTheme', tag);
+        }
     } catch (_e) {
     }
 
