@@ -29,13 +29,13 @@ Mandatory steps — execute all of them, every time, no shortcuts, no skipping, 
 cd frontend && npm install
 ```
 
-### Step 2: Create module_bindings stub (if directory doesn't exist)
-The `frontend/module_bindings/` directory is gitignored and won't exist in a fresh clone. You MUST create a stub so the app compiles. Create `frontend/module_bindings/index.ts` with stub exports for all the bindings the app imports (GameMode, Game, Player, GameRecord, PlayerProgress, XpGain, GameState, GameType, GlobalStats, PersonalRecord, CharacterEventType, DbConnection). Check `frontend/src/` for all `module_bindings` imports to know what to stub.
+### Step 2: Generate local module_bindings with the repo's SpacetimeDB version (if directory doesn't exist)
+The `frontend/module_bindings/` directory is gitignored and won't exist in a fresh clone. Do NOT create a tracked bindings file, do NOT hand-write a stub for committed code, and do NOT change tracked imports or types to work around missing generated bindings. After `cd frontend && npm install`, use the frontend dependency lockfile as the compatibility source of truth: `frontend/package-lock.json` currently resolves `spacetimedb` to `1.12.0` even though `frontend/package.json` has the broader range `^1.10.0`. Generate bindings locally into `frontend/module_bindings/` with a compatible `spacetime` CLI version (1.12.x). If your local CLI version does not match that compatibility target, update the CLI before generating bindings.
 
 ### Step 3: Fix ALL build errors
 Run `cd frontend && npx tsc -b` and fix every error. Common issues:
 - Missing asset files referenced in `manifest.ts` or `assetManager.ts` — remove the broken references
-- Missing types from module_bindings — add them to the stub
+- Missing `module_bindings` imports usually mean the local generated bindings are absent or stale — regenerate them with the compatible SpacetimeDB version instead of editing tracked source files
 - Any other TypeScript errors — fix them before proceeding
 **DO NOT proceed to the next step until `tsc -b` passes with zero errors.**
 
@@ -178,7 +178,9 @@ Always check the table definition for available indexes before writing queries.
 
 ### Local dev commands
 
-Generate bindings:
+Generate bindings with a compatible `spacetime` CLI version:
+Use the frontend lockfile's resolved SpacetimeDB version as the compatibility target first. Right now `frontend/package-lock.json` resolves the frontend package to `spacetimedb@1.12.0`, so use a compatible `spacetime` CLI (1.12.x) when generating local gitignored bindings. Do not commit generated bindings or handwritten stubs.
+
 spacetime generate --lang typescript --out-dir frontend/module_bindings --module-path spacetimedb
 
 If you're curious about the state of a table:
