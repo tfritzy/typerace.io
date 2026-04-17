@@ -112,7 +112,13 @@ export const PhraseOverlay = ({
     <div
       ref={boxRef}
       onClick={() => inputRef.current?.focus()}
-      className="absolute bottom-5 left-1/2 -translate-x-1/2 w-80 text-[32px] font-light tracking-wide leading-[2.4] h-[2.4em] overflow-hidden px-5 z-10 whitespace-nowrap"
+      className="absolute bottom-5 left-1/2 -translate-x-1/2 w-[640px] text-[32px] font-light tracking-wide leading-[2.4] h-[2.4em] overflow-hidden px-5 z-10 whitespace-nowrap"
+      style={{
+        maskImage:
+          "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
+        WebkitMaskImage:
+          "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
+      }}
     >
       <input
         ref={inputRef}
