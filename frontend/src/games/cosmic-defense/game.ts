@@ -108,7 +108,7 @@ export async function createCosmicDefenseGame(
     background: 0x0a0a1a,
     antialias: false,
     resolution: 1,
-    autoDensity: true,
+    autoDensity: false,
     roundPixels: true,
     preserveDrawingBuffer: true,
   });
