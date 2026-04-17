@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
-import type { DbConnection } from '../../module_bindings';
-import { DbConnection as DbConnectionClass } from '../../module_bindings';
+import { DbConnection } from '../../module_bindings';
 import { useAuth } from '../firebase/AuthContext';
 import { LoadingDots } from '../components/LoadingDots';
 
@@ -35,7 +34,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
         }
 
         try {
-            let builder = DbConnectionClass.builder()
+            let builder = DbConnection.builder()
                 .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
                 .withModuleName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace');
 
