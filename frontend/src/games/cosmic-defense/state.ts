@@ -5,7 +5,7 @@ import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLANET_HIT_RADIUS = 100;
-const PROJECTILE_SPEED = 600;
+const PROJECTILE_SPEED = 300 * 2;
 
 export interface EntityState {
   id: number;
