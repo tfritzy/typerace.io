@@ -23,13 +23,13 @@ export enum ProjectileType {
 export const SHIP_ENTITY_TYPES = [
   "Vanguard", "Sentinel", "Corsair", "Falcon", "Scout", "Dart", "Wasp",
   "Phoenix", "Hawk", "Sparrow", "Gnat", "Stinger", "Needle", "Mite",
-  "Titan", "Raptor", "Lance", "Javelin", "Pip", "Raven", "Osprey",
-  "Leviathan", "Talon", "Hornet", "Behemoth", "Dreadnought", "Marauder",
-  "Eagle", "Pike", "Arrow", "Juggernaut", "Warden", "Specter", "Harrier",
-  "Viper", "Flea", "Broadside", "Kestrel", "Finch", "Striker", "Robin",
+  "Titan", "Raptor", "Lance", "Grace", "Pip", "Raven", "Osprey",
+  "Leviathan", "Talon", "Hornet", "Bastion", "Dreadnought", "Marauder",
+  "Eagle", "Mender", "Tender", "Haven", "Warden", "Specter", "Harrier",
+  "Viper", "Flea", "Broadside", "Kestrel", "Flare", "Striker", "Robin",
   "Cricket", "Moth", "Colossus", "Cutlass", "Sabre", "Mantis", "Speck",
-  "Crest", "Piston", "Vulture", "Orb", "Flicker", "Barb", "Sliver",
-  "Flagship", "Aegis", "Bolt", "Spur", "Dot", "Rampart", "Clipper",
+  "Crest", "Beacon", "Vulture", "Nova", "Ward", "Barb", "Spark",
+  "Flagship", "Aegis", "Bolt", "Spur", "Dot", "Corona", "Clipper",
 ] as const;
 
 export type EntityType = (typeof SHIP_ENTITY_TYPES)[number];
