@@ -110,6 +110,7 @@ export async function createCosmicDefenseGame(
     resolution: 1,
     autoDensity: true,
     roundPixels: true,
+    preserveDrawingBuffer: true,
   });
 
   app.canvas.style.width = "100%";
