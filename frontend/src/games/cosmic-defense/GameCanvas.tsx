@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { startNextWave } from "./state";
-import { formatGold } from "./constants";
+import { formatGold, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { PlanetHealthBar } from "./PlanetHealthBar";
 import { ShopPanel } from "./ShopPanel";
 import { PlacementOverlay } from "./PlacementOverlay";
@@ -22,6 +22,18 @@ export const GameCanvas = () => {
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
   const [slots, setSlots] = useState<PlacementSlot[]>(() => generateSlots());
+  const [uiScale, setUiScale] = useState(1);
+
+  useEffect(() => {
+    const div = containerRef.current;
+    if (!div) return;
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) setUiScale(entry.contentRect.width / CANVAS_WIDTH);
+    });
+    ro.observe(div);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -116,41 +128,51 @@ export const GameCanvas = () => {
       onDragStart={(e) => e.preventDefault()}
       onContextMenu={(e) => e.preventDefault()}
     >
-      <PlanetHealthBar ratio={healthRatio} />
-      <div className="absolute top-3 right-3 z-10 flex items-center gap-3">
-        <span className="text-[11px] text-[#f9e2af] flex items-center gap-1">
-          <Coins className="w-3.5 h-3.5" />
-          {formatGold(gold)}
-        </span>
-        <span className="text-[11px] text-[#a6adc8]">
-          Wave {waveNumber + 1}
-        </span>
+      <div
+        className="absolute top-0 left-0"
+        style={{
+          width: CANVAS_WIDTH,
+          height: CANVAS_HEIGHT,
+          transformOrigin: "top left",
+          transform: `scale(${uiScale})`,
+        }}
+      >
+        <PlanetHealthBar ratio={healthRatio} />
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-3">
+          <span className="text-[11px] text-[#f9e2af] flex items-center gap-1">
+            <Coins className="w-3.5 h-3.5" />
+            {formatGold(gold)}
+          </span>
+          <span className="text-[11px] text-[#a6adc8]">
+            Wave {waveNumber + 1}
+          </span>
+          {!waveActive && (
+            <button
+              onClick={handleNextWave}
+              className="text-[11px] bg-green-400/85 text-[#0a0a1a] px-2.5 py-1 rounded cursor-pointer hover:brightness-125"
+            >
+              {waveNumber === 0 ? "Start" : "Next wave"}
+            </button>
+          )}
+        </div>
         {!waveActive && (
-          <button
-            onClick={handleNextWave}
-            className="text-[11px] bg-green-400/85 text-[#0a0a1a] px-2.5 py-1 rounded cursor-pointer hover:brightness-125"
-          >
-            {waveNumber === 0 ? "Start" : "Next wave"}
-          </button>
+          <PlacementOverlay
+            slots={slots}
+            onSlotClick={handleSlotClick}
+            activeSlotIndex={selectedSlot?.index ?? null}
+          />
         )}
+        {selectedSlot && (
+          <ShopPanel
+            onSelectShip={handleSelectShip}
+            onClose={handleCloseShop}
+            shipPreviews={shipPreviews}
+            gold={gold}
+            slot={selectedSlot}
+          />
+        )}
+        <PhraseOverlay gameRef={gameRef} visible={waveActive} />
       </div>
-      {!waveActive && (
-        <PlacementOverlay
-          slots={slots}
-          onSlotClick={handleSlotClick}
-          activeSlotIndex={selectedSlot?.index ?? null}
-        />
-      )}
-      {selectedSlot && (
-        <ShopPanel
-          onSelectShip={handleSelectShip}
-          onClose={handleCloseShop}
-          shipPreviews={shipPreviews}
-          gold={gold}
-          slot={selectedSlot}
-        />
-      )}
-      <PhraseOverlay gameRef={gameRef} visible={waveActive} />
     </div>
   );
 };
