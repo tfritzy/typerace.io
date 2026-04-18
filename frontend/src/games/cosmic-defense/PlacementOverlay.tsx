@@ -1,35 +1,126 @@
-import { Plus } from "lucide-react";
+import { useState, useMemo } from "react";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import type { PlacementSlot } from "./PlacementPoints";
 
 interface PlacementOverlayProps {
   slots: PlacementSlot[];
   onSlotClick: (slot: PlacementSlot) => void;
+  activeSlotIndex: number | null;
 }
 
-const BUTTON_SIZE = (140 / CANVAS_WIDTH) * 100;
+const COL_SPACING = 130;
+const ROW_SPACING = 110;
+const HEX_HALF_W = COL_SPACING / 2;
+const HEX_VERT = (ROW_SPACING * 2) / 3;
+const HEX_HALF_VERT = HEX_VERT / 2;
 
-export const PlacementOverlay = ({ slots, onSlotClick }: PlacementOverlayProps) => {
+function hexPoints(cx: number, cy: number): string {
+  return [
+    `${cx},${cy - HEX_VERT}`,
+    `${cx + HEX_HALF_W},${cy - HEX_HALF_VERT}`,
+    `${cx + HEX_HALF_W},${cy + HEX_HALF_VERT}`,
+    `${cx},${cy + HEX_VERT}`,
+    `${cx - HEX_HALF_W},${cy + HEX_HALF_VERT}`,
+    `${cx - HEX_HALF_W},${cy - HEX_HALF_VERT}`,
+  ].join(" ");
+}
+
+function buildGridPath(slots: PlacementSlot[]): string {
+  const seen = new Set<string>();
+  const segments: string[] = [];
+
+  for (const slot of slots) {
+    const verts: [number, number][] = [
+      [slot.x, slot.y - HEX_VERT],
+      [slot.x + HEX_HALF_W, slot.y - HEX_HALF_VERT],
+      [slot.x + HEX_HALF_W, slot.y + HEX_HALF_VERT],
+      [slot.x, slot.y + HEX_VERT],
+      [slot.x - HEX_HALF_W, slot.y + HEX_HALF_VERT],
+      [slot.x - HEX_HALF_W, slot.y - HEX_HALF_VERT],
+    ];
+
+    for (let i = 0; i < 6; i++) {
+      const [x1, y1] = verts[i];
+      const [x2, y2] = verts[(i + 1) % 6];
+      const ax = Math.round(x1 * 10);
+      const ay = Math.round(y1 * 10);
+      const bx = Math.round(x2 * 10);
+      const by = Math.round(y2 * 10);
+      const key =
+        `${ax},${ay}` < `${bx},${by}`
+          ? `${ax},${ay}-${bx},${by}`
+          : `${bx},${by}-${ax},${ay}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        segments.push(`M${x1},${y1}L${x2},${y2}`);
+      }
+    }
+  }
+
+  return segments.join("");
+}
+
+export const PlacementOverlay = ({
+  slots,
+  onSlotClick,
+  activeSlotIndex,
+}: PlacementOverlayProps) => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const gridPath = useMemo(() => buildGridPath(slots), [slots]);
+
   return (
-    <div className="absolute inset-0 z-10 pointer-events-none">
-      {slots.map((slot) =>
-        slot.occupant ? null : (
-          <button
-            key={slot.index}
-            className="absolute rounded-full pointer-events-auto cursor-pointer hover:bg-[#788cc8]/15 transition-colors p-0 flex items-center justify-center"
-            style={{
-              left: `${(slot.x / CANVAS_WIDTH) * 100}%`,
-              top: `${(slot.y / CANVAS_HEIGHT) * 100}%`,
-              width: `${BUTTON_SIZE}%`,
-              aspectRatio: "1",
-              transform: "translate(-50%, -50%)",
-            }}
-            onClick={() => onSlotClick(slot)}
-          >
-            <Plus className="w-3 h-3 text-[#788cc8]/40 pointer-events-none" />
-          </button>
-        )
-      )}
-    </div>
+    <svg
+      className="absolute inset-0 z-10 w-full h-full"
+      viewBox={`0 0 ${CANVAS_WIDTH} ${CANVAS_HEIGHT}`}
+      preserveAspectRatio="xMidYMid meet"
+      style={{ pointerEvents: "none" }}
+    >
+      <path
+        d={gridPath}
+        fill="none"
+        stroke="rgba(120,140,200,0.35)"
+        strokeWidth={1}
+      />
+
+      {slots.map((slot) => {
+        if (slot.occupant) return null;
+        const isActive = activeSlotIndex === slot.index;
+        const isHovered = hoveredIndex === slot.index;
+        return (
+          <g key={slot.index}>
+            <polygon
+              points={hexPoints(slot.x, slot.y)}
+              fill="transparent"
+              style={{ pointerEvents: "auto", cursor: "pointer" }}
+              onClick={() => onSlotClick(slot)}
+              onMouseEnter={() => setHoveredIndex(slot.index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+            />
+            {(isHovered || isActive) && (
+              <polygon
+                points={hexPoints(slot.x, slot.y)}
+                fill="none"
+                stroke={isActive ? "rgba(120,140,200,0.7)" : "rgba(120,140,200,0.55)"}
+                strokeWidth={1}
+                style={{ pointerEvents: "none" }}
+              />
+            )}
+            <circle
+              cx={slot.x}
+              cy={slot.y}
+              r={3}
+              fill={
+                isActive
+                  ? "rgba(120,140,200,0.7)"
+                  : isHovered
+                    ? "rgba(120,140,200,0.55)"
+                    : "rgba(120,140,200,0.3)"
+              }
+              style={{ pointerEvents: "none" }}
+            />
+          </g>
+        );
+      })}
+    </svg>
   );
 };
