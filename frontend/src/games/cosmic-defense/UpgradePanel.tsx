@@ -201,13 +201,16 @@ export const UpgradePanel = ({ onUpgrade, onClose, shipPreviews, gold, slot, ent
             <span className="text-[9px] text-[#585b70]">Tier {currentTier}</span>
             {entity && (
               <div className="w-full bg-[#1e1e2e] rounded-full h-1.5">
-                <div
-                  className="h-full rounded-full"
-                  style={{
-                    width: `${Math.max(0, Math.min(100, (entity.health / entity.maxHealth) * 100))}%`,
-                    backgroundColor: entity.health / entity.maxHealth > 0.5 ? "#a6e3a1" : entity.health / entity.maxHealth > 0.25 ? "#f9e2af" : "#f38ba8",
-                  }}
-                />
+                {(() => {
+                  const healthPct = Math.max(0, Math.min(100, (entity.health / entity.maxHealth) * 100));
+                  const barColor = healthPct > 50 ? "#a6e3a1" : healthPct > 25 ? "#f9e2af" : "#f38ba8";
+                  return (
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${healthPct}%`, backgroundColor: barColor }}
+                    />
+                  );
+                })()}
               </div>
             )}
           </div>

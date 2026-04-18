@@ -473,7 +473,7 @@ function findNearestTarget(
       }
     }
   } else if (mode === TargetingMode.Strongest) {
-    let bestHealth = -1;
+    let bestHealth = -Infinity;
     for (const other of state.entities) {
       if (other.team !== opposingTeam) continue;
       if (other.health > bestHealth) {

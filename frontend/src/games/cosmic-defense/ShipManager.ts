@@ -44,7 +44,13 @@ export class ShipManager {
     if (!config) return -1;
     const oldEntity = state.entities.find((e) => e.id === oldEntityId);
     const savedStats = oldEntity
-      ? { kills: oldEntity.kills, damageDealt: oldEntity.damageDealt, totalHealed: oldEntity.totalHealed, totalShielded: oldEntity.totalShielded, targetingMode: oldEntity.targetingMode }
+      ? {
+          kills: oldEntity.kills,
+          damageDealt: oldEntity.damageDealt,
+          totalHealed: oldEntity.totalHealed,
+          totalShielded: oldEntity.totalShielded,
+          targetingMode: oldEntity.targetingMode,
+        }
       : null;
     const idx = state.entities.findIndex((e) => e.id === oldEntityId);
     if (idx >= 0) state.entities.splice(idx, 1);
