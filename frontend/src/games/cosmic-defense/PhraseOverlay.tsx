@@ -3,20 +3,31 @@ import type { CosmicDefenseGame } from "./game";
 import { getRandomWord } from "../../utils/wordLists";
 import { getLanguageFromSlug } from "../../utils/modes";
 
-const PHRASE_BUFFER_SIZE = 500;
+const MAX_COMPLETED_DISPLAY_CHARS = 160;
 
 function getLangCode(): string {
   const slug = window.location.pathname.split("/").pop() ?? "";
   return getLanguageFromSlug(slug)?.htmlLang ?? "en";
 }
 
-function generatePhrase(wordCount: number): string {
-  const langCode = getLangCode();
-  const words: string[] = [];
-  for (let i = 0; i < wordCount; i++) {
-    words.push(getRandomWord(langCode));
+function generateWord(): string {
+  return getRandomWord(getLangCode());
+}
+
+function trimCompletedWords(words: string[]): string[] {
+  let totalChars = words.reduce((sum, word) => sum + word.length, 0) + Math.max(words.length - 1, 0);
+  let start = 0;
+
+  while (totalChars > MAX_COMPLETED_DISPLAY_CHARS && start < words.length - 1) {
+    totalChars -= words[start].length + 1;
+    start++;
   }
-  return words.join(" ");
+
+  return start === 0 ? words : words.slice(start);
+}
+
+function charsMatch(typedChar: string, targetChar: string): boolean {
+  return typedChar.toLowerCase() === targetChar.toLowerCase();
 }
 
 export const PhraseOverlay = ({
@@ -26,18 +37,21 @@ export const PhraseOverlay = ({
   gameRef: React.RefObject<CosmicDefenseGame | null>;
   visible: boolean;
 }) => {
-  const [phrase, setPhrase] = useState(() => generatePhrase(PHRASE_BUFFER_SIZE));
-  const [typedText, setTypedText] = useState("");
+  const [completedWords, setCompletedWords] = useState<string[]>([]);
+  const [currentWord, setCurrentWord] = useState(() => generateWord());
+  const [typedWord, setTypedWord] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const cursorCharRef = useRef<HTMLSpanElement>(null);
   const offsetRef = useRef(0);
 
-  const phraseRef = useRef(phrase);
-  const typedTextRef = useRef(typedText);
-  phraseRef.current = phrase;
-  typedTextRef.current = typedText;
+  const completedWordsRef = useRef(completedWords);
+  const currentWordRef = useRef(currentWord);
+  const typedWordRef = useRef(typedWord);
+  completedWordsRef.current = completedWords;
+  currentWordRef.current = currentWord;
+  typedWordRef.current = typedWord;
 
   useEffect(() => {
     if (!visible) return;
@@ -46,30 +60,42 @@ export const PhraseOverlay = ({
       const game = gameRef.current;
       if (!game) return;
       if (e.ctrlKey || e.altKey || e.metaKey) return;
+
       if (e.key === "Backspace") {
         e.preventDefault();
+        if (typedWordRef.current.length > 0) {
+          setTypedWord(typedWordRef.current.slice(0, -1));
+        }
+        if (inputRef.current) inputRef.current.value = "";
         return;
       }
+
+      if (e.key === " ") {
+        e.preventDefault();
+        if (typedWordRef.current.length === 0) return;
+        setCompletedWords(trimCompletedWords([...completedWordsRef.current, typedWordRef.current]));
+        setTypedWord("");
+        setCurrentWord(generateWord());
+        if (inputRef.current) inputRef.current.value = "";
+        return;
+      }
+
       if (e.key.length !== 1) return;
       e.preventDefault();
 
-      const text = phraseRef.current;
-      const tc = typedTextRef.current.length;
       const normalizedKey = e.key.toLowerCase();
-      const correct = tc < text.length && normalizedKey === text[tc].toLowerCase();
-      const newTypedText = typedTextRef.current + e.key;
+      const typedLength = typedWordRef.current.length;
+      const targetWord = currentWordRef.current;
+      const correct =
+        typedLength < targetWord.length && normalizedKey === targetWord[typedLength].toLowerCase();
+      const newTypedWord = typedWordRef.current + e.key;
 
       if (correct) {
         game.onCorrectKeystroke();
       }
 
-      setTypedText(newTypedText);
+      setTypedWord(newTypedWord);
       if (inputRef.current) inputRef.current.value = "";
-
-      if (newTypedText.length > PHRASE_BUFFER_SIZE && text.length - newTypedText.length < PHRASE_BUFFER_SIZE) {
-        const extra = generatePhrase(PHRASE_BUFFER_SIZE);
-        setPhrase(text + " " + extra);
-      }
     };
 
     document.addEventListener("keydown", onKeyDown);
@@ -78,8 +104,9 @@ export const PhraseOverlay = ({
 
   useEffect(() => {
     if (visible) {
-      setPhrase(generatePhrase(PHRASE_BUFFER_SIZE));
-      setTypedText("");
+      setCompletedWords([]);
+      setCurrentWord(generateWord());
+      setTypedWord("");
     }
   }, [visible]);
 
@@ -91,7 +118,7 @@ export const PhraseOverlay = ({
     const charEl = cursorCharRef.current;
     if (!box || !track || !charEl) return;
 
-    if (typedText.length === 0) {
+    if (completedWords.length === 0 && typedWord.length === 0) {
       offsetRef.current = 0;
     }
 
@@ -105,15 +132,12 @@ export const PhraseOverlay = ({
 
     offsetRef.current = newOffset;
     track.style.transform = `translateX(${newOffset}px)`;
-  }, [phrase, typedText.length, visible]);
+  }, [completedWords, currentWord, typedWord.length, visible]);
 
   if (!visible) return null;
 
-  let lastCompletedWordEnd = 0;
-  for (let i = 0; i < typedText.length && i < phrase.length; i++) {
-    if (typedText[i] !== phrase[i]) break;
-    if (phrase[i] === " ") lastCompletedWordEnd = i + 1;
-  }
+  const completedText = completedWords.length > 0 ? `${completedWords.join(" ")} ` : "";
+  const activeLength = Math.max(currentWord.length, typedWord.length);
 
   return (
     <div
@@ -139,20 +163,21 @@ export const PhraseOverlay = ({
         ref={trackRef}
         className="inline-block whitespace-nowrap transition-transform duration-[80ms] ease-out"
       >
-        {phrase.split("").map((char, i) => {
-          const isTyped = i < typedText.length;
-          const isCorrect = isTyped && typedText[i] === char;
-          const isCursor = i === typedText.length;
-          const isInCompletedWord = i < lastCompletedWordEnd;
-          const isInCurrentWord =
-            i >= lastCompletedWordEnd && i < typedText.length && isCorrect;
+        {completedText.length > 0 && (
+          <span className="text-text-completed">{completedText}</span>
+        )}
+        {Array.from({ length: activeLength }).map((_, i) => {
+          const targetChar = currentWord[i];
+          const typedChar = typedWord[i];
+          const displayChar = targetChar ?? typedChar;
+          const isTyped = i < typedWord.length;
+          const isCorrect = isTyped && targetChar !== undefined && charsMatch(typedChar, targetChar);
+          const isCursor = i === typedWord.length;
 
           let colorClass = "text-text-untyped";
           if (isTyped && !isCorrect) {
             colorClass = "text-destructive";
-          } else if (isInCompletedWord) {
-            colorClass = "text-text-completed";
-          } else if (isInCurrentWord) {
+          } else if (isTyped) {
             colorClass = "text-foreground";
           }
 
@@ -162,10 +187,18 @@ export const PhraseOverlay = ({
               ref={isCursor ? cursorCharRef : null}
               className={`${colorClass} ${isTyped && !isCorrect ? "underline decoration-2 decoration-destructive" : ""} ${isCursor ? "shadow-[-1px_0_0_0_#4a5568]" : ""}`}
             >
-              {char}
+              {displayChar}
             </span>
           );
         })}
+        {typedWord.length >= activeLength && (
+          <span
+            ref={cursorCharRef}
+            className="text-text-untyped shadow-[-1px_0_0_0_#4a5568]"
+          >
+            {" "}
+          </span>
+        )}
       </div>
     </div>
   );
