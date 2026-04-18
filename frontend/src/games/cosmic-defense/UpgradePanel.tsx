@@ -61,7 +61,7 @@ function renderStatRows(currentConfig: FriendlyConfig, nextConfig: FriendlyConfi
       rows.push({ label: "Damage", current: currentConfig.projectileDamage, next: nextConfig.projectileDamage });
       break;
     default:
-      throw new Error(`Unknown ship role: ${role}`);
+      throw new Error(`Unknown ship role: ${String(role)}`);
   }
 
   rows.push({ label: "Health", current: currentConfig.health, next: nextConfig.health });
