@@ -78,7 +78,7 @@ export const PlacementOverlay = ({
       <path
         d={gridPath}
         fill="none"
-        stroke="rgba(120,140,200,0.2)"
+        stroke="rgba(120,140,200,0.35)"
         strokeWidth={1}
       />
 
@@ -100,7 +100,7 @@ export const PlacementOverlay = ({
               <polygon
                 points={hexPoints(slot.x, slot.y)}
                 fill="none"
-                stroke={isActive ? "rgba(120,140,200,0.5)" : "rgba(120,140,200,0.35)"}
+                stroke={isActive ? "rgba(120,140,200,0.7)" : "rgba(120,140,200,0.55)"}
                 strokeWidth={1}
                 style={{ pointerEvents: "none" }}
               />
@@ -111,10 +111,10 @@ export const PlacementOverlay = ({
               r={3}
               fill={
                 isActive
-                  ? "rgba(120,140,200,0.5)"
+                  ? "rgba(120,140,200,0.7)"
                   : isHovered
-                    ? "rgba(120,140,200,0.4)"
-                    : "rgba(120,140,200,0.15)"
+                    ? "rgba(120,140,200,0.55)"
+                    : "rgba(120,140,200,0.3)"
               }
               style={{ pointerEvents: "none" }}
             />
