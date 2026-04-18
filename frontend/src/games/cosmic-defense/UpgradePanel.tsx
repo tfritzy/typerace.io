@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { formatGold, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import type { EntityType } from "./types";
 import {
@@ -9,7 +8,6 @@ import {
 } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
 import { getNextUpgrade, getUpgradeCost, getShipTier } from "./upgradePaths";
-import { FRIENDLY_CONFIG_MAP, type FriendlyConfig } from "./enemyConfig";
 import { TargetingMode } from "./state";
 import type { EntityState } from "./state";
 import { getShipRole, ROLE_META } from "./shipCatalog";
@@ -39,18 +37,6 @@ const TARGETING_OPTIONS: { mode: TargetingMode; label: string }[] = [
   { mode: TargetingMode.LowestHealth, label: "Most damaged" },
 ];
 
-function getPrimaryStat(
-  config: FriendlyConfig
-): { label: string; value: number } | null {
-  if (config.projectileDamage > 0) return { label: "dmg", value: config.projectileDamage };
-  if (config.laserDamage > 0) return { label: "dmg", value: config.laserDamage };
-  if (config.healAmount > 0) return { label: "heal", value: config.healAmount };
-  if (config.shieldAmount > 0) return { label: "shield", value: config.shieldAmount };
-  if (config.plasmaStacks > 0) return { label: "stacks", value: config.plasmaStacks };
-  if (config.chargesGranted > 0) return { label: "charges", value: config.chargesGranted };
-  return null;
-}
-
 export const UpgradePanel = ({
   onUpgrade,
   onClose,
@@ -60,8 +46,6 @@ export const UpgradePanel = ({
   entity,
   onTargetingChange,
 }: UpgradePanelProps) => {
-  const [hovering, setHovering] = useState(false);
-
   const currentType = slot.occupant;
   if (!currentType) return null;
 
@@ -80,15 +64,9 @@ export const UpgradePanel = ({
   );
 
   const currentPreview = shipPreviews.get(currentType);
-  const currentConfig = FRIENDLY_CONFIG_MAP.get(currentType);
-  const nextConfig = nextType ? FRIENDLY_CONFIG_MAP.get(nextType) : undefined;
   const roleMeta = role ? ROLE_META[role] : null;
   const RoleIcon = roleMeta?.icon;
   const currentTargeting = entity?.targetingMode ?? TargetingMode.NearestToShip;
-
-  const primaryStat = currentConfig ? getPrimaryStat(currentConfig) : null;
-  const nextPrimaryStat = nextConfig ? getPrimaryStat(nextConfig) : null;
-  const showDeltas = hovering && nextConfig !== undefined;
 
   return (
     <>
@@ -167,44 +145,6 @@ export const UpgradePanel = ({
           </div>
         </div>
 
-        {entity && (
-          <div className="px-2.5 pb-1.5">
-            <div className="w-full bg-[#1e1e2e] rounded-full h-1 overflow-hidden">
-              {(() => {
-                const pct = Math.max(
-                  0,
-                  Math.min(100, (entity.health / entity.maxHealth) * 100)
-                );
-                const color =
-                  pct > 50 ? "#a6e3a1" : pct > 25 ? "#f9e2af" : "#f38ba8";
-                return (
-                  <div
-                    className="h-full rounded-full transition-all"
-                    style={{ width: `${pct}%`, backgroundColor: color }}
-                  />
-                );
-              })()}
-            </div>
-            <div className="flex items-center justify-between mt-0.5">
-              <span className="text-[8px] text-[#6c7086]">
-                {Math.round(entity.health)}/{entity.maxHealth}
-              </span>
-              {primaryStat && (
-                <span className="text-[8px] text-[#6c7086]">
-                  {primaryStat.label} {primaryStat.value}
-                  {showDeltas &&
-                    nextPrimaryStat &&
-                    nextPrimaryStat.value !== primaryStat.value && (
-                      <span className="text-[#a6e3a1]">
-                        →{nextPrimaryStat.value}
-                      </span>
-                    )}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-
         <div className="px-2.5 pb-1.5">
           <select
             value={currentTargeting}
@@ -229,10 +169,6 @@ export const UpgradePanel = ({
               }`}
               onClick={canAfford ? onUpgrade : undefined}
               disabled={!canAfford}
-              onMouseEnter={() => setHovering(true)}
-              onMouseLeave={() => setHovering(false)}
-              onFocus={() => setHovering(true)}
-              onBlur={() => setHovering(false)}
             >
               <ChevronUp className="w-3 h-3" />
               {nextType}
