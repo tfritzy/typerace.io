@@ -12,10 +12,10 @@ export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   { entityType: "Moth", cost: 15, colorPreset: ColorPreset.Preset1 },
   { entityType: "Osprey", cost: 15, colorPreset: ColorPreset.Preset1 },
   { entityType: "Mender", cost: 15, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Speck", cost: 15, colorPreset: ColorPreset.Preset1 },
+  { entityType: "Buckler", cost: 15, colorPreset: ColorPreset.Preset1 },
   { entityType: "Spark", cost: 15, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Mite", cost: 15, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Specter", cost: 15, colorPreset: ColorPreset.Preset1 },
+  { entityType: "Pulse", cost: 15, colorPreset: ColorPreset.Preset1 },
+  { entityType: "Prism", cost: 15, colorPreset: ColorPreset.Preset1 },
 ];
 
 for (const bp of SHIP_BLUEPRINTS) {

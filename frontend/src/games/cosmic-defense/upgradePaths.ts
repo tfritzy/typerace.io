@@ -4,10 +4,10 @@ export const UPGRADE_PATHS: EntityType[][] = [
   ["Moth", "Needle", "Clipper", "Warden"],
   ["Osprey", "Raven", "Vanguard", "Titan"],
   ["Mender", "Tender", "Grace", "Haven"],
-  ["Speck", "Ward", "Aegis", "Bastion"],
-  ["Spark", "Beacon", "Corona", "Phoenix"],
-  ["Mite", "Flare", "Bolt", "Falcon"],
-  ["Specter", "Nova", "Sabre", "Leviathan"],
+  ["Buckler", "Ward", "Aegis", "Bastion"],
+  ["Spark", "Ember", "Corona", "Inferno"],
+  ["Pulse", "Flare", "Bolt", "Dynamo"],
+  ["Prism", "Nova", "Sabre", "Leviathan"],
 ];
 
 export const TIER_UPGRADE_COSTS = [15, 80, 400, 2000];
