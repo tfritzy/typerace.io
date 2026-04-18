@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
-import { startNextWave } from "./state";
+import { startNextWave, TargetingMode } from "./state";
+import type { EntityState } from "./state";
 import { formatGold } from "./constants";
 import { PlanetHealthBar } from "./PlanetHealthBar";
 import { ShopPanel } from "./ShopPanel";
@@ -149,6 +150,19 @@ export const GameCanvas = () => {
     setSelectedSlot(null);
   }, []);
 
+  const getSelectedEntity = useCallback((): EntityState | null => {
+    const game = gameRef.current;
+    if (!game || !selectedSlot || !selectedSlot.entityId) return null;
+    return game.state.entities.find((e) => e.id === selectedSlot.entityId) ?? null;
+  }, [selectedSlot]);
+
+  const handleTargetingChange = useCallback((mode: TargetingMode) => {
+    const game = gameRef.current;
+    if (!game || !selectedSlot || !selectedSlot.entityId) return;
+    const entity = game.state.entities.find((e) => e.id === selectedSlot.entityId);
+    if (entity) entity.targetingMode = mode;
+  }, [selectedSlot]);
+
   return (
     <div
       ref={containerRef}
@@ -207,6 +221,8 @@ export const GameCanvas = () => {
             shipPreviews={shipPreviews}
             gold={gold}
             slot={selectedSlot}
+            entity={getSelectedEntity()}
+            onTargetingChange={handleTargetingChange}
           />
         )}
         <PhraseOverlay gameRef={gameRef} visible={waveActive} />

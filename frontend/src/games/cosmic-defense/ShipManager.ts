@@ -42,9 +42,24 @@ export class ShipManager {
   upgradeShip(state: GameState, oldEntityId: number, newEntityType: EntityType, x: number, y: number): number {
     const config = FRIENDLY_CONFIG_MAP.get(newEntityType);
     if (!config) return -1;
+    const oldEntity = state.entities.find((e) => e.id === oldEntityId);
+    const savedStats = oldEntity
+      ? { kills: oldEntity.kills, damageDealt: oldEntity.damageDealt, totalHealed: oldEntity.totalHealed, totalShielded: oldEntity.totalShielded, targetingMode: oldEntity.targetingMode }
+      : null;
     const idx = state.entities.findIndex((e) => e.id === oldEntityId);
     if (idx >= 0) state.entities.splice(idx, 1);
-    return this.addShip(state, newEntityType, x, y);
+    const newId = this.addShip(state, newEntityType, x, y);
+    if (savedStats) {
+      const newEntity = state.entities.find((e) => e.id === newId);
+      if (newEntity) {
+        newEntity.kills = savedStats.kills;
+        newEntity.damageDealt = savedStats.damageDealt;
+        newEntity.totalHealed = savedStats.totalHealed;
+        newEntity.totalShielded = savedStats.totalShielded;
+        newEntity.targetingMode = savedStats.targetingMode;
+      }
+    }
+    return newId;
   }
 
   update(state: GameState, dt: number): void {
