@@ -1,16 +1,16 @@
 import { SHIP_BLUEPRINTS, type ShipRole } from "./shipCatalog";
 import { formatGold, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import type { EntityType } from "./types";
-import { Coins, X, Crosshair, Repeat, Heart, Shield, Flame, Zap, Focus } from "lucide-react";
+import { Coins, X, Crosshair, ChevronsRight, Heart, Shield, FlaskConical, Zap, Focus } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
 import type { LucideIcon } from "lucide-react";
 
 const ROLE_META: Record<ShipRole, { icon: LucideIcon; label: string; color: string }> = {
   shooter: { icon: Crosshair, label: "Shooter", color: "#94e2d5" },
-  alternating: { icon: Repeat, label: "Alternating", color: "#89b4fa" },
+  rapid_fire: { icon: ChevronsRight, label: "Rapid Fire", color: "#89b4fa" },
   healer: { icon: Heart, label: "Healer", color: "#a6e3a1" },
   shield: { icon: Shield, label: "Shield", color: "#74c7ec" },
-  damage: { icon: Flame, label: "Damage", color: "#fab387" },
+  plasma: { icon: FlaskConical, label: "Plasma", color: "#fab387" },
   charge: { icon: Zap, label: "Charge", color: "#f9e2af" },
   laser: { icon: Focus, label: "Laser", color: "#cba6f7" },
 };
