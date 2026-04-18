@@ -5,11 +5,13 @@ import { startNextWave } from "./state";
 import { formatGold } from "./constants";
 import { PlanetHealthBar } from "./PlanetHealthBar";
 import { ShopPanel } from "./ShopPanel";
+import { UpgradePanel } from "./UpgradePanel";
 import { PlacementOverlay } from "./PlacementOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import { SHIP_BLUEPRINT_MAP } from "./shipCatalog";
 import type { EntityType } from "./types";
+import { getNextUpgrade, getUpgradeCost } from "./upgradePaths";
 import { Coins } from "lucide-react";
 
 export const GameCanvas = () => {
@@ -94,11 +96,36 @@ export const GameCanvas = () => {
     game.state.gold -= bp.cost;
     game.state.onGoldChanged.emit();
 
-    game.shipManager.addShip(game.state, entityType, selectedSlot.x, selectedSlot.y);
+    const entityId = game.shipManager.addShip(game.state, entityType, selectedSlot.x, selectedSlot.y);
 
     setSlots((prev) =>
       prev.map((s) =>
-        s.index === selectedSlot.index ? { ...s, occupant: entityType } : s
+        s.index === selectedSlot.index ? { ...s, occupant: entityType, entityId } : s
+      )
+    );
+    setSelectedSlot(null);
+  }, [selectedSlot]);
+
+  const handleUpgrade = useCallback(() => {
+    const game = gameRef.current;
+    if (!game || !selectedSlot || !selectedSlot.occupant || selectedSlot.entityId == null) return;
+
+    const nextType = getNextUpgrade(selectedSlot.occupant);
+    if (!nextType) return;
+
+    const cost = getUpgradeCost(selectedSlot.occupant);
+    if (game.state.gold < cost) return;
+
+    game.state.gold -= cost;
+    game.state.onGoldChanged.emit();
+
+    const newEntityId = game.shipManager.upgradeShip(
+      game.state, selectedSlot.entityId, nextType, selectedSlot.x, selectedSlot.y
+    );
+
+    setSlots((prev) =>
+      prev.map((s) =>
+        s.index === selectedSlot.index ? { ...s, occupant: nextType, entityId: newEntityId } : s
       )
     );
     setSelectedSlot(null);
@@ -141,9 +168,18 @@ export const GameCanvas = () => {
           activeSlotIndex={selectedSlot?.index ?? null}
         />
       )}
-      {selectedSlot && (
+      {selectedSlot && !selectedSlot.occupant && (
         <ShopPanel
           onSelectShip={handleSelectShip}
+          onClose={handleCloseShop}
+          shipPreviews={shipPreviews}
+          gold={gold}
+          slot={selectedSlot}
+        />
+      )}
+      {selectedSlot && selectedSlot.occupant && (
+        <UpgradePanel
+          onUpgrade={handleUpgrade}
           onClose={handleCloseShop}
           shipPreviews={shipPreviews}
           gold={gold}
