@@ -620,6 +620,7 @@ function activateAbility(state: GameState, e: EntityState): void {
       const allies = findNearbyAllies(state, e);
       for (const ally of allies) {
         if (ally.chargesRequired <= 0) continue;
+        if (ally.role === "charge") continue;
         ally.charge = Math.min(ally.chargesRequired, ally.charge + e.abilityValue);
         activateAbility(state, ally);
       }
