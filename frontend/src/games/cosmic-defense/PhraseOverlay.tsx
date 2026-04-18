@@ -15,7 +15,8 @@ function generateWord(): string {
 }
 
 function trimCompletedWords(words: string[]): string[] {
-  let totalChars = words.reduce((sum, word) => sum + word.length, 0) + Math.max(words.length - 1, 0);
+  const spacesCount = Math.max(words.length - 1, 0);
+  let totalChars = words.reduce((sum, word) => sum + word.length, 0) + spacesCount;
   let start = 0;
 
   while (totalChars > MAX_COMPLETED_DISPLAY_CHARS && start < words.length - 1) {
@@ -137,7 +138,7 @@ export const PhraseOverlay = ({
   if (!visible) return null;
 
   const completedText = completedWords.length > 0 ? `${completedWords.join(" ")} ` : "";
-  const activeLength = Math.max(currentWord.length, typedWord.length);
+  const displayCharCount = Math.max(currentWord.length, typedWord.length);
 
   return (
     <div
@@ -166,7 +167,7 @@ export const PhraseOverlay = ({
         {completedText.length > 0 && (
           <span className="text-text-completed">{completedText}</span>
         )}
-        {Array.from({ length: activeLength }).map((_, i) => {
+        {Array.from({ length: displayCharCount }).map((_, i) => {
           const targetChar = currentWord[i];
           const typedChar = typedWord[i];
           const displayChar = targetChar ?? typedChar;
@@ -191,7 +192,7 @@ export const PhraseOverlay = ({
             </span>
           );
         })}
-        {typedWord.length >= activeLength && (
+        {typedWord.length >= displayCharCount && (
           <span
             ref={cursorCharRef}
             className="text-text-untyped shadow-[-1px_0_0_0_#4a5568]"
