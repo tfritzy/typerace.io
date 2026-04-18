@@ -3,7 +3,7 @@ import type { EntityType } from "./types";
 import { Coins, X } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
 import { getNextUpgrade, getUpgradeCost, getShipTier } from "./upgradePaths";
-import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
+import { FRIENDLY_CONFIG_MAP, type FriendlyConfig } from "./enemyConfig";
 
 interface UpgradePanelProps {
   onUpgrade: () => void;
@@ -23,6 +23,73 @@ function statDelta(current: number, next: number): string {
   const diff = next - current;
   if (diff > 0) return `+${diff}`;
   return `${diff}`;
+}
+
+function renderChargeDots(count: number, color: string) {
+  return (
+    <div className="flex items-center gap-1">
+      {Array.from({ length: count }, (_, i) => (
+        <div
+          key={i}
+          className="w-2 h-2 rounded-full"
+          style={{ backgroundColor: color }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function renderStatRows(currentConfig: FriendlyConfig, nextConfig: FriendlyConfig) {
+  const rows: { label: string; current: number; next: number }[] = [];
+
+  if (currentConfig.healAmount !== nextConfig.healAmount) {
+    rows.push({ label: "Heal", current: currentConfig.healAmount, next: nextConfig.healAmount });
+  }
+
+  if (currentConfig.shieldAmount !== nextConfig.shieldAmount) {
+    rows.push({ label: "Shield", current: currentConfig.shieldAmount, next: nextConfig.shieldAmount });
+  }
+
+  if (currentConfig.plasmaStacks !== nextConfig.plasmaStacks) {
+    rows.push({ label: "Stacks", current: currentConfig.plasmaStacks, next: nextConfig.plasmaStacks });
+  }
+
+  if (currentConfig.projectileDamage !== nextConfig.projectileDamage) {
+    rows.push({ label: "Damage", current: currentConfig.projectileDamage, next: nextConfig.projectileDamage });
+  }
+
+  if (currentConfig.laserDamage !== nextConfig.laserDamage) {
+    rows.push({ label: "Damage", current: currentConfig.laserDamage, next: nextConfig.laserDamage });
+  }
+
+  if (currentConfig.health !== nextConfig.health) {
+    rows.push({ label: "Health", current: currentConfig.health, next: nextConfig.health });
+  }
+
+  const chargeRow = currentConfig.chargesGranted > 0 && currentConfig.chargesRequired !== nextConfig.chargesRequired;
+
+  return (
+    <>
+      {chargeRow && (
+        <div className="flex flex-col gap-1">
+          <span className="text-[9px] text-[#6c7086]">Charges</span>
+          <div className="flex items-center gap-2">
+            {renderChargeDots(currentConfig.chargesRequired, "#585b70")}
+            <span className="text-[9px] text-[#6c7086]">→</span>
+            {renderChargeDots(nextConfig.chargesRequired, "#a6e3a1")}
+          </div>
+        </div>
+      )}
+      {rows.map((row) => (
+        <div key={row.label} className="flex justify-between text-[9px]">
+          <span className="text-[#6c7086]">{row.label}</span>
+          <span className={row.next >= row.current ? "text-[#a6e3a1]" : "text-[#f38ba8]"}>
+            {row.next} ({statDelta(row.current, row.next)})
+          </span>
+        </div>
+      ))}
+    </>
+  );
 }
 
 export const UpgradePanel = ({ onUpgrade, onClose, shipPreviews, gold, slot }: UpgradePanelProps) => {
@@ -100,18 +167,7 @@ export const UpgradePanel = ({ onUpgrade, onClose, shipPreviews, gold, slot }: U
 
             {currentConfig && nextConfig && (
               <div className="flex flex-col gap-1 px-1">
-                <div className="flex justify-between text-[9px]">
-                  <span className="text-[#6c7086]">Damage</span>
-                  <span className="text-[#a6e3a1]">
-                    {nextConfig.projectileDamage} ({statDelta(currentConfig.projectileDamage, nextConfig.projectileDamage)})
-                  </span>
-                </div>
-                <div className="flex justify-between text-[9px]">
-                  <span className="text-[#6c7086]">Health</span>
-                  <span className="text-[#a6e3a1]">
-                    {nextConfig.health} ({statDelta(currentConfig.health, nextConfig.health)})
-                  </span>
-                </div>
+                {renderStatRows(currentConfig, nextConfig)}
               </div>
             )}
 

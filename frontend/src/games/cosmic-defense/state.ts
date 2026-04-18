@@ -1,11 +1,15 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, Team } from "./types";
 import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, goldForEnemy } from "./enemyConfig";
+import { getShipRole, type ShipRole } from "./shipCatalog";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLANET_HIT_RADIUS = 100;
 const PROJECTILE_SPEED = 300 * 2;
+const NEARBY_RANGE = 200;
+const PLASMA_DPS_PER_STACK = 5;
+const LASER_RANGE = 1200;
 
 export interface EntityState {
   id: number;
@@ -33,6 +37,14 @@ export interface EntityState {
   range: number;
   hitHalfW: number;
   hitHalfH: number;
+  role: ShipRole | null;
+  shield: number;
+  plasmaStacks: number;
+  healAmount: number;
+  shieldAmount: number;
+  plasmaStacksApplied: number;
+  chargesGranted: number;
+  laserDamage: number;
 }
 
 export interface ProjectileState {
@@ -44,6 +56,7 @@ export interface ProjectileState {
   damage: number;
   team: Team;
   projectileType: ProjectileType;
+  plasmaStacks: number;
 }
 
 export interface ExplosionState {
@@ -109,10 +122,20 @@ export interface DamageData {
   killed: boolean;
 }
 
+export interface LaserBeam {
+  id: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  time: number;
+}
+
 export interface GameState {
   entities: EntityState[];
   projectiles: ProjectileState[];
   explosions: ExplosionState[];
+  laserBeams: LaserBeam[];
   time: {
     time: number;
     deltaTime: number;
@@ -154,6 +177,7 @@ export function createGameState(): GameState {
     entities: [],
     projectiles: [],
     explosions: [],
+    laserBeams: [],
     time: { time: 0, deltaTime: 0 },
     nextId: 1,
     planetHealth: 1000,
@@ -219,6 +243,14 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     range: config.range,
     hitHalfW: hitbox.hitWidth / 2,
     hitHalfH: hitbox.hitHeight / 2,
+    role: null,
+    shield: 0,
+    plasmaStacks: 0,
+    healAmount: 0,
+    shieldAmount: 0,
+    plasmaStacksApplied: 0,
+    chargesGranted: 0,
+    laserDamage: 0,
   };
 
   state.entities.push(entity);
@@ -259,6 +291,14 @@ export function spawnAlliedEntity(
     range: 0,
     hitHalfW: hitbox.hitWidth / 2,
     hitHalfH: hitbox.hitHeight / 2,
+    role: getShipRole(config.entityType),
+    shield: 0,
+    plasmaStacks: 0,
+    healAmount: config.healAmount,
+    shieldAmount: config.shieldAmount,
+    plasmaStacksApplied: config.plasmaStacks,
+    chargesGranted: config.chargesGranted,
+    laserDamage: config.laserDamage,
   };
 
   state.entities.push(entity);
@@ -317,7 +357,18 @@ function checkCollisions(state: GameState): void {
         const dx = Math.abs(p.x - e.x);
         const dy = Math.abs(p.y - e.y);
         if (dx < e.hitHalfW && dy < e.hitHalfH) {
-          e.health -= p.damage;
+          if (p.plasmaStacks > 0) {
+            e.plasmaStacks += p.plasmaStacks;
+          }
+
+          let dmg = p.damage;
+          if (e.shield > 0) {
+            const absorbed = Math.min(e.shield, dmg);
+            e.shield -= absorbed;
+            dmg -= absorbed;
+          }
+          e.health -= dmg;
+
           const killed = e.health <= 0;
           state.onDamageDealt.emit({ amount: p.damage, x: e.x, y: e.y, killed });
           if (killed) {
@@ -470,6 +521,7 @@ export function updateState(state: GameState, dt: number): void {
               damage: e.projectileDamage,
               team: e.team,
               projectileType: e.projectileType,
+              plasmaStacks: 0,
             });
           }
         }
@@ -494,16 +546,35 @@ export function updateState(state: GameState, dt: number): void {
     p.y += p.vy * dt;
   }
 
+  for (let i = state.entities.length - 1; i >= 0; i--) {
+    const e = state.entities[i];
+    if (e.plasmaStacks > 0) {
+      const plasmaDamage = e.plasmaStacks * PLASMA_DPS_PER_STACK * dt;
+      e.health -= plasmaDamage;
+      if (e.health <= 0) {
+        state.onDamageDealt.emit({ amount: plasmaDamage, x: e.x, y: e.y, killed: true });
+        if (e.team === Team.Enemy) {
+          state.gold += e.gold;
+          state.onGoldChanged.emit();
+        }
+        state.entities.splice(i, 1);
+      }
+    }
+  }
+
   checkCollisions(state);
+
+  const LASER_BEAM_DURATION = 0.15;
+  for (let i = state.laserBeams.length - 1; i >= 0; i--) {
+    if (state.time.time - state.laserBeams[i].time > LASER_BEAM_DURATION) {
+      state.laserBeams.splice(i, 1);
+    }
+  }
 }
 
-function tryFireEntity(state: GameState, e: EntityState): void {
-  if (e.charge < e.chargesRequired) return;
-
+function fireProjectile(state: GameState, e: EntityState, plasmaStacks: number): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
-
-  e.charge = 0;
 
   const angle = computeLeadAngle(
     e.x, e.y,
@@ -521,14 +592,131 @@ function tryFireEntity(state: GameState, e: EntityState): void {
     damage: e.projectileDamage,
     team: e.team,
     projectileType: e.projectileType,
+    plasmaStacks,
   });
+}
+
+function findNearbyAllies(state: GameState, e: EntityState): EntityState[] {
+  const r2 = NEARBY_RANGE * NEARBY_RANGE;
+  const allies: EntityState[] = [];
+  for (const other of state.entities) {
+    if (other.id === e.id || other.team !== Team.Allied) continue;
+    const dx = e.x - other.x;
+    const dy = e.y - other.y;
+    if (dx * dx + dy * dy <= r2) {
+      allies.push(other);
+    }
+  }
+  return allies;
+}
+
+function fireLaser(state: GameState, e: EntityState): void {
+  const target = findNearestTarget(state, e);
+  if (!target) return;
+
+  const dx = target.x - e.x;
+  const dy = target.y - e.y;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  if (len === 0) return;
+
+  const nx = dx / len;
+  const ny = dy / len;
+
+  const endX = e.x + nx * LASER_RANGE;
+  const endY = e.y + ny * LASER_RANGE;
+
+  let goldGained = false;
+  for (let i = state.entities.length - 1; i >= 0; i--) {
+    const other = state.entities[i];
+    if (other.team !== Team.Enemy) continue;
+
+    const ex = other.x - e.x;
+    const ey = other.y - e.y;
+    const proj = ex * nx + ey * ny;
+    if (proj < 0 || proj > LASER_RANGE) continue;
+
+    const perpX = ex - proj * nx;
+    const perpY = ey - proj * ny;
+    const perpDist = Math.sqrt(perpX * perpX + perpY * perpY);
+
+    const hitRadius = Math.max(other.hitHalfW, other.hitHalfH);
+    if (perpDist > hitRadius) continue;
+
+    let dmg = e.laserDamage;
+    if (other.shield > 0) {
+      const absorbed = Math.min(other.shield, dmg);
+      other.shield -= absorbed;
+      dmg -= absorbed;
+    }
+    other.health -= dmg;
+
+    const killed = other.health <= 0;
+    state.onDamageDealt.emit({ amount: e.laserDamage, x: other.x, y: other.y, killed });
+    if (killed) {
+      state.gold += other.gold;
+      goldGained = true;
+      state.entities.splice(i, 1);
+    }
+  }
+
+  if (goldGained) state.onGoldChanged.emit();
+
+  state.laserBeams.push({
+    id: state.nextId++,
+    x1: e.x,
+    y1: e.y,
+    x2: endX,
+    y2: endY,
+    time: state.time.time,
+  });
+}
+
+function activateAbility(state: GameState, e: EntityState): void {
+  if (e.charge < e.chargesRequired) return;
+  e.charge = 0;
+
+  if (e.healAmount > 0) {
+    const allies = findNearbyAllies(state, e);
+    for (const ally of allies) {
+      ally.health = Math.min(ally.maxHealth, ally.health + e.healAmount);
+    }
+    return;
+  }
+
+  if (e.shieldAmount > 0) {
+    const allies = findNearbyAllies(state, e);
+    for (const ally of allies) {
+      ally.shield += e.shieldAmount;
+    }
+    return;
+  }
+
+  if (e.chargesGranted > 0) {
+    const allies = findNearbyAllies(state, e);
+    for (const ally of allies) {
+      if (ally.chargesRequired <= 0) continue;
+      if (ally.chargesGranted > 0) continue;
+      ally.charge = Math.min(ally.chargesRequired, ally.charge + e.chargesGranted);
+      activateAbility(state, ally);
+    }
+    return;
+  }
+
+  if (e.laserDamage > 0) {
+    fireLaser(state, e);
+    return;
+  }
+
+  if (e.projectileDamage > 0 || e.plasmaStacksApplied > 0) {
+    fireProjectile(state, e, e.plasmaStacksApplied);
+  }
 }
 
 export function onCorrectKeystroke(state: GameState): void {
   for (const e of state.entities) {
     if (e.chargesRequired <= 0) continue;
     e.charge++;
-    tryFireEntity(state, e);
+    activateAbility(state, e);
   }
 }
 
