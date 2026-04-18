@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { formatGold, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import type { EntityType } from "./types";
-import { X, Crosshair, Globe, ArrowUpCircle, ArrowDownCircle, ChevronUp } from "lucide-react";
+import { X, Crosshair, Globe, ArrowUpCircle, ArrowDownCircle, ChevronUp, Skull, Swords, Heart, ShieldPlus } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
 import { getNextUpgrade, getUpgradeCost, getShipTier } from "./upgradePaths";
 import { FRIENDLY_CONFIG_MAP, type FriendlyConfig } from "./enemyConfig";
@@ -31,19 +32,27 @@ const TARGETING_BUTTONS: { mode: TargetingMode; label: string; icon: typeof Cros
   { mode: TargetingMode.Weakest, label: "Weak", icon: ArrowDownCircle },
 ];
 
-function getStatRows(config: FriendlyConfig, nextConfig: FriendlyConfig | undefined): { label: string; value: number; next: number | null }[] {
+function getStatRows(config: FriendlyConfig, nextConfig: FriendlyConfig | undefined, showDeltas: boolean): { label: string; value: number; next: number | null }[] {
   const rows: { label: string; value: number; next: number | null }[] = [];
-  if (config.projectileDamage > 0) rows.push({ label: "Damage", value: config.projectileDamage, next: nextConfig && nextConfig.projectileDamage !== config.projectileDamage ? nextConfig.projectileDamage : null });
-  if (config.laserDamage > 0) rows.push({ label: "Damage", value: config.laserDamage, next: nextConfig && nextConfig.laserDamage !== config.laserDamage ? nextConfig.laserDamage : null });
-  if (config.healAmount > 0) rows.push({ label: "Heal", value: config.healAmount, next: nextConfig && nextConfig.healAmount !== config.healAmount ? nextConfig.healAmount : null });
-  if (config.shieldAmount > 0) rows.push({ label: "Shield", value: config.shieldAmount, next: nextConfig && nextConfig.shieldAmount !== config.shieldAmount ? nextConfig.shieldAmount : null });
-  if (config.plasmaStacks > 0) rows.push({ label: "Stacks", value: config.plasmaStacks, next: nextConfig && nextConfig.plasmaStacks !== config.plasmaStacks ? nextConfig.plasmaStacks : null });
-  if (config.chargesGranted > 0) rows.push({ label: "Charges", value: config.chargesGranted, next: nextConfig && nextConfig.chargesGranted !== config.chargesGranted ? nextConfig.chargesGranted : null });
-  rows.push({ label: "Health", value: config.health, next: nextConfig && nextConfig.health !== config.health ? nextConfig.health : null });
+  const delta = (cur: number, nxt: number | undefined) => showDeltas && nxt !== undefined && nxt !== cur ? nxt : null;
+  if (config.projectileDamage > 0) rows.push({ label: "Damage", value: config.projectileDamage, next: delta(config.projectileDamage, nextConfig?.projectileDamage) });
+  if (config.laserDamage > 0) rows.push({ label: "Damage", value: config.laserDamage, next: delta(config.laserDamage, nextConfig?.laserDamage) });
+  if (config.healAmount > 0) rows.push({ label: "Heal", value: config.healAmount, next: delta(config.healAmount, nextConfig?.healAmount) });
+  if (config.shieldAmount > 0) rows.push({ label: "Shield", value: config.shieldAmount, next: delta(config.shieldAmount, nextConfig?.shieldAmount) });
+  if (config.plasmaStacks > 0) rows.push({ label: "Stacks", value: config.plasmaStacks, next: delta(config.plasmaStacks, nextConfig?.plasmaStacks) });
+  if (config.chargesGranted > 0) rows.push({ label: "Charges", value: config.chargesGranted, next: delta(config.chargesGranted, nextConfig?.chargesGranted) });
+  rows.push({ label: "Health", value: config.health, next: delta(config.health, nextConfig?.health) });
   return rows;
 }
 
+function formatStat(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return String(n);
+}
+
 export const UpgradePanel = ({ onUpgrade, onClose, shipPreviews, gold, slot, entity, onTargetingChange }: UpgradePanelProps) => {
+  const [confirming, setConfirming] = useState(false);
+
   const currentType = slot.occupant;
   if (!currentType) return null;
 
@@ -64,7 +73,17 @@ export const UpgradePanel = ({ onUpgrade, onClose, shipPreviews, gold, slot, ent
   const roleMeta = role ? ROLE_META[role] : null;
   const RoleIcon = roleMeta?.icon;
   const currentTargeting = entity?.targetingMode ?? TargetingMode.NearestToShip;
-  const statRows = currentConfig ? getStatRows(currentConfig, nextConfig) : [];
+  const statRows = currentConfig ? getStatRows(currentConfig, nextConfig, confirming) : [];
+
+  const handleUpgradeClick = () => {
+    if (!canAfford) return;
+    if (confirming) {
+      onUpgrade();
+      setConfirming(false);
+    } else {
+      setConfirming(true);
+    }
+  };
 
   return (
     <>
@@ -138,6 +157,35 @@ export const UpgradePanel = ({ onUpgrade, onClose, shipPreviews, gold, slot, ent
           ))}
         </div>
 
+        {entity && (entity.kills > 0 || entity.damageDealt > 0 || entity.totalHealed > 0 || entity.totalShielded > 0) && (
+          <div className="px-3 pb-2 flex items-center gap-2.5">
+            {entity.kills > 0 && (
+              <span className="flex items-center gap-0.5 text-[#585b70]" title="Kills">
+                <Skull className="w-2.5 h-2.5" />
+                <span className="text-[8px]">{formatStat(entity.kills)}</span>
+              </span>
+            )}
+            {entity.damageDealt > 0 && (
+              <span className="flex items-center gap-0.5 text-[#585b70]" title="Damage dealt">
+                <Swords className="w-2.5 h-2.5" />
+                <span className="text-[8px]">{formatStat(entity.damageDealt)}</span>
+              </span>
+            )}
+            {entity.totalHealed > 0 && (
+              <span className="flex items-center gap-0.5 text-[#585b70]" title="Total healed">
+                <Heart className="w-2.5 h-2.5" />
+                <span className="text-[8px]">{formatStat(entity.totalHealed)}</span>
+              </span>
+            )}
+            {entity.totalShielded > 0 && (
+              <span className="flex items-center gap-0.5 text-[#585b70]" title="Total shielded">
+                <ShieldPlus className="w-2.5 h-2.5" />
+                <span className="text-[8px]">{formatStat(entity.totalShielded)}</span>
+              </span>
+            )}
+          </div>
+        )}
+
         <div className="px-3 pb-2">
           <span className="text-[9px] text-[#585b70] mb-1 block">Target</span>
           <div className="grid grid-cols-4 gap-0.5">
@@ -166,15 +214,17 @@ export const UpgradePanel = ({ onUpgrade, onClose, shipPreviews, gold, slot, ent
           <div className="px-3 pb-3">
             <button
               className={`flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[10px] font-medium transition-colors w-full ${
-                canAfford
-                  ? "bg-[#a6e3a1]/10 text-[#a6e3a1] cursor-pointer hover:bg-[#a6e3a1]/20"
-                  : "bg-white/[0.02] text-[#585b70] cursor-not-allowed"
+                confirming && canAfford
+                  ? "bg-[#f9e2af]/15 text-[#f9e2af] cursor-pointer hover:bg-[#f9e2af]/25"
+                  : canAfford
+                    ? "bg-[#a6e3a1]/10 text-[#a6e3a1] cursor-pointer hover:bg-[#a6e3a1]/20"
+                    : "bg-white/[0.02] text-[#585b70] cursor-not-allowed"
               }`}
-              onClick={() => canAfford && onUpgrade()}
+              onClick={handleUpgradeClick}
               disabled={!canAfford}
             >
               <ChevronUp className="w-3.5 h-3.5" />
-              {nextType} · {formatGold(upgradeCost)}
+              {confirming ? `Confirm · ${formatGold(upgradeCost)}` : `${nextType} · ${formatGold(upgradeCost)}`}
             </button>
           </div>
         ) : (
