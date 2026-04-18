@@ -2,11 +2,11 @@ import type { EntityType } from "./types";
 
 export const UPGRADE_PATHS: EntityType[][] = [
   ["Moth", "Needle", "Clipper", "Warden"],
-  ["Osprey", "Raven", "Vanguard", "Titan"],
+  ["Pip", "Osprey", "Raven", "Marauder"],
   ["Mender", "Tender", "Grace", "Haven"],
-  ["Speck", "Ward", "Aegis", "Bastion"],
-  ["Spark", "Beacon", "Corona", "Phoenix"],
-  ["Mite", "Flare", "Bolt", "Falcon"],
+  ["Spark", "Ward", "Aegis", "Phoenix"],
+  ["Speck", "Beacon", "Corona", "Bastion"],
+  ["Mite", "Flare", "Bolt", "Colossus"],
   ["Specter", "Nova", "Sabre", "Leviathan"],
 ];
 
