@@ -4,7 +4,6 @@ import { Coins, X } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
 import { getNextUpgrade, getUpgradeCost, getShipTier } from "./upgradePaths";
 import { FRIENDLY_CONFIG_MAP, type FriendlyConfig } from "./enemyConfig";
-import { getShipRole } from "./shipCatalog";
 
 interface UpgradePanelProps {
   onUpgrade: () => void;
@@ -40,33 +39,28 @@ function renderChargeDots(count: number, color: string) {
   );
 }
 
-function renderStatRows(currentConfig: FriendlyConfig, nextConfig: FriendlyConfig, role: string | null) {
+function renderStatRows(currentConfig: FriendlyConfig, nextConfig: FriendlyConfig) {
   const rows: { label: string; current: number; next: number }[] = [];
 
-  switch (role) {
-    case "healer":
-      rows.push({ label: "Heal", current: currentConfig.healAmount, next: nextConfig.healAmount });
-      break;
-    case "shield":
-      rows.push({ label: "Shield", current: currentConfig.shieldAmount, next: nextConfig.shieldAmount });
-      break;
-    case "plasma":
-      rows.push({ label: "Stacks", current: currentConfig.plasmaStacks, next: nextConfig.plasmaStacks });
-      break;
-    case "charge":
-      break;
-    case "shooter":
-    case "rapid_fire":
-    case "laser":
-      rows.push({ label: "Damage", current: currentConfig.projectileDamage, next: nextConfig.projectileDamage });
-      break;
-    default:
-      throw new Error(`Unknown ship role: ${String(role)}`);
+  if (currentConfig.healAmount > 0 || nextConfig.healAmount > 0) {
+    rows.push({ label: "Heal", current: currentConfig.healAmount, next: nextConfig.healAmount });
+  }
+
+  if (currentConfig.shieldAmount > 0 || nextConfig.shieldAmount > 0) {
+    rows.push({ label: "Shield", current: currentConfig.shieldAmount, next: nextConfig.shieldAmount });
+  }
+
+  if (currentConfig.plasmaStacks > 0 || nextConfig.plasmaStacks > 0) {
+    rows.push({ label: "Stacks", current: currentConfig.plasmaStacks, next: nextConfig.plasmaStacks });
+  }
+
+  if (currentConfig.projectileDamage > 0 || nextConfig.projectileDamage > 0) {
+    rows.push({ label: "Damage", current: currentConfig.projectileDamage, next: nextConfig.projectileDamage });
   }
 
   rows.push({ label: "Health", current: currentConfig.health, next: nextConfig.health });
 
-  const chargeRow = role === "charge" && currentConfig.chargesRequired !== nextConfig.chargesRequired;
+  const chargeRow = currentConfig.chargesGranted > 0 && currentConfig.chargesRequired !== nextConfig.chargesRequired;
 
   return (
     <>
@@ -110,7 +104,6 @@ export const UpgradePanel = ({ onUpgrade, onClose, shipPreviews, gold, slot }: U
   const nextPreview = nextType ? shipPreviews.get(nextType) : null;
   const currentConfig = FRIENDLY_CONFIG_MAP.get(currentType);
   const nextConfig = nextType ? FRIENDLY_CONFIG_MAP.get(nextType) : null;
-  const role = getShipRole(currentType);
 
   return (
     <>
@@ -168,7 +161,7 @@ export const UpgradePanel = ({ onUpgrade, onClose, shipPreviews, gold, slot }: U
 
             {currentConfig && nextConfig && (
               <div className="flex flex-col gap-1 px-1">
-                {renderStatRows(currentConfig, nextConfig, role)}
+                {renderStatRows(currentConfig, nextConfig)}
               </div>
             )}
 

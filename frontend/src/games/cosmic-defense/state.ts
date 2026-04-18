@@ -43,7 +43,6 @@ export interface EntityState {
   shieldAmount: number;
   plasmaStacksApplied: number;
   chargesGranted: number;
-  piercing: boolean;
 }
 
 export interface ProjectileState {
@@ -55,7 +54,6 @@ export interface ProjectileState {
   damage: number;
   team: Team;
   projectileType: ProjectileType;
-  piercing: boolean;
   plasmaStacks: number;
 }
 
@@ -239,7 +237,6 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     shieldAmount: 0,
     plasmaStacksApplied: 0,
     chargesGranted: 0,
-    piercing: false,
   };
 
   state.entities.push(entity);
@@ -287,7 +284,6 @@ export function spawnAlliedEntity(
     shieldAmount: config.shieldAmount,
     plasmaStacksApplied: config.plasmaStacks,
     chargesGranted: config.chargesGranted,
-    piercing: config.piercing,
   };
 
   state.entities.push(entity);
@@ -374,12 +370,12 @@ function checkCollisions(state: GameState): void {
               projectileType: p.projectileType,
             });
           }
-          if (!p.piercing) break;
+          break;
         }
       }
     }
 
-    if ((hit && !p.piercing) || !isInBounds(p.x, p.y)) {
+    if (hit || !isInBounds(p.x, p.y)) {
       state.projectiles.splice(i, 1);
     }
   }
@@ -510,7 +506,6 @@ export function updateState(state: GameState, dt: number): void {
               damage: e.projectileDamage,
               team: e.team,
               projectileType: e.projectileType,
-              piercing: false,
               plasmaStacks: 0,
             });
           }
@@ -555,7 +550,7 @@ export function updateState(state: GameState, dt: number): void {
   checkCollisions(state);
 }
 
-function fireProjectile(state: GameState, e: EntityState, piercing: boolean, plasmaStacks: number): void {
+function fireProjectile(state: GameState, e: EntityState, plasmaStacks: number): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
 
@@ -575,7 +570,6 @@ function fireProjectile(state: GameState, e: EntityState, piercing: boolean, pla
     damage: e.projectileDamage,
     team: e.team,
     projectileType: e.projectileType,
-    piercing,
     plasmaStacks,
   });
 }
@@ -626,7 +620,7 @@ function activateAbility(state: GameState, e: EntityState): void {
   }
 
   if (e.projectileDamage > 0 || e.plasmaStacksApplied > 0) {
-    fireProjectile(state, e, e.piercing, e.plasmaStacksApplied);
+    fireProjectile(state, e, e.plasmaStacksApplied);
   }
 }
 
