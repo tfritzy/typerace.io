@@ -168,6 +168,7 @@ export const GameCanvas = () => {
     if (!game || !selectedSlot || !selectedSlot.entityId) return;
     const entity = game.state.entityById.get(selectedSlot.entityId);
     if (entity) entity.targetingMode = mode;
+    setInspectTick((t) => t + 1);
   }, [selectedSlot]);
 
   return (

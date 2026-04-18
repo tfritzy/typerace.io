@@ -16,6 +16,7 @@ export enum TargetingMode {
   NearestToPlanet = 1,
   Strongest = 2,
   Weakest = 3,
+  LowestHealth = 4,
 }
 
 export interface EntityState {
@@ -478,9 +479,12 @@ function findNearestTarget(
         break;
       }
       case TargetingMode.Strongest:
-        score = other.health;
+        score = other.maxHealth;
         break;
       case TargetingMode.Weakest:
+        score = -other.maxHealth;
+        break;
+      case TargetingMode.LowestHealth:
         score = -other.health;
         break;
       default: {
