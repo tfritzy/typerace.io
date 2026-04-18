@@ -91,7 +91,11 @@ export interface FriendlyConfig {
   projectileDamage: number;
   projectileType: ProjectileType;
   chargesRequired: number;
-  abilityValue: number;
+  healAmount: number;
+  shieldAmount: number;
+  plasmaStacks: number;
+  chargesGranted: number;
+  piercing: boolean;
 }
 
 export const ENEMY_CATALOG: EnemyConfig[] = [
@@ -121,40 +125,40 @@ export const ENEMY_CATALOG: EnemyConfig[] = [
 ];
 
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [
-  { entityType: "Moth", health: 200, projectileDamage: 8, projectileType: ProjectileType.Tiny, chargesRequired: 4, abilityValue: 0 },
-  { entityType: "Needle", health: 800, projectileDamage: 40, projectileType: ProjectileType.Projectile2, chargesRequired: 4, abilityValue: 0 },
-  { entityType: "Clipper", health: 3000, projectileDamage: 200, projectileType: ProjectileType.Projectile3, chargesRequired: 4, abilityValue: 0 },
-  { entityType: "Warden", health: 12000, projectileDamage: 1000, projectileType: ProjectileType.Projectile5, chargesRequired: 4, abilityValue: 0 },
+  { entityType: "Moth", health: 200, projectileDamage: 8, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: false },
+  { entityType: "Needle", health: 800, projectileDamage: 40, projectileType: ProjectileType.Projectile2, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: false },
+  { entityType: "Clipper", health: 3000, projectileDamage: 200, projectileType: ProjectileType.Projectile3, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: false },
+  { entityType: "Warden", health: 12000, projectileDamage: 1000, projectileType: ProjectileType.Projectile5, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: false },
 
-  { entityType: "Osprey", health: 150, projectileDamage: 5, projectileType: ProjectileType.Tiny, chargesRequired: 2, abilityValue: 0 },
-  { entityType: "Raven", health: 600, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 2, abilityValue: 0 },
-  { entityType: "Vanguard", health: 2500, projectileDamage: 130, projectileType: ProjectileType.Projectile3, chargesRequired: 2, abilityValue: 0 },
-  { entityType: "Titan", health: 10000, projectileDamage: 650, projectileType: ProjectileType.Projectile5, chargesRequired: 2, abilityValue: 0 },
+  { entityType: "Osprey", health: 150, projectileDamage: 5, projectileType: ProjectileType.Tiny, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: false },
+  { entityType: "Raven", health: 600, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: false },
+  { entityType: "Vanguard", health: 2500, projectileDamage: 130, projectileType: ProjectileType.Projectile3, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: false },
+  { entityType: "Titan", health: 10000, projectileDamage: 650, projectileType: ProjectileType.Projectile5, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: false },
 
-  { entityType: "Mender", health: 250, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, abilityValue: 25 },
-  { entityType: "Tender", health: 1000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, abilityValue: 100 },
-  { entityType: "Grace", health: 4000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, abilityValue: 400 },
-  { entityType: "Haven", health: 15000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 3, abilityValue: 1500 },
+  { entityType: "Mender", health: 250, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 25, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: false },
+  { entityType: "Tender", health: 1000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 100, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: false },
+  { entityType: "Grace", health: 4000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 400, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: false },
+  { entityType: "Haven", health: 15000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 3, healAmount: 1500, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: false },
 
-  { entityType: "Buckler", health: 250, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, abilityValue: 40 },
-  { entityType: "Ward", health: 1000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, abilityValue: 160 },
-  { entityType: "Aegis", health: 4000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, abilityValue: 640 },
-  { entityType: "Bastion", health: 15000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 3, abilityValue: 2500 },
+  { entityType: "Buckler", health: 250, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 40, plasmaStacks: 0, chargesGranted: 0, piercing: false },
+  { entityType: "Ward", health: 1000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 160, plasmaStacks: 0, chargesGranted: 0, piercing: false },
+  { entityType: "Aegis", health: 4000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 640, plasmaStacks: 0, chargesGranted: 0, piercing: false },
+  { entityType: "Bastion", health: 15000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 3, healAmount: 0, shieldAmount: 2500, plasmaStacks: 0, chargesGranted: 0, piercing: false },
 
-  { entityType: "Spark", health: 200, projectileDamage: 6, projectileType: ProjectileType.Tiny, chargesRequired: 4, abilityValue: 1 },
-  { entityType: "Ember", health: 800, projectileDamage: 30, projectileType: ProjectileType.Projectile2, chargesRequired: 4, abilityValue: 2 },
-  { entityType: "Corona", health: 3000, projectileDamage: 150, projectileType: ProjectileType.Projectile3, chargesRequired: 3, abilityValue: 3 },
-  { entityType: "Inferno", health: 12000, projectileDamage: 750, projectileType: ProjectileType.Projectile5, chargesRequired: 3, abilityValue: 5 },
+  { entityType: "Spark", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 1, chargesGranted: 0, piercing: false },
+  { entityType: "Ember", health: 800, projectileDamage: 0, projectileType: ProjectileType.Projectile2, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 2, chargesGranted: 0, piercing: false },
+  { entityType: "Corona", health: 3000, projectileDamage: 0, projectileType: ProjectileType.Projectile3, chargesRequired: 3, healAmount: 0, shieldAmount: 0, plasmaStacks: 3, chargesGranted: 0, piercing: false },
+  { entityType: "Inferno", health: 12000, projectileDamage: 0, projectileType: ProjectileType.Projectile5, chargesRequired: 3, healAmount: 0, shieldAmount: 0, plasmaStacks: 5, chargesGranted: 0, piercing: false },
 
-  { entityType: "Pulse", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 8, abilityValue: 1 },
-  { entityType: "Flare", health: 800, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 7, abilityValue: 1 },
-  { entityType: "Bolt", health: 3000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 6, abilityValue: 2 },
-  { entityType: "Dynamo", health: 12000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 5, abilityValue: 3 },
+  { entityType: "Pulse", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 8, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, piercing: false },
+  { entityType: "Flare", health: 800, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 7, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, piercing: false },
+  { entityType: "Bolt", health: 3000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 6, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, piercing: false },
+  { entityType: "Dynamo", health: 12000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, piercing: false },
 
-  { entityType: "Prism", health: 200, projectileDamage: 10, projectileType: ProjectileType.Tiny, chargesRequired: 5, abilityValue: 0 },
-  { entityType: "Nova", health: 800, projectileDamage: 50, projectileType: ProjectileType.Projectile2, chargesRequired: 5, abilityValue: 0 },
-  { entityType: "Sabre", health: 3000, projectileDamage: 250, projectileType: ProjectileType.Projectile3, chargesRequired: 5, abilityValue: 0 },
-  { entityType: "Leviathan", health: 12000, projectileDamage: 1200, projectileType: ProjectileType.Projectile6, chargesRequired: 6, abilityValue: 0 },
+  { entityType: "Prism", health: 200, projectileDamage: 10, projectileType: ProjectileType.Tiny, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: true },
+  { entityType: "Nova", health: 800, projectileDamage: 50, projectileType: ProjectileType.Projectile2, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: true },
+  { entityType: "Sabre", health: 3000, projectileDamage: 250, projectileType: ProjectileType.Projectile3, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: true },
+  { entityType: "Leviathan", health: 12000, projectileDamage: 1200, projectileType: ProjectileType.Projectile6, chargesRequired: 6, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, piercing: true },
 ];
 
 export const FRIENDLY_CONFIG_MAP = new Map<string, FriendlyConfig>(

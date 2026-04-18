@@ -39,7 +39,11 @@ export interface EntityState {
   role: ShipRole | null;
   shield: number;
   plasmaStacks: number;
-  abilityValue: number;
+  healAmount: number;
+  shieldAmount: number;
+  plasmaStacksApplied: number;
+  chargesGranted: number;
+  piercing: boolean;
 }
 
 export interface ProjectileState {
@@ -231,7 +235,11 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     role: null,
     shield: 0,
     plasmaStacks: 0,
-    abilityValue: 0,
+    healAmount: 0,
+    shieldAmount: 0,
+    plasmaStacksApplied: 0,
+    chargesGranted: 0,
+    piercing: false,
   };
 
   state.entities.push(entity);
@@ -275,7 +283,11 @@ export function spawnAlliedEntity(
     role: getShipRole(config.entityType),
     shield: 0,
     plasmaStacks: 0,
-    abilityValue: config.abilityValue,
+    healAmount: config.healAmount,
+    shieldAmount: config.shieldAmount,
+    plasmaStacksApplied: config.plasmaStacks,
+    chargesGranted: config.chargesGranted,
+    piercing: config.piercing,
   };
 
   state.entities.push(entity);
@@ -586,46 +598,35 @@ function activateAbility(state: GameState, e: EntityState): void {
   if (e.charge < e.chargesRequired) return;
   e.charge = 0;
 
-  switch (e.role) {
-    case "shooter":
-    case "rapid_fire":
-      fireProjectile(state, e, false, 0);
-      break;
-
-    case "laser":
-      fireProjectile(state, e, true, 0);
-      break;
-
-    case "plasma":
-      fireProjectile(state, e, false, e.abilityValue);
-      break;
-
-    case "healer": {
-      const allies = findNearbyAllies(state, e);
-      for (const ally of allies) {
-        ally.health = Math.min(ally.maxHealth, ally.health + e.abilityValue);
-      }
-      break;
+  if (e.healAmount > 0) {
+    const allies = findNearbyAllies(state, e);
+    for (const ally of allies) {
+      ally.health = Math.min(ally.maxHealth, ally.health + e.healAmount);
     }
+    return;
+  }
 
-    case "shield": {
-      const allies = findNearbyAllies(state, e);
-      for (const ally of allies) {
-        ally.shield += e.abilityValue;
-      }
-      break;
+  if (e.shieldAmount > 0) {
+    const allies = findNearbyAllies(state, e);
+    for (const ally of allies) {
+      ally.shield += e.shieldAmount;
     }
+    return;
+  }
 
-    case "charge": {
-      const allies = findNearbyAllies(state, e);
-      for (const ally of allies) {
-        if (ally.chargesRequired <= 0) continue;
-        if (ally.role === "charge") continue;
-        ally.charge = Math.min(ally.chargesRequired, ally.charge + e.abilityValue);
-        activateAbility(state, ally);
-      }
-      break;
+  if (e.chargesGranted > 0) {
+    const allies = findNearbyAllies(state, e);
+    for (const ally of allies) {
+      if (ally.chargesRequired <= 0) continue;
+      if (ally.chargesGranted > 0) continue;
+      ally.charge = Math.min(ally.chargesRequired, ally.charge + e.chargesGranted);
+      activateAbility(state, ally);
     }
+    return;
+  }
+
+  if (e.projectileDamage > 0 || e.plasmaStacksApplied > 0) {
+    fireProjectile(state, e, e.piercing, e.plasmaStacksApplied);
   }
 }
 

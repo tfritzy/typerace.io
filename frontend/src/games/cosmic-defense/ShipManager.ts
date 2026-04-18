@@ -17,7 +17,6 @@ const BLUEPRINT_MAP = new Map(
 const CHARGE_DOT_RADIUS = 3;
 const CHARGE_DOT_SPACING = 10;
 const CHARGE_DOT_OFFSET = 45;
-const SHIELD_RING_RADIUS = 28;
 
 export class ShipManager {
   readonly layer: Container;
@@ -25,7 +24,7 @@ export class ShipManager {
   private entityDisplayObjects = new Map<number, Container>();
   private chargeGraphics = new Map<number, Graphics>();
   private healthBarGraphics = new Map<number, Graphics>();
-  private shieldGraphics = new Map<number, Graphics>();
+  private shieldSprites = new Map<number, Sprite>();
   private activeEntityIds = new Set<number>();
 
   constructor(assets: AssetManager) {
@@ -107,26 +106,27 @@ export class ShipManager {
     drawHealthBar(g, entity);
   }
 
-  private updateShieldRing(entity: EntityState): void {
-    let g = this.shieldGraphics.get(entity.id);
+  private updateShield(entity: EntityState): void {
+    let sprite = this.shieldSprites.get(entity.id);
     if (entity.shield <= 0) {
-      if (g) {
-        g.clear();
+      if (sprite) {
+        sprite.visible = false;
       }
       return;
     }
 
-    if (!g) {
-      g = new Graphics();
-      this.layer.addChild(g);
-      this.shieldGraphics.set(entity.id, g);
+    if (!sprite) {
+      const tex = this.assets.getShieldTexture(entity.entityType);
+      sprite = new Sprite(tex);
+      sprite.anchor.set(0.5);
+      sprite.scale.set(3);
+      this.layer.addChild(sprite);
+      this.shieldSprites.set(entity.id, sprite);
     }
 
-    g.clear();
-    g.x = entity.x;
-    g.y = entity.y;
-    g.circle(0, 0, SHIELD_RING_RADIUS);
-    g.stroke({ color: 0x74c7ec, width: 2, alpha: 0.7 });
+    sprite.visible = true;
+    sprite.x = entity.x;
+    sprite.y = entity.y;
   }
 
   private syncRendering(state: GameState, dt: number): void {
@@ -149,7 +149,7 @@ export class ShipManager {
 
       this.drawChargeDots(entity);
       this.updateHealthBar(entity);
-      this.updateShieldRing(entity);
+      this.updateShield(entity);
     }
 
     for (const [id, display] of this.entityDisplayObjects) {
@@ -166,10 +166,10 @@ export class ShipManager {
           hb.destroy();
           this.healthBarGraphics.delete(id);
         }
-        const sg = this.shieldGraphics.get(id);
-        if (sg) {
-          sg.destroy();
-          this.shieldGraphics.delete(id);
+        const ss = this.shieldSprites.get(id);
+        if (ss) {
+          ss.destroy();
+          this.shieldSprites.delete(id);
         }
       }
     }
@@ -182,8 +182,8 @@ export class ShipManager {
     this.chargeGraphics.clear();
     for (const g of this.healthBarGraphics.values()) g.destroy();
     this.healthBarGraphics.clear();
-    for (const g of this.shieldGraphics.values()) g.destroy();
-    this.shieldGraphics.clear();
+    for (const s of this.shieldSprites.values()) s.destroy();
+    this.shieldSprites.clear();
     this.layer.destroy();
   }
 }

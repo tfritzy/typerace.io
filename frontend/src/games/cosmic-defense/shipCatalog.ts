@@ -14,13 +14,13 @@ export interface ShipBlueprint {
 export const SHIP_BLUEPRINT_MAP = new Map<string, ShipBlueprint>();
 
 export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
-  { entityType: "Moth", cost: 15, colorPreset: ColorPreset.Preset1, role: "shooter", description: "Fires a projectile every 4 keystrokes" },
-  { entityType: "Osprey", cost: 15, colorPreset: ColorPreset.Preset1, role: "rapid_fire", description: "Fires a quick shot every 2 keystrokes" },
-  { entityType: "Mender", cost: 15, colorPreset: ColorPreset.Preset1, role: "healer", description: "Heals nearby allies every 4 keystrokes" },
-  { entityType: "Buckler", cost: 15, colorPreset: ColorPreset.Preset1, role: "shield", description: "Shields nearby allies every 4 keystrokes" },
-  { entityType: "Spark", cost: 15, colorPreset: ColorPreset.Preset1, role: "plasma", description: "Applies plasma stacks to enemies every 4 keystrokes" },
-  { entityType: "Pulse", cost: 15, colorPreset: ColorPreset.Preset1, role: "charge", description: "Grants 1 charge to nearby allies every 8 keystrokes" },
-  { entityType: "Prism", cost: 15, colorPreset: ColorPreset.Preset1, role: "laser", description: "Fires a piercing beam every 5 keystrokes" },
+  { entityType: "Moth", cost: 15, colorPreset: ColorPreset.Preset1, role: "shooter", description: "Fires projectiles at enemies" },
+  { entityType: "Osprey", cost: 15, colorPreset: ColorPreset.Preset1, role: "rapid_fire", description: "Fires rapidly at enemies" },
+  { entityType: "Mender", cost: 15, colorPreset: ColorPreset.Preset1, role: "healer", description: "Repairs nearby allied ships" },
+  { entityType: "Buckler", cost: 15, colorPreset: ColorPreset.Preset1, role: "shield", description: "Projects a shield onto nearby allies" },
+  { entityType: "Spark", cost: 15, colorPreset: ColorPreset.Preset1, role: "plasma", description: "Burns enemies with plasma stacks" },
+  { entityType: "Pulse", cost: 15, colorPreset: ColorPreset.Preset1, role: "charge", description: "Grants a charge to nearby allies" },
+  { entityType: "Prism", cost: 15, colorPreset: ColorPreset.Preset1, role: "laser", description: "Fires a piercing beam through enemies" },
 ];
 
 for (const bp of SHIP_BLUEPRINTS) {
