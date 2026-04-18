@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { startNextWave } from "./state";
-import { formatGold, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
+import { formatGold } from "./constants";
 import { PlanetHealthBar } from "./PlanetHealthBar";
 import { ShopPanel } from "./ShopPanel";
 import { PlacementOverlay } from "./PlacementOverlay";
@@ -11,6 +11,8 @@ import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import { SHIP_BLUEPRINT_MAP } from "./shipCatalog";
 import type { EntityType } from "./types";
 import { Coins } from "lucide-react";
+
+const UI_REFERENCE_WIDTH = 900;
 
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,7 +31,7 @@ export const GameCanvas = () => {
     if (!div) return;
     const ro = new ResizeObserver((entries) => {
       const entry = entries[0];
-      if (entry) setUiScale(entry.contentRect.width / CANVAS_WIDTH);
+      if (entry) setUiScale(Math.min(1, entry.contentRect.width / UI_REFERENCE_WIDTH));
     });
     ro.observe(div);
     return () => ro.disconnect();
@@ -131,8 +133,8 @@ export const GameCanvas = () => {
       <div
         className="absolute top-0 left-0"
         style={{
-          width: CANVAS_WIDTH,
-          height: CANVAS_HEIGHT,
+          width: `${100 / uiScale}%`,
+          height: `${100 / uiScale}%`,
           transformOrigin: "top left",
           transform: `scale(${uiScale})`,
         }}
