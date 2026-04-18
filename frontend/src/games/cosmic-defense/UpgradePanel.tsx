@@ -3,11 +3,6 @@ import { formatGold, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import type { EntityType } from "./types";
 import {
   X,
-  Crosshair,
-  Globe,
-  ArrowUpCircle,
-  ArrowDownCircle,
-  HeartCrack,
   ChevronUp,
   Skull,
   Coins,
@@ -36,16 +31,12 @@ const PANEL_MAX_TOP = 55;
 const PANEL_WIDTH = 180;
 const MAX_TIER = 4;
 
-const TARGETING_BUTTONS: {
-  mode: TargetingMode;
-  icon: typeof Crosshair;
-  tip: string;
-}[] = [
-  { mode: TargetingMode.NearestToShip, icon: Crosshair, tip: "Targets the nearest enemy to this ship" },
-  { mode: TargetingMode.NearestToPlanet, icon: Globe, tip: "Targets the enemy closest to the planet" },
-  { mode: TargetingMode.Strongest, icon: ArrowUpCircle, tip: "Targets the enemy with the most max health" },
-  { mode: TargetingMode.Weakest, icon: ArrowDownCircle, tip: "Targets the enemy with the least max health" },
-  { mode: TargetingMode.LowestHealth, icon: HeartCrack, tip: "Targets the enemy with the lowest current health" },
+const TARGETING_OPTIONS: { mode: TargetingMode; label: string }[] = [
+  { mode: TargetingMode.NearestToShip, label: "Nearest" },
+  { mode: TargetingMode.NearestToPlanet, label: "Closest to planet" },
+  { mode: TargetingMode.Strongest, label: "Strongest" },
+  { mode: TargetingMode.Weakest, label: "Weakest" },
+  { mode: TargetingMode.LowestHealth, label: "Most damaged" },
 ];
 
 function getPrimaryStat(
@@ -214,25 +205,18 @@ export const UpgradePanel = ({
           </div>
         )}
 
-        <div className="px-2.5 pb-1.5 flex items-center justify-start gap-0.5">
-          {TARGETING_BUTTONS.map((btn) => {
-            const active = btn.mode === currentTargeting;
-            const BtnIcon = btn.icon;
-            return (
-              <button
-                key={btn.mode}
-                className={`p-1.5 rounded transition-colors cursor-pointer ${
-                  active
-                    ? "bg-white/10 text-[#a6e3a1]"
-                    : "text-[#585b70] hover:bg-white/[0.06] hover:text-[#a6adc8]"
-                }`}
-                onClick={() => onTargetingChange(btn.mode)}
-                title={btn.tip}
-              >
-                <BtnIcon className="w-3.5 h-3.5" />
-              </button>
-            );
-          })}
+        <div className="px-2.5 pb-1.5">
+          <select
+            value={currentTargeting}
+            onChange={(e) => onTargetingChange(Number(e.target.value) as TargetingMode)}
+            className="w-full text-[9px] bg-[#1e1e2e] text-[#a6adc8] border border-white/10 rounded px-1.5 py-1 outline-none cursor-pointer hover:border-white/20 transition-colors"
+          >
+            {TARGETING_OPTIONS.map((opt) => (
+              <option key={opt.mode} value={opt.mode}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         {nextType ? (
