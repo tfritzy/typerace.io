@@ -86,7 +86,7 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold, slot }: S
                 onClick={() => canAfford && onSelectShip(bp.entityType)}
                 disabled={!canAfford}
               >
-                <div className={`w-8 h-8 flex items-center justify-center shrink-0 ${!canAfford ? "grayscale" : ""}`}>
+                <div className="w-8 h-8 flex items-center justify-center shrink-0">
                   {preview ? (
                     <img
                       src={preview}
@@ -100,19 +100,19 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold, slot }: S
                 </div>
                 <div className="flex flex-col items-start min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <span className={`text-[11px] font-medium ${canAfford ? "text-[#bac2de]" : "text-[#585b70]"}`}>
+                    <span className="text-[11px] font-medium text-[#bac2de]">
                       {bp.entityType}
                     </span>
-                    <RoleIcon className="w-2.5 h-2.5 shrink-0" style={{ color: canAfford ? meta.color : "#585b70" }} />
-                    <span className="text-[9px]" style={{ color: canAfford ? meta.color : "#585b70" }}>
+                    <RoleIcon className="w-2.5 h-2.5 shrink-0" style={{ color: meta.color }} />
+                    <span className="text-[9px]" style={{ color: meta.color }}>
                       {meta.label}
                     </span>
                   </div>
-                  <span className={`text-[9px] leading-tight ${canAfford ? "text-[#6c7086]" : "text-[#45475a]"}`}>
+                  <span className="text-[9px] leading-tight text-[#6c7086] text-left">
                     {bp.description}
                   </span>
                 </div>
-                <span className={`text-[10px] font-medium flex items-center gap-0.5 shrink-0 ${canAfford ? "text-[#f9e2af]" : "text-[#585b70]"}`}>
+                <span className="text-[10px] font-medium flex items-center gap-0.5 shrink-0 text-[#f9e2af]">
                   <Coins className="w-2.5 h-2.5" />
                   {formatGold(bp.cost)}
                 </span>

@@ -112,12 +112,6 @@ export const UpgradePanel = ({ onUpgrade, onClose, shipPreviews, gold, slot }: U
                     {nextConfig.health} ({statDelta(currentConfig.health, nextConfig.health)})
                   </span>
                 </div>
-                <div className="flex justify-between text-[9px]">
-                  <span className="text-[#6c7086]">Speed</span>
-                  <span className="text-[#a6e3a1]">
-                    {nextConfig.projectileSpeed} ({statDelta(currentConfig.projectileSpeed, nextConfig.projectileSpeed)})
-                  </span>
-                </div>
               </div>
             )}
 

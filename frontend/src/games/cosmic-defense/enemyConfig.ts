@@ -122,39 +122,39 @@ export const ENEMY_CATALOG: EnemyConfig[] = [
 
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [
   { entityType: "Moth", health: 200, projectileSpeed: 200, projectileDamage: 8, projectileType: ProjectileType.Tiny, chargesRequired: 4 },
-  { entityType: "Needle", health: 800, projectileSpeed: 260, projectileDamage: 40, projectileType: ProjectileType.Projectile2, chargesRequired: 4 },
-  { entityType: "Clipper", health: 3000, projectileSpeed: 320, projectileDamage: 200, projectileType: ProjectileType.Projectile3, chargesRequired: 4 },
-  { entityType: "Warden", health: 12000, projectileSpeed: 380, projectileDamage: 1000, projectileType: ProjectileType.Projectile5, chargesRequired: 4 },
+  { entityType: "Needle", health: 800, projectileSpeed: 200, projectileDamage: 40, projectileType: ProjectileType.Projectile2, chargesRequired: 4 },
+  { entityType: "Clipper", health: 3000, projectileSpeed: 200, projectileDamage: 200, projectileType: ProjectileType.Projectile3, chargesRequired: 4 },
+  { entityType: "Warden", health: 12000, projectileSpeed: 200, projectileDamage: 1000, projectileType: ProjectileType.Projectile5, chargesRequired: 4 },
 
-  { entityType: "Osprey", health: 150, projectileSpeed: 220, projectileDamage: 5, projectileType: ProjectileType.Tiny, chargesRequired: 2 },
-  { entityType: "Raven", health: 600, projectileSpeed: 280, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 2 },
-  { entityType: "Vanguard", health: 2500, projectileSpeed: 340, projectileDamage: 130, projectileType: ProjectileType.Projectile3, chargesRequired: 2 },
-  { entityType: "Titan", health: 10000, projectileSpeed: 400, projectileDamage: 650, projectileType: ProjectileType.Projectile5, chargesRequired: 2 },
+  { entityType: "Osprey", health: 150, projectileSpeed: 200, projectileDamage: 5, projectileType: ProjectileType.Tiny, chargesRequired: 2 },
+  { entityType: "Raven", health: 600, projectileSpeed: 200, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 2 },
+  { entityType: "Vanguard", health: 2500, projectileSpeed: 200, projectileDamage: 130, projectileType: ProjectileType.Projectile3, chargesRequired: 2 },
+  { entityType: "Titan", health: 10000, projectileSpeed: 200, projectileDamage: 650, projectileType: ProjectileType.Projectile5, chargesRequired: 2 },
 
   { entityType: "Mender", health: 250, projectileSpeed: 200, projectileDamage: 5, projectileType: ProjectileType.Tiny, chargesRequired: 4 },
-  { entityType: "Tender", health: 1000, projectileSpeed: 260, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 4 },
-  { entityType: "Grace", health: 4000, projectileSpeed: 320, projectileDamage: 120, projectileType: ProjectileType.Projectile3, chargesRequired: 4 },
-  { entityType: "Haven", health: 15000, projectileSpeed: 380, projectileDamage: 600, projectileType: ProjectileType.Projectile5, chargesRequired: 4 },
+  { entityType: "Tender", health: 1000, projectileSpeed: 200, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 4 },
+  { entityType: "Grace", health: 4000, projectileSpeed: 200, projectileDamage: 120, projectileType: ProjectileType.Projectile3, chargesRequired: 4 },
+  { entityType: "Haven", health: 15000, projectileSpeed: 200, projectileDamage: 600, projectileType: ProjectileType.Projectile5, chargesRequired: 4 },
 
   { entityType: "Buckler", health: 250, projectileSpeed: 200, projectileDamage: 5, projectileType: ProjectileType.Tiny, chargesRequired: 4 },
-  { entityType: "Ward", health: 1000, projectileSpeed: 260, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 4 },
-  { entityType: "Aegis", health: 4000, projectileSpeed: 320, projectileDamage: 120, projectileType: ProjectileType.Projectile3, chargesRequired: 4 },
-  { entityType: "Bastion", health: 15000, projectileSpeed: 380, projectileDamage: 600, projectileType: ProjectileType.Projectile5, chargesRequired: 4 },
+  { entityType: "Ward", health: 1000, projectileSpeed: 200, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 4 },
+  { entityType: "Aegis", health: 4000, projectileSpeed: 200, projectileDamage: 120, projectileType: ProjectileType.Projectile3, chargesRequired: 4 },
+  { entityType: "Bastion", health: 15000, projectileSpeed: 200, projectileDamage: 600, projectileType: ProjectileType.Projectile5, chargesRequired: 4 },
 
   { entityType: "Spark", health: 200, projectileSpeed: 200, projectileDamage: 6, projectileType: ProjectileType.Tiny, chargesRequired: 4 },
-  { entityType: "Ember", health: 800, projectileSpeed: 260, projectileDamage: 30, projectileType: ProjectileType.Projectile2, chargesRequired: 4 },
-  { entityType: "Corona", health: 3000, projectileSpeed: 320, projectileDamage: 150, projectileType: ProjectileType.Projectile3, chargesRequired: 4 },
-  { entityType: "Inferno", health: 12000, projectileSpeed: 380, projectileDamage: 750, projectileType: ProjectileType.Projectile5, chargesRequired: 4 },
+  { entityType: "Ember", health: 800, projectileSpeed: 200, projectileDamage: 30, projectileType: ProjectileType.Projectile2, chargesRequired: 4 },
+  { entityType: "Corona", health: 3000, projectileSpeed: 200, projectileDamage: 150, projectileType: ProjectileType.Projectile3, chargesRequired: 4 },
+  { entityType: "Inferno", health: 12000, projectileSpeed: 200, projectileDamage: 750, projectileType: ProjectileType.Projectile5, chargesRequired: 4 },
 
   { entityType: "Pulse", health: 200, projectileSpeed: 200, projectileDamage: 5, projectileType: ProjectileType.Tiny, chargesRequired: 4 },
-  { entityType: "Flare", health: 800, projectileSpeed: 260, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 4 },
-  { entityType: "Bolt", health: 3000, projectileSpeed: 320, projectileDamage: 120, projectileType: ProjectileType.Projectile3, chargesRequired: 4 },
-  { entityType: "Dynamo", health: 12000, projectileSpeed: 380, projectileDamage: 600, projectileType: ProjectileType.Projectile5, chargesRequired: 4 },
+  { entityType: "Flare", health: 800, projectileSpeed: 200, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 4 },
+  { entityType: "Bolt", health: 3000, projectileSpeed: 200, projectileDamage: 120, projectileType: ProjectileType.Projectile3, chargesRequired: 4 },
+  { entityType: "Dynamo", health: 12000, projectileSpeed: 200, projectileDamage: 600, projectileType: ProjectileType.Projectile5, chargesRequired: 4 },
 
-  { entityType: "Prism", health: 200, projectileSpeed: 250, projectileDamage: 10, projectileType: ProjectileType.Tiny, chargesRequired: 5 },
-  { entityType: "Nova", health: 800, projectileSpeed: 310, projectileDamage: 50, projectileType: ProjectileType.Projectile2, chargesRequired: 5 },
-  { entityType: "Sabre", health: 3000, projectileSpeed: 370, projectileDamage: 250, projectileType: ProjectileType.Projectile3, chargesRequired: 5 },
-  { entityType: "Leviathan", health: 12000, projectileSpeed: 430, projectileDamage: 1200, projectileType: ProjectileType.Projectile6, chargesRequired: 6 },
+  { entityType: "Prism", health: 200, projectileSpeed: 200, projectileDamage: 10, projectileType: ProjectileType.Tiny, chargesRequired: 5 },
+  { entityType: "Nova", health: 800, projectileSpeed: 200, projectileDamage: 50, projectileType: ProjectileType.Projectile2, chargesRequired: 5 },
+  { entityType: "Sabre", health: 3000, projectileSpeed: 200, projectileDamage: 250, projectileType: ProjectileType.Projectile3, chargesRequired: 5 },
+  { entityType: "Leviathan", health: 12000, projectileSpeed: 200, projectileDamage: 1200, projectileType: ProjectileType.Projectile6, chargesRequired: 6 },
 ];
 
 export const FRIENDLY_CONFIG_MAP = new Map<string, FriendlyConfig>(
