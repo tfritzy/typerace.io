@@ -1,15 +1,13 @@
 import { useState } from "react";
 import { formatGold, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import type { EntityType } from "./types";
-import { Coins, X, Crosshair, ChevronsRight, Heart, Shield, FlaskConical, Zap, Focus, Sword, Skull, ChevronDown } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Coins, X, Heart, Shield, Sword, Skull, ChevronDown } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
 import { getNextUpgrade, getUpgradeCost, getShipTier } from "./upgradePaths";
 import { FRIENDLY_CONFIG_MAP, type FriendlyConfig } from "./enemyConfig";
 import { TargetingMode } from "./state";
 import type { EntityState } from "./state";
-import type { ShipRole } from "./shipCatalog";
-import { getShipRole } from "./shipCatalog";
+import { getShipRole, ROLE_META } from "./shipCatalog";
 
 interface UpgradePanelProps {
   onUpgrade: () => void;
@@ -26,16 +24,6 @@ const PANEL_OFFSET_TOP = 10;
 const PANEL_MIN_TOP = 3;
 const PANEL_MAX_TOP = 55;
 const PANEL_WIDTH = 240;
-
-const ROLE_META: Record<ShipRole, { icon: LucideIcon; label: string; color: string }> = {
-  shooter: { icon: Crosshair, label: "Shooter", color: "#94e2d5" },
-  rapid_fire: { icon: ChevronsRight, label: "Rapid Fire", color: "#89b4fa" },
-  healer: { icon: Heart, label: "Healer", color: "#a6e3a1" },
-  shield: { icon: Shield, label: "Shield", color: "#74c7ec" },
-  plasma: { icon: FlaskConical, label: "Plasma", color: "#fab387" },
-  charge: { icon: Zap, label: "Charge", color: "#f9e2af" },
-  laser: { icon: Focus, label: "Laser", color: "#cba6f7" },
-};
 
 const TARGETING_OPTIONS = [
   { mode: TargetingMode.NearestToShip, label: "Nearest to Ship" },
