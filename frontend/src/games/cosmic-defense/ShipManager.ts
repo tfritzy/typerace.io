@@ -39,6 +39,8 @@ export class ShipManager {
   }
 
   upgradeShip(state: GameState, oldEntityId: number, newEntityType: EntityType, x: number, y: number): number {
+    const config = FRIENDLY_CONFIG_MAP.get(newEntityType);
+    if (!config) return -1;
     const idx = state.entities.findIndex((e) => e.id === oldEntityId);
     if (idx >= 0) state.entities.splice(idx, 1);
     return this.addShip(state, newEntityType, x, y);

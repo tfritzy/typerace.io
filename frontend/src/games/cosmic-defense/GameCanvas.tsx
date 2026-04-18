@@ -108,7 +108,7 @@ export const GameCanvas = () => {
 
   const handleUpgrade = useCallback(() => {
     const game = gameRef.current;
-    if (!game || !selectedSlot || !selectedSlot.occupant || selectedSlot.entityId == null) return;
+    if (!game || !selectedSlot || !selectedSlot.occupant || selectedSlot.entityId === null) return;
 
     const nextType = getNextUpgrade(selectedSlot.occupant);
     if (!nextType) return;
