@@ -10,10 +10,10 @@ export const SHIP_BLUEPRINT_MAP = new Map<string, ShipBlueprint>();
 
 export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   { entityType: "Moth", cost: 15, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Pip", cost: 15, colorPreset: ColorPreset.Preset1 },
+  { entityType: "Osprey", cost: 15, colorPreset: ColorPreset.Preset1 },
   { entityType: "Mender", cost: 15, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Spark", cost: 15, colorPreset: ColorPreset.Preset1 },
   { entityType: "Speck", cost: 15, colorPreset: ColorPreset.Preset1 },
+  { entityType: "Spark", cost: 15, colorPreset: ColorPreset.Preset1 },
   { entityType: "Mite", cost: 15, colorPreset: ColorPreset.Preset1 },
   { entityType: "Specter", cost: 15, colorPreset: ColorPreset.Preset1 },
 ];
