@@ -13,6 +13,7 @@ export interface PlacementSlot {
   x: number;
   y: number;
   occupant: EntityType | null;
+  entityId: number | null;
 }
 
 export function generateSlots(): PlacementSlot[] {
@@ -34,7 +35,7 @@ export function generateSlots(): PlacementSlot[] {
       const dist = Math.sqrt(dx * dx + dy * dy);
 
       if (dist > PLANET_EXCLUSION) {
-        slots.push({ index, x, y, occupant: null });
+        slots.push({ index, x, y, occupant: null, entityId: null });
         index++;
       }
 

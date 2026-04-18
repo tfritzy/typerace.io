@@ -83,9 +83,9 @@ export const PlacementOverlay = ({
       />
 
       {slots.map((slot) => {
-        if (slot.occupant) return null;
         const isActive = activeSlotIndex === slot.index;
         const isHovered = hoveredIndex === slot.index;
+        const isEmpty = !slot.occupant;
         return (
           <g key={slot.index}>
             <polygon
@@ -105,19 +105,21 @@ export const PlacementOverlay = ({
                 style={{ pointerEvents: "none" }}
               />
             )}
-            <circle
-              cx={slot.x}
-              cy={slot.y}
-              r={3}
-              fill={
-                isActive
-                  ? "rgba(120,140,200,0.7)"
-                  : isHovered
-                    ? "rgba(120,140,200,0.55)"
-                    : "rgba(120,140,200,0.3)"
-              }
-              style={{ pointerEvents: "none" }}
-            />
+            {isEmpty && (
+              <circle
+                cx={slot.x}
+                cy={slot.y}
+                r={3}
+                fill={
+                  isActive
+                    ? "rgba(120,140,200,0.7)"
+                    : isHovered
+                      ? "rgba(120,140,200,0.55)"
+                      : "rgba(120,140,200,0.3)"
+                }
+                style={{ pointerEvents: "none" }}
+              />
+            )}
           </g>
         );
       })}

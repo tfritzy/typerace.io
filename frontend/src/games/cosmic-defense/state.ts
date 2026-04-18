@@ -230,7 +230,7 @@ export function spawnAlliedEntity(
   colorPreset: ColorPreset,
   x: number,
   y: number
-): void {
+): number {
   const hitbox = SHIP_HITBOX_MAP[config.entityType];
 
   const entity: EntityState = {
@@ -262,6 +262,7 @@ export function spawnAlliedEntity(
   };
 
   state.entities.push(entity);
+  return entity.id;
 }
 
 function isInBounds(x: number, y: number): boolean {

@@ -31,11 +31,19 @@ export class ShipManager {
     this.layer = new Container();
   }
 
-  addShip(state: GameState, entityType: EntityType, x: number, y: number): void {
+  addShip(state: GameState, entityType: EntityType, x: number, y: number): number {
     const config = FRIENDLY_CONFIG_MAP.get(entityType);
-    if (!config) return;
+    if (!config) return -1;
     const bp = BLUEPRINT_MAP.get(entityType);
-    spawnAlliedEntity(state, config, bp?.colorPreset ?? 0, x, y);
+    return spawnAlliedEntity(state, config, bp?.colorPreset ?? 0, x, y);
+  }
+
+  upgradeShip(state: GameState, oldEntityId: number, newEntityType: EntityType, x: number, y: number): number {
+    const config = FRIENDLY_CONFIG_MAP.get(newEntityType);
+    if (!config) return -1;
+    const idx = state.entities.findIndex((e) => e.id === oldEntityId);
+    if (idx >= 0) state.entities.splice(idx, 1);
+    return this.addShip(state, newEntityType, x, y);
   }
 
   update(state: GameState, dt: number): void {

@@ -12,6 +12,7 @@ import { AssetManager } from "./assetManager";
 import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, WavePhase } from "./state";
 import type { GameState } from "./state";
 import type { EntityType } from "./types";
+import { getAllUpgradeShipTypes } from "./upgradePaths";
 
 export class CosmicDefenseGame {
   private app: Application;
@@ -37,7 +38,7 @@ export class CosmicDefenseGame {
   async init(): Promise<void> {
     this.assetManager = await AssetManager.load(MANIFEST);
     this.buildScene(this.assetManager);
-    this.shipPreviews = await this.assetManager.generateShipPreviews(this.app);
+    this.shipPreviews = await this.assetManager.generateShipPreviews(this.app, getAllUpgradeShipTypes());
 
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
     this.app.ticker.add(this.tickerCallback);

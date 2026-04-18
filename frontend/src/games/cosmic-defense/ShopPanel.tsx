@@ -1,8 +1,19 @@
-import { SHIP_BLUEPRINTS } from "./shipCatalog";
+import { SHIP_BLUEPRINTS, type ShipRole } from "./shipCatalog";
 import { formatGold, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import type { EntityType } from "./types";
-import { Coins, X } from "lucide-react";
+import { Coins, X, Crosshair, ChevronsRight, Heart, Shield, FlaskConical, Zap, Focus } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
+import type { LucideIcon } from "lucide-react";
+
+const ROLE_META: Record<ShipRole, { icon: LucideIcon; label: string; color: string }> = {
+  shooter: { icon: Crosshair, label: "Shooter", color: "#94e2d5" },
+  rapid_fire: { icon: ChevronsRight, label: "Rapid Fire", color: "#89b4fa" },
+  healer: { icon: Heart, label: "Healer", color: "#a6e3a1" },
+  shield: { icon: Shield, label: "Shield", color: "#74c7ec" },
+  plasma: { icon: FlaskConical, label: "Plasma", color: "#fab387" },
+  charge: { icon: Zap, label: "Charge", color: "#f9e2af" },
+  laser: { icon: Focus, label: "Laser", color: "#cba6f7" },
+};
 
 interface ShopPanelProps {
   onSelectShip: (entityType: EntityType) => void;
@@ -16,7 +27,7 @@ const PANEL_OFFSET_LEFT = 5;
 const PANEL_OFFSET_TOP = 22;
 const PANEL_MIN_TOP = 3;
 const PANEL_MAX_TOP = 55;
-const PANEL_WIDTH = 260;
+const PANEL_WIDTH = 280;
 
 export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold, slot }: ShopPanelProps) => {
   const slotLeftPct = (slot.x / CANVAS_WIDTH) * 100;
@@ -34,7 +45,7 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold, slot }: S
           left: `${panelLeft}%`,
           top: `${panelTop}%`,
           width: PANEL_WIDTH,
-          maxHeight: "46%",
+          maxHeight: "60%",
           background: "linear-gradient(180deg, rgba(12,14,30,0.96) 0%, rgba(8,10,24,0.96) 100%)",
           backdropFilter: "blur(12px)",
           boxShadow: "0 8px 32px rgba(0,0,0,0.6), 0 0 1px rgba(120,140,200,0.2)",
@@ -62,10 +73,12 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold, slot }: S
           {SHIP_BLUEPRINTS.map((bp) => {
             const canAfford = gold >= bp.cost;
             const preview = shipPreviews.get(bp.entityType);
+            const meta = ROLE_META[bp.role];
+            const RoleIcon = meta.icon;
             return (
               <button
                 key={bp.entityType}
-                className={`flex items-center gap-2.5 p-1.5 px-2 rounded-md border transition-colors w-full ${
+                className={`flex items-center gap-2 p-1.5 px-2 rounded-md border transition-colors w-full ${
                   canAfford
                     ? "border-white/5 bg-white/[0.02] cursor-pointer hover:bg-white/8 hover:border-white/15"
                     : "border-transparent bg-transparent cursor-not-allowed opacity-30"
@@ -73,7 +86,7 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold, slot }: S
                 onClick={() => canAfford && onSelectShip(bp.entityType)}
                 disabled={!canAfford}
               >
-                <div className={`w-8 h-8 flex items-center justify-center shrink-0 ${!canAfford ? "grayscale" : ""}`}>
+                <div className="w-8 h-8 flex items-center justify-center shrink-0">
                   {preview ? (
                     <img
                       src={preview}
@@ -85,10 +98,21 @@ export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold, slot }: S
                     <div className="w-5 h-5 bg-white/15 rounded" />
                   )}
                 </div>
-                <span className={`text-[11px] font-medium ${canAfford ? "text-[#bac2de]" : "text-[#585b70]"}`}>
-                  {bp.entityType}
-                </span>
-                <span className={`text-[10px] font-medium flex items-center gap-0.5 ml-auto ${canAfford ? "text-[#f9e2af]" : "text-[#585b70]"}`}>
+                <div className="flex flex-col items-start min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] font-medium text-[#bac2de]">
+                      {bp.entityType}
+                    </span>
+                    <RoleIcon className="w-2.5 h-2.5 shrink-0" style={{ color: meta.color }} />
+                    <span className="text-[9px]" style={{ color: meta.color }}>
+                      {meta.label}
+                    </span>
+                  </div>
+                  <span className="text-[9px] leading-tight text-[#6c7086] text-left">
+                    {bp.description}
+                  </span>
+                </div>
+                <span className="text-[10px] font-medium flex items-center gap-0.5 shrink-0 text-[#f9e2af]">
                   <Coins className="w-2.5 h-2.5" />
                   {formatGold(bp.cost)}
                 </span>

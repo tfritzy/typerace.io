@@ -1,29 +1,25 @@
 import { type EntityType, ColorPreset } from "./types";
 
+export type ShipRole = "shooter" | "rapid_fire" | "healer" | "shield" | "plasma" | "charge" | "laser";
+
 export interface ShipBlueprint {
   entityType: EntityType;
   cost: number;
   colorPreset: ColorPreset;
+  role: ShipRole;
+  description: string;
 }
 
 export const SHIP_BLUEPRINT_MAP = new Map<string, ShipBlueprint>();
 
 export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
-  { entityType: "Moth", cost: 15, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Dot", cost: 40, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Gnat", cost: 100, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Ward", cost: 250, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Clipper", cost: 600, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Stinger", cost: 1500, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Crest", cost: 3500, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Osprey", cost: 8000, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Kestrel", cost: 20000, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Vulture", cost: 50000, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Talon", cost: 120000, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Broadside", cost: 300000, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Bastion", cost: 750000, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Haven", cost: 2000000, colorPreset: ColorPreset.Preset1 },
-  { entityType: "Colossus", cost: 5000000, colorPreset: ColorPreset.Preset1 },
+  { entityType: "Moth", cost: 15, colorPreset: ColorPreset.Preset1, role: "shooter", description: "Fires steady projectiles at enemies" },
+  { entityType: "Osprey", cost: 15, colorPreset: ColorPreset.Preset1, role: "rapid_fire", description: "Fires rapidly at enemies" },
+  { entityType: "Mender", cost: 15, colorPreset: ColorPreset.Preset1, role: "healer", description: "Repairs nearby allied ships" },
+  { entityType: "Buckler", cost: 15, colorPreset: ColorPreset.Preset1, role: "shield", description: "Projects a shield onto nearby allies" },
+  { entityType: "Spark", cost: 15, colorPreset: ColorPreset.Preset1, role: "plasma", description: "Applies stacks of plasma to enemies" },
+  { entityType: "Pulse", cost: 15, colorPreset: ColorPreset.Preset1, role: "charge", description: "Grants charge to nearby allies" },
+  { entityType: "Prism", cost: 15, colorPreset: ColorPreset.Preset1, role: "laser", description: "Fires a piercing beam through enemies" },
 ];
 
 for (const bp of SHIP_BLUEPRINTS) {
