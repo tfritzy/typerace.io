@@ -28,6 +28,13 @@ export const GameCanvas = () => {
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
   const [slots, setSlots] = useState<PlacementSlot[]>(() => generateSlots());
   const [uiScale, setUiScale] = useState(1);
+  const [, setInspectTick] = useState(0);
+
+  useEffect(() => {
+    if (!selectedSlot?.entityId) return;
+    const interval = setInterval(() => setInspectTick((t) => t + 1), 200);
+    return () => clearInterval(interval);
+  }, [selectedSlot?.entityId]);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -153,13 +160,13 @@ export const GameCanvas = () => {
   const getSelectedEntity = useCallback((): EntityState | null => {
     const game = gameRef.current;
     if (!game || !selectedSlot || !selectedSlot.entityId) return null;
-    return game.state.entities.find((e) => e.id === selectedSlot.entityId) ?? null;
+    return game.state.entityById.get(selectedSlot.entityId) ?? null;
   }, [selectedSlot]);
 
   const handleTargetingChange = useCallback((mode: TargetingMode) => {
     const game = gameRef.current;
     if (!game || !selectedSlot || !selectedSlot.entityId) return;
-    const entity = game.state.entities.find((e) => e.id === selectedSlot.entityId);
+    const entity = game.state.entityById.get(selectedSlot.entityId);
     if (entity) entity.targetingMode = mode;
   }, [selectedSlot]);
 

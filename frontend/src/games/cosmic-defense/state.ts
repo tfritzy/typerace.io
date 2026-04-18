@@ -146,6 +146,7 @@ export interface LaserBeam {
 
 export interface GameState {
   entities: EntityState[];
+  entityById: Map<number, EntityState>;
   projectiles: ProjectileState[];
   explosions: ExplosionState[];
   laserBeams: LaserBeam[];
@@ -188,6 +189,7 @@ export function onStateCreated(cb: () => void): () => void {
 export function createGameState(): GameState {
   const state: GameState = {
     entities: [],
+    entityById: new Map(),
     projectiles: [],
     explosions: [],
     laserBeams: [],
@@ -215,6 +217,17 @@ export function createGameState(): GameState {
   for (const cb of stateCreatedListeners) cb();
   stateCreatedListeners.length = 0;
   return state;
+}
+
+function addEntity(state: GameState, entity: EntityState): void {
+  state.entities.push(entity);
+  state.entityById.set(entity.id, entity);
+}
+
+function removeEntityAt(state: GameState, index: number): void {
+  const entity = state.entities[index];
+  state.entityById.delete(entity.id);
+  state.entities.splice(index, 1);
 }
 
 function spawnFromRight(): { x: number; y: number } {
@@ -271,7 +284,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     targetingMode: TargetingMode.NearestToShip,
   };
 
-  state.entities.push(entity);
+  addEntity(state, entity);
 }
 
 export function spawnAlliedEntity(
@@ -324,7 +337,7 @@ export function spawnAlliedEntity(
     targetingMode: TargetingMode.NearestToShip,
   };
 
-  state.entities.push(entity);
+  addEntity(state, entity);
   return entity.id;
 }
 
@@ -346,7 +359,7 @@ function checkCollisions(state: GameState): void {
   for (let i = state.entities.length - 1; i >= 0; i--) {
     const e = state.entities[i];
     if (e.team === Team.Enemy && !isInBounds(e.x, e.y)) {
-      state.entities.splice(i, 1);
+      removeEntityAt(state, i);
     }
   }
 
@@ -392,7 +405,7 @@ function checkCollisions(state: GameState): void {
           }
           e.health -= dmg;
 
-          const source = state.entities.find((s) => s.id === p.sourceId);
+          const source = state.entityById.get(p.sourceId);
           if (source) {
             source.damageDealt += p.damage;
           }
@@ -403,7 +416,7 @@ function checkCollisions(state: GameState): void {
             if (source) source.kills++;
             state.gold += e.gold;
             goldGained = true;
-            state.entities.splice(j, 1);
+            removeEntityAt(state, j);
           }
           hit = true;
           if (p.projectileType !== ProjectileType.Tiny) {
@@ -437,81 +450,54 @@ function findNearestTarget(
   const opposingTeam =
     entity.team === Team.Enemy ? Team.Allied : Team.Enemy;
 
-  let bestDist = Infinity;
+  let bestScore = -Infinity;
   let found = false;
 
   if (entity.team === Team.Enemy) {
     const dx = entity.x - PLANET_X;
     const dy = entity.y - PLANET_Y;
-    const d2 = dx * dx + dy * dy;
-    if (d2 < bestDist) {
-      bestDist = d2;
-      _targetResult.x = PLANET_X;
-      _targetResult.y = PLANET_Y;
-      _targetResult.vx = 0;
-      _targetResult.vy = 0;
-      found = true;
-    }
+    bestScore = -(dx * dx + dy * dy);
+    _targetResult.x = PLANET_X;
+    _targetResult.y = PLANET_Y;
+    _targetResult.vx = 0;
+    _targetResult.vy = 0;
+    found = true;
   }
 
   const mode = entity.team === Team.Allied ? entity.targetingMode : TargetingMode.NearestToShip;
 
-  if (mode === TargetingMode.NearestToPlanet) {
-    let bestPlanetDist = Infinity;
-    for (const other of state.entities) {
-      if (other.team !== opposingTeam) continue;
-      const dx = other.x - PLANET_X;
-      const dy = other.y - PLANET_Y;
-      const d2 = dx * dx + dy * dy;
-      if (d2 < bestPlanetDist) {
-        bestPlanetDist = d2;
-        _targetResult.x = other.x;
-        _targetResult.y = other.y;
-        _targetResult.vx = other.vx;
-        _targetResult.vy = other.vy;
-        found = true;
+  for (const other of state.entities) {
+    if (other.team !== opposingTeam) continue;
+
+    let score: number;
+    switch (mode) {
+      case TargetingMode.NearestToPlanet: {
+        const dx = other.x - PLANET_X;
+        const dy = other.y - PLANET_Y;
+        score = -(dx * dx + dy * dy);
+        break;
+      }
+      case TargetingMode.Strongest:
+        score = other.health;
+        break;
+      case TargetingMode.Weakest:
+        score = -other.health;
+        break;
+      default: {
+        const dx = entity.x - other.x;
+        const dy = entity.y - other.y;
+        score = -(dx * dx + dy * dy);
+        break;
       }
     }
-  } else if (mode === TargetingMode.Strongest) {
-    let bestHealth = -Infinity;
-    for (const other of state.entities) {
-      if (other.team !== opposingTeam) continue;
-      if (other.health > bestHealth) {
-        bestHealth = other.health;
-        _targetResult.x = other.x;
-        _targetResult.y = other.y;
-        _targetResult.vx = other.vx;
-        _targetResult.vy = other.vy;
-        found = true;
-      }
-    }
-  } else if (mode === TargetingMode.Weakest) {
-    let bestHealth = Infinity;
-    for (const other of state.entities) {
-      if (other.team !== opposingTeam) continue;
-      if (other.health < bestHealth) {
-        bestHealth = other.health;
-        _targetResult.x = other.x;
-        _targetResult.y = other.y;
-        _targetResult.vx = other.vx;
-        _targetResult.vy = other.vy;
-        found = true;
-      }
-    }
-  } else {
-    for (const other of state.entities) {
-      if (other.team !== opposingTeam) continue;
-      const dx = entity.x - other.x;
-      const dy = entity.y - other.y;
-      const d2 = dx * dx + dy * dy;
-      if (d2 < bestDist) {
-        bestDist = d2;
-        _targetResult.x = other.x;
-        _targetResult.y = other.y;
-        _targetResult.vx = other.vx;
-        _targetResult.vy = other.vy;
-        found = true;
-      }
+
+    if (score > bestScore) {
+      bestScore = score;
+      _targetResult.x = other.x;
+      _targetResult.y = other.y;
+      _targetResult.vx = other.vx;
+      _targetResult.vy = other.vy;
+      found = true;
     }
   }
 
@@ -633,7 +619,7 @@ export function updateState(state: GameState, dt: number): void {
           state.gold += e.gold;
           state.onGoldChanged.emit();
         }
-        state.entities.splice(i, 1);
+        removeEntityAt(state, i);
       }
     }
   }
@@ -734,7 +720,7 @@ function fireLaser(state: GameState, e: EntityState): void {
       e.kills++;
       state.gold += other.gold;
       goldGained = true;
-      state.entities.splice(i, 1);
+      removeEntityAt(state, i);
     }
   }
 
