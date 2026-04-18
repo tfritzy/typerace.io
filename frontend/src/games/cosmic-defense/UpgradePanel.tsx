@@ -295,6 +295,8 @@ export const UpgradePanel = ({
               disabled={!canAfford}
               onMouseEnter={() => setHovering(true)}
               onMouseLeave={() => setHovering(false)}
+              onFocus={() => setHovering(true)}
+              onBlur={() => setHovering(false)}
             >
               <ChevronUp className="w-3 h-3" />
               {nextType}
