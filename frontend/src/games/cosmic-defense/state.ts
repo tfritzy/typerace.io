@@ -9,6 +9,7 @@ const PLANET_HIT_RADIUS = 100;
 const PROJECTILE_SPEED = 300 * 2;
 const NEARBY_RANGE = 200;
 const PLASMA_DPS_PER_STACK = 5;
+const LASER_RANGE = 1200;
 
 export interface EntityState {
   id: number;
@@ -43,6 +44,7 @@ export interface EntityState {
   shieldAmount: number;
   plasmaStacksApplied: number;
   chargesGranted: number;
+  laserDamage: number;
 }
 
 export interface ProjectileState {
@@ -120,10 +122,20 @@ export interface DamageData {
   killed: boolean;
 }
 
+export interface LaserBeam {
+  id: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  time: number;
+}
+
 export interface GameState {
   entities: EntityState[];
   projectiles: ProjectileState[];
   explosions: ExplosionState[];
+  laserBeams: LaserBeam[];
   time: {
     time: number;
     deltaTime: number;
@@ -165,6 +177,7 @@ export function createGameState(): GameState {
     entities: [],
     projectiles: [],
     explosions: [],
+    laserBeams: [],
     time: { time: 0, deltaTime: 0 },
     nextId: 1,
     planetHealth: 1000,
@@ -237,6 +250,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     shieldAmount: 0,
     plasmaStacksApplied: 0,
     chargesGranted: 0,
+    laserDamage: 0,
   };
 
   state.entities.push(entity);
@@ -284,6 +298,7 @@ export function spawnAlliedEntity(
     shieldAmount: config.shieldAmount,
     plasmaStacksApplied: config.plasmaStacks,
     chargesGranted: config.chargesGranted,
+    laserDamage: config.laserDamage,
   };
 
   state.entities.push(entity);
@@ -548,6 +563,13 @@ export function updateState(state: GameState, dt: number): void {
   }
 
   checkCollisions(state);
+
+  const LASER_BEAM_DURATION = 0.15;
+  for (let i = state.laserBeams.length - 1; i >= 0; i--) {
+    if (state.time.time - state.laserBeams[i].time > LASER_BEAM_DURATION) {
+      state.laserBeams.splice(i, 1);
+    }
+  }
 }
 
 function fireProjectile(state: GameState, e: EntityState, plasmaStacks: number): void {
@@ -588,6 +610,67 @@ function findNearbyAllies(state: GameState, e: EntityState): EntityState[] {
   return allies;
 }
 
+function fireLaser(state: GameState, e: EntityState): void {
+  const target = findNearestTarget(state, e);
+  if (!target) return;
+
+  const dx = target.x - e.x;
+  const dy = target.y - e.y;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  if (len === 0) return;
+
+  const nx = dx / len;
+  const ny = dy / len;
+
+  const endX = e.x + nx * LASER_RANGE;
+  const endY = e.y + ny * LASER_RANGE;
+
+  let goldGained = false;
+  for (let i = state.entities.length - 1; i >= 0; i--) {
+    const other = state.entities[i];
+    if (other.team !== Team.Enemy) continue;
+
+    const ex = other.x - e.x;
+    const ey = other.y - e.y;
+    const proj = ex * nx + ey * ny;
+    if (proj < 0 || proj > LASER_RANGE) continue;
+
+    const perpX = ex - proj * nx;
+    const perpY = ey - proj * ny;
+    const perpDist = Math.sqrt(perpX * perpX + perpY * perpY);
+
+    const hitRadius = Math.max(other.hitHalfW, other.hitHalfH);
+    if (perpDist > hitRadius) continue;
+
+    let dmg = e.laserDamage;
+    if (other.shield > 0) {
+      const absorbed = Math.min(other.shield, dmg);
+      other.shield -= absorbed;
+      dmg -= absorbed;
+    }
+    other.health -= dmg;
+
+    const killed = other.health <= 0;
+    state.onDamageDealt.emit({ amount: e.laserDamage, x: other.x, y: other.y, killed });
+    if (killed) {
+      state.gold += other.gold;
+      goldGained = true;
+      state.entities.splice(i, 1);
+    }
+  }
+
+  if (goldGained) state.onGoldChanged.emit();
+
+  state.laserBeams.push({
+    id: state.nextId++,
+    x1: e.x,
+    y1: e.y,
+    x2: endX,
+    y2: endY,
+    time: state.time.time,
+  });
+}
+
 function activateAbility(state: GameState, e: EntityState): void {
   if (e.charge < e.chargesRequired) return;
   e.charge = 0;
@@ -616,6 +699,11 @@ function activateAbility(state: GameState, e: EntityState): void {
       ally.charge = Math.min(ally.chargesRequired, ally.charge + e.chargesGranted);
       activateAbility(state, ally);
     }
+    return;
+  }
+
+  if (e.laserDamage > 0) {
+    fireLaser(state, e);
     return;
   }
 

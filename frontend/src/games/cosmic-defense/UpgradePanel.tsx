@@ -42,23 +42,29 @@ function renderChargeDots(count: number, color: string) {
 function renderStatRows(currentConfig: FriendlyConfig, nextConfig: FriendlyConfig) {
   const rows: { label: string; current: number; next: number }[] = [];
 
-  if (currentConfig.healAmount > 0 || nextConfig.healAmount > 0) {
+  if (currentConfig.healAmount !== nextConfig.healAmount) {
     rows.push({ label: "Heal", current: currentConfig.healAmount, next: nextConfig.healAmount });
   }
 
-  if (currentConfig.shieldAmount > 0 || nextConfig.shieldAmount > 0) {
+  if (currentConfig.shieldAmount !== nextConfig.shieldAmount) {
     rows.push({ label: "Shield", current: currentConfig.shieldAmount, next: nextConfig.shieldAmount });
   }
 
-  if (currentConfig.plasmaStacks > 0 || nextConfig.plasmaStacks > 0) {
+  if (currentConfig.plasmaStacks !== nextConfig.plasmaStacks) {
     rows.push({ label: "Stacks", current: currentConfig.plasmaStacks, next: nextConfig.plasmaStacks });
   }
 
-  if (currentConfig.projectileDamage > 0 || nextConfig.projectileDamage > 0) {
+  if (currentConfig.projectileDamage !== nextConfig.projectileDamage) {
     rows.push({ label: "Damage", current: currentConfig.projectileDamage, next: nextConfig.projectileDamage });
   }
 
-  rows.push({ label: "Health", current: currentConfig.health, next: nextConfig.health });
+  if (currentConfig.laserDamage !== nextConfig.laserDamage) {
+    rows.push({ label: "Damage", current: currentConfig.laserDamage, next: nextConfig.laserDamage });
+  }
+
+  if (currentConfig.health !== nextConfig.health) {
+    rows.push({ label: "Health", current: currentConfig.health, next: nextConfig.health });
+  }
 
   const chargeRow = currentConfig.chargesGranted > 0 && currentConfig.chargesRequired !== nextConfig.chargesRequired;
 
