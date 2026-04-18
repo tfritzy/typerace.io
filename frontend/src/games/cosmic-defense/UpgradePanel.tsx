@@ -3,7 +3,8 @@ import type { EntityType } from "./types";
 import { Coins, X } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
 import { getNextUpgrade, getUpgradeCost, getShipTier } from "./upgradePaths";
-import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
+import { FRIENDLY_CONFIG_MAP, type FriendlyConfig } from "./enemyConfig";
+import { getShipRole } from "./shipCatalog";
 
 interface UpgradePanelProps {
   onUpgrade: () => void;
@@ -25,6 +26,44 @@ function statDelta(current: number, next: number): string {
   return `${diff}`;
 }
 
+function renderStatRows(currentConfig: FriendlyConfig, nextConfig: FriendlyConfig, role: string | null) {
+  const rows: { label: string; current: number; next: number }[] = [];
+
+  switch (role) {
+    case "healer":
+      rows.push({ label: "Heal", current: currentConfig.abilityValue, next: nextConfig.abilityValue });
+      break;
+    case "shield":
+      rows.push({ label: "Shield", current: currentConfig.abilityValue, next: nextConfig.abilityValue });
+      break;
+    case "plasma":
+      rows.push({ label: "Stacks", current: currentConfig.abilityValue, next: nextConfig.abilityValue });
+      rows.push({ label: "Damage", current: currentConfig.projectileDamage, next: nextConfig.projectileDamage });
+      break;
+    case "charge":
+      rows.push({ label: "Charges granted", current: currentConfig.abilityValue, next: nextConfig.abilityValue });
+      break;
+    default:
+      rows.push({ label: "Damage", current: currentConfig.projectileDamage, next: nextConfig.projectileDamage });
+      break;
+  }
+
+  if (currentConfig.chargesRequired !== nextConfig.chargesRequired) {
+    rows.push({ label: "Keystrokes", current: currentConfig.chargesRequired, next: nextConfig.chargesRequired });
+  }
+
+  rows.push({ label: "Health", current: currentConfig.health, next: nextConfig.health });
+
+  return rows.map((row) => (
+    <div key={row.label} className="flex justify-between text-[9px]">
+      <span className="text-[#6c7086]">{row.label}</span>
+      <span className={row.next >= row.current ? "text-[#a6e3a1]" : "text-[#f38ba8]"}>
+        {row.next} ({statDelta(row.current, row.next)})
+      </span>
+    </div>
+  ));
+}
+
 export const UpgradePanel = ({ onUpgrade, onClose, shipPreviews, gold, slot }: UpgradePanelProps) => {
   const currentType = slot.occupant;
   if (!currentType) return null;
@@ -43,6 +82,7 @@ export const UpgradePanel = ({ onUpgrade, onClose, shipPreviews, gold, slot }: U
   const nextPreview = nextType ? shipPreviews.get(nextType) : null;
   const currentConfig = FRIENDLY_CONFIG_MAP.get(currentType);
   const nextConfig = nextType ? FRIENDLY_CONFIG_MAP.get(nextType) : null;
+  const role = getShipRole(currentType);
 
   return (
     <>
@@ -100,18 +140,7 @@ export const UpgradePanel = ({ onUpgrade, onClose, shipPreviews, gold, slot }: U
 
             {currentConfig && nextConfig && (
               <div className="flex flex-col gap-1 px-1">
-                <div className="flex justify-between text-[9px]">
-                  <span className="text-[#6c7086]">Damage</span>
-                  <span className="text-[#a6e3a1]">
-                    {nextConfig.projectileDamage} ({statDelta(currentConfig.projectileDamage, nextConfig.projectileDamage)})
-                  </span>
-                </div>
-                <div className="flex justify-between text-[9px]">
-                  <span className="text-[#6c7086]">Health</span>
-                  <span className="text-[#a6e3a1]">
-                    {nextConfig.health} ({statDelta(currentConfig.health, nextConfig.health)})
-                  </span>
-                </div>
+                {renderStatRows(currentConfig, nextConfig, role)}
               </div>
             )}
 

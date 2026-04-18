@@ -1,11 +1,14 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, Team } from "./types";
 import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, goldForEnemy } from "./enemyConfig";
+import { getShipRole, type ShipRole } from "./shipCatalog";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLANET_HIT_RADIUS = 100;
 const PROJECTILE_SPEED = 300 * 2;
+const NEARBY_RANGE = 200;
+const PLASMA_DPS_PER_STACK = 5;
 
 export interface EntityState {
   id: number;
@@ -33,6 +36,10 @@ export interface EntityState {
   range: number;
   hitHalfW: number;
   hitHalfH: number;
+  role: ShipRole | null;
+  shield: number;
+  plasmaStacks: number;
+  abilityValue: number;
 }
 
 export interface ProjectileState {
@@ -44,6 +51,8 @@ export interface ProjectileState {
   damage: number;
   team: Team;
   projectileType: ProjectileType;
+  piercing: boolean;
+  plasmaStacks: number;
 }
 
 export interface ExplosionState {
@@ -219,6 +228,10 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     range: config.range,
     hitHalfW: hitbox.hitWidth / 2,
     hitHalfH: hitbox.hitHeight / 2,
+    role: null,
+    shield: 0,
+    plasmaStacks: 0,
+    abilityValue: 0,
   };
 
   state.entities.push(entity);
@@ -259,6 +272,10 @@ export function spawnAlliedEntity(
     range: 0,
     hitHalfW: hitbox.hitWidth / 2,
     hitHalfH: hitbox.hitHeight / 2,
+    role: getShipRole(config.entityType),
+    shield: 0,
+    plasmaStacks: 0,
+    abilityValue: config.abilityValue,
   };
 
   state.entities.push(entity);
@@ -317,7 +334,18 @@ function checkCollisions(state: GameState): void {
         const dx = Math.abs(p.x - e.x);
         const dy = Math.abs(p.y - e.y);
         if (dx < e.hitHalfW && dy < e.hitHalfH) {
-          e.health -= p.damage;
+          if (p.plasmaStacks > 0) {
+            e.plasmaStacks += p.plasmaStacks;
+          }
+
+          let dmg = p.damage;
+          if (e.shield > 0) {
+            const absorbed = Math.min(e.shield, dmg);
+            e.shield -= absorbed;
+            dmg -= absorbed;
+          }
+          e.health -= dmg;
+
           const killed = e.health <= 0;
           state.onDamageDealt.emit({ amount: p.damage, x: e.x, y: e.y, killed });
           if (killed) {
@@ -334,12 +362,12 @@ function checkCollisions(state: GameState): void {
               projectileType: p.projectileType,
             });
           }
-          break;
+          if (!p.piercing) break;
         }
       }
     }
 
-    if (hit || !isInBounds(p.x, p.y)) {
+    if ((hit && !p.piercing) || !isInBounds(p.x, p.y)) {
       state.projectiles.splice(i, 1);
     }
   }
@@ -470,6 +498,8 @@ export function updateState(state: GameState, dt: number): void {
               damage: e.projectileDamage,
               team: e.team,
               projectileType: e.projectileType,
+              piercing: false,
+              plasmaStacks: 0,
             });
           }
         }
@@ -494,16 +524,28 @@ export function updateState(state: GameState, dt: number): void {
     p.y += p.vy * dt;
   }
 
+  for (let i = state.entities.length - 1; i >= 0; i--) {
+    const e = state.entities[i];
+    if (e.plasmaStacks > 0) {
+      const plasmaDamage = e.plasmaStacks * PLASMA_DPS_PER_STACK * dt;
+      e.health -= plasmaDamage;
+      if (e.health <= 0) {
+        state.onDamageDealt.emit({ amount: plasmaDamage, x: e.x, y: e.y, killed: true });
+        if (e.team === Team.Enemy) {
+          state.gold += e.gold;
+          state.onGoldChanged.emit();
+        }
+        state.entities.splice(i, 1);
+      }
+    }
+  }
+
   checkCollisions(state);
 }
 
-function tryFireEntity(state: GameState, e: EntityState): void {
-  if (e.charge < e.chargesRequired) return;
-
+function fireProjectile(state: GameState, e: EntityState, piercing: boolean, plasmaStacks: number): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
-
-  e.charge = 0;
 
   const angle = computeLeadAngle(
     e.x, e.y,
@@ -521,14 +563,76 @@ function tryFireEntity(state: GameState, e: EntityState): void {
     damage: e.projectileDamage,
     team: e.team,
     projectileType: e.projectileType,
+    piercing,
+    plasmaStacks,
   });
+}
+
+function findNearbyAllies(state: GameState, e: EntityState): EntityState[] {
+  const r2 = NEARBY_RANGE * NEARBY_RANGE;
+  const allies: EntityState[] = [];
+  for (const other of state.entities) {
+    if (other.id === e.id || other.team !== Team.Allied) continue;
+    const dx = e.x - other.x;
+    const dy = e.y - other.y;
+    if (dx * dx + dy * dy <= r2) {
+      allies.push(other);
+    }
+  }
+  return allies;
+}
+
+function activateAbility(state: GameState, e: EntityState): void {
+  if (e.charge < e.chargesRequired) return;
+  e.charge = 0;
+
+  switch (e.role) {
+    case "shooter":
+    case "rapid_fire":
+      fireProjectile(state, e, false, 0);
+      break;
+
+    case "laser":
+      fireProjectile(state, e, true, 0);
+      break;
+
+    case "plasma":
+      fireProjectile(state, e, false, e.abilityValue);
+      break;
+
+    case "healer": {
+      const allies = findNearbyAllies(state, e);
+      for (const ally of allies) {
+        ally.health = Math.min(ally.maxHealth, ally.health + e.abilityValue);
+      }
+      break;
+    }
+
+    case "shield": {
+      const allies = findNearbyAllies(state, e);
+      for (const ally of allies) {
+        ally.shield += e.abilityValue;
+      }
+      break;
+    }
+
+    case "charge": {
+      const allies = findNearbyAllies(state, e);
+      for (const ally of allies) {
+        if (ally.chargesRequired <= 0) continue;
+        ally.charge = Math.min(ally.chargesRequired, ally.charge + e.abilityValue);
+        activateAbility(state, ally);
+      }
+      break;
+    }
+  }
 }
 
 export function onCorrectKeystroke(state: GameState): void {
   for (const e of state.entities) {
     if (e.chargesRequired <= 0) continue;
     e.charge++;
-    tryFireEntity(state, e);
+    activateAbility(state, e);
   }
 }
 
