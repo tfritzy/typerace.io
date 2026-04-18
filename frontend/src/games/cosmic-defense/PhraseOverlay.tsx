@@ -24,7 +24,12 @@ function trimCompletedWords(words: string[]): string[] {
     start++;
   }
 
-  return start === 0 ? words : words.slice(start);
+  const trimmedWords = start === 0 ? words : words.slice(start);
+  if (trimmedWords.length === 1 && trimmedWords[0].length > MAX_COMPLETED_DISPLAY_CHARS) {
+    return [trimmedWords[0].slice(-MAX_COMPLETED_DISPLAY_CHARS)];
+  }
+
+  return trimmedWords;
 }
 
 function charsMatch(typedChar: string, targetChar: string): boolean {
@@ -138,7 +143,7 @@ export const PhraseOverlay = ({
   if (!visible) return null;
 
   const completedText = completedWords.length > 0 ? `${completedWords.join(" ")} ` : "";
-  const displayCharCount = Math.max(currentWord.length, typedWord.length);
+  const displayWordLength = Math.max(currentWord.length, typedWord.length);
 
   return (
     <div
@@ -167,7 +172,7 @@ export const PhraseOverlay = ({
         {completedText.length > 0 && (
           <span className="text-text-completed">{completedText}</span>
         )}
-        {Array.from({ length: displayCharCount }).map((_, i) => {
+        {Array.from({ length: displayWordLength }).map((_, i) => {
           const targetChar = currentWord[i];
           const typedChar = typedWord[i];
           const displayChar = targetChar ?? typedChar;
@@ -192,7 +197,7 @@ export const PhraseOverlay = ({
             </span>
           );
         })}
-        {typedWord.length >= displayCharCount && (
+        {typedWord.length >= displayWordLength && (
           <span
             ref={cursorCharRef}
             className="text-text-untyped shadow-[-1px_0_0_0_#4a5568]"
