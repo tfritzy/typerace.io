@@ -712,7 +712,11 @@ export function updateSpawner(state: GameState, dt: number): void {
 
   state.spawner.elapsed += dt;
 
+  const prevGold = Math.floor(state.gold);
   state.gold += GOLD_PER_SECOND * dt;
+  if (Math.floor(state.gold) !== prevGold) {
+    state.onGoldChanged.emit();
+  }
 
   const rate = getSpawnRate(state.spawner.elapsed);
   state.spawner.spawnAccumulator += rate * dt;
