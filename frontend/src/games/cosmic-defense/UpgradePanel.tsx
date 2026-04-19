@@ -120,16 +120,19 @@ export const UpgradePanel = ({
             <div className="flex items-center gap-1 mt-0.5">
               <div className="flex items-center gap-0.5">
                 {Array.from({ length: MAX_TIER }, (_, i) => (
-                  <div
+                  <svg
                     key={i}
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{
-                      backgroundColor:
-                        i < currentTier
-                          ? (roleMeta?.color ?? "#a6adc8")
-                          : "rgba(88,91,112,0.4)",
-                    }}
-                  />
+                    className="w-2.5 h-2.5"
+                    viewBox="0 0 24 24"
+                    fill={
+                      i < currentTier
+                        ? (roleMeta?.color ?? "#a6adc8")
+                        : "rgba(88,91,112,0.4)"
+                    }
+                    stroke="none"
+                  >
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
                 ))}
               </div>
               {entity && entity.kills > 0 && (
