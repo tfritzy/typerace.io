@@ -64,23 +64,10 @@ export interface ExplosionState {
   projectileType: ProjectileType;
 }
 
-export enum WavePhase {
-  Idle,
-  Spawning,
-  Clearing,
-}
-
-export interface WaveState {
-  wave: number;
-  phase: WavePhase;
-  spawnQueue: SpawnEntry[];
-  spawnIndex: number;
-  waveTimer: number;
-}
-
-export interface SpawnEntry {
-  config: EnemyConfig;
-  spawnTime: number;
+export interface SpawnState {
+  elapsed: number;
+  spawnAccumulator: number;
+  paused: boolean;
 }
 
 export class GameEvent {
@@ -142,11 +129,8 @@ export interface GameState {
   planetHealth: number;
   maxPlanetHealth: number;
   gold: number;
-  wave: WaveState;
-  waveActive: boolean;
+  spawner: SpawnState;
   onPlanetDamaged: GameEvent;
-  onWaveComplete: GameEvent;
-  onWaveActiveChanged: GameEvent;
   onGoldChanged: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
 }
@@ -181,17 +165,12 @@ export function createGameState(): GameState {
     planetHealth: 1000,
     maxPlanetHealth: 1000,
     gold: 15,
-    wave: {
-      wave: 0,
-      phase: WavePhase.Idle,
-      spawnQueue: [],
-      spawnIndex: 0,
-      waveTimer: 0,
+    spawner: {
+      elapsed: 0,
+      spawnAccumulator: 0,
+      paused: false,
     },
-    waveActive: false,
     onPlanetDamaged: new GameEvent(),
-    onWaveComplete: new GameEvent(),
-    onWaveActiveChanged: new GameEvent(),
     onGoldChanged: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
   };
@@ -473,6 +452,8 @@ export function updateState(state: GameState, dt: number): void {
   state.time.deltaTime = dt;
   state.time.time += dt;
 
+  if (state.spawner.paused) return;
+
   for (const e of state.entities) {
     const target = findNearestTarget(state, e);
 
@@ -673,55 +654,79 @@ export function onCorrectKeystroke(state: GameState): void {
   }
 }
 
-const WAVE_SPAWN_DURATION = 15;
+const TIER_SPREAD = 45;
+const TIER_OFFSET = 30;
+const BASE_SPAWN_RATE = 0.6;
+const MAX_SPAWN_RATE = 4.0;
+const SPAWN_RAMP_TIME = 120;
+const GOLD_PER_SECOND = 0.5;
 
-export function generateWaveSpawns(wave: number, catalog: EnemyConfig[]): SpawnEntry[] {
-  const totalPower = Math.round(80 * Math.pow(wave, 1.5));
-  const minCatalogPower = catalog.length > 0 ? Math.min(...catalog.map(e => e.power)) : 10;
-  const maxSinglePower = Math.max(minCatalogPower, Math.floor(totalPower * 0.4));
+function binomialWeight(t: number, n: number, k: number): number {
+  const p = Math.max(0, Math.min(1, t));
+  if (p === 0) return k === 0 ? 1 : 0;
+  if (p === 1) return k === n ? 1 : 0;
 
-  const eligible = catalog.filter((e) => e.power <= maxSinglePower);
-  if (eligible.length === 0) return [];
-
-  const cutoffPower = Math.max(eligible[0].power, Math.floor(totalPower * 0.05));
-  const enemies: EnemyConfig[] = [];
-  let remaining = totalPower;
-
-  while (remaining >= cutoffPower) {
-    const affordable = eligible.filter((e) => e.power <= remaining);
-    if (affordable.length === 0) break;
-
-    const pick = affordable[Math.floor(Math.random() * affordable.length)];
-    enemies.push(pick);
-    remaining -= pick.power;
+  let coeff = 1;
+  for (let i = 0; i < k; i++) {
+    coeff *= (n - i) / (i + 1);
   }
 
-  for (let i = enemies.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [enemies[i], enemies[j]] = [enemies[j], enemies[i]];
+  return coeff * Math.pow(p, k) * Math.pow(1 - p, n - k);
+}
+
+function getTierWeights(elapsed: number): number[] {
+  const tierCount = ENEMY_CATALOG.length;
+  const weights: number[] = new Array(tierCount).fill(0);
+
+  for (let i = 0; i < tierCount; i++) {
+    const center = TIER_OFFSET + i * TIER_SPREAD;
+    const n = 20;
+    const t = (elapsed - (center - TIER_SPREAD)) / (TIER_SPREAD * 2);
+    const w = binomialWeight(t, n, Math.floor(n / 2));
+    weights[i] = Math.max(0, w);
   }
 
-  const interval =
-    enemies.length > 1 ? WAVE_SPAWN_DURATION / (enemies.length - 1) : 0;
-
-  return enemies.map((config, i) => ({
-    config,
-    spawnTime: i * interval,
-  }));
+  return weights;
 }
 
-export function startNextWave(state: GameState): void {
-  state.wave.wave++;
-  state.wave.spawnQueue = generateWaveSpawns(state.wave.wave, ENEMY_CATALOG);
-  state.wave.spawnIndex = 0;
-  state.wave.waveTimer = 0;
-  state.wave.phase = WavePhase.Spawning;
+function pickEnemyTier(weights: number[]): number {
+  let total = 0;
+  for (const w of weights) total += w;
+  if (total === 0) return 0;
+
+  let r = Math.random() * total;
+  for (let i = 0; i < weights.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return i;
+  }
+  return weights.length - 1;
 }
 
-export function completeWave(state: GameState): void {
-  const bonus = 10 + state.wave.wave * 5;
-  state.gold += bonus;
-  state.wave.phase = WavePhase.Idle;
-  state.onWaveComplete.emit();
-  state.onGoldChanged.emit();
+function getSpawnRate(elapsed: number): number {
+  const t = Math.min(1, elapsed / SPAWN_RAMP_TIME);
+  return BASE_SPAWN_RATE + (MAX_SPAWN_RATE - BASE_SPAWN_RATE) * t;
+}
+
+export function updateSpawner(state: GameState, dt: number): void {
+  if (state.spawner.paused) return;
+
+  state.spawner.elapsed += dt;
+
+  state.gold += GOLD_PER_SECOND * dt;
+
+  const rate = getSpawnRate(state.spawner.elapsed);
+  state.spawner.spawnAccumulator += rate * dt;
+
+  const weights = getTierWeights(state.spawner.elapsed);
+
+  while (state.spawner.spawnAccumulator >= 1) {
+    state.spawner.spawnAccumulator -= 1;
+    const tierIndex = pickEnemyTier(weights);
+    const config = ENEMY_CATALOG[tierIndex];
+    spawnEntity(state, config, Team.Enemy);
+  }
+}
+
+export function setSpawnerPaused(state: GameState, paused: boolean): void {
+  state.spawner.paused = paused;
 }

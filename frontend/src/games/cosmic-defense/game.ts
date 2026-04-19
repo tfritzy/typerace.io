@@ -9,7 +9,7 @@ import { ShipManager } from "./ShipManager";
 import { DamageNumberManager } from "./DamageNumberManager";
 import { LaserBeamManager } from "./LaserBeamManager";
 import { AssetManager } from "./assetManager";
-import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, WavePhase } from "./state";
+import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, setSpawnerPaused } from "./state";
 import type { GameState } from "./state";
 import type { EntityType } from "./types";
 import { getAllUpgradeShipTypes } from "./upgradePaths";
@@ -76,6 +76,10 @@ export class CosmicDefenseGame {
     world.addChild(this.damageNumberManager.container);
   }
 
+  setPaused(paused: boolean): void {
+    setSpawnerPaused(this.state, paused);
+  }
+
   private update(dt: number): void {
     updateState(this.state, dt);
     this.enemyManager.update(this.state, dt);
@@ -83,12 +87,6 @@ export class CosmicDefenseGame {
     this.laserBeamManager.update(this.state);
     this.shipManager.update(this.state, dt);
     this.damageNumberManager.update(dt);
-
-    const waveActive = this.state.wave.phase !== WavePhase.Idle;
-    if (waveActive !== this.state.waveActive) {
-      this.state.waveActive = waveActive;
-      this.state.onWaveActiveChanged.emit();
-    }
   }
 
   destroy(): void {

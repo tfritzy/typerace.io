@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
-import { startNextWave, TargetingMode } from "./state";
+import { TargetingMode } from "./state";
 import type { EntityState } from "./state";
 import { formatGold } from "./constants";
 import { PlanetHealthBar } from "./PlanetHealthBar";
@@ -21,8 +21,6 @@ export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
   const [healthRatio, setHealthRatio] = useState(1);
-  const [waveNumber, setWaveNumber] = useState(0);
-  const [waveActive, setWaveActive] = useState(false);
   const [gold, setGold] = useState(0);
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
@@ -35,6 +33,12 @@ export const GameCanvas = () => {
     const interval = setInterval(() => setInspectTick((t) => t + 1), 200);
     return () => clearInterval(interval);
   }, [selectedSlot?.entityId]);
+
+  useEffect(() => {
+    const game = gameRef.current;
+    if (!game) return;
+    game.setPaused(selectedSlot !== null);
+  }, [selectedSlot]);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -53,8 +57,6 @@ export const GameCanvas = () => {
 
     let cancelled = false;
     let unsubDamage: (() => void) | null = null;
-    let unsubWaveComplete: (() => void) | null = null;
-    let unsubWaveActive: (() => void) | null = null;
     let unsubGold: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
@@ -69,13 +71,6 @@ export const GameCanvas = () => {
         unsubDamage = game.state.onPlanetDamaged.subscribe(() => {
           setHealthRatio(game.state.planetHealth / game.state.maxPlanetHealth);
         });
-        unsubWaveComplete = game.state.onWaveComplete.subscribe(() => {
-          setWaveNumber(game.state.wave.wave);
-          setWaveActive(false);
-        });
-        unsubWaveActive = game.state.onWaveActiveChanged.subscribe(() => {
-          setWaveActive(game.state.waveActive);
-        });
         unsubGold = game.state.onGoldChanged.subscribe(() => {
           setGold(game.state.gold);
         });
@@ -87,21 +82,10 @@ export const GameCanvas = () => {
     return () => {
       cancelled = true;
       unsubDamage?.();
-      unsubWaveComplete?.();
-      unsubWaveActive?.();
       unsubGold?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
-  }, []);
-
-  const handleNextWave = useCallback(() => {
-    const game = gameRef.current;
-    if (game) {
-      startNextWave(game.state);
-      setWaveNumber(game.state.wave.wave);
-      setWaveActive(true);
-    }
   }, []);
 
   const handleSlotClick = useCallback((slot: PlacementSlot) => {
@@ -171,6 +155,8 @@ export const GameCanvas = () => {
     setInspectTick((t) => t + 1);
   }, [selectedSlot]);
 
+  const menuOpen = selectedSlot !== null;
+
   return (
     <div
       ref={containerRef}
@@ -192,27 +178,17 @@ export const GameCanvas = () => {
         <div className="absolute top-3 right-3 z-10 flex items-center gap-3">
           <span className="text-[11px] text-[#f9e2af] flex items-center gap-1">
             <Coins className="w-3.5 h-3.5" />
-            {formatGold(gold)}
+            {formatGold(Math.floor(gold))}
           </span>
           <span className="text-[11px] text-[#a6adc8]">
-            Wave {waveNumber + 1}
+            {Math.floor(gameRef.current?.state.spawner.elapsed ?? 0)}s
           </span>
-          {!waveActive && (
-            <button
-              onClick={handleNextWave}
-              className="text-[11px] bg-green-400/85 text-[#0a0a1a] px-2.5 py-1 rounded cursor-pointer hover:brightness-125"
-            >
-              {waveNumber === 0 ? "Start" : "Next wave"}
-            </button>
-          )}
         </div>
-        {!waveActive && (
-          <PlacementOverlay
-            slots={slots}
-            onSlotClick={handleSlotClick}
-            activeSlotIndex={selectedSlot?.index ?? null}
-          />
-        )}
+        <PlacementOverlay
+          slots={slots}
+          onSlotClick={handleSlotClick}
+          activeSlotIndex={selectedSlot?.index ?? null}
+        />
         {selectedSlot && !selectedSlot.occupant && (
           <ShopPanel
             onSelectShip={handleSelectShip}
@@ -233,7 +209,7 @@ export const GameCanvas = () => {
             onTargetingChange={handleTargetingChange}
           />
         )}
-        <PhraseOverlay gameRef={gameRef} visible={waveActive} />
+        <PhraseOverlay gameRef={gameRef} visible={!menuOpen} />
       </div>
     </div>
   );

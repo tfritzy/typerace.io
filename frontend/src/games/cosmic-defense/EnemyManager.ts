@@ -1,7 +1,7 @@
 import { Container, Graphics, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState } from "./state";
-import { WavePhase, spawnEntity, completeWave } from "./state";
+import { updateSpawner } from "./state";
 import { Team } from "./types";
 import { SHIP_TURN_SPEED } from "./constants";
 import { approachAngle } from "./utils";
@@ -21,38 +21,7 @@ export class EnemyManager {
   }
 
   update(state: GameState, dt: number): void {
-    const wave = state.wave;
-
-    if (wave.phase === WavePhase.Spawning) {
-      wave.waveTimer += dt;
-
-      if (
-        !state.entities.some((e) => e.team === Team.Enemy) &&
-        wave.spawnIndex < wave.spawnQueue.length
-      ) {
-        wave.waveTimer = wave.spawnQueue[wave.spawnIndex].spawnTime;
-      }
-
-      while (
-        wave.spawnIndex < wave.spawnQueue.length &&
-        wave.waveTimer >= wave.spawnQueue[wave.spawnIndex].spawnTime
-      ) {
-        const entry = wave.spawnQueue[wave.spawnIndex];
-        spawnEntity(state, entry.config, Team.Enemy);
-        wave.spawnIndex++;
-      }
-
-      if (wave.spawnIndex >= wave.spawnQueue.length) {
-        wave.phase = WavePhase.Clearing;
-      }
-    }
-
-    if (wave.phase === WavePhase.Clearing) {
-      if (!state.entities.some((e) => e.team === Team.Enemy)) {
-        completeWave(state);
-      }
-    }
-
+    updateSpawner(state, dt);
     this.syncRendering(state, dt);
   }
 
