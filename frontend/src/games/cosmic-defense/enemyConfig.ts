@@ -125,41 +125,26 @@ export const ENEMY_CATALOG: EnemyConfig[] = [
 
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [
   { entityType: "Moth", health: 200, projectileDamage: 8, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Needle", health: 800, projectileDamage: 40, projectileType: ProjectileType.Projectile2, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Clipper", health: 3000, projectileDamage: 200, projectileType: ProjectileType.Projectile3, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Warden", health: 12000, projectileDamage: 1000, projectileType: ProjectileType.Projectile5, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-
   { entityType: "Osprey", health: 150, projectileDamage: 5, projectileType: ProjectileType.Tiny, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Raven", health: 600, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Vanguard", health: 2500, projectileDamage: 130, projectileType: ProjectileType.Projectile3, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Titan", health: 10000, projectileDamage: 650, projectileType: ProjectileType.Projectile5, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-
   { entityType: "Mender", health: 250, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 25, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Tender", health: 1000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 100, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Grace", health: 4000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 400, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Haven", health: 15000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 3, healAmount: 1500, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-
-  { entityType: "Buckler", health: 250, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 40, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Ward", health: 1000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 160, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Aegis", health: 4000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 640, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Bastion", health: 15000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 3, healAmount: 0, shieldAmount: 2500, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-
   { entityType: "Spark", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 1, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Ember", health: 800, projectileDamage: 0, projectileType: ProjectileType.Projectile2, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 2, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Corona", health: 3000, projectileDamage: 0, projectileType: ProjectileType.Projectile3, chargesRequired: 3, healAmount: 0, shieldAmount: 0, plasmaStacks: 3, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Inferno", health: 12000, projectileDamage: 0, projectileType: ProjectileType.Projectile5, chargesRequired: 3, healAmount: 0, shieldAmount: 0, plasmaStacks: 5, chargesGranted: 0, laserDamage: 0 },
-
   { entityType: "Pulse", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 8, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, laserDamage: 0 },
-  { entityType: "Flare", health: 800, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 7, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, laserDamage: 0 },
-  { entityType: "Bolt", health: 3000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 6, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, laserDamage: 0 },
-  { entityType: "Dynamo", health: 12000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, laserDamage: 0 },
-
   { entityType: "Prism", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 10 },
-  { entityType: "Nova", health: 800, projectileDamage: 0, projectileType: ProjectileType.Projectile2, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 50 },
-  { entityType: "Sabre", health: 3000, projectileDamage: 0, projectileType: ProjectileType.Projectile3, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 250 },
-  { entityType: "Leviathan", health: 12000, projectileDamage: 0, projectileType: ProjectileType.Projectile6, chargesRequired: 6, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 1200 },
 ];
 
 export const FRIENDLY_CONFIG_MAP = new Map<string, FriendlyConfig>(
   FRIENDLY_CATALOG.map((c) => [c.entityType, c])
 );
+
+export function getScaledConfig(config: FriendlyConfig, level: number): FriendlyConfig {
+  if (level <= 1) return config;
+  const mult = Math.pow(2, level - 1);
+  return {
+    ...config,
+    health: Math.round(config.health * mult),
+    projectileDamage: Math.round(config.projectileDamage * mult),
+    healAmount: Math.round(config.healAmount * mult),
+    shieldAmount: Math.round(config.shieldAmount * mult),
+    laserDamage: Math.round(config.laserDamage * mult),
+  };
+}

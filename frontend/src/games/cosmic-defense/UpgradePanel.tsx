@@ -1,23 +1,14 @@
-import { formatGold, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import type { EntityType } from "./types";
-import {
-  X,
-  ChevronUp,
-  Skull,
-  Coins,
-  Star,
-} from "lucide-react";
+import { X } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
-import { getNextUpgrade, getUpgradeCost, getShipTier } from "./upgradePaths";
 import { TargetingMode } from "./state";
 import type { EntityState } from "./state";
 import { getShipRole, ROLE_META } from "./shipCatalog";
 
-interface UpgradePanelProps {
-  onUpgrade: () => void;
+interface InspectionPanelProps {
   onClose: () => void;
   shipPreviews: Map<EntityType, string>;
-  gold: number;
   slot: PlacementSlot;
   entity: EntityState | null;
   onTargetingChange: (mode: TargetingMode) => void;
@@ -27,8 +18,7 @@ const PANEL_OFFSET_LEFT = 5;
 const PANEL_OFFSET_TOP = 10;
 const PANEL_MIN_TOP = 3;
 const PANEL_MAX_TOP = 55;
-const PANEL_WIDTH = 180;
-const MAX_TIER = 4;
+const PANEL_WIDTH = 170;
 
 const TARGETING_OPTIONS: { mode: TargetingMode; label: string }[] = [
   { mode: TargetingMode.NearestToShip, label: "Nearest" },
@@ -38,24 +28,17 @@ const TARGETING_OPTIONS: { mode: TargetingMode; label: string }[] = [
   { mode: TargetingMode.LowestHealth, label: "Most damaged" },
 ];
 
-export const UpgradePanel = ({
-  onUpgrade,
+export const InspectionPanel = ({
   onClose,
   shipPreviews,
-  gold,
   slot,
   entity,
   onTargetingChange,
-}: UpgradePanelProps) => {
+}: InspectionPanelProps) => {
   const currentType = slot.occupant;
   if (!currentType) return null;
 
-  const nextType = getNextUpgrade(currentType);
-  const upgradeCost = getUpgradeCost(currentType);
-  const currentTier = getShipTier(currentType);
-  const canAfford = nextType !== null && gold >= upgradeCost;
   const role = getShipRole(currentType);
-
   const slotLeftPct = (slot.x / CANVAS_WIDTH) * 100;
   const slotTopPct = (slot.y / CANVAS_HEIGHT) * 100;
   const panelLeft = slotLeftPct + PANEL_OFFSET_LEFT;
@@ -118,35 +101,13 @@ export const UpgradePanel = ({
                 />
               )}
             </div>
-            <div className="flex items-center gap-1 mt-0.5">
-              <div className="flex items-center gap-0.5">
-                {Array.from({ length: MAX_TIER }, (_, i) => (
-                  <Star
-                    key={i}
-                    className="w-2.5 h-2.5"
-                    fill={
-                      i < currentTier
-                        ? (roleMeta?.color ?? "#a6adc8")
-                        : "rgba(88,91,112,0.4)"
-                    }
-                    stroke="none"
-                  />
-                ))}
-              </div>
-              {entity && entity.kills > 0 && (
-                <span
-                  className="flex items-center gap-0.5 text-[#45475a] ml-auto"
-                  title="Kills"
-                >
-                  <Skull className="w-2 h-2" />
-                  <span className="text-[7px]">{entity.kills}</span>
-                </span>
-              )}
+            <div className="text-[9px] text-[#585b70] mt-0.5">
+              Lv {slot.level}
             </div>
           </div>
         </div>
 
-        <div className="px-2.5 pb-1.5">
+        <div className="px-2.5 pb-2.5">
           <select
             value={currentTargeting}
             onChange={(e) => onTargetingChange(Number(e.target.value) as TargetingMode)}
@@ -159,31 +120,6 @@ export const UpgradePanel = ({
             ))}
           </select>
         </div>
-
-        {nextType ? (
-          <div className="px-2.5 pb-2.5">
-            <button
-              className={`flex items-center justify-center gap-1 py-1.5 rounded-md text-[10px] font-medium transition-all w-full ${
-                canAfford
-                  ? "bg-[#a6e3a1]/10 text-[#a6e3a1] cursor-pointer hover:bg-[#a6e3a1]/20"
-                  : "bg-white/[0.02] text-[#585b70] cursor-not-allowed"
-              }`}
-              onClick={canAfford ? onUpgrade : undefined}
-              disabled={!canAfford}
-            >
-              <ChevronUp className="w-3 h-3" />
-              {nextType}
-              <span className="flex items-center gap-0.5 opacity-70">
-                <Coins className="w-2.5 h-2.5" />
-                {formatGold(upgradeCost)}
-              </span>
-            </button>
-          </div>
-        ) : (
-          <div className="px-2.5 pb-2.5 text-center text-[8px] text-[#45475a]">
-            Max tier
-          </div>
-        )}
       </div>
     </>
   );

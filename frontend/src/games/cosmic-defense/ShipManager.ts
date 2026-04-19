@@ -32,45 +32,11 @@ export class ShipManager {
     this.layer = new Container();
   }
 
-  addShip(state: GameState, entityType: EntityType, x: number, y: number): number {
+  addShip(state: GameState, entityType: EntityType, x: number, y: number, level: number = 1): number {
     const config = FRIENDLY_CONFIG_MAP.get(entityType);
     if (!config) return -1;
     const bp = BLUEPRINT_MAP.get(entityType);
-    return spawnAlliedEntity(state, config, bp?.colorPreset ?? 0, x, y);
-  }
-
-  upgradeShip(state: GameState, oldEntityId: number, newEntityType: EntityType, x: number, y: number): number {
-    const config = FRIENDLY_CONFIG_MAP.get(newEntityType);
-    if (!config) return -1;
-    const oldEntity = state.entityById.get(oldEntityId);
-    const savedStats = oldEntity
-      ? {
-          kills: oldEntity.kills,
-          damageDealt: oldEntity.damageDealt,
-          totalHealed: oldEntity.totalHealed,
-          totalShielded: oldEntity.totalShielded,
-          targetingMode: oldEntity.targetingMode,
-        }
-      : null;
-    if (oldEntity) {
-      const idx = state.entities.indexOf(oldEntity);
-      if (idx >= 0) {
-        state.entities.splice(idx, 1);
-        state.entityById.delete(oldEntityId);
-      }
-    }
-    const newId = this.addShip(state, newEntityType, x, y);
-    if (savedStats) {
-      const newEntity = state.entityById.get(newId);
-      if (newEntity) {
-        newEntity.kills = savedStats.kills;
-        newEntity.damageDealt = savedStats.damageDealt;
-        newEntity.totalHealed = savedStats.totalHealed;
-        newEntity.totalShielded = savedStats.totalShielded;
-        newEntity.targetingMode = savedStats.targetingMode;
-      }
-    }
-    return newId;
+    return spawnAlliedEntity(state, config, bp?.colorPreset ?? 0, x, y, level);
   }
 
   update(state: GameState, dt: number): void {

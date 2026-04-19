@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, Team } from "./types";
-import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, goldForEnemy } from "./enemyConfig";
+import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, goldForEnemy, getScaledConfig } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 
 export const PLANET_X = 200;
@@ -55,6 +55,7 @@ export interface EntityState {
   totalHealed: number;
   totalShielded: number;
   targetingMode: TargetingMode;
+  level: number;
 }
 
 export interface ExplosionState {
@@ -130,9 +131,13 @@ export interface GameState {
   maxPlanetHealth: number;
   gold: number;
   spawner: SpawnState;
+  xp: number;
+  level: number;
+  pendingChoice: boolean;
   onPlanetDamaged: GameEvent;
   onGoldChanged: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
+  onLevelUp: GameEvent;
 }
 
 let gameState: GameState | null = null;
@@ -164,15 +169,19 @@ export function createGameState(): GameState {
     nextId: 1,
     planetHealth: 1000,
     maxPlanetHealth: 1000,
-    gold: 15,
+    gold: 0,
     spawner: {
       elapsed: 0,
       spawnAccumulator: 0,
-      paused: false,
+      paused: true,
     },
+    xp: 0,
+    level: 1,
+    pendingChoice: true,
     onPlanetDamaged: new GameEvent(),
     onGoldChanged: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
+    onLevelUp: new GameEvent(),
   };
 
   gameState = state;
@@ -243,6 +252,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     totalHealed: 0,
     totalShielded: 0,
     targetingMode: TargetingMode.NearestToShip,
+    level: 0,
   };
 
   addEntity(state, entity);
@@ -253,8 +263,10 @@ export function spawnAlliedEntity(
   config: FriendlyConfig,
   colorPreset: ColorPreset,
   x: number,
-  y: number
+  y: number,
+  level: number = 1
 ): number {
+  const scaled = getScaledConfig(config, level);
   const hitbox = SHIP_HITBOX_MAP[config.entityType];
 
   const entity: EntityState = {
@@ -264,13 +276,13 @@ export function spawnAlliedEntity(
     y,
     vx: 0,
     vy: 0,
-    health: config.health,
-    maxHealth: config.health,
+    health: scaled.health,
+    maxHealth: scaled.health,
     power: 0,
     colorPreset,
     team: Team.Allied,
     fireRate: 0,
-    projectileDamage: config.projectileDamage,
+    projectileDamage: scaled.projectileDamage,
     projectileType: config.projectileType,
     fireTimer: 0,
     rotation: 0,
@@ -285,16 +297,17 @@ export function spawnAlliedEntity(
     role: getShipRole(config.entityType),
     shield: 0,
     plasmaStacks: 0,
-    healAmount: config.healAmount,
-    shieldAmount: config.shieldAmount,
+    healAmount: scaled.healAmount,
+    shieldAmount: scaled.shieldAmount,
     plasmaStacksApplied: config.plasmaStacks,
     chargesGranted: config.chargesGranted,
-    laserDamage: config.laserDamage,
+    laserDamage: scaled.laserDamage,
     kills: 0,
     damageDealt: 0,
     totalHealed: 0,
     totalShielded: 0,
     targetingMode: TargetingMode.NearestToShip,
+    level,
   };
 
   addEntity(state, entity);
@@ -431,6 +444,7 @@ function performInstantHit(
       if (target.entity.team === Team.Enemy) {
         state.gold += target.entity.gold;
         state.onGoldChanged.emit();
+        awardXP(state, target.entity.gold);
       }
       const idx = state.entities.indexOf(target.entity);
       if (idx >= 0) removeEntityAt(state, idx);
@@ -503,6 +517,7 @@ export function updateState(state: GameState, dt: number): void {
         if (e.team === Team.Enemy) {
           state.gold += e.gold;
           state.onGoldChanged.emit();
+          awardXP(state, e.gold);
         }
         removeEntityAt(state, i);
       }
@@ -586,6 +601,7 @@ function fireLaser(state: GameState, e: EntityState): void {
       e.kills++;
       state.gold += other.gold;
       goldGained = true;
+      awardXP(state, other.gold);
       removeEntityAt(state, i);
     }
   }
@@ -733,4 +749,34 @@ export function updateSpawner(state: GameState, dt: number): void {
 
 export function setSpawnerPaused(state: GameState, paused: boolean): void {
   state.spawner.paused = paused;
+}
+
+function xpForNextLevel(level: number): number {
+  return 20 + level * 5;
+}
+
+export function awardXP(state: GameState, amount: number): void {
+  if (state.pendingChoice) return;
+  state.xp += amount;
+  const needed = xpForNextLevel(state.level);
+  if (state.xp >= needed) {
+    state.xp -= needed;
+    state.level++;
+    state.pendingChoice = true;
+    state.spawner.paused = true;
+    state.onLevelUp.emit();
+  }
+}
+
+export function levelUpEntity(state: GameState, entityId: number, config: FriendlyConfig, newLevel: number): void {
+  const entity = state.entityById.get(entityId);
+  if (!entity) return;
+  const scaled = getScaledConfig(config, newLevel);
+  entity.level = newLevel;
+  entity.maxHealth = scaled.health;
+  entity.health = scaled.health;
+  entity.projectileDamage = scaled.projectileDamage;
+  entity.healAmount = scaled.healAmount;
+  entity.shieldAmount = scaled.shieldAmount;
+  entity.laserDamage = scaled.laserDamage;
 }
