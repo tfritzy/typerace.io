@@ -30,6 +30,7 @@ export const PhraseOverlay = ({
   const [typed, setTyped] = useState<string>("");
   const [phrase, setPhrase] = useState<string>(generatePhrase(3));
   const [checkpoint, setCheckpoint] = useState<number>(0);
+  const skipTransition = useRef(false);
 
   useEffect(() => {
     if (!visible) {
@@ -44,6 +45,7 @@ export const PhraseOverlay = ({
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      skipTransition.current = false;
       let completed;
       if (event.target.value.length < checkpoint) {
         completed = typed.substring(0, checkpoint);
@@ -66,6 +68,7 @@ export const PhraseOverlay = ({
         uPhrase = uPhrase.substring(spaceI);
         completed = completed.substring(spaceI);
         uCheckpoint -= spaceI;
+        skipTransition.current = true;
       }
 
       setTyped(completed);
@@ -81,31 +84,39 @@ export const PhraseOverlay = ({
 
   const chars = useMemo(() => {
     const c = [];
-    for (
-      let i = typed.length - CHAR_COUNT;
-      i < typed.length + CHAR_COUNT;
-      i++
-    ) {
-      if (i < 0) {
-        c.push(<span> </span>);
-      } else if (i < typed.length) {
+    for (let i = 0; i < phrase.length; i++) {
+      if (i < typed.length) {
         if (i >= checkpoint) {
           if (phrase[i] === " ") {
             setCheckpoint(i + 1);
           }
 
           if (phrase[i] === typed[i]) {
-            c.push(<span className="text-white">{phrase[i]}</span>);
+            c.push(
+              <span key={i} className="text-white">
+                {phrase[i]}
+              </span>,
+            );
           } else {
-            c.push(<span className="text-destructive">{phrase[i]}</span>);
+            c.push(
+              <span key={i} className="text-destructive">
+                {phrase[i]}
+              </span>,
+            );
           }
         } else {
           c.push(
-            <span className="text-text-untyped opacity-50">{phrase[i]}</span>,
+            <span key={i} className="text-text-untyped opacity-50">
+              {phrase[i]}
+            </span>,
           );
         }
       } else {
-        c.push(<span className="text-text-untyped">{phrase[i]}</span>);
+        c.push(
+          <span key={i} className="text-text-untyped">
+            {phrase[i]}
+          </span>,
+        );
       }
     }
 
@@ -116,19 +127,33 @@ export const PhraseOverlay = ({
     return null;
   }
 
+  const offset = CHAR_COUNT - typed.length;
+
   return (
     <div className="w-full h-full relative">
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
         <div
-          className="text-2xl font-mono whitespace-pre"
+          className="text-2xl font-mono whitespace-pre relative"
           style={{
+            width: `${CHAR_COUNT * 2}ch`,
+            overflowX: "hidden",
             maskImage:
               "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
             WebkitMaskImage:
               "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
           }}
         >
-          {chars}
+          <div
+            style={{
+              transform: `translateX(${offset}ch)`,
+              transition: skipTransition.current
+                ? "none"
+                : "transform 80ms ease-out",
+              whiteSpace: "pre",
+            }}
+          >
+            {chars}
+          </div>
           <input
             ref={inputRef}
             autoFocus
