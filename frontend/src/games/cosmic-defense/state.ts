@@ -361,26 +361,19 @@ function findNearestTarget(
   state: GameState,
   entity: EntityState
 ): { x: number; y: number; entity: EntityState | null } | null {
-  const opposingTeam =
-    entity.team === Team.Enemy ? Team.Allied : Team.Enemy;
-
-  let bestScore = -Infinity;
-  let found = false;
-
   if (entity.team === Team.Enemy) {
-    const dx = entity.x - PLANET_X;
-    const dy = entity.y - PLANET_Y;
-    bestScore = -(dx * dx + dy * dy);
     _targetResult.x = PLANET_X;
     _targetResult.y = PLANET_Y;
     _targetResult.entity = null;
-    found = true;
+    return _targetResult;
   }
 
-  const mode = entity.team === Team.Allied ? entity.targetingMode : TargetingMode.NearestToShip;
+  let bestScore = -Infinity;
+  let found = false;
+  const mode = entity.targetingMode;
 
   for (const other of state.entities) {
-    if (other.team !== opposingTeam) continue;
+    if (other.team !== Team.Enemy) continue;
 
     let score: number;
     switch (mode) {
@@ -931,11 +924,11 @@ export function onCorrectKeystroke(state: GameState): void {
   }
 }
 
-const TIER_SPREAD = 45;
+const TIER_SPREAD = 90;
 const TIER_OFFSET = 30;
 const BASE_SPAWN_RATE = 0.6;
 const MAX_SPAWN_RATE = 4.0;
-const SPAWN_RAMP_TIME = 120;
+const SPAWN_RAMP_TIME = 240;
 
 function binomialWeight(t: number, n: number, k: number): number {
   const p = Math.max(0, Math.min(1, t));
