@@ -5,6 +5,7 @@ import {
   ChevronUp,
   Skull,
   Coins,
+  Star,
 } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
 import { getNextUpgrade, getUpgradeCost, getShipTier } from "./upgradePaths";
@@ -120,15 +121,15 @@ export const UpgradePanel = ({
             <div className="flex items-center gap-1 mt-0.5">
               <div className="flex items-center gap-0.5">
                 {Array.from({ length: MAX_TIER }, (_, i) => (
-                  <div
+                  <Star
                     key={i}
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{
-                      backgroundColor:
-                        i < currentTier
-                          ? (roleMeta?.color ?? "#a6adc8")
-                          : "rgba(88,91,112,0.4)",
-                    }}
+                    className="w-2.5 h-2.5"
+                    fill={
+                      i < currentTier
+                        ? (roleMeta?.color ?? "#a6adc8")
+                        : "rgba(88,91,112,0.4)"
+                    }
+                    stroke="none"
                   />
                 ))}
               </div>
