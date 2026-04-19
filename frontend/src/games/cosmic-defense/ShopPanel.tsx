@@ -24,8 +24,6 @@ const NEIGHBOR_OFFSETS = [
 ];
 
 const ANIM_DURATION = 200;
-const ANIM_STAGGER = 30;
-const ANIM_TOTAL = ANIM_DURATION + 6 * ANIM_STAGGER;
 const SPRITE_SIZE = 34;
 
 function easeOutBack(t: number): number {
@@ -49,7 +47,7 @@ export const ShopPanel = ({
     const tick = (now: number) => {
       const ms = now - start;
       setElapsed(ms);
-      if (ms < ANIM_TOTAL) animId = requestAnimationFrame(tick);
+      if (ms < ANIM_DURATION) animId = requestAnimationFrame(tick);
     };
     animId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animId);
@@ -67,10 +65,9 @@ export const ShopPanel = ({
         {SHIP_BLUEPRINTS.map((bp, i) => {
           const offset = NEIGHBOR_OFFSETS[i];
           const isCenter = i === 0;
-          const delay = isCenter ? 0 : (i - 1) * ANIM_STAGGER;
           const t = isCenter
             ? 1
-            : Math.max(0, Math.min(1, (elapsed - delay) / ANIM_DURATION));
+            : Math.max(0, Math.min(1, elapsed / ANIM_DURATION));
           const progress = isCenter ? 1 : easeOutBack(t);
           const opacity = isCenter ? 1 : Math.min(1, t * 3);
           const cx = slot.x + offset.x * progress;
