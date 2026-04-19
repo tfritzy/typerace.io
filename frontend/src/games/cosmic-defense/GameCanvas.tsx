@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
-import { startNextWave } from "./state";
+import { startNextWave, TargetingMode } from "./state";
+import type { EntityState } from "./state";
 import { formatGold } from "./constants";
 import { PlanetHealthBar } from "./PlanetHealthBar";
 import { ShopPanel } from "./ShopPanel";
@@ -27,6 +28,13 @@ export const GameCanvas = () => {
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
   const [slots, setSlots] = useState<PlacementSlot[]>(() => generateSlots());
   const [uiScale, setUiScale] = useState(1);
+  const [, setInspectTick] = useState(0);
+
+  useEffect(() => {
+    if (!selectedSlot?.entityId) return;
+    const interval = setInterval(() => setInspectTick((t) => t + 1), 200);
+    return () => clearInterval(interval);
+  }, [selectedSlot?.entityId]);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -149,6 +157,20 @@ export const GameCanvas = () => {
     setSelectedSlot(null);
   }, []);
 
+  const getSelectedEntity = useCallback((): EntityState | null => {
+    const game = gameRef.current;
+    if (!game || !selectedSlot || !selectedSlot.entityId) return null;
+    return game.state.entityById.get(selectedSlot.entityId) ?? null;
+  }, [selectedSlot]);
+
+  const handleTargetingChange = useCallback((mode: TargetingMode) => {
+    const game = gameRef.current;
+    if (!game || !selectedSlot || !selectedSlot.entityId) return;
+    const entity = game.state.entityById.get(selectedSlot.entityId);
+    if (entity) entity.targetingMode = mode;
+    setInspectTick((t) => t + 1);
+  }, [selectedSlot]);
+
   return (
     <div
       ref={containerRef}
@@ -207,6 +229,8 @@ export const GameCanvas = () => {
             shipPreviews={shipPreviews}
             gold={gold}
             slot={selectedSlot}
+            entity={getSelectedEntity()}
+            onTargetingChange={handleTargetingChange}
           />
         )}
         <PhraseOverlay gameRef={gameRef} visible={waveActive} />

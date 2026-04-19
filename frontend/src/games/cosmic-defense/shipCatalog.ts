@@ -1,7 +1,19 @@
 import { type EntityType, ColorPreset } from "./types";
 import { UPGRADE_PATHS } from "./upgradePaths";
+import { Crosshair, Gauge, Heart, Shield, Flame, Zap, Focus } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 export type ShipRole = "shooter" | "rapid_fire" | "healer" | "shield" | "plasma" | "charge" | "laser";
+
+export const ROLE_META: Record<ShipRole, { icon: LucideIcon; label: string; color: string }> = {
+  shooter: { icon: Crosshair, label: "Shooter", color: "#94e2d5" },
+  rapid_fire: { icon: Gauge, label: "Rapid Fire", color: "#89b4fa" },
+  healer: { icon: Heart, label: "Healer", color: "#a6e3a1" },
+  shield: { icon: Shield, label: "Shield", color: "#74c7ec" },
+  plasma: { icon: Flame, label: "Plasma", color: "#fab387" },
+  charge: { icon: Zap, label: "Charge", color: "#f9e2af" },
+  laser: { icon: Focus, label: "Laser", color: "#cba6f7" },
+};
 
 export interface ShipBlueprint {
   entityType: EntityType;
