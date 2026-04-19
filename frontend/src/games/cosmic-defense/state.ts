@@ -842,7 +842,8 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
         nearest = other;
       }
     }
-    currentTarget = nearest!;
+    if (!nearest) break;
+    currentTarget = nearest;
   }
 }
 
@@ -900,8 +901,7 @@ function activateAbility(state: GameState, e: EntityState): void {
   }
 
   if (e.laserDamage > 0) {
-    const isPiercing = e.role === "pierce_laser" || e.role === "ice_beam";
-    fireLaser(state, e, isPiercing);
+    fireLaser(state, e, e.role !== "laser");
     return;
   }
 
