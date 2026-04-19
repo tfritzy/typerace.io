@@ -7,6 +7,10 @@ export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DPS_PER_STACK = 5;
 const LASER_RANGE = 1200;
+const FREEZE_SLOW_FACTOR = 0.3;
+const FREEZE_DECAY_RATE = 1;
+const MAC_CANNON_RANGE = 1200;
+const MAC_CANNON_RADIUS = 30;
 
 export enum TargetingMode {
   NearestToShip = 0,
@@ -55,6 +59,13 @@ export interface EntityState {
   totalShielded: number;
   targetingMode: TargetingMode;
   level: number;
+  freezeStacks: number;
+  freezeTimer: number;
+  chainCount: number;
+  buffMultiplier: number;
+  buffedNextAttack: boolean;
+  macCannonDamage: number;
+  dualShot: boolean;
 }
 
 export interface ExplosionState {
@@ -250,6 +261,13 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     totalShielded: 0,
     targetingMode: TargetingMode.NearestToShip,
     level: 0,
+    freezeStacks: 0,
+    freezeTimer: 0,
+    chainCount: 0,
+    buffMultiplier: 0,
+    buffedNextAttack: false,
+    macCannonDamage: 0,
+    dualShot: false,
   };
 
   addEntity(state, entity);
@@ -297,7 +315,7 @@ export function spawnAlliedEntity(
     healAmount: scaled.healAmount,
     shieldAmount: scaled.shieldAmount,
     plasmaStacksApplied: config.plasmaStacks,
-    chargesGranted: config.chargesGranted,
+    chargesGranted: scaled.chargesGranted,
     laserDamage: scaled.laserDamage,
     kills: 0,
     damageDealt: 0,
@@ -305,6 +323,13 @@ export function spawnAlliedEntity(
     totalShielded: 0,
     targetingMode: TargetingMode.NearestToShip,
     level,
+    freezeStacks: scaled.freezeStacks,
+    freezeTimer: 0,
+    chainCount: scaled.chainCount,
+    buffMultiplier: scaled.buffMultiplier,
+    buffedNextAttack: false,
+    macCannonDamage: scaled.macCannonDamage,
+    dualShot: config.dualShot,
   };
 
   addEntity(state, entity);
@@ -465,6 +490,11 @@ export function updateState(state: GameState, dt: number): void {
   if (state.spawner.paused) return;
 
   for (const e of state.entities) {
+    if (e.freezeTimer > 0) {
+      e.freezeTimer = Math.max(0, e.freezeTimer - dt * FREEZE_DECAY_RATE);
+    }
+
+    const freezeSlow = e.freezeTimer > 0 ? FREEZE_SLOW_FACTOR : 1;
     const target = findNearestTarget(state, e);
 
     if (target) {
@@ -481,21 +511,23 @@ export function updateState(state: GameState, dt: number): void {
         e.rotation = Math.atan2(dy, dx);
 
         if (e.chargesRequired <= 0) {
-          e.fireTimer -= dt;
+          e.fireTimer -= dt * freezeSlow;
           if (e.fireTimer <= 0) {
             e.fireTimer += e.fireRate;
             performInstantHit(state, e, target, e.projectileDamage, 0);
           }
         }
       } else if (e.speed > 0) {
-        e.vx = -e.speed;
+        const effectiveSpeed = e.speed * freezeSlow;
+        e.vx = -effectiveSpeed;
         e.vy = 0;
         e.x += e.vx * dt;
         e.y += e.vy * dt;
         e.rotation = Math.atan2(e.vy, e.vx);
       }
     } else if (e.speed > 0) {
-      e.vx = -e.speed;
+      const effectiveSpeed = e.speed * freezeSlow;
+      e.vx = -effectiveSpeed;
       e.vy = 0;
       e.x += e.vx * dt;
       e.y += e.vy * dt;
@@ -534,9 +566,14 @@ function fireProjectile(state: GameState, e: EntityState, plasmaStacks: number):
   if (!target) return;
 
   if (plasmaStacks > 0 && target.entity) {
-    fireExplosiveProjectile(state, e, target, plasmaStacks);
+    fireExplosiveProjectile(state, e, target, plasmaStacks, 0);
   } else {
-    performInstantHit(state, e, target, e.projectileDamage, 0);
+    let dmg = e.projectileDamage;
+    if (e.buffedNextAttack) {
+      dmg = Math.round(dmg * 2);
+      e.buffedNextAttack = false;
+    }
+    performInstantHit(state, e, target, dmg, 0);
   }
 }
 
@@ -546,7 +583,8 @@ function fireExplosiveProjectile(
   state: GameState,
   shooter: EntityState,
   target: { x: number; y: number; entity: EntityState | null },
-  plasmaStacks: number
+  plasmaStacks: number,
+  freezeStacks: number
 ): void {
   const ft = flareType(shooter.projectileType);
 
@@ -572,9 +610,13 @@ function fireExplosiveProjectile(
     const dy = other.y - target.y;
     if (dx * dx + dy * dy > r2) continue;
 
-    other.plasmaStacks += plasmaStacks;
+    if (plasmaStacks > 0) other.plasmaStacks += plasmaStacks;
+    if (freezeStacks > 0) other.freezeTimer = Math.max(other.freezeTimer, freezeStacks);
 
     let dmg = shooter.projectileDamage;
+    if (shooter.buffedNextAttack) {
+      dmg = Math.round(dmg * 2);
+    }
     if (other.shield > 0) {
       const absorbed = Math.min(other.shield, dmg);
       other.shield -= absorbed;
@@ -593,9 +635,10 @@ function fireExplosiveProjectile(
       removeEntityAt(state, i);
     }
   }
+  shooter.buffedNextAttack = false;
 }
 
-function fireLaser(state: GameState, e: EntityState): void {
+function fireLaser(state: GameState, e: EntityState, piercing: boolean): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
 
@@ -610,6 +653,13 @@ function fireLaser(state: GameState, e: EntityState): void {
   const endX = e.x + nx * LASER_RANGE;
   const endY = e.y + ny * LASER_RANGE;
 
+  let dmg = e.laserDamage;
+  if (e.buffedNextAttack) {
+    dmg = Math.round(dmg * 2);
+    e.buffedNextAttack = false;
+  }
+
+  let hitCount = 0;
   for (let i = state.entities.length - 1; i >= 0; i--) {
     const other = state.entities[i];
     if (other.team !== Team.Enemy) continue;
@@ -626,17 +676,88 @@ function fireLaser(state: GameState, e: EntityState): void {
     const hitRadius = Math.max(other.hitHalfW, other.hitHalfH);
     if (perpDist > hitRadius) continue;
 
-    let dmg = e.laserDamage;
+    if (e.freezeStacks > 0) other.freezeTimer = Math.max(other.freezeTimer, e.freezeStacks);
+
+    let actualDmg = dmg;
     if (other.shield > 0) {
-      const absorbed = Math.min(other.shield, dmg);
+      const absorbed = Math.min(other.shield, actualDmg);
       other.shield -= absorbed;
-      dmg -= absorbed;
+      actualDmg -= absorbed;
     }
-    other.health -= dmg;
-    e.damageDealt += e.laserDamage;
+    other.health -= actualDmg;
+    e.damageDealt += dmg;
 
     const killed = other.health <= 0;
-    state.onDamageDealt.emit({ amount: e.laserDamage, x: other.x, y: other.y, killed });
+    state.onDamageDealt.emit({ amount: dmg, x: other.x, y: other.y, killed });
+    if (killed) {
+      e.kills++;
+      state.gold += other.gold;
+      awardXP(state, other.gold);
+      removeEntityAt(state, i);
+    }
+
+    hitCount++;
+    if (!piercing && hitCount >= 1) break;
+  }
+
+  state.laserBeams.push({
+    id: state.nextId++,
+    x1: e.x,
+    y1: e.y,
+    x2: endX,
+    y2: endY,
+    time: state.time.time,
+  });
+}
+
+function fireMacCannon(state: GameState, e: EntityState): void {
+  const target = findNearestTarget(state, e);
+  if (!target) return;
+
+  const dx = target.x - e.x;
+  const dy = target.y - e.y;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  if (len === 0) return;
+
+  const nx = dx / len;
+  const ny = dy / len;
+
+  const endX = e.x + nx * MAC_CANNON_RANGE;
+  const endY = e.y + ny * MAC_CANNON_RANGE;
+
+  let dmg = e.macCannonDamage;
+  if (e.buffedNextAttack) {
+    dmg = Math.round(dmg * 2);
+    e.buffedNextAttack = false;
+  }
+
+  for (let i = state.entities.length - 1; i >= 0; i--) {
+    const other = state.entities[i];
+    if (other.team !== Team.Enemy) continue;
+
+    const ex = other.x - e.x;
+    const ey = other.y - e.y;
+    const proj = ex * nx + ey * ny;
+    if (proj < 0 || proj > MAC_CANNON_RANGE) continue;
+
+    const perpX = ex - proj * nx;
+    const perpY = ey - proj * ny;
+    const perpDist = Math.sqrt(perpX * perpX + perpY * perpY);
+
+    const hitRadius = Math.max(other.hitHalfW, other.hitHalfH) + MAC_CANNON_RADIUS;
+    if (perpDist > hitRadius) continue;
+
+    let actualDmg = dmg;
+    if (other.shield > 0) {
+      const absorbed = Math.min(other.shield, actualDmg);
+      other.shield -= absorbed;
+      actualDmg -= absorbed;
+    }
+    other.health -= actualDmg;
+    e.damageDealt += dmg;
+
+    const killed = other.health <= 0;
+    state.onDamageDealt.emit({ amount: dmg, x: other.x, y: other.y, killed });
     if (killed) {
       e.kills++;
       state.gold += other.gold;
@@ -655,6 +776,99 @@ function fireLaser(state: GameState, e: EntityState): void {
   });
 }
 
+function fireChainProjectile(state: GameState, e: EntityState): void {
+  const target = findNearestTarget(state, e);
+  if (!target || !target.entity) return;
+
+  let dmg = e.projectileDamage;
+  if (e.buffedNextAttack) {
+    dmg = Math.round(dmg * 2);
+    e.buffedNextAttack = false;
+  }
+
+  const ft = flareType(e.projectileType);
+  state.explosions.push({
+    id: state.nextId++,
+    x: e.x,
+    y: e.y,
+    projectileType: ft,
+  });
+
+  const hitIds = new Set<number>();
+  let currentTarget = target.entity;
+  let chainsRemaining = e.chainCount;
+
+  while (currentTarget && chainsRemaining >= 0) {
+    hitIds.add(currentTarget.id);
+
+    if (currentTarget.shield > 0) {
+      const absorbed = Math.min(currentTarget.shield, dmg);
+      currentTarget.shield -= absorbed;
+      currentTarget.health -= (dmg - absorbed);
+    } else {
+      currentTarget.health -= dmg;
+    }
+    e.damageDealt += dmg;
+
+    state.explosions.push({
+      id: state.nextId++,
+      x: currentTarget.x,
+      y: currentTarget.y,
+      projectileType: ft,
+    });
+
+    const killed = currentTarget.health <= 0;
+    state.onDamageDealt.emit({ amount: dmg, x: currentTarget.x, y: currentTarget.y, killed });
+    if (killed) {
+      e.kills++;
+      state.gold += currentTarget.gold;
+      awardXP(state, currentTarget.gold);
+      const idx = state.entities.indexOf(currentTarget);
+      if (idx >= 0) removeEntityAt(state, idx);
+    }
+
+    chainsRemaining--;
+    if (chainsRemaining < 0) break;
+
+    let nearest: EntityState | null = null;
+    let nearestDist = Infinity;
+    for (const other of state.entities) {
+      if (other.team !== Team.Enemy || hitIds.has(other.id)) continue;
+      const cx = other.x - currentTarget.x;
+      const cy = other.y - currentTarget.y;
+      const d = cx * cx + cy * cy;
+      if (d < nearestDist) {
+        nearestDist = d;
+        nearest = other;
+      }
+    }
+    currentTarget = nearest!;
+  }
+}
+
+function activateBuffer(state: GameState, e: EntityState): void {
+  for (const ally of state.entities) {
+    if (ally.id === e.id || ally.team !== Team.Allied) continue;
+    if (ally.chargesRequired <= 0) continue;
+    if (ally.chargesGranted > 0 || ally.buffMultiplier > 0) continue;
+    ally.buffedNextAttack = true;
+  }
+}
+
+function fireDualShot(state: GameState, e: EntityState): void {
+  const target = findNearestTarget(state, e);
+  if (!target) return;
+
+  let dmg = e.projectileDamage;
+  if (e.buffedNextAttack) {
+    dmg = Math.round(dmg * 2);
+    e.buffedNextAttack = false;
+  }
+
+  performInstantHit(state, e, target, dmg, 0);
+  performInstantHit(state, e, target, dmg, 0);
+}
+
 function activateAbility(state: GameState, e: EntityState): void {
   if (e.charge < e.chargesRequired) return;
   e.charge = 0;
@@ -670,8 +884,37 @@ function activateAbility(state: GameState, e: EntityState): void {
     return;
   }
 
+  if (e.buffMultiplier > 0) {
+    activateBuffer(state, e);
+    return;
+  }
+
+  if (e.macCannonDamage > 0) {
+    fireMacCannon(state, e);
+    return;
+  }
+
+  if (e.chainCount > 0) {
+    fireChainProjectile(state, e);
+    return;
+  }
+
   if (e.laserDamage > 0) {
-    fireLaser(state, e);
+    const isPiercing = e.role === "pierce_laser" || e.role === "ice_beam";
+    fireLaser(state, e, isPiercing);
+    return;
+  }
+
+  if (e.freezeStacks > 0 && e.projectileDamage > 0) {
+    const target = findNearestTarget(state, e);
+    if (target) {
+      fireExplosiveProjectile(state, e, target, 0, e.freezeStacks);
+    }
+    return;
+  }
+
+  if (e.dualShot) {
+    fireDualShot(state, e);
     return;
   }
 
@@ -790,4 +1033,9 @@ export function levelUpEntity(state: GameState, entityId: number, config: Friend
   entity.healAmount = scaled.healAmount;
   entity.shieldAmount = scaled.shieldAmount;
   entity.laserDamage = scaled.laserDamage;
+  entity.macCannonDamage = scaled.macCannonDamage;
+  entity.chargesGranted = scaled.chargesGranted;
+  entity.chainCount = scaled.chainCount;
+  entity.freezeStacks = scaled.freezeStacks;
+  entity.buffMultiplier = scaled.buffMultiplier;
 }

@@ -95,6 +95,11 @@ export interface FriendlyConfig {
   plasmaStacks: number;
   chargesGranted: number;
   laserDamage: number;
+  freezeStacks: number;
+  chainCount: number;
+  buffMultiplier: number;
+  macCannonDamage: number;
+  dualShot: boolean;
 }
 
 export const ENEMY_CATALOG: EnemyConfig[] = [
@@ -124,11 +129,19 @@ export const ENEMY_CATALOG: EnemyConfig[] = [
 ];
 
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [
-  { entityType: "Moth", health: 200, projectileDamage: 8, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Osprey", health: 150, projectileDamage: 5, projectileType: ProjectileType.Tiny, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Spark", health: 200, projectileDamage: 6, projectileType: ProjectileType.Projectile3, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 1, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Pulse", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 8, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, laserDamage: 0 },
-  { entityType: "Prism", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 10 },
+  { entityType: "Dreadnought", health: 300, projectileDamage: 40, projectileType: ProjectileType.Projectile5, chargesRequired: 8, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, macCannonDamage: 0, dualShot: false },
+  { entityType: "Flagship", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 6, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 2, macCannonDamage: 0, dualShot: false },
+  { entityType: "Prism", health: 150, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 1, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 5, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, macCannonDamage: 0, dualShot: false },
+  { entityType: "Osprey", health: 150, projectileDamage: 4, projectileType: ProjectileType.Tiny, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, macCannonDamage: 0, dualShot: true },
+  { entityType: "Pulse", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 10, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, macCannonDamage: 0, dualShot: false },
+  { entityType: "Lance", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 3, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, macCannonDamage: 0, dualShot: false },
+  { entityType: "Titan", health: 300, projectileDamage: 8, projectileType: ProjectileType.Projectile4, chargesRequired: 8, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 3, chainCount: 0, buffMultiplier: 0, macCannonDamage: 0, dualShot: false },
+  { entityType: "Spark", health: 200, projectileDamage: 6, projectileType: ProjectileType.Projectile3, chargesRequired: 6, healAmount: 0, shieldAmount: 0, plasmaStacks: 2, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, macCannonDamage: 0, dualShot: false },
+  { entityType: "Moth", health: 200, projectileDamage: 10, projectileType: ProjectileType.Projectile1, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, macCannonDamage: 0, dualShot: false },
+  { entityType: "Bolt", health: 150, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 4, freezeStacks: 2, chainCount: 0, buffMultiplier: 0, macCannonDamage: 0, dualShot: false },
+  { entityType: "Corona", health: 200, projectileDamage: 10, projectileType: ProjectileType.Projectile2, chargesRequired: 6, healAmount: 0, shieldAmount: 0, plasmaStacks: 4, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, macCannonDamage: 0, dualShot: false },
+  { entityType: "Clipper", health: 180, projectileDamage: 5, projectileType: ProjectileType.Projectile1, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 3, buffMultiplier: 0, macCannonDamage: 0, dualShot: false },
+  { entityType: "Bastion", health: 400, projectileDamage: 0, projectileType: ProjectileType.Projectile6, chargesRequired: 13, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, macCannonDamage: 30, dualShot: false },
 ];
 
 export const FRIENDLY_CONFIG_MAP = new Map<string, FriendlyConfig>(
@@ -145,5 +158,10 @@ export function getScaledConfig(config: FriendlyConfig, level: number): Friendly
     healAmount: Math.round(config.healAmount * mult),
     shieldAmount: Math.round(config.shieldAmount * mult),
     laserDamage: Math.round(config.laserDamage * mult),
+    macCannonDamage: Math.round(config.macCannonDamage * mult),
+    chargesGranted: config.chargesGranted + Math.floor((level - 1) * 0.5),
+    chainCount: config.chainCount + (level - 1),
+    freezeStacks: config.freezeStacks + (level - 1),
+    buffMultiplier: config.buffMultiplier + (level - 1) * 0.5,
   };
 }
