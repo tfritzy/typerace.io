@@ -1,7 +1,8 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, Team } from "./types";
-import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, goldForEnemy } from "./enemyConfig";
+import { SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, goldForEnemy } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
+import { generateWaveSpawns } from "./formations";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -81,6 +82,9 @@ export interface WaveState {
 export interface SpawnEntry {
   config: EnemyConfig;
   spawnTime: number;
+  x: number;
+  y: number;
+  speed: number;
 }
 
 export class GameEvent {
@@ -213,17 +217,17 @@ function removeEntityAt(state: GameState, index: number): void {
   state.entities.splice(index, 1);
 }
 
-function spawnFromRight(): { x: number; y: number } {
-  const pad = 120;
-  return {
-    x: CANVAS_WIDTH + pad,
-    y: pad + Math.random() * (CANVAS_HEIGHT - pad * 2),
-  };
-}
-
-export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
-  const { x, y } = spawnFromRight();
-  const speed = 30 + Math.random() * 52.5;
+export function spawnEntity(
+  state: GameState,
+  config: EnemyConfig,
+  team: Team,
+  spawnX: number,
+  spawnY: number,
+  spawnSpeed: number
+): void {
+  const x = spawnX;
+  const y = spawnY;
+  const speed = spawnSpeed;
   const hitbox = SHIP_HITBOX_MAP[config.entityType];
 
   const entity: EntityState = {
@@ -673,46 +677,9 @@ export function onCorrectKeystroke(state: GameState): void {
   }
 }
 
-const WAVE_SPAWN_DURATION = 15;
-
-export function generateWaveSpawns(wave: number, catalog: EnemyConfig[]): SpawnEntry[] {
-  const totalPower = Math.round(80 * Math.pow(wave, 1.5));
-  const minCatalogPower = catalog.length > 0 ? Math.min(...catalog.map(e => e.power)) : 10;
-  const maxSinglePower = Math.max(minCatalogPower, Math.floor(totalPower * 0.4));
-
-  const eligible = catalog.filter((e) => e.power <= maxSinglePower);
-  if (eligible.length === 0) return [];
-
-  const cutoffPower = Math.max(eligible[0].power, Math.floor(totalPower * 0.05));
-  const enemies: EnemyConfig[] = [];
-  let remaining = totalPower;
-
-  while (remaining >= cutoffPower) {
-    const affordable = eligible.filter((e) => e.power <= remaining);
-    if (affordable.length === 0) break;
-
-    const pick = affordable[Math.floor(Math.random() * affordable.length)];
-    enemies.push(pick);
-    remaining -= pick.power;
-  }
-
-  for (let i = enemies.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [enemies[i], enemies[j]] = [enemies[j], enemies[i]];
-  }
-
-  const interval =
-    enemies.length > 1 ? WAVE_SPAWN_DURATION / (enemies.length - 1) : 0;
-
-  return enemies.map((config, i) => ({
-    config,
-    spawnTime: i * interval,
-  }));
-}
-
 export function startNextWave(state: GameState): void {
   state.wave.wave++;
-  state.wave.spawnQueue = generateWaveSpawns(state.wave.wave, ENEMY_CATALOG);
+  state.wave.spawnQueue = generateWaveSpawns(state.wave.wave);
   state.wave.spawnIndex = 0;
   state.wave.waveTimer = 0;
   state.wave.phase = WavePhase.Spawning;

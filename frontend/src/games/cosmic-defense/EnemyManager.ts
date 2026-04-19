@@ -38,7 +38,7 @@ export class EnemyManager {
         wave.waveTimer >= wave.spawnQueue[wave.spawnIndex].spawnTime
       ) {
         const entry = wave.spawnQueue[wave.spawnIndex];
-        spawnEntity(state, entry.config, Team.Enemy);
+        spawnEntity(state, entry.config, Team.Enemy, entry.x, entry.y, entry.speed);
         wave.spawnIndex++;
       }
 
