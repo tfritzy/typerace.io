@@ -5,8 +5,6 @@ import { getShipRole, type ShipRole } from "./shipCatalog";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
-const PLANET_HIT_RADIUS = 100;
-const PROJECTILE_SPEED = 300 * 2;
 const NEARBY_RANGE = 200;
 const PLASMA_DPS_PER_STACK = 5;
 const LASER_RANGE = 1200;
@@ -58,19 +56,6 @@ export interface EntityState {
   totalHealed: number;
   totalShielded: number;
   targetingMode: TargetingMode;
-}
-
-export interface ProjectileState {
-  id: number;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  damage: number;
-  team: Team;
-  projectileType: ProjectileType;
-  plasmaStacks: number;
-  sourceId: number;
 }
 
 export interface ExplosionState {
@@ -148,7 +133,6 @@ export interface LaserBeam {
 export interface GameState {
   entities: EntityState[];
   entityById: Map<number, EntityState>;
-  projectiles: ProjectileState[];
   explosions: ExplosionState[];
   laserBeams: LaserBeam[];
   time: {
@@ -191,7 +175,6 @@ export function createGameState(): GameState {
   const state: GameState = {
     entities: [],
     entityById: new Map(),
-    projectiles: [],
     explosions: [],
     laserBeams: [],
     time: { time: 0, deltaTime: 0 },
@@ -257,7 +240,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     colorPreset: ColorPreset.Preset4,
     team,
     fireRate: config.fireRate,
-    projectileSpeed: PROJECTILE_SPEED,
+    projectileSpeed: 0,
     projectileDamage: config.projectileDamage,
     projectileType: config.projectileType,
     fireTimer: Math.random() * config.fireRate,
@@ -310,7 +293,7 @@ export function spawnAlliedEntity(
     colorPreset,
     team: Team.Allied,
     fireRate: 0,
-    projectileSpeed: PROJECTILE_SPEED,
+    projectileSpeed: 0,
     projectileDamage: config.projectileDamage,
     projectileType: config.projectileType,
     fireTimer: 0,
@@ -353,101 +336,20 @@ function isInBounds(x: number, y: number): boolean {
 }
 
 function checkCollisions(state: GameState): void {
-  const pr2 = PLANET_HIT_RADIUS * PLANET_HIT_RADIUS;
-  let damaged = false;
-  let goldGained = false;
-
   for (let i = state.entities.length - 1; i >= 0; i--) {
     const e = state.entities[i];
     if (e.team === Team.Enemy && !isInBounds(e.x, e.y)) {
       removeEntityAt(state, i);
     }
   }
-
-  for (let i = state.projectiles.length - 1; i >= 0; i--) {
-    const p = state.projectiles[i];
-    let hit = false;
-
-    if (p.team === Team.Enemy) {
-      const dx = p.x - PLANET_X;
-      const dy = p.y - PLANET_Y;
-      if (dx * dx + dy * dy < pr2) {
-        state.planetHealth = Math.max(0, state.planetHealth - p.damage);
-        hit = true;
-        damaged = true;
-        if (p.projectileType !== ProjectileType.Tiny) {
-          state.explosions.push({
-            id: state.nextId++,
-            x: p.x,
-            y: p.y,
-            projectileType: p.projectileType,
-          });
-        }
-      }
-    }
-
-    if (!hit) {
-      const opposingTeam = p.team === Team.Enemy ? Team.Allied : Team.Enemy;
-      for (let j = state.entities.length - 1; j >= 0; j--) {
-        const e = state.entities[j];
-        if (e.team !== opposingTeam) continue;
-        const dx = Math.abs(p.x - e.x);
-        const dy = Math.abs(p.y - e.y);
-        if (dx < e.hitHalfW && dy < e.hitHalfH) {
-          if (p.plasmaStacks > 0) {
-            e.plasmaStacks += p.plasmaStacks;
-          }
-
-          let dmg = p.damage;
-          if (e.shield > 0) {
-            const absorbed = Math.min(e.shield, dmg);
-            e.shield -= absorbed;
-            dmg -= absorbed;
-          }
-          e.health -= dmg;
-
-          const source = state.entityById.get(p.sourceId);
-          if (source) {
-            source.damageDealt += p.damage;
-          }
-
-          const killed = e.health <= 0;
-          state.onDamageDealt.emit({ amount: p.damage, x: e.x, y: e.y, killed });
-          if (killed) {
-            if (source) source.kills++;
-            state.gold += e.gold;
-            goldGained = true;
-            removeEntityAt(state, j);
-          }
-          hit = true;
-          if (p.projectileType !== ProjectileType.Tiny) {
-            state.explosions.push({
-              id: state.nextId++,
-              x: p.x,
-              y: p.y,
-              projectileType: p.projectileType,
-            });
-          }
-          break;
-        }
-      }
-    }
-
-    if (hit || !isInBounds(p.x, p.y)) {
-      state.projectiles.splice(i, 1);
-    }
-  }
-
-  if (damaged) state.onPlanetDamaged.emit();
-  if (goldGained) state.onGoldChanged.emit();
 }
 
-const _targetResult = { x: 0, y: 0, vx: 0, vy: 0 };
+const _targetResult = { x: 0, y: 0, vx: 0, vy: 0, entity: null as EntityState | null };
 
 function findNearestTarget(
   state: GameState,
   entity: EntityState
-): { x: number; y: number; vx: number; vy: number } | null {
+): { x: number; y: number; vx: number; vy: number; entity: EntityState | null } | null {
   const opposingTeam =
     entity.team === Team.Enemy ? Team.Allied : Team.Enemy;
 
@@ -462,6 +364,7 @@ function findNearestTarget(
     _targetResult.y = PLANET_Y;
     _targetResult.vx = 0;
     _targetResult.vy = 0;
+    _targetResult.entity = null;
     found = true;
   }
 
@@ -501,6 +404,7 @@ function findNearestTarget(
       _targetResult.y = other.y;
       _targetResult.vx = other.vx;
       _targetResult.vy = other.vy;
+      _targetResult.entity = other;
       found = true;
     }
   }
@@ -508,42 +412,68 @@ function findNearestTarget(
   return found ? _targetResult : null;
 }
 
-function computeLeadAngle(
-  sx: number,
-  sy: number,
-  tx: number,
-  ty: number,
-  tvx: number,
-  tvy: number,
-  projectileSpeed: number
-): number {
-  const dx = tx - sx;
-  const dy = ty - sy;
-  const a = tvx * tvx + tvy * tvy - projectileSpeed * projectileSpeed;
-  const b = 2 * (dx * tvx + dy * tvy);
-  const c = dx * dx + dy * dy;
+function flareType(pt: ProjectileType): ProjectileType {
+  return pt === ProjectileType.Tiny ? ProjectileType.Projectile1 : pt;
+}
 
-  let t = 0;
-  if (Math.abs(a) < 1e-6) {
-    if (Math.abs(b) > 1e-6) {
-      t = -c / b;
+function performInstantHit(
+  state: GameState,
+  shooter: EntityState,
+  target: { x: number; y: number; entity: EntityState | null },
+  damage: number,
+  plasmaStacks: number
+): void {
+  const ft = flareType(shooter.projectileType);
+
+  state.explosions.push({
+    id: state.nextId++,
+    x: shooter.x,
+    y: shooter.y,
+    projectileType: ft,
+  });
+
+  if (target.entity) {
+    if (plasmaStacks > 0) target.entity.plasmaStacks += plasmaStacks;
+
+    let dmg = damage;
+    if (target.entity.shield > 0) {
+      const absorbed = Math.min(target.entity.shield, dmg);
+      target.entity.shield -= absorbed;
+      dmg -= absorbed;
+    }
+    target.entity.health -= dmg;
+    shooter.damageDealt += damage;
+
+    const killed = target.entity.health <= 0;
+    state.onDamageDealt.emit({ amount: damage, x: target.entity.x, y: target.entity.y, killed });
+
+    state.explosions.push({
+      id: state.nextId++,
+      x: target.entity.x,
+      y: target.entity.y,
+      projectileType: ft,
+    });
+
+    if (killed) {
+      shooter.kills++;
+      if (target.entity.team === Team.Enemy) {
+        state.gold += target.entity.gold;
+        state.onGoldChanged.emit();
+      }
+      const idx = state.entities.indexOf(target.entity);
+      if (idx >= 0) removeEntityAt(state, idx);
     }
   } else {
-    const disc = b * b - 4 * a * c;
-    if (disc >= 0) {
-      const sqrtDisc = Math.sqrt(disc);
-      const t1 = (-b - sqrtDisc) / (2 * a);
-      const t2 = (-b + sqrtDisc) / (2 * a);
-      if (t1 > 0) t = t1;
-      else if (t2 > 0) t = t2;
-    }
-  }
+    state.planetHealth = Math.max(0, state.planetHealth - damage);
+    state.onPlanetDamaged.emit();
 
-  if (t <= 0) {
-    return Math.atan2(dy, dx);
+    state.explosions.push({
+      id: state.nextId++,
+      x: target.x,
+      y: target.y,
+      projectileType: ft,
+    });
   }
-
-  return Math.atan2(dy + tvy * t, dx + tvx * t);
 }
 
 export function updateState(state: GameState, dt: number): void {
@@ -570,25 +500,7 @@ export function updateState(state: GameState, dt: number): void {
           e.fireTimer -= dt;
           if (e.fireTimer <= 0) {
             e.fireTimer += e.fireRate;
-
-            const angle = computeLeadAngle(
-              e.x, e.y,
-              target.x, target.y,
-              target.vx, target.vy,
-              e.projectileSpeed
-            );
-            state.projectiles.push({
-              id: state.nextId++,
-              x: e.x,
-              y: e.y,
-              vx: Math.cos(angle) * e.projectileSpeed,
-              vy: Math.sin(angle) * e.projectileSpeed,
-              damage: e.projectileDamage,
-              team: e.team,
-              projectileType: e.projectileType,
-              plasmaStacks: 0,
-              sourceId: e.id,
-            });
+            performInstantHit(state, e, target, e.projectileDamage, 0);
           }
         }
       } else if (e.speed > 0) {
@@ -605,11 +517,6 @@ export function updateState(state: GameState, dt: number): void {
       e.y += e.vy * dt;
       e.rotation = Math.atan2(e.vy, e.vx);
     }
-  }
-
-  for (const p of state.projectiles) {
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
   }
 
   for (let i = state.entities.length - 1; i >= 0; i--) {
@@ -641,26 +548,7 @@ export function updateState(state: GameState, dt: number): void {
 function fireProjectile(state: GameState, e: EntityState, plasmaStacks: number): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
-
-  const angle = computeLeadAngle(
-    e.x, e.y,
-    target.x, target.y,
-    target.vx, target.vy,
-    e.projectileSpeed
-  );
-
-  state.projectiles.push({
-    id: state.nextId++,
-    x: e.x,
-    y: e.y,
-    vx: Math.cos(angle) * e.projectileSpeed,
-    vy: Math.sin(angle) * e.projectileSpeed,
-    damage: e.projectileDamage,
-    team: e.team,
-    projectileType: e.projectileType,
-    plasmaStacks,
-    sourceId: e.id,
-  });
+  performInstantHit(state, e, target, e.projectileDamage, plasmaStacks);
 }
 
 function findNearbyAllies(state: GameState, e: EntityState): EntityState[] {
@@ -840,7 +728,6 @@ export function startNextWave(state: GameState): void {
 export function completeWave(state: GameState): void {
   const bonus = 10 + state.wave.wave * 5;
   state.gold += bonus;
-  state.projectiles.length = 0;
   state.wave.phase = WavePhase.Idle;
   state.onWaveComplete.emit();
   state.onGoldChanged.emit();

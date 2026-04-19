@@ -4,7 +4,6 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { Background } from "./Background";
 import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
-import { ProjectileManager } from "./ProjectileManager";
 import { ExplosionManager } from "./ExplosionManager";
 import { ShipManager } from "./ShipManager";
 import { DamageNumberManager } from "./DamageNumberManager";
@@ -24,7 +23,6 @@ export class CosmicDefenseGame {
   private background!: Background;
   private planetManager!: PlanetManager;
   private enemyManager!: EnemyManager;
-  private projectileManager!: ProjectileManager;
   private explosionManager!: ExplosionManager;
   private damageNumberManager!: DamageNumberManager;
   private laserBeamManager!: LaserBeamManager;
@@ -64,17 +62,14 @@ export class CosmicDefenseGame {
     this.shipManager = new ShipManager(assetManager);
     world.addChild(this.shipManager.layer);
 
-    this.projectileManager = new ProjectileManager(assetManager);
-    world.addChild(this.projectileManager.layer);
-
-    this.explosionManager = new ExplosionManager(assetManager);
-    world.addChild(this.explosionManager.layer);
-
     this.laserBeamManager = new LaserBeamManager();
     world.addChild(this.laserBeamManager.layer);
 
     this.enemyManager = new EnemyManager(assetManager);
     world.addChild(this.enemyManager.layer);
+
+    this.explosionManager = new ExplosionManager(assetManager);
+    world.addChild(this.explosionManager.layer);
 
     this.damageNumberManager = new DamageNumberManager();
     this.damageNumberManager.subscribe(this.state);
@@ -84,7 +79,6 @@ export class CosmicDefenseGame {
   private update(dt: number): void {
     updateState(this.state, dt);
     this.enemyManager.update(this.state, dt);
-    this.projectileManager.update(this.state);
     this.explosionManager.update(this.state);
     this.laserBeamManager.update(this.state);
     this.shipManager.update(this.state, dt);
@@ -105,7 +99,6 @@ export class CosmicDefenseGame {
     this.background.destroy();
     this.planetManager.destroy();
     this.enemyManager.destroy();
-    this.projectileManager.destroy();
     this.explosionManager.destroy();
     this.laserBeamManager.destroy();
     this.damageNumberManager.destroy();
