@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { SHIP_BLUEPRINTS, ROLE_META } from "./shipCatalog";
 import { formatGold, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import type { EntityType } from "./types";
-import { Coins, X } from "lucide-react";
+import { Coins } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
 
 interface ShopPanelProps {
@@ -12,103 +13,157 @@ interface ShopPanelProps {
   slot: PlacementSlot;
 }
 
-const PANEL_OFFSET_LEFT = 5;
-const PANEL_OFFSET_TOP = 22;
-const PANEL_MIN_TOP = 3;
-const PANEL_MAX_TOP = 55;
-const PANEL_WIDTH = 280;
+const RADIUS = 90;
+const HEX_R = 38;
+const CONTAINER_SIZE = (RADIUS + HEX_R) * 2 + 20;
+const CENTER = CONTAINER_SIZE / 2;
 
-export const ShopPanel = ({ onSelectShip, onClose, shipPreviews, gold, slot }: ShopPanelProps) => {
+function hexPoints(cx: number, cy: number, r: number): string {
+  return Array.from({ length: 6 }, (_, i) => {
+    const angle = ((i * 60 - 90) * Math.PI) / 180;
+    return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
+  }).join(" ");
+}
+
+const POSITIONS = [
+  { x: 0, y: 0 },
+  ...Array.from({ length: 6 }, (_, i) => {
+    const angle = ((i * 60 - 90) * Math.PI) / 180;
+    return {
+      x: Math.round(RADIUS * Math.cos(angle)),
+      y: Math.round(RADIUS * Math.sin(angle)),
+    };
+  }),
+];
+
+export const ShopPanel = ({
+  onSelectShip,
+  onClose,
+  shipPreviews,
+  gold,
+  slot,
+}: ShopPanelProps) => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const slotLeftPct = (slot.x / CANVAS_WIDTH) * 100;
   const slotTopPct = (slot.y / CANVAS_HEIGHT) * 100;
-
-  const panelLeft = slotLeftPct + PANEL_OFFSET_LEFT;
-  const panelTop = Math.max(PANEL_MIN_TOP, Math.min(PANEL_MAX_TOP, slotTopPct - PANEL_OFFSET_TOP));
 
   return (
     <>
       <div className="absolute inset-0 z-20" onClick={onClose} />
       <div
-        className="absolute z-30 rounded-lg p-2.5 border border-white/10 flex flex-col"
+        className="absolute z-30"
         style={{
-          left: `${panelLeft}%`,
-          top: `${panelTop}%`,
-          width: PANEL_WIDTH,
-          maxHeight: "60%",
-          background: "linear-gradient(180deg, rgba(12,14,30,0.96) 0%, rgba(8,10,24,0.96) 100%)",
-          backdropFilter: "blur(12px)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.6), 0 0 1px rgba(120,140,200,0.2)",
+          left: `${slotLeftPct}%`,
+          top: `${slotTopPct}%`,
+          width: CONTAINER_SIZE,
+          height: CONTAINER_SIZE,
+          transform: "translate(-50%, -50%)",
+          pointerEvents: "none",
         }}
-        onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-2 px-0.5">
-          <span className="text-[#cdd6f4] text-xs font-semibold tracking-wide">
-            Deploy Ship
-          </span>
-          <div className="flex items-center gap-2.5">
-            <span className="text-[#f9e2af] text-[10px] font-medium flex items-center gap-0.5">
-              <Coins className="w-3 h-3" />
-              {formatGold(gold)}
-            </span>
-            <button
-              onClick={onClose}
-              className="text-[#585b70] hover:text-[#a6adc8] transition-colors cursor-pointer p-0.5 -mr-0.5"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-        <div className="overflow-y-auto min-h-0 flex flex-col gap-0.5">
-          {SHIP_BLUEPRINTS.map((bp) => {
+        <svg
+          className="absolute inset-0"
+          width={CONTAINER_SIZE}
+          height={CONTAINER_SIZE}
+          viewBox={`0 0 ${CONTAINER_SIZE} ${CONTAINER_SIZE}`}
+        >
+          <polygon
+            points={hexPoints(CENTER, CENTER, RADIUS)}
+            fill="rgba(8,10,24,0.4)"
+            stroke="rgba(120,140,200,0.18)"
+            strokeWidth={1}
+          />
+          {POSITIONS.slice(1).map((pos, i) => (
+            <line
+              key={`spoke-${i}`}
+              x1={CENTER}
+              y1={CENTER}
+              x2={CENTER + pos.x}
+              y2={CENTER + pos.y}
+              stroke="rgba(120,140,200,0.12)"
+              strokeWidth={1}
+            />
+          ))}
+          {SHIP_BLUEPRINTS.map((bp, i) => {
+            const pos = POSITIONS[i];
+            const isHovered = hoveredIndex === i;
             const canAfford = gold >= bp.cost;
-            const preview = shipPreviews.get(bp.entityType);
             const meta = ROLE_META[bp.role];
-            const RoleIcon = meta.icon;
+            const roleColor = meta.color;
             return (
-              <button
-                key={bp.entityType}
-                className={`flex items-center gap-2 p-1.5 px-2 rounded-md border transition-colors w-full ${
-                  canAfford
-                    ? "border-white/5 bg-white/[0.02] cursor-pointer hover:bg-white/8 hover:border-white/15"
-                    : "border-transparent bg-transparent cursor-not-allowed opacity-30"
-                }`}
-                onClick={() => canAfford && onSelectShip(bp.entityType)}
-                disabled={!canAfford}
-              >
-                <div className="w-8 h-8 flex items-center justify-center shrink-0">
-                  {preview ? (
-                    <img
-                      src={preview}
-                      alt={bp.entityType}
-                      className="max-w-8 max-h-8"
-                      style={{ imageRendering: "pixelated" }}
-                    />
-                  ) : (
-                    <div className="w-5 h-5 bg-white/15 rounded" />
-                  )}
-                </div>
-                <div className="flex flex-col items-start min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] font-medium text-[#bac2de]">
-                      {bp.entityType}
-                    </span>
-                    <RoleIcon className="w-2.5 h-2.5 shrink-0" style={{ color: meta.color }} />
-                    <span className="text-[9px]" style={{ color: meta.color }}>
-                      {meta.label}
-                    </span>
-                  </div>
-                  <span className="text-[9px] leading-tight text-[#6c7086] text-left">
-                    {bp.description}
-                  </span>
-                </div>
-                <span className="text-[10px] font-medium flex items-center gap-0.5 shrink-0 text-[#f9e2af]">
-                  <Coins className="w-2.5 h-2.5" />
-                  {formatGold(bp.cost)}
-                </span>
-              </button>
+              <polygon
+                key={`hex-${bp.entityType}`}
+                points={hexPoints(CENTER + pos.x, CENTER + pos.y, HEX_R)}
+                fill={
+                  !canAfford
+                    ? "rgba(12,14,30,0.8)"
+                    : isHovered
+                      ? `rgba(12,14,30,0.6)`
+                      : "rgba(12,14,30,0.92)"
+                }
+                stroke={
+                  !canAfford
+                    ? "rgba(120,140,200,0.08)"
+                    : isHovered
+                      ? roleColor
+                      : "rgba(120,140,200,0.3)"
+                }
+                strokeWidth={isHovered && canAfford ? 1.5 : 1}
+                style={{
+                  pointerEvents: "auto",
+                  cursor: canAfford ? "pointer" : "not-allowed",
+                  filter: isHovered && canAfford
+                    ? `drop-shadow(0 0 6px ${roleColor}40)`
+                    : undefined,
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (canAfford) onSelectShip(bp.entityType);
+                }}
+                onMouseEnter={() => setHoveredIndex(i)}
+                onMouseLeave={() => setHoveredIndex(null)}
+              />
             );
           })}
-        </div>
+        </svg>
+        {SHIP_BLUEPRINTS.map((bp, i) => {
+          const pos = POSITIONS[i];
+          const canAfford = gold >= bp.cost;
+          const preview = shipPreviews.get(bp.entityType);
+          return (
+            <div
+              key={`label-${bp.entityType}`}
+              className="absolute flex flex-col items-center justify-center"
+              style={{
+                left: CENTER + pos.x,
+                top: CENTER + pos.y,
+                transform: "translate(-50%, -50%)",
+                pointerEvents: "none",
+                opacity: canAfford ? 1 : 0.3,
+              }}
+            >
+              <div className="flex items-center justify-center" style={{ height: 30 }}>
+                {preview ? (
+                  <img
+                    src={preview}
+                    alt={bp.entityType}
+                    className="max-w-7 max-h-7"
+                    style={{ imageRendering: "pixelated" }}
+                  />
+                ) : (
+                  <div className="w-5 h-5 bg-white/15 rounded" />
+                )}
+              </div>
+              <span className="text-[9px] text-[#bac2de] font-medium leading-none whitespace-nowrap">
+                {bp.entityType}
+              </span>
+              <span className="text-[8px] text-[#f9e2af] flex items-center gap-0.5 leading-none mt-0.5">
+                <Coins className="w-2.5 h-2.5" />
+                {formatGold(bp.cost)}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </>
   );
