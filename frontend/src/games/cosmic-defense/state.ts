@@ -221,13 +221,10 @@ export function spawnEntity(
   state: GameState,
   config: EnemyConfig,
   team: Team,
-  spawnX: number,
-  spawnY: number,
-  spawnSpeed: number
+  x: number,
+  y: number,
+  speed: number
 ): void {
-  const x = spawnX;
-  const y = spawnY;
-  const speed = spawnSpeed;
   const hitbox = SHIP_HITBOX_MAP[config.entityType];
 
   const entity: EntityState = {
