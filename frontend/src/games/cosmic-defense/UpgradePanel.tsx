@@ -119,13 +119,13 @@ export const UpgradePanel = ({
             </div>
             <div className="flex items-center gap-1 mt-0.5">
               <div className="flex items-center gap-0.5">
-                {Array.from({ length: MAX_TIER }, (_, i) => (
+                {Array.from({ length: MAX_TIER - 1 }, (_, i) => (
                   <div
                     key={i}
                     className="w-1.5 h-1.5 rounded-full"
                     style={{
                       backgroundColor:
-                        i < currentTier
+                        i < currentTier - 1
                           ? (roleMeta?.color ?? "#a6adc8")
                           : "rgba(88,91,112,0.4)",
                     }}
