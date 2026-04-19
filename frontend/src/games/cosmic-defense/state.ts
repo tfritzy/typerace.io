@@ -30,7 +30,6 @@ export interface EntityState {
   colorPreset: ColorPreset;
   team: Team;
   fireRate: number;
-  projectileSpeed: number;
   projectileDamage: number;
   projectileType: ProjectileType;
   fireTimer: number;
@@ -240,7 +239,6 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     colorPreset: ColorPreset.Preset4,
     team,
     fireRate: config.fireRate,
-    projectileSpeed: 0,
     projectileDamage: config.projectileDamage,
     projectileType: config.projectileType,
     fireTimer: Math.random() * config.fireRate,
@@ -293,7 +291,6 @@ export function spawnAlliedEntity(
     colorPreset,
     team: Team.Allied,
     fireRate: 0,
-    projectileSpeed: 0,
     projectileDamage: config.projectileDamage,
     projectileType: config.projectileType,
     fireTimer: 0,
@@ -344,12 +341,12 @@ function checkCollisions(state: GameState): void {
   }
 }
 
-const _targetResult = { x: 0, y: 0, vx: 0, vy: 0, entity: null as EntityState | null };
+const _targetResult = { x: 0, y: 0, entity: null as EntityState | null };
 
 function findNearestTarget(
   state: GameState,
   entity: EntityState
-): { x: number; y: number; vx: number; vy: number; entity: EntityState | null } | null {
+): { x: number; y: number; entity: EntityState | null } | null {
   const opposingTeam =
     entity.team === Team.Enemy ? Team.Allied : Team.Enemy;
 
@@ -362,8 +359,6 @@ function findNearestTarget(
     bestScore = -(dx * dx + dy * dy);
     _targetResult.x = PLANET_X;
     _targetResult.y = PLANET_Y;
-    _targetResult.vx = 0;
-    _targetResult.vy = 0;
     _targetResult.entity = null;
     found = true;
   }
@@ -402,8 +397,6 @@ function findNearestTarget(
       bestScore = score;
       _targetResult.x = other.x;
       _targetResult.y = other.y;
-      _targetResult.vx = other.vx;
-      _targetResult.vy = other.vy;
       _targetResult.entity = other;
       found = true;
     }
