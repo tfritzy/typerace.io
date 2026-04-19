@@ -135,7 +135,6 @@ export interface GameState {
   level: number;
   pendingChoice: boolean;
   onPlanetDamaged: GameEvent;
-  onGoldChanged: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
   onLevelUp: GameEvent;
 }
@@ -179,7 +178,6 @@ export function createGameState(): GameState {
     level: 1,
     pendingChoice: true,
     onPlanetDamaged: new GameEvent(),
-    onGoldChanged: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
     onLevelUp: new GameEvent(),
   };
@@ -443,7 +441,6 @@ function performInstantHit(
       shooter.kills++;
       if (target.entity.team === Team.Enemy) {
         state.gold += target.entity.gold;
-        state.onGoldChanged.emit();
         awardXP(state, target.entity.gold);
       }
       const idx = state.entities.indexOf(target.entity);
@@ -516,7 +513,6 @@ export function updateState(state: GameState, dt: number): void {
         state.onDamageDealt.emit({ amount: plasmaDamage, x: e.x, y: e.y, killed: true });
         if (e.team === Team.Enemy) {
           state.gold += e.gold;
-          state.onGoldChanged.emit();
           awardXP(state, e.gold);
         }
         removeEntityAt(state, i);
@@ -569,7 +565,6 @@ function fireLaser(state: GameState, e: EntityState): void {
   const endX = e.x + nx * LASER_RANGE;
   const endY = e.y + ny * LASER_RANGE;
 
-  let goldGained = false;
   for (let i = state.entities.length - 1; i >= 0; i--) {
     const other = state.entities[i];
     if (other.team !== Team.Enemy) continue;
@@ -600,13 +595,10 @@ function fireLaser(state: GameState, e: EntityState): void {
     if (killed) {
       e.kills++;
       state.gold += other.gold;
-      goldGained = true;
       awardXP(state, other.gold);
       removeEntityAt(state, i);
     }
   }
-
-  if (goldGained) state.onGoldChanged.emit();
 
   state.laserBeams.push({
     id: state.nextId++,
@@ -675,7 +667,6 @@ const TIER_OFFSET = 30;
 const BASE_SPAWN_RATE = 0.6;
 const MAX_SPAWN_RATE = 4.0;
 const SPAWN_RAMP_TIME = 120;
-const GOLD_PER_SECOND = 0.5;
 
 function binomialWeight(t: number, n: number, k: number): number {
   const p = Math.max(0, Math.min(1, t));
@@ -727,12 +718,6 @@ export function updateSpawner(state: GameState, dt: number): void {
   if (state.spawner.paused) return;
 
   state.spawner.elapsed += dt;
-
-  const prevGold = Math.floor(state.gold);
-  state.gold += GOLD_PER_SECOND * dt;
-  if (Math.floor(state.gold) !== prevGold) {
-    state.onGoldChanged.emit();
-  }
 
   const rate = getSpawnRate(state.spawner.elapsed);
   state.spawner.spawnAccumulator += rate * dt;

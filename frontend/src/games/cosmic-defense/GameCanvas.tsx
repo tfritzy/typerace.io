@@ -25,12 +25,21 @@ export const GameCanvas = () => {
   const [, setInspectTick] = useState(0);
   const [pendingChoice, setPendingChoice] = useState(true);
   const [level, setLevel] = useState(1);
+  const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
     const interval = setInterval(() => setInspectTick((t) => t + 1), 200);
     return () => clearInterval(interval);
   }, [selectedSlot?.entityId]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const game = gameRef.current;
+      if (game) setElapsed(Math.floor(game.state.spawner.elapsed));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const game = gameRef.current;
@@ -171,7 +180,7 @@ export const GameCanvas = () => {
             Lv {level}
           </span>
           <span className="text-[11px] text-[#a6adc8]">
-            {Math.floor(gameRef.current?.state.spawner.elapsed ?? 0)}s
+            {elapsed}s
           </span>
         </div>
         <PlacementOverlay
