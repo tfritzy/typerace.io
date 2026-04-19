@@ -93,7 +93,7 @@ export const PhraseOverlay = ({
 
           if (phrase[i] === typed[i]) {
             c.push(
-              <span key={i} className="text-white">
+              <span key={i} style={{ color: "rgba(255,255,255,1)" }}>
                 {phrase[i]}
               </span>,
             );
@@ -106,14 +106,14 @@ export const PhraseOverlay = ({
           }
         } else {
           c.push(
-            <span key={i} className="text-text-untyped opacity-50">
+            <span key={i} style={{ color: "rgba(255,255,255,0.3)" }}>
               {phrase[i]}
             </span>,
           );
         }
       } else {
         c.push(
-          <span key={i} className="text-text-untyped">
+          <span key={i} style={{ color: "rgba(255,255,255,0.5)" }}>
             {phrase[i]}
           </span>,
         );
@@ -131,7 +131,7 @@ export const PhraseOverlay = ({
 
   return (
     <div className="w-full h-full relative">
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <div
           className="text-2xl font-mono whitespace-pre relative"
           style={{
@@ -150,6 +150,7 @@ export const PhraseOverlay = ({
                 ? "none"
                 : "transform 80ms ease-out",
               whiteSpace: "pre",
+              textShadow: "0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)",
             }}
           >
             {chars}
@@ -160,7 +161,13 @@ export const PhraseOverlay = ({
             className="w-full h-full absolute left-0 top-0 outline-none opacity-0"
             onChange={handleChange}
           ></input>
-          <div className="absolute border-l border-accent left-1/2 -top-1 h-8 -translate-x-[1px]" />
+          <div
+            className="absolute left-1/2 -top-1 h-8 -translate-x-[1px]"
+            style={{
+              borderLeft: "2px solid rgba(255,255,255,0.7)",
+              filter: "drop-shadow(0 0 2px rgba(0,0,0,0.8))",
+            }}
+          />
         </div>
       </div>
     </div>

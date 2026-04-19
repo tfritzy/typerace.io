@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useCallback } from "react";
 import { SHIP_BLUEPRINTS, ROLE_META } from "./shipCatalog";
 import type { EntityType } from "./types";
 import type { PlacementSlot } from "./PlacementPoints";
@@ -36,6 +36,18 @@ export const ShipChoiceOverlay = ({
     if (s.occupant) existing.set(s.occupant, s);
   }
 
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    const idx = parseInt(e.key) - 1;
+    if (idx >= 0 && idx < choices.length) {
+      onSelect(choices[idx]);
+    }
+  }, [choices, onSelect]);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
   return (
     <>
       <div
@@ -56,18 +68,19 @@ export const ShipChoiceOverlay = ({
           Choose a ship
         </div>
         <div className="flex gap-5">
-          {choices.map((entityType) => {
+          {choices.map((entityType, i) => {
             const bp = SHIP_BLUEPRINTS.find((b) => b.entityType === entityType)!;
             const meta = ROLE_META[bp.role];
             const preview = shipPreviews.get(entityType);
             const existingSlot = existing.get(entityType);
             const isUpgrade = !!existingSlot;
             const currentLevel = existingSlot?.level ?? 0;
+            const hotkey = i + 1;
 
             return (
               <button
                 key={entityType}
-                className="flex flex-col items-center rounded-lg border cursor-pointer transition-all hover:border-opacity-60"
+                className="flex flex-col items-center rounded-lg border cursor-pointer transition-all hover:border-opacity-60 relative"
                 style={{
                   width: 160,
                   padding: "20px 12px",
@@ -84,6 +97,16 @@ export const ShipChoiceOverlay = ({
                 }}
                 onClick={() => onSelect(entityType)}
               >
+                <span
+                  className="absolute top-2 left-2 text-[11px] font-bold rounded px-1.5 py-0.5"
+                  style={{
+                    background: "rgba(255,255,255,0.08)",
+                    color: "#a6adc8",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                  }}
+                >
+                  {hotkey}
+                </span>
                 {preview && (
                   <img
                     src={preview}

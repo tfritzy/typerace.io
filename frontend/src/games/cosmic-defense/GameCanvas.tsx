@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
-import { TargetingMode, levelUpEntity } from "./state";
+import { TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
 import type { EntityState } from "./state";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { PlanetHealthBar } from "./PlanetHealthBar";
@@ -26,6 +26,8 @@ export const GameCanvas = () => {
   const [pendingChoice, setPendingChoice] = useState(true);
   const [level, setLevel] = useState(1);
   const [elapsed, setElapsed] = useState(0);
+  const [xp, setXp] = useState(0);
+  const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -36,8 +38,12 @@ export const GameCanvas = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       const game = gameRef.current;
-      if (game) setElapsed(Math.floor(game.state.spawner.elapsed));
-    }, 1000);
+      if (game) {
+        setElapsed(Math.floor(game.state.spawner.elapsed));
+        setXp(game.state.xp);
+        setXpNeeded(xpForNextLevel(game.state.level));
+      }
+    }, 200);
     return () => clearInterval(interval);
   }, []);
 
@@ -175,13 +181,33 @@ export const GameCanvas = () => {
         }}
       >
         <PlanetHealthBar ratio={healthRatio} />
-        <div className="absolute top-3 right-3 z-10 flex items-center gap-3">
-          <span className="text-[11px] text-[#f9e2af]">
-            Lv {level}
-          </span>
-          <span className="text-[11px] text-[#a6adc8]">
+        <div className="absolute top-2.5 left-3 z-10">
+          <span className="text-[11px] text-[#585b70]">
             {elapsed}s
           </span>
+        </div>
+        <div className="absolute top-2 right-3 z-10 flex items-center gap-2">
+          <span className="text-[11px] text-[#f9e2af] font-semibold">
+            Lv {level}
+          </span>
+          <div
+            className="relative rounded-full overflow-hidden"
+            style={{
+              width: 100,
+              height: 8,
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.1)",
+            }}
+          >
+            <div
+              className="absolute left-0 top-0 h-full rounded-full"
+              style={{
+                width: `${Math.min(100, (xp / xpNeeded) * 100)}%`,
+                background: "linear-gradient(90deg, #f9e2af, #fab387)",
+                transition: "width 0.2s ease-out",
+              }}
+            />
+          </div>
         </div>
         <PlacementOverlay
           slots={slots}

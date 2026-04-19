@@ -126,8 +126,7 @@ export const ENEMY_CATALOG: EnemyConfig[] = [
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [
   { entityType: "Moth", health: 200, projectileDamage: 8, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
   { entityType: "Osprey", health: 150, projectileDamage: 5, projectileType: ProjectileType.Tiny, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Mender", health: 250, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 25, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Spark", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 1, chargesGranted: 0, laserDamage: 0 },
+  { entityType: "Spark", health: 200, projectileDamage: 6, projectileType: ProjectileType.Projectile3, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 1, chargesGranted: 0, laserDamage: 0 },
   { entityType: "Pulse", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 8, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, laserDamage: 0 },
   { entityType: "Prism", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 10 },
 ];
@@ -138,7 +137,7 @@ export const FRIENDLY_CONFIG_MAP = new Map<string, FriendlyConfig>(
 
 export function getScaledConfig(config: FriendlyConfig, level: number): FriendlyConfig {
   if (level <= 1) return config;
-  const mult = Math.pow(2, level - 1);
+  const mult = Math.pow(1.5, level - 1);
   return {
     ...config,
     health: Math.round(config.health * mult),

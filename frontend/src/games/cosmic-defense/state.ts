@@ -5,7 +5,6 @@ import { getShipRole, type ShipRole } from "./shipCatalog";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
-const NEARBY_RANGE = 200;
 const PLASMA_DPS_PER_STACK = 5;
 const LASER_RANGE = 1200;
 
@@ -533,21 +532,67 @@ export function updateState(state: GameState, dt: number): void {
 function fireProjectile(state: GameState, e: EntityState, plasmaStacks: number): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
-  performInstantHit(state, e, target, e.projectileDamage, plasmaStacks);
+
+  if (plasmaStacks > 0 && target.entity) {
+    fireExplosiveProjectile(state, e, target, plasmaStacks);
+  } else {
+    performInstantHit(state, e, target, e.projectileDamage, 0);
+  }
 }
 
-function findNearbyAllies(state: GameState, e: EntityState): EntityState[] {
-  const r2 = NEARBY_RANGE * NEARBY_RANGE;
-  const allies: EntityState[] = [];
-  for (const other of state.entities) {
-    if (other.id === e.id || other.team !== Team.Allied) continue;
-    const dx = e.x - other.x;
-    const dy = e.y - other.y;
-    if (dx * dx + dy * dy <= r2) {
-      allies.push(other);
+const EXPLOSION_RADIUS = 120;
+
+function fireExplosiveProjectile(
+  state: GameState,
+  shooter: EntityState,
+  target: { x: number; y: number; entity: EntityState | null },
+  plasmaStacks: number
+): void {
+  const ft = flareType(shooter.projectileType);
+
+  state.explosions.push({
+    id: state.nextId++,
+    x: shooter.x,
+    y: shooter.y,
+    projectileType: ft,
+  });
+
+  state.explosions.push({
+    id: state.nextId++,
+    x: target.x,
+    y: target.y,
+    projectileType: ft,
+  });
+
+  const r2 = EXPLOSION_RADIUS * EXPLOSION_RADIUS;
+  for (let i = state.entities.length - 1; i >= 0; i--) {
+    const other = state.entities[i];
+    if (other.team !== Team.Enemy) continue;
+    const dx = other.x - target.x;
+    const dy = other.y - target.y;
+    if (dx * dx + dy * dy > r2) continue;
+
+    other.plasmaStacks += plasmaStacks;
+
+    let dmg = shooter.projectileDamage;
+    if (other.shield > 0) {
+      const absorbed = Math.min(other.shield, dmg);
+      other.shield -= absorbed;
+      dmg -= absorbed;
+    }
+    other.health -= dmg;
+    shooter.damageDealt += shooter.projectileDamage;
+
+    const killed = other.health <= 0;
+    state.onDamageDealt.emit({ amount: shooter.projectileDamage, x: other.x, y: other.y, killed });
+
+    if (killed) {
+      shooter.kills++;
+      state.gold += other.gold;
+      awardXP(state, other.gold);
+      removeEntityAt(state, i);
     }
   }
-  return allies;
 }
 
 function fireLaser(state: GameState, e: EntityState): void {
@@ -614,28 +659,9 @@ function activateAbility(state: GameState, e: EntityState): void {
   if (e.charge < e.chargesRequired) return;
   e.charge = 0;
 
-  if (e.healAmount > 0) {
-    const allies = findNearbyAllies(state, e);
-    for (const ally of allies) {
-      const healed = Math.min(ally.maxHealth - ally.health, e.healAmount);
-      ally.health += healed;
-      e.totalHealed += healed;
-    }
-    return;
-  }
-
-  if (e.shieldAmount > 0) {
-    const allies = findNearbyAllies(state, e);
-    for (const ally of allies) {
-      ally.shield += e.shieldAmount;
-      e.totalShielded += e.shieldAmount;
-    }
-    return;
-  }
-
   if (e.chargesGranted > 0) {
-    const allies = findNearbyAllies(state, e);
-    for (const ally of allies) {
+    for (const ally of state.entities) {
+      if (ally.id === e.id || ally.team !== Team.Allied) continue;
       if (ally.chargesRequired <= 0) continue;
       if (ally.chargesGranted > 0) continue;
       ally.charge = Math.min(ally.chargesRequired, ally.charge + e.chargesGranted);
@@ -736,8 +762,8 @@ export function setSpawnerPaused(state: GameState, paused: boolean): void {
   state.spawner.paused = paused;
 }
 
-function xpForNextLevel(level: number): number {
-  return 20 + level * 5;
+export function xpForNextLevel(level: number): number {
+  return 40 + level * 10;
 }
 
 export function awardXP(state: GameState, amount: number): void {
