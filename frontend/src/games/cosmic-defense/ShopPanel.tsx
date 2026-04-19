@@ -14,7 +14,6 @@ interface ShopPanelProps {
 }
 
 const NEIGHBOR_OFFSETS = [
-  { x: 0, y: 0 },
   { x: HEX_HALF_W, y: -ROW_SPACING },
   { x: COL_SPACING, y: 0 },
   { x: HEX_HALF_W, y: ROW_SPACING },
@@ -23,7 +22,7 @@ const NEIGHBOR_OFFSETS = [
   { x: -HEX_HALF_W, y: -ROW_SPACING },
 ];
 
-const ANIM_DURATION = 150;
+const ANIM_DURATION = 100;
 const SPRITE_SIZE = 34;
 const HIT_RADIUS = 40;
 const TOOLTIP_W = 160;
@@ -62,10 +61,7 @@ export const ShopPanel = ({
       >
         {SHIP_BLUEPRINTS.map((bp, i) => {
           const offset = NEIGHBOR_OFFSETS[i];
-          const isCenter = i === 0;
-          const t = isCenter
-            ? 1
-            : Math.max(0, Math.min(1, elapsed / ANIM_DURATION));
+          const t = Math.max(0, Math.min(1, elapsed / ANIM_DURATION));
           const cx = slot.x + offset.x * t;
           const cy = slot.y + offset.y * t;
           const isHovered = hoveredIndex === i;
