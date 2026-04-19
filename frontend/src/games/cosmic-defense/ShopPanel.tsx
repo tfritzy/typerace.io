@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SHIP_BLUEPRINTS, ROLE_META } from "./shipCatalog";
 import { formatGold, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import type { EntityType } from "./types";
-import { Coins } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
 
 interface ShopPanelProps {
@@ -13,28 +12,42 @@ interface ShopPanelProps {
   slot: PlacementSlot;
 }
 
-const RADIUS = 90;
-const HEX_R = 38;
-const CONTAINER_SIZE = (RADIUS + HEX_R) * 2 + 20;
-const CENTER = CONTAINER_SIZE / 2;
+const COL_SPACING = 130;
+const ROW_SPACING = 110;
+const HEX_HALF_W = COL_SPACING / 2;
+const HEX_VERT = (ROW_SPACING * 2) / 3;
+const HEX_HALF_VERT = HEX_VERT / 2;
 
-function hexPoints(cx: number, cy: number, r: number): string {
-  return Array.from({ length: 6 }, (_, i) => {
-    const angle = ((i * 60 - 90) * Math.PI) / 180;
-    return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
-  }).join(" ");
+function hexPoints(cx: number, cy: number): string {
+  return [
+    `${cx},${cy - HEX_VERT}`,
+    `${cx + HEX_HALF_W},${cy - HEX_HALF_VERT}`,
+    `${cx + HEX_HALF_W},${cy + HEX_HALF_VERT}`,
+    `${cx},${cy + HEX_VERT}`,
+    `${cx - HEX_HALF_W},${cy + HEX_HALF_VERT}`,
+    `${cx - HEX_HALF_W},${cy - HEX_HALF_VERT}`,
+  ].join(" ");
 }
 
-const POSITIONS = [
+const NEIGHBOR_OFFSETS = [
   { x: 0, y: 0 },
-  ...Array.from({ length: 6 }, (_, i) => {
-    const angle = ((i * 60 - 90) * Math.PI) / 180;
-    return {
-      x: Math.round(RADIUS * Math.cos(angle)),
-      y: Math.round(RADIUS * Math.sin(angle)),
-    };
-  }),
+  { x: HEX_HALF_W, y: -ROW_SPACING },
+  { x: COL_SPACING, y: 0 },
+  { x: HEX_HALF_W, y: ROW_SPACING },
+  { x: -HEX_HALF_W, y: ROW_SPACING },
+  { x: -COL_SPACING, y: 0 },
+  { x: -HEX_HALF_W, y: -ROW_SPACING },
 ];
+
+const ANIM_DURATION = 200;
+const ANIM_STAGGER = 30;
+const ANIM_TOTAL = ANIM_DURATION + 6 * ANIM_STAGGER;
+const SPRITE_SIZE = 34;
+
+function easeOutBack(t: number): number {
+  const c = 1.7;
+  return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2);
+}
 
 export const ShopPanel = ({
   onSelectShip,
@@ -44,77 +57,67 @@ export const ShopPanel = ({
   slot,
 }: ShopPanelProps) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const slotLeftPct = (slot.x / CANVAS_WIDTH) * 100;
-  const slotTopPct = (slot.y / CANVAS_HEIGHT) * 100;
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    const start = performance.now();
+    let animId: number;
+    const tick = (now: number) => {
+      const ms = now - start;
+      setElapsed(ms);
+      if (ms < ANIM_TOTAL) animId = requestAnimationFrame(tick);
+    };
+    animId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animId);
+  }, []);
 
   return (
     <>
       <div className="absolute inset-0 z-20" onClick={onClose} />
-      <div
-        className="absolute z-30"
-        style={{
-          left: `${slotLeftPct}%`,
-          top: `${slotTopPct}%`,
-          width: CONTAINER_SIZE,
-          height: CONTAINER_SIZE,
-          transform: "translate(-50%, -50%)",
-          pointerEvents: "none",
-        }}
+      <svg
+        className="absolute inset-0 z-30 w-full h-full"
+        viewBox={`0 0 ${CANVAS_WIDTH} ${CANVAS_HEIGHT}`}
+        preserveAspectRatio="xMidYMid meet"
+        style={{ pointerEvents: "none" }}
       >
-        <svg
-          className="absolute inset-0"
-          width={CONTAINER_SIZE}
-          height={CONTAINER_SIZE}
-          viewBox={`0 0 ${CONTAINER_SIZE} ${CONTAINER_SIZE}`}
-        >
-          <polygon
-            points={hexPoints(CENTER, CENTER, RADIUS)}
-            fill="rgba(8,10,24,0.4)"
-            stroke="rgba(120,140,200,0.18)"
-            strokeWidth={1}
-          />
-          {POSITIONS.slice(1).map((pos, i) => (
-            <line
-              key={`spoke-${i}`}
-              x1={CENTER}
-              y1={CENTER}
-              x2={CENTER + pos.x}
-              y2={CENTER + pos.y}
-              stroke="rgba(120,140,200,0.12)"
-              strokeWidth={1}
-            />
-          ))}
-          {SHIP_BLUEPRINTS.map((bp, i) => {
-            const pos = POSITIONS[i];
-            const isHovered = hoveredIndex === i;
-            const canAfford = gold >= bp.cost;
-            const meta = ROLE_META[bp.role];
-            const roleColor = meta.color;
-            return (
+        {SHIP_BLUEPRINTS.map((bp, i) => {
+          const offset = NEIGHBOR_OFFSETS[i];
+          const isCenter = i === 0;
+          const delay = isCenter ? 0 : (i - 1) * ANIM_STAGGER;
+          const t = isCenter
+            ? 1
+            : Math.max(0, Math.min(1, (elapsed - delay) / ANIM_DURATION));
+          const progress = isCenter ? 1 : easeOutBack(t);
+          const opacity = isCenter ? 1 : Math.min(1, t * 3);
+          const cx = slot.x + offset.x * progress;
+          const cy = slot.y + offset.y * progress;
+          const isHovered = hoveredIndex === i;
+          const canAfford = gold >= bp.cost;
+          const meta = ROLE_META[bp.role];
+          const preview = shipPreviews.get(bp.entityType);
+
+          return (
+            <g key={bp.entityType} opacity={opacity}>
               <polygon
-                key={`hex-${bp.entityType}`}
-                points={hexPoints(CENTER + pos.x, CENTER + pos.y, HEX_R)}
+                points={hexPoints(cx, cy)}
                 fill={
                   !canAfford
                     ? "rgba(12,14,30,0.8)"
                     : isHovered
-                      ? `rgba(12,14,30,0.6)`
+                      ? "rgba(12,14,30,0.6)"
                       : "rgba(12,14,30,0.92)"
                 }
                 stroke={
                   !canAfford
                     ? "rgba(120,140,200,0.08)"
                     : isHovered
-                      ? roleColor
+                      ? meta.color
                       : "rgba(120,140,200,0.3)"
                 }
                 strokeWidth={isHovered && canAfford ? 1.5 : 1}
                 style={{
                   pointerEvents: "auto",
                   cursor: canAfford ? "pointer" : "not-allowed",
-                  filter: isHovered && canAfford
-                    ? `drop-shadow(0 0 6px ${roleColor}40)`
-                    : undefined,
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -123,48 +126,44 @@ export const ShopPanel = ({
                 onMouseEnter={() => setHoveredIndex(i)}
                 onMouseLeave={() => setHoveredIndex(null)}
               />
-            );
-          })}
-        </svg>
-        {SHIP_BLUEPRINTS.map((bp, i) => {
-          const pos = POSITIONS[i];
-          const canAfford = gold >= bp.cost;
-          const preview = shipPreviews.get(bp.entityType);
-          return (
-            <div
-              key={`label-${bp.entityType}`}
-              className="absolute flex flex-col items-center justify-center"
-              style={{
-                left: CENTER + pos.x,
-                top: CENTER + pos.y,
-                transform: "translate(-50%, -50%)",
-                pointerEvents: "none",
-                opacity: canAfford ? 1 : 0.3,
-              }}
-            >
-              <div className="flex items-center justify-center" style={{ height: 30 }}>
-                {preview ? (
-                  <img
-                    src={preview}
-                    alt={bp.entityType}
-                    className="max-w-7 max-h-7"
-                    style={{ imageRendering: "pixelated" }}
-                  />
-                ) : (
-                  <div className="w-5 h-5 bg-white/15 rounded" />
-                )}
-              </div>
-              <span className="text-[9px] text-[#bac2de] font-medium leading-none whitespace-nowrap">
+              {preview && (
+                <image
+                  href={preview}
+                  x={cx - SPRITE_SIZE / 2}
+                  y={cy - SPRITE_SIZE / 2 - 8}
+                  width={SPRITE_SIZE}
+                  height={SPRITE_SIZE}
+                  preserveAspectRatio="xMidYMid meet"
+                  style={{ pointerEvents: "none", imageRendering: "pixelated" }}
+                />
+              )}
+              <text
+                x={cx}
+                y={cy + 18}
+                textAnchor="middle"
+                fill={canAfford ? "#bac2de" : "rgba(186,194,222,0.3)"}
+                fontSize={11}
+                fontWeight={500}
+                fontFamily="system-ui, sans-serif"
+                style={{ pointerEvents: "none" }}
+              >
                 {bp.entityType}
-              </span>
-              <span className="text-[8px] text-[#f9e2af] flex items-center gap-0.5 leading-none mt-0.5">
-                <Coins className="w-2.5 h-2.5" />
+              </text>
+              <text
+                x={cx}
+                y={cy + 32}
+                textAnchor="middle"
+                fill={canAfford ? "#f9e2af" : "rgba(249,226,175,0.3)"}
+                fontSize={10}
+                fontFamily="system-ui, sans-serif"
+                style={{ pointerEvents: "none" }}
+              >
                 {formatGold(bp.cost)}
-              </span>
-            </div>
+              </text>
+            </g>
           );
         })}
-      </div>
+      </svg>
     </>
   );
 };
