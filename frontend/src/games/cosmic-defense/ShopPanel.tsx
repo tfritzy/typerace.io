@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { SHIP_BLUEPRINTS, ROLE_META } from "./shipCatalog";
 import { formatGold, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import type { EntityType } from "./types";
-import { hexPoints, COL_SPACING, ROW_SPACING, HEX_HALF_W } from "./PlacementPoints";
+import { COL_SPACING, ROW_SPACING, HEX_HALF_W } from "./PlacementPoints";
 import type { PlacementSlot } from "./PlacementPoints";
 
 interface ShopPanelProps {
@@ -23,13 +23,11 @@ const NEIGHBOR_OFFSETS = [
   { x: -HEX_HALF_W, y: -ROW_SPACING },
 ];
 
-const ANIM_DURATION = 200;
+const ANIM_DURATION = 150;
 const SPRITE_SIZE = 34;
-
-function easeOutBack(t: number): number {
-  const c = 1.7;
-  return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2);
-}
+const HIT_RADIUS = 40;
+const TOOLTIP_W = 160;
+const TOOLTIP_H = 52;
 
 export const ShopPanel = ({
   onSelectShip,
@@ -68,34 +66,21 @@ export const ShopPanel = ({
           const t = isCenter
             ? 1
             : Math.max(0, Math.min(1, elapsed / ANIM_DURATION));
-          const progress = isCenter ? 1 : easeOutBack(t);
-          const opacity = isCenter ? 1 : Math.min(1, t * 3);
-          const cx = slot.x + offset.x * progress;
-          const cy = slot.y + offset.y * progress;
+          const cx = slot.x + offset.x * t;
+          const cy = slot.y + offset.y * t;
           const isHovered = hoveredIndex === i;
           const canAfford = gold >= bp.cost;
           const meta = ROLE_META[bp.role];
           const preview = shipPreviews.get(bp.entityType);
+          const RoleIcon = meta.icon;
 
           return (
-            <g key={bp.entityType} opacity={opacity}>
-              <polygon
-                points={hexPoints(cx, cy)}
-                fill={
-                  !canAfford
-                    ? "rgba(12,14,30,0.8)"
-                    : isHovered
-                      ? "rgba(12,14,30,0.6)"
-                      : "rgba(12,14,30,0.92)"
-                }
-                stroke={
-                  !canAfford
-                    ? "rgba(120,140,200,0.08)"
-                    : isHovered
-                      ? meta.color
-                      : "rgba(120,140,200,0.3)"
-                }
-                strokeWidth={isHovered && canAfford ? 1.5 : 1}
+            <g key={bp.entityType} opacity={t}>
+              <circle
+                cx={cx}
+                cy={cy}
+                r={HIT_RADIUS}
+                fill="transparent"
                 style={{
                   pointerEvents: "auto",
                   cursor: canAfford ? "pointer" : "not-allowed",
@@ -111,16 +96,25 @@ export const ShopPanel = ({
                 <image
                   href={preview}
                   x={cx - SPRITE_SIZE / 2}
-                  y={cy - SPRITE_SIZE / 2 - 8}
+                  y={cy - SPRITE_SIZE / 2 - 10}
                   width={SPRITE_SIZE}
                   height={SPRITE_SIZE}
                   preserveAspectRatio="xMidYMid meet"
                   style={{ pointerEvents: "none", imageRendering: "pixelated" }}
                 />
               )}
+              <foreignObject
+                x={cx + SPRITE_SIZE / 2 - 2}
+                y={cy - SPRITE_SIZE / 2 - 10}
+                width={16}
+                height={16}
+                style={{ pointerEvents: "none", overflow: "visible" }}
+              >
+                <RoleIcon size={12} color={meta.color} strokeWidth={2.5} />
+              </foreignObject>
               <text
                 x={cx}
-                y={cy + 18}
+                y={cy + SPRITE_SIZE / 2}
                 textAnchor="middle"
                 fill={canAfford ? "#bac2de" : "rgba(186,194,222,0.3)"}
                 fontSize={11}
@@ -132,7 +126,7 @@ export const ShopPanel = ({
               </text>
               <text
                 x={cx}
-                y={cy + 32}
+                y={cy + SPRITE_SIZE / 2 + 14}
                 textAnchor="middle"
                 fill={canAfford ? "#f9e2af" : "rgba(249,226,175,0.3)"}
                 fontSize={10}
@@ -141,6 +135,47 @@ export const ShopPanel = ({
               >
                 {formatGold(bp.cost)}
               </text>
+              {isHovered && (
+                <foreignObject
+                  x={cx - TOOLTIP_W / 2}
+                  y={cy - SPRITE_SIZE / 2 - 10 - TOOLTIP_H - 6}
+                  width={TOOLTIP_W}
+                  height={TOOLTIP_H}
+                  style={{ pointerEvents: "none", overflow: "visible" }}
+                >
+                  <div
+                    style={{
+                      background: "rgba(12,14,30,0.95)",
+                      border: `1px solid ${meta.color}40`,
+                      borderRadius: 6,
+                      padding: "6px 10px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div
+                      style={{
+                        color: meta.color,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        fontFamily: "system-ui, sans-serif",
+                        marginBottom: 2,
+                      }}
+                    >
+                      {meta.label}
+                    </div>
+                    <div
+                      style={{
+                        color: "#a6adc8",
+                        fontSize: 10,
+                        fontFamily: "system-ui, sans-serif",
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {bp.description}
+                    </div>
+                  </div>
+                </foreignObject>
+              )}
             </g>
           );
         })}
