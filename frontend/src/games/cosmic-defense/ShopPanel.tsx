@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { SHIP_BLUEPRINTS, ROLE_META } from "./shipCatalog";
 import { formatGold, CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import type { EntityType } from "./types";
+import { hexPoints, COL_SPACING, ROW_SPACING, HEX_HALF_W } from "./PlacementPoints";
 import type { PlacementSlot } from "./PlacementPoints";
 
 interface ShopPanelProps {
@@ -10,23 +11,6 @@ interface ShopPanelProps {
   shipPreviews: Map<EntityType, string>;
   gold: number;
   slot: PlacementSlot;
-}
-
-const COL_SPACING = 130;
-const ROW_SPACING = 110;
-const HEX_HALF_W = COL_SPACING / 2;
-const HEX_VERT = (ROW_SPACING * 2) / 3;
-const HEX_HALF_VERT = HEX_VERT / 2;
-
-function hexPoints(cx: number, cy: number): string {
-  return [
-    `${cx},${cy - HEX_VERT}`,
-    `${cx + HEX_HALF_W},${cy - HEX_HALF_VERT}`,
-    `${cx + HEX_HALF_W},${cy + HEX_HALF_VERT}`,
-    `${cx},${cy + HEX_VERT}`,
-    `${cx - HEX_HALF_W},${cy + HEX_HALF_VERT}`,
-    `${cx - HEX_HALF_W},${cy - HEX_HALF_VERT}`,
-  ].join(" ");
 }
 
 const NEIGHBOR_OFFSETS = [

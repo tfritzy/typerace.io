@@ -2,9 +2,22 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { PLANET_X, PLANET_Y } from "./state";
 import type { EntityType } from "./types";
 
-const COL_SPACING = 130;
-const ROW_SPACING = 110;
-const HALF_COL = COL_SPACING / 2;
+export const COL_SPACING = 130;
+export const ROW_SPACING = 110;
+export const HEX_HALF_W = COL_SPACING / 2;
+export const HEX_VERT = (ROW_SPACING * 2) / 3;
+export const HEX_HALF_VERT = HEX_VERT / 2;
+
+export function hexPoints(cx: number, cy: number): string {
+  return [
+    `${cx},${cy - HEX_VERT}`,
+    `${cx + HEX_HALF_W},${cy - HEX_HALF_VERT}`,
+    `${cx + HEX_HALF_W},${cy + HEX_HALF_VERT}`,
+    `${cx},${cy + HEX_VERT}`,
+    `${cx - HEX_HALF_W},${cy + HEX_HALF_VERT}`,
+    `${cx - HEX_HALF_W},${cy - HEX_HALF_VERT}`,
+  ].join(" ");
+}
 const PLANET_EXCLUSION = 170;
 const MAX_X = CANVAS_WIDTH / 2;
 
@@ -26,7 +39,7 @@ export function generateSlots(): PlacementSlot[] {
     if (y < 60 || y > CANVAS_HEIGHT - 60) continue;
 
     const isOddRow = Math.abs(rowOffset) % 2 === 1;
-    const startX = isOddRow ? HALF_COL : 0;
+    const startX = isOddRow ? HEX_HALF_W : 0;
 
     let x = startX + 60;
     while (x <= MAX_X) {

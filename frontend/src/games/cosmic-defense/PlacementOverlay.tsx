@@ -1,28 +1,12 @@
 import { useState, useMemo } from "react";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
+import { hexPoints, HEX_HALF_W, HEX_VERT, HEX_HALF_VERT } from "./PlacementPoints";
 import type { PlacementSlot } from "./PlacementPoints";
 
 interface PlacementOverlayProps {
   slots: PlacementSlot[];
   onSlotClick: (slot: PlacementSlot) => void;
   activeSlotIndex: number | null;
-}
-
-const COL_SPACING = 130;
-const ROW_SPACING = 110;
-const HEX_HALF_W = COL_SPACING / 2;
-const HEX_VERT = (ROW_SPACING * 2) / 3;
-const HEX_HALF_VERT = HEX_VERT / 2;
-
-function hexPoints(cx: number, cy: number): string {
-  return [
-    `${cx},${cy - HEX_VERT}`,
-    `${cx + HEX_HALF_W},${cy - HEX_HALF_VERT}`,
-    `${cx + HEX_HALF_W},${cy + HEX_HALF_VERT}`,
-    `${cx},${cy + HEX_VERT}`,
-    `${cx - HEX_HALF_W},${cy + HEX_HALF_VERT}`,
-    `${cx - HEX_HALF_W},${cy - HEX_HALF_VERT}`,
-  ].join(" ");
 }
 
 function buildGridPath(slots: PlacementSlot[]): string {
