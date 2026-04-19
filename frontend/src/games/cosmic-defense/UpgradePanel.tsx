@@ -7,7 +7,7 @@ import {
   Coins,
 } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
-import { getNextUpgrade, getUpgradeCost, getShipTier } from "./upgradePaths";
+import { getNextUpgrade, getUpgradeCost } from "./upgradePaths";
 import { TargetingMode } from "./state";
 import type { EntityState } from "./state";
 import { getShipRole, ROLE_META } from "./shipCatalog";
@@ -27,7 +27,6 @@ const PANEL_OFFSET_TOP = 10;
 const PANEL_MIN_TOP = 3;
 const PANEL_MAX_TOP = 55;
 const PANEL_WIDTH = 180;
-const MAX_TIER = 4;
 
 const TARGETING_OPTIONS: { mode: TargetingMode; label: string }[] = [
   { mode: TargetingMode.NearestToShip, label: "Nearest" },
@@ -51,7 +50,6 @@ export const UpgradePanel = ({
 
   const nextType = getNextUpgrade(currentType);
   const upgradeCost = getUpgradeCost(currentType);
-  const currentTier = getShipTier(currentType);
   const canAfford = nextType !== null && gold >= upgradeCost;
   const role = getShipRole(currentType);
 
@@ -118,20 +116,22 @@ export const UpgradePanel = ({
               )}
             </div>
             <div className="flex items-center gap-1 mt-0.5">
-              <div className="flex items-center gap-0.5">
-                {Array.from({ length: MAX_TIER - 1 }, (_, i) => (
-                  <div
-                    key={i}
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{
-                      backgroundColor:
-                        i < currentTier - 1
-                          ? (roleMeta?.color ?? "#a6adc8")
-                          : "rgba(88,91,112,0.4)",
-                    }}
-                  />
-                ))}
-              </div>
+              {entity && entity.chargesGranted > 0 && (
+                <div className="flex items-center gap-0.5">
+                  {Array.from({ length: entity.chargesRequired }, (_, i) => (
+                    <div
+                      key={i}
+                      className="w-1.5 h-1.5 rounded-full"
+                      style={{
+                        backgroundColor:
+                          i < entity.charge
+                            ? (roleMeta?.color ?? "#a6adc8")
+                            : "rgba(88,91,112,0.4)",
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
               {entity && entity.kills > 0 && (
                 <span
                   className="flex items-center gap-0.5 text-[#45475a] ml-auto"
