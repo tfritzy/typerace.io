@@ -330,7 +330,7 @@ export const GamePage = () => {
               return (
                 <div
                   key="stats-section"
-                  className="w-full animate-slideUpFadeIn pb-4"
+                  className="w-full animate-fadeIn pb-4"
                 >
                   {currentPP && (
                     <PlayerStatsRow

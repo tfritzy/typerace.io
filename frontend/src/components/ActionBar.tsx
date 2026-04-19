@@ -50,7 +50,7 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
   }, [navigate, gameType, canRematch, handlePlayAgain, handleRematch]);
 
   return (
-    <div className="flex gap-3 mt-3 animate-slideUpFadeIn" style={{ animationDelay: '0.2s' }}>
+    <div className="flex gap-3 mt-3">
       <button
         onClick={() => navigate(getLangHome())}
         className="box rounded-lg px-8 py-4 bg-transparent text-foreground text-base font-semibold cursor-pointer opacity-80 flex-1"
