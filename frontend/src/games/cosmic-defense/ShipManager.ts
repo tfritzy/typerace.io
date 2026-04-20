@@ -24,7 +24,6 @@ export class ShipManager {
   private entityDisplayObjects = new Map<number, Container>();
   private chargeGraphics = new Map<number, Graphics>();
   private healthBarGraphics = new Map<number, Graphics>();
-  private shieldSprites = new Map<number, Sprite>();
   private activeEntityIds = new Set<number>();
 
   constructor(assets: AssetManager) {
@@ -98,29 +97,6 @@ export class ShipManager {
     drawHealthBar(g, entity);
   }
 
-  private updateShield(entity: EntityState): void {
-    let sprite = this.shieldSprites.get(entity.id);
-    if (entity.shield <= 0) {
-      if (sprite) {
-        sprite.visible = false;
-      }
-      return;
-    }
-
-    if (!sprite) {
-      const tex = this.assets.getShieldTexture(entity.entityType);
-      sprite = new Sprite(tex);
-      sprite.anchor.set(0.5);
-      sprite.scale.set(3);
-      this.layer.addChild(sprite);
-      this.shieldSprites.set(entity.id, sprite);
-    }
-
-    sprite.visible = true;
-    sprite.x = entity.x;
-    sprite.y = entity.y;
-  }
-
   private syncRendering(state: GameState, dt: number): void {
     this.activeEntityIds.clear();
     const maxStep = SHIP_TURN_SPEED * dt;
@@ -141,7 +117,6 @@ export class ShipManager {
 
       this.drawChargeDots(entity);
       this.updateHealthBar(entity);
-      this.updateShield(entity);
     }
 
     for (const [id, display] of this.entityDisplayObjects) {
@@ -158,11 +133,6 @@ export class ShipManager {
           hb.destroy();
           this.healthBarGraphics.delete(id);
         }
-        const ss = this.shieldSprites.get(id);
-        if (ss) {
-          ss.destroy();
-          this.shieldSprites.delete(id);
-        }
       }
     }
   }
@@ -174,8 +144,6 @@ export class ShipManager {
     this.chargeGraphics.clear();
     for (const g of this.healthBarGraphics.values()) g.destroy();
     this.healthBarGraphics.clear();
-    for (const s of this.shieldSprites.values()) s.destroy();
-    this.shieldSprites.clear();
     this.layer.destroy();
   }
 }
