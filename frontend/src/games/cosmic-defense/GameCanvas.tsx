@@ -4,7 +4,6 @@ import type { CosmicDefenseGame } from "./game";
 import { TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
 import type { EntityState } from "./state";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
-import { PlanetHealthBar } from "./PlanetHealthBar";
 import { InspectionPanel } from "./UpgradePanel";
 import { PlacementOverlay } from "./PlacementOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
@@ -17,7 +16,6 @@ const UI_REFERENCE_WIDTH = 700;
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
-  const [healthRatio, setHealthRatio] = useState(1);
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
   const [slots, setSlots] = useState<PlacementSlot[]>(() => generateSlots());
@@ -69,7 +67,6 @@ export const GameCanvas = () => {
     if (!div) return;
 
     let cancelled = false;
-    let unsubDamage: (() => void) | null = null;
     let unsubLevelUp: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
@@ -82,9 +79,6 @@ export const GameCanvas = () => {
         setShipPreviews(game.shipPreviews);
         setPendingChoice(game.state.pendingChoice);
         setLevel(game.state.level);
-        unsubDamage = game.state.onPlanetDamaged.subscribe(() => {
-          setHealthRatio(game.state.planetHealth / game.state.maxPlanetHealth);
-        });
         unsubLevelUp = game.state.onLevelUp.subscribe(() => {
           setPendingChoice(true);
           setLevel(game.state.level);
@@ -96,7 +90,6 @@ export const GameCanvas = () => {
 
     return () => {
       cancelled = true;
-      unsubDamage?.();
       unsubLevelUp?.();
       gameRef.current?.destroy();
       gameRef.current = null;
@@ -178,13 +171,7 @@ export const GameCanvas = () => {
           transform: `scale(${uiScale})`,
         }}
       >
-        <PlanetHealthBar ratio={healthRatio} />
-        <div className="absolute top-2.5 left-3 z-10">
-          <span className="text-[11px] text-[#585b70]">
-            {elapsed}s
-          </span>
-        </div>
-        <div className="absolute top-2 right-3 z-10 flex items-center gap-2">
+        <div className="absolute top-2 left-3 z-10 flex items-center gap-2">
           <span className="text-[11px] text-[#f9e2af] font-semibold">
             Lv {level}
           </span>
@@ -206,6 +193,9 @@ export const GameCanvas = () => {
               }}
             />
           </div>
+          <span className="text-[11px] text-[#585b70]">
+            {elapsed}s
+          </span>
         </div>
         <PlacementOverlay
           slots={slots}

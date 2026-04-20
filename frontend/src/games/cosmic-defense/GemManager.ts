@@ -1,16 +1,16 @@
 import { Container, Graphics } from "pixi.js";
 import type { GameState, DamageData } from "./state";
-import { CANVAS_WIDTH } from "./constants";
 
-const GEM_SIZE = 6;
-const POP_SPEED = 120;
-const HOMING_DELAY = 0.2;
-const HOMING_ACCEL = 600;
-const MAX_SPEED = 1400;
+const GEM_SIZE = 4;
+const POP_SPEED = 100;
+const POP_DURATION = 0.3;
+const GRAVITY = 200;
 const GEM_MAX_LIFE = 3.0;
-const COLLECTION_DIST = 12;
+const COLLECTION_DIST = 8;
+const LERP_START = 0.5;
+const LERP_END = 12;
 
-const TARGET_X = CANVAS_WIDTH - 60;
+const TARGET_X = 60;
 const TARGET_Y = 20;
 
 interface GemColors {
@@ -20,9 +20,9 @@ interface GemColors {
 }
 
 const GEM_TIERS: { minXp: number; colors: GemColors; size: number }[] = [
-  { minXp: 20, colors: { fill: 0xf9e2af, edge: 0xfab387, glow: 0xf9e2af }, size: 10 },
-  { minXp: 10, colors: { fill: 0xcba6f7, edge: 0xb4befe, glow: 0xcba6f7 }, size: 8 },
-  { minXp: 5, colors: { fill: 0x89b4fa, edge: 0x74c7ec, glow: 0x89b4fa }, size: 7 },
+  { minXp: 20, colors: { fill: 0xf9e2af, edge: 0xfab387, glow: 0xf9e2af }, size: 7 },
+  { minXp: 10, colors: { fill: 0xcba6f7, edge: 0xb4befe, glow: 0xcba6f7 }, size: 6 },
+  { minXp: 5, colors: { fill: 0x89b4fa, edge: 0x74c7ec, glow: 0x89b4fa }, size: 5 },
   { minXp: 0, colors: { fill: 0xa6e3a1, edge: 0x94e2d5, glow: 0xa6e3a1 }, size: GEM_SIZE },
 ];
 
@@ -111,8 +111,11 @@ export class GemManager {
         continue;
       }
 
-      if (gem.elapsed > HOMING_DELAY) {
-        const homingTime = gem.elapsed - HOMING_DELAY;
+      if (gem.elapsed < POP_DURATION) {
+        gem.vy += GRAVITY * dt;
+        gem.x += gem.vx * dt;
+        gem.y += gem.vy * dt;
+      } else {
         const dx = TARGET_X - gem.x;
         const dy = TARGET_Y - gem.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -123,22 +126,12 @@ export class GemManager {
           continue;
         }
 
-        const nx = dx / dist;
-        const ny = dy / dist;
-        const accel = HOMING_ACCEL * (1 + homingTime * 4);
-
-        gem.vx += nx * accel * dt;
-        gem.vy += ny * accel * dt;
-
-        const speed = Math.sqrt(gem.vx * gem.vx + gem.vy * gem.vy);
-        if (speed > MAX_SPEED) {
-          gem.vx = (gem.vx / speed) * MAX_SPEED;
-          gem.vy = (gem.vy / speed) * MAX_SPEED;
-        }
+        const homingTime = gem.elapsed - POP_DURATION;
+        const t = 1 - Math.exp(-dt * (LERP_START + homingTime * LERP_END));
+        gem.x += dx * t;
+        gem.y += dy * t;
       }
 
-      gem.x += gem.vx * dt;
-      gem.y += gem.vy * dt;
       gem.g.x = gem.x;
       gem.g.y = gem.y;
 
