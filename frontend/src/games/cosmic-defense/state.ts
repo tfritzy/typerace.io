@@ -223,9 +223,6 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
   const speed = (30 + Math.random() * 52.5) * 0.75;
   const hitbox = SHIP_HITBOX_MAP[config.entityType];
 
-  const healthMult = 1 + state.spawner.elapsed * 0.01;
-  const scaledHealth = Math.round(config.health * healthMult);
-
   const entity: EntityState = {
     id: state.nextId++,
     entityType: config.entityType,
@@ -233,8 +230,8 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     y,
     vx: -speed,
     vy: 0,
-    health: scaledHealth,
-    maxHealth: scaledHealth,
+    health: config.health,
+    maxHealth: config.health,
     power: config.power,
     colorPreset: ColorPreset.Preset4,
     team,
