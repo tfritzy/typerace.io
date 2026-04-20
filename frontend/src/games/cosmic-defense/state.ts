@@ -6,10 +6,10 @@ import { getShipRole, type ShipRole } from "./shipCatalog";
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DPS_PER_STACK = 5;
-const LASER_RANGE = 1200;
+const LASER_RANGE = 2200;
 const FREEZE_SLOW_FACTOR = 0;
 const FREEZE_DECAY_RATE = 1;
-const MAC_CANNON_RANGE = 1200;
+const MAC_CANNON_RANGE = 2200;
 const MAC_CANNON_RADIUS = 30;
 
 export enum TargetingMode {
@@ -647,8 +647,13 @@ function fireLaser(state: GameState, e: EntityState, piercing: boolean): void {
   const nx = dx / len;
   const ny = dy / len;
 
-  const endX = e.x + nx * LASER_RANGE;
-  const endY = e.y + ny * LASER_RANGE;
+  const muzzleOffset = 12;
+  const startX = e.x + nx * muzzleOffset;
+  const startY = e.y + ny * muzzleOffset;
+
+  const beamLen = piercing ? LASER_RANGE : len;
+  const endX = e.x + nx * beamLen;
+  const endY = e.y + ny * beamLen;
 
   let dmg = e.laserDamage;
   if (e.buffedNextAttack) {
@@ -656,6 +661,7 @@ function fireLaser(state: GameState, e: EntityState, piercing: boolean): void {
     e.buffedNextAttack = false;
   }
 
+  const searchRange = piercing ? LASER_RANGE : len + 20;
   let hitCount = 0;
   for (let i = state.entities.length - 1; i >= 0; i--) {
     const other = state.entities[i];
@@ -664,7 +670,7 @@ function fireLaser(state: GameState, e: EntityState, piercing: boolean): void {
     const ex = other.x - e.x;
     const ey = other.y - e.y;
     const proj = ex * nx + ey * ny;
-    if (proj < 0 || proj > LASER_RANGE) continue;
+    if (proj < 0 || proj > searchRange) continue;
 
     const perpX = ex - proj * nx;
     const perpY = ey - proj * ny;
@@ -699,8 +705,8 @@ function fireLaser(state: GameState, e: EntityState, piercing: boolean): void {
 
   state.laserBeams.push({
     id: state.nextId++,
-    x1: e.x,
-    y1: e.y,
+    x1: startX,
+    y1: startY,
     x2: endX,
     y2: endY,
     time: state.time.time,
@@ -720,6 +726,9 @@ function fireMacCannon(state: GameState, e: EntityState): void {
   const nx = dx / len;
   const ny = dy / len;
 
+  const muzzleOffset = 12;
+  const startX = e.x + nx * muzzleOffset;
+  const startY = e.y + ny * muzzleOffset;
   const endX = e.x + nx * MAC_CANNON_RANGE;
   const endY = e.y + ny * MAC_CANNON_RANGE;
 
@@ -766,8 +775,8 @@ function fireMacCannon(state: GameState, e: EntityState): void {
 
   state.laserBeams.push({
     id: state.nextId++,
-    x1: e.x,
-    y1: e.y,
+    x1: startX,
+    y1: startY,
     x2: endX,
     y2: endY,
     time: state.time.time,
