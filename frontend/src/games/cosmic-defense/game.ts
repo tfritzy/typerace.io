@@ -8,6 +8,7 @@ import { ExplosionManager } from "./ExplosionManager";
 import { ShipManager } from "./ShipManager";
 import { DamageNumberManager } from "./DamageNumberManager";
 import { LaserBeamManager } from "./LaserBeamManager";
+import { GemManager } from "./GemManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, setSpawnerPaused } from "./state";
 import type { GameState } from "./state";
@@ -26,6 +27,7 @@ export class CosmicDefenseGame {
   private explosionManager!: ExplosionManager;
   private damageNumberManager!: DamageNumberManager;
   private laserBeamManager!: LaserBeamManager;
+  private gemManager!: GemManager;
   shipManager!: ShipManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
@@ -72,6 +74,10 @@ export class CosmicDefenseGame {
     this.explosionManager = new ExplosionManager(assetManager);
     world.addChild(this.explosionManager.layer);
 
+    this.gemManager = new GemManager();
+    this.gemManager.subscribe(this.state);
+    world.addChild(this.gemManager.layer);
+
     this.damageNumberManager = new DamageNumberManager();
     this.damageNumberManager.subscribe(this.state);
     world.addChild(this.damageNumberManager.container);
@@ -87,6 +93,7 @@ export class CosmicDefenseGame {
     this.explosionManager.update(this.state);
     this.laserBeamManager.update(this.state);
     this.shipManager.update(this.state, dt);
+    this.gemManager.update(dt);
     this.damageNumberManager.update(dt);
   }
 
@@ -100,6 +107,7 @@ export class CosmicDefenseGame {
     this.enemyManager.destroy();
     this.explosionManager.destroy();
     this.laserBeamManager.destroy();
+    this.gemManager.destroy();
     this.damageNumberManager.destroy();
     this.shipManager.destroy();
     this.app.destroy(true);

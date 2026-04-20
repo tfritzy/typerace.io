@@ -137,7 +137,7 @@ export const PhraseOverlay = ({
     <div className="w-full h-full relative" style={{ pointerEvents: "none" }}>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <div
-          className="text-2xl font-mono whitespace-pre relative"
+          className="text-4xl font-mono whitespace-pre relative"
           style={{
             width: `${CHAR_COUNT * 2}ch`,
             overflowX: "hidden",

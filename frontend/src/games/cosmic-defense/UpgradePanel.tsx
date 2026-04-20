@@ -4,7 +4,6 @@ import { X } from "lucide-react";
 import type { PlacementSlot } from "./PlacementPoints";
 import { TargetingMode } from "./state";
 import type { EntityState } from "./state";
-import { getShipRole, ROLE_META } from "./shipCatalog";
 
 interface InspectionPanelProps {
   onClose: () => void;
@@ -38,7 +37,6 @@ export const InspectionPanel = ({
   const currentType = slot.occupant;
   if (!currentType) return null;
 
-  const role = getShipRole(currentType);
   const slotLeftPct = (slot.x / CANVAS_WIDTH) * 100;
   const slotTopPct = (slot.y / CANVAS_HEIGHT) * 100;
   const panelLeft = slotLeftPct + PANEL_OFFSET_LEFT;
@@ -48,8 +46,6 @@ export const InspectionPanel = ({
   );
 
   const currentPreview = shipPreviews.get(currentType);
-  const roleMeta = role ? ROLE_META[role] : null;
-  const RoleIcon = roleMeta?.icon;
   const currentTargeting = entity?.targetingMode ?? TargetingMode.NearestToShip;
 
   return (
@@ -94,12 +90,6 @@ export const InspectionPanel = ({
               <span className="text-[#cdd6f4] text-[11px] font-semibold leading-tight">
                 {currentType}
               </span>
-              {RoleIcon && (
-                <RoleIcon
-                  className="w-2.5 h-2.5 shrink-0"
-                  style={{ color: roleMeta?.color }}
-                />
-              )}
             </div>
             <div className="text-[9px] text-[#585b70] mt-0.5">
               Lv {slot.level}

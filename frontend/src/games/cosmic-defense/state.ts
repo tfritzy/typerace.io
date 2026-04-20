@@ -211,9 +211,9 @@ function removeEntityAt(state: GameState, index: number): void {
 }
 
 function spawnFromRight(): { x: number; y: number } {
-  const pad = 120;
+  const pad = 60;
   return {
-    x: CANVAS_WIDTH + pad,
+    x: CANVAS_WIDTH + 20,
     y: pad + Math.random() * (CANVAS_HEIGHT - pad * 2),
   };
 }
@@ -1011,7 +1011,7 @@ export function setSpawnerPaused(state: GameState, paused: boolean): void {
 }
 
 export function xpForNextLevel(level: number): number {
-  return 40 + level * level * 5;
+  return 30 + level * 8;
 }
 
 export function awardXP(state: GameState, amount: number): void {

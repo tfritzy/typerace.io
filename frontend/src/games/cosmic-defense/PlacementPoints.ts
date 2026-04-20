@@ -17,19 +17,30 @@ export interface PlacementSlot {
 }
 
 export function generateSlots(): PlacementSlot[] {
-  const slots: PlacementSlot[] = [];
+  const positions: { x: number; y: number }[] = [];
   for (let i = 0; i < SLOT_COUNT; i++) {
     const angle = -ARC_SPAN / 2 + (ARC_SPAN * i) / (SLOT_COUNT - 1);
-    slots.push({
-      index: i,
+    positions.push({
       x: Math.round(PLANET_X + ARC_RADIUS * Math.cos(angle)),
       y: Math.round(PLANET_Y + ARC_RADIUS * Math.sin(angle)),
-      occupant: null,
-      entityId: null,
-      level: 0,
     });
   }
-  return slots;
+
+  const midIndex = Math.floor(SLOT_COUNT / 2);
+  const ordered: number[] = [midIndex];
+  for (let offset = 1; ordered.length < SLOT_COUNT; offset++) {
+    if (midIndex - offset >= 0) ordered.push(midIndex - offset);
+    if (midIndex + offset < SLOT_COUNT) ordered.push(midIndex + offset);
+  }
+
+  return ordered.map((posIdx, slotIdx) => ({
+    index: slotIdx,
+    x: positions[posIdx].x,
+    y: positions[posIdx].y,
+    occupant: null,
+    entityId: null,
+    level: 0,
+  }));
 }
 
 export { SLOT_HIT_RADIUS };

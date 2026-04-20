@@ -1,7 +1,13 @@
 import { useMemo, useEffect, useCallback } from "react";
-import { SHIP_BLUEPRINTS, ROLE_META } from "./shipCatalog";
+import { SHIP_BLUEPRINTS } from "./shipCatalog";
+import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import type { EntityType } from "./types";
 import type { PlacementSlot } from "./PlacementPoints";
+
+const DAMAGE_ROLES = new Set([
+  "sniper", "laser", "dual_shot", "pierce_laser", "freeze",
+  "plasma", "shooter", "ice_beam", "plasma_single", "chain", "mac_cannon",
+]);
 
 interface ShipChoiceOverlayProps {
   onSelect: (entityType: EntityType) => void;
@@ -11,12 +17,25 @@ interface ShipChoiceOverlayProps {
 }
 
 function generateChoices(slots: PlacementSlot[]): EntityType[] {
-  const all = SHIP_BLUEPRINTS.map((bp) => bp.entityType);
   const existing = new Set(
     slots.filter((s) => s.occupant).map((s) => s.occupant!)
   );
   const hasEmptySlot = slots.some((s) => !s.occupant);
-  const pool = hasEmptySlot ? [...all] : [...existing];
+
+  let pool: EntityType[];
+  if (hasEmptySlot) {
+    const hasAnyShip = existing.size > 0;
+    if (hasAnyShip) {
+      pool = SHIP_BLUEPRINTS.map((bp) => bp.entityType);
+    } else {
+      pool = SHIP_BLUEPRINTS
+        .filter((bp) => DAMAGE_ROLES.has(bp.role))
+        .map((bp) => bp.entityType);
+    }
+  } else {
+    pool = [...existing];
+  }
+
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -70,30 +89,31 @@ export const ShipChoiceOverlay = ({
         <div className="flex gap-5">
           {choices.map((entityType, i) => {
             const bp = SHIP_BLUEPRINTS.find((b) => b.entityType === entityType)!;
-            const meta = ROLE_META[bp.role];
+            const config = FRIENDLY_CONFIG_MAP.get(entityType);
             const preview = shipPreviews.get(entityType);
             const existingSlot = existing.get(entityType);
             const isUpgrade = !!existingSlot;
             const currentLevel = existingSlot?.level ?? 0;
             const hotkey = i + 1;
+            const charges = config?.chargesRequired ?? 0;
 
             return (
               <button
                 key={entityType}
-                className="flex flex-col items-center rounded-lg border cursor-pointer transition-all hover:border-opacity-60 relative"
+                className="flex flex-col items-center rounded-lg cursor-pointer transition-all relative"
                 style={{
                   width: 160,
                   padding: "20px 12px 24px",
                   background: "rgba(12,14,30,0.95)",
-                  borderColor: `${meta.color}40`,
+                  border: "1px solid rgba(255,255,255,0.08)",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "rgba(20,22,44,0.95)";
-                  e.currentTarget.style.borderColor = `${meta.color}80`;
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = "rgba(12,14,30,0.95)";
-                  e.currentTarget.style.borderColor = `${meta.color}40`;
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
                 }}
                 onClick={() => onSelect(entityType)}
               >
@@ -108,28 +128,42 @@ export const ShipChoiceOverlay = ({
                 <span className="text-[#cdd6f4] text-[14px] font-semibold">
                   {entityType}
                 </span>
-                <span className="text-[11px] mt-1" style={{ color: meta.color }}>
-                  {meta.label}
-                </span>
                 <span
-                  className="text-[12px] font-medium mt-2"
+                  className="text-[12px] font-medium mt-1.5"
                   style={{ color: isUpgrade ? "#f9e2af" : "#a6e3a1" }}
                 >
                   {isUpgrade
                     ? `Lv ${currentLevel} → ${currentLevel + 1}`
                     : "NEW"}
                 </span>
-                <span className="text-[10px] text-[#585b70] mt-2 text-center leading-tight">
+                <span className="text-[11px] text-[#a6adc8] mt-2 text-center leading-snug px-1">
                   {bp.description}
                 </span>
+                {charges > 0 && (
+                  <div className="flex gap-1 mt-2.5">
+                    {Array.from({ length: charges }, (_, d) => (
+                      <span
+                        key={d}
+                        className="inline-block rounded-full"
+                        style={{
+                          width: 5,
+                          height: 5,
+                          background: "rgba(255,255,255,0.25)",
+                          border: "1px solid rgba(255,255,255,0.15)",
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
                 <span
-                  className="absolute left-1/2 -translate-x-1/2 text-[14px] font-bold rounded-md px-2.5 py-1 flex items-center justify-center"
+                  className="absolute left-1/2 -translate-x-1/2 text-[14px] font-bold rounded-md flex items-center justify-center"
                   style={{
                     bottom: -14,
                     background: "rgba(12,14,30,0.95)",
                     color: "#cdd6f4",
-                    border: `1px solid ${meta.color}60`,
-                    minWidth: 28,
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    width: 30,
+                    height: 28,
                   }}
                 >
                   {hotkey}
