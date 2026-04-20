@@ -12,7 +12,7 @@ import { ShipChoiceOverlay } from "./ShipChoiceOverlay";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
-const UI_REFERENCE_WIDTH = 900;
+const UI_REFERENCE_WIDTH = 700;
 
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -161,8 +161,6 @@ export const GameCanvas = () => {
     setInspectTick((t) => t + 1);
   }, [selectedSlot]);
 
-  const menuOpen = selectedSlot !== null;
-
   return (
     <div
       ref={containerRef}
@@ -231,7 +229,7 @@ export const GameCanvas = () => {
             level={level}
           />
         )}
-        <PhraseOverlay gameRef={gameRef} visible={!menuOpen && !pendingChoice} />
+        <PhraseOverlay gameRef={gameRef} />
       </div>
     </div>
   );

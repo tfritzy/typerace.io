@@ -15,8 +15,8 @@ function generateChoices(slots: PlacementSlot[]): EntityType[] {
   const existing = new Set(
     slots.filter((s) => s.occupant).map((s) => s.occupant!)
   );
-  const allPlaced = all.every((t) => existing.has(t));
-  const pool = allPlaced ? [...existing] : [...all];
+  const hasEmptySlot = slots.some((s) => !s.occupant);
+  const pool = hasEmptySlot ? [...all] : [...existing];
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -83,7 +83,7 @@ export const ShipChoiceOverlay = ({
                 className="flex flex-col items-center rounded-lg border cursor-pointer transition-all hover:border-opacity-60 relative"
                 style={{
                   width: 160,
-                  padding: "20px 12px",
+                  padding: "20px 12px 24px",
                   background: "rgba(12,14,30,0.95)",
                   borderColor: `${meta.color}40`,
                 }}
@@ -97,16 +97,6 @@ export const ShipChoiceOverlay = ({
                 }}
                 onClick={() => onSelect(entityType)}
               >
-                <span
-                  className="absolute top-2 left-2 text-[11px] font-bold rounded px-1.5 py-0.5"
-                  style={{
-                    background: "rgba(255,255,255,0.08)",
-                    color: "#a6adc8",
-                    border: "1px solid rgba(255,255,255,0.15)",
-                  }}
-                >
-                  {hotkey}
-                </span>
                 {preview && (
                   <img
                     src={preview}
@@ -131,6 +121,18 @@ export const ShipChoiceOverlay = ({
                 </span>
                 <span className="text-[10px] text-[#585b70] mt-2 text-center leading-tight">
                   {bp.description}
+                </span>
+                <span
+                  className="absolute left-1/2 -translate-x-1/2 text-[14px] font-bold rounded-md px-2.5 py-1 flex items-center justify-center"
+                  style={{
+                    bottom: -14,
+                    background: "rgba(12,14,30,0.95)",
+                    color: "#cdd6f4",
+                    border: `1px solid ${meta.color}60`,
+                    minWidth: 28,
+                  }}
+                >
+                  {hotkey}
                 </span>
               </button>
             );

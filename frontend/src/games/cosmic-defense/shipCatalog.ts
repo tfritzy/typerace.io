@@ -41,19 +41,19 @@ export interface ShipBlueprint {
 }
 
 export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
-  { entityType: "Spur", colorPreset: ColorPreset.Preset1, role: "sniper", description: "Slow attacker, high damage" },
-  { entityType: "Ember", colorPreset: ColorPreset.Preset1, role: "buffer", description: "All other ships next attack deals extra damage" },
-  { entityType: "Corona", colorPreset: ColorPreset.Preset1, role: "laser", description: "Fires a low damage laser beam that deals single target damage" },
-  { entityType: "Pip", colorPreset: ColorPreset.Preset1, role: "dual_shot", description: "Fires projectile from each gun (2x) that does low damage" },
-  { entityType: "Eagle", colorPreset: ColorPreset.Preset1, role: "charge", description: "Give all other ships a charge (and more as you level up)" },
-  { entityType: "Needle", colorPreset: ColorPreset.Preset1, role: "pierce_laser", description: "Fire a piercing laser beam that hurts all enemies in the way" },
-  { entityType: "Flare", colorPreset: ColorPreset.Preset1, role: "freeze", description: "Shoots an explosive projectile that freezes all enemies it hits" },
-  { entityType: "Dart", colorPreset: ColorPreset.Preset1, role: "plasma", description: "Shoots explosive projectile that applies plasma to all enemies it hits" },
-  { entityType: "Moth", colorPreset: ColorPreset.Preset1, role: "shooter", description: "Shoots a projectile" },
-  { entityType: "Prism", colorPreset: ColorPreset.Preset1, role: "ice_beam", description: "Shoots an ice beam" },
-  { entityType: "Hawk", colorPreset: ColorPreset.Preset1, role: "plasma_single", description: "Shoots a projectile that applies plasma stacks, and deals decent damage. Single target" },
-  { entityType: "Nova", colorPreset: ColorPreset.Preset1, role: "chain", description: "Shoots projectile that chains to enemies. Number chained increases with level ups" },
-  { entityType: "Lance", colorPreset: ColorPreset.Preset1, role: "mac_cannon", description: "Shoots a mac cannon that pierces all enemies like a laser, but has a larger radius" },
+  { entityType: "Spur", colorPreset: ColorPreset.Preset1, role: "sniper", description: "Devastating long-range strikes" },
+  { entityType: "Ember", colorPreset: ColorPreset.Preset1, role: "buffer", description: "Empowers allied ships" },
+  { entityType: "Corona", colorPreset: ColorPreset.Preset1, role: "laser", description: "Focused energy beam" },
+  { entityType: "Pip", colorPreset: ColorPreset.Preset1, role: "dual_shot", description: "Twin-barrel barrage" },
+  { entityType: "Eagle", colorPreset: ColorPreset.Preset1, role: "charge", description: "Charges all allies" },
+  { entityType: "Needle", colorPreset: ColorPreset.Preset1, role: "pierce_laser", description: "Beam that cuts through all" },
+  { entityType: "Flare", colorPreset: ColorPreset.Preset1, role: "freeze", description: "Freezing explosive blast" },
+  { entityType: "Dart", colorPreset: ColorPreset.Preset1, role: "plasma", description: "Plasma explosive blast" },
+  { entityType: "Moth", colorPreset: ColorPreset.Preset1, role: "shooter", description: "Reliable standard fire" },
+  { entityType: "Prism", colorPreset: ColorPreset.Preset1, role: "ice_beam", description: "Freezing piercing beam" },
+  { entityType: "Hawk", colorPreset: ColorPreset.Preset1, role: "plasma_single", description: "Heavy plasma rounds" },
+  { entityType: "Nova", colorPreset: ColorPreset.Preset1, role: "chain", description: "Bouncing chain shots" },
+  { entityType: "Lance", colorPreset: ColorPreset.Preset1, role: "mac_cannon", description: "Wide piercing cannon" },
 ];
 
 export const SHIP_BLUEPRINT_MAP = new Map<string, ShipBlueprint>();

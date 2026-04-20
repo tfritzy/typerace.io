@@ -7,7 +7,7 @@ export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DPS_PER_STACK = 5;
 const LASER_RANGE = 1200;
-const FREEZE_SLOW_FACTOR = 0.3;
+const FREEZE_SLOW_FACTOR = 0;
 const FREEZE_DECAY_RATE = 1;
 const MAC_CANNON_RANGE = 1200;
 const MAC_CANNON_RADIUS = 30;
@@ -125,6 +125,7 @@ export interface LaserBeam {
   x2: number;
   y2: number;
   time: number;
+  width: number;
 }
 
 export interface GameState {
@@ -219,8 +220,11 @@ function spawnFromRight(): { x: number; y: number } {
 
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
   const { x, y } = spawnFromRight();
-  const speed = 30 + Math.random() * 52.5;
+  const speed = (30 + Math.random() * 52.5) * 0.75;
   const hitbox = SHIP_HITBOX_MAP[config.entityType];
+
+  const healthMult = 1 + state.spawner.elapsed * 0.01;
+  const scaledHealth = Math.round(config.health * healthMult);
 
   const entity: EntityState = {
     id: state.nextId++,
@@ -229,8 +233,8 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     y,
     vx: -speed,
     vy: 0,
-    health: config.health,
-    maxHealth: config.health,
+    health: scaledHealth,
+    maxHealth: scaledHealth,
     power: config.power,
     colorPreset: ColorPreset.Preset4,
     team,
@@ -546,7 +550,7 @@ export function updateState(state: GameState, dt: number): void {
 
   checkCollisions(state);
 
-  const LASER_BEAM_DURATION = 0.15;
+  const LASER_BEAM_DURATION = 0.35;
   for (let i = state.laserBeams.length - 1; i >= 0; i--) {
     if (state.time.time - state.laserBeams[i].time > LASER_BEAM_DURATION) {
       state.laserBeams.splice(i, 1);
@@ -700,6 +704,7 @@ function fireLaser(state: GameState, e: EntityState, piercing: boolean): void {
     x2: endX,
     y2: endY,
     time: state.time.time,
+    width: 2,
   });
 }
 
@@ -766,6 +771,7 @@ function fireMacCannon(state: GameState, e: EntityState): void {
     x2: endX,
     y2: endY,
     time: state.time.time,
+    width: 6,
   });
 }
 
@@ -999,7 +1005,7 @@ export function setSpawnerPaused(state: GameState, paused: boolean): void {
 }
 
 export function xpForNextLevel(level: number): number {
-  return 40 + level * 10;
+  return 40 + level * level * 5;
 }
 
 export function awardXP(state: GameState, amount: number): void {

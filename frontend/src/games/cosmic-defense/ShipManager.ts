@@ -14,9 +14,9 @@ const BLUEPRINT_MAP = new Map(
   SHIP_BLUEPRINTS.map((bp) => [bp.entityType, bp])
 );
 
-const CHARGE_DOT_RADIUS = 3;
-const CHARGE_DOT_SPACING = 10;
-const CHARGE_DOT_OFFSET = 45;
+const CHARGE_DOT_RADIUS = 2;
+const CHARGE_DOT_SPACING = 7;
+const CHARGE_DOT_OFFSET = 28;
 
 export class ShipManager {
   readonly layer: Container;
@@ -50,7 +50,7 @@ export class ShipManager {
 
     const container = new Container();
     container.addChild(shipSprite);
-    container.scale.set(3);
+    container.scale.set(1.5);
     container.x = entity.x;
     container.y = entity.y;
 
