@@ -155,7 +155,7 @@ export function getScaledConfig(config: FriendlyConfig, level: number): Friendly
     health: Math.round(config.health * mult),
     projectileDamage: Math.round(config.projectileDamage * mult),
     laserDamage: Math.round(config.laserDamage * mult),
-    chargesGranted: config.chargesGranted > 0 ? config.chargesGranted + Math.floor((level - 1) * 0.5) : 0,
+    chargesGranted: config.chargesGranted > 0 ? config.chargesGranted + (level - 1) : 0,
     chainCount: config.chainCount > 0 ? config.chainCount + (level - 1) : 0,
     freezeStacks: config.freezeStacks > 0 ? config.freezeStacks + (level - 1) : 0,
     buffMultiplier: config.buffMultiplier > 0 ? config.buffMultiplier + (level - 1) * 0.5 : 0,

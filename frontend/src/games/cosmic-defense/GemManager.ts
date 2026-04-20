@@ -135,13 +135,17 @@ export class GemManager {
       gem.g.x = gem.x;
       gem.g.y = gem.y;
 
-      if (gem.elapsed < 0.1) {
-        gem.g.scale.set(gem.elapsed / 0.1);
+      const easeInDur = 0.15;
+      if (gem.elapsed < easeInDur) {
+        const p = gem.elapsed / easeInDur;
+        gem.g.scale.set(p * (2 - p));
       } else {
         gem.g.scale.set(1);
       }
 
-      gem.g.alpha = 1;
+      const dist = Math.sqrt((TARGET_X - gem.x) ** 2 + (TARGET_Y - gem.y) ** 2);
+      const fadeDist = 40;
+      gem.g.alpha = dist < fadeDist ? dist / fadeDist : 1;
       gem.g.rotation = gem.elapsed * Math.PI * 3;
     }
   }
