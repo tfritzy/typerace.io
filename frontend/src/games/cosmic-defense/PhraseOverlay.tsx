@@ -18,6 +18,7 @@ function generatePhrase(wordCount: number): string {
 }
 
 const CHAR_COUNT = 22;
+const HOTKEYS = new Set(["1", "2", "3"]);
 
 export const PhraseOverlay = ({
   gameRef,
@@ -82,7 +83,7 @@ export const PhraseOverlay = ({
   const handleKey = useCallback(
     (e: KeyboardEvent) => {
       if (e.target === inputRef.current) return;
-      if (e.key === "1" || e.key === "2" || e.key === "3") return;
+      if (HOTKEYS.has(e.key)) return;
       if (e.metaKey || e.altKey) return;
 
       if (e.key === "Backspace") {
@@ -116,7 +117,7 @@ export const PhraseOverlay = ({
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "1" || e.key === "2" || e.key === "3") return;
+      if (HOTKEYS.has(e.key)) return;
       if (e.key === "Backspace") {
         e.preventDefault();
         processInput("Backspace", e.ctrlKey);
