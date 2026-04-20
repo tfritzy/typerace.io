@@ -2,8 +2,13 @@ import { Container, Graphics } from "pixi.js";
 import type { GameState, DamageData } from "./state";
 import { CANVAS_WIDTH } from "./constants";
 
-const GEM_LIFETIME = 0.8;
 const GEM_SIZE = 6;
+const POP_SPEED = 120;
+const HOMING_DELAY = 0.2;
+const HOMING_ACCEL = 600;
+const MAX_SPEED = 1400;
+const GEM_MAX_LIFE = 3.0;
+const COLLECTION_DIST = 12;
 
 const TARGET_X = CANVAS_WIDTH - 60;
 const TARGET_Y = 20;
@@ -31,10 +36,10 @@ function getTier(xp: number): typeof GEM_TIERS[number] {
 interface ActiveGem {
   g: Graphics;
   elapsed: number;
-  startX: number;
-  startY: number;
-  cpX: number;
-  cpY: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
 }
 
 export class GemManager {
@@ -82,16 +87,16 @@ export class GemManager {
 
     this.layer.addChild(g);
 
-    const midX = (x + TARGET_X) / 2 + (Math.random() - 0.5) * 200;
-    const midY = Math.min(y, TARGET_Y) - 80 - Math.random() * 120;
+    const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.8;
+    const speed = POP_SPEED * (0.7 + Math.random() * 0.6);
 
     this.active.push({
       g,
       elapsed: 0,
-      startX: x,
-      startY: y,
-      cpX: midX,
-      cpY: midY,
+      x,
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
     });
   }
 
@@ -99,33 +104,52 @@ export class GemManager {
     for (let i = this.active.length - 1; i >= 0; i--) {
       const gem = this.active[i];
       gem.elapsed += dt;
-      const t = Math.min(1, gem.elapsed / GEM_LIFETIME);
 
-      if (t >= 1) {
+      if (gem.elapsed >= GEM_MAX_LIFE) {
         gem.g.destroy();
         this.active.splice(i, 1);
         continue;
       }
 
-      const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      if (gem.elapsed > HOMING_DELAY) {
+        const homingTime = gem.elapsed - HOMING_DELAY;
+        const dx = TARGET_X - gem.x;
+        const dy = TARGET_Y - gem.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-      const u = 1 - ease;
-      gem.g.x = u * u * gem.startX + 2 * u * ease * gem.cpX + ease * ease * TARGET_X;
-      gem.g.y = u * u * gem.startY + 2 * u * ease * gem.cpY + ease * ease * TARGET_Y;
+        if (dist < COLLECTION_DIST) {
+          gem.g.destroy();
+          this.active.splice(i, 1);
+          continue;
+        }
 
-      if (t < 0.1) {
-        gem.g.scale.set(t / 0.1);
-        gem.g.alpha = 1;
-      } else if (t > 0.75) {
-        const fade = (t - 0.75) / 0.25;
-        gem.g.scale.set(1 - fade * 0.5);
-        gem.g.alpha = 1 - fade * 0.3;
-      } else {
-        gem.g.scale.set(1);
-        gem.g.alpha = 1;
+        const nx = dx / dist;
+        const ny = dy / dist;
+        const accel = HOMING_ACCEL * (1 + homingTime * 4);
+
+        gem.vx += nx * accel * dt;
+        gem.vy += ny * accel * dt;
+
+        const speed = Math.sqrt(gem.vx * gem.vx + gem.vy * gem.vy);
+        if (speed > MAX_SPEED) {
+          gem.vx = (gem.vx / speed) * MAX_SPEED;
+          gem.vy = (gem.vy / speed) * MAX_SPEED;
+        }
       }
 
-      gem.g.rotation = t * Math.PI * 2;
+      gem.x += gem.vx * dt;
+      gem.y += gem.vy * dt;
+      gem.g.x = gem.x;
+      gem.g.y = gem.y;
+
+      if (gem.elapsed < 0.1) {
+        gem.g.scale.set(gem.elapsed / 0.1);
+      } else {
+        gem.g.scale.set(1);
+      }
+
+      gem.g.alpha = 1;
+      gem.g.rotation = gem.elapsed * Math.PI * 3;
     }
   }
 
