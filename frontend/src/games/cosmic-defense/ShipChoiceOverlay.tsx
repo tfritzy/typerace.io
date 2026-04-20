@@ -117,6 +117,18 @@ export const ShipChoiceOverlay = ({
                 }}
                 onClick={() => onSelect(entityType)}
               >
+                <span
+                  className="absolute text-[11px] font-semibold rounded-full px-2 py-0.5"
+                  style={{
+                    top: 8,
+                    right: 8,
+                    background: isUpgrade ? "rgba(249,226,175,0.15)" : "rgba(166,227,161,0.15)",
+                    color: isUpgrade ? "#f9e2af" : "#a6e3a1",
+                    border: `1px solid ${isUpgrade ? "rgba(249,226,175,0.3)" : "rgba(166,227,161,0.3)"}`,
+                  }}
+                >
+                  {isUpgrade ? `Lv ${currentLevel + 1}` : "NEW"}
+                </span>
                 {preview && (
                   <img
                     src={preview}
@@ -127,14 +139,6 @@ export const ShipChoiceOverlay = ({
                 )}
                 <span className="text-[#cdd6f4] text-[14px] font-semibold">
                   {entityType}
-                </span>
-                <span
-                  className="text-[12px] font-medium mt-1.5"
-                  style={{ color: isUpgrade ? "#f9e2af" : "#a6e3a1" }}
-                >
-                  {isUpgrade
-                    ? `Lv ${currentLevel} → ${currentLevel + 1}`
-                    : "NEW"}
                 </span>
                 <span className="text-[11px] text-[#a6adc8] mt-2 text-center leading-snug px-1">
                   {bp.description}

@@ -31,19 +31,17 @@ export const PhraseOverlay = ({
   const typedRef = useRef(typed);
   const phraseRef = useRef(phrase);
   const checkpointRef = useRef(checkpoint);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleKey = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "1" || e.key === "2" || e.key === "3") return;
-      if (e.metaKey || e.altKey) return;
-
+  const processInput = useCallback(
+    (key: string, ctrlKey: boolean) => {
       skipTransition.current = false;
       let currentTyped = typedRef.current;
       let currentPhrase = phraseRef.current;
       let currentCheckpoint = checkpointRef.current;
 
-      if (e.key === "Backspace") {
-        if (e.ctrlKey) {
+      if (key === "Backspace") {
+        if (ctrlKey) {
           const lastSpace = currentTyped.lastIndexOf(" ", currentTyped.length - 2);
           currentTyped = lastSpace >= 0 ? currentTyped.substring(0, lastSpace + 1) : "";
         } else {
@@ -52,16 +50,12 @@ export const PhraseOverlay = ({
         if (currentTyped.length < currentCheckpoint) {
           currentTyped = typedRef.current.substring(0, currentCheckpoint);
         }
-      } else if (e.key.length === 1) {
-        currentTyped = currentTyped + e.key;
-        if (e.key === currentPhrase[currentTyped.length - 1]) {
+      } else {
+        currentTyped = currentTyped + key;
+        if (key === currentPhrase[currentTyped.length - 1]) {
           gameRef.current?.onCorrectKeystroke();
         }
-      } else {
-        return;
       }
-
-      e.preventDefault();
 
       while (currentPhrase.length - currentTyped.length < CHAR_COUNT) {
         currentPhrase += " " + getRandomWord(getLangCode());
@@ -85,10 +79,57 @@ export const PhraseOverlay = ({
     [gameRef],
   );
 
+  const handleKey = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.target === inputRef.current) return;
+      if (e.key === "1" || e.key === "2" || e.key === "3") return;
+      if (e.metaKey || e.altKey) return;
+
+      if (e.key === "Backspace") {
+        e.preventDefault();
+        processInput("Backspace", e.ctrlKey);
+      } else if (e.key.length === 1) {
+        e.preventDefault();
+        processInput(e.key, false);
+      }
+    },
+    [processInput],
+  );
+
   useEffect(() => {
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [handleKey]);
+
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    const onInput = () => {
+      const val = input.value;
+      if (val.length > 0) {
+        for (const char of val) {
+          processInput(char, false);
+        }
+        input.value = "";
+      }
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "1" || e.key === "2" || e.key === "3") return;
+      if (e.key === "Backspace") {
+        e.preventDefault();
+        processInput("Backspace", e.ctrlKey);
+      }
+    };
+
+    input.addEventListener("input", onInput);
+    input.addEventListener("keydown", onKeyDown);
+    return () => {
+      input.removeEventListener("input", onInput);
+      input.removeEventListener("keydown", onKeyDown);
+    };
+  }, [processInput]);
 
   const chars = useMemo(() => {
     const c = [];
@@ -135,7 +176,28 @@ export const PhraseOverlay = ({
 
   return (
     <div className="w-full h-full relative" style={{ pointerEvents: "none" }}>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+      <input
+        ref={inputRef}
+        type="text"
+        autoCapitalize="off"
+        autoCorrect="off"
+        autoComplete="off"
+        spellCheck={false}
+        style={{
+          position: "absolute",
+          opacity: 0,
+          width: 1,
+          height: 1,
+          top: "50%",
+          left: "50%",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+        style={{ pointerEvents: "auto", cursor: "text" }}
+        onClick={() => inputRef.current?.focus()}
+      >
         <div
           className="text-4xl font-mono whitespace-pre relative"
           style={{
