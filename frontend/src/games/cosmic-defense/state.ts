@@ -653,6 +653,7 @@ function activateBuffer(state: GameState, e: EntityState): void {
 }
 
 function activateAbility(state: GameState, e: EntityState): void {
+  if (e.chargesRequired <= 0) return;
   while (e.charge >= e.chargesRequired) {
     e.charge -= e.chargesRequired;
 
