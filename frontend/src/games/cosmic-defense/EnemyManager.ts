@@ -66,6 +66,7 @@ export class EnemyManager {
       display.y = entity.y;
       entity.displayRotation = approachAngle(entity.displayRotation, entity.rotation, maxStep);
       display.rotation = entity.displayRotation;
+      display.tint = entity.freezeStacks > 0 ? 0x88bbff : 0xffffff;
 
       this.updateHealthBar(entity);
     }
