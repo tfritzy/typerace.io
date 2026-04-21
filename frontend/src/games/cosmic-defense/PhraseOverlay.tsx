@@ -200,7 +200,7 @@ export const PhraseOverlay = ({
         onClick={() => inputRef.current?.focus()}
       >
         <div
-          className="text-4xl font-mono whitespace-pre relative"
+          className="text-2xl font-mono whitespace-pre relative"
           style={{
             width: `${CHAR_COUNT * 2}ch`,
             overflowX: "hidden",
