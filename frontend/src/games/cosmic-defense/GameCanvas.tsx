@@ -1,40 +1,55 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
-import { startNextWave, TargetingMode } from "./state";
+import { TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
 import type { EntityState } from "./state";
-import { formatGold } from "./constants";
-import { PlanetHealthBar } from "./PlanetHealthBar";
-import { ShopPanel } from "./ShopPanel";
-import { UpgradePanel } from "./UpgradePanel";
+import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
+import { InspectionPanel } from "./UpgradePanel";
 import { PlacementOverlay } from "./PlacementOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
+import { ShipChoiceOverlay } from "./ShipChoiceOverlay";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
-import { SHIP_BLUEPRINT_MAP } from "./shipCatalog";
 import type { EntityType } from "./types";
-import { getNextUpgrade, getUpgradeCost } from "./upgradePaths";
-import { Coins } from "lucide-react";
 
-const UI_REFERENCE_WIDTH = 900;
+const UI_REFERENCE_WIDTH = 700;
 
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
-  const [healthRatio, setHealthRatio] = useState(1);
-  const [waveNumber, setWaveNumber] = useState(0);
-  const [waveActive, setWaveActive] = useState(false);
-  const [gold, setGold] = useState(0);
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
   const [slots, setSlots] = useState<PlacementSlot[]>(() => generateSlots());
   const [uiScale, setUiScale] = useState(1);
   const [, setInspectTick] = useState(0);
+  const [pendingChoice, setPendingChoice] = useState(true);
+  const [level, setLevel] = useState(1);
+  const [elapsed, setElapsed] = useState(0);
+  const [xp, setXp] = useState(0);
+  const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
     const interval = setInterval(() => setInspectTick((t) => t + 1), 200);
     return () => clearInterval(interval);
   }, [selectedSlot?.entityId]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const game = gameRef.current;
+      if (game) {
+        setElapsed(Math.floor(game.state.spawner.elapsed));
+        setXp(game.state.xp);
+        setXpNeeded(xpForNextLevel(game.state.level));
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const game = gameRef.current;
+    if (!game) return;
+    game.setPaused(selectedSlot !== null || pendingChoice);
+  }, [selectedSlot, pendingChoice]);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -52,10 +67,7 @@ export const GameCanvas = () => {
     if (!div) return;
 
     let cancelled = false;
-    let unsubDamage: (() => void) | null = null;
-    let unsubWaveComplete: (() => void) | null = null;
-    let unsubWaveActive: (() => void) | null = null;
-    let unsubGold: (() => void) | null = null;
+    let unsubLevelUp: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -65,19 +77,11 @@ export const GameCanvas = () => {
         }
         gameRef.current = game;
         setShipPreviews(game.shipPreviews);
-        setGold(game.state.gold);
-        unsubDamage = game.state.onPlanetDamaged.subscribe(() => {
-          setHealthRatio(game.state.planetHealth / game.state.maxPlanetHealth);
-        });
-        unsubWaveComplete = game.state.onWaveComplete.subscribe(() => {
-          setWaveNumber(game.state.wave.wave);
-          setWaveActive(false);
-        });
-        unsubWaveActive = game.state.onWaveActiveChanged.subscribe(() => {
-          setWaveActive(game.state.waveActive);
-        });
-        unsubGold = game.state.onGoldChanged.subscribe(() => {
-          setGold(game.state.gold);
+        setPendingChoice(game.state.pendingChoice);
+        setLevel(game.state.level);
+        unsubLevelUp = game.state.onLevelUp.subscribe(() => {
+          setPendingChoice(true);
+          setLevel(game.state.level);
         });
       })
       .catch((err) => {
@@ -86,74 +90,53 @@ export const GameCanvas = () => {
 
     return () => {
       cancelled = true;
-      unsubDamage?.();
-      unsubWaveComplete?.();
-      unsubWaveActive?.();
-      unsubGold?.();
+      unsubLevelUp?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
   }, []);
 
-  const handleNextWave = useCallback(() => {
-    const game = gameRef.current;
-    if (game) {
-      startNextWave(game.state);
-      setWaveNumber(game.state.wave.wave);
-      setWaveActive(true);
-    }
-  }, []);
-
   const handleSlotClick = useCallback((slot: PlacementSlot) => {
+    if (pendingChoice) return;
     setSelectedSlot(slot);
-  }, []);
+  }, [pendingChoice]);
 
-  const handleSelectShip = useCallback((entityType: EntityType) => {
+  const handleShipChoice = useCallback((entityType: EntityType) => {
     const game = gameRef.current;
-    if (!game || !selectedSlot) return;
+    if (!game) return;
 
-    const bp = SHIP_BLUEPRINT_MAP.get(entityType);
-    if (!bp || game.state.gold < bp.cost) return;
+    const existingSlot = slots.find((s) => s.occupant === entityType);
 
-    game.state.gold -= bp.cost;
-    game.state.onGoldChanged.emit();
+    if (existingSlot && existingSlot.entityId !== null) {
+      const newLevel = existingSlot.level + 1;
+      const config = FRIENDLY_CONFIG_MAP.get(entityType);
+      if (config) {
+        levelUpEntity(game.state, existingSlot.entityId, config, newLevel);
+      }
+      setSlots((prev) =>
+        prev.map((s) =>
+          s.index === existingSlot.index ? { ...s, level: newLevel } : s
+        )
+      );
+    } else {
+      const emptySlot = slots.find((s) => !s.occupant);
+      if (!emptySlot) return;
+      const entityId = game.shipManager.addShip(game.state, entityType, emptySlot.x, emptySlot.y, 1);
+      setSlots((prev) =>
+        prev.map((s) =>
+          s.index === emptySlot.index
+            ? { ...s, occupant: entityType, entityId, level: 1 }
+            : s
+        )
+      );
+    }
 
-    const entityId = game.shipManager.addShip(game.state, entityType, selectedSlot.x, selectedSlot.y);
+    game.state.pendingChoice = false;
+    game.state.spawner.paused = false;
+    setPendingChoice(false);
+  }, [slots]);
 
-    setSlots((prev) =>
-      prev.map((s) =>
-        s.index === selectedSlot.index ? { ...s, occupant: entityType, entityId } : s
-      )
-    );
-    setSelectedSlot(null);
-  }, [selectedSlot]);
-
-  const handleUpgrade = useCallback(() => {
-    const game = gameRef.current;
-    if (!game || !selectedSlot || !selectedSlot.occupant || selectedSlot.entityId === null) return;
-
-    const nextType = getNextUpgrade(selectedSlot.occupant);
-    if (!nextType) return;
-
-    const cost = getUpgradeCost(selectedSlot.occupant);
-    if (game.state.gold < cost) return;
-
-    game.state.gold -= cost;
-    game.state.onGoldChanged.emit();
-
-    const newEntityId = game.shipManager.upgradeShip(
-      game.state, selectedSlot.entityId, nextType, selectedSlot.x, selectedSlot.y
-    );
-
-    setSlots((prev) =>
-      prev.map((s) =>
-        s.index === selectedSlot.index ? { ...s, occupant: nextType, entityId: newEntityId } : s
-      )
-    );
-    setSelectedSlot(null);
-  }, [selectedSlot]);
-
-  const handleCloseShop = useCallback(() => {
+  const handleCloseInspection = useCallback(() => {
     setSelectedSlot(null);
   }, []);
 
@@ -188,52 +171,55 @@ export const GameCanvas = () => {
           transform: `scale(${uiScale})`,
         }}
       >
-        <PlanetHealthBar ratio={healthRatio} />
-        <div className="absolute top-3 right-3 z-10 flex items-center gap-3">
-          <span className="text-[11px] text-[#f9e2af] flex items-center gap-1">
-            <Coins className="w-3.5 h-3.5" />
-            {formatGold(gold)}
+        <div className="absolute top-2 left-3 z-10 flex items-center gap-2">
+          <span className="text-[11px] text-[#f9e2af] font-semibold">
+            Lv {level}
           </span>
-          <span className="text-[11px] text-[#a6adc8]">
-            Wave {waveNumber + 1}
+          <div
+            className="relative rounded-full overflow-hidden"
+            style={{
+              width: 100,
+              height: 8,
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.1)",
+            }}
+          >
+            <div
+              className="absolute left-0 top-0 h-full rounded-full"
+              style={{
+                width: `${Math.min(100, (xp / xpNeeded) * 100)}%`,
+                background: "linear-gradient(90deg, #f9e2af, #fab387)",
+                transition: "width 0.2s ease-out",
+              }}
+            />
+          </div>
+          <span className="text-[11px] text-[#585b70]">
+            {elapsed}s
           </span>
-          {!waveActive && (
-            <button
-              onClick={handleNextWave}
-              className="text-[11px] bg-green-400/85 text-[#0a0a1a] px-2.5 py-1 rounded cursor-pointer hover:brightness-125"
-            >
-              {waveNumber === 0 ? "Start" : "Next wave"}
-            </button>
-          )}
         </div>
-        {!waveActive && (
-          <PlacementOverlay
-            slots={slots}
-            onSlotClick={handleSlotClick}
-            activeSlotIndex={selectedSlot?.index ?? null}
-          />
-        )}
-        {selectedSlot && !selectedSlot.occupant && (
-          <ShopPanel
-            onSelectShip={handleSelectShip}
-            onClose={handleCloseShop}
+        <PlacementOverlay
+          slots={slots}
+          onSlotClick={handleSlotClick}
+          activeSlotIndex={selectedSlot?.index ?? null}
+        />
+        {selectedSlot && selectedSlot.occupant && !pendingChoice && (
+          <InspectionPanel
+            onClose={handleCloseInspection}
             shipPreviews={shipPreviews}
-            gold={gold}
-            slot={selectedSlot}
-          />
-        )}
-        {selectedSlot && selectedSlot.occupant && (
-          <UpgradePanel
-            onUpgrade={handleUpgrade}
-            onClose={handleCloseShop}
-            shipPreviews={shipPreviews}
-            gold={gold}
             slot={selectedSlot}
             entity={getSelectedEntity()}
             onTargetingChange={handleTargetingChange}
           />
         )}
-        <PhraseOverlay gameRef={gameRef} visible={waveActive} />
+        {pendingChoice && (
+          <ShipChoiceOverlay
+            onSelect={handleShipChoice}
+            shipPreviews={shipPreviews}
+            slots={slots}
+            level={level}
+          />
+        )}
+        <PhraseOverlay gameRef={gameRef} />
       </div>
     </div>
   );

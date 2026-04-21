@@ -1,9 +1,9 @@
 import { Graphics } from "pixi.js";
 import type { EntityState } from "./state";
 
-const HEALTH_BAR_WIDTH = 40;
-const HEALTH_BAR_HEIGHT = 4;
-const HEALTH_BAR_OFFSET = -30;
+const HEALTH_BAR_WIDTH = 28;
+const HEALTH_BAR_HEIGHT = 3;
+const HEALTH_BAR_OFFSET = -18;
 
 export function drawHealthBar(
   g: Graphics,

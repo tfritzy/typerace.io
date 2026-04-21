@@ -81,7 +81,7 @@ export interface EnemyConfig {
 }
 
 export function goldForEnemy(config: EnemyConfig): number {
-  return Math.round(Math.pow(config.health, 0.6));
+  return Math.max(1, Math.round(Math.pow(config.health, 0.6) / 3));
 }
 
 export interface FriendlyConfig {
@@ -90,76 +90,75 @@ export interface FriendlyConfig {
   projectileDamage: number;
   projectileType: ProjectileType;
   chargesRequired: number;
-  healAmount: number;
-  shieldAmount: number;
   plasmaStacks: number;
   chargesGranted: number;
   laserDamage: number;
+  freezeStacks: number;
+  chainCount: number;
+  buffMultiplier: number;
+  fireCount: number;
+  beamWidth: number;
+  explosionRadius: number;
 }
 
 export const ENEMY_CATALOG: EnemyConfig[] = [
-  { entityType: "Pulse", health: 40, power: 40, fireRate: 2.2, projectileDamage: 4, projectileType: ProjectileType.Tiny, range: 250 },
-  { entityType: "Buckler", health: 55, power: 55, fireRate: 2.1, projectileDamage: 5, projectileType: ProjectileType.Tiny, range: 255 },
-  { entityType: "Pip", health: 70, power: 70, fireRate: 2.0, projectileDamage: 7, projectileType: ProjectileType.Tiny, range: 260 },
-  { entityType: "Flea", health: 95, power: 95, fireRate: 1.9, projectileDamage: 9, projectileType: ProjectileType.Tiny, range: 265 },
-  { entityType: "Needle", health: 125, power: 125, fireRate: 1.8, projectileDamage: 11, projectileType: ProjectileType.Projectile2, range: 270 },
-  { entityType: "Bolt", health: 170, power: 170, fireRate: 1.7, projectileDamage: 14, projectileType: ProjectileType.Projectile2, range: 275 },
-  { entityType: "Cricket", health: 225, power: 225, fireRate: 1.6, projectileDamage: 18, projectileType: ProjectileType.Projectile2, range: 280 },
-  { entityType: "Robin", health: 300, power: 300, fireRate: 1.5, projectileDamage: 22, projectileType: ProjectileType.Projectile2, range: 285 },
-  { entityType: "Sparrow", health: 400, power: 400, fireRate: 1.4, projectileDamage: 28, projectileType: ProjectileType.Projectile3, range: 290 },
-  { entityType: "Hornet", health: 530, power: 530, fireRate: 1.3, projectileDamage: 35, projectileType: ProjectileType.Projectile3, range: 295 },
-  { entityType: "Dart", health: 700, power: 700, fireRate: 1.2, projectileDamage: 42, projectileType: ProjectileType.Projectile3, range: 300 },
-  { entityType: "Scout", health: 940, power: 940, fireRate: 1.1, projectileDamage: 52, projectileType: ProjectileType.Projectile3, range: 305 },
-  { entityType: "Hawk", health: 1250, power: 1250, fireRate: 1.0, projectileDamage: 62, projectileType: ProjectileType.Projectile4, range: 310 },
-  { entityType: "Dynamo", health: 1675, power: 1675, fireRate: 0.95, projectileDamage: 80, projectileType: ProjectileType.Projectile4, range: 315 },
-  { entityType: "Harrier", health: 2225, power: 2225, fireRate: 0.9, projectileDamage: 100, projectileType: ProjectileType.Projectile4, range: 320 },
-  { entityType: "Raptor", health: 2950, power: 2950, fireRate: 0.85, projectileDamage: 125, projectileType: ProjectileType.Projectile4, range: 325 },
-  { entityType: "Eagle", health: 3925, power: 3925, fireRate: 0.8, projectileDamage: 155, projectileType: ProjectileType.Projectile5, range: 330 },
-  { entityType: "Corsair", health: 5225, power: 5225, fireRate: 0.8, projectileDamage: 190, projectileType: ProjectileType.Projectile5, range: 335 },
-  { entityType: "Vanguard", health: 6950, power: 6950, fireRate: 0.75, projectileDamage: 235, projectileType: ProjectileType.Projectile5, range: 340 },
-  { entityType: "Titan", health: 9250, power: 9250, fireRate: 0.7, projectileDamage: 290, projectileType: ProjectileType.Projectile6, range: 345 },
-  { entityType: "Dreadnought", health: 12300, power: 12300, fireRate: 0.7, projectileDamage: 355, projectileType: ProjectileType.Projectile6, range: 350 },
-  { entityType: "Leviathan", health: 16350, power: 16350, fireRate: 0.65, projectileDamage: 430, projectileType: ProjectileType.Projectile6, range: 355 },
-  { entityType: "Flagship", health: 21750, power: 21750, fireRate: 0.6, projectileDamage: 530, projectileType: ProjectileType.Projectile6, range: 360 },
+  { entityType: "Pulse", health: 20, power: 40, fireRate: 2.2, projectileDamage: 4, projectileType: ProjectileType.Tiny, range: 500 },
+  { entityType: "Buckler", health: 28, power: 55, fireRate: 2.1, projectileDamage: 5, projectileType: ProjectileType.Tiny, range: 510 },
+  { entityType: "Pip", health: 35, power: 70, fireRate: 2.0, projectileDamage: 7, projectileType: ProjectileType.Tiny, range: 520 },
+  { entityType: "Flea", health: 48, power: 95, fireRate: 1.9, projectileDamage: 9, projectileType: ProjectileType.Tiny, range: 530 },
+  { entityType: "Needle", health: 63, power: 125, fireRate: 1.8, projectileDamage: 11, projectileType: ProjectileType.Projectile2, range: 540 },
+  { entityType: "Bolt", health: 85, power: 170, fireRate: 1.7, projectileDamage: 14, projectileType: ProjectileType.Projectile2, range: 550 },
+  { entityType: "Cricket", health: 113, power: 225, fireRate: 1.6, projectileDamage: 18, projectileType: ProjectileType.Projectile2, range: 560 },
+  { entityType: "Robin", health: 150, power: 300, fireRate: 1.5, projectileDamage: 22, projectileType: ProjectileType.Projectile2, range: 570 },
+  { entityType: "Sparrow", health: 200, power: 400, fireRate: 1.4, projectileDamage: 28, projectileType: ProjectileType.Projectile3, range: 580 },
+  { entityType: "Hornet", health: 265, power: 530, fireRate: 1.3, projectileDamage: 35, projectileType: ProjectileType.Projectile3, range: 590 },
+  { entityType: "Dart", health: 350, power: 700, fireRate: 1.2, projectileDamage: 42, projectileType: ProjectileType.Projectile3, range: 600 },
+  { entityType: "Scout", health: 470, power: 940, fireRate: 1.1, projectileDamage: 52, projectileType: ProjectileType.Projectile3, range: 610 },
+  { entityType: "Hawk", health: 625, power: 1250, fireRate: 1.0, projectileDamage: 62, projectileType: ProjectileType.Projectile4, range: 620 },
+  { entityType: "Dynamo", health: 838, power: 1675, fireRate: 0.95, projectileDamage: 80, projectileType: ProjectileType.Projectile4, range: 630 },
+  { entityType: "Harrier", health: 1113, power: 2225, fireRate: 0.9, projectileDamage: 100, projectileType: ProjectileType.Projectile4, range: 640 },
+  { entityType: "Raptor", health: 1475, power: 2950, fireRate: 0.85, projectileDamage: 125, projectileType: ProjectileType.Projectile4, range: 650 },
+  { entityType: "Eagle", health: 1963, power: 3925, fireRate: 0.8, projectileDamage: 155, projectileType: ProjectileType.Projectile5, range: 660 },
+  { entityType: "Corsair", health: 2613, power: 5225, fireRate: 0.8, projectileDamage: 190, projectileType: ProjectileType.Projectile5, range: 670 },
+  { entityType: "Vanguard", health: 3475, power: 6950, fireRate: 0.75, projectileDamage: 235, projectileType: ProjectileType.Projectile5, range: 680 },
+  { entityType: "Titan", health: 4625, power: 9250, fireRate: 0.7, projectileDamage: 290, projectileType: ProjectileType.Projectile6, range: 690 },
+  { entityType: "Dreadnought", health: 6150, power: 12300, fireRate: 0.7, projectileDamage: 355, projectileType: ProjectileType.Projectile6, range: 700 },
+  { entityType: "Leviathan", health: 8175, power: 16350, fireRate: 0.65, projectileDamage: 430, projectileType: ProjectileType.Projectile6, range: 710 },
+  { entityType: "Flagship", health: 10875, power: 21750, fireRate: 0.6, projectileDamage: 530, projectileType: ProjectileType.Projectile6, range: 720 },
 ];
 
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [
-  { entityType: "Moth", health: 200, projectileDamage: 8, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Needle", health: 800, projectileDamage: 40, projectileType: ProjectileType.Projectile2, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Clipper", health: 3000, projectileDamage: 200, projectileType: ProjectileType.Projectile3, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Warden", health: 12000, projectileDamage: 1000, projectileType: ProjectileType.Projectile5, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-
-  { entityType: "Osprey", health: 150, projectileDamage: 5, projectileType: ProjectileType.Tiny, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Raven", health: 600, projectileDamage: 25, projectileType: ProjectileType.Projectile2, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Vanguard", health: 2500, projectileDamage: 130, projectileType: ProjectileType.Projectile3, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Titan", health: 10000, projectileDamage: 650, projectileType: ProjectileType.Projectile5, chargesRequired: 2, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-
-  { entityType: "Mender", health: 250, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 25, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Tender", health: 1000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 100, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Grace", health: 4000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 400, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Haven", health: 15000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 3, healAmount: 1500, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-
-  { entityType: "Buckler", health: 250, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 40, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Ward", health: 1000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 160, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Aegis", health: 4000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 640, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Bastion", health: 15000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 3, healAmount: 0, shieldAmount: 2500, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0 },
-
-  { entityType: "Spark", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 1, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Ember", health: 800, projectileDamage: 0, projectileType: ProjectileType.Projectile2, chargesRequired: 4, healAmount: 0, shieldAmount: 0, plasmaStacks: 2, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Corona", health: 3000, projectileDamage: 0, projectileType: ProjectileType.Projectile3, chargesRequired: 3, healAmount: 0, shieldAmount: 0, plasmaStacks: 3, chargesGranted: 0, laserDamage: 0 },
-  { entityType: "Inferno", health: 12000, projectileDamage: 0, projectileType: ProjectileType.Projectile5, chargesRequired: 3, healAmount: 0, shieldAmount: 0, plasmaStacks: 5, chargesGranted: 0, laserDamage: 0 },
-
-  { entityType: "Pulse", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 8, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, laserDamage: 0 },
-  { entityType: "Flare", health: 800, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 7, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, laserDamage: 0 },
-  { entityType: "Bolt", health: 3000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 6, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, laserDamage: 0 },
-  { entityType: "Dynamo", health: 12000, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 1, laserDamage: 0 },
-
-  { entityType: "Prism", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 10 },
-  { entityType: "Nova", health: 800, projectileDamage: 0, projectileType: ProjectileType.Projectile2, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 50 },
-  { entityType: "Sabre", health: 3000, projectileDamage: 0, projectileType: ProjectileType.Projectile3, chargesRequired: 5, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 250 },
-  { entityType: "Leviathan", health: 12000, projectileDamage: 0, projectileType: ProjectileType.Projectile6, chargesRequired: 6, healAmount: 0, shieldAmount: 0, plasmaStacks: 0, chargesGranted: 0, laserDamage: 1200 },
+  { entityType: "Spur", health: 300, projectileDamage: 40, projectileType: ProjectileType.Projectile5, chargesRequired: 8, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0 },
+  { entityType: "Ember", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 6, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 2, fireCount: 1, beamWidth: 0, explosionRadius: 0 },
+  { entityType: "Corona", health: 150, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 1, plasmaStacks: 0, chargesGranted: 0, laserDamage: 5, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0 },
+  { entityType: "Pip", health: 150, projectileDamage: 4, projectileType: ProjectileType.Tiny, chargesRequired: 2, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 2, beamWidth: 0, explosionRadius: 0 },
+  { entityType: "Eagle", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 10, plasmaStacks: 0, chargesGranted: 1, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0 },
+  { entityType: "Needle", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, plasmaStacks: 0, chargesGranted: 0, laserDamage: 3, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0 },
+  { entityType: "Flare", health: 300, projectileDamage: 8, projectileType: ProjectileType.Projectile4, chargesRequired: 8, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 3, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120 },
+  { entityType: "Dart", health: 200, projectileDamage: 6, projectileType: ProjectileType.Projectile3, chargesRequired: 6, plasmaStacks: 2, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120 },
+  { entityType: "Moth", health: 200, projectileDamage: 10, projectileType: ProjectileType.Projectile1, chargesRequired: 4, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0 },
+  { entityType: "Prism", health: 150, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 2, plasmaStacks: 0, chargesGranted: 0, laserDamage: 4, freezeStacks: 2, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0 },
+  { entityType: "Hawk", health: 200, projectileDamage: 10, projectileType: ProjectileType.Projectile2, chargesRequired: 6, plasmaStacks: 4, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0 },
+  { entityType: "Nova", health: 180, projectileDamage: 5, projectileType: ProjectileType.Projectile1, chargesRequired: 5, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 3, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0 },
+  { entityType: "Lance", health: 400, projectileDamage: 0, projectileType: ProjectileType.Projectile6, chargesRequired: 14, plasmaStacks: 0, chargesGranted: 0, laserDamage: 30, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 6, explosionRadius: 0 },
 ];
 
 export const FRIENDLY_CONFIG_MAP = new Map<string, FriendlyConfig>(
   FRIENDLY_CATALOG.map((c) => [c.entityType, c])
 );
+
+export function getScaledConfig(config: FriendlyConfig, level: number): FriendlyConfig {
+  if (level <= 1) return config;
+  const mult = Math.pow(1.5, level - 1);
+  return {
+    ...config,
+    health: Math.round(config.health * mult),
+    projectileDamage: Math.round(config.projectileDamage * mult),
+    laserDamage: Math.round(config.laserDamage * mult),
+    chargesGranted: config.chargesGranted > 0 ? config.chargesGranted + (level - 1) : 0,
+    chainCount: config.chainCount > 0 ? config.chainCount + (level - 1) : 0,
+    freezeStacks: config.freezeStacks > 0 ? config.freezeStacks + (level - 1) : 0,
+    buffMultiplier: config.buffMultiplier > 0 ? config.buffMultiplier + (level - 1) * 0.5 : 0,
+    explosionRadius: config.explosionRadius > 0 ? config.explosionRadius + (level - 1) * 10 : 0,
+  };
+}

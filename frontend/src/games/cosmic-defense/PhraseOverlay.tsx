@@ -18,69 +18,119 @@ function generatePhrase(wordCount: number): string {
 }
 
 const CHAR_COUNT = 22;
+const HOTKEYS = new Set(["1", "2", "3"]);
 
 export const PhraseOverlay = ({
   gameRef,
-  visible,
 }: {
   gameRef: React.RefObject<CosmicDefenseGame | null>;
-  visible: boolean;
 }) => {
-  const inputRef = useRef<HTMLInputElement>(null);
   const [typed, setTyped] = useState<string>("");
-  const [phrase, setPhrase] = useState<string>(generatePhrase(3));
+  const [phrase, setPhrase] = useState<string>(() => generatePhrase(5));
   const [checkpoint, setCheckpoint] = useState<number>(0);
   const skipTransition = useRef(false);
+  const typedRef = useRef(typed);
+  const phraseRef = useRef(phrase);
+  const checkpointRef = useRef(checkpoint);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!visible) {
-      setPhrase("");
-      setTyped("");
-      setCheckpoint(0);
-      if (inputRef.current?.value) {
-        inputRef.current!.value = "";
-      }
-    }
-  }, [visible]);
-
-  const handleChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+  const processInput = useCallback(
+    (key: string, ctrlKey: boolean) => {
       skipTransition.current = false;
-      let completed;
-      if (event.target.value.length < checkpoint) {
-        completed = typed.substring(0, checkpoint);
-      } else {
-        completed = event.target.value;
+      let currentTyped = typedRef.current;
+      let currentPhrase = phraseRef.current;
+      let currentCheckpoint = checkpointRef.current;
 
-        if (completed[completed.length - 1] === phrase[completed.length - 1]) {
+      if (key === "Backspace") {
+        if (ctrlKey) {
+          const lastSpace = currentTyped.lastIndexOf(" ", currentTyped.length - 2);
+          currentTyped = lastSpace >= 0 ? currentTyped.substring(0, lastSpace + 1) : "";
+        } else {
+          currentTyped = currentTyped.substring(0, currentTyped.length - 1);
+        }
+        if (currentTyped.length < currentCheckpoint) {
+          currentTyped = typedRef.current.substring(0, currentCheckpoint);
+        }
+      } else {
+        currentTyped = currentTyped + key;
+        if (key === currentPhrase[currentTyped.length - 1]) {
           gameRef.current?.onCorrectKeystroke();
         }
       }
 
-      let uPhrase = phrase;
-      let uCheckpoint = checkpoint;
-      while (uPhrase.length - completed.length < CHAR_COUNT) {
-        uPhrase += " " + getRandomWord(getLangCode());
+      while (currentPhrase.length - currentTyped.length < CHAR_COUNT) {
+        currentPhrase += " " + getRandomWord(getLangCode());
       }
 
-      while (completed.length > CHAR_COUNT * 2) {
-        const spaceI = uPhrase.indexOf(" ") + 1;
-        uPhrase = uPhrase.substring(spaceI);
-        completed = completed.substring(spaceI);
-        uCheckpoint -= spaceI;
+      while (currentTyped.length > CHAR_COUNT * 2) {
+        const spaceI = currentPhrase.indexOf(" ") + 1;
+        currentPhrase = currentPhrase.substring(spaceI);
+        currentTyped = currentTyped.substring(spaceI);
+        currentCheckpoint -= spaceI;
         skipTransition.current = true;
       }
 
-      setTyped(completed);
-      event.target.value = completed;
+      typedRef.current = currentTyped;
+      phraseRef.current = currentPhrase;
+      checkpointRef.current = currentCheckpoint;
+      setTyped(currentTyped);
+      setPhrase(currentPhrase);
+      setCheckpoint(currentCheckpoint);
+    },
+    [gameRef],
+  );
 
-      if (phrase != uPhrase) {
-        setPhrase(uPhrase);
-        setCheckpoint(uCheckpoint);
+  const handleKey = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.target === inputRef.current) return;
+      if (HOTKEYS.has(e.key)) return;
+      if (e.metaKey || e.altKey) return;
+
+      if (e.key === "Backspace") {
+        e.preventDefault();
+        processInput("Backspace", e.ctrlKey);
+      } else if (e.key.length === 1) {
+        e.preventDefault();
+        processInput(e.key, false);
       }
     },
-    [typed, phrase],
+    [processInput],
   );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [handleKey]);
+
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    const onInput = () => {
+      const val = input.value;
+      if (val.length > 0) {
+        for (const char of val) {
+          processInput(char, false);
+        }
+        input.value = "";
+      }
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (HOTKEYS.has(e.key)) return;
+      if (e.key === "Backspace") {
+        e.preventDefault();
+        processInput("Backspace", e.ctrlKey);
+      }
+    };
+
+    input.addEventListener("input", onInput);
+    input.addEventListener("keydown", onKeyDown);
+    return () => {
+      input.removeEventListener("input", onInput);
+      input.removeEventListener("keydown", onKeyDown);
+    };
+  }, [processInput]);
 
   const chars = useMemo(() => {
     const c = [];
@@ -93,7 +143,7 @@ export const PhraseOverlay = ({
 
           if (phrase[i] === typed[i]) {
             c.push(
-              <span key={i} className="text-white">
+              <span key={i} style={{ color: "rgba(255,255,255,1)" }}>
                 {phrase[i]}
               </span>,
             );
@@ -106,14 +156,14 @@ export const PhraseOverlay = ({
           }
         } else {
           c.push(
-            <span key={i} className="text-text-untyped opacity-50">
+            <span key={i} style={{ color: "rgba(255,255,255,0.3)" }}>
               {phrase[i]}
             </span>,
           );
         }
       } else {
         c.push(
-          <span key={i} className="text-text-untyped">
+          <span key={i} style={{ color: "rgba(255,255,255,0.5)" }}>
             {phrase[i]}
           </span>,
         );
@@ -123,17 +173,34 @@ export const PhraseOverlay = ({
     return c;
   }, [phrase, typed, checkpoint]);
 
-  if (!visible) {
-    return null;
-  }
-
   const offset = CHAR_COUNT - typed.length;
 
   return (
-    <div className="w-full h-full relative">
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+    <div className="w-full h-full relative" style={{ pointerEvents: "none" }}>
+      <input
+        ref={inputRef}
+        type="text"
+        autoCapitalize="off"
+        autoCorrect="off"
+        autoComplete="off"
+        spellCheck={false}
+        style={{
+          position: "absolute",
+          opacity: 0,
+          width: 1,
+          height: 1,
+          top: "50%",
+          left: "50%",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+        style={{ pointerEvents: "auto", cursor: "text" }}
+        onClick={() => inputRef.current?.focus()}
+      >
         <div
-          className="text-2xl font-mono whitespace-pre relative"
+          className="text-4xl font-mono whitespace-pre relative"
           style={{
             width: `${CHAR_COUNT * 2}ch`,
             overflowX: "hidden",
@@ -150,17 +217,18 @@ export const PhraseOverlay = ({
                 ? "none"
                 : "transform 80ms ease-out",
               whiteSpace: "pre",
+              textShadow: "0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)",
             }}
           >
             {chars}
           </div>
-          <input
-            ref={inputRef}
-            autoFocus
-            className="w-full h-full absolute left-0 top-0 outline-none opacity-0"
-            onChange={handleChange}
-          ></input>
-          <div className="absolute border-l border-accent left-1/2 -top-1 h-8 -translate-x-[1px]" />
+          <div
+            className="absolute left-1/2 -top-1 h-8 -translate-x-[1px]"
+            style={{
+              borderLeft: "2px solid rgba(255,255,255,0.7)",
+              filter: "drop-shadow(0 0 2px rgba(0,0,0,0.8))",
+            }}
+          />
         </div>
       </div>
     </div>

@@ -8,11 +8,12 @@ import { ExplosionManager } from "./ExplosionManager";
 import { ShipManager } from "./ShipManager";
 import { DamageNumberManager } from "./DamageNumberManager";
 import { LaserBeamManager } from "./LaserBeamManager";
+import { GemManager } from "./GemManager";
 import { AssetManager } from "./assetManager";
-import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, WavePhase } from "./state";
+import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, setSpawnerPaused } from "./state";
 import type { GameState } from "./state";
 import type { EntityType } from "./types";
-import { getAllUpgradeShipTypes } from "./upgradePaths";
+import { SHIP_BLUEPRINTS } from "./shipCatalog";
 
 export class CosmicDefenseGame {
   private app: Application;
@@ -26,6 +27,7 @@ export class CosmicDefenseGame {
   private explosionManager!: ExplosionManager;
   private damageNumberManager!: DamageNumberManager;
   private laserBeamManager!: LaserBeamManager;
+  private gemManager!: GemManager;
   shipManager!: ShipManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
@@ -38,7 +40,8 @@ export class CosmicDefenseGame {
   async init(): Promise<void> {
     this.assetManager = await AssetManager.load(MANIFEST);
     this.buildScene(this.assetManager);
-    this.shipPreviews = await this.assetManager.generateShipPreviews(this.app, getAllUpgradeShipTypes());
+    const baseTypes = SHIP_BLUEPRINTS.map((bp) => bp.entityType);
+    this.shipPreviews = await this.assetManager.generateShipPreviews(this.app, baseTypes);
 
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
     this.app.ticker.add(this.tickerCallback);
@@ -71,9 +74,17 @@ export class CosmicDefenseGame {
     this.explosionManager = new ExplosionManager(assetManager);
     world.addChild(this.explosionManager.layer);
 
+    this.gemManager = new GemManager();
+    this.gemManager.subscribe(this.state);
+    world.addChild(this.gemManager.layer);
+
     this.damageNumberManager = new DamageNumberManager();
     this.damageNumberManager.subscribe(this.state);
     world.addChild(this.damageNumberManager.container);
+  }
+
+  setPaused(paused: boolean): void {
+    setSpawnerPaused(this.state, paused);
   }
 
   private update(dt: number): void {
@@ -82,13 +93,8 @@ export class CosmicDefenseGame {
     this.explosionManager.update(this.state);
     this.laserBeamManager.update(this.state);
     this.shipManager.update(this.state, dt);
+    this.gemManager.update(dt);
     this.damageNumberManager.update(dt);
-
-    const waveActive = this.state.wave.phase !== WavePhase.Idle;
-    if (waveActive !== this.state.waveActive) {
-      this.state.waveActive = waveActive;
-      this.state.onWaveActiveChanged.emit();
-    }
   }
 
   destroy(): void {
@@ -101,6 +107,7 @@ export class CosmicDefenseGame {
     this.enemyManager.destroy();
     this.explosionManager.destroy();
     this.laserBeamManager.destroy();
+    this.gemManager.destroy();
     this.damageNumberManager.destroy();
     this.shipManager.destroy();
     this.app.destroy(true);

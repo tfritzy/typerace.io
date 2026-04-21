@@ -1,7 +1,7 @@
 import { Container, Graphics } from "pixi.js";
 import type { GameState } from "./state";
 
-const BEAM_DURATION = 0.15;
+const BEAM_DURATION = 0.35;
 
 export class LaserBeamManager {
   readonly layer: Container;
@@ -31,7 +31,7 @@ export class LaserBeamManager {
       g.clear();
       g.moveTo(beam.x1, beam.y1);
       g.lineTo(beam.x2, beam.y2);
-      g.stroke({ width: 2, color: 0x89b4fa, alpha });
+      g.stroke({ width: beam.width, color: 0x89b4fa, alpha });
     }
 
     for (const [id, g] of this.displayObjects) {

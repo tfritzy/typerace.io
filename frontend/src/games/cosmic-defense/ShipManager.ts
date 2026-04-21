@@ -14,9 +14,9 @@ const BLUEPRINT_MAP = new Map(
   SHIP_BLUEPRINTS.map((bp) => [bp.entityType, bp])
 );
 
-const CHARGE_DOT_RADIUS = 3;
-const CHARGE_DOT_SPACING = 10;
-const CHARGE_DOT_OFFSET = 45;
+const CHARGE_DOT_RADIUS = 2;
+const CHARGE_DOT_SPACING = 7;
+const CHARGE_DOT_OFFSET = 28;
 
 export class ShipManager {
   readonly layer: Container;
@@ -24,7 +24,6 @@ export class ShipManager {
   private entityDisplayObjects = new Map<number, Container>();
   private chargeGraphics = new Map<number, Graphics>();
   private healthBarGraphics = new Map<number, Graphics>();
-  private shieldSprites = new Map<number, Sprite>();
   private activeEntityIds = new Set<number>();
 
   constructor(assets: AssetManager) {
@@ -32,45 +31,11 @@ export class ShipManager {
     this.layer = new Container();
   }
 
-  addShip(state: GameState, entityType: EntityType, x: number, y: number): number {
+  addShip(state: GameState, entityType: EntityType, x: number, y: number, level: number = 1): number {
     const config = FRIENDLY_CONFIG_MAP.get(entityType);
     if (!config) return -1;
     const bp = BLUEPRINT_MAP.get(entityType);
-    return spawnAlliedEntity(state, config, bp?.colorPreset ?? 0, x, y);
-  }
-
-  upgradeShip(state: GameState, oldEntityId: number, newEntityType: EntityType, x: number, y: number): number {
-    const config = FRIENDLY_CONFIG_MAP.get(newEntityType);
-    if (!config) return -1;
-    const oldEntity = state.entityById.get(oldEntityId);
-    const savedStats = oldEntity
-      ? {
-          kills: oldEntity.kills,
-          damageDealt: oldEntity.damageDealt,
-          totalHealed: oldEntity.totalHealed,
-          totalShielded: oldEntity.totalShielded,
-          targetingMode: oldEntity.targetingMode,
-        }
-      : null;
-    if (oldEntity) {
-      const idx = state.entities.indexOf(oldEntity);
-      if (idx >= 0) {
-        state.entities.splice(idx, 1);
-        state.entityById.delete(oldEntityId);
-      }
-    }
-    const newId = this.addShip(state, newEntityType, x, y);
-    if (savedStats) {
-      const newEntity = state.entityById.get(newId);
-      if (newEntity) {
-        newEntity.kills = savedStats.kills;
-        newEntity.damageDealt = savedStats.damageDealt;
-        newEntity.totalHealed = savedStats.totalHealed;
-        newEntity.totalShielded = savedStats.totalShielded;
-        newEntity.targetingMode = savedStats.targetingMode;
-      }
-    }
-    return newId;
+    return spawnAlliedEntity(state, config, bp?.colorPreset ?? 0, x, y, level);
   }
 
   update(state: GameState, dt: number): void {
@@ -84,7 +49,7 @@ export class ShipManager {
 
     const container = new Container();
     container.addChild(shipSprite);
-    container.scale.set(3);
+    container.scale.set(1.5);
     container.x = entity.x;
     container.y = entity.y;
 
@@ -132,29 +97,6 @@ export class ShipManager {
     drawHealthBar(g, entity);
   }
 
-  private updateShield(entity: EntityState): void {
-    let sprite = this.shieldSprites.get(entity.id);
-    if (entity.shield <= 0) {
-      if (sprite) {
-        sprite.visible = false;
-      }
-      return;
-    }
-
-    if (!sprite) {
-      const tex = this.assets.getShieldTexture(entity.entityType);
-      sprite = new Sprite(tex);
-      sprite.anchor.set(0.5);
-      sprite.scale.set(3);
-      this.layer.addChild(sprite);
-      this.shieldSprites.set(entity.id, sprite);
-    }
-
-    sprite.visible = true;
-    sprite.x = entity.x;
-    sprite.y = entity.y;
-  }
-
   private syncRendering(state: GameState, dt: number): void {
     this.activeEntityIds.clear();
     const maxStep = SHIP_TURN_SPEED * dt;
@@ -175,7 +117,6 @@ export class ShipManager {
 
       this.drawChargeDots(entity);
       this.updateHealthBar(entity);
-      this.updateShield(entity);
     }
 
     for (const [id, display] of this.entityDisplayObjects) {
@@ -192,11 +133,6 @@ export class ShipManager {
           hb.destroy();
           this.healthBarGraphics.delete(id);
         }
-        const ss = this.shieldSprites.get(id);
-        if (ss) {
-          ss.destroy();
-          this.shieldSprites.delete(id);
-        }
       }
     }
   }
@@ -208,8 +144,6 @@ export class ShipManager {
     this.chargeGraphics.clear();
     for (const g of this.healthBarGraphics.values()) g.destroy();
     this.healthBarGraphics.clear();
-    for (const s of this.shieldSprites.values()) s.destroy();
-    this.shieldSprites.clear();
     this.layer.destroy();
   }
 }

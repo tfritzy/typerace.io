@@ -1,25 +1,11 @@
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { PLANET_X, PLANET_Y } from "./state";
 import type { EntityType } from "./types";
 
-export const COL_SPACING = 130;
-export const ROW_SPACING = 110;
-export const HEX_HALF_W = COL_SPACING / 2;
-export const HEX_VERT = (ROW_SPACING * 2) / 3;
-export const HEX_HALF_VERT = HEX_VERT / 2;
+export const SLOT_COUNT = 10;
+const ARC_RADIUS = 250;
+const ARC_SPAN = Math.PI * 0.85;
 
-export function hexPoints(cx: number, cy: number): string {
-  return [
-    `${cx},${cy - HEX_VERT}`,
-    `${cx + HEX_HALF_W},${cy - HEX_HALF_VERT}`,
-    `${cx + HEX_HALF_W},${cy + HEX_HALF_VERT}`,
-    `${cx},${cy + HEX_VERT}`,
-    `${cx - HEX_HALF_W},${cy + HEX_HALF_VERT}`,
-    `${cx - HEX_HALF_W},${cy - HEX_HALF_VERT}`,
-  ].join(" ");
-}
-const PLANET_EXCLUSION = 170;
-const MAX_X = CANVAS_WIDTH / 2;
+const SLOT_HIT_RADIUS = 22;
 
 export interface PlacementSlot {
   index: number;
@@ -27,34 +13,34 @@ export interface PlacementSlot {
   y: number;
   occupant: EntityType | null;
   entityId: number | null;
+  level: number;
 }
 
 export function generateSlots(): PlacementSlot[] {
-  const slots: PlacementSlot[] = [];
-  let index = 0;
-  const rows = [-3, -2, -1, 0, 1, 2, 3];
-
-  for (const rowOffset of rows) {
-    const y = PLANET_Y + rowOffset * ROW_SPACING;
-    if (y < 60 || y > CANVAS_HEIGHT - 60) continue;
-
-    const isOddRow = Math.abs(rowOffset) % 2 === 1;
-    const startX = isOddRow ? HEX_HALF_W : 0;
-
-    let x = startX + 60;
-    while (x <= MAX_X) {
-      const dx = x - PLANET_X;
-      const dy = y - PLANET_Y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist > PLANET_EXCLUSION) {
-        slots.push({ index, x, y, occupant: null, entityId: null });
-        index++;
-      }
-
-      x += COL_SPACING;
-    }
+  const positions: { x: number; y: number }[] = [];
+  for (let i = 0; i < SLOT_COUNT; i++) {
+    const angle = -ARC_SPAN / 2 + (ARC_SPAN * i) / (SLOT_COUNT - 1);
+    positions.push({
+      x: Math.round(PLANET_X + ARC_RADIUS * Math.cos(angle)),
+      y: Math.round(PLANET_Y + ARC_RADIUS * Math.sin(angle)),
+    });
   }
 
-  return slots;
+  const midIndex = Math.floor(SLOT_COUNT / 2);
+  const ordered: number[] = [midIndex];
+  for (let offset = 1; ordered.length < SLOT_COUNT; offset++) {
+    if (midIndex - offset >= 0) ordered.push(midIndex - offset);
+    if (midIndex + offset < SLOT_COUNT) ordered.push(midIndex + offset);
+  }
+
+  return ordered.map((posIdx, slotIdx) => ({
+    index: slotIdx,
+    x: positions[posIdx].x,
+    y: positions[posIdx].y,
+    occupant: null,
+    entityId: null,
+    level: 0,
+  }));
 }
+
+export { SLOT_HIT_RADIUS };
