@@ -1,6 +1,6 @@
 import { AnimatedSprite, Container, Graphics, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
-import type { GameState, EntityState } from "./state";
+import type { GameState, EntityState, EntityDeathData } from "./state";
 import { spawnAlliedEntity } from "./state";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
@@ -28,12 +28,18 @@ export class ShipManager {
   private chargeGraphics = new Map<number, Graphics>();
   private healthBarGraphics = new Map<number, Graphics>();
   private activeEntityIds = new Set<number>();
-  private lastKnownPositions = new Map<number, { x: number; y: number }>();
   private deathAnimations: AnimatedSprite[] = [];
+  private unsubDeath: (() => void) | null = null;
 
   constructor(assets: AssetManager) {
     this.assets = assets;
     this.layer = new Container();
+  }
+
+  subscribe(state: GameState): void {
+    this.unsubDeath = state.onAlliedEntityDeath.subscribe((data: EntityDeathData) => {
+      this.spawnDeathExplosion(data.x, data.y);
+    });
   }
 
   addShip(state: GameState, entityType: EntityType, x: number, y: number, level: number = 1): number {
@@ -144,7 +150,6 @@ export class ShipManager {
       display.y = entity.y;
       entity.displayRotation = approachAngle(entity.displayRotation, entity.rotation, maxStep);
       display.rotation = entity.displayRotation;
-      this.lastKnownPositions.set(entity.id, { x: entity.x, y: entity.y });
 
       this.drawChargeDots(entity);
       this.updateHealthBar(entity);
@@ -154,11 +159,6 @@ export class ShipManager {
       if (!this.activeEntityIds.has(id)) {
         display.destroy();
         this.entityDisplayObjects.delete(id);
-        const pos = this.lastKnownPositions.get(id);
-        if (pos) {
-          this.spawnDeathExplosion(pos.x, pos.y);
-          this.lastKnownPositions.delete(id);
-        }
         const cg = this.chargeGraphics.get(id);
         if (cg) {
           cg.destroy();
@@ -174,6 +174,10 @@ export class ShipManager {
   }
 
   destroy(): void {
+    if (this.unsubDeath) {
+      this.unsubDeath();
+      this.unsubDeath = null;
+    }
     for (const d of this.entityDisplayObjects.values()) d.destroy();
     this.entityDisplayObjects.clear();
     for (const g of this.chargeGraphics.values()) g.destroy();
@@ -182,7 +186,6 @@ export class ShipManager {
     this.healthBarGraphics.clear();
     for (const anim of this.deathAnimations) anim.destroy();
     this.deathAnimations.length = 0;
-    this.lastKnownPositions.clear();
     this.layer.destroy();
   }
 }
