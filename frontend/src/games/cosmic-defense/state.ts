@@ -7,7 +7,6 @@ export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
-const ENEMY_HEALTH_MULTIPLIER = 1.5;
 
 export enum TargetingMode {
   NearestToShip = 0,
@@ -267,9 +266,8 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
   const { x, y } = spawnFromRight();
   const speed = (30 + Math.random() * 52.5) * 0.75;
   const entity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
-  const maxHealth = Math.round(config.health * ENEMY_HEALTH_MULTIPLIER);
-  entity.health = maxHealth;
-  entity.maxHealth = maxHealth;
+  entity.health = config.health;
+  entity.maxHealth = config.health;
   entity.power = config.power;
   entity.fireRate = config.fireRate;
   entity.projectileDamage = config.projectileDamage;
