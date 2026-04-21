@@ -109,6 +109,12 @@ export interface DamageData {
   killed: boolean;
 }
 
+export interface EntityDeathData {
+  x: number;
+  y: number;
+  team: Team;
+}
+
 export interface LaserBeam {
   id: number;
   x1: number;
@@ -138,6 +144,7 @@ export interface GameState {
   pendingChoice: boolean;
   onPlanetDamaged: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
+  onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
   onLevelUp: GameEvent;
 }
 
@@ -181,6 +188,7 @@ export function createGameState(): GameState {
     pendingChoice: true,
     onPlanetDamaged: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
+    onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
     onLevelUp: new GameEvent(),
   };
 
@@ -406,6 +414,7 @@ function dealDamageToEntity(
     if (target.team === Team.Enemy) {
       state.gold += target.gold;
       awardXP(state, target.gold);
+      state.onEnemyEntityDeath.emit({ x: target.x, y: target.y, team: target.team });
     }
     const idx = state.entities.indexOf(target);
     if (idx >= 0) removeEntityAt(state, idx);
