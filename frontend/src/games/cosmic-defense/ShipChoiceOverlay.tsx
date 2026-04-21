@@ -117,7 +117,7 @@ export const ShipChoiceOverlay = ({
                 }}
                 onClick={() => onSelect(entityType)}
               >
-                <div className="w-12 h-12 mb-3 flex items-center justify-center">
+                <div className="w-12 h-12 mb-3">
                   {preview && (
                     <img
                       src={preview}
