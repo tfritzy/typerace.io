@@ -43,8 +43,12 @@ export const PhraseOverlay = ({
 
       if (key === "Backspace") {
         if (ctrlKey) {
-          const lastSpace = currentTyped.lastIndexOf(" ", currentTyped.length - 2);
-          currentTyped = lastSpace >= 0 ? currentTyped.substring(0, lastSpace + 1) : "";
+          const lastSpace = currentTyped.lastIndexOf(
+            " ",
+            currentTyped.length - 2,
+          );
+          currentTyped =
+            lastSpace >= 0 ? currentTyped.substring(0, lastSpace + 1) : "";
         } else {
           currentTyped = currentTyped.substring(0, currentTyped.length - 1);
         }
@@ -200,7 +204,7 @@ export const PhraseOverlay = ({
         onClick={() => inputRef.current?.focus()}
       >
         <div
-          className="text-4xl font-mono whitespace-pre relative"
+          className="text-3xl font-mono whitespace-pre relative"
           style={{
             width: `${CHAR_COUNT * 2}ch`,
             overflowX: "hidden",
@@ -217,7 +221,8 @@ export const PhraseOverlay = ({
                 ? "none"
                 : "transform 80ms ease-out",
               whiteSpace: "pre",
-              textShadow: "0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)",
+              textShadow:
+                "0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)",
             }}
           >
             {chars}
