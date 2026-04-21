@@ -22,8 +22,10 @@ const HOTKEYS = new Set(["1", "2", "3"]);
 
 export const PhraseOverlay = ({
   gameRef,
+  isPaused,
 }: {
   gameRef: React.RefObject<CosmicDefenseGame | null>;
+  isPaused: boolean;
 }) => {
   const [typed, setTyped] = useState<string>("");
   const [phrase, setPhrase] = useState<string>(() => generatePhrase(5));
@@ -86,6 +88,7 @@ export const PhraseOverlay = ({
 
   const handleKey = useCallback(
     (e: KeyboardEvent) => {
+      if (isPaused) return;
       if (e.target === inputRef.current) return;
       if (HOTKEYS.has(e.key)) return;
       if (e.metaKey || e.altKey) return;
@@ -98,7 +101,7 @@ export const PhraseOverlay = ({
         processInput(e.key, false);
       }
     },
-    [processInput],
+    [isPaused, processInput],
   );
 
   useEffect(() => {
@@ -111,6 +114,10 @@ export const PhraseOverlay = ({
     if (!input) return;
 
     const onInput = () => {
+      if (isPaused) {
+        input.value = "";
+        return;
+      }
       const val = input.value;
       if (val.length > 0) {
         for (const char of val) {
@@ -121,6 +128,7 @@ export const PhraseOverlay = ({
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
+      if (isPaused) return;
       if (HOTKEYS.has(e.key)) return;
       if (e.key === "Backspace") {
         e.preventDefault();
@@ -134,7 +142,7 @@ export const PhraseOverlay = ({
       input.removeEventListener("input", onInput);
       input.removeEventListener("keydown", onKeyDown);
     };
-  }, [processInput]);
+  }, [isPaused, processInput]);
 
   const chars = useMemo(() => {
     const c = [];
@@ -200,7 +208,7 @@ export const PhraseOverlay = ({
       />
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{ pointerEvents: "auto", cursor: "text" }}
+        style={{ pointerEvents: "auto", cursor: "text", visibility: isPaused ? "hidden" : "visible" }}
         onClick={() => inputRef.current?.focus()}
       >
         <div

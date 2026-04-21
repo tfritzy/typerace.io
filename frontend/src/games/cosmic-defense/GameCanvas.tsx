@@ -219,7 +219,7 @@ export const GameCanvas = () => {
             level={level}
           />
         )}
-        <PhraseOverlay gameRef={gameRef} />
+        <PhraseOverlay gameRef={gameRef} isPaused={selectedSlot !== null || pendingChoice} />
       </div>
     </div>
   );
