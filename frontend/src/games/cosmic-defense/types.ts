@@ -18,6 +18,7 @@ export enum ProjectileType {
   Projectile4 = 4,
   Projectile5 = 5,
   Projectile6 = 6,
+  PlasmaExplosive = 7,
 }
 
 export const SHIP_ENTITY_TYPES = [

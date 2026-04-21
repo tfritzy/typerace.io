@@ -1,5 +1,5 @@
 import { Assets, type Application, type AssetsManifest, Sprite, type Spritesheet, type Texture } from "pixi.js";
-import { ColorPreset, type EntityType, type ProjectileType, getShipEntityIndex } from "./types";
+import { ColorPreset, type EntityType, ProjectileType, getShipEntityIndex } from "./types";
 import { applyPaletteSwap } from "../planetary-defense/ships";
 
 const COLOR_PRESET_ALIASES: Record<ColorPreset, string> = {
@@ -40,11 +40,11 @@ export class AssetManager {
       presetAliasValues.map((a) => [a, loaded[a] as Texture])
     );
     this.projectileSheets_ = [];
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 7; i++) {
       this.projectileSheets_.push(loaded[`projectile-${i}`] as Spritesheet);
     }
     this.explosionSheets_ = [];
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 7; i++) {
       this.explosionSheets_.push(loaded[`explosion-${i}`] as Spritesheet);
     }
     this.shipDeathExplosionSheet_ = loaded["ship-death-explosion"] as Spritesheet;
@@ -89,7 +89,8 @@ export class AssetManager {
   getExplosionTextures(projectileType: ProjectileType): Texture[] {
     const sheet = this.explosionSheets_[projectileType - 1];
     const textures: Texture[] = [];
-    for (let i = 0; i < 3; i++) {
+    const frameCount = projectileType === ProjectileType.PlasmaExplosive ? 14 : 3;
+    for (let i = 0; i < frameCount; i++) {
       textures.push(sheet.textures[`exp-${projectileType}-${i}`]);
     }
     return textures;

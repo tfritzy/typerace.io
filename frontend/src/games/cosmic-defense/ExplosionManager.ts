@@ -5,6 +5,7 @@ import { ProjectileType } from "./types";
 
 const EXPLOSION_SCALE = 3;
 const EXPLOSION_ANIMATION_SPEED = 0.15;
+const PLASMA_EXPLOSION_ANIMATION_SPEED = 0.35;
 
 export class ExplosionManager {
   readonly layer: Container;
@@ -64,7 +65,9 @@ export class ExplosionManager {
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
     sprite.scale.set(EXPLOSION_SCALE);
-    sprite.animationSpeed = EXPLOSION_ANIMATION_SPEED;
+    sprite.animationSpeed = exp.projectileType === ProjectileType.PlasmaExplosive
+      ? PLASMA_EXPLOSION_ANIMATION_SPEED
+      : EXPLOSION_ANIMATION_SPEED;
     sprite.loop = false;
     sprite.onComplete = () => {
       this.completedIds.add(exp.id);
