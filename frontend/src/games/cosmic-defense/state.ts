@@ -144,7 +144,7 @@ export interface GameState {
   pendingChoice: boolean;
   onPlanetDamaged: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
-  onAlliedEntityDeath: GameDataEvent<EntityDeathData>;
+  onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
   onLevelUp: GameEvent;
 }
 
@@ -188,7 +188,7 @@ export function createGameState(): GameState {
     pendingChoice: true,
     onPlanetDamaged: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
-    onAlliedEntityDeath: new GameDataEvent<EntityDeathData>(),
+    onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
     onLevelUp: new GameEvent(),
   };
 
@@ -413,8 +413,7 @@ function dealDamageToEntity(
     if (target.team === Team.Enemy) {
       state.gold += target.gold;
       awardXP(state, target.gold);
-    } else if (target.team === Team.Allied) {
-      state.onAlliedEntityDeath.emit({ x: target.x, y: target.y, team: target.team });
+      state.onEnemyEntityDeath.emit({ x: target.x, y: target.y, team: target.team });
     }
     const idx = state.entities.indexOf(target);
     if (idx >= 0) removeEntityAt(state, idx);

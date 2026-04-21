@@ -63,13 +63,13 @@ export class CosmicDefenseGame {
     world.addChild(this.planetManager.container);
 
     this.shipManager = new ShipManager(assetManager);
-    this.shipManager.subscribe(this.state);
     world.addChild(this.shipManager.layer);
 
     this.laserBeamManager = new LaserBeamManager();
     world.addChild(this.laserBeamManager.layer);
 
     this.enemyManager = new EnemyManager(assetManager);
+    this.enemyManager.subscribe(this.state);
     world.addChild(this.enemyManager.layer);
 
     this.explosionManager = new ExplosionManager(assetManager);

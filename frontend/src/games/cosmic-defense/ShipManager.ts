@@ -1,6 +1,6 @@
-import { AnimatedSprite, Container, Graphics, Sprite } from "pixi.js";
+import { Container, Graphics, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
-import type { GameState, EntityState, EntityDeathData } from "./state";
+import type { GameState, EntityState } from "./state";
 import { spawnAlliedEntity } from "./state";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
@@ -18,9 +18,6 @@ const CHARGE_DOT_RADIUS = 2;
 const CHARGE_DOT_SPACING = 7;
 const CHARGE_DOT_OFFSET = 28;
 
-const SHIP_DEATH_EXPLOSION_SCALE = 2.5;
-const SHIP_DEATH_ANIMATION_SPEED = 0.3;
-
 export class ShipManager {
   readonly layer: Container;
   private assets: AssetManager;
@@ -28,18 +25,10 @@ export class ShipManager {
   private chargeGraphics = new Map<number, Graphics>();
   private healthBarGraphics = new Map<number, Graphics>();
   private activeEntityIds = new Set<number>();
-  private deathAnimations: AnimatedSprite[] = [];
-  private unsubDeath: (() => void) | null = null;
 
   constructor(assets: AssetManager) {
     this.assets = assets;
     this.layer = new Container();
-  }
-
-  subscribe(state: GameState): void {
-    this.unsubDeath = state.onAlliedEntityDeath.subscribe((data: EntityDeathData) => {
-      this.spawnDeathExplosion(data.x, data.y);
-    });
   }
 
   addShip(state: GameState, entityType: EntityType, x: number, y: number, level: number = 1): number {
@@ -51,7 +40,6 @@ export class ShipManager {
 
   update(state: GameState, dt: number): void {
     this.syncRendering(state, dt);
-    this.tickDeathAnimations();
   }
 
   private createDisplayObject(entity: EntityState): Container {
@@ -109,30 +97,6 @@ export class ShipManager {
     drawHealthBar(g, entity);
   }
 
-  private tickDeathAnimations(): void {
-    for (let i = this.deathAnimations.length - 1; i >= 0; i--) {
-      const anim = this.deathAnimations[i];
-      if (!anim.playing) {
-        anim.destroy();
-        this.deathAnimations.splice(i, 1);
-      }
-    }
-  }
-
-  private spawnDeathExplosion(x: number, y: number): void {
-    const textures = this.assets.getShipDeathExplosionTextures();
-    const sprite = new AnimatedSprite(textures);
-    sprite.anchor.set(0.5);
-    sprite.scale.set(SHIP_DEATH_EXPLOSION_SCALE);
-    sprite.animationSpeed = SHIP_DEATH_ANIMATION_SPEED;
-    sprite.loop = false;
-    sprite.x = x;
-    sprite.y = y;
-    sprite.play();
-    this.layer.addChild(sprite);
-    this.deathAnimations.push(sprite);
-  }
-
   private syncRendering(state: GameState, dt: number): void {
     this.activeEntityIds.clear();
     const maxStep = SHIP_TURN_SPEED * dt;
@@ -174,18 +138,12 @@ export class ShipManager {
   }
 
   destroy(): void {
-    if (this.unsubDeath) {
-      this.unsubDeath();
-      this.unsubDeath = null;
-    }
     for (const d of this.entityDisplayObjects.values()) d.destroy();
     this.entityDisplayObjects.clear();
     for (const g of this.chargeGraphics.values()) g.destroy();
     this.chargeGraphics.clear();
     for (const g of this.healthBarGraphics.values()) g.destroy();
     this.healthBarGraphics.clear();
-    for (const anim of this.deathAnimations) anim.destroy();
-    this.deathAnimations.length = 0;
     this.layer.destroy();
   }
 }
