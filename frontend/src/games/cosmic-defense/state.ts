@@ -254,16 +254,17 @@ function makeBaseEntity(
   };
 }
 
-function spawnFromRight(): { x: number; y: number } {
+function spawnInRightThird(): { x: number; y: number } {
   const pad = 60;
+  const xStart = (CANVAS_WIDTH * 2) / 3;
   return {
-    x: CANVAS_WIDTH + 20,
+    x: xStart + Math.random() * (CANVAS_WIDTH - xStart - pad),
     y: pad + Math.random() * (CANVAS_HEIGHT - pad * 2),
   };
 }
 
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
-  const { x, y } = spawnFromRight();
+  const { x, y } = spawnInRightThird();
   const speed = (30 + Math.random() * 52.5) * 0.75;
   const entity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
   entity.health = config.health;
