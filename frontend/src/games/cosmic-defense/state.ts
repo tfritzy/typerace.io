@@ -57,6 +57,15 @@ export interface EntityState {
   fireCount: number;
   beamWidth: number;
   explosionRadius: number;
+  hitDelay: number;
+}
+
+export interface PendingShot {
+  fireAt: number;
+  shooterId: number;
+  targetX: number;
+  targetY: number;
+  targetEntityId: number | null;
 }
 
 export interface ExplosionState {
@@ -130,6 +139,7 @@ export interface GameState {
   entityById: Map<number, EntityState>;
   explosions: ExplosionState[];
   laserBeams: LaserBeam[];
+  pendingShots: PendingShot[];
   time: {
     time: number;
     deltaTime: number;
@@ -173,6 +183,7 @@ export function createGameState(): GameState {
     entityById: new Map(),
     explosions: [],
     laserBeams: [],
+    pendingShots: [],
     time: { time: 0, deltaTime: 0 },
     nextId: 1,
     planetHealth: 1000,
@@ -259,6 +270,7 @@ function makeBaseEntity(
     fireCount: 1,
     beamWidth: 0,
     explosionRadius: 0,
+    hitDelay: 0,
   };
 }
 
@@ -317,6 +329,7 @@ export function spawnAlliedEntity(
   entity.fireCount = config.fireCount;
   entity.beamWidth = config.beamWidth;
   entity.explosionRadius = scaled.explosionRadius;
+  entity.hitDelay = config.hitDelay;
   addEntity(state, entity);
   return entity.id;
 }
@@ -513,6 +526,39 @@ export function updateState(state: GameState, dt: number): void {
       state.laserBeams.splice(i, 1);
     }
   }
+
+  for (let i = state.pendingShots.length - 1; i >= 0; i--) {
+    const shot = state.pendingShots[i];
+    if (state.time.time < shot.fireAt) continue;
+    state.pendingShots.splice(i, 1);
+
+    const shooter = state.entityById.get(shot.shooterId);
+    if (!shooter) continue;
+
+    const dmg = getBuffedDamage(shooter, shooter.projectileDamage);
+
+    if (shooter.explosionRadius > 0) {
+      spawnExplosion(state, shooter.entityType, shot.targetX, shot.targetY);
+      const r2 = shooter.explosionRadius * shooter.explosionRadius;
+      for (let j = state.entities.length - 1; j >= 0; j--) {
+        const other = state.entities[j];
+        if (other.team !== Team.Enemy) continue;
+        const dx = other.x - shot.targetX;
+        const dy = other.y - shot.targetY;
+        if (dx * dx + dy * dy > r2) continue;
+        if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
+        if (shooter.freezeStacks > 0) other.freezeStacks += shooter.freezeStacks;
+        dealDamageToEntity(state, shooter, other, dmg);
+      }
+    } else {
+      const target = shot.targetEntityId !== null ? state.entityById.get(shot.targetEntityId) : null;
+      if (target) {
+        if (shooter.plasmaStacksApplied > 0) target.plasmaStacks += shooter.plasmaStacksApplied;
+        spawnExplosion(state, shooter.entityType, target.x, target.y);
+        dealDamageToEntity(state, shooter, target, dmg);
+      }
+    }
+  }
 }
 
 function getBuffedDamage(e: EntityState, baseDamage: number): number {
@@ -523,38 +569,17 @@ function getBuffedDamage(e: EntityState, baseDamage: number): number {
   return baseDamage;
 }
 
-function fireProjectile(state: GameState, e: EntityState): void {
-  const target = findNearestTarget(state, e);
-  if (!target || !target.entity) return;
-
-  const dmg = getBuffedDamage(e, e.projectileDamage);
-  if (e.plasmaStacksApplied > 0) target.entity.plasmaStacks += e.plasmaStacksApplied;
-
-  spawnExplosion(state, e.entityType, target.entity.x, target.entity.y);
-  dealDamageToEntity(state, e, target.entity, dmg);
-}
-
-function fireExplosiveProjectile(state: GameState, e: EntityState): void {
+function fireShot(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
 
-  spawnExplosion(state, e.entityType, target.x, target.y);
-
-  const dmg = getBuffedDamage(e, e.projectileDamage);
-  const r2 = e.explosionRadius * e.explosionRadius;
-
-  for (let i = state.entities.length - 1; i >= 0; i--) {
-    const other = state.entities[i];
-    if (other.team !== Team.Enemy) continue;
-    const dx = other.x - target.x;
-    const dy = other.y - target.y;
-    if (dx * dx + dy * dy > r2) continue;
-
-    if (e.plasmaStacksApplied > 0) other.plasmaStacks += e.plasmaStacksApplied;
-    if (e.freezeStacks > 0) other.freezeStacks += e.freezeStacks;
-
-    dealDamageToEntity(state, e, other, dmg);
-  }
+  state.pendingShots.push({
+    fireAt: state.time.time + e.hitDelay,
+    shooterId: e.id,
+    targetX: target.x,
+    targetY: target.y,
+    targetEntityId: target.entity?.id ?? null,
+  });
 }
 
 function fireLaser(state: GameState, e: EntityState): void {
@@ -688,13 +713,13 @@ function activateAbility(state: GameState, e: EntityState): void {
     }
 
     if (e.explosionRadius > 0) {
-      fireExplosiveProjectile(state, e);
+      fireShot(state, e);
       continue;
     }
 
     if (e.projectileDamage > 0 || e.plasmaStacksApplied > 0) {
       for (let f = 0; f < e.fireCount; f++) {
-        fireProjectile(state, e);
+        fireShot(state, e);
       }
       continue;
     }
