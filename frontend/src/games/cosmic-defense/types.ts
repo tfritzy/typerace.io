@@ -21,31 +21,15 @@ export enum ProjectileType {
 }
 
 export enum ExplosionType {
-  Tier1 = 1,
-  Tier2 = 2,
-  Tier3 = 3,
-  Tier4 = 4,
-  Tier5 = 5,
-  Tier6 = 6,
-  PlasmaExplosive = 7,
+  PlasmaExplosive = 1,
 }
-
-export const PROJECTILE_EXPLOSION_TYPES: Record<ProjectileType, ExplosionType> = {
-  [ProjectileType.Tiny]: ExplosionType.Tier1,
-  [ProjectileType.Projectile1]: ExplosionType.Tier1,
-  [ProjectileType.Projectile2]: ExplosionType.Tier2,
-  [ProjectileType.Projectile3]: ExplosionType.Tier3,
-  [ProjectileType.Projectile4]: ExplosionType.Tier4,
-  [ProjectileType.Projectile5]: ExplosionType.Tier5,
-  [ProjectileType.Projectile6]: ExplosionType.Tier6,
-};
 
 export const ENTITY_EXPLOSION_TYPES: Partial<Record<EntityType, ExplosionType>> = {
   Dart: ExplosionType.PlasmaExplosive,
 };
 
-export function getExplosionType(entityType: EntityType, projectileType: ProjectileType): ExplosionType {
-  return ENTITY_EXPLOSION_TYPES[entityType] ?? PROJECTILE_EXPLOSION_TYPES[projectileType];
+export function getExplosionType(entityType: EntityType): ExplosionType | undefined {
+  return ENTITY_EXPLOSION_TYPES[entityType];
 }
 
 export const SHIP_ENTITY_TYPES = [

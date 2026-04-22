@@ -56,8 +56,6 @@ export class ExplosionManager {
       case ExplosionType.PlasmaExplosive:
         textures = this.assets.getPlasmaExplosionTextures();
         break;
-      default:
-        textures = this.assets.getExplosionTextures(exp.explosionType);
     }
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);

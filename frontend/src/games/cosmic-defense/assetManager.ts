@@ -1,5 +1,5 @@
 import { Assets, type Application, type AssetsManifest, Sprite, type Spritesheet, type Texture } from "pixi.js";
-import { ColorPreset, type EntityType, type ProjectileType, ExplosionType, getShipEntityIndex } from "./types";
+import { ColorPreset, type EntityType, type ProjectileType, getShipEntityIndex } from "./types";
 import { applyPaletteSwap } from "../planetary-defense/ships";
 
 const COLOR_PRESET_ALIASES: Record<ColorPreset, string> = {
@@ -25,7 +25,6 @@ export class AssetManager {
   private spaceshipsShield_: Spritesheet;
   private colorPresets_: Record<string, Texture>;
   private projectileSheets_: Spritesheet[];
-  private explosionSheets_: Spritesheet[];
   private plasmaExplosionSheet_: Spritesheet;
   private shipDeathExplosionSheet_: Spritesheet;
 
@@ -43,10 +42,6 @@ export class AssetManager {
     this.projectileSheets_ = [];
     for (let i = 1; i <= 6; i++) {
       this.projectileSheets_.push(loaded[`projectile-${i}`] as Spritesheet);
-    }
-    this.explosionSheets_ = [];
-    for (let i = 1; i <= 6; i++) {
-      this.explosionSheets_.push(loaded[`explosion-${i}`] as Spritesheet);
     }
     this.plasmaExplosionSheet_ = loaded["plasma-explosion"] as Spritesheet;
     this.shipDeathExplosionSheet_ = loaded["ship-death-explosion"] as Spritesheet;
@@ -84,15 +79,6 @@ export class AssetManager {
     const textures: Texture[] = [];
     for (let i = 0; i < 5; i++) {
       textures.push(sheet.textures[`proj-${projectileType}-${i}`]);
-    }
-    return textures;
-  }
-
-  getExplosionTextures(explosionType: ExplosionType): Texture[] {
-    const sheet = this.explosionSheets_[explosionType - 1];
-    const textures: Texture[] = [];
-    for (let i = 0; i < 3; i++) {
-      textures.push(sheet.textures[`exp-${explosionType}-${i}`]);
     }
     return textures;
   }
@@ -148,9 +134,6 @@ export class AssetManager {
       setTextureNearest(tex);
     }
     for (const sheet of this.projectileSheets_) {
-      setNearestNeighbor(sheet);
-    }
-    for (const sheet of this.explosionSheets_) {
       setNearestNeighbor(sheet);
     }
     setNearestNeighbor(this.plasmaExplosionSheet_);
