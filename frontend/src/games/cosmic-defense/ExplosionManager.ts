@@ -51,12 +51,10 @@ export class ExplosionManager {
   }
 
   private createDisplayObject(exp: ExplosionState): Container {
-    let textures;
-    switch (exp.explosionType) {
-      case ExplosionType.PlasmaExplosive:
-        textures = this.assets.getPlasmaExplosionTextures();
-        break;
-    }
+    const textures =
+      exp.explosionType === ExplosionType.IceExplosive
+        ? this.assets.getIceExplosionTextures()
+        : this.assets.getPlasmaExplosionTextures();
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
     sprite.scale.set(EXPLOSION_SCALE);

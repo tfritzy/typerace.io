@@ -22,6 +22,7 @@ export const MANIFEST: AssetsManifest = {
         { alias: "projectile-6", src: "/pixel_starships_kit/Projectiles/projectile-6.json" },
         { alias: "plasma-explosion", src: "/Effect and FX/Effects 1/SpriteSheet/plasma-explosion.json" },
         { alias: "ship-death-explosion", src: "/Effect and FX/Effects 4/SpriteSheet/ship-death-explosion.json" },
+        { alias: "ice-explosion", src: "/Effect and FX/Effects 10/SpriteSheet/ice-explosion.json" },
       ],
     },
   ],
