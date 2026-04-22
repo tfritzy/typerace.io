@@ -569,20 +569,7 @@ function getBuffedDamage(e: EntityState, baseDamage: number): number {
   return baseDamage;
 }
 
-function fireProjectile(state: GameState, e: EntityState): void {
-  const target = findNearestTarget(state, e);
-  if (!target || !target.entity) return;
-
-  state.pendingShots.push({
-    fireAt: state.time.time + e.hitDelay,
-    shooterId: e.id,
-    targetX: target.entity.x,
-    targetY: target.entity.y,
-    targetEntityId: target.entity.id,
-  });
-}
-
-function fireExplosiveProjectile(state: GameState, e: EntityState): void {
+function fireShot(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
 
@@ -591,7 +578,7 @@ function fireExplosiveProjectile(state: GameState, e: EntityState): void {
     shooterId: e.id,
     targetX: target.x,
     targetY: target.y,
-    targetEntityId: null,
+    targetEntityId: target.entity?.id ?? null,
   });
 }
 
@@ -726,13 +713,13 @@ function activateAbility(state: GameState, e: EntityState): void {
     }
 
     if (e.explosionRadius > 0) {
-      fireExplosiveProjectile(state, e);
+      fireShot(state, e);
       continue;
     }
 
     if (e.projectileDamage > 0 || e.plasmaStacksApplied > 0) {
       for (let f = 0; f < e.fireCount; f++) {
-        fireProjectile(state, e);
+        fireShot(state, e);
       }
       continue;
     }
