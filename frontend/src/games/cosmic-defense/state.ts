@@ -65,8 +65,6 @@ export interface PendingShot {
   shooterId: number;
   targetX: number;
   targetY: number;
-  damage: number;
-  explosive: boolean;
   targetEntityId: number | null;
 }
 
@@ -537,7 +535,9 @@ export function updateState(state: GameState, dt: number): void {
     const shooter = state.entityById.get(shot.shooterId);
     if (!shooter) continue;
 
-    if (shot.explosive) {
+    const dmg = getBuffedDamage(shooter, shooter.projectileDamage);
+
+    if (shooter.explosionRadius > 0) {
       spawnExplosion(state, shooter.entityType, shot.targetX, shot.targetY);
       const r2 = shooter.explosionRadius * shooter.explosionRadius;
       for (let j = state.entities.length - 1; j >= 0; j--) {
@@ -548,14 +548,14 @@ export function updateState(state: GameState, dt: number): void {
         if (dx * dx + dy * dy > r2) continue;
         if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
         if (shooter.freezeStacks > 0) other.freezeStacks += shooter.freezeStacks;
-        dealDamageToEntity(state, shooter, other, shot.damage);
+        dealDamageToEntity(state, shooter, other, dmg);
       }
     } else {
       const target = shot.targetEntityId !== null ? state.entityById.get(shot.targetEntityId) : null;
       if (target) {
         if (shooter.plasmaStacksApplied > 0) target.plasmaStacks += shooter.plasmaStacksApplied;
         spawnExplosion(state, shooter.entityType, target.x, target.y);
-        dealDamageToEntity(state, shooter, target, shot.damage);
+        dealDamageToEntity(state, shooter, target, dmg);
       }
     }
   }
@@ -573,61 +573,26 @@ function fireProjectile(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target || !target.entity) return;
 
-  const dmg = getBuffedDamage(e, e.projectileDamage);
-
-  if (e.hitDelay > 0) {
-    state.pendingShots.push({
-      fireAt: state.time.time + e.hitDelay,
-      shooterId: e.id,
-      targetX: target.entity.x,
-      targetY: target.entity.y,
-      damage: dmg,
-      explosive: false,
-      targetEntityId: target.entity.id,
-    });
-    return;
-  }
-
-  if (e.plasmaStacksApplied > 0) target.entity.plasmaStacks += e.plasmaStacksApplied;
-  spawnExplosion(state, e.entityType, target.entity.x, target.entity.y);
-  dealDamageToEntity(state, e, target.entity, dmg);
+  state.pendingShots.push({
+    fireAt: state.time.time + e.hitDelay,
+    shooterId: e.id,
+    targetX: target.entity.x,
+    targetY: target.entity.y,
+    targetEntityId: target.entity.id,
+  });
 }
 
 function fireExplosiveProjectile(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
 
-  const dmg = getBuffedDamage(e, e.projectileDamage);
-
-  if (e.hitDelay > 0) {
-    state.pendingShots.push({
-      fireAt: state.time.time + e.hitDelay,
-      shooterId: e.id,
-      targetX: target.x,
-      targetY: target.y,
-      damage: dmg,
-      explosive: true,
-      targetEntityId: null,
-    });
-    return;
-  }
-
-  spawnExplosion(state, e.entityType, target.x, target.y);
-
-  const r2 = e.explosionRadius * e.explosionRadius;
-
-  for (let i = state.entities.length - 1; i >= 0; i--) {
-    const other = state.entities[i];
-    if (other.team !== Team.Enemy) continue;
-    const dx = other.x - target.x;
-    const dy = other.y - target.y;
-    if (dx * dx + dy * dy > r2) continue;
-
-    if (e.plasmaStacksApplied > 0) other.plasmaStacks += e.plasmaStacksApplied;
-    if (e.freezeStacks > 0) other.freezeStacks += e.freezeStacks;
-
-    dealDamageToEntity(state, e, other, dmg);
-  }
+  state.pendingShots.push({
+    fireAt: state.time.time + e.hitDelay,
+    shooterId: e.id,
+    targetX: target.x,
+    targetY: target.y,
+    targetEntityId: null,
+  });
 }
 
 function fireLaser(state: GameState, e: EntityState): void {
