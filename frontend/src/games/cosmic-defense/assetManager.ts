@@ -26,6 +26,7 @@ export class AssetManager {
   private colorPresets_: Record<string, Texture>;
   private projectileSheets_: Spritesheet[];
   private explosionSheets_: Spritesheet[];
+  private plasmaExplosionSheet_: Spritesheet;
   private shipDeathExplosionSheet_: Spritesheet;
 
   constructor(loaded: Record<string, unknown>) {
@@ -44,9 +45,10 @@ export class AssetManager {
       this.projectileSheets_.push(loaded[`projectile-${i}`] as Spritesheet);
     }
     this.explosionSheets_ = [];
-    for (let i = 1; i <= 7; i++) {
+    for (let i = 1; i <= 6; i++) {
       this.explosionSheets_.push(loaded[`explosion-${i}`] as Spritesheet);
     }
+    this.plasmaExplosionSheet_ = loaded["plasma-explosion"] as Spritesheet;
     this.shipDeathExplosionSheet_ = loaded["ship-death-explosion"] as Spritesheet;
 
     this.applyNearestNeighbor();
@@ -89,9 +91,16 @@ export class AssetManager {
   getExplosionTextures(explosionType: ExplosionType): Texture[] {
     const sheet = this.explosionSheets_[explosionType - 1];
     const textures: Texture[] = [];
-    const frameCount = explosionType === ExplosionType.PlasmaExplosive ? 14 : 3;
-    for (let i = 0; i < frameCount; i++) {
+    for (let i = 0; i < 3; i++) {
       textures.push(sheet.textures[`exp-${explosionType}-${i}`]);
+    }
+    return textures;
+  }
+
+  getPlasmaExplosionTextures(): Texture[] {
+    const textures: Texture[] = [];
+    for (let i = 0; i < 14; i++) {
+      textures.push(this.plasmaExplosionSheet_.textures[`exp-7-${i}`]);
     }
     return textures;
   }
@@ -144,6 +153,7 @@ export class AssetManager {
     for (const sheet of this.explosionSheets_) {
       setNearestNeighbor(sheet);
     }
+    setNearestNeighbor(this.plasmaExplosionSheet_);
     setNearestNeighbor(this.shipDeathExplosionSheet_);
   }
 }
