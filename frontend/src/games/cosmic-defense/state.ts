@@ -1,5 +1,5 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
-import { type EntityType, ColorPreset, ProjectileType, Team } from "./types";
+import { type EntityType, ColorPreset, ProjectileType, ExplosionType, Team } from "./types";
 import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, goldForEnemy, getScaledConfig } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 
@@ -63,7 +63,7 @@ export interface ExplosionState {
   id: number;
   x: number;
   y: number;
-  projectileType: ProjectileType;
+  explosionType: ExplosionType;
 }
 
 export interface SpawnState {
@@ -423,8 +423,9 @@ function dealDamageToEntity(
   return killed;
 }
 
-function flareType(pt: ProjectileType): ProjectileType {
-  return pt === ProjectileType.Tiny ? ProjectileType.Projectile1 : pt;
+function flareType(pt: ProjectileType): ExplosionType {
+  const t = pt === ProjectileType.Tiny ? ProjectileType.Projectile1 : pt;
+  return t as unknown as ExplosionType;
 }
 
 function performInstantHit(
@@ -434,8 +435,8 @@ function performInstantHit(
   damage: number
 ): void {
   const ft = flareType(shooter.projectileType);
-  state.explosions.push({ id: state.nextId++, x: shooter.x, y: shooter.y, projectileType: ft });
-  state.explosions.push({ id: state.nextId++, x: target.x, y: target.y, projectileType: ft });
+  state.explosions.push({ id: state.nextId++, x: shooter.x, y: shooter.y, explosionType: ft });
+  state.explosions.push({ id: state.nextId++, x: target.x, y: target.y, explosionType: ft });
 
   if (target.entity) {
     dealDamageToEntity(state, shooter, target.entity, damage);
@@ -530,8 +531,8 @@ function fireProjectile(state: GameState, e: EntityState): void {
   if (e.plasmaStacksApplied > 0) target.entity.plasmaStacks += e.plasmaStacksApplied;
 
   const ft = flareType(e.projectileType);
-  state.explosions.push({ id: state.nextId++, x: e.x, y: e.y, projectileType: ft });
-  state.explosions.push({ id: state.nextId++, x: target.entity.x, y: target.entity.y, projectileType: ft });
+  state.explosions.push({ id: state.nextId++, x: e.x, y: e.y, explosionType: ft });
+  state.explosions.push({ id: state.nextId++, x: target.entity.x, y: target.entity.y, explosionType: ft });
   dealDamageToEntity(state, e, target.entity, dmg);
 }
 
@@ -540,8 +541,9 @@ function fireExplosiveProjectile(state: GameState, e: EntityState): void {
   if (!target) return;
 
   const ft = flareType(e.projectileType);
-  state.explosions.push({ id: state.nextId++, x: e.x, y: e.y, projectileType: ft });
-  state.explosions.push({ id: state.nextId++, x: target.x, y: target.y, projectileType: ft });
+  const impactType = e.plasmaStacksApplied > 0 ? ExplosionType.PlasmaExplosive : ft;
+  state.explosions.push({ id: state.nextId++, x: e.x, y: e.y, explosionType: ft });
+  state.explosions.push({ id: state.nextId++, x: target.x, y: target.y, explosionType: impactType });
 
   const dmg = getBuffedDamage(e, e.projectileDamage);
   const r2 = e.explosionRadius * e.explosionRadius;
@@ -622,7 +624,7 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
 
   const dmg = getBuffedDamage(e, e.projectileDamage);
   const ft = flareType(e.projectileType);
-  state.explosions.push({ id: state.nextId++, x: e.x, y: e.y, projectileType: ft });
+  state.explosions.push({ id: state.nextId++, x: e.x, y: e.y, explosionType: ft });
 
   const hitIds = new Set<number>();
   let currentTarget: EntityState | null = target.entity;
@@ -630,7 +632,7 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
 
   while (currentTarget && chainsRemaining >= 0) {
     hitIds.add(currentTarget.id);
-    state.explosions.push({ id: state.nextId++, x: currentTarget.x, y: currentTarget.y, projectileType: ft });
+    state.explosions.push({ id: state.nextId++, x: currentTarget.x, y: currentTarget.y, explosionType: ft });
     dealDamageToEntity(state, e, currentTarget, dmg);
 
     chainsRemaining--;

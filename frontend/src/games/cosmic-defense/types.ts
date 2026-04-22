@@ -18,6 +18,15 @@ export enum ProjectileType {
   Projectile4 = 4,
   Projectile5 = 5,
   Projectile6 = 6,
+}
+
+export enum ExplosionType {
+  Projectile1 = 1,
+  Projectile2 = 2,
+  Projectile3 = 3,
+  Projectile4 = 4,
+  Projectile5 = 5,
+  Projectile6 = 6,
   PlasmaExplosive = 7,
 }
 
