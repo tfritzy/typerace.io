@@ -554,6 +554,7 @@ export function updateState(state: GameState, dt: number): void {
       const target = shot.targetEntityId !== null ? state.entityById.get(shot.targetEntityId) : null;
       if (target) {
         if (shooter.plasmaStacksApplied > 0) target.plasmaStacks += shooter.plasmaStacksApplied;
+        if (shooter.freezeStacks > 0) target.freezeStacks += shooter.freezeStacks;
         spawnExplosion(state, shooter.entityType, target.x, target.y);
         dealDamageToEntity(state, shooter, target, dmg);
       }
