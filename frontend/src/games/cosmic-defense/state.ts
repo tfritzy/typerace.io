@@ -543,7 +543,6 @@ function fireExplosiveProjectile(state: GameState, e: EntityState): void {
   const ft = flareType(e.projectileType);
   const isIce = e.freezeStacks > 0;
   const baseExp = { projectileType: ft, iceExplosion: isIce };
-  state.explosions.push({ id: state.nextId++, x: e.x, y: e.y, ...baseExp });
   state.explosions.push({ id: state.nextId++, x: target.x, y: target.y, ...baseExp });
 
   const dmg = getBuffedDamage(e, e.projectileDamage);
