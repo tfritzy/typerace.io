@@ -1,7 +1,7 @@
-import { AnimatedSprite, Container, Graphics } from "pixi.js";
+import { AnimatedSprite, Container } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, ExplosionState } from "./state";
-import { ProjectileType } from "./types";
+import { ExplosionType } from "./types";
 
 const EXPLOSION_SCALE = 3;
 const EXPLOSION_ANIMATION_SPEED = 0.15;
@@ -51,16 +51,12 @@ export class ExplosionManager {
   }
 
   private createDisplayObject(exp: ExplosionState): Container {
-    if (exp.projectileType === ProjectileType.Tiny) {
-      const g = new Graphics();
-      g.circle(0, 0, 3);
-      g.fill(0xffffff);
-      g.scale.set(EXPLOSION_SCALE);
-      this.completedIds.add(exp.id);
-      return g;
+    let textures;
+    switch (exp.explosionType) {
+      case ExplosionType.PlasmaExplosive:
+        textures = this.assets.getPlasmaExplosionTextures();
+        break;
     }
-
-    const textures = this.assets.getExplosionTextures(exp.projectileType);
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
     sprite.scale.set(EXPLOSION_SCALE);
