@@ -423,17 +423,20 @@ function dealDamageToEntity(
   return killed;
 }
 
+function spawnExplosion(state: GameState, entityType: EntityType, x: number, y: number): void {
+  const et = getExplosionType(entityType);
+  if (et !== undefined) {
+    state.explosions.push({ id: state.nextId++, x, y, explosionType: et });
+  }
+}
+
 function performInstantHit(
   state: GameState,
   shooter: EntityState,
   target: { x: number; y: number; entity: EntityState | null },
   damage: number
 ): void {
-  const et = getExplosionType(shooter.entityType);
-  if (et !== undefined) {
-    state.explosions.push({ id: state.nextId++, x: shooter.x, y: shooter.y, explosionType: et });
-    state.explosions.push({ id: state.nextId++, x: target.x, y: target.y, explosionType: et });
-  }
+  spawnExplosion(state, shooter.entityType, target.x, target.y);
 
   if (target.entity) {
     dealDamageToEntity(state, shooter, target.entity, damage);
@@ -527,11 +530,7 @@ function fireProjectile(state: GameState, e: EntityState): void {
   const dmg = getBuffedDamage(e, e.projectileDamage);
   if (e.plasmaStacksApplied > 0) target.entity.plasmaStacks += e.plasmaStacksApplied;
 
-  const et = getExplosionType(e.entityType);
-  if (et !== undefined) {
-    state.explosions.push({ id: state.nextId++, x: e.x, y: e.y, explosionType: et });
-    state.explosions.push({ id: state.nextId++, x: target.entity.x, y: target.entity.y, explosionType: et });
-  }
+  spawnExplosion(state, e.entityType, target.entity.x, target.entity.y);
   dealDamageToEntity(state, e, target.entity, dmg);
 }
 
@@ -539,11 +538,7 @@ function fireExplosiveProjectile(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
 
-  const et = getExplosionType(e.entityType);
-  if (et !== undefined) {
-    state.explosions.push({ id: state.nextId++, x: e.x, y: e.y, explosionType: et });
-    state.explosions.push({ id: state.nextId++, x: target.x, y: target.y, explosionType: et });
-  }
+  spawnExplosion(state, e.entityType, target.x, target.y);
 
   const dmg = getBuffedDamage(e, e.projectileDamage);
   const r2 = e.explosionRadius * e.explosionRadius;
@@ -623,10 +618,6 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
   if (!target || !target.entity) return;
 
   const dmg = getBuffedDamage(e, e.projectileDamage);
-  const et = getExplosionType(e.entityType);
-  if (et !== undefined) {
-    state.explosions.push({ id: state.nextId++, x: e.x, y: e.y, explosionType: et });
-  }
 
   const hitIds = new Set<number>();
   let currentTarget: EntityState | null = target.entity;
@@ -634,9 +625,7 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
 
   while (currentTarget && chainsRemaining >= 0) {
     hitIds.add(currentTarget.id);
-    if (et !== undefined) {
-      state.explosions.push({ id: state.nextId++, x: currentTarget.x, y: currentTarget.y, explosionType: et });
-    }
+    spawnExplosion(state, e.entityType, currentTarget.x, currentTarget.y);
     dealDamageToEntity(state, e, currentTarget, dmg);
 
     chainsRemaining--;
