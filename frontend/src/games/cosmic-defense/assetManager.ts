@@ -28,6 +28,7 @@ export class AssetManager {
   private plasmaExplosionSheet_: Spritesheet;
   private shipDeathExplosionSheet_: Spritesheet;
   private iceExplosionSheet_: Spritesheet;
+  private warpInSheet_: Spritesheet;
 
   constructor(loaded: Record<string, unknown>) {
     const presetAliasValues = Object.values(COLOR_PRESET_ALIASES);
@@ -47,6 +48,7 @@ export class AssetManager {
     this.plasmaExplosionSheet_ = loaded["plasma-explosion"] as Spritesheet;
     this.shipDeathExplosionSheet_ = loaded["ship-death-explosion"] as Spritesheet;
     this.iceExplosionSheet_ = loaded["ice-explosion"] as Spritesheet;
+    this.warpInSheet_ = loaded["warp-in"] as Spritesheet;
 
     this.applyNearestNeighbor();
   }
@@ -109,6 +111,14 @@ export class AssetManager {
     return textures;
   }
 
+  getWarpInTextures(): Texture[] {
+    const textures: Texture[] = [];
+    for (let i = 0; i < 63; i++) {
+      textures.push(this.warpInSheet_.textures[`warp-in-${i}`]);
+    }
+    return textures;
+  }
+
   static async load(manifest: AssetsManifest): Promise<AssetManager> {
     const bundle = manifest.bundles[0];
     Assets.addBundle(bundle.name, bundle.assets);
@@ -149,5 +159,6 @@ export class AssetManager {
     setNearestNeighbor(this.plasmaExplosionSheet_);
     setNearestNeighbor(this.shipDeathExplosionSheet_);
     setNearestNeighbor(this.iceExplosionSheet_);
+    setNearestNeighbor(this.warpInSheet_);
   }
 }

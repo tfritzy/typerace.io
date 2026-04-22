@@ -9,6 +9,7 @@ import type { EntityType } from "./types";
 import { SHIP_TURN_SPEED } from "./constants";
 import { approachAngle } from "./utils";
 import { drawHealthBar } from "./healthBar";
+import type { WarpInManager } from "./WarpInManager";
 
 const BLUEPRINT_MAP = new Map(
   SHIP_BLUEPRINTS.map((bp) => [bp.entityType, bp])
@@ -21,6 +22,7 @@ const CHARGE_DOT_OFFSET = 28;
 export class ShipManager {
   readonly layer: Container;
   private assets: AssetManager;
+  private warpInManager: WarpInManager | null = null;
   private entityDisplayObjects = new Map<number, Container>();
   private chargeGraphics = new Map<number, Graphics>();
   private healthBarGraphics = new Map<number, Graphics>();
@@ -29,6 +31,10 @@ export class ShipManager {
   constructor(assets: AssetManager) {
     this.assets = assets;
     this.layer = new Container();
+  }
+
+  setWarpInManager(manager: WarpInManager): void {
+    this.warpInManager = manager;
   }
 
   addShip(state: GameState, entityType: EntityType, x: number, y: number, level: number = 1): number {
@@ -109,6 +115,7 @@ export class ShipManager {
         display = this.createDisplayObject(entity);
         this.layer.addChild(display);
         this.entityDisplayObjects.set(entity.id, display);
+        this.warpInManager?.playAt(entity.x, entity.y);
       }
       display.x = entity.x;
       display.y = entity.y;
