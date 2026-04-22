@@ -60,7 +60,9 @@ export class ExplosionManager {
       return g;
     }
 
-    const textures = this.assets.getExplosionTextures(exp.projectileType);
+    const textures = exp.iceExplosion
+      ? this.assets.getIceExplosionTextures()
+      : this.assets.getExplosionTextures(exp.projectileType);
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
     sprite.scale.set(EXPLOSION_SCALE);

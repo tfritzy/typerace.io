@@ -64,6 +64,7 @@ export interface ExplosionState {
   x: number;
   y: number;
   projectileType: ProjectileType;
+  iceExplosion?: true;
 }
 
 export interface SpawnState {
@@ -540,8 +541,9 @@ function fireExplosiveProjectile(state: GameState, e: EntityState): void {
   if (!target) return;
 
   const ft = flareType(e.projectileType);
-  state.explosions.push({ id: state.nextId++, x: e.x, y: e.y, projectileType: ft });
-  state.explosions.push({ id: state.nextId++, x: target.x, y: target.y, projectileType: ft });
+  const isIce = e.freezeStacks > 0;
+  state.explosions.push({ id: state.nextId++, x: e.x, y: e.y, projectileType: ft, ...(isIce ? { iceExplosion: true as const } : {}) });
+  state.explosions.push({ id: state.nextId++, x: target.x, y: target.y, projectileType: ft, ...(isIce ? { iceExplosion: true as const } : {}) });
 
   const dmg = getBuffedDamage(e, e.projectileDamage);
   const r2 = e.explosionRadius * e.explosionRadius;
