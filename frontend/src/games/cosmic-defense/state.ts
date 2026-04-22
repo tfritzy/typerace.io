@@ -548,7 +548,7 @@ export function updateState(state: GameState, dt: number): void {
         if (dx * dx + dy * dy > r2) continue;
         if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
         if (shooter.freezeStacks > 0) other.freezeStacks += shooter.freezeStacks;
-        dealDamageToEntity(state, shooter, other, dmg);
+        if (dmg > 0) dealDamageToEntity(state, shooter, other, dmg);
       }
     } else {
       const target = shot.targetEntityId !== null ? state.entityById.get(shot.targetEntityId) : null;
