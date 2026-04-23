@@ -1,4 +1,4 @@
-import { AnimatedSprite, Container, Graphics, Sprite } from "pixi.js";
+import { Container, Graphics, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState } from "./state";
 import { spawnAlliedEntity } from "./state";
@@ -18,9 +18,6 @@ const CHARGE_DOT_RADIUS = 2;
 const CHARGE_DOT_SPACING = 7;
 const CHARGE_DOT_OFFSET = 28;
 
-const WARP_IN_SCALE = 2;
-const WARP_IN_ANIMATION_SPEED = 0.25;
-
 export class ShipManager {
   readonly layer: Container;
   private assets: AssetManager;
@@ -28,7 +25,6 @@ export class ShipManager {
   private chargeGraphics = new Map<number, Graphics>();
   private healthBarGraphics = new Map<number, Graphics>();
   private activeEntityIds = new Set<number>();
-  private warpInAnimations: AnimatedSprite[] = [];
 
   constructor(assets: AssetManager) {
     this.assets = assets;
@@ -44,7 +40,6 @@ export class ShipManager {
 
   update(state: GameState, dt: number): void {
     this.syncRendering(state, dt);
-    this.tickWarpInAnimations();
   }
 
   private createDisplayObject(entity: EntityState): Container {
@@ -114,7 +109,7 @@ export class ShipManager {
         display = this.createDisplayObject(entity);
         this.layer.addChild(display);
         this.entityDisplayObjects.set(entity.id, display);
-        this.spawnWarpIn(entity.x, entity.y);}
+      }
       display.x = entity.x;
       display.y = entity.y;
       entity.displayRotation = approachAngle(entity.displayRotation, entity.rotation, maxStep);
@@ -142,30 +137,6 @@ export class ShipManager {
     }
   }
 
-  private spawnWarpIn(x: number, y: number): void {
-    const textures = this.assets.getWarpInTextures();
-    const sprite = new AnimatedSprite(textures);
-    sprite.anchor.set(0.5);
-    sprite.scale.set(WARP_IN_SCALE);
-    sprite.x = x;
-    sprite.y = y;
-    sprite.animationSpeed = WARP_IN_ANIMATION_SPEED;
-    sprite.loop = false;
-    sprite.play();
-    this.layer.addChild(sprite);
-    this.warpInAnimations.push(sprite);
-  }
-
-  private tickWarpInAnimations(): void {
-    for (let i = this.warpInAnimations.length - 1; i >= 0; i--) {
-      const anim = this.warpInAnimations[i];
-      if (!anim.playing) {
-        anim.destroy();
-        this.warpInAnimations.splice(i, 1);
-      }
-    }
-  }
-
   destroy(): void {
     for (const d of this.entityDisplayObjects.values()) d.destroy();
     this.entityDisplayObjects.clear();
@@ -173,8 +144,6 @@ export class ShipManager {
     this.chargeGraphics.clear();
     for (const g of this.healthBarGraphics.values()) g.destroy();
     this.healthBarGraphics.clear();
-    for (const anim of this.warpInAnimations) anim.destroy();
-    this.warpInAnimations.length = 0;
     this.layer.destroy();
   }
 }

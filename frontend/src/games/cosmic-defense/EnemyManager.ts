@@ -9,6 +9,8 @@ import { drawHealthBar } from "./healthBar";
 
 const SHIP_DEATH_EXPLOSION_SCALE = 2.5;
 const SHIP_DEATH_ANIMATION_SPEED = 0.3;
+const WARP_IN_SCALE = 2;
+const WARP_IN_ANIMATION_SPEED = 0.25;
 
 export class EnemyManager {
   readonly layer: Container;
@@ -18,6 +20,7 @@ export class EnemyManager {
   private healthBarGraphics = new Map<number, Graphics>();
   private activeEntityIds = new Set<number>();
   private deathAnimations: AnimatedSprite[] = [];
+  private warpInAnimations: AnimatedSprite[] = [];
   private unsubDeath: (() => void) | null = null;
 
   constructor(assets: AssetManager) {
@@ -35,6 +38,7 @@ export class EnemyManager {
     updateSpawner(state, dt);
     this.syncRendering(state, dt);
     this.tickDeathAnimations();
+    this.tickWarpInAnimations();
   }
 
   private createDisplayObject(entity: EntityState): Container {
@@ -97,6 +101,7 @@ export class EnemyManager {
         display = this.createDisplayObject(entity);
         this.layer.addChild(display);
         this.entityDisplayObjects.set(entity.id, display);
+        this.spawnWarpIn(entity.x, entity.y);
       }
       display.x = entity.x;
       display.y = entity.y;
@@ -120,6 +125,30 @@ export class EnemyManager {
     }
   }
 
+  private spawnWarpIn(x: number, y: number): void {
+    const textures = this.assets.getWarpInTextures();
+    const sprite = new AnimatedSprite(textures);
+    sprite.anchor.set(0.5);
+    sprite.scale.set(WARP_IN_SCALE);
+    sprite.x = x;
+    sprite.y = y;
+    sprite.animationSpeed = WARP_IN_ANIMATION_SPEED;
+    sprite.loop = false;
+    sprite.play();
+    this.layer.addChild(sprite);
+    this.warpInAnimations.push(sprite);
+  }
+
+  private tickWarpInAnimations(): void {
+    for (let i = this.warpInAnimations.length - 1; i >= 0; i--) {
+      const anim = this.warpInAnimations[i];
+      if (!anim.playing) {
+        anim.destroy();
+        this.warpInAnimations.splice(i, 1);
+      }
+    }
+  }
+
   destroy(): void {
     if (this.unsubDeath) {
       this.unsubDeath();
@@ -131,6 +160,8 @@ export class EnemyManager {
     this.healthBarGraphics.clear();
     for (const anim of this.deathAnimations) anim.destroy();
     this.deathAnimations.length = 0;
+    for (const anim of this.warpInAnimations) anim.destroy();
+    this.warpInAnimations.length = 0;
     this.layer.destroy();
   }
 }
