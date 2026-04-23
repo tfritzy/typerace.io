@@ -1,8 +1,15 @@
-import { AnimatedSprite, Container } from "pixi.js";
+import { AnimatedSprite, ColorMatrixFilter, Container, type ColorMatrix } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 
 const WARP_IN_SCALE = 2;
 const WARP_IN_ANIMATION_SPEED = 0.25;
+
+const BLUE_TINT_MATRIX: ColorMatrix = [
+  0, 0, 1, 0, 0,
+  0, 1, 0, 0, 0,
+  1, 0, 0, 0, 0,
+  0, 0, 0, 1, 0,
+];
 
 export class WarpInManager {
   readonly layer: Container;
@@ -22,6 +29,9 @@ export class WarpInManager {
     sprite.y = y;
     sprite.animationSpeed = WARP_IN_ANIMATION_SPEED;
     sprite.loop = false;
+    const filter = new ColorMatrixFilter();
+    filter.matrix = BLUE_TINT_MATRIX;
+    sprite.filters = [filter];
     sprite.onComplete = () => {
       sprite.destroy();
     };
