@@ -1,4 +1,4 @@
-import { Assets, Rectangle, Texture, type Application, type AssetsManifest, Sprite, type Spritesheet } from "pixi.js";
+import { Assets, Texture, type Application, type AssetsManifest, Sprite, type Spritesheet } from "pixi.js";
 import { ColorPreset, type EntityType, type ProjectileType, getShipEntityIndex } from "./types";
 import { applyPaletteSwap } from "../planetary-defense/ships";
 
@@ -28,7 +28,7 @@ export class AssetManager {
   private plasmaExplosionSheet_: Spritesheet;
   private shipDeathExplosionSheet_: Spritesheet;
   private iceExplosionSheet_: Spritesheet;
-  private warpInTexture_: Texture;
+  private warpInSheet_: Spritesheet;
 
   constructor(loaded: Record<string, unknown>) {
     const presetAliasValues = Object.values(COLOR_PRESET_ALIASES);
@@ -48,7 +48,7 @@ export class AssetManager {
     this.plasmaExplosionSheet_ = loaded["plasma-explosion"] as Spritesheet;
     this.shipDeathExplosionSheet_ = loaded["ship-death-explosion"] as Spritesheet;
     this.iceExplosionSheet_ = loaded["ice-explosion"] as Spritesheet;
-    this.warpInTexture_ = loaded["warp-in"] as Texture;
+    this.warpInSheet_ = loaded["warp-in"] as Spritesheet;
 
     this.applyNearestNeighbor();
   }
@@ -113,12 +113,8 @@ export class AssetManager {
 
   getWarpInTextures(): Texture[] {
     const textures: Texture[] = [];
-    const frameSize = 64;
-    for (let col = 0; col < 7; col++) {
-      textures.push(new Texture({
-        source: this.warpInTexture_.source,
-        frame: new Rectangle(col * frameSize, 0, frameSize, frameSize),
-      }));
+    for (let i = 0; i < 7; i++) {
+      textures.push(this.warpInSheet_.textures[`warp-in-${i}`]);
     }
     return textures;
   }
@@ -163,6 +159,6 @@ export class AssetManager {
     setNearestNeighbor(this.plasmaExplosionSheet_);
     setNearestNeighbor(this.shipDeathExplosionSheet_);
     setNearestNeighbor(this.iceExplosionSheet_);
-    setTextureNearest(this.warpInTexture_);
+    setNearestNeighbor(this.warpInSheet_);
   }
 }
