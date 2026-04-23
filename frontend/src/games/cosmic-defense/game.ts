@@ -6,7 +6,6 @@ import { PlanetManager } from "./PlanetManager";
 import { EnemyManager } from "./EnemyManager";
 import { ExplosionManager } from "./ExplosionManager";
 import { ShipManager } from "./ShipManager";
-import { WarpInManager } from "./WarpInManager";
 import { DamageNumberManager } from "./DamageNumberManager";
 import { LaserBeamManager } from "./LaserBeamManager";
 import { GemManager } from "./GemManager";
@@ -26,7 +25,6 @@ export class CosmicDefenseGame {
   private planetManager!: PlanetManager;
   private enemyManager!: EnemyManager;
   private explosionManager!: ExplosionManager;
-  private warpInManager!: WarpInManager;
   private damageNumberManager!: DamageNumberManager;
   private laserBeamManager!: LaserBeamManager;
   private gemManager!: GemManager;
@@ -66,10 +64,6 @@ export class CosmicDefenseGame {
 
     this.shipManager = new ShipManager(assetManager);
     world.addChild(this.shipManager.layer);
-
-    this.warpInManager = new WarpInManager(assetManager);
-    world.addChild(this.warpInManager.layer);
-    this.shipManager.setWarpInManager(this.warpInManager);
 
     this.laserBeamManager = new LaserBeamManager();
     world.addChild(this.laserBeamManager.layer);
@@ -113,7 +107,6 @@ export class CosmicDefenseGame {
     this.planetManager.destroy();
     this.enemyManager.destroy();
     this.explosionManager.destroy();
-    this.warpInManager.destroy();
     this.laserBeamManager.destroy();
     this.gemManager.destroy();
     this.damageNumberManager.destroy();
