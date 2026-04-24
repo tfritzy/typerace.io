@@ -6,7 +6,6 @@ interface SimulationOptions {
   runs: number;
   dt: number;
   keystrokesPerSecond: number;
-  seed: number;
 }
 
 interface ShipStats {
@@ -19,18 +18,7 @@ const DEFAULT_OPTIONS: SimulationOptions = {
   runs: 100,
   dt: 0.1,
   keystrokesPerSecond: 8,
-  seed: 1337,
 };
-
-function createSeededRandom(seed: number): () => number {
-  let state = seed >>> 0;
-  return () => {
-    state = (state + 0x6D2B79F5) >>> 0;
-    let t = Math.imul(state ^ (state >>> 15), 1 | state);
-    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
 function parseNumber(value: string | undefined, fallback: number): number {
   if (!value) return fallback;
@@ -48,35 +36,11 @@ function parseArgs(args: string[]): SimulationOptions {
     if (key === "keystrokes-per-second") {
       options.keystrokesPerSecond = Math.max(0, parseNumber(rawValue, options.keystrokesPerSecond));
     }
-    if (key === "seed") options.seed = Math.floor(parseNumber(rawValue, options.seed));
   }
   return options;
 }
 
-function runSingleSimulation(random: () => number, dt: number, keystrokesPerSecond: number): Map<EntityType, number> {
-  const game = new CosmicDefenseCore({ random, maxLevel: 100 });
-  let keystrokeAccumulator = 0;
-
-  while (game.state.planetHealth > 0) {
-    if (game.state.pendingChoice) {
-      const choices = game.getChoices();
-      if (choices.length === 0) break;
-      const choice = choices[Math.floor(random() * choices.length)];
-      if (!game.selectChoice(choice)) break;
-      if (game.state.level >= game.state.maxLevel && !game.state.pendingChoice) break;
-      continue;
-    }
-
-    game.update(dt);
-    keystrokeAccumulator += keystrokesPerSecond * dt;
-    while (keystrokeAccumulator >= 1) {
-      game.onCorrectKeystroke();
-      keystrokeAccumulator -= 1;
-    }
-
-    if (game.state.level >= game.state.maxLevel && !game.state.pendingChoice) break;
-  }
-
+function getCurrentLevels(game: CosmicDefenseCore): Map<EntityType, number> {
   const levels = new Map<EntityType, number>();
   for (const slot of game.getSlots()) {
     if (slot.occupant && slot.level > 0) {
@@ -86,6 +50,39 @@ function runSingleSimulation(random: () => number, dt: number, keystrokesPerSeco
   return levels;
 }
 
+function hasReachedSimulationCap(levels: Map<EntityType, number>): boolean {
+  for (const level of levels.values()) {
+    if (level >= 100) return true;
+  }
+  return false;
+}
+
+function runSingleSimulation(dt: number, keystrokesPerSecond: number): Map<EntityType, number> {
+  const game = new CosmicDefenseCore();
+  let keystrokeAccumulator = 0;
+
+  while (game.state.planetHealth > 0) {
+    if (game.state.pendingChoice) {
+      const choices = game.getChoices();
+      if (choices.length === 0) break;
+      const choice = choices[Math.floor(Math.random() * choices.length)];
+      if (!game.selectChoice(choice)) break;
+      const levels = getCurrentLevels(game);
+      if (hasReachedSimulationCap(levels)) return levels;
+      continue;
+    }
+
+    game.update(dt);
+    keystrokeAccumulator += keystrokesPerSecond * dt;
+    while (keystrokeAccumulator >= 1) {
+      game.onCorrectKeystroke();
+      keystrokeAccumulator -= 1;
+    }
+  }
+
+  return getCurrentLevels(game);
+}
+
 function formatRow(entityType: EntityType, stats: ShipStats): string {
   const averageLevel = stats.selectedRuns > 0 ? stats.totalFinalLevel / stats.selectedRuns : 0;
   return `${entityType.padEnd(8)} selected_runs=${String(stats.selectedRuns).padStart(4)} avg_final_level=${averageLevel.toFixed(2).padStart(6)} max_final_level=${String(stats.maxFinalLevel).padStart(3)}`;
@@ -93,7 +90,6 @@ function formatRow(entityType: EntityType, stats: ShipStats): string {
 
 function main(): void {
   const options = parseArgs(process.argv.slice(2));
-  const masterRandom = createSeededRandom(options.seed);
   const stats = new Map<EntityType, ShipStats>();
 
   for (const blueprint of SHIP_BLUEPRINTS) {
@@ -105,12 +101,7 @@ function main(): void {
   }
 
   for (let run = 0; run < options.runs; run++) {
-    const runSeed = Math.floor(masterRandom() * 0xFFFFFFFF) >>> 0;
-    const levels = runSingleSimulation(
-      createSeededRandom(runSeed),
-      options.dt,
-      options.keystrokesPerSecond
-    );
+    const levels = runSingleSimulation(options.dt, options.keystrokesPerSecond);
     for (const [entityType, level] of levels) {
       const entry = stats.get(entityType);
       if (!entry) continue;
@@ -121,7 +112,7 @@ function main(): void {
   }
 
   console.log(
-    `cosmic-defense simulation runs=${options.runs} seed=${options.seed} dt=${options.dt} keystrokes_per_second=${options.keystrokesPerSecond} max_level=100`
+    `cosmic-defense simulation runs=${options.runs} dt=${options.dt} keystrokes_per_second=${options.keystrokesPerSecond} stop_level=100`
   );
   for (const blueprint of SHIP_BLUEPRINTS) {
     const entry = stats.get(blueprint.entityType);

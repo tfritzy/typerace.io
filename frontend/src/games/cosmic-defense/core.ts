@@ -8,7 +8,6 @@ import {
   onCorrectKeystroke as onCorrectKeystrokeForState,
   setSpawnerPaused,
   spawnAlliedEntity,
-  type CreateGameStateOptions,
   type EntityState,
   type GameState,
   type TargetingMode,
@@ -21,7 +20,7 @@ const DAMAGE_ROLES = new Set([
   "plasma", "shooter", "ice_beam", "plasma_single", "chain", "mac_cannon",
 ]);
 
-export interface CosmicDefenseCoreOptions extends CreateGameStateOptions {
+export interface CosmicDefenseCoreOptions {
   slots?: PlacementSlot[];
 }
 
@@ -33,9 +32,7 @@ export interface ShipChoice {
 }
 
 export function generateShipChoices(
-  slots: PlacementSlot[],
-  maxLevel: number,
-  random: () => number
+  slots: PlacementSlot[]
 ): EntityType[] {
   const existing = new Map(
     slots
@@ -50,22 +47,16 @@ export function generateShipChoices(
     const basePool = hasAnyShip
       ? SHIP_BLUEPRINTS
       : SHIP_BLUEPRINTS.filter((bp) => DAMAGE_ROLES.has(bp.role));
-    pool = basePool
-      .map((bp) => bp.entityType)
-      .filter((entityType) => {
-        const slot = existing.get(entityType);
-        return !slot || slot.level < maxLevel;
-      });
+    pool = basePool.map((bp) => bp.entityType);
   } else {
     pool = [...existing.values()]
-      .filter((slot) => slot.level < maxLevel)
       .map((slot) => slot.occupant!)
       .filter((entityType) => entityType !== null);
   }
 
   const shuffled = [...pool];
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
+    const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled.slice(0, Math.min(3, shuffled.length));
@@ -88,7 +79,7 @@ export class CosmicDefenseCore {
   private choices: EntityType[] = [];
 
   constructor(options: CosmicDefenseCoreOptions = {}) {
-    this.state = createGameState(options);
+    this.state = createGameState();
     this.slots = cloneSlots(options.slots ?? generateSlots());
     this.refreshChoices();
   }
@@ -131,7 +122,7 @@ export class CosmicDefenseCore {
         entityType,
         isUpgrade: !!slot,
         currentLevel,
-        nextLevel: Math.min(this.state.maxLevel, currentLevel + 1),
+        nextLevel: currentLevel + 1,
       };
     });
   }
@@ -152,8 +143,7 @@ export class CosmicDefenseCore {
 
     const existingSlot = this.slots.find((slot) => slot.occupant === entityType);
     if (existingSlot && existingSlot.entityId !== null) {
-      const nextLevel = Math.min(this.state.maxLevel, existingSlot.level + 1);
-      if (nextLevel === existingSlot.level) return false;
+      const nextLevel = existingSlot.level + 1;
       const config = FRIENDLY_CONFIG_MAP.get(entityType);
       if (!config) return false;
       levelUpEntity(this.state, existingSlot.entityId, config, nextLevel);
@@ -183,7 +173,7 @@ export class CosmicDefenseCore {
       this.choices = [];
       return;
     }
-    this.choices = generateShipChoices(this.slots, this.state.maxLevel, this.state.random);
+    this.choices = generateShipChoices(this.slots);
     if (this.choices.length === 0) {
       this.state.pendingChoice = false;
       this.state.spawner.paused = false;

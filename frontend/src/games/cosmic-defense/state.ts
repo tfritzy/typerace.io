@@ -7,8 +7,6 @@ export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
-export const DEFAULT_MAX_LEVEL = 100;
-export const MAX_RANDOM_VALUE = 1 - Number.EPSILON;
 
 export enum TargetingMode {
   NearestToShip = 0,
@@ -153,30 +151,11 @@ export interface GameState {
   spawner: SpawnState;
   xp: number;
   level: number;
-  maxLevel: number;
   pendingChoice: boolean;
-  random: () => number;
   onPlanetDamaged: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
   onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
   onLevelUp: GameEvent;
-}
-
-export interface CreateGameStateOptions {
-  random?: () => number;
-  maxLevel?: number;
-}
-
-export function normalizeRandomValue(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  if (value <= 0) return 0;
-  if (value >= 1) return MAX_RANDOM_VALUE;
-  return value;
-}
-
-function createRandomSource(random?: () => number): () => number {
-  if (!random) return Math.random;
-  return () => normalizeRandomValue(random());
 }
 
 let gameState: GameState | null = null;
@@ -198,7 +177,7 @@ export function onStateCreated(cb: () => void): () => void {
   };
 }
 
-export function createGameState(options: CreateGameStateOptions = {}): GameState {
+export function createGameState(): GameState {
   const state: GameState = {
     entities: [],
     entityById: new Map(),
@@ -217,9 +196,7 @@ export function createGameState(options: CreateGameStateOptions = {}): GameState
     },
     xp: 0,
     level: 1,
-    maxLevel: options.maxLevel ?? DEFAULT_MAX_LEVEL,
     pendingChoice: true,
-    random: createRandomSource(options.random),
     onPlanetDamaged: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
     onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
@@ -297,18 +274,18 @@ function makeBaseEntity(
   };
 }
 
-function spawnInRightThird(state: GameState): { x: number; y: number } {
+function spawnInRightThird(): { x: number; y: number } {
   const pad = 60;
   const xStart = (CANVAS_WIDTH * 2) / 3;
   return {
-    x: xStart + state.random() * (CANVAS_WIDTH - xStart - pad),
-    y: pad + state.random() * (CANVAS_HEIGHT - pad * 2),
+    x: xStart + Math.random() * (CANVAS_WIDTH - xStart - pad),
+    y: pad + Math.random() * (CANVAS_HEIGHT - pad * 2),
   };
 }
 
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
-  const { x, y } = spawnInRightThird(state);
-  const speed = (30 + state.random() * 52.5) * 0.75;
+  const { x, y } = spawnInRightThird();
+  const speed = (30 + Math.random() * 52.5) * 0.75;
   const entity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
   entity.health = config.health;
   entity.maxHealth = config.health;
@@ -316,7 +293,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
   entity.fireRate = config.fireRate;
   entity.projectileDamage = config.projectileDamage;
   entity.projectileType = config.projectileType;
-  entity.fireTimer = state.random() * config.fireRate;
+  entity.fireTimer = Math.random() * config.fireRate;
   entity.rotation = Math.PI;
   entity.displayRotation = Math.PI;
   entity.speed = speed;
@@ -791,12 +768,12 @@ function getTierWeights(elapsed: number): number[] {
   return weights;
 }
 
-function pickEnemyTier(weights: number[], random: () => number): number {
+function pickEnemyTier(weights: number[]): number {
   let total = 0;
   for (const w of weights) total += w;
   if (total === 0) return 0;
 
-  let r = random() * total;
+  let r = Math.random() * total;
   for (let i = 0; i < weights.length; i++) {
     r -= weights[i];
     if (r <= 0) return i;
@@ -821,7 +798,7 @@ export function updateSpawner(state: GameState, dt: number): void {
 
   while (state.spawner.spawnAccumulator >= 1) {
     state.spawner.spawnAccumulator -= 1;
-    const tierIndex = pickEnemyTier(weights, state.random);
+    const tierIndex = pickEnemyTier(weights);
     const config = ENEMY_CATALOG[tierIndex];
     spawnEntity(state, config, Team.Enemy);
   }
@@ -836,7 +813,7 @@ export function xpForNextLevel(level: number): number {
 }
 
 export function awardXP(state: GameState, amount: number): void {
-  if (state.pendingChoice || state.level >= state.maxLevel) return;
+  if (state.pendingChoice) return;
   state.xp += amount;
   const needed = xpForNextLevel(state.level);
   if (state.xp >= needed) {
@@ -851,9 +828,8 @@ export function awardXP(state: GameState, amount: number): void {
 export function levelUpEntity(state: GameState, entityId: number, config: FriendlyConfig, newLevel: number): void {
   const entity = state.entityById.get(entityId);
   if (!entity) return;
-  const nextLevel = Math.min(newLevel, state.maxLevel);
-  const scaled = getScaledConfig(config, nextLevel);
-  entity.level = nextLevel;
+  const scaled = getScaledConfig(config, newLevel);
+  entity.level = newLevel;
   entity.maxHealth = scaled.health;
   entity.health = scaled.health;
   entity.projectileDamage = scaled.projectileDamage;
