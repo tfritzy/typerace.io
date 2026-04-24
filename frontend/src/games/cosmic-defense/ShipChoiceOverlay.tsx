@@ -58,6 +58,7 @@ export const ShipChoiceOverlay = ({
         <div className="flex gap-5">
           {choices.map((entityType, i) => {
             const bp = SHIP_BLUEPRINT_MAP.get(entityType);
+            if (!bp) return null;
             const config = FRIENDLY_CONFIG_MAP.get(entityType);
             const preview = shipPreviews.get(entityType);
             const existingSlot = existing.get(entityType);
@@ -65,7 +66,6 @@ export const ShipChoiceOverlay = ({
             const currentLevel = existingSlot?.level ?? 0;
             const hotkey = i + 1;
             const charges = config?.chargesRequired ?? 0;
-            if (!bp) return null;
 
             return (
               <button

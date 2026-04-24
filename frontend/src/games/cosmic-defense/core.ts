@@ -12,7 +12,6 @@ import {
   type EntityState,
   type GameState,
   type TargetingMode,
-  normalizeRandomValue,
   updateSpawner,
   updateState,
 } from "./state";
@@ -66,7 +65,7 @@ export function generateShipChoices(
 
   const shuffled = [...pool];
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(normalizeRandomValue(random()) * (i + 1));
+    const j = Math.floor(random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled.slice(0, Math.min(3, shuffled.length));
