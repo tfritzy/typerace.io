@@ -8,6 +8,7 @@ export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
 export const DEFAULT_MAX_LEVEL = 100;
+export const MAX_RANDOM_VALUE = 1 - Number.EPSILON;
 
 export enum TargetingMode {
   NearestToShip = 0,
@@ -166,10 +167,10 @@ export interface CreateGameStateOptions {
   maxLevel?: number;
 }
 
-function normalizeRandomValue(value: number): number {
+export function normalizeRandomValue(value: number): number {
   if (!Number.isFinite(value)) return 0;
   if (value <= 0) return 0;
-  if (value >= 1) return 0.9999999999999999;
+  if (value >= 1) return MAX_RANDOM_VALUE;
   return value;
 }
 
