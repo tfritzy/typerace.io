@@ -121,6 +121,15 @@ export class AssetManager {
     return textures;
   }
 
+  getShipTextureSize(entityType: EntityType): { width: number; height: number } {
+    const frameIndex = getShipEntityIndex(entityType);
+    const tex = this.spaceships_.textures[`ship-${frameIndex}`];
+    if (!tex || tex.width <= 0 || tex.height <= 0) {
+      return { width: 32, height: 32 };
+    }
+    return { width: tex.width, height: tex.height };
+  }
+
   getWarpInTextures(): Texture[] {
     const textures: Texture[] = [];
     for (let i = 0; i < 7; i++) {

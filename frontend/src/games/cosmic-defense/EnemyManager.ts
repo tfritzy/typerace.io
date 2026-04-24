@@ -3,14 +3,16 @@ import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState, EntityDeathData } from "./state";
 import { updateSpawner } from "./state";
 import { Team } from "./types";
+import type { EntityType } from "./types";
 import { SHIP_TURN_SPEED } from "./constants";
 import { approachAngle } from "./utils";
 import { drawHealthBar } from "./healthBar";
 
 const SHIP_DEATH_EXPLOSION_SCALE = 2.5;
 const SHIP_DEATH_ANIMATION_SPEED = 0.3;
-const WARP_IN_SCALE = 2;
+const ENEMY_CONTAINER_SCALE = 1.5;
 const WARP_IN_ANIMATION_SPEED = 0.25;
+const WARP_FRAME_SIZE = 64;
 
 export class EnemyManager {
   readonly layer: Container;
@@ -48,7 +50,7 @@ export class EnemyManager {
 
     const container = new Container();
     container.addChild(shipSprite);
-    container.scale.set(1.5);
+    container.scale.set(ENEMY_CONTAINER_SCALE);
     container.x = entity.x;
     container.y = entity.y;
 
@@ -89,11 +91,15 @@ export class EnemyManager {
     this.deathAnimations.push(sprite);
   }
 
-  private spawnWarpIn(x: number, y: number): void {
+  private spawnWarpIn(x: number, y: number, entityType: EntityType): void {
     const textures = this.assets.getWarpInTextures();
+    const { width, height } = this.assets.getShipTextureSize(entityType);
+    const maxDim = Math.max(width, height);
+    if (maxDim <= 0) return;
+    const warpScale = (maxDim * ENEMY_CONTAINER_SCALE) / WARP_FRAME_SIZE;
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
-    sprite.scale.set(WARP_IN_SCALE);
+    sprite.scale.set(warpScale);
     sprite.x = x;
     sprite.y = y;
     sprite.animationSpeed = WARP_IN_ANIMATION_SPEED;
@@ -125,7 +131,7 @@ export class EnemyManager {
         display = this.createDisplayObject(entity);
         this.layer.addChild(display);
         this.entityDisplayObjects.set(entity.id, display);
-        this.spawnWarpIn(entity.x, entity.y);
+        this.spawnWarpIn(entity.x, entity.y, entity.entityType);
       }
       display.x = entity.x;
       display.y = entity.y;
