@@ -25,7 +25,7 @@ interface ShipStats {
 const DEFAULT_OPTIONS: SimulationOptions = {
   runs: 100,
   dt: 0.1,
-  wpm: 96,
+  wpm: 50,
 };
 
 function parseNumber(value: string | undefined, fallback: number): number {
@@ -62,13 +62,6 @@ function getCurrentLevels(state: GameState): Map<EntityType, number> {
   return levels;
 }
 
-function hasReachedSimulationCap(levels: Map<EntityType, number>): boolean {
-  for (const level of levels.values()) {
-    if (level >= 100) return true;
-  }
-  return false;
-}
-
 function runSingleSimulation(dt: number, wpm: number): Map<EntityType, number> {
   const state = createGameState();
   let keystrokeAccumulator = 0;
@@ -80,8 +73,6 @@ function runSingleSimulation(dt: number, wpm: number): Map<EntityType, number> {
       if (choices.length === 0) break;
       const choice = choices[Math.floor(Math.random() * choices.length)];
       if (!selectChoice(state, choice)) break;
-      const levels = getCurrentLevels(state);
-      if (hasReachedSimulationCap(levels)) return levels;
       continue;
     }
 
@@ -125,7 +116,7 @@ function main(): void {
   }
 
   console.log(
-    `cosmic-defense simulation runs=${options.runs} dt=${options.dt} wpm=${options.wpm} stop_level=100`
+    `cosmic-defense simulation runs=${options.runs} dt=${options.dt} wpm=${options.wpm} stop_condition=planet_dead`
   );
   for (const blueprint of SHIP_BLUEPRINTS) {
     const entry = stats.get(blueprint.entityType);
