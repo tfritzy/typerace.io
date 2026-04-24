@@ -5,7 +5,7 @@ import type { EntityType } from "../src/games/cosmic-defense/types.ts";
 interface SimulationOptions {
   runs: number;
   dt: number;
-  keystrokesPerSecond: number;
+  wpm: number;
 }
 
 interface ShipStats {
@@ -17,7 +17,7 @@ interface ShipStats {
 const DEFAULT_OPTIONS: SimulationOptions = {
   runs: 100,
   dt: 0.1,
-  keystrokesPerSecond: 8,
+  wpm: 96,
 };
 
 function parseNumber(value: string | undefined, fallback: number): number {
@@ -33,11 +33,15 @@ function parseArgs(args: string[]): SimulationOptions {
     const key = rawKey.replace(/^--/, "");
     if (key === "runs") options.runs = Math.max(1, Math.floor(parseNumber(rawValue, options.runs)));
     if (key === "dt") options.dt = Math.max(0.01, parseNumber(rawValue, options.dt));
-    if (key === "keystrokes-per-second") {
-      options.keystrokesPerSecond = Math.max(0, parseNumber(rawValue, options.keystrokesPerSecond));
+    if (key === "wpm") {
+      options.wpm = Math.max(0, parseNumber(rawValue, options.wpm));
     }
   }
   return options;
+}
+
+function charsPerSecondFromWpm(wpm: number): number {
+  return (wpm * 5) / 60;
 }
 
 function getCurrentLevels(game: CosmicDefenseCore): Map<EntityType, number> {
@@ -57,9 +61,10 @@ function hasReachedSimulationCap(levels: Map<EntityType, number>): boolean {
   return false;
 }
 
-function runSingleSimulation(dt: number, keystrokesPerSecond: number): Map<EntityType, number> {
+function runSingleSimulation(dt: number, wpm: number): Map<EntityType, number> {
   const game = new CosmicDefenseCore();
   let keystrokeAccumulator = 0;
+  const charsPerSecond = charsPerSecondFromWpm(wpm);
 
   while (game.state.planetHealth > 0) {
     if (game.state.pendingChoice) {
@@ -73,7 +78,7 @@ function runSingleSimulation(dt: number, keystrokesPerSecond: number): Map<Entit
     }
 
     game.update(dt);
-    keystrokeAccumulator += keystrokesPerSecond * dt;
+    keystrokeAccumulator += charsPerSecond * dt;
     while (keystrokeAccumulator >= 1) {
       game.onCorrectKeystroke();
       keystrokeAccumulator -= 1;
@@ -101,7 +106,7 @@ function main(): void {
   }
 
   for (let run = 0; run < options.runs; run++) {
-    const levels = runSingleSimulation(options.dt, options.keystrokesPerSecond);
+    const levels = runSingleSimulation(options.dt, options.wpm);
     for (const [entityType, level] of levels) {
       const entry = stats.get(entityType);
       if (!entry) continue;
@@ -112,7 +117,7 @@ function main(): void {
   }
 
   console.log(
-    `cosmic-defense simulation runs=${options.runs} dt=${options.dt} keystrokes_per_second=${options.keystrokesPerSecond} stop_level=100`
+    `cosmic-defense simulation runs=${options.runs} dt=${options.dt} wpm=${options.wpm} stop_level=100`
   );
   for (const blueprint of SHIP_BLUEPRINTS) {
     const entry = stats.get(blueprint.entityType);

@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "simulate:cosmic-defense": "mkdir -p .sim-dist && esbuild scripts/cosmic-defense-sim.ts --bundle --platform=node --format=esm --outfile=.sim-dist/cosmic-defense-sim.js && node .sim-dist/cosmic-defense-sim.js"
+    "simulate:cosmic-defense": "sh scripts/run-cosmic-defense-sim.sh"
   },
   "dependencies": {
     "@pixi/particle-emitter": "^5.0.10",
