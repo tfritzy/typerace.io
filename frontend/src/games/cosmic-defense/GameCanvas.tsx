@@ -1,65 +1,224 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
-import { TargetingMode, xpForNextLevel } from "./state";
-import type { EntityState } from "./state";
+import {
+  GameEvent,
+  TargetingMode,
+  getChoices,
+  getEntityForSlot,
+  getSlot,
+  getSlots,
+  selectChoice,
+  setPaused,
+  setTargetingMode,
+  xpForNextLevel,
+  type EntityState,
+  type GameState,
+} from "./state";
 import { InspectionPanel } from "./UpgradePanel";
 import { PlacementOverlay } from "./PlacementOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
 import { ShipChoiceOverlay } from "./ShipChoiceOverlay";
-import { generateSlots, type PlacementSlot } from "./PlacementPoints";
+import type { PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
 const UI_REFERENCE_WIDTH = 700;
+const EMPTY_SLOTS: PlacementSlot[] = [];
+const EMPTY_CHOICES: EntityType[] = [];
+const EMPTY_HUD = { level: 1, elapsed: 0, xp: 0, xpNeeded: xpForNextLevel(1) };
+
+function useGameSubscription<T>(
+  state: GameState | null,
+  getSnapshot: (state: GameState) => T,
+  getEvents: (state: GameState) => GameEvent[],
+  fallback: T
+): T {
+  const subscribe = useCallback((onStoreChange: () => void) => {
+    if (!state) return () => {};
+    const unsubs = getEvents(state).map((event) => event.subscribe(onStoreChange));
+    return () => {
+      for (const unsub of unsubs) unsub();
+    };
+  }, [state, getEvents]);
+
+  const snapshot = useCallback(() => {
+    return state ? getSnapshot(state) : fallback;
+  }, [state, getSnapshot, fallback]);
+
+  return useSyncExternalStore(subscribe, snapshot, () => fallback);
+}
+
+const HudOverlay = ({ state }: { state: GameState | null }) => {
+  const hud = useGameSubscription(
+    state,
+    (currentState) => ({
+      level: currentState.level,
+      elapsed: Math.floor(currentState.spawner.elapsed),
+      xp: currentState.xp,
+      xpNeeded: xpForNextLevel(currentState.level),
+    }),
+    (currentState) => [currentState.onHudChanged],
+    EMPTY_HUD
+  );
+
+  return (
+    <div className="absolute top-2 left-3 z-10 flex items-center gap-2">
+      <span className="text-[11px] text-[#f9e2af] font-semibold">
+        Lv {hud.level}
+      </span>
+      <div
+        className="relative rounded-full overflow-hidden"
+        style={{
+          width: 100,
+          height: 8,
+          background: "rgba(255,255,255,0.08)",
+          border: "1px solid rgba(255,255,255,0.1)",
+        }}
+      >
+        <div
+          className="absolute left-0 top-0 h-full rounded-full"
+          style={{
+            width: `${Math.min(100, (hud.xp / hud.xpNeeded) * 100)}%`,
+            background: "linear-gradient(90deg, #f9e2af, #fab387)",
+            transition: "width 0.2s ease-out",
+          }}
+        />
+      </div>
+      <span className="text-[11px] text-[#585b70]">
+        {hud.elapsed}s
+      </span>
+    </div>
+  );
+};
+
+const PlacementOverlayLayer = ({
+  state,
+  onSlotClick,
+  activeSlotIndex,
+}: {
+  state: GameState | null;
+  onSlotClick: (slot: PlacementSlot) => void;
+  activeSlotIndex: number | null;
+}) => {
+  const slots = useGameSubscription(
+    state,
+    getSlots,
+    (currentState) => [currentState.onSlotsChanged],
+    EMPTY_SLOTS
+  );
+
+  return (
+    <PlacementOverlay
+      slots={slots}
+      onSlotClick={onSlotClick}
+      activeSlotIndex={activeSlotIndex}
+    />
+  );
+};
+
+const ShipChoiceOverlayLayer = ({
+  state,
+  shipPreviews,
+  onSelect,
+}: {
+  state: GameState | null;
+  shipPreviews: Map<EntityType, string>;
+  onSelect: (entityType: EntityType) => void;
+}) => {
+  const choiceState = useGameSubscription(
+    state,
+    (currentState) => ({
+      pendingChoice: currentState.pendingChoice,
+      level: currentState.level,
+      choices: getChoices(currentState),
+      slots: getSlots(currentState),
+    }),
+    (currentState) => [currentState.onChoicesChanged, currentState.onSlotsChanged],
+    { pendingChoice: true, level: 1, choices: EMPTY_CHOICES, slots: EMPTY_SLOTS }
+  );
+
+  if (!choiceState.pendingChoice) return null;
+
+  return (
+    <ShipChoiceOverlay
+      onSelect={onSelect}
+      shipPreviews={shipPreviews}
+      slots={choiceState.slots}
+      level={choiceState.level}
+      choices={choiceState.choices}
+    />
+  );
+};
+
+const InspectionPanelLayer = ({
+  state,
+  shipPreviews,
+  selectedSlotIndex,
+  onClose,
+}: {
+  state: GameState | null;
+  shipPreviews: Map<EntityType, string>;
+  selectedSlotIndex: number | null;
+  onClose: () => void;
+}) => {
+  const inspection = useGameSubscription(
+    state,
+    (currentState) => {
+      if (selectedSlotIndex === null) {
+        return { slot: null as PlacementSlot | null, entity: null as EntityState | null };
+      }
+      return {
+        slot: getSlot(currentState, selectedSlotIndex),
+        entity: getEntityForSlot(currentState, selectedSlotIndex),
+      };
+    },
+    (currentState) => [currentState.onSlotsChanged, currentState.onTargetingChanged],
+    { slot: null as PlacementSlot | null, entity: null as EntityState | null }
+  );
+
+  const handleTargetingChange = useCallback((mode: TargetingMode) => {
+    if (!state || selectedSlotIndex === null) return;
+    setTargetingMode(state, selectedSlotIndex, mode);
+  }, [state, selectedSlotIndex]);
+
+  if (!inspection.slot?.occupant) return null;
+
+  return (
+    <InspectionPanel
+      onClose={onClose}
+      shipPreviews={shipPreviews}
+      slot={inspection.slot}
+      entity={inspection.entity}
+      onTargetingChange={handleTargetingChange}
+    />
+  );
+};
 
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
-  const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
+  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(null);
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
-  const [slots, setSlots] = useState<PlacementSlot[]>(() => generateSlots());
   const [uiScale, setUiScale] = useState(1);
-  const [, setInspectTick] = useState(0);
-  const [pendingChoice, setPendingChoice] = useState(true);
-  const [level, setLevel] = useState(1);
-  const [elapsed, setElapsed] = useState(0);
-  const [xp, setXp] = useState(0);
-  const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
-  const [choices, setChoices] = useState<EntityType[]>([]);
 
-  const syncFromGame = useCallback((game: CosmicDefenseGame) => {
-    setSlots(game.getSlots());
-    setChoices(game.getChoices());
-    setPendingChoice(game.state.pendingChoice);
-    setLevel(game.state.level);
-    setElapsed(Math.floor(game.state.spawner.elapsed));
-    setXp(game.state.xp);
-    setXpNeeded(xpForNextLevel(game.state.level));
-    setSelectedSlot((prev) => {
-      if (!prev) return prev;
-      return game.getSlots().find((slot) => slot.index === prev.index) ?? null;
-    });
-  }, []);
+  const pendingChoice = useGameSubscription(
+    gameState,
+    (state) => state.pendingChoice,
+    (state) => [state.onChoicesChanged],
+    true
+  );
 
   useEffect(() => {
-    if (!selectedSlot?.entityId) return;
-    const interval = setInterval(() => setInspectTick((t) => t + 1), 200);
-    return () => clearInterval(interval);
-  }, [selectedSlot?.entityId]);
+    if (pendingChoice) {
+      setSelectedSlotIndex(null);
+    }
+  }, [pendingChoice]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const game = gameRef.current;
-      if (game) syncFromGame(game);
-    }, 200);
-    return () => clearInterval(interval);
-  }, [syncFromGame]);
-
-  useEffect(() => {
-    const game = gameRef.current;
-    if (!game) return;
-    game.setPaused(selectedSlot !== null || pendingChoice);
-  }, [selectedSlot, pendingChoice]);
+    if (!gameState) return;
+    setPaused(gameState, selectedSlotIndex !== null || pendingChoice);
+  }, [gameState, selectedSlotIndex, pendingChoice]);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -77,7 +236,6 @@ export const GameCanvas = () => {
     if (!div) return;
 
     let cancelled = false;
-    let unsubLevelUp: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -86,11 +244,8 @@ export const GameCanvas = () => {
           return;
         }
         gameRef.current = game;
+        setGameState(game.state);
         setShipPreviews(game.shipPreviews);
-        syncFromGame(game);
-        unsubLevelUp = game.state.onLevelUp.subscribe(() => {
-          queueMicrotask(() => syncFromGame(game));
-        });
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -98,40 +253,25 @@ export const GameCanvas = () => {
 
     return () => {
       cancelled = true;
-      unsubLevelUp?.();
       gameRef.current?.destroy();
       gameRef.current = null;
+      setGameState(null);
     };
   }, []);
 
   const handleSlotClick = useCallback((slot: PlacementSlot) => {
     if (pendingChoice) return;
-    setSelectedSlot(slot);
+    setSelectedSlotIndex(slot.index);
   }, [pendingChoice]);
 
   const handleShipChoice = useCallback((entityType: EntityType) => {
-    const game = gameRef.current;
-    if (!game) return;
-    if (!game.selectChoice(entityType)) return;
-    syncFromGame(game);
-  }, [syncFromGame]);
+    if (!gameState) return;
+    selectChoice(gameState, entityType);
+  }, [gameState]);
 
   const handleCloseInspection = useCallback(() => {
-    setSelectedSlot(null);
+    setSelectedSlotIndex(null);
   }, []);
-
-  const getSelectedEntity = useCallback((): EntityState | null => {
-    const game = gameRef.current;
-    if (!game || !selectedSlot) return null;
-    return game.getEntityForSlot(selectedSlot.index);
-  }, [selectedSlot]);
-
-  const handleTargetingChange = useCallback((mode: TargetingMode) => {
-    const game = gameRef.current;
-    if (!game || !selectedSlot) return;
-    game.setTargetingMode(selectedSlot.index, mode);
-    setInspectTick((t) => t + 1);
-  }, [selectedSlot]);
 
   return (
     <div
@@ -150,56 +290,26 @@ export const GameCanvas = () => {
           transform: `scale(${uiScale})`,
         }}
       >
-        <div className="absolute top-2 left-3 z-10 flex items-center gap-2">
-          <span className="text-[11px] text-[#f9e2af] font-semibold">
-            Lv {level}
-          </span>
-          <div
-            className="relative rounded-full overflow-hidden"
-            style={{
-              width: 100,
-              height: 8,
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.1)",
-            }}
-          >
-            <div
-              className="absolute left-0 top-0 h-full rounded-full"
-              style={{
-                width: `${Math.min(100, (xp / xpNeeded) * 100)}%`,
-                background: "linear-gradient(90deg, #f9e2af, #fab387)",
-                transition: "width 0.2s ease-out",
-              }}
-            />
-          </div>
-          <span className="text-[11px] text-[#585b70]">
-            {elapsed}s
-          </span>
-        </div>
-        <PlacementOverlay
-          slots={slots}
+        <HudOverlay state={gameState} />
+        <PlacementOverlayLayer
+          state={gameState}
           onSlotClick={handleSlotClick}
-          activeSlotIndex={selectedSlot?.index ?? null}
+          activeSlotIndex={selectedSlotIndex}
         />
-        {selectedSlot && selectedSlot.occupant && !pendingChoice && (
-          <InspectionPanel
+        {!pendingChoice && (
+          <InspectionPanelLayer
+            state={gameState}
+            shipPreviews={shipPreviews}
+            selectedSlotIndex={selectedSlotIndex}
             onClose={handleCloseInspection}
-            shipPreviews={shipPreviews}
-            slot={selectedSlot}
-            entity={getSelectedEntity()}
-            onTargetingChange={handleTargetingChange}
           />
         )}
-        {pendingChoice && (
-          <ShipChoiceOverlay
-            onSelect={handleShipChoice}
-            shipPreviews={shipPreviews}
-            slots={slots}
-            level={level}
-            choices={choices}
-          />
-        )}
-        <PhraseOverlay gameRef={gameRef} isPaused={selectedSlot !== null || pendingChoice} />
+        <ShipChoiceOverlayLayer
+          state={gameState}
+          shipPreviews={shipPreviews}
+          onSelect={handleShipChoice}
+        />
+        <PhraseOverlay gameRef={gameRef} isPaused={selectedSlotIndex !== null || pendingChoice} />
       </div>
     </div>
   );

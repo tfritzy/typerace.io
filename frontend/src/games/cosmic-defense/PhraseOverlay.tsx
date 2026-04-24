@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CosmicDefenseGame } from "./game";
+import { onCorrectKeystroke } from "./state";
 import { getRandomWord } from "../../utils/wordLists";
 import { getLanguageFromSlug } from "../../utils/modes";
 
@@ -57,12 +58,14 @@ export const PhraseOverlay = ({
         if (currentTyped.length < currentCheckpoint) {
           currentTyped = typedRef.current.substring(0, currentCheckpoint);
         }
-      } else {
-        currentTyped = currentTyped + key;
-        if (key === currentPhrase[currentTyped.length - 1]) {
-          gameRef.current?.onCorrectKeystroke();
+        } else {
+          currentTyped = currentTyped + key;
+          if (key === currentPhrase[currentTyped.length - 1]) {
+            if (gameRef.current) {
+              onCorrectKeystroke(gameRef.current.state);
+            }
+          }
         }
-      }
 
       while (currentPhrase.length - currentTyped.length < CHAR_COUNT) {
         currentPhrase += " " + getRandomWord(getLangCode());

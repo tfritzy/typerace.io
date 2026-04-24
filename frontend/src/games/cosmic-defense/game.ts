@@ -10,11 +10,12 @@ import { DamageNumberManager } from "./DamageNumberManager";
 import { LaserBeamManager } from "./LaserBeamManager";
 import { GemManager } from "./GemManager";
 import { AssetManager } from "./assetManager";
-import { CosmicDefenseCore } from "./core";
+import { createGameState, updateGame, type GameState } from "./state";
 import type { EntityType } from "./types";
 import { SHIP_BLUEPRINTS } from "./shipBlueprints";
 
-export class CosmicDefenseGame extends CosmicDefenseCore {
+export class CosmicDefenseGame {
+  readonly state: GameState;
   private app: Application;
   private assetManager!: AssetManager;
   shipPreviews: Map<EntityType, string> = new Map();
@@ -31,8 +32,8 @@ export class CosmicDefenseGame extends CosmicDefenseCore {
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
   constructor(app: Application) {
-    super();
     this.app = app;
+    this.state = createGameState();
   }
 
   async init(): Promise<void> {
@@ -79,7 +80,7 @@ export class CosmicDefenseGame extends CosmicDefenseCore {
   }
 
   update(dt: number): void {
-    super.update(dt);
+    updateGame(this.state, dt);
     this.enemyManager.update(this.state, dt);
     this.explosionManager.update(this.state);
     this.laserBeamManager.update(this.state);

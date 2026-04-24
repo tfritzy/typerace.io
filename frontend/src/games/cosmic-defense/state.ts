@@ -1,12 +1,17 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, ExplosionType, Team, getExplosionType } from "./types";
-import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, goldForEnemy, getScaledConfig } from "./enemyConfig";
-import { getShipRole, type ShipRole } from "./shipBlueprints";
+import { ENEMY_CATALOG, FRIENDLY_CONFIG_MAP, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, goldForEnemy, getScaledConfig } from "./enemyConfig";
+import { generateSlots, type PlacementSlot } from "./PlacementPoints";
+import { getShipRole, SHIP_BLUEPRINT_MAP, SHIP_BLUEPRINTS, type ShipRole } from "./shipBlueprints";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
+const DAMAGE_ROLES = new Set([
+  "sniper", "laser", "dual_shot", "pierce_laser", "freeze",
+  "plasma", "shooter", "ice_beam", "plasma_single", "chain", "mac_cannon",
+]);
 
 export enum TargetingMode {
   NearestToShip = 0,
@@ -137,6 +142,8 @@ export interface LaserBeam {
 export interface GameState {
   entities: EntityState[];
   entityById: Map<number, EntityState>;
+  slots: PlacementSlot[];
+  choices: EntityType[];
   explosions: ExplosionState[];
   laserBeams: LaserBeam[];
   pendingShots: PendingShot[];
@@ -156,6 +163,10 @@ export interface GameState {
   onDamageDealt: GameDataEvent<DamageData>;
   onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
   onLevelUp: GameEvent;
+  onHudChanged: GameEvent;
+  onSlotsChanged: GameEvent;
+  onChoicesChanged: GameEvent;
+  onTargetingChanged: GameEvent;
 }
 
 let gameState: GameState | null = null;
@@ -181,6 +192,8 @@ export function createGameState(): GameState {
   const state: GameState = {
     entities: [],
     entityById: new Map(),
+    slots: cloneSlots(generateSlots()),
+    choices: [],
     explosions: [],
     laserBeams: [],
     pendingShots: [],
@@ -201,12 +214,138 @@ export function createGameState(): GameState {
     onDamageDealt: new GameDataEvent<DamageData>(),
     onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
     onLevelUp: new GameEvent(),
+    onHudChanged: new GameEvent(),
+    onSlotsChanged: new GameEvent(),
+    onChoicesChanged: new GameEvent(),
+    onTargetingChanged: new GameEvent(),
   };
+
+  refreshChoices(state);
 
   gameState = state;
   for (const cb of stateCreatedListeners) cb();
   stateCreatedListeners.length = 0;
   return state;
+}
+
+function cloneSlots(slots: PlacementSlot[]): PlacementSlot[] {
+  return slots.map((slot) => ({ ...slot }));
+}
+
+export function generateShipChoices(slots: PlacementSlot[]): EntityType[] {
+  const existing = new Map(
+    slots
+      .filter((slot) => slot.occupant)
+      .map((slot) => [slot.occupant!, slot])
+  );
+  const hasEmptySlot = slots.some((slot) => !slot.occupant);
+
+  let pool: EntityType[];
+  if (hasEmptySlot) {
+    const hasAnyShip = existing.size > 0;
+    const basePool = hasAnyShip
+      ? SHIP_BLUEPRINTS
+      : SHIP_BLUEPRINTS.filter((bp) => DAMAGE_ROLES.has(bp.role));
+    pool = basePool.map((bp) => bp.entityType);
+  } else {
+    pool = [...existing.values()]
+      .map((slot) => slot.occupant!)
+      .filter((entityType) => entityType !== null);
+  }
+
+  const shuffled = [...pool];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, Math.min(3, shuffled.length));
+}
+
+export function getSlots(state: GameState): PlacementSlot[] {
+  return cloneSlots(state.slots);
+}
+
+export function getChoices(state: GameState): EntityType[] {
+  return [...state.choices];
+}
+
+export function getSlot(state: GameState, slotIndex: number): PlacementSlot | null {
+  return state.slots.find((slot) => slot.index === slotIndex) ?? null;
+}
+
+export function getEntityForSlot(state: GameState, slotIndex: number): EntityState | null {
+  const slot = getSlot(state, slotIndex);
+  if (!slot?.entityId) return null;
+  return state.entityById.get(slot.entityId) ?? null;
+}
+
+export function setTargetingMode(state: GameState, slotIndex: number, mode: TargetingMode): void {
+  const entity = getEntityForSlot(state, slotIndex);
+  if (!entity) return;
+  entity.targetingMode = mode;
+  state.onTargetingChanged.emit();
+}
+
+function addShip(state: GameState, entityType: EntityType, x: number, y: number, level: number): number {
+  const config = FRIENDLY_CONFIG_MAP.get(entityType);
+  const blueprint = SHIP_BLUEPRINT_MAP.get(entityType);
+  if (!config || !blueprint) return -1;
+  return spawnAlliedEntity(state, config, blueprint.colorPreset, x, y, level);
+}
+
+function refreshChoices(state: GameState): void {
+  if (!state.pendingChoice) {
+    state.choices = [];
+    state.onChoicesChanged.emit();
+    return;
+  }
+
+  state.choices = generateShipChoices(state.slots);
+  if (state.choices.length === 0) {
+    state.pendingChoice = false;
+    state.spawner.paused = false;
+  }
+  state.onChoicesChanged.emit();
+}
+
+export function selectChoice(state: GameState, entityType: EntityType): boolean {
+  if (!state.pendingChoice || !state.choices.includes(entityType)) return false;
+
+  const existingSlot = state.slots.find((slot) => slot.occupant === entityType);
+  if (existingSlot && existingSlot.entityId !== null) {
+    const nextLevel = existingSlot.level + 1;
+    const config = FRIENDLY_CONFIG_MAP.get(entityType);
+    if (!config) return false;
+    levelUpEntity(state, existingSlot.entityId, config, nextLevel);
+    existingSlot.level = nextLevel;
+  } else {
+    const emptySlot = state.slots.find((slot) => !slot.occupant);
+    if (!emptySlot) return false;
+    const entityId = addShip(state, entityType, emptySlot.x, emptySlot.y, 1);
+    if (entityId < 0) return false;
+    emptySlot.occupant = entityType;
+    emptySlot.entityId = entityId;
+    emptySlot.level = 1;
+  }
+
+  state.pendingChoice = false;
+  state.spawner.paused = false;
+  state.onSlotsChanged.emit();
+  refreshChoices(state);
+  return true;
+}
+
+export function updateGame(state: GameState, dt: number): void {
+  const previousElapsed = Math.floor(state.spawner.elapsed);
+  updateState(state, dt);
+  updateSpawner(state, dt);
+  if (Math.floor(state.spawner.elapsed) !== previousElapsed) {
+    state.onHudChanged.emit();
+  }
+}
+
+export function setPaused(state: GameState, paused: boolean): void {
+  setSpawnerPaused(state, paused);
 }
 
 function addEntity(state: GameState, entity: EntityState): void {
@@ -822,7 +961,9 @@ export function awardXP(state: GameState, amount: number): void {
     state.pendingChoice = true;
     state.spawner.paused = true;
     state.onLevelUp.emit();
+    refreshChoices(state);
   }
+  state.onHudChanged.emit();
 }
 
 export function levelUpEntity(state: GameState, entityId: number, config: FriendlyConfig, newLevel: number): void {

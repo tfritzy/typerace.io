@@ -1,5 +1,13 @@
-import { CosmicDefenseCore } from "../src/games/cosmic-defense/core.ts";
 import { SHIP_BLUEPRINTS } from "../src/games/cosmic-defense/shipBlueprints.ts";
+import {
+  createGameState,
+  getChoices,
+  getSlots,
+  onCorrectKeystroke,
+  selectChoice,
+  updateGame,
+  type GameState,
+} from "../src/games/cosmic-defense/state.ts";
 import type { EntityType } from "../src/games/cosmic-defense/types.ts";
 
 interface SimulationOptions {
@@ -44,9 +52,9 @@ function charsPerSecondFromWpm(wpm: number): number {
   return (wpm * 5) / 60;
 }
 
-function getCurrentLevels(game: CosmicDefenseCore): Map<EntityType, number> {
+function getCurrentLevels(state: GameState): Map<EntityType, number> {
   const levels = new Map<EntityType, number>();
-  for (const slot of game.getSlots()) {
+  for (const slot of getSlots(state)) {
     if (slot.occupant && slot.level > 0) {
       levels.set(slot.occupant, slot.level);
     }
@@ -62,30 +70,30 @@ function hasReachedSimulationCap(levels: Map<EntityType, number>): boolean {
 }
 
 function runSingleSimulation(dt: number, wpm: number): Map<EntityType, number> {
-  const game = new CosmicDefenseCore();
+  const state = createGameState();
   let keystrokeAccumulator = 0;
   const charsPerSecond = charsPerSecondFromWpm(wpm);
 
-  while (game.state.planetHealth > 0) {
-    if (game.state.pendingChoice) {
-      const choices = game.getChoices();
+  while (state.planetHealth > 0) {
+    if (state.pendingChoice) {
+      const choices = getChoices(state);
       if (choices.length === 0) break;
       const choice = choices[Math.floor(Math.random() * choices.length)];
-      if (!game.selectChoice(choice)) break;
-      const levels = getCurrentLevels(game);
+      if (!selectChoice(state, choice)) break;
+      const levels = getCurrentLevels(state);
       if (hasReachedSimulationCap(levels)) return levels;
       continue;
     }
 
-    game.update(dt);
+    updateGame(state, dt);
     keystrokeAccumulator += charsPerSecond * dt;
     while (keystrokeAccumulator >= 1) {
-      game.onCorrectKeystroke();
+      onCorrectKeystroke(state);
       keystrokeAccumulator -= 1;
     }
   }
 
-  return getCurrentLevels(game);
+  return getCurrentLevels(state);
 }
 
 function formatRow(entityType: EntityType, stats: ShipStats): string {
