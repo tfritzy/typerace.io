@@ -12,6 +12,7 @@ import {
   type EntityState,
   type GameState,
   type TargetingMode,
+  updateSpawner,
   updateState,
 } from "./state";
 
@@ -95,6 +96,7 @@ export class CosmicDefenseCore {
   update(dt: number): void {
     const wasPendingChoice = this.state.pendingChoice;
     updateState(this.state, dt);
+    updateSpawner(this.state, dt);
     if (!wasPendingChoice && this.state.pendingChoice) {
       this.refreshChoices();
     }

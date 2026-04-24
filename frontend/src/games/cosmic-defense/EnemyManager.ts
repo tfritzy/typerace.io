@@ -1,7 +1,6 @@
 import { AnimatedSprite, Container, Graphics, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState, EntityDeathData } from "./state";
-import { updateSpawner } from "./state";
 import { Team } from "./types";
 import type { EntityType } from "./types";
 import { SHIP_TURN_SPEED } from "./constants";
@@ -37,7 +36,6 @@ export class EnemyManager {
   }
 
   update(state: GameState, dt: number): void {
-    updateSpawner(state, dt);
     this.syncRendering(state, dt);
     this.tickDeathAnimations();
     this.tickWarpInAnimations();
