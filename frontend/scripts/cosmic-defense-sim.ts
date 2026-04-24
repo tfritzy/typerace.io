@@ -105,7 +105,7 @@ function main(): void {
   }
 
   for (let run = 0; run < options.runs; run++) {
-    const runSeed = Math.floor(masterRandom() * 0xFFFFFFFF);
+    const runSeed = Math.floor(masterRandom() * 0xFFFFFFFF) >>> 0;
     const levels = runSingleSimulation(
       createSeededRandom(runSeed),
       options.dt,

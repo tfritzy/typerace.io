@@ -166,6 +166,18 @@ export interface CreateGameStateOptions {
   maxLevel?: number;
 }
 
+function normalizeRandomValue(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  if (value <= 0) return 0;
+  if (value >= 1) return 0.9999999999999999;
+  return value;
+}
+
+function createRandomSource(random?: () => number): () => number {
+  if (!random) return Math.random;
+  return () => normalizeRandomValue(random());
+}
+
 let gameState: GameState | null = null;
 const stateCreatedListeners: Array<() => void> = [];
 
@@ -206,7 +218,7 @@ export function createGameState(options: CreateGameStateOptions = {}): GameState
     level: 1,
     maxLevel: options.maxLevel ?? DEFAULT_MAX_LEVEL,
     pendingChoice: true,
-    random: options.random ?? Math.random,
+    random: createRandomSource(options.random),
     onPlanetDamaged: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
     onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),

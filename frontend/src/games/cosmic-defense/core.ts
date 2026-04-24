@@ -65,7 +65,7 @@ export function generateShipChoices(
 
   const shuffled = [...pool];
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
+    const j = Math.floor(Math.min(0.9999999999999999, Math.max(0, random())) * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled.slice(0, Math.min(3, shuffled.length));
