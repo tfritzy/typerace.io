@@ -34,11 +34,8 @@ function useGameSubscription<T>(
 ): T {
   const snapshotRef = useRef(getSnapshot);
   const eventsRef = useRef(getEvents);
-
-  useEffect(() => {
-    snapshotRef.current = getSnapshot;
-    eventsRef.current = getEvents;
-  }, [getSnapshot, getEvents]);
+  snapshotRef.current = getSnapshot;
+  eventsRef.current = getEvents;
 
   const subscribe = useCallback((onStoreChange: () => void) => {
     if (!state) return () => {};
