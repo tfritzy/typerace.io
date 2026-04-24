@@ -209,7 +209,7 @@ export const GameCanvas = () => {
   const pendingChoice = useGameSubscription(
     gameState,
     (state) => state.pendingChoice,
-    (state) => [state.onChoicesChanged],
+    (state) => [state.onPendingChoiceChanged],
     true
   );
 

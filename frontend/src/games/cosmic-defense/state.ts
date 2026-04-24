@@ -167,6 +167,7 @@ export interface GameState {
   onSlotsChanged: GameEvent;
   onChoicesChanged: GameEvent;
   onTargetingChanged: GameEvent;
+  onPendingChoiceChanged: GameEvent;
 }
 
 let gameState: GameState | null = null;
@@ -218,6 +219,7 @@ export function createGameState(): GameState {
     onSlotsChanged: new GameEvent(),
     onChoicesChanged: new GameEvent(),
     onTargetingChanged: new GameEvent(),
+    onPendingChoiceChanged: new GameEvent(),
   };
 
   refreshChoices(state);
@@ -233,22 +235,18 @@ function cloneSlots(slots: PlacementSlot[]): PlacementSlot[] {
 }
 
 export function generateShipChoices(slots: PlacementSlot[]): EntityType[] {
-  const existing = new Map(
-    slots
-      .filter((slot) => slot.occupant)
-      .map((slot) => [slot.occupant!, slot])
-  );
   const hasEmptySlot = slots.some((slot) => !slot.occupant);
+  const occupiedSlots = slots.filter((slot) => slot.occupant);
 
   let pool: EntityType[];
   if (hasEmptySlot) {
-    const hasAnyShip = existing.size > 0;
+    const hasAnyShip = occupiedSlots.length > 0;
     const basePool = hasAnyShip
       ? SHIP_BLUEPRINTS
       : SHIP_BLUEPRINTS.filter((bp) => DAMAGE_ROLES.has(bp.role));
     pool = basePool.map((bp) => bp.entityType);
   } else {
-    pool = [...existing.values()]
+    pool = occupiedSlots
       .map((slot) => slot.occupant!)
       .filter((entityType) => entityType !== null);
   }
@@ -304,6 +302,7 @@ function refreshChoices(state: GameState): void {
   if (state.choices.length === 0) {
     state.pendingChoice = false;
     state.spawner.paused = false;
+    state.onPendingChoiceChanged.emit();
   }
   state.onChoicesChanged.emit();
 }
@@ -330,6 +329,7 @@ export function selectChoice(state: GameState, entityType: EntityType): boolean 
 
   state.pendingChoice = false;
   state.spawner.paused = false;
+  state.onPendingChoiceChanged.emit();
   state.onSlotsChanged.emit();
   refreshChoices(state);
   return true;
@@ -960,6 +960,7 @@ export function awardXP(state: GameState, amount: number): void {
     state.level++;
     state.pendingChoice = true;
     state.spawner.paused = true;
+    state.onPendingChoiceChanged.emit();
     state.onLevelUp.emit();
     refreshChoices(state);
   }
