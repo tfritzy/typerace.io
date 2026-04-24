@@ -102,7 +102,9 @@ export interface FriendlyConfig {
   hitDelay: number;
 }
 
-export const ENEMY_CATALOG: EnemyConfig[] = [
+const ENEMY_HEALTH_MULTIPLIER = 2;
+
+const ENEMY_BASE_CATALOG: EnemyConfig[] = [
   { entityType: "Pulse", health: 30, power: 40, fireRate: 2.2, projectileDamage: 4, projectileType: ProjectileType.Tiny, range: 500 },
   { entityType: "Buckler", health: 42, power: 55, fireRate: 2.1, projectileDamage: 5, projectileType: ProjectileType.Tiny, range: 510 },
   { entityType: "Pip", health: 53, power: 70, fireRate: 2.0, projectileDamage: 7, projectileType: ProjectileType.Tiny, range: 520 },
@@ -127,6 +129,11 @@ export const ENEMY_CATALOG: EnemyConfig[] = [
   { entityType: "Leviathan", health: 12263, power: 16350, fireRate: 0.65, projectileDamage: 430, projectileType: ProjectileType.Projectile6, range: 710 },
   { entityType: "Flagship", health: 16313, power: 21750, fireRate: 0.6, projectileDamage: 530, projectileType: ProjectileType.Projectile6, range: 720 },
 ];
+
+export const ENEMY_CATALOG: EnemyConfig[] = ENEMY_BASE_CATALOG.map((config): EnemyConfig => ({
+  ...config,
+  health: config.health * ENEMY_HEALTH_MULTIPLIER,
+}));
 
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [
   { entityType: "Spur", health: 300, projectileDamage: 40, projectileType: ProjectileType.Projectile5, chargesRequired: 8, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0 },
