@@ -10,15 +10,13 @@ import { DamageNumberManager } from "./DamageNumberManager";
 import { LaserBeamManager } from "./LaserBeamManager";
 import { GemManager } from "./GemManager";
 import { AssetManager } from "./assetManager";
-import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, setSpawnerPaused } from "./state";
-import type { GameState } from "./state";
+import { CosmicDefenseCore } from "./core";
 import type { EntityType } from "./types";
-import { SHIP_BLUEPRINTS } from "./shipCatalog";
+import { SHIP_BLUEPRINTS } from "./shipBlueprints";
 
-export class CosmicDefenseGame {
+export class CosmicDefenseGame extends CosmicDefenseCore {
   private app: Application;
   private assetManager!: AssetManager;
-  state: GameState;
   shipPreviews: Map<EntityType, string> = new Map();
 
   private background!: Background;
@@ -33,8 +31,8 @@ export class CosmicDefenseGame {
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
 
   constructor(app: Application) {
+    super();
     this.app = app;
-    this.state = createGameState();
   }
 
   async init(): Promise<void> {
@@ -45,10 +43,6 @@ export class CosmicDefenseGame {
 
     this.tickerCallback = (ticker) => this.update(ticker.deltaMS / 1000);
     this.app.ticker.add(this.tickerCallback);
-  }
-
-  onCorrectKeystroke(): void {
-    stateOnCorrectKeystroke(this.state);
   }
 
   private buildScene(assetManager: AssetManager): void {
@@ -84,12 +78,8 @@ export class CosmicDefenseGame {
     world.addChild(this.damageNumberManager.container);
   }
 
-  setPaused(paused: boolean): void {
-    setSpawnerPaused(this.state, paused);
-  }
-
-  private update(dt: number): void {
-    updateState(this.state, dt);
+  update(dt: number): void {
+    super.update(dt);
     this.enemyManager.update(this.state, dt);
     this.explosionManager.update(this.state);
     this.laserBeamManager.update(this.state);

@@ -1,46 +1,15 @@
-import { useMemo, useEffect, useCallback } from "react";
-import { SHIP_BLUEPRINTS } from "./shipCatalog";
+import { useEffect, useCallback } from "react";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
+import { SHIP_BLUEPRINT_MAP } from "./shipBlueprints";
 import type { EntityType } from "./types";
 import type { PlacementSlot } from "./PlacementPoints";
-
-const DAMAGE_ROLES = new Set([
-  "sniper", "laser", "dual_shot", "pierce_laser", "freeze",
-  "plasma", "shooter", "ice_beam", "plasma_single", "chain", "mac_cannon",
-]);
 
 interface ShipChoiceOverlayProps {
   onSelect: (entityType: EntityType) => void;
   shipPreviews: Map<EntityType, string>;
   slots: PlacementSlot[];
   level: number;
-}
-
-function generateChoices(slots: PlacementSlot[]): EntityType[] {
-  const existing = new Set(
-    slots.filter((s) => s.occupant).map((s) => s.occupant!)
-  );
-  const hasEmptySlot = slots.some((s) => !s.occupant);
-
-  let pool: EntityType[];
-  if (hasEmptySlot) {
-    const hasAnyShip = existing.size > 0;
-    if (hasAnyShip) {
-      pool = SHIP_BLUEPRINTS.map((bp) => bp.entityType);
-    } else {
-      pool = SHIP_BLUEPRINTS
-        .filter((bp) => DAMAGE_ROLES.has(bp.role))
-        .map((bp) => bp.entityType);
-    }
-  } else {
-    pool = [...existing];
-  }
-
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  return pool.slice(0, Math.min(3, pool.length));
+  choices: EntityType[];
 }
 
 export const ShipChoiceOverlay = ({
@@ -48,8 +17,8 @@ export const ShipChoiceOverlay = ({
   shipPreviews,
   slots,
   level,
+  choices,
 }: ShipChoiceOverlayProps) => {
-  const choices = useMemo(() => generateChoices(slots), [slots]);
   const existing = new Map<string, PlacementSlot>();
   for (const s of slots) {
     if (s.occupant) existing.set(s.occupant, s);
@@ -88,7 +57,7 @@ export const ShipChoiceOverlay = ({
         </div>
         <div className="flex gap-5">
           {choices.map((entityType, i) => {
-            const bp = SHIP_BLUEPRINTS.find((b) => b.entityType === entityType)!;
+            const bp = SHIP_BLUEPRINT_MAP.get(entityType);
             const config = FRIENDLY_CONFIG_MAP.get(entityType);
             const preview = shipPreviews.get(entityType);
             const existingSlot = existing.get(entityType);
@@ -96,6 +65,7 @@ export const ShipChoiceOverlay = ({
             const currentLevel = existingSlot?.level ?? 0;
             const hotkey = i + 1;
             const charges = config?.chargesRequired ?? 0;
+            if (!bp) return null;
 
             return (
               <button

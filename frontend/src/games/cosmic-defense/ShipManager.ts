@@ -3,7 +3,7 @@ import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState } from "./state";
 import { spawnAlliedEntity } from "./state";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
-import { SHIP_BLUEPRINTS } from "./shipCatalog";
+import { SHIP_BLUEPRINTS } from "./shipBlueprints";
 import { Team } from "./types";
 import type { EntityType } from "./types";
 import { SHIP_TURN_SPEED } from "./constants";

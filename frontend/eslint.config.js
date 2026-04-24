@@ -29,4 +29,10 @@ export default defineConfig([
       'no-empty': 'off',
     },
   },
+  {
+    files: ['scripts/**/*.ts'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
 ])

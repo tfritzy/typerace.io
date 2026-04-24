@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
-import { TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
+import { TargetingMode, xpForNextLevel } from "./state";
 import type { EntityState } from "./state";
-import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
 import { PlacementOverlay } from "./PlacementOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
@@ -26,6 +25,21 @@ export const GameCanvas = () => {
   const [elapsed, setElapsed] = useState(0);
   const [xp, setXp] = useState(0);
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
+  const [choices, setChoices] = useState<EntityType[]>([]);
+
+  const syncFromGame = useCallback((game: CosmicDefenseGame) => {
+    setSlots(game.getSlots());
+    setChoices(game.getChoices());
+    setPendingChoice(game.state.pendingChoice);
+    setLevel(game.state.level);
+    setElapsed(Math.floor(game.state.spawner.elapsed));
+    setXp(game.state.xp);
+    setXpNeeded(xpForNextLevel(game.state.level));
+    setSelectedSlot((prev) => {
+      if (!prev) return prev;
+      return game.getSlots().find((slot) => slot.index === prev.index) ?? null;
+    });
+  }, []);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -36,14 +50,10 @@ export const GameCanvas = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       const game = gameRef.current;
-      if (game) {
-        setElapsed(Math.floor(game.state.spawner.elapsed));
-        setXp(game.state.xp);
-        setXpNeeded(xpForNextLevel(game.state.level));
-      }
+      if (game) syncFromGame(game);
     }, 200);
     return () => clearInterval(interval);
-  }, []);
+  }, [syncFromGame]);
 
   useEffect(() => {
     const game = gameRef.current;
@@ -77,11 +87,9 @@ export const GameCanvas = () => {
         }
         gameRef.current = game;
         setShipPreviews(game.shipPreviews);
-        setPendingChoice(game.state.pendingChoice);
-        setLevel(game.state.level);
+        syncFromGame(game);
         unsubLevelUp = game.state.onLevelUp.subscribe(() => {
-          setPendingChoice(true);
-          setLevel(game.state.level);
+          queueMicrotask(() => syncFromGame(game));
         });
       })
       .catch((err) => {
@@ -104,37 +112,9 @@ export const GameCanvas = () => {
   const handleShipChoice = useCallback((entityType: EntityType) => {
     const game = gameRef.current;
     if (!game) return;
-
-    const existingSlot = slots.find((s) => s.occupant === entityType);
-
-    if (existingSlot && existingSlot.entityId !== null) {
-      const newLevel = existingSlot.level + 1;
-      const config = FRIENDLY_CONFIG_MAP.get(entityType);
-      if (config) {
-        levelUpEntity(game.state, existingSlot.entityId, config, newLevel);
-      }
-      setSlots((prev) =>
-        prev.map((s) =>
-          s.index === existingSlot.index ? { ...s, level: newLevel } : s
-        )
-      );
-    } else {
-      const emptySlot = slots.find((s) => !s.occupant);
-      if (!emptySlot) return;
-      const entityId = game.shipManager.addShip(game.state, entityType, emptySlot.x, emptySlot.y, 1);
-      setSlots((prev) =>
-        prev.map((s) =>
-          s.index === emptySlot.index
-            ? { ...s, occupant: entityType, entityId, level: 1 }
-            : s
-        )
-      );
-    }
-
-    game.state.pendingChoice = false;
-    game.state.spawner.paused = false;
-    setPendingChoice(false);
-  }, [slots]);
+    if (!game.selectChoice(entityType)) return;
+    syncFromGame(game);
+  }, [syncFromGame]);
 
   const handleCloseInspection = useCallback(() => {
     setSelectedSlot(null);
@@ -142,15 +122,14 @@ export const GameCanvas = () => {
 
   const getSelectedEntity = useCallback((): EntityState | null => {
     const game = gameRef.current;
-    if (!game || !selectedSlot || !selectedSlot.entityId) return null;
-    return game.state.entityById.get(selectedSlot.entityId) ?? null;
+    if (!game || !selectedSlot) return null;
+    return game.getEntityForSlot(selectedSlot.index);
   }, [selectedSlot]);
 
   const handleTargetingChange = useCallback((mode: TargetingMode) => {
     const game = gameRef.current;
-    if (!game || !selectedSlot || !selectedSlot.entityId) return;
-    const entity = game.state.entityById.get(selectedSlot.entityId);
-    if (entity) entity.targetingMode = mode;
+    if (!game || !selectedSlot) return;
+    game.setTargetingMode(selectedSlot.index, mode);
     setInspectTick((t) => t + 1);
   }, [selectedSlot]);
 
@@ -217,6 +196,7 @@ export const GameCanvas = () => {
             shipPreviews={shipPreviews}
             slots={slots}
             level={level}
+            choices={choices}
           />
         )}
         <PhraseOverlay gameRef={gameRef} isPaused={selectedSlot !== null || pendingChoice} />
