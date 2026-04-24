@@ -96,7 +96,7 @@ export class EnemyManager {
     const { width, height } = this.assets.getShipTextureSize(entityType);
     const maxDim = Math.max(width, height);
     if (maxDim <= 0) return;
-    const warpScale = (maxDim * ENEMY_CONTAINER_SCALE) / WARP_FRAME_SIZE;
+    const warpScale = (maxDim * ENEMY_CONTAINER_SCALE * 1.5) / WARP_FRAME_SIZE;
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
     sprite.scale.set(warpScale);
