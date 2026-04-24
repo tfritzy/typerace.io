@@ -3,13 +3,14 @@ import type { AssetManager } from "./assetManager";
 import type { GameState, EntityState, EntityDeathData } from "./state";
 import { updateSpawner } from "./state";
 import { Team } from "./types";
+import { SHIP_HITBOX_MAP } from "./enemyConfig";
 import { SHIP_TURN_SPEED } from "./constants";
 import { approachAngle } from "./utils";
 import { drawHealthBar } from "./healthBar";
 
 const SHIP_DEATH_EXPLOSION_SCALE = 2.5;
 const SHIP_DEATH_ANIMATION_SPEED = 0.3;
-const WARP_IN_SCALE = 2;
+const WARP_IN_FRAME_SIZE = 64;
 const WARP_IN_ANIMATION_SPEED = 0.25;
 
 export class EnemyManager {
@@ -89,13 +90,15 @@ export class EnemyManager {
     this.deathAnimations.push(sprite);
   }
 
-  private spawnWarpIn(x: number, y: number): void {
+  private spawnWarpIn(entity: EntityState): void {
     const textures = this.assets.getWarpInTextures();
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
-    sprite.scale.set(WARP_IN_SCALE);
-    sprite.x = x;
-    sprite.y = y;
+    const hitbox = SHIP_HITBOX_MAP[entity.entityType];
+    const shipSize = Math.max(hitbox.hitWidth, hitbox.hitHeight);
+    sprite.scale.set(shipSize / WARP_IN_FRAME_SIZE);
+    sprite.x = entity.x;
+    sprite.y = entity.y;
     sprite.animationSpeed = WARP_IN_ANIMATION_SPEED;
     sprite.loop = false;
     sprite.play();
@@ -125,7 +128,7 @@ export class EnemyManager {
         display = this.createDisplayObject(entity);
         this.layer.addChild(display);
         this.entityDisplayObjects.set(entity.id, display);
-        this.spawnWarpIn(entity.x, entity.y);
+        this.spawnWarpIn(entity);
       }
       display.x = entity.x;
       display.y = entity.y;
