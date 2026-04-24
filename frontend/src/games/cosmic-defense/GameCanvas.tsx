@@ -12,7 +12,6 @@ import {
   setPaused,
   setTargetingMode,
   xpForNextLevel,
-  type EntityState,
   type GameState,
 } from "./state";
 import { InspectionPanel } from "./UpgradePanel";
@@ -33,17 +32,25 @@ function useGameSubscription<T>(
   getEvents: (state: GameState) => GameEvent[],
   fallback: T
 ): T {
+  const snapshotRef = useRef(getSnapshot);
+  const eventsRef = useRef(getEvents);
+
+  useEffect(() => {
+    snapshotRef.current = getSnapshot;
+    eventsRef.current = getEvents;
+  }, [getSnapshot, getEvents]);
+
   const subscribe = useCallback((onStoreChange: () => void) => {
     if (!state) return () => {};
-    const unsubs = getEvents(state).map((event) => event.subscribe(onStoreChange));
+    const unsubs = eventsRef.current(state).map((event) => event.subscribe(onStoreChange));
     return () => {
       for (const unsub of unsubs) unsub();
     };
-  }, [state, getEvents]);
+  }, [state]);
 
   const snapshot = useCallback(() => {
-    return state ? getSnapshot(state) : fallback;
-  }, [state, getSnapshot, fallback]);
+    return state ? snapshotRef.current(state) : fallback;
+  }, [state, fallback]);
 
   return useSyncExternalStore(subscribe, snapshot, () => fallback);
 }
@@ -165,7 +172,7 @@ const InspectionPanelLayer = ({
     state,
     (currentState) => {
       if (selectedSlotIndex === null) {
-        return { slot: null as PlacementSlot | null, entity: null as EntityState | null };
+        return { slot: null, entity: null };
       }
       return {
         slot: getSlot(currentState, selectedSlotIndex),
@@ -173,7 +180,7 @@ const InspectionPanelLayer = ({
       };
     },
     (currentState) => [currentState.onSlotsChanged, currentState.onTargetingChanged],
-    { slot: null as PlacementSlot | null, entity: null as EntityState | null }
+    { slot: null, entity: null }
   );
 
   const handleTargetingChange = useCallback((mode: TargetingMode) => {

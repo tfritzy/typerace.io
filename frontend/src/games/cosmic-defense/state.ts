@@ -229,7 +229,14 @@ export function createGameState(): GameState {
 }
 
 function cloneSlots(slots: PlacementSlot[]): PlacementSlot[] {
-  return slots.map((slot) => ({ ...slot }));
+  return slots.map((slot) => ({
+    index: slot.index,
+    x: slot.x,
+    y: slot.y,
+    occupant: slot.occupant,
+    entityId: slot.entityId,
+    level: slot.level,
+  }));
 }
 
 export function generateShipChoices(slots: PlacementSlot[]): EntityType[] {
