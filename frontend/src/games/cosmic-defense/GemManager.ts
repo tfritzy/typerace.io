@@ -48,7 +48,7 @@ export class GemManager {
 
   private active: ActiveGem[] = [];
   private unsub: (() => void) | null = null;
-  private state: GameState | null = null;
+  private state!: GameState;
 
   constructor() {
     this.layer = new Container();
@@ -125,7 +125,7 @@ export class GemManager {
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist < COLLECTION_DIST) {
-          if (this.state) awardXP(this.state, gem.xpAmount);
+          awardXP(this.state, gem.xpAmount);
           gem.g.destroy();
           this.active.splice(i, 1);
           continue;
@@ -157,7 +157,6 @@ export class GemManager {
 
   destroy(): void {
     this.unsub?.();
-    this.state = null;
     for (const gem of this.active) gem.g.destroy();
     this.active.length = 0;
     this.layer.destroy();

@@ -424,19 +424,21 @@ function dealDamageToEntity(
   if (attacker) attacker.damageDealt += damage;
 
   const killed = target.health <= 0;
-  const xpDropped = killed && target.team === Team.Enemy ? target.gold : 0;
-  state.onDamageDealt.emit({ amount: damage, x: target.x, y: target.y, killed, xpDropped });
+  let xpDropped = 0;
 
   if (killed) {
     if (attacker) attacker.kills++;
     if (target.team === Team.Enemy) {
-      state.gold += target.gold;
-      state.score += target.gold * 10;
+      xpDropped = target.gold;
+      state.gold += xpDropped;
+      state.score += xpDropped * 10;
       state.onEnemyEntityDeath.emit({ x: target.x, y: target.y, team: target.team, entityType: target.entityType });
     }
     const idx = state.entities.indexOf(target);
     if (idx >= 0) removeEntityAt(state, idx);
   }
+
+  state.onDamageDealt.emit({ amount: damage, x: target.x, y: target.y, killed, xpDropped });
 
   return killed;
 }
