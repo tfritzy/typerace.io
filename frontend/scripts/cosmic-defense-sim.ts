@@ -28,7 +28,7 @@ const DEFAULT_OPTIONS: SimulationOptions = {
   wpm: 50,
 };
 
-const MAX_WAVE = 100;
+const MAX_ELAPSED_SECONDS = 100;
 
 function parseNumber(value: string | undefined, fallback: number): number {
   if (!value) return fallback;
@@ -65,7 +65,7 @@ function getPresentShips(state: GameState): Set<EntityType> {
 }
 
 function getCurrentElapsedSeconds(state: GameState): number {
-  return Math.min(MAX_WAVE, Math.floor(state.spawner.elapsed));
+  return Math.min(MAX_ELAPSED_SECONDS, Math.floor(state.spawner.elapsed));
 }
 
 function runSingleSimulation(
@@ -76,7 +76,7 @@ function runSingleSimulation(
   let keystrokeAccumulator = 0;
   const charsPerSecond = charsPerSecondFromWpm(wpm);
 
-  while (state.planetHealth > 0 && getCurrentElapsedSeconds(state) < MAX_WAVE) {
+  while (state.planetHealth > 0 && getCurrentElapsedSeconds(state) < MAX_ELAPSED_SECONDS) {
     if (state.pendingChoice) {
       const choices = getChoices(state);
       if (choices.length === 0) break;
