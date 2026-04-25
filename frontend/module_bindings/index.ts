@@ -36,6 +36,8 @@ import {
 // Import and reexport all reducer arg types
 import ArchiveOldGamesReducer from "./archive_old_games_reducer";
 export { ArchiveOldGamesReducer };
+import CleanupOldScoresReducer from "./cleanup_old_scores_reducer";
+export { CleanupOldScoresReducer };
 import CleanupOldXpGainsReducer from "./cleanup_old_xp_gains_reducer";
 export { CleanupOldXpGainsReducer };
 import ClientConnectedReducer from "./client_connected_reducer";
@@ -50,6 +52,8 @@ import JoinPrivateGameReducer from "./join_private_game_reducer";
 export { JoinPrivateGameReducer };
 import KickPlayerReducer from "./kick_player_reducer";
 export { KickPlayerReducer };
+import PublishScoreReducer from "./publish_score_reducer";
+export { PublishScoreReducer };
 import RematchReducer from "./rematch_reducer";
 export { RematchReducer };
 import SetPlayerNameReducer from "./set_player_name_reducer";
@@ -80,6 +84,8 @@ import GameArchiverRow from "./game_archiver_table";
 export { GameArchiverRow };
 import GameStartRow from "./game_start_table";
 export { GameStartRow };
+import ScoreCleanerRow from "./score_cleaner_table";
+export { ScoreCleanerRow };
 import XpGainCleanerRow from "./xp_gain_cleaner_table";
 export { XpGainCleanerRow };
 import EloRow from "./elo_table";
@@ -90,12 +96,16 @@ import GamerecordRow from "./gamerecord_table";
 export { GamerecordRow };
 import GlobalstatsRow from "./globalstats_table";
 export { GlobalstatsRow };
+import HighscoreRow from "./highscore_table";
+export { HighscoreRow };
 import PersonalrecordRow from "./personalrecord_table";
 export { PersonalrecordRow };
 import PlayerRow from "./player_table";
 export { PlayerRow };
 import PlayerprogressRow from "./playerprogress_table";
 export { PlayerprogressRow };
+import ScoreRow from "./score_table";
+export { ScoreRow };
 import XpgainRow from "./xpgain_table";
 export { XpgainRow };
 
@@ -130,6 +140,8 @@ import GameType from "./game_type_type";
 export { GameType };
 import GlobalStats from "./global_stats_type";
 export { GlobalStats };
+import HighScore from "./high_score_type";
+export { HighScore };
 import PersonalRecord from "./personal_record_type";
 export { PersonalRecord };
 import Player from "./player_type";
@@ -138,6 +150,10 @@ import PlayerColor from "./player_color_type";
 export { PlayerColor };
 import PlayerProgress from "./player_progress_type";
 export { PlayerProgress };
+import Score from "./score_type";
+export { Score };
+import ScoreCleaner from "./score_cleaner_type";
+export { ScoreCleaner };
 import XpGain from "./xp_gain_type";
 export { XpGain };
 import XpGainCleaner from "./xp_gain_cleaner_type";
@@ -205,6 +221,17 @@ const tablesSchema = __schema(
       { name: 'GameStart_ScheduledId_key', constraint: 'unique', columns: ['scheduledId'] },
     ],
   }, GameStartRow),
+  __table({
+    name: 'ScoreCleaner',
+    indexes: [
+      { name: 'ScheduledId', algorithm: 'btree', columns: [
+        'scheduledId',
+      ] },
+    ],
+    constraints: [
+      { name: 'ScoreCleaner_ScheduledId_key', constraint: 'unique', columns: ['scheduledId'] },
+    ],
+  }, ScoreCleanerRow),
   __table({
     name: 'XpGainCleaner',
     indexes: [
@@ -306,6 +333,34 @@ const tablesSchema = __schema(
     ],
   }, GlobalstatsRow),
   __table({
+    name: 'highscore',
+    indexes: [
+      { name: 'GameId_Value', algorithm: 'btree', columns: [
+        'gameId',
+        'value',
+      ] },
+      { name: 'GameId', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+      { name: 'Id', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { name: 'PlayerId_GameId', algorithm: 'btree', columns: [
+        'playerId',
+        'gameId',
+      ] },
+      { name: 'PlayerId', algorithm: 'btree', columns: [
+        'playerId',
+      ] },
+      { name: 'Value', algorithm: 'btree', columns: [
+        'value',
+      ] },
+    ],
+    constraints: [
+      { name: 'highscore_Id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, HighscoreRow),
+  __table({
     name: 'personalrecord',
     indexes: [
       { name: 'GameMode', algorithm: 'btree', columns: [
@@ -361,6 +416,33 @@ const tablesSchema = __schema(
     ],
   }, PlayerprogressRow),
   __table({
+    name: 'score',
+    indexes: [
+      { name: 'GameId_Timestamp', algorithm: 'btree', columns: [
+        'gameId',
+        'timestamp',
+      ] },
+      { name: 'GameId', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+      { name: 'Id', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { name: 'PlayerId', algorithm: 'btree', columns: [
+        'playerId',
+      ] },
+      { name: 'Timestamp', algorithm: 'btree', columns: [
+        'timestamp',
+      ] },
+      { name: 'Value', algorithm: 'btree', columns: [
+        'value',
+      ] },
+    ],
+    constraints: [
+      { name: 'score_Id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, ScoreRow),
+  __table({
     name: 'xpgain',
     indexes: [
       { name: 'Id', algorithm: 'btree', columns: [
@@ -382,11 +464,13 @@ const tablesSchema = __schema(
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
   __reducerSchema("ArchiveOldGames", ArchiveOldGamesReducer),
+  __reducerSchema("CleanupOldScores", CleanupOldScoresReducer),
   __reducerSchema("CleanupOldXpGains", CleanupOldXpGainsReducer),
   __reducerSchema("FillGameWithBots", FillGameWithBotsReducer),
   __reducerSchema("joinGame", JoinGameReducer),
   __reducerSchema("joinPrivateGame", JoinPrivateGameReducer),
   __reducerSchema("kickPlayer", KickPlayerReducer),
+  __reducerSchema("publishScore", PublishScoreReducer),
   __reducerSchema("rematch", RematchReducer),
   __reducerSchema("setPlayerName", SetPlayerNameReducer),
   __reducerSchema("StartCountdown", StartCountdownReducer),

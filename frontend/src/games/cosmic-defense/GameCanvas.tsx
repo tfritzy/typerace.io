@@ -1,4 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useDatabase } from "../../contexts/SpacetimeContext";
+import { getLanguageFromSlug } from "../../utils/modes";
+import { throttle } from "../../utils/throttle";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
@@ -12,8 +16,12 @@ import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
 const UI_REFERENCE_WIDTH = 700;
+const SCORE_PUBLISH_INTERVAL_MS = 10_000;
 
 export const GameCanvas = () => {
+  const conn = useDatabase();
+  const { gameId = "", lang } = useParams();
+  const language = getLanguageFromSlug(lang).slug || "en";
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
@@ -24,8 +32,21 @@ export const GameCanvas = () => {
   const [pendingChoice, setPendingChoice] = useState(true);
   const [level, setLevel] = useState(1);
   const [xp, setXp] = useState(0);
-  const [score, setScore] = useState(0);
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
+  const [score, setScore] = useState(0);
+  const publishScore = useMemo(
+    () =>
+      throttle((nextScore: number) => {
+        if (!conn) return;
+        conn.reducers.publishScore({
+          gameId,
+          language,
+          score: nextScore,
+          timeMs: 0n,
+        });
+      }, SCORE_PUBLISH_INTERVAL_MS),
+    [conn, gameId, language]
+  );
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -70,8 +91,8 @@ export const GameCanvas = () => {
         setPendingChoice(game.state.pendingChoice);
         setLevel(game.state.level);
         setXp(game.state.xp);
-        setScore(game.state.score);
         setXpNeeded(xpForNextLevel(game.state.level));
+        setScore(game.state.score);
         unsubLevelUp = game.state.onLevelUp.subscribe(() => {
           setPendingChoice(true);
           setLevel(game.state.level);
@@ -83,6 +104,7 @@ export const GameCanvas = () => {
         });
         unsubEnemyEntityDeath = game.state.onEnemyEntityDeath.subscribe(() => {
           setScore(game.state.score);
+          publishScore(game.state.score);
         });
       })
       .catch((err) => {
@@ -94,10 +116,11 @@ export const GameCanvas = () => {
       unsubLevelUp?.();
       unsubXPChanged?.();
       unsubEnemyEntityDeath?.();
+      publishScore.cancel();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
-  }, []);
+  }, [publishScore]);
 
   const handleSlotClick = useCallback((slot: PlacementSlot) => {
     if (pendingChoice) return;
@@ -199,7 +222,7 @@ export const GameCanvas = () => {
         </div>
         <div className="absolute top-2 right-3 z-10">
           <span className="text-[11px] text-[#cdd6f4] font-semibold">
-            Score {score}
+            Score {score.toLocaleString()}
           </span>
         </div>
         <PlacementOverlay
