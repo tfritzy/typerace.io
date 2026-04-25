@@ -198,6 +198,8 @@ export const GameCanvas = () => {
           <span className="text-[11px] text-[#585b70]">
             {elapsed}s
           </span>
+        </div>
+        <div className="absolute top-2 right-3 z-10">
           <span className="text-[11px] text-[#cdd6f4] font-semibold">
             Score {score}
           </span>
