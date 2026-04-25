@@ -102,7 +102,7 @@ export interface FriendlyConfig {
   hitDelay: number;
 }
 
-const ENEMY_HEALTH_MULTIPLIER = 2;
+const ENEMY_HEALTH_MULTIPLIER = 4;
 
 const ENEMY_BASE_CATALOG: EnemyConfig[] = [
   { entityType: "Pulse", health: 30, power: 40, fireRate: 2.2, projectileDamage: 4, projectileType: ProjectileType.Tiny, range: 500 },
