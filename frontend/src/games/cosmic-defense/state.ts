@@ -72,7 +72,7 @@ export interface ExplosionState {
   id: number;
   x: number;
   y: number;
-  explosionType: ExplosionType | null;
+  explosionType: ExplosionType | undefined;
 }
 
 export interface SpawnState {
@@ -438,7 +438,7 @@ function dealDamageToEntity(
 }
 
 function spawnExplosion(state: GameState, entityType: EntityType, x: number, y: number): void {
-  state.explosions.push({ id: state.nextId++, x, y, explosionType: getExplosionType(entityType) ?? null });
+  state.explosions.push({ id: state.nextId++, x, y, explosionType: getExplosionType(entityType) });
 }
 
 function performInstantHit(

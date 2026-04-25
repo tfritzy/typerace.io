@@ -50,7 +50,7 @@ export class ExplosionManager {
     }
   }
 
-  private getExplosionTextures(explosionType: ExplosionType | null): Texture[] {
+  private getExplosionTextures(explosionType: ExplosionType | undefined): Texture[] {
     switch (explosionType) {
       case ExplosionType.PlasmaExplosive: return this.assets.getPlasmaExplosionTextures();
       case ExplosionType.IceExplosive: return this.assets.getIceExplosionTextures();
