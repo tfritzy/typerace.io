@@ -25,7 +25,7 @@ export const GameCanvas = () => {
   const [level, setLevel] = useState(1);
   const [elapsed, setElapsed] = useState(0);
   const [xp, setXp] = useState(0);
-  const [xpScore, setXpScore] = useState(0);
+  const [score, setScore] = useState(0);
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export const GameCanvas = () => {
       if (game) {
         setElapsed(Math.floor(game.state.spawner.elapsed));
         setXp(game.state.xp);
-        setXpScore(game.state.score);
+        setScore(game.state.score);
         setXpNeeded(xpForNextLevel(game.state.level));
       }
     }, 200);
@@ -173,35 +173,35 @@ export const GameCanvas = () => {
           transform: `scale(${uiScale})`,
         }}
       >
-        <div className="absolute top-2 left-3 z-10 flex items-start gap-2">
+        <div className="absolute top-2 left-3 z-10 flex items-center gap-2">
           <span className="text-[11px] text-[#f9e2af] font-semibold">
             Lv {level}
           </span>
-          <div className="flex flex-col gap-1">
+          <div
+            className="relative rounded-full overflow-hidden"
+            style={{
+              width: 100,
+              height: 8,
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.1)",
+            }}
+          >
             <div
-              className="relative rounded-full overflow-hidden"
+              className="absolute left-0 top-0 h-full rounded-full"
               style={{
-                width: 100,
-                height: 8,
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.1)",
+                width: `${Math.min(100, (xp / xpNeeded) * 100)}%`,
+                background: "linear-gradient(90deg, #f9e2af, #fab387)",
+                transition: "width 0.2s ease-out",
               }}
-            >
-              <div
-                className="absolute left-0 top-0 h-full rounded-full"
-                style={{
-                  width: `${Math.min(100, (xp / xpNeeded) * 100)}%`,
-                  background: "linear-gradient(90deg, #f9e2af, #fab387)",
-                  transition: "width 0.2s ease-out",
-                }}
-              />
-            </div>
-            <span className="text-[11px] text-[#cdd6f4] font-semibold">
-              Score {xpScore}
-            </span>
+            />
           </div>
           <span className="text-[11px] text-[#585b70]">
             {elapsed}s
+          </span>
+        </div>
+        <div className="absolute top-2 right-3 z-10">
+          <span className="text-[11px] text-[#cdd6f4] font-semibold">
+            Score {score}
           </span>
         </div>
         <PlacementOverlay

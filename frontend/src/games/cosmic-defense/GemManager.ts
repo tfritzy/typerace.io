@@ -1,5 +1,5 @@
 import { Container, Graphics } from "pixi.js";
-import type { GameState, DamageData } from "./state";
+import { awardXP, type GameState, type DamageData } from "./state";
 
 const GEM_SIZE = 4;
 const POP_SPEED = 100;
@@ -40,6 +40,7 @@ interface ActiveGem {
   y: number;
   vx: number;
   vy: number;
+  xpAmount: number;
 }
 
 export class GemManager {
@@ -47,15 +48,17 @@ export class GemManager {
 
   private active: ActiveGem[] = [];
   private unsub: (() => void) | null = null;
+  private state: GameState | null = null;
 
   constructor() {
     this.layer = new Container();
   }
 
   subscribe(state: GameState): void {
+    this.state = state;
     this.unsub = state.onDamageDealt.subscribe((data: DamageData) => {
-      if (data.killed) {
-        this.spawn(data.x, data.y, data.amount);
+      if (data.xpDropped > 0) {
+        this.spawn(data.x, data.y, data.xpDropped);
       }
     });
   }
@@ -97,6 +100,7 @@ export class GemManager {
       y,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
+      xpAmount,
     });
   }
 
@@ -121,6 +125,7 @@ export class GemManager {
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist < COLLECTION_DIST) {
+          if (this.state) awardXP(this.state, gem.xpAmount);
           gem.g.destroy();
           this.active.splice(i, 1);
           continue;
@@ -152,6 +157,7 @@ export class GemManager {
 
   destroy(): void {
     this.unsub?.();
+    this.state = null;
     for (const gem of this.active) gem.g.destroy();
     this.active.length = 0;
     this.layer.destroy();

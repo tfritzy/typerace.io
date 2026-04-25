@@ -116,6 +116,7 @@ export interface DamageData {
   x: number;
   y: number;
   killed: boolean;
+  xpDropped: number;
 }
 
 export interface EntityDeathData {
@@ -423,13 +424,14 @@ function dealDamageToEntity(
   if (attacker) attacker.damageDealt += damage;
 
   const killed = target.health <= 0;
-  state.onDamageDealt.emit({ amount: damage, x: target.x, y: target.y, killed });
+  const xpDropped = killed && target.team === Team.Enemy ? target.gold : 0;
+  state.onDamageDealt.emit({ amount: damage, x: target.x, y: target.y, killed, xpDropped });
 
   if (killed) {
     if (attacker) attacker.kills++;
     if (target.team === Team.Enemy) {
       state.gold += target.gold;
-      awardXP(state, target.gold);
+      state.score += target.gold * 10;
       state.onEnemyEntityDeath.emit({ x: target.x, y: target.y, team: target.team, entityType: target.entityType });
     }
     const idx = state.entities.indexOf(target);
@@ -815,7 +817,6 @@ export function xpForNextLevel(level: number): number {
 export function awardXP(state: GameState, amount: number): void {
   if (state.pendingChoice) return;
   state.xp += amount;
-  state.score += amount;
   const needed = xpForNextLevel(state.level);
   if (state.xp >= needed) {
     state.xp -= needed;
