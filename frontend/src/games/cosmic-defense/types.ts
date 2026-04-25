@@ -24,12 +24,14 @@ export enum ExplosionType {
   PlasmaExplosive = 1,
   IceExplosive = 2,
   Explosive = 3,
+  MothHit = 4,
 }
 
 export const ENTITY_EXPLOSION_TYPES: Partial<Record<EntityType, ExplosionType>> = {
   Dart: ExplosionType.PlasmaExplosive,
   Flare: ExplosionType.IceExplosive,
   Hawk: ExplosionType.Explosive,
+  Moth: ExplosionType.MothHit,
 };
 
 export function getExplosionType(entityType: EntityType): ExplosionType | undefined {
