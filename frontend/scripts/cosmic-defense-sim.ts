@@ -18,8 +18,8 @@ interface SimulationOptions {
 
 interface ShipStats {
   selectedRuns: number;
-  totalFinalWave: number;
-  maxFinalWave: number;
+  totalFinalElapsedSeconds: number;
+  maxFinalElapsedSeconds: number;
 }
 
 const DEFAULT_OPTIONS: SimulationOptions = {
@@ -64,19 +64,19 @@ function getPresentShips(state: GameState): Set<EntityType> {
   return ships;
 }
 
-function getCurrentWave(state: GameState): number {
+function getCurrentElapsedSeconds(state: GameState): number {
   return Math.min(MAX_WAVE, Math.floor(state.spawner.elapsed));
 }
 
 function runSingleSimulation(
   dt: number,
   wpm: number
-): { presentShips: Set<EntityType>; finalWave: number } {
+): { presentShips: Set<EntityType>; finalElapsedSeconds: number } {
   const state = createGameState();
   let keystrokeAccumulator = 0;
   const charsPerSecond = charsPerSecondFromWpm(wpm);
 
-  while (state.planetHealth > 0 && getCurrentWave(state) < MAX_WAVE) {
+  while (state.planetHealth > 0 && getCurrentElapsedSeconds(state) < MAX_WAVE) {
     if (state.pendingChoice) {
       const choices = getChoices(state);
       if (choices.length === 0) break;
@@ -95,13 +95,14 @@ function runSingleSimulation(
 
   return {
     presentShips: getPresentShips(state),
-    finalWave: getCurrentWave(state),
+    finalElapsedSeconds: getCurrentElapsedSeconds(state),
   };
 }
 
 function formatRow(entityType: EntityType, stats: ShipStats): string {
-  const averageWave = stats.selectedRuns > 0 ? stats.totalFinalWave / stats.selectedRuns : 0;
-  return `${entityType.padEnd(8)} selected_runs=${String(stats.selectedRuns).padStart(4)} avg_final_wave=${averageWave.toFixed(2).padStart(6)} max_final_wave=${String(stats.maxFinalWave).padStart(3)}`;
+  const averageElapsedSeconds =
+    stats.selectedRuns > 0 ? stats.totalFinalElapsedSeconds / stats.selectedRuns : 0;
+  return `${entityType.padEnd(8)} selected_runs=${String(stats.selectedRuns).padStart(4)} avg_final_elapsed_s=${averageElapsedSeconds.toFixed(2).padStart(6)} max_final_elapsed_s=${String(stats.maxFinalElapsedSeconds).padStart(3)}`;
 }
 
 function main(): void {
@@ -111,24 +112,24 @@ function main(): void {
   for (const blueprint of SHIP_BLUEPRINTS) {
     stats.set(blueprint.entityType, {
       selectedRuns: 0,
-      totalFinalWave: 0,
-      maxFinalWave: 0,
+      totalFinalElapsedSeconds: 0,
+      maxFinalElapsedSeconds: 0,
     });
   }
 
   for (let run = 0; run < options.runs; run++) {
-    const { presentShips, finalWave } = runSingleSimulation(options.dt, options.wpm);
+    const { presentShips, finalElapsedSeconds } = runSingleSimulation(options.dt, options.wpm);
     for (const entityType of presentShips) {
       const entry = stats.get(entityType);
       if (!entry) continue;
       entry.selectedRuns++;
-      entry.totalFinalWave += finalWave;
-      entry.maxFinalWave = Math.max(entry.maxFinalWave, finalWave);
+      entry.totalFinalElapsedSeconds += finalElapsedSeconds;
+      entry.maxFinalElapsedSeconds = Math.max(entry.maxFinalElapsedSeconds, finalElapsedSeconds);
     }
   }
 
   console.log(
-    `cosmic-defense simulation runs=${options.runs} dt=${options.dt} wpm=${options.wpm} stop_condition=planet_dead_or_wave_100`
+    `cosmic-defense simulation runs=${options.runs} dt=${options.dt} wpm=${options.wpm} stop_condition=planet_dead_or_elapsed_100s`
   );
   for (const blueprint of SHIP_BLUEPRINTS) {
     const entry = stats.get(blueprint.entityType);
