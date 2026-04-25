@@ -1,4 +1,4 @@
-import { AnimatedSprite, Container } from "pixi.js";
+import { AnimatedSprite, Container, type Texture } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import type { GameState, ExplosionState } from "./state";
 import { ExplosionType } from "./types";
@@ -50,15 +50,17 @@ export class ExplosionManager {
     }
   }
 
+  private getExplosionTextures(explosionType: ExplosionType): Texture[] {
+    switch (explosionType) {
+      case ExplosionType.IceExplosive: return this.assets.getIceExplosionTextures();
+      case ExplosionType.Explosive:    return this.assets.getHawkExplosionTextures();
+      case ExplosionType.MothHit:      return this.assets.getMothExplosionTextures();
+      default:                         return this.assets.getPlasmaExplosionTextures();
+    }
+  }
+
   private createDisplayObject(exp: ExplosionState): Container {
-    const textures =
-      exp.explosionType === ExplosionType.IceExplosive
-        ? this.assets.getIceExplosionTextures()
-        : exp.explosionType === ExplosionType.Explosive
-        ? this.assets.getHawkExplosionTextures()
-        : exp.explosionType === ExplosionType.MothHit
-        ? this.assets.getMothExplosionTextures()
-        : this.assets.getPlasmaExplosionTextures();
+    const textures = this.getExplosionTextures(exp.explosionType);
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
     sprite.scale.set(EXPLOSION_SCALE);

@@ -125,7 +125,7 @@ export class AssetManager {
 
   getMothExplosionTextures(): Texture[] {
     const textures: Texture[] = [];
-    for (let i = 0; i < 54; i++) {
+    for (let i = 0; i < 6; i++) {
       textures.push(this.mothExplosionSheet_.textures[`moth-exp-${i}`]);
     }
     return textures;
