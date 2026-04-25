@@ -1,4 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useDatabase } from "../../contexts/SpacetimeContext";
+import { getLanguageFromSlug } from "../../utils/modes";
+import { throttle } from "../../utils/throttle";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
@@ -12,8 +16,12 @@ import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
 const UI_REFERENCE_WIDTH = 700;
+const SCORE_PUBLISH_INTERVAL_MS = 10_000;
 
 export const GameCanvas = () => {
+  const conn = useDatabase();
+  const { gameId = "", lang } = useParams();
+  const language = getLanguageFromSlug(lang).slug || "en";
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
@@ -27,6 +35,19 @@ export const GameCanvas = () => {
   const [score, setScore] = useState(0);
   const [totalKills, setTotalKills] = useState(0);
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
+  const publishScore = useMemo(
+    () =>
+      throttle((nextScore: number) => {
+        if (!conn) return;
+        conn.reducers.publishScore({
+          gameId,
+          language,
+          score: nextScore,
+          timeMs: 0n,
+        });
+      }, SCORE_PUBLISH_INTERVAL_MS),
+    [conn, gameId, language]
+  );
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -86,6 +107,7 @@ export const GameCanvas = () => {
         unsubEnemyEntityDeath = game.state.onEnemyEntityDeath.subscribe(() => {
           setScore(game.state.score);
           setTotalKills(game.state.totalKills);
+          publishScore(game.state.score);
         });
       })
       .catch((err) => {
@@ -97,10 +119,11 @@ export const GameCanvas = () => {
       unsubLevelUp?.();
       unsubXPChanged?.();
       unsubEnemyEntityDeath?.();
+      publishScore.cancel();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
-  }, []);
+  }, [publishScore]);
 
   const handleSlotClick = useCallback((slot: PlacementSlot) => {
     if (pendingChoice) return;
@@ -212,7 +235,7 @@ export const GameCanvas = () => {
             </div>
             <div className="flex items-center gap-1">
               <span className="text-[11px] text-[#585b70]">Score</span>
-              <span className="text-[11px] text-[#cdd6f4] font-semibold">{score}</span>
+              <span className="text-[11px] text-[#cdd6f4] font-semibold">{score.toLocaleString()}</span>
             </div>
           </div>
         </div>

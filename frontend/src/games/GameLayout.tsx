@@ -1,12 +1,14 @@
 import { useEffect, type ReactNode } from "react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import { ScoreLeaderboards } from "./ScoreLeaderboards";
 
 type GameLayoutProps = {
   title: string;
   children: ReactNode;
   aspectRatio?: number;
   viewportChromeOffsetPx?: number;
+  gameId?: string;
 };
 
 export const GameLayout = ({
@@ -14,6 +16,7 @@ export const GameLayout = ({
   children,
   aspectRatio = 16 / 9,
   viewportChromeOffsetPx = 220,
+  gameId,
 }: GameLayoutProps) => {
   useEffect(() => {
     document.title = `${title} - TypeRace.io`;
@@ -45,6 +48,7 @@ export const GameLayout = ({
               </div>
             </div>
           </section>
+          {gameId && <ScoreLeaderboards gameId={gameId} />}
         </div>
       </main>
       <Footer />
