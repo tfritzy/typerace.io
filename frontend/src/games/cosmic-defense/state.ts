@@ -424,12 +424,11 @@ function dealDamageToEntity(
   if (attacker) attacker.damageDealt += damage;
 
   const killed = target.health <= 0;
-  let xpDropped = 0;
+  const xpDropped = killed && target.team === Team.Enemy ? target.gold : 0;
 
   if (killed) {
     if (attacker) attacker.kills++;
-    if (target.team === Team.Enemy) {
-      xpDropped = target.gold;
+    if (xpDropped > 0) {
       state.gold += xpDropped;
       state.score += xpDropped * 10;
       state.onEnemyEntityDeath.emit({ x: target.x, y: target.y, team: target.team, entityType: target.entityType });

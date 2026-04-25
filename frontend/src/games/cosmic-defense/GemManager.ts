@@ -57,7 +57,7 @@ export class GemManager {
   subscribe(state: GameState): void {
     this.state = state;
     this.unsub = state.onDamageDealt.subscribe((data: DamageData) => {
-      if (data.xpDropped > 0) {
+      if (data.killed && data.xpDropped > 0) {
         this.spawn(data.x, data.y, data.xpDropped);
       }
     });
