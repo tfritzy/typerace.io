@@ -196,7 +196,7 @@ export const GameCanvas = () => {
                 }}
               />
             </div>
-            <span className="text-[11px] text-[#585b70]">
+            <span className="text-[11px] text-[#cdd6f4] font-semibold">
               Score {xpScore}
             </span>
           </div>
