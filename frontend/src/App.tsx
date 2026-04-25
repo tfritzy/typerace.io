@@ -37,9 +37,9 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/games" element={<GamesPage />} />
-          <Route path="/games/word-defense" element={<WordDefensePage />} />
-          <Route path="/games/planetary-defense" element={<PlanetaryDefensePage />} />
-          <Route path="/games/cosmic-defense" element={<CosmicDefensePage />} />
+          <Route path="/games/word-defense" element={<SpacetimeProvider><WordDefensePage /></SpacetimeProvider>} />
+          <Route path="/games/planetary-defense" element={<SpacetimeProvider><PlanetaryDefensePage /></SpacetimeProvider>} />
+          <Route path="/games/cosmic-defense" element={<SpacetimeProvider><CosmicDefensePage /></SpacetimeProvider>} />
           <Route path="/games/ship-grid" element={<ShipGridPage />} />
           <Route path="/item-designer" element={<ItemDesignerPage />} />
           <Route path="*" element={<ConnectedRoutes />} />

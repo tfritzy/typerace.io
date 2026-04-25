@@ -10,12 +10,21 @@ import { PhraseOverlay } from "./PhraseOverlay";
 import { ShipChoiceOverlay } from "./ShipChoiceOverlay";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
+import type { DbConnection } from "../../../module_bindings";
 
 const UI_REFERENCE_WIDTH = 700;
+const SCORE_PUBLISH_INTERVAL_MS = 10_000;
+const GAME_ID = "cosmic_defense";
 
-export const GameCanvas = () => {
+type GameCanvasProps = {
+  conn: DbConnection | null;
+};
+
+export const GameCanvas = ({ conn }: GameCanvasProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
+  const lastPublishedAtRef = useRef(0);
+  const lastPublishedScoreRef = useRef(0);
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
   const [slots, setSlots] = useState<PlacementSlot[]>(() => generateSlots());
@@ -26,6 +35,7 @@ export const GameCanvas = () => {
   const [elapsed, setElapsed] = useState(0);
   const [xp, setXp] = useState(0);
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -40,10 +50,35 @@ export const GameCanvas = () => {
         setElapsed(Math.floor(game.state.spawner.elapsed));
         setXp(game.state.xp);
         setXpNeeded(xpForNextLevel(game.state.level));
+        setScore(game.state.score);
       }
     }, 200);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (!conn) return;
+
+    const interval = setInterval(() => {
+      const game = gameRef.current;
+      if (!game || game.state.score === lastPublishedScoreRef.current) return;
+
+      const now = Date.now();
+      if (lastPublishedAtRef.current !== 0 && now - lastPublishedAtRef.current < SCORE_PUBLISH_INTERVAL_MS) {
+        return;
+      }
+
+      conn.reducers.publishScore({
+        gameId: GAME_ID,
+        score: game.state.score,
+        timeMs: BigInt(Math.floor(game.state.spawner.elapsed * 1000)),
+      });
+      lastPublishedAtRef.current = now;
+      lastPublishedScoreRef.current = game.state.score;
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [conn]);
 
   useEffect(() => {
     const game = gameRef.current;
@@ -196,6 +231,9 @@ export const GameCanvas = () => {
           <span className="text-[11px] text-[#585b70]">
             {elapsed}s
           </span>
+        </div>
+        <div className="absolute top-7 left-3 z-10 text-[13px] text-[#f9e2af] font-semibold drop-shadow">
+          Score {score}
         </div>
         <PlacementOverlay
           slots={slots}

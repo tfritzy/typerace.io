@@ -149,6 +149,7 @@ export interface GameState {
   planetHealth: number;
   maxPlanetHealth: number;
   gold: number;
+  score: number;
   spawner: SpawnState;
   xp: number;
   level: number;
@@ -156,6 +157,7 @@ export interface GameState {
   onPlanetDamaged: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
   onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
+  onScoreChanged: GameEvent;
   onLevelUp: GameEvent;
 }
 
@@ -190,6 +192,7 @@ export function createGameState(): GameState {
     planetHealth: 1000,
     maxPlanetHealth: 1000,
     gold: 0,
+    score: 0,
     spawner: {
       elapsed: 0,
       spawnAccumulator: 0,
@@ -201,6 +204,7 @@ export function createGameState(): GameState {
     onPlanetDamaged: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
     onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
+    onScoreChanged: new GameEvent(),
     onLevelUp: new GameEvent(),
   };
 
@@ -427,6 +431,8 @@ function dealDamageToEntity(
     if (attacker) attacker.kills++;
     if (target.team === Team.Enemy) {
       state.gold += target.gold;
+      state.score += target.gold;
+      state.onScoreChanged.emit();
       awardXP(state, target.gold);
       state.onEnemyEntityDeath.emit({ x: target.x, y: target.y, team: target.team, entityType: target.entityType });
     }
