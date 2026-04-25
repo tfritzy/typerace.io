@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, ExplosionType, Team, getExplosionType } from "./types";
-import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, goldForEnemy, getScaledConfig } from "./enemyConfig";
+import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, xpForEnemy, getScaledConfig } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 
 export const PLANET_X = 200;
@@ -37,7 +37,7 @@ export interface EntityState {
   speed: number;
   chargesRequired: number;
   charge: number;
-  gold: number;
+  xpReward: number;
   range: number;
   hitHalfW: number;
   hitHalfH: number;
@@ -149,7 +149,6 @@ export interface GameState {
   nextId: number;
   planetHealth: number;
   maxPlanetHealth: number;
-  gold: number;
   spawner: SpawnState;
   xp: number;
   level: number;
@@ -190,7 +189,6 @@ export function createGameState(): GameState {
     nextId: 1,
     planetHealth: 1000,
     maxPlanetHealth: 1000,
-    gold: 0,
     spawner: {
       elapsed: 0,
       spawnAccumulator: 0,
@@ -252,7 +250,7 @@ function makeBaseEntity(
     speed: 0,
     chargesRequired: 0,
     charge: 0,
-    gold: 0,
+    xpReward: 0,
     range: 0,
     hitHalfW: hitbox.hitWidth / 2,
     hitHalfH: hitbox.hitHeight / 2,
@@ -300,7 +298,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
   entity.displayRotation = Math.PI;
   entity.speed = speed;
   entity.vx = -speed;
-  entity.gold = goldForEnemy(config);
+  entity.xpReward = xpForEnemy(config);
   entity.range = config.range;
   addEntity(state, entity);
 }
@@ -427,13 +425,12 @@ function dealDamageToEntity(
   if (killed) {
     if (attacker) attacker.kills++;
     if (target.team === Team.Enemy) {
-      state.gold += target.gold;
       state.onEnemyEntityDeath.emit({
         x: target.x,
         y: target.y,
         team: target.team,
         entityType: target.entityType,
-        xpAmount: target.gold,
+        xpAmount: target.xpReward,
       });
     }
     const idx = state.entities.indexOf(target);
