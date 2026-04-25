@@ -50,12 +50,13 @@ export class ExplosionManager {
     }
   }
 
-  private getExplosionTextures(explosionType: ExplosionType): Texture[] {
+  private getExplosionTextures(explosionType: ExplosionType | undefined): Texture[] {
     switch (explosionType) {
+      case ExplosionType.PlasmaExplosive: return this.assets.getPlasmaExplosionTextures();
       case ExplosionType.IceExplosive: return this.assets.getIceExplosionTextures();
       case ExplosionType.Explosive:    return this.assets.getHawkExplosionTextures();
       case ExplosionType.MothHit:      return this.assets.getMothExplosionTextures();
-      default:                         return this.assets.getPlasmaExplosionTextures();
+      default:                         return this.assets.getMothExplosionTextures();
     }
   }
 
