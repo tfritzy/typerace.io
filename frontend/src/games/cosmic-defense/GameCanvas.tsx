@@ -25,6 +25,7 @@ export const GameCanvas = () => {
   const [level, setLevel] = useState(1);
   const [elapsed, setElapsed] = useState(0);
   const [xp, setXp] = useState(0);
+  const [score, setScore] = useState(0);
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
 
   useEffect(() => {
@@ -39,6 +40,7 @@ export const GameCanvas = () => {
       if (game) {
         setElapsed(Math.floor(game.state.spawner.elapsed));
         setXp(game.state.xp);
+        setScore(game.state.score);
         setXpNeeded(xpForNextLevel(game.state.level));
       }
     }, 200);
@@ -195,6 +197,9 @@ export const GameCanvas = () => {
           </div>
           <span className="text-[11px] text-[#585b70]">
             {elapsed}s
+          </span>
+          <span className="text-[11px] text-[#cdd6f4] font-semibold">
+            Score {score}
           </span>
         </div>
         <PlacementOverlay

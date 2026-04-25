@@ -151,6 +151,7 @@ export interface GameState {
   gold: number;
   spawner: SpawnState;
   xp: number;
+  score: number;
   level: number;
   pendingChoice: boolean;
   onPlanetDamaged: GameEvent;
@@ -196,6 +197,7 @@ export function createGameState(): GameState {
       paused: true,
     },
     xp: 0,
+    score: 0,
     level: 1,
     pendingChoice: true,
     onPlanetDamaged: new GameEvent(),
@@ -813,6 +815,7 @@ export function xpForNextLevel(level: number): number {
 export function awardXP(state: GameState, amount: number): void {
   if (state.pendingChoice) return;
   state.xp += amount;
+  state.score += amount;
   const needed = xpForNextLevel(state.level);
   if (state.xp >= needed) {
     state.xp -= needed;
