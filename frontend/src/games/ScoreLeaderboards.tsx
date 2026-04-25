@@ -108,10 +108,10 @@ export const ScoreLeaderboards = ({ gameId }: ScoreLeaderboardsProps) => {
     if (!conn) return;
 
     const refreshScores = () => {
-      setScores(Array.from(conn.db.score.iter()).filter((row) => row.gameId === gameId));
+      setScores(Array.from(conn.db.score.GameId.filter(gameId)));
     };
     const refreshHighScores = () => {
-      setHighScores(Array.from(conn.db.highscore.iter()).filter((row) => row.gameId === gameId));
+      setHighScores(Array.from(conn.db.highscore.GameId.filter(gameId)));
     };
 
     conn.db.score.onInsert(refreshScores);
