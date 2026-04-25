@@ -12,7 +12,8 @@ const SHIP_DEATH_EXPLOSION_SCALE = 2.5;
 const SHIP_DEATH_ANIMATION_SPEED = 0.3;
 const ENEMY_CONTAINER_SCALE = 1.5;
 const WARP_IN_ANIMATION_SPEED = 0.25;
-const WARP_FRAME_SIZE = 43;
+const WARP_FRAME_SIZE = 64;
+const WARP_SIZE_MULTIPLIER = 1.5;
 
 export class EnemyManager {
   readonly layer: Container;
@@ -96,7 +97,7 @@ export class EnemyManager {
     const { width, height } = this.assets.getShipTextureSize(entityType);
     const maxDim = Math.max(width, height);
     if (maxDim <= 0) return;
-    const warpScale = (maxDim * ENEMY_CONTAINER_SCALE) / WARP_FRAME_SIZE;
+    const warpScale = (maxDim * ENEMY_CONTAINER_SCALE * WARP_SIZE_MULTIPLIER) / WARP_FRAME_SIZE;
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
     sprite.scale.set(warpScale);
