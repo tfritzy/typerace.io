@@ -340,6 +340,40 @@ public static partial class Module
         public int TotalXp;
     }
 
+    [Table(Name = "score", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Timestamp) })]
+    public partial struct Score
+    {
+        [PrimaryKey]
+        public string Id;
+        [SpacetimeDB.Index.BTree]
+        public string GameId;
+        [SpacetimeDB.Index.BTree]
+        public Identity PlayerId;
+        [SpacetimeDB.Index.BTree]
+        public int Value;
+        [SpacetimeDB.Index.BTree]
+        public long Timestamp;
+        public long TimeMs;
+    }
+
+    [Table(Name = "highscore", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameId) })]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Value) })]
+    public partial struct HighScore
+    {
+        [PrimaryKey]
+        public string Id;
+        [SpacetimeDB.Index.BTree]
+        public string GameId;
+        [SpacetimeDB.Index.BTree]
+        public Identity PlayerId;
+        [SpacetimeDB.Index.BTree]
+        public int Value;
+        public long Timestamp;
+        public long TimeMs;
+    }
+
     [Table(Name = "elo", Public = true)]
     [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
     public partial struct Elo
@@ -395,6 +429,15 @@ public static partial class Module
 
     [Table(Scheduled = nameof(CleanupOldXpGains))]
     public partial struct XpGainCleaner
+    {
+        [AutoInc]
+        [PrimaryKey]
+        public ulong ScheduledId;
+        public ScheduleAt ScheduledAt;
+    }
+
+    [Table(Scheduled = nameof(CleanupOldScores))]
+    public partial struct ScoreCleaner
     {
         [AutoInc]
         [PrimaryKey]
@@ -462,6 +505,14 @@ public static partial class Module
         });
 
         Log.Info("Initialized game archiver with 5-minute interval");
+
+        ctx.Db.ScoreCleaner.Insert(new ScoreCleaner
+        {
+            ScheduledId = 0,
+            ScheduledAt = new ScheduleAt.Interval(fiveMinutes)
+        });
+
+        Log.Info("Initialized score cleaner with 5-minute interval");
 
         for (int i = 0; i < 100; i++)
         {
@@ -1571,6 +1622,87 @@ public static partial class Module
     [Reducer]
     public static void CleanupOldXpGains(ReducerContext ctx, XpGainCleaner args)
     {
+    }
+
+    [Reducer]
+    public static void CleanupOldScores(ReducerContext ctx, ScoreCleaner args)
+    {
+        var cutoff = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 86_400_000_000;
+        var deleted = ctx.Db.score.Timestamp.Delete((long.MinValue, cutoff));
+        Log.Info($"Deleted {deleted} score records older than 24 hours");
+    }
+
+    [Reducer]
+    public static void publishScore(ReducerContext ctx, string gameId, int score, long timeMs)
+    {
+        if (!IsValidScoreGameId(gameId))
+        {
+            throw new Exception("Invalid game ID");
+        }
+
+        if (score < 0)
+        {
+            throw new Exception("Score cannot be negative");
+        }
+
+        if (timeMs < 0)
+        {
+            throw new Exception("Time cannot be negative");
+        }
+
+        var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
+        ctx.Db.score.Insert(new Score
+        {
+            Id = IdGenerator.Generate("score_", ctx.Rng),
+            GameId = gameId,
+            PlayerId = ctx.Sender,
+            Value = score,
+            Timestamp = timestamp,
+            TimeMs = timeMs
+        });
+
+        var highScoreId = $"{gameId}_{ctx.Sender}";
+        var existingHighScore = ctx.Db.highscore.Id.Find(highScoreId);
+        if (existingHighScore == null)
+        {
+            ctx.Db.highscore.Insert(new HighScore
+            {
+                Id = highScoreId,
+                GameId = gameId,
+                PlayerId = ctx.Sender,
+                Value = score,
+                Timestamp = timestamp,
+                TimeMs = timeMs
+            });
+            return;
+        }
+
+        if (score > existingHighScore.Value.Value)
+        {
+            var updatedHighScore = existingHighScore.Value;
+            updatedHighScore.Value = score;
+            updatedHighScore.Timestamp = timestamp;
+            updatedHighScore.TimeMs = timeMs;
+            ctx.Db.highscore.Id.Update(updatedHighScore);
+        }
+    }
+
+    private static bool IsValidScoreGameId(string gameId)
+    {
+        if (gameId.Length == 0 || gameId.Length > 64)
+        {
+            return false;
+        }
+
+        foreach (var c in gameId)
+        {
+            if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_'))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static void UpdateDailyActivePlayerCount(ReducerContext ctx, Identity playerId, string dateKey)
