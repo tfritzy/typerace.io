@@ -122,6 +122,7 @@ export interface EntityDeathData {
   x: number;
   y: number;
   team: Team;
+  entityType: EntityType;
 }
 
 export interface LaserBeam {
@@ -427,7 +428,7 @@ function dealDamageToEntity(
     if (target.team === Team.Enemy) {
       state.gold += target.gold;
       awardXP(state, target.gold);
-      state.onEnemyEntityDeath.emit({ x: target.x, y: target.y, team: target.team });
+      state.onEnemyEntityDeath.emit({ x: target.x, y: target.y, team: target.team, entityType: target.entityType });
     }
     const idx = state.entities.indexOf(target);
     if (idx >= 0) removeEntityAt(state, idx);
