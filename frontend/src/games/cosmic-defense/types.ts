@@ -34,8 +34,8 @@ export const ENTITY_EXPLOSION_TYPES: Partial<Record<EntityType, ExplosionType>> 
   Moth: ExplosionType.MothHit,
 };
 
-export function getExplosionType(entityType: EntityType): ExplosionType | undefined {
-  return ENTITY_EXPLOSION_TYPES[entityType];
+export function getExplosionType(entityType: EntityType): ExplosionType {
+  return ENTITY_EXPLOSION_TYPES[entityType] ?? ExplosionType.MothHit;
 }
 
 export const SHIP_ENTITY_TYPES = [
