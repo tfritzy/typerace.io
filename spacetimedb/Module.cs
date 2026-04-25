@@ -1653,21 +1653,42 @@ public static partial class Module
         }
 
         var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
-        var day = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000).ToUniversalTime().ToString("yyyy-MM-dd");
+        var day = DateTimeOffset.FromUnixTimeSeconds(timestamp / 1_000_000).ToUniversalTime().ToString("yyyy-MM-dd");
         var player = ctx.Db.player.Identity.Find(ctx.Sender);
-        var playerName = player?.Name ?? "Unknown";
-        ctx.Db.game_score.Insert(new GameScore
+        var playerName = player?.Name ?? $"Anonymous {AnimalNameGenerator.Generate(ctx.Rng)}";
+        var scoreId = $"{gameId}_{language}_{day}_{ctx.Sender}";
+        var existingScore = ctx.Db.game_score.Id.Find(scoreId);
+        if (existingScore == null)
         {
-            Id = IdGenerator.Generate("score_", ctx.Rng),
-            GameId = gameId,
-            Language = language,
-            PlayerId = ctx.Sender,
-            PlayerName = playerName,
-            Value = score,
-            Timestamp = timestamp,
-            TimeMs = 0,
-            Day = day
-        });
+            ctx.Db.game_score.Insert(new GameScore
+            {
+                Id = scoreId,
+                GameId = gameId,
+                Language = language,
+                PlayerId = ctx.Sender,
+                PlayerName = playerName,
+                Value = score,
+                Timestamp = timestamp,
+                TimeMs = 0,
+                Day = day
+            });
+        }
+        else if (score > existingScore.Value.Value)
+        {
+            var currentScore = existingScore.Value;
+            ctx.Db.game_score.Id.Update(new GameScore
+            {
+                Id = currentScore.Id,
+                GameId = currentScore.GameId,
+                Language = currentScore.Language,
+                PlayerId = currentScore.PlayerId,
+                PlayerName = playerName,
+                Value = score,
+                Timestamp = timestamp,
+                TimeMs = currentScore.TimeMs,
+                Day = currentScore.Day
+            });
+        }
 
         var highScoreId = $"{gameId}_{language}_{ctx.Sender}";
         var existingHighScore = ctx.Db.game_highscore.Id.Find(highScoreId);
@@ -1717,7 +1738,7 @@ public static partial class Module
         var proof = (score + 73_210_291L) % ScoreProofMod;
         proof = AddScoreProofText(proof, gameId);
         proof = AddScoreProofText(proof, language);
-        return (proof * 97 + score * 13L + 166_452_5L) % ScoreProofMod;
+        return (proof * 97 + score * 13L + 1_664_525L) % ScoreProofMod;
     }
 
     private static long AddScoreProofText(long proof, string value)
