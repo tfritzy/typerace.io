@@ -29,6 +29,7 @@ export class AssetManager {
   private shipDeathExplosionSheet_: Spritesheet;
   private iceExplosionSheet_: Spritesheet;
   private hawkExplosionSheet_: Spritesheet;
+  private mothExplosionSheet_: Spritesheet;
   private warpInSheet_: Spritesheet;
 
   constructor(loaded: Record<string, unknown>) {
@@ -50,6 +51,7 @@ export class AssetManager {
     this.shipDeathExplosionSheet_ = loaded["ship-death-explosion"] as Spritesheet;
     this.iceExplosionSheet_ = loaded["ice-explosion"] as Spritesheet;
     this.hawkExplosionSheet_ = loaded["hawk-explosion"] as Spritesheet;
+    this.mothExplosionSheet_ = loaded["moth-explosion"] as Spritesheet;
     this.warpInSheet_ = loaded["warp-in"] as Spritesheet;
 
     this.applyNearestNeighbor();
@@ -121,6 +123,14 @@ export class AssetManager {
     return textures;
   }
 
+  getMothExplosionTextures(): Texture[] {
+    const textures: Texture[] = [];
+    for (let i = 0; i < 54; i++) {
+      textures.push(this.mothExplosionSheet_.textures[`moth-exp-${i}`]);
+    }
+    return textures;
+  }
+
   getShipTextureSize(entityType: EntityType): { width: number; height: number } {
     const frameIndex = getShipEntityIndex(entityType);
     const tex = this.spaceships_.textures[`ship-${frameIndex}`];
@@ -179,6 +189,7 @@ export class AssetManager {
     setNearestNeighbor(this.shipDeathExplosionSheet_);
     setNearestNeighbor(this.iceExplosionSheet_);
     setNearestNeighbor(this.hawkExplosionSheet_);
+    setNearestNeighbor(this.mothExplosionSheet_);
     setNearestNeighbor(this.warpInSheet_);
   }
 }

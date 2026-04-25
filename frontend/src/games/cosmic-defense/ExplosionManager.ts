@@ -56,6 +56,8 @@ export class ExplosionManager {
         ? this.assets.getIceExplosionTextures()
         : exp.explosionType === ExplosionType.Explosive
         ? this.assets.getHawkExplosionTextures()
+        : exp.explosionType === ExplosionType.MothHit
+        ? this.assets.getMothExplosionTextures()
         : this.assets.getPlasmaExplosionTextures();
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
