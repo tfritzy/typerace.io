@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { and, toSql } from "spacetimedb";
+import { query } from "../../../module_bindings";
 import { PlayerAvatar } from "../../components/PlayerAvatar";
 import { useDatabase } from "../../contexts/SpacetimeContext";
 import type { GameHighScore, GameScore } from "../../types/stdb";
@@ -87,7 +89,10 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
     if (!conn) return;
 
     const refreshScores = () => {
-      setScores(Array.from(conn.db.gameScore.GameId_Language.filter([gameId, language])).filter((row) => row.timestamp >= recentCutoff));
+      setScores(
+        Array.from(conn.db.gameScore.GameId_Language_Timestamp.filter([gameId, language]))
+          .filter((row) => row.timestamp >= recentCutoff)
+      );
     };
     const refreshHighScores = () => {
       setHighScores(Array.from(conn.db.gameHighscore.GameId_Language.filter([gameId, language])));
@@ -107,8 +112,16 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
     const subscription = conn.subscriptionBuilder()
       .onApplied(refresh)
       .subscribe([
-        `SELECT * FROM game_score WHERE GameId = '${gameId}' AND Language = '${language}' AND Timestamp >= ${recentCutoff}`,
-        `SELECT * FROM game_highscore WHERE GameId = '${gameId}' AND Language = '${language}'`,
+        toSql(
+          query.game_score
+            .where((row) => and(row.gameId.eq(gameId), row.language.eq(language), row.timestamp.gte(recentCutoff)))
+            .build()
+        ),
+        toSql(
+          query.game_highscore
+            .where((row) => and(row.gameId.eq(gameId), row.language.eq(language)))
+            .build()
+        ),
       ]);
 
     return () => {

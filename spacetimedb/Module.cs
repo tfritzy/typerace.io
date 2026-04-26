@@ -341,7 +341,7 @@ public static partial class Module
     }
 
     [Table(Name = "game_score", Public = true)]
-    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language) })]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language), nameof(Timestamp) })]
     public partial struct GameScore
     {
         [PrimaryKey]
