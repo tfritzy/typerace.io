@@ -24,18 +24,25 @@ function LeaderboardTable<T extends GameScore | GameHighScore>({
   rows: T[];
 }) {
   return (
-    <div className="box p-4 min-h-[240px]">
-      <h2 className="text-lg font-semibold text-foreground mb-3">{title}</h2>
+    <div className="min-h-[280px] rounded-2xl border border-white/10 bg-[#111827]/80 p-4 shadow-[0_18px_45px_rgba(0,0,0,0.25)] backdrop-blur">
+      <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-3">
+        <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+        <span className="rounded-full border border-[#f9e2af]/30 bg-[#f9e2af]/10 px-3 py-1 text-xs font-semibold text-[#f9e2af]">
+          {rows.length}
+        </span>
+      </div>
       {rows.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No scores yet.</p>
+        <div className="flex min-h-[180px] items-center justify-center rounded-xl border border-dashed border-white/10 bg-black/10">
+          <p className="text-sm text-muted-foreground">No scores yet.</p>
+        </div>
       ) : (
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           {rows.map((row, index) => (
             <div
               key={row.id}
-              className="grid grid-cols-[32px_32px_1fr_auto] gap-3 items-center text-sm"
+              className="grid grid-cols-[40px_32px_1fr_auto] items-center gap-3 rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2 text-sm"
             >
-              <span className="text-muted-foreground tabular-nums">
+              <span className="rounded-full bg-black/20 py-1 text-center text-muted-foreground tabular-nums">
                 #{index + 1}
               </span>
               {index < 3 ? (
@@ -51,7 +58,7 @@ function LeaderboardTable<T extends GameScore | GameHighScore>({
                 {row.playerName}
               </span>
               <span className="text-[#f9e2af] font-semibold tabular-nums">
-                {row.value}
+                {row.value.toLocaleString()}
               </span>
             </div>
           ))}
@@ -121,7 +128,7 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
   const allTimeScores = useMemo(() => sortByScore(highScores), [highScores]);
 
   return (
-    <section className="grid gap-4 md:grid-cols-2">
+    <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <LeaderboardTable title="Top scores today" rows={dailyScores} />
       <LeaderboardTable title="All-time high scores" rows={allTimeScores} />
     </section>
