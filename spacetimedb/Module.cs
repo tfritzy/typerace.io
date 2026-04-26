@@ -1630,8 +1630,13 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void publishScore(ReducerContext ctx, string gameId, string language, int score, long scoreProof)
+    public static void publishScore(ReducerContext ctx, string scoreSessionId, string gameId, string language, int score, long scoreProof)
     {
+        if (!IsValidScoreSessionId(scoreSessionId))
+        {
+            throw new Exception("Invalid score session ID");
+        }
+
         if (!IsValidScoreGameId(gameId))
         {
             throw new Exception("Invalid game ID");
@@ -1656,18 +1661,39 @@ public static partial class Module
         var day = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000).ToUniversalTime().ToString("yyyy-MM-dd");
         var player = ctx.Db.player.Identity.Find(ctx.Sender);
         var playerName = player?.Name ?? $"Anonymous {AnimalNameGenerator.Generate(ctx.Rng)}";
-        ctx.Db.game_score.Insert(new GameScore
+        var existingScore = ctx.Db.game_score.Id.Find(scoreSessionId);
+        if (existingScore == null)
         {
-            Id = IdGenerator.Generate("score_", ctx.Rng),
-            GameId = gameId,
-            Language = language,
-            PlayerId = ctx.Sender,
-            PlayerName = playerName,
-            Value = score,
-            Timestamp = timestamp,
-            TimeMs = 0,
-            Day = day
-        });
+            ctx.Db.game_score.Insert(new GameScore
+            {
+                Id = scoreSessionId,
+                GameId = gameId,
+                Language = language,
+                PlayerId = ctx.Sender,
+                PlayerName = playerName,
+                Value = score,
+                Timestamp = timestamp,
+                TimeMs = 0,
+                Day = day
+            });
+        }
+        else
+        {
+            if (existingScore.Value.PlayerId != ctx.Sender || existingScore.Value.GameId != gameId || existingScore.Value.Language != language)
+            {
+                throw new Exception("Invalid score session");
+            }
+
+            if (score > existingScore.Value.Value)
+            {
+                var updatedScore = existingScore.Value;
+                updatedScore.PlayerName = playerName;
+                updatedScore.Value = score;
+                updatedScore.Timestamp = timestamp;
+                updatedScore.Day = day;
+                ctx.Db.game_score.Id.Update(updatedScore);
+            }
+        }
 
         var highScoreId = $"{gameId}_{language}_{ctx.Sender}";
         var existingHighScore = ctx.Db.game_highscore.Id.Find(highScoreId);
@@ -1700,6 +1726,9 @@ public static partial class Module
 
     private static bool IsValidScoreGameId(string gameId) =>
         IsValidScoreKey(gameId, 64, c => c == '_' || (c >= '0' && c <= '9'));
+
+    private static bool IsValidScoreSessionId(string scoreSessionId) =>
+        IsValidScoreKey(scoreSessionId, 80, c => c == '_' || c == '-' || (c >= '0' && c <= '9'));
 
     private static bool IsValidScoreLanguage(string language) =>
         IsValidScoreKey(language, 16, c => c == '-');

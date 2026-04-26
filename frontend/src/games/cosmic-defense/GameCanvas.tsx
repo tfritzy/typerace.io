@@ -34,6 +34,11 @@ function createScoreProof(gameId: string, language: string, score: number): bigi
   return BigInt((proof * 97 + score * 13 + 1_664_525) % SCORE_PROOF_MOD);
 }
 
+function createScoreSessionId(): string {
+  const randomId = crypto.randomUUID();
+  return `score_${randomId}`;
+}
+
 export const GameCanvas = () => {
   const conn = useDatabase();
   const languageGameMatch = useMatch("/:lang/games/:gameId");
@@ -42,6 +47,7 @@ export const GameCanvas = () => {
   const language = getLanguageFromSlug(languageGameMatch?.params.lang).slug || "en";
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
+  const scoreSessionIdRef = useRef(createScoreSessionId());
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
   const [slots, setSlots] = useState<PlacementSlot[]>(() => generateSlots());
@@ -57,6 +63,7 @@ export const GameCanvas = () => {
       throttle((nextScore: number) => {
         if (!conn) return;
         conn.reducers.publishScore({
+          scoreSessionId: scoreSessionIdRef.current,
           gameId,
           language,
           score: nextScore,

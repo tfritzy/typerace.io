@@ -95,6 +95,7 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
     };
 
     conn.db.gameScore.onInsert(refresh);
+    conn.db.gameScore.onUpdate(refresh);
     conn.db.gameScore.onDelete(refresh);
     conn.db.gameHighscore.onInsert(refresh);
     conn.db.gameHighscore.onUpdate(refresh);
@@ -109,6 +110,7 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
 
     return () => {
       conn.db.gameScore.removeOnInsert(refresh);
+      conn.db.gameScore.removeOnUpdate(refresh);
       conn.db.gameScore.removeOnDelete(refresh);
       conn.db.gameHighscore.removeOnInsert(refresh);
       conn.db.gameHighscore.removeOnUpdate(refresh);

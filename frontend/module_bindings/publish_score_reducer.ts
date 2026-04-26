@@ -11,6 +11,7 @@ import {
 } from "spacetimedb";
 
 export default {
+  scoreSessionId: __t.string(),
   gameId: __t.string(),
   language: __t.string(),
   score: __t.i32(),
