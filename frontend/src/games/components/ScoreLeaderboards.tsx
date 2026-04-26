@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { and, toSql } from "spacetimedb";
+import { query } from "../../../module_bindings";
 import { PlayerAvatar } from "../../components/PlayerAvatar";
 import { useDatabase } from "../../contexts/SpacetimeContext";
 import type { GameHighScore, GameScore } from "../../types/stdb";
@@ -75,15 +77,11 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
   const [highScores, setHighScores] = useState<GameHighScore[]>([]);
 
   useEffect(() => {
-    const scheduleNextDay = () => {
-      const now = new Date();
-      const nextDay = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
-      return setTimeout(() => {
-        setDay(getUtcDay());
-      }, nextDay - now.getTime());
-    };
-
-    const timeout = scheduleNextDay();
+    const now = new Date();
+    const nextDay = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+    const timeout = setTimeout(() => {
+      setDay(getUtcDay());
+    }, nextDay - Date.now());
     return () => clearTimeout(timeout);
   }, [day]);
 
@@ -102,6 +100,7 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
     };
 
     conn.db.gameScore.onInsert(refresh);
+    conn.db.gameScore.onUpdate(refresh);
     conn.db.gameScore.onDelete(refresh);
     conn.db.gameHighscore.onInsert(refresh);
     conn.db.gameHighscore.onUpdate(refresh);
@@ -110,12 +109,21 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
     const subscription = conn.subscriptionBuilder()
       .onApplied(refresh)
       .subscribe([
-        `SELECT * FROM game_score WHERE GameId = '${gameId}' AND Language = '${language}' AND Day = '${day}'`,
-        `SELECT * FROM game_highscore WHERE GameId = '${gameId}' AND Language = '${language}'`,
+        toSql(
+          query.game_score
+            .where((row) => and(row.gameId.eq(gameId), row.language.eq(language), row.day.eq(day)))
+            .build()
+        ),
+        toSql(
+          query.game_highscore
+            .where((row) => and(row.gameId.eq(gameId), row.language.eq(language)))
+            .build()
+        ),
       ]);
 
     return () => {
       conn.db.gameScore.removeOnInsert(refresh);
+      conn.db.gameScore.removeOnUpdate(refresh);
       conn.db.gameScore.removeOnDelete(refresh);
       conn.db.gameHighscore.removeOnInsert(refresh);
       conn.db.gameHighscore.removeOnUpdate(refresh);
