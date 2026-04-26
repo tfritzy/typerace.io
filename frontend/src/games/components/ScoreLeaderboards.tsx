@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { PlayerAvatar } from "../../components/PlayerAvatar";
 import { useDatabase } from "../../contexts/SpacetimeContext";
 import type { GameHighScore, GameScore } from "../../types/stdb";
 
@@ -32,11 +33,20 @@ function LeaderboardTable<T extends GameScore | GameHighScore>({
           {rows.map((row, index) => (
             <div
               key={row.id}
-              className="grid grid-cols-[32px_1fr_auto] gap-3 items-center text-sm"
+              className="grid grid-cols-[32px_32px_1fr_auto] gap-3 items-center text-sm"
             >
               <span className="text-muted-foreground tabular-nums">
                 #{index + 1}
               </span>
+              {index < 3 ? (
+                <PlayerAvatar
+                  size={28}
+                  identity={row.playerId.toHexString()}
+                  placement={index + 1}
+                />
+              ) : (
+                <span />
+              )}
               <span className="text-foreground truncate">
                 {row.playerName}
               </span>

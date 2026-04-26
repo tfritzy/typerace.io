@@ -11,9 +11,19 @@ import { SpacetimeProvider } from "./contexts/SpacetimeContext";
 import { ToastProvider } from "./hooks/useToast";
 import { ToastContainer } from "./components/Toast";
 
-function LanguageGamesFallback() {
+function GamesFallback() {
   const { lang } = useParams();
-  return <Navigate to={`/${lang}/games`} replace />;
+  return <Navigate to={lang ? `/${lang}/games` : "/games"} replace />;
+}
+
+function gameRoutes() {
+  return (
+    <>
+      <Route index element={<GamesPage />} />
+      <Route path="cosmic_defense" element={<CosmicDefensePage />} />
+      <Route path="*" element={<GamesFallback />} />
+    </>
+  );
 }
 
 function ConnectedRoutes() {
@@ -25,12 +35,8 @@ function ConnectedRoutes() {
         <Route path="/profile/:playerId" element={<ProfilePage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
         <Route path="/stats" element={<SiteStatsPage />} />
-        <Route path="/games" element={<GamesPage />} />
-        <Route path="/games/cosmic_defense" element={<CosmicDefensePage />} />
-        <Route path="/games/*" element={<Navigate to="/games" replace />} />
-        <Route path="/:lang/games" element={<GamesPage />} />
-        <Route path="/:lang/games/cosmic_defense" element={<CosmicDefensePage />} />
-        <Route path="/:lang/games/*" element={<LanguageGamesFallback />} />
+        <Route path="/games">{gameRoutes()}</Route>
+        <Route path="/:lang/games">{gameRoutes()}</Route>
         <Route path="/:lang" element={<LobbyPage />} />
         <Route path="/:lang/game/:gameId" element={<GamePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
