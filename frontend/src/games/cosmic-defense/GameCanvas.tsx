@@ -92,7 +92,7 @@ export const GameCanvas = () => {
           setTotalKills(game.state.totalKills);
         });
         unsubBossApproaching = game.state.onBossApproaching.subscribe((data) => {
-          setBossAnnouncement(`${data.entityType} boss approaching`);
+          setBossAnnouncement(`The ${data.entityType} boss is approaching`);
           if (bossAnnouncementTimeoutRef.current !== null) {
             window.clearTimeout(bossAnnouncementTimeoutRef.current);
           }

@@ -12,6 +12,7 @@ const BOSS_SPEED_MULTIPLIER = 0.45;
 const BOSS_HEALTH_MULTIPLIER = 8;
 const BOSS_POWER_MULTIPLIER = 2.5;
 const BOSS_SIZE_SCALE = 2.2;
+const BOSS_XP_MULTIPLIER = 5;
 
 export enum TargetingMode {
   NearestToShip = 0,
@@ -336,7 +337,7 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team, o
   entity.displayRotation = Math.PI;
   entity.speed = speed;
   entity.vx = -speed;
-  entity.xpReward = Math.round(xpForEnemy(config) * (isBoss ? 5 : 1));
+  entity.xpReward = Math.round(xpForEnemy(config) * (isBoss ? BOSS_XP_MULTIPLIER : 1));
   entity.range = config.range;
   entity.sizeScale = sizeScale;
   entity.isBoss = isBoss;
@@ -788,6 +789,7 @@ const MAX_SPAWN_RATE = 4.0;
 const SPAWN_RAMP_TIME = 240;
 const BOSS_WARNING_LEAD_TIME = 5;
 const BOSS_HEALTH_PEAK_OFFSET = TIER_SPREAD / 2;
+const BOSS_TIER_COUNT = ENEMY_CATALOG.length - 1;
 
 function binomialWeight(t: number, n: number, k: number): number {
   const p = Math.max(0, Math.min(1, t));
@@ -841,7 +843,7 @@ export function updateSpawner(state: GameState, dt: number): void {
   state.spawner.elapsed += dt;
 
   const bossTier = state.spawner.nextBossTier;
-  if (bossTier < ENEMY_CATALOG.length - 1) {
+  if (bossTier < BOSS_TIER_COUNT) {
     const bossSpawnTime = TIER_OFFSET + bossTier * TIER_SPREAD + BOSS_HEALTH_PEAK_OFFSET;
     if (state.spawner.warnedBossTier < bossTier && state.spawner.elapsed >= bossSpawnTime - BOSS_WARNING_LEAD_TIME) {
       state.spawner.warnedBossTier = bossTier;
