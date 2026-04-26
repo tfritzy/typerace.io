@@ -15,6 +15,7 @@ export default __t.row({
   gameId: __t.string().name("GameId"),
   language: __t.string().name("Language"),
   playerId: __t.identity().name("PlayerId"),
+  playerName: __t.string().name("PlayerName"),
   value: __t.i32().name("Value"),
   timestamp: __t.i64().name("Timestamp"),
   timeMs: __t.i64().name("TimeMs"),
