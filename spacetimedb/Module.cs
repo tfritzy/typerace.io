@@ -1728,7 +1728,7 @@ public static partial class Module
         {
             if (score > maxInitialScore)
             {
-                throw new Exception("Score is too high");
+                throw new Exception($"Initial score exceeds maximum allowed value of {maxInitialScore}");
             }
             return;
         }
@@ -1740,7 +1740,7 @@ public static partial class Module
         }
 
         var elapsedSeconds = Math.Max(1, (timestamp - previousScore.Timestamp) / 1_000_000);
-        var maxScoreGain = maxInitialScore + elapsedSeconds * maxScorePerSecond;
+        var maxScoreGain = elapsedSeconds * maxScorePerSecond;
         if (score - previousScore.Value > maxScoreGain)
         {
             throw new Exception("Score increased too quickly");
