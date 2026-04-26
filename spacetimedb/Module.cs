@@ -342,7 +342,6 @@ public static partial class Module
 
     [Table(Name = "game_score", Public = true)]
     [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language), nameof(Day) })]
-    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language), nameof(PlayerId) })]
     public partial struct GameScore
     {
         [PrimaryKey]
@@ -1627,12 +1626,11 @@ public static partial class Module
     public static void CleanupOldScores(ReducerContext ctx, ScoreCleaner args)
     {
         var cutoff = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 86_400_000_000;
-        var deleted = ctx.Db.game_score.Timestamp.Delete((long.MinValue, cutoff));
-        Log.Info($"Deleted {deleted} score records older than 24 hours");
+        ctx.Db.game_score.Timestamp.Delete((long.MinValue, cutoff));
     }
 
     [Reducer]
-    public static void publishScore(ReducerContext ctx, string gameId, string language, int score, long timeMs)
+    public static void publishScore(ReducerContext ctx, string gameId, string language, int score, long scoreProof)
     {
         if (!IsValidScoreGameId(gameId))
         {
@@ -1649,13 +1647,12 @@ public static partial class Module
             throw new Exception("Score cannot be negative");
         }
 
-        if (timeMs < 0)
+        if (!IsValidScoreProof(gameId, language, score, scoreProof))
         {
-            throw new Exception("Time cannot be negative");
+            throw new Exception("Invalid score proof");
         }
 
         var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
-        ValidateScoreSubmission(ctx, gameId, language, score, timestamp);
         var day = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000).ToUniversalTime().ToString("yyyy-MM-dd");
         var player = ctx.Db.player.Identity.Find(ctx.Sender);
         var playerName = player?.Name ?? "Unknown";
@@ -1668,7 +1665,7 @@ public static partial class Module
             PlayerName = playerName,
             Value = score,
             Timestamp = timestamp,
-            TimeMs = timeMs,
+            TimeMs = 0,
             Day = day
         });
 
@@ -1685,7 +1682,7 @@ public static partial class Module
                 PlayerName = playerName,
                 Value = score,
                 Timestamp = timestamp,
-                TimeMs = timeMs
+                TimeMs = 0
             });
             return;
         }
@@ -1696,7 +1693,7 @@ public static partial class Module
             updatedHighScore.PlayerName = playerName;
             updatedHighScore.Value = score;
             updatedHighScore.Timestamp = timestamp;
-            updatedHighScore.TimeMs = timeMs;
+            updatedHighScore.TimeMs = 0;
             ctx.Db.game_highscore.Id.Update(updatedHighScore);
         }
     }
@@ -1710,41 +1707,26 @@ public static partial class Module
     private static bool IsValidScoreKey(string value, int maxLength, Func<char, bool> allowExtra) =>
         value.Length > 0 && value.Length <= maxLength && value.All(c => (c >= 'a' && c <= 'z') || allowExtra(c));
 
-    private static void ValidateScoreSubmission(ReducerContext ctx, string gameId, string language, int score, long timestamp)
+    private const long ScoreProofMod = 2_147_483_647;
+
+    private static bool IsValidScoreProof(string gameId, string language, int score, long scoreProof) =>
+        scoreProof == CreateScoreProof(gameId, language, score);
+
+    private static long CreateScoreProof(string gameId, string language, int score)
     {
-        const int maxInitialScore = 500;
-        const int maxScorePerSecond = 250;
-        GameScore? latestScore = null;
+        var proof = (score + 73_210_291L) % ScoreProofMod;
+        proof = AddScoreProofText(proof, gameId);
+        proof = AddScoreProofText(proof, language);
+        return (proof * 97 + score * 13L + 166_452_5L) % ScoreProofMod;
+    }
 
-        foreach (var scoreRow in ctx.Db.game_score.GameId_Language_PlayerId.Filter((gameId, language, ctx.Sender)))
+    private static long AddScoreProofText(long proof, string value)
+    {
+        foreach (var c in value)
         {
-            if (latestScore == null || scoreRow.Timestamp > latestScore.Value.Timestamp)
-            {
-                latestScore = scoreRow;
-            }
+            proof = (proof * 31 + c) % ScoreProofMod;
         }
-
-        if (latestScore == null)
-        {
-            if (score > maxInitialScore)
-            {
-                throw new Exception($"Initial score exceeds maximum allowed value of {maxInitialScore}");
-            }
-            return;
-        }
-
-        var previousScore = latestScore.Value;
-        if (score <= previousScore.Value)
-        {
-            return;
-        }
-
-        var elapsedSeconds = Math.Max(1, (timestamp - previousScore.Timestamp) / 1_000_000);
-        var maxScoreGain = elapsedSeconds * maxScorePerSecond;
-        if (score - previousScore.Value > maxScoreGain)
-        {
-            throw new Exception("Score increased too quickly");
-        }
+        return proof;
     }
 
     private static void UpdateDailyActivePlayerCount(ReducerContext ctx, Identity playerId, string dateKey)

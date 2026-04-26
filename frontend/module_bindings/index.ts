@@ -311,11 +311,6 @@ const tablesSchema = __schema(
         'language',
         'day',
       ] },
-      { name: 'GameId_Language_PlayerId', algorithm: 'btree', columns: [
-        'gameId',
-        'language',
-        'playerId',
-      ] },
       { name: 'Id', algorithm: 'btree', columns: [
         'id',
       ] },
