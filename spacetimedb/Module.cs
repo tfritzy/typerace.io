@@ -1717,7 +1717,7 @@ public static partial class Module
         var proof = (score + 73_210_291L) % ScoreProofMod;
         proof = AddScoreProofText(proof, gameId);
         proof = AddScoreProofText(proof, language);
-        return (proof * 97 + score * 13L + 166_452_5L) % ScoreProofMod;
+        return (proof * 97 + score * 13L + 1_664_525L) % ScoreProofMod;
     }
 
     private static long AddScoreProofText(long proof, string value)
