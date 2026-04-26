@@ -8,7 +8,7 @@
     "moth-exp-5": { "frame": { "x": 320, "y": 0, "w": 64, "h": 64 } }
   },
   "meta": {
-    "image": "358.png",
+    "image": "354.png",
     "format": "RGBA8888",
     "size": { "w": 384, "h": 576 },
     "scale": 1
