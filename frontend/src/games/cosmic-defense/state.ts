@@ -7,6 +7,7 @@ export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
+const INSTANT_SCORE_PER_XP = 10;
 
 export enum TargetingMode {
   NearestToShip = 0,
@@ -115,7 +116,6 @@ export interface DamageData {
   amount: number;
   x: number;
   y: number;
-  killed: boolean;
 }
 
 export interface EntityDeathData {
@@ -124,6 +124,12 @@ export interface EntityDeathData {
   team: Team;
   entityType: EntityType;
   xpAmount: number;
+}
+
+export interface XPData {
+  xp: number;
+  level: number;
+  xpNeeded: number;
 }
 
 export interface LaserBeam {
@@ -151,11 +157,13 @@ export interface GameState {
   maxPlanetHealth: number;
   spawner: SpawnState;
   xp: number;
+  score: number;
   level: number;
   pendingChoice: boolean;
   onPlanetDamaged: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
   onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
+  onXPChanged: GameDataEvent<XPData>;
   onLevelUp: GameEvent;
 }
 
@@ -195,11 +203,13 @@ export function createGameState(): GameState {
       paused: true,
     },
     xp: 0,
+    score: 0,
     level: 1,
     pendingChoice: true,
     onPlanetDamaged: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
     onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
+    onXPChanged: new GameDataEvent<XPData>(),
     onLevelUp: new GameEvent(),
   };
 
@@ -420,22 +430,25 @@ function dealDamageToEntity(
   if (attacker) attacker.damageDealt += damage;
 
   const killed = target.health <= 0;
-  state.onDamageDealt.emit({ amount: damage, x: target.x, y: target.y, killed });
 
   if (killed) {
     if (attacker) attacker.kills++;
     if (target.team === Team.Enemy) {
+      const xpAmount = target.xpReward;
+      state.score += xpAmount * INSTANT_SCORE_PER_XP;
       state.onEnemyEntityDeath.emit({
         x: target.x,
         y: target.y,
         team: target.team,
         entityType: target.entityType,
-        xpAmount: target.xpReward,
+        xpAmount,
       });
     }
     const idx = state.entities.indexOf(target);
     if (idx >= 0) removeEntityAt(state, idx);
   }
+
+  state.onDamageDealt.emit({ amount: damage, x: target.x, y: target.y });
 
   return killed;
 }
@@ -824,6 +837,7 @@ export function awardXP(state: GameState, amount: number): void {
     state.spawner.paused = true;
     state.onLevelUp.emit();
   }
+  state.onXPChanged.emit({ xp: state.xp, level: state.level, xpNeeded: xpForNextLevel(state.level) });
 }
 
 export function levelUpEntity(state: GameState, entityId: number, config: FriendlyConfig, newLevel: number): void {
