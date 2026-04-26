@@ -295,25 +295,8 @@ const tablesSchema = __schema(
         'gameId',
         'language',
       ] },
-      { name: 'GameId', algorithm: 'btree', columns: [
-        'gameId',
-      ] },
       { name: 'Id', algorithm: 'btree', columns: [
         'id',
-      ] },
-      { name: 'Language', algorithm: 'btree', columns: [
-        'language',
-      ] },
-      { name: 'PlayerId_GameId_Language', algorithm: 'btree', columns: [
-        'playerId',
-        'gameId',
-        'language',
-      ] },
-      { name: 'PlayerId', algorithm: 'btree', columns: [
-        'playerId',
-      ] },
-      { name: 'Value', algorithm: 'btree', columns: [
-        'value',
       ] },
     ],
     constraints: [
@@ -323,31 +306,21 @@ const tablesSchema = __schema(
   __table({
     name: 'game_score',
     indexes: [
-      { name: 'Day', algorithm: 'btree', columns: [
-        'day',
-      ] },
       { name: 'GameId_Language_Day', algorithm: 'btree', columns: [
         'gameId',
         'language',
         'day',
       ] },
-      { name: 'GameId', algorithm: 'btree', columns: [
+      { name: 'GameId_Language_PlayerId', algorithm: 'btree', columns: [
         'gameId',
+        'language',
+        'playerId',
       ] },
       { name: 'Id', algorithm: 'btree', columns: [
         'id',
       ] },
-      { name: 'Language', algorithm: 'btree', columns: [
-        'language',
-      ] },
-      { name: 'PlayerId', algorithm: 'btree', columns: [
-        'playerId',
-      ] },
       { name: 'Timestamp', algorithm: 'btree', columns: [
         'timestamp',
-      ] },
-      { name: 'Value', algorithm: 'btree', columns: [
-        'value',
       ] },
     ],
     constraints: [
