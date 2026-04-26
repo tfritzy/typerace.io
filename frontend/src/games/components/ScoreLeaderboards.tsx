@@ -8,8 +8,10 @@ type ScoreLeaderboardsProps = {
   language: string;
 };
 
-function getUtcDay(): string {
-  return new Date().toISOString().slice(0, 10);
+const RECENT_SCORE_WINDOW_US = 86_400_000_000n;
+
+function getRecentScoreCutoff(): bigint {
+  return BigInt(Date.now()) * 1000n - RECENT_SCORE_WINDOW_US;
 }
 
 function sortByScore<T extends GameScore | GameHighScore>(rows: T[]): T[] {
@@ -70,28 +72,22 @@ function LeaderboardTable<T extends GameScore | GameHighScore>({
 
 export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) => {
   const conn = useDatabase();
-  const [day, setDay] = useState(getUtcDay);
+  const [recentCutoff, setRecentCutoff] = useState(getRecentScoreCutoff);
   const [scores, setScores] = useState<GameScore[]>([]);
   const [highScores, setHighScores] = useState<GameHighScore[]>([]);
 
   useEffect(() => {
-    const scheduleNextDay = () => {
-      const now = new Date();
-      const nextDay = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
-      return setTimeout(() => {
-        setDay(getUtcDay());
-      }, nextDay - now.getTime());
-    };
-
-    const timeout = scheduleNextDay();
-    return () => clearTimeout(timeout);
-  }, [day]);
+    const interval = setInterval(() => {
+      setRecentCutoff(getRecentScoreCutoff());
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!conn) return;
 
     const refreshScores = () => {
-      setScores(Array.from(conn.db.gameScore.GameId_Language_Day.filter([gameId, language, day])));
+      setScores(Array.from(conn.db.gameScore.GameId_Language.filter([gameId, language])).filter((row) => row.timestamp >= recentCutoff));
     };
     const refreshHighScores = () => {
       setHighScores(Array.from(conn.db.gameHighscore.GameId_Language.filter([gameId, language])));
@@ -111,7 +107,7 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
     const subscription = conn.subscriptionBuilder()
       .onApplied(refresh)
       .subscribe([
-        `SELECT * FROM game_score WHERE GameId = '${gameId}' AND Language = '${language}' AND Day = '${day}'`,
+        `SELECT * FROM game_score WHERE GameId = '${gameId}' AND Language = '${language}' AND Timestamp >= ${recentCutoff}`,
         `SELECT * FROM game_highscore WHERE GameId = '${gameId}' AND Language = '${language}'`,
       ]);
 
@@ -124,14 +120,14 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
       conn.db.gameHighscore.removeOnDelete(refresh);
       subscription.unsubscribe();
     };
-  }, [conn, day, gameId, language]);
+  }, [conn, recentCutoff, gameId, language]);
 
   const dailyScores = useMemo(() => sortByScore(scores), [scores]);
   const allTimeScores = useMemo(() => sortByScore(highScores), [highScores]);
 
   return (
     <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      <LeaderboardTable title="Top scores today" rows={dailyScores} />
+      <LeaderboardTable title="Top scores last 24h" rows={dailyScores} />
       <LeaderboardTable title="All-time high scores" rows={allTimeScores} />
     </section>
   );

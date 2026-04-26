@@ -19,5 +19,4 @@ export default __t.row({
   value: __t.i32().name("Value"),
   timestamp: __t.i64().name("Timestamp"),
   timeMs: __t.i64().name("TimeMs"),
-  day: __t.string().name("Day"),
 });

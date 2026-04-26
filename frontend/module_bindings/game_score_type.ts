@@ -19,7 +19,6 @@ export default __t.object("GameScore", {
   value: __t.i32(),
   timestamp: __t.i64(),
   timeMs: __t.i64(),
-  day: __t.string(),
 });
 
 

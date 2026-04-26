@@ -341,7 +341,7 @@ public static partial class Module
     }
 
     [Table(Name = "game_score", Public = true)]
-    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language), nameof(Day) })]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language) })]
     public partial struct GameScore
     {
         [PrimaryKey]
@@ -354,7 +354,6 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         public long Timestamp;
         public long TimeMs;
-        public string Day;
     }
 
     [Table(Name = "game_highscore", Public = true)]
@@ -1630,13 +1629,8 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void publishScore(ReducerContext ctx, string scoreSessionId, string gameId, string language, int score, long scoreProof)
+    public static void publishScore(ReducerContext ctx, string gameId, string language, int score, long scoreProof)
     {
-        if (!IsValidScoreSessionId(scoreSessionId))
-        {
-            throw new Exception("Invalid score session ID");
-        }
-
         if (!IsValidScoreGameId(gameId))
         {
             throw new Exception("Invalid game ID");
@@ -1658,48 +1652,39 @@ public static partial class Module
         }
 
         var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
-        var day = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000).ToUniversalTime().ToString("yyyy-MM-dd");
+        var cutoff = timestamp - 86_400_000_000;
         var player = ctx.Db.player.Identity.Find(ctx.Sender);
         var playerName = player?.Name ?? $"Anonymous {AnimalNameGenerator.Generate(ctx.Rng)}";
-        var existingScore = ctx.Db.game_score.Id.Find(scoreSessionId);
+        var scoreId = $"{gameId}_{language}_{ctx.Sender}";
+        var existingScore = ctx.Db.game_score.Id.Find(scoreId);
         if (existingScore == null)
         {
             ctx.Db.game_score.Insert(new GameScore
             {
-                Id = scoreSessionId,
+                Id = scoreId,
                 GameId = gameId,
                 Language = language,
                 PlayerId = ctx.Sender,
                 PlayerName = playerName,
                 Value = score,
                 Timestamp = timestamp,
-                TimeMs = 0,
-                Day = day
+                TimeMs = 0
             });
         }
-        else
+        else if (existingScore.Value.Timestamp < cutoff || score > existingScore.Value.Value)
         {
-            if (existingScore.Value.PlayerId != ctx.Sender || existingScore.Value.GameId != gameId || existingScore.Value.Language != language)
+            var currentScore = existingScore.Value;
+            ctx.Db.game_score.Id.Update(new GameScore
             {
-                throw new Exception("Invalid score session");
-            }
-
-            if (score > existingScore.Value.Value)
-            {
-                var currentScore = existingScore.Value;
-                ctx.Db.game_score.Id.Update(new GameScore
-                {
-                    Id = currentScore.Id,
-                    GameId = currentScore.GameId,
-                    Language = currentScore.Language,
-                    PlayerId = currentScore.PlayerId,
-                    PlayerName = playerName,
-                    Value = score,
-                    Timestamp = timestamp,
-                    TimeMs = currentScore.TimeMs,
-                    Day = day
-                });
-            }
+                Id = currentScore.Id,
+                GameId = currentScore.GameId,
+                Language = currentScore.Language,
+                PlayerId = currentScore.PlayerId,
+                PlayerName = playerName,
+                Value = score,
+                Timestamp = timestamp,
+                TimeMs = currentScore.TimeMs
+            });
         }
 
         var highScoreId = $"{gameId}_{language}_{ctx.Sender}";
@@ -1733,9 +1718,6 @@ public static partial class Module
 
     private static bool IsValidScoreGameId(string gameId) =>
         IsValidScoreKey(gameId, 64, c => c == '_' || (c >= '0' && c <= '9'));
-
-    private static bool IsValidScoreSessionId(string scoreSessionId) =>
-        IsValidScoreKey(scoreSessionId, 80, c => c == '_' || c == '-' || (c >= '0' && c <= '9'));
 
     private static bool IsValidScoreLanguage(string language) =>
         IsValidScoreKey(language, 16, c => c == '-');

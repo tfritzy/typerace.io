@@ -306,10 +306,9 @@ const tablesSchema = __schema(
   __table({
     name: 'game_score',
     indexes: [
-      { name: 'GameId_Language_Day', algorithm: 'btree', columns: [
+      { name: 'GameId_Language', algorithm: 'btree', columns: [
         'gameId',
         'language',
-        'day',
       ] },
       { name: 'Id', algorithm: 'btree', columns: [
         'id',
