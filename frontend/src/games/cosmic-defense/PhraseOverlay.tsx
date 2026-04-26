@@ -236,9 +236,9 @@ export const PhraseOverlay = ({
             {chars}
           </div>
           <div
-            className="absolute left-1/2 -top-1 h-8 -translate-x-[1px]"
+            className="absolute left-1/2 top-0 h-[2.25rem] -translate-x-px"
             style={{
-              borderLeft: "2px solid rgba(255,255,255,0.7)",
+              borderLeft: "1px solid rgba(255,255,255,0.7)",
               filter: "drop-shadow(0 0 2px rgba(0,0,0,0.8))",
             }}
           />
