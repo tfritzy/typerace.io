@@ -1662,7 +1662,7 @@ public static partial class Module
         }
 
         var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
-        var day = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000).ToString("yyyy-MM-dd");
+        var day = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000).ToUniversalTime().ToString("yyyy-MM-dd");
         ctx.Db.game_score.Insert(new GameScore
         {
             Id = IdGenerator.Generate("score_", ctx.Rng),

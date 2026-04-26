@@ -11,6 +11,10 @@ function getUtcDay(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+function escapeSqlValue(value: string): string {
+  return value.replaceAll("'", "''");
+}
+
 function getPlayerName(players: Map<string, Player>, row: GameScore | GameHighScore): string {
   return players.get(row.playerId.toHexString())?.name ?? "Anonymous";
 }
@@ -103,6 +107,9 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
       refreshHighScores();
       refreshPlayers();
     };
+    const queryGameId = escapeSqlValue(gameId);
+    const queryLanguage = escapeSqlValue(language);
+    const queryDay = escapeSqlValue(day);
 
     conn.db.gameScore.onInsert(refresh);
     conn.db.gameScore.onDelete(refresh);
@@ -116,8 +123,8 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
     const subscription = conn.subscriptionBuilder()
       .onApplied(refresh)
       .subscribe([
-        `SELECT * FROM game_score WHERE GameId = '${gameId}' AND Language = '${language}' AND Day = '${day}'`,
-        `SELECT * FROM game_highscore WHERE GameId = '${gameId}' AND Language = '${language}'`,
+        `SELECT * FROM game_score WHERE GameId = '${queryGameId}' AND Language = '${queryLanguage}' AND Day = '${queryDay}'`,
+        `SELECT * FROM game_highscore WHERE GameId = '${queryGameId}' AND Language = '${queryLanguage}'`,
         "SELECT * FROM player WHERE IsBot = false",
       ]);
 
