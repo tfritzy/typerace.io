@@ -20,7 +20,7 @@ const SCORE_PUBLISH_INTERVAL_MS = 10_000;
 export const GameCanvas = () => {
   const conn = useDatabase();
   const { gameId: gameSlug, lang } = useParams();
-  const gameId = gameSlug?.replaceAll("-", "_") ?? "cosmic_defense";
+  const gameId = gameSlug?.replaceAll("-", "_") ?? "";
   const language = getLanguageFromSlug(lang).slug || "en";
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
@@ -72,18 +72,17 @@ export const GameCanvas = () => {
     return () => clearInterval(interval);
   }, [pendingChoice, selectedSlot]);
 
-  const publishCurrentScore = () => {
-    const game = gameRef.current;
+  const publishScoreNow = (game: CosmicDefenseGame, now: number) => {
     const currentConn = connRef.current;
-    if (!game || !currentConn || game.state.score === lastPublishedScoreRef.current) return;
+    if (!currentConn || game.state.score === lastPublishedScoreRef.current) return;
 
-    const now = Date.now();
     const elapsedSinceLastPublish = now - lastPublishedAtRef.current;
     if (lastPublishedAtRef.current !== 0 && elapsedSinceLastPublish < SCORE_PUBLISH_INTERVAL_MS) {
       if (publishTimeoutRef.current) return;
       publishTimeoutRef.current = setTimeout(() => {
+        const scheduledGame = gameRef.current;
+        if (scheduledGame) publishScoreNow(scheduledGame, Date.now());
         publishTimeoutRef.current = null;
-        publishCurrentScore();
       }, SCORE_PUBLISH_INTERVAL_MS - elapsedSinceLastPublish);
       return;
     }
@@ -92,10 +91,16 @@ export const GameCanvas = () => {
       gameId: gameIdRef.current,
       language: languageRef.current,
       score: game.state.score,
-      timeMs: BigInt(Math.floor(elapsedRef.current * 1000)),
+      timeMs: BigInt(Math.floor(game.state.spawner.elapsed * 1000)),
     });
     lastPublishedAtRef.current = now;
     lastPublishedScoreRef.current = game.state.score;
+  };
+
+  const publishCurrentScore = () => {
+    const game = gameRef.current;
+    if (!game) return;
+    publishScoreNow(game, Date.now());
   };
 
   useEffect(() => {
