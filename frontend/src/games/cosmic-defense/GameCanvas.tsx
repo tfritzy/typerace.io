@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useMatch } from "react-router-dom";
 import { useDatabase } from "../../contexts/SpacetimeContext";
 import { getLanguageFromSlug } from "../../utils/modes";
 import { throttle } from "../../utils/throttle";
@@ -36,8 +36,10 @@ function createScoreProof(gameId: string, language: string, score: number): bigi
 
 export const GameCanvas = () => {
   const conn = useDatabase();
-  const { gameId = "", lang } = useParams();
-  const language = getLanguageFromSlug(lang).slug || "en";
+  const languageGameMatch = useMatch("/:lang/games/:gameId");
+  const gameMatch = useMatch("/games/:gameId");
+  const gameId = languageGameMatch?.params.gameId ?? gameMatch?.params.gameId ?? "";
+  const language = getLanguageFromSlug(languageGameMatch?.params.lang).slug || "en";
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
