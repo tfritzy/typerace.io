@@ -204,7 +204,7 @@ export const GameCanvas = () => {
             <div className="flex-1">
               <div className="w-8 h-8 rounded border border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.04)]" />
             </div>
-            <div className="flex flex-col items-end" style={{ width: "25%" }}>
+            <div className="flex flex-col items-end w-1/4">
               <span className="text-[11px] text-[#a6adc8]">
                 {totalKills} kills
               </span>
