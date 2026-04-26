@@ -94,7 +94,7 @@ export class CosmicDefenseGame {
     this.explosionManager.update(this.state);
     this.laserBeamManager.update(this.state);
     this.shipManager.update(this.state, dt);
-    this.gemManager.update(dt);
+    this.gemManager.update(this.state, dt);
     this.damageNumberManager.update(dt);
   }
 

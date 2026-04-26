@@ -1,5 +1,5 @@
 import { Container, Graphics } from "pixi.js";
-import type { GameState, DamageData } from "./state";
+import { awardXP, type EntityDeathData, type GameState } from "./state";
 
 const GEM_SIZE = 4;
 const POP_SPEED = 100;
@@ -40,6 +40,7 @@ interface ActiveGem {
   y: number;
   vx: number;
   vy: number;
+  xpAmount: number;
 }
 
 export class GemManager {
@@ -53,10 +54,8 @@ export class GemManager {
   }
 
   subscribe(state: GameState): void {
-    this.unsub = state.onDamageDealt.subscribe((data: DamageData) => {
-      if (data.killed) {
-        this.spawn(data.x, data.y, data.amount);
-      }
+    this.unsub = state.onEnemyEntityDeath.subscribe((data: EntityDeathData) => {
+      this.spawn(data.x, data.y, data.xpAmount);
     });
   }
 
@@ -97,10 +96,11 @@ export class GemManager {
       y,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
+      xpAmount,
     });
   }
 
-  update(dt: number): void {
+  update(state: GameState, dt: number): void {
     for (let i = this.active.length - 1; i >= 0; i--) {
       const gem = this.active[i];
       gem.elapsed += dt;
@@ -121,6 +121,7 @@ export class GemManager {
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist < COLLECTION_DIST) {
+          awardXP(state, gem.xpAmount);
           gem.g.destroy();
           this.active.splice(i, 1);
           continue;
