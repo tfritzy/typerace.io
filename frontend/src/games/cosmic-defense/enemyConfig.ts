@@ -80,7 +80,7 @@ export interface EnemyConfig {
   range: number;
 }
 
-export function goldForEnemy(config: EnemyConfig): number {
+export function xpForEnemy(config: EnemyConfig): number {
   return Math.max(1, Math.round(Math.pow(config.health, 0.6) / 3));
 }
 
