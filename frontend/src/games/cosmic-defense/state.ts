@@ -158,6 +158,7 @@ export interface GameState {
   spawner: SpawnState;
   xp: number;
   score: number;
+  totalKills: number;
   level: number;
   pendingChoice: boolean;
   onPlanetDamaged: GameEvent;
@@ -204,6 +205,7 @@ export function createGameState(): GameState {
     },
     xp: 0,
     score: 0,
+    totalKills: 0,
     level: 1,
     pendingChoice: true,
     onPlanetDamaged: new GameEvent(),
@@ -434,6 +436,7 @@ function dealDamageToEntity(
   if (killed) {
     if (attacker) attacker.kills++;
     if (target.team === Team.Enemy) {
+      state.totalKills++;
       const xpAmount = target.xpReward;
       state.score += xpAmount * INSTANT_SCORE_PER_XP;
       state.onEnemyEntityDeath.emit({
