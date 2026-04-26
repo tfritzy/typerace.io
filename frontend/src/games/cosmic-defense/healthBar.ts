@@ -8,6 +8,10 @@ const BOSS_HEALTH_BAR_WIDTH = 82;
 const BOSS_HEALTH_BAR_HEIGHT = 8;
 const BOSS_HEALTH_BAR_OFFSET = -54;
 
+function shouldDisplayHealthBar(entity: EntityState, ratio: number): boolean {
+  return entity.isBoss || ratio < 1;
+}
+
 export function drawHealthBar(
   g: Graphics,
   entity: EntityState
@@ -17,7 +21,7 @@ export function drawHealthBar(
   g.y = entity.y + (entity.isBoss ? BOSS_HEALTH_BAR_OFFSET : HEALTH_BAR_OFFSET);
 
   const ratio = Math.max(0, entity.health / entity.maxHealth);
-  if (ratio >= 1 && !entity.isBoss) return;
+  if (!shouldDisplayHealthBar(entity, ratio)) return;
 
   const barColor = ratio > 0.6 ? 0x4ade80 : ratio > 0.3 ? 0xfbbf24 : 0xef4444;
   const width = entity.isBoss ? BOSS_HEALTH_BAR_WIDTH : HEALTH_BAR_WIDTH;

@@ -14,6 +14,10 @@ import type { EntityType } from "./types";
 const UI_REFERENCE_WIDTH = 700;
 const BOSS_ANNOUNCEMENT_DURATION_MS = 3600;
 
+function formatEntityTypeName(entityType: EntityType): string {
+  return entityType.replace(/([a-z])([A-Z])/g, "$1 $2");
+}
+
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
@@ -92,7 +96,7 @@ export const GameCanvas = () => {
           setTotalKills(game.state.totalKills);
         });
         unsubBossApproaching = game.state.onBossApproaching.subscribe((data) => {
-          setBossAnnouncement(`The ${data.entityType} boss is approaching`);
+          setBossAnnouncement(`The ${formatEntityTypeName(data.entityType)} boss is approaching`);
           if (bossAnnouncementTimeoutRef.current !== null) {
             window.clearTimeout(bossAnnouncementTimeoutRef.current);
           }

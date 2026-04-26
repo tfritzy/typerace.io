@@ -788,7 +788,7 @@ const BASE_SPAWN_RATE = 0.6;
 const MAX_SPAWN_RATE = 4.0;
 const SPAWN_RAMP_TIME = 240;
 const BOSS_WARNING_LEAD_TIME = 5;
-const BOSS_HEALTH_PEAK_OFFSET = TIER_SPREAD / 2;
+const BOSS_SPAWN_TIME_OFFSET = TIER_SPREAD / 2;
 const BOSS_TIER_COUNT = ENEMY_CATALOG.length - 1;
 
 function binomialWeight(t: number, n: number, k: number): number {
@@ -844,7 +844,7 @@ export function updateSpawner(state: GameState, dt: number): void {
 
   const bossTier = state.spawner.nextBossTier;
   if (bossTier < BOSS_TIER_COUNT) {
-    const bossSpawnTime = TIER_OFFSET + bossTier * TIER_SPREAD + BOSS_HEALTH_PEAK_OFFSET;
+    const bossSpawnTime = TIER_OFFSET + bossTier * TIER_SPREAD + BOSS_SPAWN_TIME_OFFSET;
     if (state.spawner.warnedBossTier < bossTier && state.spawner.elapsed >= bossSpawnTime - BOSS_WARNING_LEAD_TIME) {
       state.spawner.warnedBossTier = bossTier;
       state.onBossApproaching.emit({ entityType: ENEMY_CATALOG[bossTier].entityType });
