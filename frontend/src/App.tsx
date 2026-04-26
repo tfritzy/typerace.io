@@ -16,6 +16,16 @@ function LanguageGamesFallback() {
   return <Navigate to={`/${lang}/games`} replace />;
 }
 
+function GameRoute() {
+  const { gameId } = useParams();
+  return gameId === "cosmic_defense" ? <CosmicDefensePage /> : <Navigate to="/games" replace />;
+}
+
+function LanguageGameRoute() {
+  const { gameId } = useParams();
+  return gameId === "cosmic_defense" ? <CosmicDefensePage /> : <LanguageGamesFallback />;
+}
+
 function ConnectedRoutes() {
   return (
     <SpacetimeProvider>
@@ -26,11 +36,9 @@ function ConnectedRoutes() {
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
         <Route path="/stats" element={<SiteStatsPage />} />
         <Route path="/games" element={<GamesPage />} />
-        <Route path="/games/cosmic_defense" element={<CosmicDefensePage />} />
-        <Route path="/games/:gameId" element={<Navigate to="/games" replace />} />
+        <Route path="/games/:gameId" element={<GameRoute />} />
         <Route path="/:lang/games" element={<GamesPage />} />
-        <Route path="/:lang/games/cosmic_defense" element={<CosmicDefensePage />} />
-        <Route path="/:lang/games/:gameId" element={<LanguageGamesFallback />} />
+        <Route path="/:lang/games/:gameId" element={<LanguageGameRoute />} />
         <Route path="/:lang" element={<LobbyPage />} />
         <Route path="/:lang/game/:gameId" element={<GamePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
