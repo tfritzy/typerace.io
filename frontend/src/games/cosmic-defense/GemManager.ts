@@ -2,13 +2,13 @@ import { Container, Graphics } from "pixi.js";
 import { awardXP, type EntityDeathData, type GameState } from "./state";
 
 const GEM_SIZE = 4;
-const POP_SPEED = 200;
-const POP_DURATION = 0.15;
-const GRAVITY = 400;
-const GEM_MAX_LIFE = 1.5;
+const POP_SPEED = 100;
+const POP_DURATION = 0.3;
+const GRAVITY = 200;
+const GEM_MAX_LIFE = 3.0;
 const COLLECTION_DIST = 8;
-const LERP_START = 1.0;
-const LERP_END = 24;
+const LERP_START = 0.5;
+const LERP_END = 12;
 
 const TARGET_X = 60;
 const TARGET_Y = 20;
@@ -136,7 +136,7 @@ export class GemManager {
       gem.g.x = gem.x;
       gem.g.y = gem.y;
 
-      const easeInDur = 0.075;
+      const easeInDur = 0.15;
       if (gem.elapsed < easeInDur) {
         const p = gem.elapsed / easeInDur;
         gem.g.scale.set(p * (2 - p));

@@ -1,7 +1,7 @@
 import { Container, Graphics } from "pixi.js";
 import type { GameState } from "./state";
 
-const BEAM_DURATION = 0.175;
+const BEAM_DURATION = 0.35;
 
 export class LaserBeamManager {
   readonly layer: Container;
