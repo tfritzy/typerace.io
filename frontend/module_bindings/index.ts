@@ -92,20 +92,20 @@ import EloRow from "./elo_table";
 export { EloRow };
 import GameRow from "./game_table";
 export { GameRow };
+import GameHighscoreRow from "./game_highscore_table";
+export { GameHighscoreRow };
+import GameScoreRow from "./game_score_table";
+export { GameScoreRow };
 import GamerecordRow from "./gamerecord_table";
 export { GamerecordRow };
 import GlobalstatsRow from "./globalstats_table";
 export { GlobalstatsRow };
-import HighscoreRow from "./highscore_table";
-export { HighscoreRow };
 import PersonalrecordRow from "./personalrecord_table";
 export { PersonalrecordRow };
 import PlayerRow from "./player_table";
 export { PlayerRow };
 import PlayerprogressRow from "./playerprogress_table";
 export { PlayerprogressRow };
-import ScoreRow from "./score_table";
-export { ScoreRow };
 import XpgainRow from "./xpgain_table";
 export { XpgainRow };
 
@@ -126,12 +126,16 @@ import Game from "./game_type";
 export { Game };
 import GameArchiver from "./game_archiver_type";
 export { GameArchiver };
+import GameHighScore from "./game_high_score_type";
+export { GameHighScore };
 import GameMode from "./game_mode_type";
 export { GameMode };
 import GameModeCount from "./game_mode_count_type";
 export { GameModeCount };
 import GameRecord from "./game_record_type";
 export { GameRecord };
+import GameScore from "./game_score_type";
+export { GameScore };
 import GameStart from "./game_start_type";
 export { GameStart };
 import GameState from "./game_state_type";
@@ -140,8 +144,6 @@ import GameType from "./game_type_type";
 export { GameType };
 import GlobalStats from "./global_stats_type";
 export { GlobalStats };
-import HighScore from "./high_score_type";
-export { HighScore };
 import PersonalRecord from "./personal_record_type";
 export { PersonalRecord };
 import Player from "./player_type";
@@ -150,8 +152,6 @@ import PlayerColor from "./player_color_type";
 export { PlayerColor };
 import PlayerProgress from "./player_progress_type";
 export { PlayerProgress };
-import Score from "./score_type";
-export { Score };
 import ScoreCleaner from "./score_cleaner_type";
 export { ScoreCleaner };
 import XpGain from "./xp_gain_type";
@@ -289,6 +289,72 @@ const tablesSchema = __schema(
     ],
   }, GameRow),
   __table({
+    name: 'game_highscore',
+    indexes: [
+      { name: 'GameId_Language', algorithm: 'btree', columns: [
+        'gameId',
+        'language',
+      ] },
+      { name: 'GameId', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+      { name: 'Id', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { name: 'Language', algorithm: 'btree', columns: [
+        'language',
+      ] },
+      { name: 'PlayerId_GameId_Language', algorithm: 'btree', columns: [
+        'playerId',
+        'gameId',
+        'language',
+      ] },
+      { name: 'PlayerId', algorithm: 'btree', columns: [
+        'playerId',
+      ] },
+      { name: 'Value', algorithm: 'btree', columns: [
+        'value',
+      ] },
+    ],
+    constraints: [
+      { name: 'game_highscore_Id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, GameHighscoreRow),
+  __table({
+    name: 'game_score',
+    indexes: [
+      { name: 'Day', algorithm: 'btree', columns: [
+        'day',
+      ] },
+      { name: 'GameId_Language_Day', algorithm: 'btree', columns: [
+        'gameId',
+        'language',
+        'day',
+      ] },
+      { name: 'GameId', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+      { name: 'Id', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { name: 'Language', algorithm: 'btree', columns: [
+        'language',
+      ] },
+      { name: 'PlayerId', algorithm: 'btree', columns: [
+        'playerId',
+      ] },
+      { name: 'Timestamp', algorithm: 'btree', columns: [
+        'timestamp',
+      ] },
+      { name: 'Value', algorithm: 'btree', columns: [
+        'value',
+      ] },
+    ],
+    constraints: [
+      { name: 'game_score_Id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, GameScoreRow),
+  __table({
     name: 'gamerecord',
     indexes: [
       { name: 'Day', algorithm: 'btree', columns: [
@@ -332,34 +398,6 @@ const tablesSchema = __schema(
       { name: 'globalstats_Date_key', constraint: 'unique', columns: ['date'] },
     ],
   }, GlobalstatsRow),
-  __table({
-    name: 'highscore',
-    indexes: [
-      { name: 'GameId_Value', algorithm: 'btree', columns: [
-        'gameId',
-        'value',
-      ] },
-      { name: 'GameId', algorithm: 'btree', columns: [
-        'gameId',
-      ] },
-      { name: 'Id', algorithm: 'btree', columns: [
-        'id',
-      ] },
-      { name: 'PlayerId_GameId', algorithm: 'btree', columns: [
-        'playerId',
-        'gameId',
-      ] },
-      { name: 'PlayerId', algorithm: 'btree', columns: [
-        'playerId',
-      ] },
-      { name: 'Value', algorithm: 'btree', columns: [
-        'value',
-      ] },
-    ],
-    constraints: [
-      { name: 'highscore_Id_key', constraint: 'unique', columns: ['id'] },
-    ],
-  }, HighscoreRow),
   __table({
     name: 'personalrecord',
     indexes: [
@@ -415,33 +453,6 @@ const tablesSchema = __schema(
       { name: 'playerprogress_Id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, PlayerprogressRow),
-  __table({
-    name: 'score',
-    indexes: [
-      { name: 'GameId_Timestamp', algorithm: 'btree', columns: [
-        'gameId',
-        'timestamp',
-      ] },
-      { name: 'GameId', algorithm: 'btree', columns: [
-        'gameId',
-      ] },
-      { name: 'Id', algorithm: 'btree', columns: [
-        'id',
-      ] },
-      { name: 'PlayerId', algorithm: 'btree', columns: [
-        'playerId',
-      ] },
-      { name: 'Timestamp', algorithm: 'btree', columns: [
-        'timestamp',
-      ] },
-      { name: 'Value', algorithm: 'btree', columns: [
-        'value',
-      ] },
-    ],
-    constraints: [
-      { name: 'score_Id_key', constraint: 'unique', columns: ['id'] },
-    ],
-  }, ScoreRow),
   __table({
     name: 'xpgain',
     indexes: [
