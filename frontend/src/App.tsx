@@ -16,7 +16,7 @@ function GamesFallback() {
   return <Navigate to={lang ? `/${lang}/games` : "/games"} replace />;
 }
 
-function gameRoutes() {
+function renderGameRoutes() {
   return (
     <>
       <Route index element={<GamesPage />} />
@@ -35,8 +35,8 @@ function ConnectedRoutes() {
         <Route path="/profile/:playerId" element={<ProfilePage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
         <Route path="/stats" element={<SiteStatsPage />} />
-        <Route path="/games">{gameRoutes()}</Route>
-        <Route path="/:lang/games">{gameRoutes()}</Route>
+        <Route path="/games">{renderGameRoutes()}</Route>
+        <Route path="/:lang/games">{renderGameRoutes()}</Route>
         <Route path="/:lang" element={<LobbyPage />} />
         <Route path="/:lang/game/:gameId" element={<GamePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
