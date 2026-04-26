@@ -4,7 +4,7 @@ import type { GameState, ExplosionState } from "./state";
 import { ExplosionType } from "./types";
 
 const EXPLOSION_SCALE = 3;
-const EXPLOSION_ANIMATION_SPEED = 0.15;
+const EXPLOSION_ANIMATION_SPEED = 0.30;
 
 export class ExplosionManager {
   readonly layer: Container;
