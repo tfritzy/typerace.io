@@ -25,6 +25,7 @@ export const GameCanvas = () => {
   const [level, setLevel] = useState(1);
   const [xp, setXp] = useState(0);
   const [score, setScore] = useState(0);
+  const [totalKills, setTotalKills] = useState(0);
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
 
   useEffect(() => {
@@ -71,6 +72,7 @@ export const GameCanvas = () => {
         setLevel(game.state.level);
         setXp(game.state.xp);
         setScore(game.state.score);
+        setTotalKills(game.state.totalKills);
         setXpNeeded(xpForNextLevel(game.state.level));
         unsubLevelUp = game.state.onLevelUp.subscribe(() => {
           setPendingChoice(true);
@@ -83,6 +85,7 @@ export const GameCanvas = () => {
         });
         unsubEnemyEntityDeath = game.state.onEnemyEntityDeath.subscribe(() => {
           setScore(game.state.score);
+          setTotalKills(game.state.totalKills);
         });
       })
       .catch((err) => {
@@ -174,33 +177,42 @@ export const GameCanvas = () => {
           transform: `scale(${uiScale})`,
         }}
       >
-        <div className="absolute top-2 left-3 z-10 flex items-center gap-2">
-          <span className="text-[11px] text-[#f9e2af] font-semibold">
-            Lv {level}
-          </span>
-          <div
-            className="relative rounded-full overflow-hidden"
-            style={{
-              width: 100,
-              height: 8,
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.1)",
-            }}
-          >
+        <div className="absolute top-0 left-0 right-0 z-10 px-3 pt-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-[#f9e2af] font-semibold whitespace-nowrap">
+              Lv {level}
+            </span>
             <div
-              className="absolute left-0 top-0 h-full rounded-full"
+              className="relative flex-1 rounded-full overflow-hidden"
               style={{
-                width: `${Math.min(100, (xp / xpNeeded) * 100)}%`,
-                background: "linear-gradient(90deg, #f9e2af, #fab387)",
-                transition: "width 0.2s ease-out",
+                height: 8,
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.1)",
               }}
-            />
+            >
+              <div
+                className="absolute left-0 top-0 h-full rounded-full"
+                style={{
+                  width: `${Math.min(100, (xp / xpNeeded) * 100)}%`,
+                  background: "linear-gradient(90deg, #f9e2af, #fab387)",
+                  transition: "width 0.2s ease-out",
+                }}
+              />
+            </div>
           </div>
-        </div>
-        <div className="absolute top-2 right-3 z-10">
-          <span className="text-[11px] text-[#cdd6f4] font-semibold">
-            Score {score}
-          </span>
+          <div className="flex mt-1">
+            <div className="flex-1">
+              <div className="w-8 h-8 rounded border border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.04)]" />
+            </div>
+            <div className="flex flex-col items-end" style={{ width: "25%" }}>
+              <span className="text-[11px] text-[#a6adc8]">
+                {totalKills} kills
+              </span>
+              <span className="text-[11px] text-[#cdd6f4] font-semibold">
+                {score}
+              </span>
+            </div>
+          </div>
         </div>
         <PlacementOverlay
           slots={slots}
