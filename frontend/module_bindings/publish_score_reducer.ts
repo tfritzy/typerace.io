@@ -12,6 +12,7 @@ import {
 
 export default {
   gameId: __t.string(),
+  language: __t.string(),
   score: __t.i32(),
   timeMs: __t.i64(),
 };

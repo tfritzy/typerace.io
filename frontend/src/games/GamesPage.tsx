@@ -5,18 +5,6 @@ import { Footer } from "../components/Footer";
 
 const GAMES = [
   {
-    slug: "word-defense",
-    title: "Word Defense",
-    description:
-      "A wave-based typing defense game. Type words to shoot down enemies before they break through your shield.",
-  },
-  {
-    slug: "planetary-defense",
-    title: "Planetary Defense",
-    description:
-      "A space scene featuring ships from the Pixel Starships kit with color presets, animated engines, drifting asteroids, star particles, and a tiled space background.",
-  },
-  {
     slug: "cosmic-defense",
     title: "Cosmic Defense",
     description:

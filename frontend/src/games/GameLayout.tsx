@@ -1,14 +1,15 @@
 import { useEffect, type ReactNode } from "react";
+import { useParams } from "react-router-dom";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
-import { ScoreLeaderboards } from "./ScoreLeaderboards";
+import { ScoreLeaderboards } from "./components/ScoreLeaderboards";
+import { getLanguageFromSlug } from "../utils/modes";
 
 type GameLayoutProps = {
   title: string;
   children: ReactNode;
   aspectRatio?: number;
   viewportChromeOffsetPx?: number;
-  gameId?: string;
 };
 
 export const GameLayout = ({
@@ -16,8 +17,11 @@ export const GameLayout = ({
   children,
   aspectRatio = 16 / 9,
   viewportChromeOffsetPx = 220,
-  gameId,
 }: GameLayoutProps) => {
+  const { gameId: gameSlug, lang } = useParams();
+  const gameId = gameSlug?.replaceAll("-", "_");
+  const language = getLanguageFromSlug(lang).slug || "en";
+
   useEffect(() => {
     document.title = `${title} - TypeRace.io`;
     return () => {
@@ -48,7 +52,7 @@ export const GameLayout = ({
               </div>
             </div>
           </section>
-          {gameId && <ScoreLeaderboards gameId={gameId} />}
+          {gameId && <ScoreLeaderboards gameId={gameId} language={language} />}
         </div>
       </main>
       <Footer />
