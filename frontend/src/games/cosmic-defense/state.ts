@@ -158,6 +158,7 @@ export interface GameState {
   onDamageDealt: GameDataEvent<DamageData>;
   onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
   onScoreChanged: GameEvent;
+  onXpChanged: GameEvent;
   onLevelUp: GameEvent;
 }
 
@@ -205,6 +206,7 @@ export function createGameState(): GameState {
     onDamageDealt: new GameDataEvent<DamageData>(),
     onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
     onScoreChanged: new GameEvent(),
+    onXpChanged: new GameEvent(),
     onLevelUp: new GameEvent(),
   };
 
@@ -827,6 +829,7 @@ export function awardXP(state: GameState, amount: number): void {
     state.spawner.paused = true;
     state.onLevelUp.emit();
   }
+  state.onXpChanged.emit();
 }
 
 export function levelUpEntity(state: GameState, entityId: number, config: FriendlyConfig, newLevel: number): void {

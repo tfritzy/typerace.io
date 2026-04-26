@@ -1,13 +1,14 @@
 import { GameLayout } from "../GameLayout";
-import { useDatabase } from "../../contexts/SpacetimeContext";
+import { Navigate, useParams } from "react-router-dom";
 import { GameCanvas } from "./GameCanvas";
 
 export const CosmicDefensePage = () => {
-  const conn = useDatabase();
+  const { gameId } = useParams();
+  if (gameId !== "cosmic-defense") return <Navigate to="/games/cosmic-defense" replace />;
 
   return (
-    <GameLayout title="Cosmic Defense" aspectRatio={16 / 9} gameId="cosmic_defense">
-      <GameCanvas conn={conn} />
+    <GameLayout title="Cosmic Defense" aspectRatio={16 / 9}>
+      <GameCanvas />
     </GameLayout>
   );
 };

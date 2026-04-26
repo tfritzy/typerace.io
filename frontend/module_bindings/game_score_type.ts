@@ -10,13 +10,15 @@ import {
   type Infer as __Infer,
 } from "spacetimedb";
 
-export default __t.object("HighScore", {
+export default __t.object("GameScore", {
   id: __t.string(),
   gameId: __t.string(),
+  language: __t.string(),
   playerId: __t.identity(),
   value: __t.i32(),
   timestamp: __t.i64(),
   timeMs: __t.i64(),
+  day: __t.string(),
 });
 
 

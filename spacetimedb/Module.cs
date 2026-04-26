@@ -340,14 +340,16 @@ public static partial class Module
         public int TotalXp;
     }
 
-    [Table(Name = "score", Public = true)]
-    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Timestamp) })]
-    public partial struct Score
+    [Table(Name = "game_score", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language), nameof(Day) })]
+    public partial struct GameScore
     {
         [PrimaryKey]
         public string Id;
         [SpacetimeDB.Index.BTree]
         public string GameId;
+        [SpacetimeDB.Index.BTree]
+        public string Language;
         [SpacetimeDB.Index.BTree]
         public Identity PlayerId;
         [SpacetimeDB.Index.BTree]
@@ -355,17 +357,21 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         public long Timestamp;
         public long TimeMs;
+        [SpacetimeDB.Index.BTree]
+        public string Day;
     }
 
-    [Table(Name = "highscore", Public = true)]
-    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameId) })]
-    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Value) })]
-    public partial struct HighScore
+    [Table(Name = "game_highscore", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameId), nameof(Language) })]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language) })]
+    public partial struct GameHighScore
     {
         [PrimaryKey]
         public string Id;
         [SpacetimeDB.Index.BTree]
         public string GameId;
+        [SpacetimeDB.Index.BTree]
+        public string Language;
         [SpacetimeDB.Index.BTree]
         public Identity PlayerId;
         [SpacetimeDB.Index.BTree]
@@ -1628,16 +1634,21 @@ public static partial class Module
     public static void CleanupOldScores(ReducerContext ctx, ScoreCleaner args)
     {
         var cutoff = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 86_400_000_000;
-        var deleted = ctx.Db.score.Timestamp.Delete((long.MinValue, cutoff));
+        var deleted = ctx.Db.game_score.Timestamp.Delete((long.MinValue, cutoff));
         Log.Info($"Deleted {deleted} score records older than 24 hours");
     }
 
     [Reducer]
-    public static void publishScore(ReducerContext ctx, string gameId, int score, long timeMs)
+    public static void publishScore(ReducerContext ctx, string gameId, string language, int score, long timeMs)
     {
         if (!IsValidScoreGameId(gameId))
         {
             throw new Exception("Invalid game ID");
+        }
+
+        if (!IsValidScoreLanguage(language))
+        {
+            throw new Exception("Invalid language");
         }
 
         if (score < 0)
@@ -1651,24 +1662,28 @@ public static partial class Module
         }
 
         var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
-        ctx.Db.score.Insert(new Score
+        var day = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000).ToString("yyyy-MM-dd");
+        ctx.Db.game_score.Insert(new GameScore
         {
             Id = IdGenerator.Generate("score_", ctx.Rng),
             GameId = gameId,
+            Language = language,
             PlayerId = ctx.Sender,
             Value = score,
             Timestamp = timestamp,
-            TimeMs = timeMs
+            TimeMs = timeMs,
+            Day = day
         });
 
-        var highScoreId = $"{gameId}_{ctx.Sender}";
-        var existingHighScore = ctx.Db.highscore.Id.Find(highScoreId);
+        var highScoreId = $"{gameId}_{language}_{ctx.Sender}";
+        var existingHighScore = ctx.Db.game_highscore.Id.Find(highScoreId);
         if (existingHighScore == null)
         {
-            ctx.Db.highscore.Insert(new HighScore
+            ctx.Db.game_highscore.Insert(new GameHighScore
             {
                 Id = highScoreId,
                 GameId = gameId,
+                Language = language,
                 PlayerId = ctx.Sender,
                 Value = score,
                 Timestamp = timestamp,
@@ -1683,7 +1698,7 @@ public static partial class Module
             updatedHighScore.Value = score;
             updatedHighScore.Timestamp = timestamp;
             updatedHighScore.TimeMs = timeMs;
-            ctx.Db.highscore.Id.Update(updatedHighScore);
+            ctx.Db.game_highscore.Id.Update(updatedHighScore);
         }
     }
 
@@ -1697,6 +1712,24 @@ public static partial class Module
         foreach (var c in gameId)
         {
             if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_'))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool IsValidScoreLanguage(string language)
+    {
+        if (language.Length == 0 || language.Length > 16)
+        {
+            return false;
+        }
+
+        foreach (var c in language)
+        {
+            if (!((c >= 'a' && c <= 'z') || c == '-'))
             {
                 return false;
             }

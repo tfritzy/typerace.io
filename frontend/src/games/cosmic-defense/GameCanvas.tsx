@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useDatabase } from "../../contexts/SpacetimeContext";
+import { getLanguageFromSlug } from "../../utils/modes";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
@@ -10,21 +13,25 @@ import { PhraseOverlay } from "./PhraseOverlay";
 import { ShipChoiceOverlay } from "./ShipChoiceOverlay";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
-import type { DbConnection } from "../../../module_bindings";
 
 const UI_REFERENCE_WIDTH = 700;
 const SCORE_PUBLISH_INTERVAL_MS = 10_000;
-const GAME_ID = "cosmic_defense";
 
-type GameCanvasProps = {
-  conn: DbConnection | null;
-};
-
-export const GameCanvas = ({ conn }: GameCanvasProps) => {
+export const GameCanvas = () => {
+  const conn = useDatabase();
+  const { gameId: gameSlug, lang } = useParams();
+  const gameId = gameSlug?.replaceAll("-", "_") ?? "cosmic_defense";
+  const language = getLanguageFromSlug(lang).slug || "en";
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
+  const connRef = useRef(conn);
+  const gameIdRef = useRef(gameId);
+  const languageRef = useRef(language);
+  const elapsedRef = useRef(0);
+  const elapsedStartRef = useRef<number | null>(null);
   const lastPublishedAtRef = useRef(0);
   const lastPublishedScoreRef = useRef(0);
+  const publishTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
   const [slots, setSlots] = useState<PlacementSlot[]>(() => generateSlots());
@@ -37,6 +44,10 @@ export const GameCanvas = ({ conn }: GameCanvasProps) => {
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
   const [score, setScore] = useState(0);
 
+  connRef.current = conn;
+  gameIdRef.current = gameId;
+  languageRef.current = language;
+
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
     const interval = setInterval(() => setInspectTick((t) => t + 1), 200);
@@ -44,41 +55,48 @@ export const GameCanvas = ({ conn }: GameCanvasProps) => {
   }, [selectedSlot?.entityId]);
 
   useEffect(() => {
+    const isRunning = !pendingChoice && selectedSlot === null;
+    if (!isRunning) {
+      elapsedStartRef.current = null;
+      return;
+    }
+
+    elapsedStartRef.current = Date.now() - elapsedRef.current * 1000;
     const interval = setInterval(() => {
-      const game = gameRef.current;
-      if (game) {
-        setElapsed(Math.floor(game.state.spawner.elapsed));
-        setXp(game.state.xp);
-        setXpNeeded(xpForNextLevel(game.state.level));
-        setScore(game.state.score);
-      }
+      if (elapsedStartRef.current === null) return;
+      const nextElapsed = (Date.now() - elapsedStartRef.current) / 1000;
+      elapsedRef.current = nextElapsed;
+      setElapsed(Math.floor(nextElapsed));
     }, 200);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (!conn) return;
-
-    const interval = setInterval(() => {
-      const game = gameRef.current;
-      if (!game || game.state.score === lastPublishedScoreRef.current) return;
-
-      const now = Date.now();
-      if (lastPublishedAtRef.current !== 0 && now - lastPublishedAtRef.current < SCORE_PUBLISH_INTERVAL_MS) {
-        return;
-      }
-
-      conn.reducers.publishScore({
-        gameId: GAME_ID,
-        score: game.state.score,
-        timeMs: BigInt(Math.floor(game.state.spawner.elapsed * 1000)),
-      });
-      lastPublishedAtRef.current = now;
-      lastPublishedScoreRef.current = game.state.score;
-    }, 1000);
 
     return () => clearInterval(interval);
-  }, [conn]);
+  }, [pendingChoice, selectedSlot]);
+
+  const publishCurrentScore = () => {
+    const game = gameRef.current;
+    const currentConn = connRef.current;
+    if (!game || !currentConn || game.state.score === lastPublishedScoreRef.current) return;
+
+    const now = Date.now();
+    const elapsedSinceLastPublish = now - lastPublishedAtRef.current;
+    if (lastPublishedAtRef.current !== 0 && elapsedSinceLastPublish < SCORE_PUBLISH_INTERVAL_MS) {
+      if (publishTimeoutRef.current) return;
+      publishTimeoutRef.current = setTimeout(() => {
+        publishTimeoutRef.current = null;
+        publishCurrentScore();
+      }, SCORE_PUBLISH_INTERVAL_MS - elapsedSinceLastPublish);
+      return;
+    }
+
+    currentConn.reducers.publishScore({
+      gameId: gameIdRef.current,
+      language: languageRef.current,
+      score: game.state.score,
+      timeMs: BigInt(Math.floor(elapsedRef.current * 1000)),
+    });
+    lastPublishedAtRef.current = now;
+    lastPublishedScoreRef.current = game.state.score;
+  };
 
   useEffect(() => {
     const game = gameRef.current;
@@ -103,6 +121,8 @@ export const GameCanvas = ({ conn }: GameCanvasProps) => {
 
     let cancelled = false;
     let unsubLevelUp: (() => void) | null = null;
+    let unsubXpChanged: (() => void) | null = null;
+    let unsubScoreChanged: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -114,9 +134,21 @@ export const GameCanvas = ({ conn }: GameCanvasProps) => {
         setShipPreviews(game.shipPreviews);
         setPendingChoice(game.state.pendingChoice);
         setLevel(game.state.level);
+        setXp(game.state.xp);
+        setXpNeeded(xpForNextLevel(game.state.level));
+        setScore(game.state.score);
         unsubLevelUp = game.state.onLevelUp.subscribe(() => {
           setPendingChoice(true);
           setLevel(game.state.level);
+          setXpNeeded(xpForNextLevel(game.state.level));
+        });
+        unsubXpChanged = game.state.onXpChanged.subscribe(() => {
+          setXp(game.state.xp);
+          setXpNeeded(xpForNextLevel(game.state.level));
+        });
+        unsubScoreChanged = game.state.onScoreChanged.subscribe(() => {
+          setScore(game.state.score);
+          publishCurrentScore();
         });
       })
       .catch((err) => {
@@ -126,6 +158,9 @@ export const GameCanvas = ({ conn }: GameCanvasProps) => {
     return () => {
       cancelled = true;
       unsubLevelUp?.();
+      unsubXpChanged?.();
+      unsubScoreChanged?.();
+      if (publishTimeoutRef.current) clearTimeout(publishTimeoutRef.current);
       gameRef.current?.destroy();
       gameRef.current = null;
     };
