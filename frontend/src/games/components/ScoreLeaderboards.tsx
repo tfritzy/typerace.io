@@ -7,6 +7,8 @@ type ScoreLeaderboardsProps = {
   language: string;
 };
 
+const SCORE_GAME_ID = "cosmic_defense";
+
 function getUtcDay(): string {
   return new Date().toISOString().slice(0, 10);
 }
@@ -93,8 +95,8 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
     const subscription = conn.subscriptionBuilder()
       .onApplied(refresh)
       .subscribe([
-        `SELECT * FROM game_score WHERE GameId = '${gameId}' AND Language = '${language}' AND Day = '${day}'`,
-        `SELECT * FROM game_highscore WHERE GameId = '${gameId}' AND Language = '${language}'`,
+        `SELECT * FROM game_score WHERE GameId = '${SCORE_GAME_ID}'`,
+        `SELECT * FROM game_highscore WHERE GameId = '${SCORE_GAME_ID}'`,
       ]);
 
     return () => {
