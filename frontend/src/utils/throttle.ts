@@ -1,4 +1,4 @@
-export function createThrottle<T>(callback: (value: T) => void, waitMs: number) {
+export function throttle<T>(callback: (value: T) => void, waitMs: number) {
   let lastRunAt = 0;
   let timeout: ReturnType<typeof setTimeout> | null = null;
   let pendingValue: T;
@@ -12,32 +12,35 @@ export function createThrottle<T>(callback: (value: T) => void, waitMs: number) 
     callback(value);
   };
 
-  return {
-    run(value: T) {
-      pendingValue = value;
-      hasPendingValue = true;
-      const elapsed = Date.now() - lastRunAt;
+  const throttled = (value: T) => {
+    pendingValue = value;
+    hasPendingValue = true;
+    const elapsed = Date.now() - lastRunAt;
 
-      if (lastRunAt === 0 || elapsed >= waitMs) {
-        if (timeout) {
-          clearTimeout(timeout);
-          timeout = null;
-        }
+    if (lastRunAt === 0 || elapsed >= waitMs) {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      runPending();
+      return;
+    }
+
+    if (!timeout) {
+      timeout = setTimeout(() => {
+        timeout = null;
         runPending();
-        return;
-      }
-
-      if (!timeout) {
-        timeout = setTimeout(() => {
-          timeout = null;
-          runPending();
-        }, waitMs - elapsed);
-      }
-    },
-    cancel() {
-      if (timeout) clearTimeout(timeout);
-      timeout = null;
-      hasPendingValue = false;
-    },
+      }, waitMs - elapsed);
+    }
   };
+
+  throttled.cancel = () => {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+    hasPendingValue = false;
+  };
+
+  return throttled;
 }
