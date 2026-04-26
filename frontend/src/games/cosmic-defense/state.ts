@@ -59,6 +59,8 @@ export interface EntityState {
   beamWidth: number;
   explosionRadius: number;
   hitDelay: number;
+  sizeScale: number;
+  isBoss: boolean;
 }
 
 export interface PendingShot {
@@ -80,6 +82,8 @@ export interface SpawnState {
   elapsed: number;
   spawnAccumulator: number;
   paused: boolean;
+  nextBossTier: number;
+  warnedBossTier: number;
 }
 
 export class GameEvent {
@@ -132,6 +136,10 @@ export interface XPData {
   xpNeeded: number;
 }
 
+export interface BossApproachingData {
+  entityType: EntityType;
+}
+
 export interface LaserBeam {
   id: number;
   x1: number;
@@ -166,6 +174,7 @@ export interface GameState {
   onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
   onXPChanged: GameDataEvent<XPData>;
   onLevelUp: GameEvent;
+  onBossApproaching: GameDataEvent<BossApproachingData>;
 }
 
 let gameState: GameState | null = null;
@@ -202,6 +211,8 @@ export function createGameState(): GameState {
       elapsed: 0,
       spawnAccumulator: 0,
       paused: true,
+      nextBossTier: 0,
+      warnedBossTier: -1,
     },
     xp: 0,
     score: 0,
@@ -213,6 +224,7 @@ export function createGameState(): GameState {
     onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
     onXPChanged: new GameDataEvent<XPData>(),
     onLevelUp: new GameEvent(),
+    onBossApproaching: new GameDataEvent<BossApproachingData>(),
   };
 
   gameState = state;
@@ -283,6 +295,8 @@ function makeBaseEntity(
     beamWidth: 0,
     explosionRadius: 0,
     hitDelay: 0,
+    sizeScale: 1,
+    isBoss: false,
   };
 }
 
@@ -295,23 +309,35 @@ function spawnInRightThird(): { x: number; y: number } {
   };
 }
 
-export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
+interface EnemySpawnOptions {
+  isBoss?: boolean;
+}
+
+export function spawnEntity(state: GameState, config: EnemyConfig, team: Team, options: EnemySpawnOptions = {}): void {
   const { x, y } = spawnInRightThird();
-  const speed = (30 + Math.random() * 52.5) * 0.75;
+  const isBoss = options.isBoss === true;
+  const speed = (30 + Math.random() * 52.5) * 0.75 * (isBoss ? 0.45 : 1);
+  const healthMultiplier = isBoss ? 8 : 1;
+  const powerMultiplier = isBoss ? 2.5 : 1;
+  const sizeScale = isBoss ? 2.2 : 1;
   const entity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
-  entity.health = config.health;
-  entity.maxHealth = config.health;
-  entity.power = config.power;
+  entity.health = Math.round(config.health * healthMultiplier);
+  entity.maxHealth = entity.health;
+  entity.power = Math.round(config.power * powerMultiplier);
   entity.fireRate = config.fireRate;
-  entity.projectileDamage = config.projectileDamage;
+  entity.projectileDamage = Math.round(config.projectileDamage * powerMultiplier);
   entity.projectileType = config.projectileType;
   entity.fireTimer = Math.random() * config.fireRate;
   entity.rotation = Math.PI;
   entity.displayRotation = Math.PI;
   entity.speed = speed;
   entity.vx = -speed;
-  entity.xpReward = xpForEnemy(config);
+  entity.xpReward = Math.round(xpForEnemy(config) * (isBoss ? 5 : 1));
   entity.range = config.range;
+  entity.sizeScale = sizeScale;
+  entity.isBoss = isBoss;
+  entity.hitHalfW *= sizeScale;
+  entity.hitHalfH *= sizeScale;
   addEntity(state, entity);
 }
 
@@ -756,6 +782,8 @@ const TIER_OFFSET = 30;
 const BASE_SPAWN_RATE = 0.6;
 const MAX_SPAWN_RATE = 4.0;
 const SPAWN_RAMP_TIME = 240;
+const BOSS_WARNING_LEAD_TIME = 5;
+const BOSS_HEALTH_PEAK_OFFSET = TIER_SPREAD / 2;
 
 function binomialWeight(t: number, n: number, k: number): number {
   const p = Math.max(0, Math.min(1, t));
@@ -807,6 +835,19 @@ export function updateSpawner(state: GameState, dt: number): void {
   if (state.spawner.paused) return;
 
   state.spawner.elapsed += dt;
+
+  const bossTier = state.spawner.nextBossTier;
+  if (bossTier < ENEMY_CATALOG.length - 1) {
+    const bossSpawnTime = TIER_OFFSET + bossTier * TIER_SPREAD + BOSS_HEALTH_PEAK_OFFSET;
+    if (state.spawner.warnedBossTier < bossTier && state.spawner.elapsed >= bossSpawnTime - BOSS_WARNING_LEAD_TIME) {
+      state.spawner.warnedBossTier = bossTier;
+      state.onBossApproaching.emit({ entityType: ENEMY_CATALOG[bossTier].entityType });
+    }
+    if (state.spawner.elapsed >= bossSpawnTime) {
+      spawnEntity(state, ENEMY_CATALOG[bossTier], Team.Enemy, { isBoss: true });
+      state.spawner.nextBossTier++;
+    }
+  }
 
   const rate = getSpawnRate(state.spawner.elapsed);
   state.spawner.spawnAccumulator += rate * dt;

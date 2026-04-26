@@ -27,6 +27,8 @@ export const GameCanvas = () => {
   const [score, setScore] = useState(0);
   const [totalKills, setTotalKills] = useState(0);
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
+  const [bossAnnouncement, setBossAnnouncement] = useState<string | null>(null);
+  const bossAnnouncementTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -59,6 +61,7 @@ export const GameCanvas = () => {
     let unsubLevelUp: (() => void) | null = null;
     let unsubXPChanged: (() => void) | null = null;
     let unsubEnemyEntityDeath: (() => void) | null = null;
+    let unsubBossApproaching: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -87,6 +90,16 @@ export const GameCanvas = () => {
           setScore(game.state.score);
           setTotalKills(game.state.totalKills);
         });
+        unsubBossApproaching = game.state.onBossApproaching.subscribe((data) => {
+          setBossAnnouncement(`${data.entityType} boss approaching`);
+          if (bossAnnouncementTimeoutRef.current !== null) {
+            window.clearTimeout(bossAnnouncementTimeoutRef.current);
+          }
+          bossAnnouncementTimeoutRef.current = window.setTimeout(() => {
+            setBossAnnouncement(null);
+            bossAnnouncementTimeoutRef.current = null;
+          }, 3600);
+        });
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -97,6 +110,11 @@ export const GameCanvas = () => {
       unsubLevelUp?.();
       unsubXPChanged?.();
       unsubEnemyEntityDeath?.();
+      unsubBossApproaching?.();
+      if (bossAnnouncementTimeoutRef.current !== null) {
+        window.clearTimeout(bossAnnouncementTimeoutRef.current);
+        bossAnnouncementTimeoutRef.current = null;
+      }
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -216,6 +234,14 @@ export const GameCanvas = () => {
             </div>
           </div>
         </div>
+        {bossAnnouncement && (
+          <div className="absolute top-20 left-1/2 z-20 -translate-x-1/2 rounded-lg border border-[#f9e2af] bg-[rgba(17,17,27,0.78)] px-5 py-3 text-center shadow-[0_0_28px_rgba(249,226,175,0.28)]">
+            <div className="text-[10px] uppercase tracking-[0.36em] text-[#fab387]">Warning</div>
+            <div className="mt-1 text-[16px] font-bold uppercase tracking-[0.08em] text-[#f9e2af]">
+              {bossAnnouncement}
+            </div>
+          </div>
+        )}
         <PlacementOverlay
           slots={slots}
           onSlotClick={handleSlotClick}
