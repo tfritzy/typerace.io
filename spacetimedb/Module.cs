@@ -352,6 +352,7 @@ public static partial class Module
         public string Language;
         [SpacetimeDB.Index.BTree]
         public Identity PlayerId;
+        public string PlayerName;
         [SpacetimeDB.Index.BTree]
         public int Value;
         [SpacetimeDB.Index.BTree]
@@ -374,6 +375,7 @@ public static partial class Module
         public string Language;
         [SpacetimeDB.Index.BTree]
         public Identity PlayerId;
+        public string PlayerName;
         [SpacetimeDB.Index.BTree]
         public int Value;
         public long Timestamp;
@@ -1663,12 +1665,15 @@ public static partial class Module
 
         var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
         var day = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000).ToUniversalTime().ToString("yyyy-MM-dd");
+        var player = ctx.Db.player.Identity.Find(ctx.Sender);
+        var playerName = player?.Name ?? "Unknown";
         ctx.Db.game_score.Insert(new GameScore
         {
             Id = IdGenerator.Generate("score_", ctx.Rng),
             GameId = gameId,
             Language = language,
             PlayerId = ctx.Sender,
+            PlayerName = playerName,
             Value = score,
             Timestamp = timestamp,
             TimeMs = timeMs,
@@ -1685,6 +1690,7 @@ public static partial class Module
                 GameId = gameId,
                 Language = language,
                 PlayerId = ctx.Sender,
+                PlayerName = playerName,
                 Value = score,
                 Timestamp = timestamp,
                 TimeMs = timeMs
@@ -1695,6 +1701,7 @@ public static partial class Module
         if (score > existingHighScore.Value.Value)
         {
             var updatedHighScore = existingHighScore.Value;
+            updatedHighScore.PlayerName = playerName;
             updatedHighScore.Value = score;
             updatedHighScore.Timestamp = timestamp;
             updatedHighScore.TimeMs = timeMs;
@@ -1702,41 +1709,14 @@ public static partial class Module
         }
     }
 
-    private static bool IsValidScoreGameId(string gameId)
-    {
-        if (gameId.Length == 0 || gameId.Length > 64)
-        {
-            return false;
-        }
+    private static bool IsValidScoreGameId(string gameId) =>
+        IsValidScoreKey(gameId, 64, c => c == '_' || (c >= '0' && c <= '9'));
 
-        foreach (var c in gameId)
-        {
-            if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_'))
-            {
-                return false;
-            }
-        }
+    private static bool IsValidScoreLanguage(string language) =>
+        IsValidScoreKey(language, 16, c => c == '-');
 
-        return true;
-    }
-
-    private static bool IsValidScoreLanguage(string language)
-    {
-        if (language.Length == 0 || language.Length > 16)
-        {
-            return false;
-        }
-
-        foreach (var c in language)
-        {
-            if (!((c >= 'a' && c <= 'z') || c == '-'))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
+    private static bool IsValidScoreKey(string value, int maxLength, Func<char, bool> allowExtra) =>
+        value.Length > 0 && value.Length <= maxLength && value.All(c => (c >= 'a' && c <= 'z') || allowExtra(c));
 
     private static void UpdateDailyActivePlayerCount(ReducerContext ctx, Identity playerId, string dateKey)
     {

@@ -5,7 +5,7 @@ import { Footer } from "../components/Footer";
 
 const GAMES = [
   {
-    slug: "cosmic-defense",
+    slug: "cosmic_defense",
     title: "Cosmic Defense",
     description:
       "Defend your planet from waves of incoming enemy ships. Survive as long as you can.",
