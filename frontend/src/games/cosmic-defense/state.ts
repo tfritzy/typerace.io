@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, ExplosionType, Team, getExplosionType } from "./types";
-import { ENEMY_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, xpForEnemy, getScaledConfig } from "./enemyConfig";
+import { ENEMY_CATALOG, BOSS_CATALOG, SHIP_HITBOX_MAP, type BossConfig, type EnemyConfig, type FriendlyConfig, xpForEnemy, getScaledConfig } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 
 export const PLANET_X = 200;
@@ -8,11 +8,6 @@ export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
 const INSTANT_SCORE_PER_XP = 10;
-const BOSS_SPEED_MULTIPLIER = 0.45;
-const BOSS_HEALTH_MULTIPLIER = 8;
-const BOSS_POWER_MULTIPLIER = 2.5;
-const BOSS_SIZE_SCALE = 2.2;
-const BOSS_XP_MULTIPLIER = 5;
 
 export enum TargetingMode {
   NearestToShip = 0,
@@ -141,10 +136,6 @@ export interface XPData {
   xpNeeded: number;
 }
 
-export interface BossApproachingData {
-  entityType: EntityType;
-}
-
 export interface LaserBeam {
   id: number;
   x1: number;
@@ -179,7 +170,8 @@ export interface GameState {
   onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
   onXPChanged: GameDataEvent<XPData>;
   onLevelUp: GameEvent;
-  onBossApproaching: GameDataEvent<BossApproachingData>;
+  onBossApproaching: GameEvent;
+  onBossSpawned: GameEvent;
 }
 
 let gameState: GameState | null = null;
@@ -229,7 +221,8 @@ export function createGameState(): GameState {
     onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
     onXPChanged: new GameDataEvent<XPData>(),
     onLevelUp: new GameEvent(),
-    onBossApproaching: new GameDataEvent<BossApproachingData>(),
+    onBossApproaching: new GameEvent(),
+    onBossSpawned: new GameEvent(),
   };
 
   gameState = state;
@@ -314,36 +307,49 @@ function spawnInRightThird(): { x: number; y: number } {
   };
 }
 
-interface EnemySpawnOptions {
-  isBoss?: boolean;
-}
-
-export function spawnEntity(state: GameState, config: EnemyConfig, team: Team, options: EnemySpawnOptions = {}): void {
+export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
   const { x, y } = spawnInRightThird();
-  const isBoss = !!options.isBoss;
-  const speed = (30 + Math.random() * 52.5) * 0.75 * (isBoss ? BOSS_SPEED_MULTIPLIER : 1);
-  const healthMultiplier = isBoss ? BOSS_HEALTH_MULTIPLIER : 1;
-  const powerMultiplier = isBoss ? BOSS_POWER_MULTIPLIER : 1;
-  const sizeScale = isBoss ? BOSS_SIZE_SCALE : 1;
+  const speed = (30 + Math.random() * 52.5) * 0.75;
   const entity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
-  entity.health = Math.round(config.health * healthMultiplier);
-  entity.maxHealth = entity.health;
-  entity.power = Math.round(config.power * powerMultiplier);
+  entity.health = config.health;
+  entity.maxHealth = config.health;
+  entity.power = config.power;
   entity.fireRate = config.fireRate;
-  entity.projectileDamage = Math.round(config.projectileDamage * powerMultiplier);
+  entity.projectileDamage = config.projectileDamage;
   entity.projectileType = config.projectileType;
   entity.fireTimer = Math.random() * config.fireRate;
   entity.rotation = Math.PI;
   entity.displayRotation = Math.PI;
   entity.speed = speed;
   entity.vx = -speed;
-  entity.xpReward = Math.round(xpForEnemy(config) * (isBoss ? BOSS_XP_MULTIPLIER : 1));
+  entity.xpReward = xpForEnemy(config);
   entity.range = config.range;
-  entity.sizeScale = sizeScale;
-  entity.isBoss = isBoss;
-  entity.hitHalfW *= sizeScale;
-  entity.hitHalfH *= sizeScale;
   addEntity(state, entity);
+}
+
+function spawnBossEntity(state: GameState, config: BossConfig): void {
+  const { x, y } = spawnInRightThird();
+  const speed = (30 + Math.random() * 52.5) * 0.75 * config.speedMultiplier;
+  const entity = makeBaseEntity(state, config.entityType, x, y, Team.Enemy, ColorPreset.Preset4);
+  entity.health = config.health;
+  entity.maxHealth = config.health;
+  entity.power = config.power;
+  entity.fireRate = config.fireRate;
+  entity.projectileDamage = config.projectileDamage;
+  entity.projectileType = config.projectileType;
+  entity.fireTimer = Math.random() * config.fireRate;
+  entity.rotation = Math.PI;
+  entity.displayRotation = Math.PI;
+  entity.speed = speed;
+  entity.vx = -speed;
+  entity.xpReward = config.xpReward;
+  entity.range = config.range;
+  entity.sizeScale = config.sizeScale;
+  entity.isBoss = true;
+  entity.hitHalfW *= config.sizeScale;
+  entity.hitHalfH *= config.sizeScale;
+  addEntity(state, entity);
+  state.onBossSpawned.emit();
 }
 
 export function spawnAlliedEntity(
@@ -787,9 +793,9 @@ const TIER_OFFSET = 30;
 const BASE_SPAWN_RATE = 0.6;
 const MAX_SPAWN_RATE = 4.0;
 const SPAWN_RAMP_TIME = 240;
-const BOSS_WARNING_LEAD_TIME = 5;
+const BOSS_WARNING_LEAD_TIME = 4;
 const BOSS_SPAWN_TIME_OFFSET = TIER_SPREAD / 2;
-const BOSS_TIER_COUNT = ENEMY_CATALOG.length - 1;
+const BOSS_TIER_COUNT = BOSS_CATALOG.length - 1;
 
 function binomialWeight(t: number, n: number, k: number): number {
   const p = Math.max(0, Math.min(1, t));
@@ -847,10 +853,10 @@ export function updateSpawner(state: GameState, dt: number): void {
     const bossSpawnTime = TIER_OFFSET + bossTier * TIER_SPREAD + BOSS_SPAWN_TIME_OFFSET;
     if (state.spawner.warnedBossTier < bossTier && state.spawner.elapsed >= bossSpawnTime - BOSS_WARNING_LEAD_TIME) {
       state.spawner.warnedBossTier = bossTier;
-      state.onBossApproaching.emit({ entityType: ENEMY_CATALOG[bossTier].entityType });
+      state.onBossApproaching.emit();
     }
     if (state.spawner.elapsed >= bossSpawnTime) {
-      spawnEntity(state, ENEMY_CATALOG[bossTier], Team.Enemy, { isBoss: true });
+      spawnBossEntity(state, BOSS_CATALOG[bossTier]);
       state.spawner.nextBossTier++;
     }
   }

@@ -12,11 +12,7 @@ import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
 const UI_REFERENCE_WIDTH = 700;
-const BOSS_ANNOUNCEMENT_DURATION_MS = 3600;
-
-function formatEntityTypeName(entityType: EntityType): string {
-  return entityType.replace(/([a-z])([A-Z])/g, "$1 $2");
-}
+const BOSS_ANNOUNCEMENT_DURATION_MS = 4000;
 
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,8 +28,7 @@ export const GameCanvas = () => {
   const [score, setScore] = useState(0);
   const [totalKills, setTotalKills] = useState(0);
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
-  const [bossAnnouncement, setBossAnnouncement] = useState<string | null>(null);
-  const bossAnnouncementTimeoutRef = useRef<number | null>(null);
+  const [bossApproaching, setBossApproaching] = useState(false);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -67,6 +62,7 @@ export const GameCanvas = () => {
     let unsubXPChanged: (() => void) | null = null;
     let unsubEnemyEntityDeath: (() => void) | null = null;
     let unsubBossApproaching: (() => void) | null = null;
+    let unsubBossSpawned: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -95,15 +91,14 @@ export const GameCanvas = () => {
           setScore(game.state.score);
           setTotalKills(game.state.totalKills);
         });
-        unsubBossApproaching = game.state.onBossApproaching.subscribe((data) => {
-          setBossAnnouncement(`The ${formatEntityTypeName(data.entityType)} boss is approaching`);
-          if (bossAnnouncementTimeoutRef.current !== null) {
-            window.clearTimeout(bossAnnouncementTimeoutRef.current);
-          }
-          bossAnnouncementTimeoutRef.current = window.setTimeout(() => {
-            setBossAnnouncement(null);
-            bossAnnouncementTimeoutRef.current = null;
+        unsubBossApproaching = game.state.onBossApproaching.subscribe(() => {
+          setBossApproaching(true);
+          window.setTimeout(() => {
+            if (!cancelled) setBossApproaching(false);
           }, BOSS_ANNOUNCEMENT_DURATION_MS);
+        });
+        unsubBossSpawned = game.state.onBossSpawned.subscribe(() => {
+          setBossApproaching(false);
         });
       })
       .catch((err) => {
@@ -116,10 +111,7 @@ export const GameCanvas = () => {
       unsubXPChanged?.();
       unsubEnemyEntityDeath?.();
       unsubBossApproaching?.();
-      if (bossAnnouncementTimeoutRef.current !== null) {
-        window.clearTimeout(bossAnnouncementTimeoutRef.current);
-        bossAnnouncementTimeoutRef.current = null;
-      }
+      unsubBossSpawned?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -239,11 +231,11 @@ export const GameCanvas = () => {
             </div>
           </div>
         </div>
-        {bossAnnouncement && (
+        {bossApproaching && (
           <div className="absolute top-20 left-1/2 z-20 -translate-x-1/2 rounded-lg border border-[#f9e2af] bg-[rgba(17,17,27,0.78)] px-5 py-3 text-center shadow-[0_0_28px_rgba(249,226,175,0.28)]">
             <div className="text-[10px] uppercase tracking-[0.36em] text-[#fab387]">Warning</div>
             <div className="mt-1 text-[16px] font-bold uppercase tracking-[0.08em] text-[#f9e2af]">
-              {bossAnnouncement}
+              large disturbance in warp space detected
             </div>
           </div>
         )}

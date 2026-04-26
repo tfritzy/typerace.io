@@ -80,6 +80,12 @@ export interface EnemyConfig {
   range: number;
 }
 
+export interface BossConfig extends EnemyConfig {
+  xpReward: number;
+  sizeScale: number;
+  speedMultiplier: number;
+}
+
 export function xpForEnemy(config: EnemyConfig): number {
   return Math.max(1, Math.round(Math.pow(config.health, 0.6) / 3));
 }
@@ -126,6 +132,32 @@ export const ENEMY_CATALOG: EnemyConfig[] = [
   { entityType: "Dreadnought", health: 9225, power: 12300, fireRate: 0.7, projectileDamage: 355, projectileType: ProjectileType.Projectile6, range: 700 },
   { entityType: "Leviathan", health: 12263, power: 16350, fireRate: 0.65, projectileDamage: 430, projectileType: ProjectileType.Projectile6, range: 710 },
   { entityType: "Flagship", health: 16313, power: 21750, fireRate: 0.6, projectileDamage: 530, projectileType: ProjectileType.Projectile6, range: 720 },
+];
+
+export const BOSS_CATALOG: BossConfig[] = [
+  { entityType: "Pulse", health: 240, power: 100, fireRate: 2.2, projectileDamage: 10, projectileType: ProjectileType.Tiny, range: 500, xpReward: 15, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Buckler", health: 336, power: 138, fireRate: 2.1, projectileDamage: 12, projectileType: ProjectileType.Tiny, range: 510, xpReward: 15, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Pip", health: 424, power: 175, fireRate: 2.0, projectileDamage: 18, projectileType: ProjectileType.Tiny, range: 520, xpReward: 20, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Flea", health: 576, power: 238, fireRate: 1.9, projectileDamage: 22, projectileType: ProjectileType.Tiny, range: 530, xpReward: 20, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Needle", health: 760, power: 312, fireRate: 1.8, projectileDamage: 28, projectileType: ProjectileType.Projectile2, range: 540, xpReward: 25, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Bolt", health: 1024, power: 425, fireRate: 1.7, projectileDamage: 35, projectileType: ProjectileType.Projectile2, range: 550, xpReward: 30, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Cricket", health: 1360, power: 562, fireRate: 1.6, projectileDamage: 45, projectileType: ProjectileType.Projectile2, range: 560, xpReward: 35, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Robin", health: 1800, power: 750, fireRate: 1.5, projectileDamage: 55, projectileType: ProjectileType.Projectile2, range: 570, xpReward: 45, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Sparrow", health: 2400, power: 1000, fireRate: 1.4, projectileDamage: 70, projectileType: ProjectileType.Projectile3, range: 580, xpReward: 50, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Hornet", health: 3184, power: 1325, fireRate: 1.3, projectileDamage: 88, projectileType: ProjectileType.Projectile3, range: 590, xpReward: 60, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Dart", health: 4200, power: 1750, fireRate: 1.2, projectileDamage: 105, projectileType: ProjectileType.Projectile3, range: 600, xpReward: 70, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Scout", health: 5640, power: 2350, fireRate: 1.1, projectileDamage: 130, projectileType: ProjectileType.Projectile3, range: 610, xpReward: 85, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Hawk", health: 7504, power: 3125, fireRate: 1.0, projectileDamage: 155, projectileType: ProjectileType.Projectile4, range: 620, xpReward: 100, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Dynamo", health: 10056, power: 4188, fireRate: 0.95, projectileDamage: 200, projectileType: ProjectileType.Projectile4, range: 630, xpReward: 120, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Harrier", health: 13360, power: 5562, fireRate: 0.9, projectileDamage: 250, projectileType: ProjectileType.Projectile4, range: 640, xpReward: 145, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Raptor", health: 17704, power: 7375, fireRate: 0.85, projectileDamage: 312, projectileType: ProjectileType.Projectile4, range: 650, xpReward: 170, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Eagle", health: 23560, power: 9812, fireRate: 0.8, projectileDamage: 388, projectileType: ProjectileType.Projectile5, range: 660, xpReward: 200, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Corsair", health: 31360, power: 13062, fireRate: 0.8, projectileDamage: 475, projectileType: ProjectileType.Projectile5, range: 670, xpReward: 240, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Vanguard", health: 41704, power: 17375, fireRate: 0.75, projectileDamage: 588, projectileType: ProjectileType.Projectile5, range: 680, xpReward: 285, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Titan", health: 55504, power: 23125, fireRate: 0.7, projectileDamage: 725, projectileType: ProjectileType.Projectile6, range: 690, xpReward: 335, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Dreadnought", health: 73800, power: 30750, fireRate: 0.7, projectileDamage: 888, projectileType: ProjectileType.Projectile6, range: 700, xpReward: 400, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Leviathan", health: 98104, power: 40875, fireRate: 0.65, projectileDamage: 1075, projectileType: ProjectileType.Projectile6, range: 710, xpReward: 475, sizeScale: 2.2, speedMultiplier: 0.45 },
+  { entityType: "Flagship", health: 130504, power: 54375, fireRate: 0.6, projectileDamage: 1325, projectileType: ProjectileType.Projectile6, range: 720, xpReward: 560, sizeScale: 2.2, speedMultiplier: 0.45 },
 ];
 
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [
