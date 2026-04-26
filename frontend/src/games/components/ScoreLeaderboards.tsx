@@ -45,7 +45,7 @@ function LeaderboardTable<T extends GameScore | GameHighScore>({
                   placement={index + 1}
                 />
               ) : (
-                <span />
+                <div aria-hidden="true" />
               )}
               <span className="text-foreground truncate">
                 {row.playerName}
