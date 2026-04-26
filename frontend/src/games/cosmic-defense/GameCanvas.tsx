@@ -23,7 +23,6 @@ export const GameCanvas = () => {
   const [, setInspectTick] = useState(0);
   const [pendingChoice, setPendingChoice] = useState(true);
   const [level, setLevel] = useState(1);
-  const [elapsed, setElapsed] = useState(0);
   const [xp, setXp] = useState(0);
   const [score, setScore] = useState(0);
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
@@ -33,19 +32,6 @@ export const GameCanvas = () => {
     const interval = setInterval(() => setInspectTick((t) => t + 1), 200);
     return () => clearInterval(interval);
   }, [selectedSlot?.entityId]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const game = gameRef.current;
-      if (game) {
-        setElapsed(Math.floor(game.state.spawner.elapsed));
-        setXp(game.state.xp);
-        setScore(game.state.score);
-        setXpNeeded(xpForNextLevel(game.state.level));
-      }
-    }, 200);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const game = gameRef.current;
@@ -70,6 +56,8 @@ export const GameCanvas = () => {
 
     let cancelled = false;
     let unsubLevelUp: (() => void) | null = null;
+    let unsubXPChanged: (() => void) | null = null;
+    let unsubEnemyEntityDeath: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -81,9 +69,20 @@ export const GameCanvas = () => {
         setShipPreviews(game.shipPreviews);
         setPendingChoice(game.state.pendingChoice);
         setLevel(game.state.level);
+        setXp(game.state.xp);
+        setScore(game.state.score);
+        setXpNeeded(xpForNextLevel(game.state.level));
         unsubLevelUp = game.state.onLevelUp.subscribe(() => {
           setPendingChoice(true);
           setLevel(game.state.level);
+        });
+        unsubXPChanged = game.state.onXPChanged.subscribe((data) => {
+          setXp(data.xp);
+          setLevel(data.level);
+          setXpNeeded(data.xpNeeded);
+        });
+        unsubEnemyEntityDeath = game.state.onEnemyEntityDeath.subscribe(() => {
+          setScore(game.state.score);
         });
       })
       .catch((err) => {
@@ -93,6 +92,8 @@ export const GameCanvas = () => {
     return () => {
       cancelled = true;
       unsubLevelUp?.();
+      unsubXPChanged?.();
+      unsubEnemyEntityDeath?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -195,9 +196,6 @@ export const GameCanvas = () => {
               }}
             />
           </div>
-          <span className="text-[11px] text-[#585b70]">
-            {elapsed}s
-          </span>
         </div>
         <div className="absolute top-2 right-3 z-10">
           <span className="text-[11px] text-[#cdd6f4] font-semibold">

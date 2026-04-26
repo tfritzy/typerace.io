@@ -126,6 +126,12 @@ export interface EntityDeathData {
   xpAmount: number;
 }
 
+export interface XPData {
+  xp: number;
+  level: number;
+  xpNeeded: number;
+}
+
 export interface LaserBeam {
   id: number;
   x1: number;
@@ -157,6 +163,7 @@ export interface GameState {
   onPlanetDamaged: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
   onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
+  onXPChanged: GameDataEvent<XPData>;
   onLevelUp: GameEvent;
 }
 
@@ -202,6 +209,7 @@ export function createGameState(): GameState {
     onPlanetDamaged: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
     onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
+    onXPChanged: new GameDataEvent<XPData>(),
     onLevelUp: new GameEvent(),
   };
 
@@ -829,6 +837,7 @@ export function awardXP(state: GameState, amount: number): void {
     state.spawner.paused = true;
     state.onLevelUp.emit();
   }
+  state.onXPChanged.emit({ xp: state.xp, level: state.level, xpNeeded: xpForNextLevel(state.level) });
 }
 
 export function levelUpEntity(state: GameState, entityId: number, config: FriendlyConfig, newLevel: number): void {
