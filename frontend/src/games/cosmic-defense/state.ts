@@ -7,7 +7,7 @@ export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
-const SCORE_PER_XP_MULTIPLIER = 10;
+const INSTANT_SCORE_PER_XP = 10;
 
 export enum TargetingMode {
   NearestToShip = 0,
@@ -427,7 +427,7 @@ function dealDamageToEntity(
     if (attacker) attacker.kills++;
     if (target.team === Team.Enemy) {
       const xpAmount = target.xpReward;
-      state.score += xpAmount * SCORE_PER_XP_MULTIPLIER;
+      state.score += xpAmount * INSTANT_SCORE_PER_XP;
       state.onEnemyEntityDeath.emit({
         x: target.x,
         y: target.y,
