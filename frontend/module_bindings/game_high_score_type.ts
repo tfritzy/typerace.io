@@ -15,6 +15,7 @@ export default __t.object("GameHighScore", {
   gameId: __t.string(),
   language: __t.string(),
   playerId: __t.identity(),
+  playerName: __t.string(),
   value: __t.i32(),
   timestamp: __t.i64(),
   timeMs: __t.i64(),

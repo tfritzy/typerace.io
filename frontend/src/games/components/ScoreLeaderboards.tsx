@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDatabase } from "../../contexts/SpacetimeContext";
-import type { GameHighScore, GameScore, Player } from "../../types/stdb";
+import type { GameHighScore, GameScore } from "../../types/stdb";
 
 type ScoreLeaderboardsProps = {
   gameId: string;
@@ -11,14 +11,6 @@ function getUtcDay(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function escapeSqlValue(value: string): string {
-  return value.replaceAll("'", "''");
-}
-
-function getPlayerName(players: Map<string, Player>, row: GameScore | GameHighScore): string {
-  return players.get(row.playerId.toHexString())?.name ?? "Anonymous";
-}
-
 function sortByScore<T extends GameScore | GameHighScore>(rows: T[]): T[] {
   return [...rows].sort((a, b) => b.value - a.value);
 }
@@ -26,11 +18,9 @@ function sortByScore<T extends GameScore | GameHighScore>(rows: T[]): T[] {
 function LeaderboardTable<T extends GameScore | GameHighScore>({
   title,
   rows,
-  players,
 }: {
   title: string;
   rows: T[];
-  players: Map<string, Player>;
 }) {
   return (
     <div className="box p-4 min-h-[240px]">
@@ -48,7 +38,7 @@ function LeaderboardTable<T extends GameScore | GameHighScore>({
                 #{index + 1}
               </span>
               <span className="text-foreground truncate">
-                {getPlayerName(players, row)}
+                {row.playerName}
               </span>
               <span className="text-[#f9e2af] font-semibold tabular-nums">
                 {row.value}
@@ -66,7 +56,6 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
   const [day, setDay] = useState(getUtcDay);
   const [scores, setScores] = useState<GameScore[]>([]);
   const [highScores, setHighScores] = useState<GameHighScore[]>([]);
-  const [players, setPlayers] = useState<Map<string, Player>>(new Map());
 
   useEffect(() => {
     const scheduleNextDay = () => {
@@ -90,42 +79,22 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
     const refreshHighScores = () => {
       setHighScores(Array.from(conn.db.gameHighscore.GameId_Language.filter([gameId, language])));
     };
-    const refreshPlayers = () => {
-      const nextPlayers = new Map<string, Player>();
-      for (const score of conn.db.gameScore.GameId_Language_Day.filter([gameId, language, day])) {
-        const player = conn.db.player.Identity.find(score.playerId);
-        if (player) nextPlayers.set(score.playerId.toHexString(), player);
-      }
-      for (const highScore of conn.db.gameHighscore.GameId_Language.filter([gameId, language])) {
-        const player = conn.db.player.Identity.find(highScore.playerId);
-        if (player) nextPlayers.set(highScore.playerId.toHexString(), player);
-      }
-      setPlayers(nextPlayers);
-    };
     const refresh = () => {
       refreshScores();
       refreshHighScores();
-      refreshPlayers();
     };
-    const queryGameId = escapeSqlValue(gameId);
-    const queryLanguage = escapeSqlValue(language);
-    const queryDay = escapeSqlValue(day);
 
     conn.db.gameScore.onInsert(refresh);
     conn.db.gameScore.onDelete(refresh);
     conn.db.gameHighscore.onInsert(refresh);
     conn.db.gameHighscore.onUpdate(refresh);
     conn.db.gameHighscore.onDelete(refresh);
-    conn.db.player.onInsert(refreshPlayers);
-    conn.db.player.onUpdate(refreshPlayers);
-    conn.db.player.onDelete(refreshPlayers);
 
     const subscription = conn.subscriptionBuilder()
       .onApplied(refresh)
       .subscribe([
-        `SELECT * FROM game_score WHERE GameId = '${queryGameId}' AND Language = '${queryLanguage}' AND Day = '${queryDay}'`,
-        `SELECT * FROM game_highscore WHERE GameId = '${queryGameId}' AND Language = '${queryLanguage}'`,
-        "SELECT * FROM player WHERE IsBot = false",
+        `SELECT * FROM game_score WHERE GameId = '${gameId}' AND Language = '${language}' AND Day = '${day}'`,
+        `SELECT * FROM game_highscore WHERE GameId = '${gameId}' AND Language = '${language}'`,
       ]);
 
     return () => {
@@ -134,9 +103,6 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
       conn.db.gameHighscore.removeOnInsert(refresh);
       conn.db.gameHighscore.removeOnUpdate(refresh);
       conn.db.gameHighscore.removeOnDelete(refresh);
-      conn.db.player.removeOnInsert(refreshPlayers);
-      conn.db.player.removeOnUpdate(refreshPlayers);
-      conn.db.player.removeOnDelete(refreshPlayers);
       subscription.unsubscribe();
     };
   }, [conn, day, gameId, language]);
@@ -146,8 +112,8 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
 
   return (
     <section className="grid gap-4 md:grid-cols-2">
-      <LeaderboardTable title="Top scores today" rows={dailyScores} players={players} />
-      <LeaderboardTable title="All-time high scores" rows={allTimeScores} players={players} />
+      <LeaderboardTable title="Top scores today" rows={dailyScores} />
+      <LeaderboardTable title="All-time high scores" rows={allTimeScores} />
     </section>
   );
 };

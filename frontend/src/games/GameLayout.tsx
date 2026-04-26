@@ -18,8 +18,7 @@ export const GameLayout = ({
   aspectRatio = 16 / 9,
   viewportChromeOffsetPx = 220,
 }: GameLayoutProps) => {
-  const { gameId: gameSlug, lang } = useParams();
-  const gameId = gameSlug?.replaceAll("-", "_");
+  const { gameId, lang } = useParams();
   const language = getLanguageFromSlug(lang).slug || "en";
 
   useEffect(() => {
