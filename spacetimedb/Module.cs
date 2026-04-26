@@ -341,7 +341,7 @@ public static partial class Module
     }
 
     [Table(Name = "game_score", Public = true)]
-    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language), nameof(Timestamp) })]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language), nameof(Day) })]
     public partial struct GameScore
     {
         [PrimaryKey]
@@ -354,6 +354,7 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         public long Timestamp;
         public long TimeMs;
+        public string Day;
     }
 
     [Table(Name = "game_highscore", Public = true)]
@@ -1652,10 +1653,10 @@ public static partial class Module
         }
 
         var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
-        var cutoff = timestamp - 86_400_000_000;
+        var day = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000).ToUniversalTime().ToString("yyyy-MM-dd");
         var player = ctx.Db.player.Identity.Find(ctx.Sender);
         var playerName = player?.Name ?? $"Anonymous {AnimalNameGenerator.Generate(ctx.Rng)}";
-        var scoreId = $"{gameId}_{language}_{ctx.Sender}";
+        var scoreId = $"{gameId}_{language}_{day}_{ctx.Sender}";
         var existingScore = ctx.Db.game_score.Id.Find(scoreId);
         if (existingScore == null)
         {
@@ -1668,10 +1669,11 @@ public static partial class Module
                 PlayerName = playerName,
                 Value = score,
                 Timestamp = timestamp,
-                TimeMs = 0
+                TimeMs = 0,
+                Day = day
             });
         }
-        else if (existingScore.Value.Timestamp < cutoff || score > existingScore.Value.Value)
+        else if (score > existingScore.Value.Value)
         {
             var currentScore = existingScore.Value;
             ctx.Db.game_score.Id.Update(new GameScore
@@ -1683,7 +1685,8 @@ public static partial class Module
                 PlayerName = playerName,
                 Value = score,
                 Timestamp = timestamp,
-                TimeMs = currentScore.TimeMs
+                TimeMs = currentScore.TimeMs,
+                Day = currentScore.Day
             });
         }
 

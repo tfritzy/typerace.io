@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMatch } from "react-router-dom";
 import { useDatabase } from "../../contexts/SpacetimeContext";
 import { getLanguageFromSlug } from "../../utils/modes";
+import { createScoreProof } from "../../utils/scoreProof";
 import { throttle } from "../../utils/throttle";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
@@ -17,22 +18,6 @@ import type { EntityType } from "./types";
 
 const UI_REFERENCE_WIDTH = 700;
 const SCORE_PUBLISH_INTERVAL_MS = 10_000;
-const SCORE_PROOF_MOD = 2_147_483_647;
-
-function addScoreProofText(proof: number, value: string): number {
-  let nextProof = proof;
-  for (const c of value) {
-    nextProof = (nextProof * 31 + c.charCodeAt(0)) % SCORE_PROOF_MOD;
-  }
-  return nextProof;
-}
-
-function createScoreProof(gameId: string, language: string, score: number): bigint {
-  let proof = (score + 73_210_291) % SCORE_PROOF_MOD;
-  proof = addScoreProofText(proof, gameId);
-  proof = addScoreProofText(proof, language);
-  return BigInt((proof * 97 + score * 13 + 1_664_525) % SCORE_PROOF_MOD);
-}
 
 export const GameCanvas = () => {
   const conn = useDatabase();
