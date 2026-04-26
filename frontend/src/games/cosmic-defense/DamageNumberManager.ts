@@ -1,9 +1,9 @@
 import { Container, Text } from "pixi.js";
 import type { GameState, DamageData } from "./state";
 
-const LIFETIME_S = 1.0;
-const GRAVITY = 280;
-const INITIAL_SPEED = 160;
+const LIFETIME_S = 0.5;
+const GRAVITY = 560;
+const INITIAL_SPEED = 320;
 const FADE_START = 0.6;
 const POP_DURATION = 0.08;
 const FONT_SIZE = 24;
