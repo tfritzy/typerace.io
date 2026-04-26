@@ -342,41 +342,32 @@ public static partial class Module
 
     [Table(Name = "game_score", Public = true)]
     [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language), nameof(Day) })]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language), nameof(PlayerId) })]
     public partial struct GameScore
     {
         [PrimaryKey]
         public string Id;
-        [SpacetimeDB.Index.BTree]
         public string GameId;
-        [SpacetimeDB.Index.BTree]
         public string Language;
-        [SpacetimeDB.Index.BTree]
         public Identity PlayerId;
         public string PlayerName;
-        [SpacetimeDB.Index.BTree]
         public int Value;
         [SpacetimeDB.Index.BTree]
         public long Timestamp;
         public long TimeMs;
-        [SpacetimeDB.Index.BTree]
         public string Day;
     }
 
     [Table(Name = "game_highscore", Public = true)]
-    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameId), nameof(Language) })]
     [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language) })]
     public partial struct GameHighScore
     {
         [PrimaryKey]
         public string Id;
-        [SpacetimeDB.Index.BTree]
         public string GameId;
-        [SpacetimeDB.Index.BTree]
         public string Language;
-        [SpacetimeDB.Index.BTree]
         public Identity PlayerId;
         public string PlayerName;
-        [SpacetimeDB.Index.BTree]
         public int Value;
         public long Timestamp;
         public long TimeMs;
@@ -1664,6 +1655,7 @@ public static partial class Module
         }
 
         var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
+        ValidateScoreSubmission(ctx, gameId, language, score, timestamp);
         var day = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000).ToUniversalTime().ToString("yyyy-MM-dd");
         var player = ctx.Db.player.Identity.Find(ctx.Sender);
         var playerName = player?.Name ?? "Unknown";
@@ -1717,6 +1709,43 @@ public static partial class Module
 
     private static bool IsValidScoreKey(string value, int maxLength, Func<char, bool> allowExtra) =>
         value.Length > 0 && value.Length <= maxLength && value.All(c => (c >= 'a' && c <= 'z') || allowExtra(c));
+
+    private static void ValidateScoreSubmission(ReducerContext ctx, string gameId, string language, int score, long timestamp)
+    {
+        const int maxInitialScore = 500;
+        const int maxScorePerSecond = 250;
+        GameScore? latestScore = null;
+
+        foreach (var scoreRow in ctx.Db.game_score.GameId_Language_PlayerId.Filter((gameId, language, ctx.Sender)))
+        {
+            if (latestScore == null || scoreRow.Timestamp > latestScore.Value.Timestamp)
+            {
+                latestScore = scoreRow;
+            }
+        }
+
+        if (latestScore == null)
+        {
+            if (score > maxInitialScore)
+            {
+                throw new Exception("Score is too high");
+            }
+            return;
+        }
+
+        var previousScore = latestScore.Value;
+        if (score <= previousScore.Value)
+        {
+            return;
+        }
+
+        var elapsedSeconds = Math.Max(1, (timestamp - previousScore.Timestamp) / 1_000_000);
+        var maxScoreGain = maxInitialScore + elapsedSeconds * maxScorePerSecond;
+        if (score - previousScore.Value > maxScoreGain)
+        {
+            throw new Exception("Score increased too quickly");
+        }
+    }
 
     private static void UpdateDailyActivePlayerCount(ReducerContext ctx, Identity playerId, string dateKey)
     {
