@@ -1653,7 +1653,7 @@ public static partial class Module
         }
 
         var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
-        var day = DateTimeOffset.FromUnixTimeMilliseconds(timestamp / 1000).ToUniversalTime().ToString("yyyy-MM-dd");
+        var day = DateTimeOffset.FromUnixTimeSeconds(timestamp / 1_000_000).ToUniversalTime().ToString("yyyy-MM-dd");
         var player = ctx.Db.player.Identity.Find(ctx.Sender);
         var playerName = player?.Name ?? $"Anonymous {AnimalNameGenerator.Generate(ctx.Rng)}";
         var scoreId = $"{gameId}_{language}_{day}_{ctx.Sender}";

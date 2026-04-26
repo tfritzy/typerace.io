@@ -81,7 +81,7 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
     const nextDay = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
     const timeout = setTimeout(() => {
       setDay(getUtcDay());
-    }, nextDay - now.getTime());
+    }, nextDay - Date.now());
     return () => clearTimeout(timeout);
   }, [day]);
 
