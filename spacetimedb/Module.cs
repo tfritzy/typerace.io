@@ -1686,12 +1686,19 @@ public static partial class Module
 
             if (score > existingScore.Value.Value)
             {
-                var updatedScore = existingScore.Value;
-                updatedScore.PlayerName = playerName;
-                updatedScore.Value = score;
-                updatedScore.Timestamp = timestamp;
-                updatedScore.Day = day;
-                ctx.Db.game_score.Id.Update(updatedScore);
+                var currentScore = existingScore.Value;
+                ctx.Db.game_score.Id.Update(new GameScore
+                {
+                    Id = currentScore.Id,
+                    GameId = currentScore.GameId,
+                    Language = currentScore.Language,
+                    PlayerId = currentScore.PlayerId,
+                    PlayerName = playerName,
+                    Value = score,
+                    Timestamp = timestamp,
+                    TimeMs = currentScore.TimeMs,
+                    Day = day
+                });
             }
         }
 

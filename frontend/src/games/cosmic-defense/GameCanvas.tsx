@@ -47,7 +47,7 @@ export const GameCanvas = () => {
   const language = getLanguageFromSlug(languageGameMatch?.params.lang).slug || "en";
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<CosmicDefenseGame | null>(null);
-  const scoreSessionIdRef = useRef(createScoreSessionId());
+  const scoreSessionId = useMemo(createScoreSessionId, []);
   const [selectedSlot, setSelectedSlot] = useState<PlacementSlot | null>(null);
   const [shipPreviews, setShipPreviews] = useState<Map<EntityType, string>>(new Map());
   const [slots, setSlots] = useState<PlacementSlot[]>(() => generateSlots());
@@ -63,14 +63,14 @@ export const GameCanvas = () => {
       throttle((nextScore: number) => {
         if (!conn) return;
         conn.reducers.publishScore({
-          scoreSessionId: scoreSessionIdRef.current,
+          scoreSessionId,
           gameId,
           language,
           score: nextScore,
           scoreProof: createScoreProof(gameId, language, nextScore),
         });
       }, SCORE_PUBLISH_INTERVAL_MS),
-    [conn, gameId, language]
+    [conn, gameId, language, scoreSessionId]
   );
 
   useEffect(() => {
