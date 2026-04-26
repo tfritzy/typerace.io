@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from "react";
-import { useParams } from "react-router-dom";
+import { useMatch } from "react-router-dom";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { ScoreLeaderboards } from "./components/ScoreLeaderboards";
@@ -18,8 +18,10 @@ export const GameLayout = ({
   aspectRatio = 16 / 9,
   viewportChromeOffsetPx = 220,
 }: GameLayoutProps) => {
-  const { gameId, lang } = useParams();
-  const language = getLanguageFromSlug(lang).slug || "en";
+  const languageGameMatch = useMatch("/:lang/games/:gameId");
+  const gameMatch = useMatch("/games/:gameId");
+  const gameId = languageGameMatch?.params.gameId ?? gameMatch?.params.gameId;
+  const language = getLanguageFromSlug(languageGameMatch?.params.lang).slug || "en";
 
   useEffect(() => {
     document.title = `${title} - TypeRace.io`;
