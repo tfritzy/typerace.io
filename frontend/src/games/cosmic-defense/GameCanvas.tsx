@@ -12,6 +12,7 @@ import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
 const UI_REFERENCE_WIDTH = 700;
+const BOSS_ANNOUNCEMENT_DURATION_MS = 3600;
 
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -98,7 +99,7 @@ export const GameCanvas = () => {
           bossAnnouncementTimeoutRef.current = window.setTimeout(() => {
             setBossAnnouncement(null);
             bossAnnouncementTimeoutRef.current = null;
-          }, 3600);
+          }, BOSS_ANNOUNCEMENT_DURATION_MS);
         });
       })
       .catch((err) => {

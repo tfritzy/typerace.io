@@ -8,6 +8,10 @@ export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
 const INSTANT_SCORE_PER_XP = 10;
+const BOSS_SPEED_MULTIPLIER = 0.45;
+const BOSS_HEALTH_MULTIPLIER = 8;
+const BOSS_POWER_MULTIPLIER = 2.5;
+const BOSS_SIZE_SCALE = 2.2;
 
 export enum TargetingMode {
   NearestToShip = 0,
@@ -315,11 +319,11 @@ interface EnemySpawnOptions {
 
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team, options: EnemySpawnOptions = {}): void {
   const { x, y } = spawnInRightThird();
-  const isBoss = options.isBoss === true;
-  const speed = (30 + Math.random() * 52.5) * 0.75 * (isBoss ? 0.45 : 1);
-  const healthMultiplier = isBoss ? 8 : 1;
-  const powerMultiplier = isBoss ? 2.5 : 1;
-  const sizeScale = isBoss ? 2.2 : 1;
+  const isBoss = !!options.isBoss;
+  const speed = (30 + Math.random() * 52.5) * 0.75 * (isBoss ? BOSS_SPEED_MULTIPLIER : 1);
+  const healthMultiplier = isBoss ? BOSS_HEALTH_MULTIPLIER : 1;
+  const powerMultiplier = isBoss ? BOSS_POWER_MULTIPLIER : 1;
+  const sizeScale = isBoss ? BOSS_SIZE_SCALE : 1;
   const entity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
   entity.health = Math.round(config.health * healthMultiplier);
   entity.maxHealth = entity.health;
