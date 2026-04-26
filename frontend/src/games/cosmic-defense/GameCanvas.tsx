@@ -183,34 +183,36 @@ export const GameCanvas = () => {
               Lv {level}
             </span>
             <div
-              className="relative flex-1 rounded-full overflow-hidden"
+              className="relative flex-1 overflow-hidden"
               style={{
-                height: 8,
+                height: 12,
+                borderRadius: 4,
                 background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.1)",
+                border: "1px solid rgba(249,226,175,0.3)",
               }}
             >
               <div
-                className="absolute left-0 top-0 h-full rounded-full"
+                className="absolute left-0 top-0 h-full"
                 style={{
                   width: `${Math.min(100, (xp / xpNeeded) * 100)}%`,
+                  borderRadius: 4,
                   background: "linear-gradient(90deg, #f9e2af, #fab387)",
                   transition: "width 0.2s ease-out",
                 }}
               />
             </div>
           </div>
-          <div className="flex mt-1">
-            <div className="flex-1">
-              <div className="w-8 h-8 rounded border border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.04)]" />
+          <div className="flex items-center gap-2 mt-1">
+            <div className="w-8 h-8 rounded border border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.04)]" />
+            <div className="w-8 h-8 rounded border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)]" />
+            <div className="flex-1" />
+            <div className="flex items-center gap-1">
+              <span className="text-[12px]">💀</span>
+              <span className="text-[11px] text-[#a6adc8] font-semibold">{totalKills}</span>
             </div>
-            <div className="flex flex-col items-end w-1/4">
-              <span className="text-[11px] text-[#a6adc8]">
-                {totalKills} kills
-              </span>
-              <span className="text-[11px] text-[#cdd6f4] font-semibold">
-                {score}
-              </span>
+            <div className="flex items-center gap-1">
+              <span className="text-[11px] text-[#585b70]">Score</span>
+              <span className="text-[11px] text-[#cdd6f4] font-semibold">{score}</span>
             </div>
           </div>
         </div>
