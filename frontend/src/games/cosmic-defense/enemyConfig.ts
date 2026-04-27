@@ -85,7 +85,7 @@ export interface EnemyConfig {
 }
 
 export function xpForEnemy(config: EnemyConfig): number {
-  return config.xpReward;
+  return config.xpReward > 0 ? config.xpReward : Math.max(1, Math.round(Math.pow(config.health, 0.6) / 3));
 }
 
 export interface FriendlyConfig {

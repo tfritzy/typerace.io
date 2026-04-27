@@ -309,9 +309,11 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
   const { x, y } = spawnInRightThird();
   const speed = (30 + Math.random() * 52.5) * 0.75 * config.speedMultiplier;
   const baseEntity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
+  const { entityType, health, power, fireRate, projectileDamage, projectileType, range, xpReward, sizeScale, isBoss } = config;
+  const entityConfig = { entityType, health, power, fireRate, projectileDamage, projectileType, range, xpReward, sizeScale, isBoss };
   const entity: EntityState = {
     ...baseEntity,
-    ...config,
+    ...entityConfig,
     maxHealth: config.health,
     fireTimer: Math.random() * config.fireRate,
     rotation: Math.PI,
