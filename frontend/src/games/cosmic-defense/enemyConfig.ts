@@ -182,7 +182,7 @@ const ENEMY_BASE_CATALOG: EnemyBaseConfig[] = [
   { entityType: "Flagship", health: 16313, fireRate: 0.6, projectileDamage: 530, projectileType: ProjectileType.Projectile6, range: 720 },
 ];
 
-export const ENEMY_CATALOG: EnemyConfig[] = ENEMY_BASE_CATALOG.map(createEnemyConfig);
+export const ENEMY_CATALOG: EnemyConfig[] = ENEMY_BASE_CATALOG.map((baseConfig, tier) => createEnemyConfig(baseConfig, tier));
 
 export const BOSS_CATALOG: EnemyConfig[] = ENEMY_CATALOG.map(createBossConfig);
 
