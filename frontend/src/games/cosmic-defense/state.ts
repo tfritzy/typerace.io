@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, ExplosionType, Team, getExplosionType } from "./types";
-import { ENEMY_CATALOG, BOSS_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, xpForEnemy, getScaledConfig } from "./enemyConfig";
+import { ENEMY_CATALOG, BOSS_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 
 export const PLANET_X = 200;
@@ -324,7 +324,6 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     vx: -speed,
     hitHalfW: baseEntity.hitHalfW * entityConfig.sizeScale,
     hitHalfH: baseEntity.hitHalfH * entityConfig.sizeScale,
-    xpReward: xpForEnemy(config),
   };
   addEntity(state, entity);
 }
