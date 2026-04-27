@@ -146,7 +146,7 @@ export const GameCanvas = () => {
         return;
       }
       setBossHealth(Math.max(0, entity.health));
-    }, 50);
+    }, 150);
     return () => clearInterval(interval);
   }, [bossEntityId]);
 
@@ -269,7 +269,9 @@ export const GameCanvas = () => {
             </div>
           </div>
         )}
-        {bossEntityId !== null && (
+        {bossEntityId !== null && (() => {
+          const bossHealthPct = bossMaxHealth > 0 ? Math.max(0, Math.min(100, (bossHealth / bossMaxHealth) * 100)) : 0;
+          return (
           <div
             className="absolute bottom-0 left-0 right-0 z-20 px-4 pb-3 pt-2"
             style={{ background: "linear-gradient(to top, rgba(10,10,26,0.82) 0%, transparent 100%)" }}
@@ -293,7 +295,7 @@ export const GameCanvas = () => {
                 className="text-[10px] font-semibold tabular-nums"
                 style={{ color: "rgba(243,139,168,0.6)" }}
               >
-                {bossMaxHealth > 0 ? Math.round((bossHealth / bossMaxHealth) * 100) : 0}%
+                {Math.round(bossHealthPct)}%
               </span>
             </div>
             <div
@@ -312,7 +314,7 @@ export const GameCanvas = () => {
                   left: 0,
                   top: 0,
                   height: "100%",
-                  width: `${bossMaxHealth > 0 ? Math.max(0, Math.min(100, (bossHealth / bossMaxHealth) * 100)) : 0}%`,
+                  width: `${bossHealthPct}%`,
                   background: "linear-gradient(90deg, #c0364a, #f38ba8)",
                   borderRadius: 4,
                   transition: "width 0.08s linear",
@@ -346,7 +348,8 @@ export const GameCanvas = () => {
               ))}
             </div>
           </div>
-        )}
+          );
+        })()}
         <PlacementOverlay
           slots={slots}
           onSlotClick={handleSlotClick}
