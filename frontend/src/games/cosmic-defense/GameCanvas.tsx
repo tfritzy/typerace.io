@@ -3,7 +3,7 @@ import { useMatch } from "react-router-dom";
 import { getLanguageFromSlug } from "../../utils/modes";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
-import { TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
+import { BOSS_WARNING_LEAD_TIME_SECONDS, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
 import type { EntityState } from "./state";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
@@ -15,6 +15,7 @@ import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
 const UI_REFERENCE_WIDTH = 700;
+const BOSS_ANNOUNCEMENT_DURATION_MS = BOSS_WARNING_LEAD_TIME_SECONDS * 1000;
 
 export const GameCanvas = () => {
   const languageGameMatch = useMatch("/:lang/games/:gameId");
@@ -33,6 +34,7 @@ export const GameCanvas = () => {
   const [xp, setXp] = useState(0);
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
   const [totalKills, setTotalKills] = useState(0);
+  const [bossApproaching, setBossApproaching] = useState(false);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -65,6 +67,7 @@ export const GameCanvas = () => {
     let unsubLevelUp: (() => void) | null = null;
     let unsubXPChanged: (() => void) | null = null;
     let unsubEnemyEntityDeath: (() => void) | null = null;
+    let unsubBossApproaching: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -91,6 +94,12 @@ export const GameCanvas = () => {
         unsubEnemyEntityDeath = game.state.onEnemyEntityDeath.subscribe(() => {
           setTotalKills(game.state.totalKills);
         });
+        unsubBossApproaching = game.state.onBossApproaching.subscribe(() => {
+          setBossApproaching(true);
+          window.setTimeout(() => {
+            if (!cancelled) setBossApproaching(false);
+          }, BOSS_ANNOUNCEMENT_DURATION_MS);
+        });
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -101,6 +110,7 @@ export const GameCanvas = () => {
       unsubLevelUp?.();
       unsubXPChanged?.();
       unsubEnemyEntityDeath?.();
+      unsubBossApproaching?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -217,6 +227,14 @@ export const GameCanvas = () => {
             </div>
           </div>
         </div>
+        {bossApproaching && (
+          <div className="absolute top-20 left-1/2 z-20 -translate-x-1/2 rounded-lg border border-[#f9e2af] bg-[rgba(17,17,27,0.78)] px-5 py-3 text-center shadow-[0_0_28px_rgba(249,226,175,0.28)]">
+            <div className="text-[10px] uppercase tracking-[0.36em] text-[#fab387]">Warning</div>
+            <div className="mt-1 text-[16px] font-bold uppercase tracking-[0.08em] text-[#f9e2af]">
+              large disturbance in warp space detected
+            </div>
+          </div>
+        )}
         <PlacementOverlay
           slots={slots}
           onSlotClick={handleSlotClick}

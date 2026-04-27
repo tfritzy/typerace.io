@@ -52,7 +52,7 @@ export class EnemyManager {
 
     const container = new Container();
     container.addChild(shipSprite);
-    container.scale.set(ENEMY_CONTAINER_SCALE);
+    container.scale.set(ENEMY_CONTAINER_SCALE * entity.sizeScale);
     container.x = entity.x;
     container.y = entity.y;
 
