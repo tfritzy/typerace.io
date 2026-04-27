@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { and, toSql } from "spacetimedb";
-import { query } from "../../../module_bindings";
 import { PlayerAvatar } from "../../components/PlayerAvatar";
 import { useDatabase } from "../../contexts/SpacetimeContext";
 import type { GameHighScore, GameScore } from "../../types/stdb";
@@ -10,8 +8,33 @@ type ScoreLeaderboardsProps = {
   language: string;
 };
 
+type LeaderboardQueryValues = {
+  gameId: string;
+  language: string;
+  day: string;
+};
+
+const GAME_ID_PATTERN = /^[a-z0-9_]+$/;
+const LANGUAGE_PATTERN = /^[a-z0-9_-]+$/;
+const DAY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
 function getUtcDay(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+function escapeSqlString(value: string): string {
+  return value.replaceAll("'", "''");
+}
+
+function getLeaderboardQueryValues(gameId: string, language: string, day: string): LeaderboardQueryValues | null {
+  if (!GAME_ID_PATTERN.test(gameId) || !LANGUAGE_PATTERN.test(language) || !DAY_PATTERN.test(day)) {
+    return null;
+  }
+  return {
+    gameId: escapeSqlString(gameId),
+    language: escapeSqlString(language),
+    day: escapeSqlString(day),
+  };
 }
 
 function sortByScore<T extends GameScore | GameHighScore>(rows: T[]): T[] {
@@ -86,7 +109,8 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
   }, [day]);
 
   useEffect(() => {
-    if (!conn) return;
+    const queryValues = getLeaderboardQueryValues(gameId, language, day);
+    if (!conn || !queryValues) return;
 
     const refreshScores = () => {
       setScores(Array.from(conn.db.gameScore.GameId_Language_Day.filter([gameId, language, day])));
@@ -109,16 +133,8 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
     const subscription = conn.subscriptionBuilder()
       .onApplied(refresh)
       .subscribe([
-        toSql(
-          query.game_score
-            .where((row) => and(row.gameId.eq(gameId), row.language.eq(language), row.day.eq(day)))
-            .build()
-        ),
-        toSql(
-          query.game_highscore
-            .where((row) => and(row.gameId.eq(gameId), row.language.eq(language)))
-            .build()
-        ),
+        `SELECT * FROM game_score WHERE GameId = '${queryValues.gameId}' AND Language = '${queryValues.language}' AND Day = '${queryValues.day}'`,
+        `SELECT * FROM game_highscore WHERE GameId = '${queryValues.gameId}' AND Language = '${queryValues.language}'`,
       ]);
 
     return () => {

@@ -11,7 +11,7 @@ import {
 } from "spacetimedb";
 
 export default __t.row({
-  scheduledId: __t.u64().primaryKey().name("ScheduledId"),
-  gameId: __t.string().name("GameId"),
-  scheduledAt: __t.scheduleAt().name("ScheduledAt"),
+  scheduledId: __t.u64().primaryKey(),
+  gameId: __t.string(),
+  scheduledAt: __t.scheduleAt(),
 });
