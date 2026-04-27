@@ -7,17 +7,13 @@ export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
-const INSTANT_SCORE_PER_XP = 10;
-const ENEMY_BASE_SPEED = 30;
-const ENEMY_SPEED_VARIANCE = 52.5;
-const ENEMY_SPEED_FACTOR = 0.75;
+const SCORE_PER_XP = 10;
 
 export enum TargetingMode {
-  NearestToShip = 0,
-  NearestToPlanet = 1,
-  Strongest = 2,
-  Weakest = 3,
-  LowestHealth = 4,
+  NearestToPlanet = 0,
+  Strongest = 1,
+  Weakest = 2,
+  Random = 3,
 }
 
 export interface EntityState {
@@ -139,6 +135,14 @@ export interface XPData {
   xpNeeded: number;
 }
 
+export interface ScoreData {
+  score: number;
+}
+
+export interface BossApproachingData {
+  entityType: EntityType;
+}
+
 export interface LaserBeam {
   id: number;
   x1: number;
@@ -172,6 +176,7 @@ export interface GameState {
   onDamageDealt: GameDataEvent<DamageData>;
   onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
   onXPChanged: GameDataEvent<XPData>;
+  onScoreChanged: GameDataEvent<ScoreData>;
   onLevelUp: GameEvent;
   onBossApproaching: GameEvent;
 }
@@ -222,6 +227,7 @@ export function createGameState(): GameState {
     onDamageDealt: new GameDataEvent<DamageData>(),
     onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
     onXPChanged: new GameDataEvent<XPData>(),
+    onScoreChanged: new GameDataEvent<ScoreData>(),
     onLevelUp: new GameEvent(),
     onBossApproaching: new GameEvent(),
   };
@@ -284,7 +290,7 @@ function makeBaseEntity(
     laserDamage: 0,
     kills: 0,
     damageDealt: 0,
-    targetingMode: TargetingMode.NearestToShip,
+    targetingMode: TargetingMode.NearestToPlanet,
     level: 0,
     freezeStacks: 0,
     chainCount: 0,
@@ -310,20 +316,17 @@ function spawnInRightThird(): { x: number; y: number } {
 
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
   const { x, y } = spawnInRightThird();
-  const { speedMultiplier: configuredSpeedMultiplier, ...entityConfig } = config;
-  const speed = (ENEMY_BASE_SPEED + Math.random() * ENEMY_SPEED_VARIANCE) * ENEMY_SPEED_FACTOR * configuredSpeedMultiplier;
   const baseEntity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
   const entity: EntityState = {
     ...baseEntity,
-    ...entityConfig,
+    ...config,
     maxHealth: config.health,
     fireTimer: Math.random() * config.fireRate,
     rotation: Math.PI,
     displayRotation: Math.PI,
-    speed,
-    vx: -speed,
-    hitHalfW: baseEntity.hitHalfW * entityConfig.sizeScale,
-    hitHalfH: baseEntity.hitHalfH * entityConfig.sizeScale,
+    vx: -config.speed,
+    hitHalfW: baseEntity.hitHalfW * config.sizeScale,
+    hitHalfH: baseEntity.hitHalfH * config.sizeScale,
   };
   addEntity(state, entity);
 }
@@ -395,6 +398,25 @@ function findNearestTarget(
   let found = false;
   const mode = entity.targetingMode;
 
+  if (mode === TargetingMode.Random) {
+    for (let attempts = 0; attempts < state.entities.length; attempts++) {
+      const target = state.entities[Math.floor(Math.random() * state.entities.length)];
+      if (target.team !== Team.Enemy) continue;
+      _targetResult.x = target.x;
+      _targetResult.y = target.y;
+      _targetResult.entity = target;
+      return _targetResult;
+    }
+    for (const target of state.entities) {
+      if (target.team !== Team.Enemy) continue;
+      _targetResult.x = target.x;
+      _targetResult.y = target.y;
+      _targetResult.entity = target;
+      return _targetResult;
+    }
+    return null;
+  }
+
   for (const other of state.entities) {
     if (other.team !== Team.Enemy) continue;
 
@@ -410,9 +432,6 @@ function findNearestTarget(
         score = other.maxHealth;
         break;
       case TargetingMode.Weakest:
-        score = -other.maxHealth;
-        break;
-      case TargetingMode.LowestHealth:
         score = -other.health;
         break;
       default: {
@@ -451,7 +470,8 @@ function dealDamageToEntity(
     if (target.team === Team.Enemy) {
       state.totalKills++;
       const xpAmount = target.xpReward;
-      state.score += xpAmount * INSTANT_SCORE_PER_XP;
+      state.score += xpAmount * SCORE_PER_XP;
+      state.onScoreChanged.emit({ score: state.score });
       state.onEnemyEntityDeath.emit({
         x: target.x,
         y: target.y,
