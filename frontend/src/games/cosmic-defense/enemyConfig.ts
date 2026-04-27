@@ -86,6 +86,58 @@ export interface EnemyConfig {
 
 const ENEMY_DEFAULTS = { xpReward: 0, sizeScale: 1, speedMultiplier: 1, isBoss: false } satisfies Pick<EnemyConfig, "xpReward" | "sizeScale" | "speedMultiplier" | "isBoss">;
 
+type EnemyBaseConfig = Pick<EnemyConfig, "entityType" | "health" | "fireRate" | "projectileDamage" | "projectileType" | "range">;
+
+const ENEMY_POWER_HEALTH_RATIO = 4 / 3;
+const ENEMY_POWER_ROUNDING = 5;
+const ENEMY_XP_POWER_SCALE = 0.28;
+const ENEMY_XP_POWER_EXPONENT = 0.6;
+const ENEMY_XP_TIER_BONUS = 0.01;
+const BOSS_HEALTH_MULTIPLIER = 8;
+const BOSS_POWER_MULTIPLIER = 2.5;
+const BOSS_PROJECTILE_DAMAGE_MULTIPLIER = 2.5;
+const BOSS_XP_MULTIPLIER = 5;
+const BOSS_SIZE_SCALE = 2.2;
+const BOSS_SPEED_MULTIPLIER = 0.45;
+
+function roundHalfEven(value: number): number {
+  const floor = Math.floor(value);
+  const fraction = value - floor;
+  if (fraction !== 0.5) return Math.round(value);
+  return floor % 2 === 0 ? floor : floor + 1;
+}
+
+function calculateEnemyPower(health: number): number {
+  return Math.floor((health * ENEMY_POWER_HEALTH_RATIO) / ENEMY_POWER_ROUNDING) * ENEMY_POWER_ROUNDING;
+}
+
+function calculateEnemyXpReward(power: number, tier: number): number {
+  return Math.round(Math.pow(power, ENEMY_XP_POWER_EXPONENT) * ENEMY_XP_POWER_SCALE + tier * ENEMY_XP_TIER_BONUS);
+}
+
+function createEnemyConfig(baseConfig: EnemyBaseConfig, tier: number): EnemyConfig {
+  const power = calculateEnemyPower(baseConfig.health);
+  return {
+    ...ENEMY_DEFAULTS,
+    ...baseConfig,
+    power,
+    xpReward: calculateEnemyXpReward(power, tier),
+  };
+}
+
+function createBossConfig(config: EnemyConfig): EnemyConfig {
+  return {
+    ...config,
+    health: config.health * BOSS_HEALTH_MULTIPLIER,
+    power: roundHalfEven(config.power * BOSS_POWER_MULTIPLIER),
+    projectileDamage: roundHalfEven(config.projectileDamage * BOSS_PROJECTILE_DAMAGE_MULTIPLIER),
+    xpReward: config.xpReward * BOSS_XP_MULTIPLIER,
+    sizeScale: BOSS_SIZE_SCALE,
+    speedMultiplier: BOSS_SPEED_MULTIPLIER,
+    isBoss: true,
+  };
+}
+
 export interface FriendlyConfig {
   entityType: EntityType;
   health: number;
@@ -104,57 +156,35 @@ export interface FriendlyConfig {
   hitDelay: number;
 }
 
-export const ENEMY_CATALOG: EnemyConfig[] = [
-  { ...ENEMY_DEFAULTS, entityType: "Pulse", health: 30, power: 40, fireRate: 2.2, projectileDamage: 4, projectileType: ProjectileType.Tiny, range: 500, xpReward: 3 },
-  { ...ENEMY_DEFAULTS, entityType: "Buckler", health: 42, power: 55, fireRate: 2.1, projectileDamage: 5, projectileType: ProjectileType.Tiny, range: 510, xpReward: 3 },
-  { ...ENEMY_DEFAULTS, entityType: "Pip", health: 53, power: 70, fireRate: 2.0, projectileDamage: 7, projectileType: ProjectileType.Tiny, range: 520, xpReward: 4 },
-  { ...ENEMY_DEFAULTS, entityType: "Flea", health: 72, power: 95, fireRate: 1.9, projectileDamage: 9, projectileType: ProjectileType.Tiny, range: 530, xpReward: 4 },
-  { ...ENEMY_DEFAULTS, entityType: "Needle", health: 95, power: 125, fireRate: 1.8, projectileDamage: 11, projectileType: ProjectileType.Projectile2, range: 540, xpReward: 5 },
-  { ...ENEMY_DEFAULTS, entityType: "Bolt", health: 128, power: 170, fireRate: 1.7, projectileDamage: 14, projectileType: ProjectileType.Projectile2, range: 550, xpReward: 6 },
-  { ...ENEMY_DEFAULTS, entityType: "Cricket", health: 170, power: 225, fireRate: 1.6, projectileDamage: 18, projectileType: ProjectileType.Projectile2, range: 560, xpReward: 7 },
-  { ...ENEMY_DEFAULTS, entityType: "Robin", health: 225, power: 300, fireRate: 1.5, projectileDamage: 22, projectileType: ProjectileType.Projectile2, range: 570, xpReward: 9 },
-  { ...ENEMY_DEFAULTS, entityType: "Sparrow", health: 300, power: 400, fireRate: 1.4, projectileDamage: 28, projectileType: ProjectileType.Projectile3, range: 580, xpReward: 10 },
-  { ...ENEMY_DEFAULTS, entityType: "Hornet", health: 398, power: 530, fireRate: 1.3, projectileDamage: 35, projectileType: ProjectileType.Projectile3, range: 590, xpReward: 12 },
-  { ...ENEMY_DEFAULTS, entityType: "Dart", health: 525, power: 700, fireRate: 1.2, projectileDamage: 42, projectileType: ProjectileType.Projectile3, range: 600, xpReward: 14 },
-  { ...ENEMY_DEFAULTS, entityType: "Scout", health: 705, power: 940, fireRate: 1.1, projectileDamage: 52, projectileType: ProjectileType.Projectile3, range: 610, xpReward: 17 },
-  { ...ENEMY_DEFAULTS, entityType: "Hawk", health: 938, power: 1250, fireRate: 1.0, projectileDamage: 62, projectileType: ProjectileType.Projectile4, range: 620, xpReward: 20 },
-  { ...ENEMY_DEFAULTS, entityType: "Dynamo", health: 1257, power: 1675, fireRate: 0.95, projectileDamage: 80, projectileType: ProjectileType.Projectile4, range: 630, xpReward: 24 },
-  { ...ENEMY_DEFAULTS, entityType: "Harrier", health: 1670, power: 2225, fireRate: 0.9, projectileDamage: 100, projectileType: ProjectileType.Projectile4, range: 640, xpReward: 29 },
-  { ...ENEMY_DEFAULTS, entityType: "Raptor", health: 2213, power: 2950, fireRate: 0.85, projectileDamage: 125, projectileType: ProjectileType.Projectile4, range: 650, xpReward: 34 },
-  { ...ENEMY_DEFAULTS, entityType: "Eagle", health: 2945, power: 3925, fireRate: 0.8, projectileDamage: 155, projectileType: ProjectileType.Projectile5, range: 660, xpReward: 40 },
-  { ...ENEMY_DEFAULTS, entityType: "Corsair", health: 3920, power: 5225, fireRate: 0.8, projectileDamage: 190, projectileType: ProjectileType.Projectile5, range: 670, xpReward: 48 },
-  { ...ENEMY_DEFAULTS, entityType: "Vanguard", health: 5213, power: 6950, fireRate: 0.75, projectileDamage: 235, projectileType: ProjectileType.Projectile5, range: 680, xpReward: 57 },
-  { ...ENEMY_DEFAULTS, entityType: "Titan", health: 6938, power: 9250, fireRate: 0.7, projectileDamage: 290, projectileType: ProjectileType.Projectile6, range: 690, xpReward: 67 },
-  { ...ENEMY_DEFAULTS, entityType: "Dreadnought", health: 9225, power: 12300, fireRate: 0.7, projectileDamage: 355, projectileType: ProjectileType.Projectile6, range: 700, xpReward: 80 },
-  { ...ENEMY_DEFAULTS, entityType: "Leviathan", health: 12263, power: 16350, fireRate: 0.65, projectileDamage: 430, projectileType: ProjectileType.Projectile6, range: 710, xpReward: 95 },
-  { ...ENEMY_DEFAULTS, entityType: "Flagship", health: 16313, power: 21750, fireRate: 0.6, projectileDamage: 530, projectileType: ProjectileType.Projectile6, range: 720, xpReward: 112 },
+const ENEMY_BASE_CATALOG: EnemyBaseConfig[] = [
+  { entityType: "Pulse", health: 30, fireRate: 2.2, projectileDamage: 4, projectileType: ProjectileType.Tiny, range: 500 },
+  { entityType: "Buckler", health: 42, fireRate: 2.1, projectileDamage: 5, projectileType: ProjectileType.Tiny, range: 510 },
+  { entityType: "Pip", health: 53, fireRate: 2.0, projectileDamage: 7, projectileType: ProjectileType.Tiny, range: 520 },
+  { entityType: "Flea", health: 72, fireRate: 1.9, projectileDamage: 9, projectileType: ProjectileType.Tiny, range: 530 },
+  { entityType: "Needle", health: 95, fireRate: 1.8, projectileDamage: 11, projectileType: ProjectileType.Projectile2, range: 540 },
+  { entityType: "Bolt", health: 128, fireRate: 1.7, projectileDamage: 14, projectileType: ProjectileType.Projectile2, range: 550 },
+  { entityType: "Cricket", health: 170, fireRate: 1.6, projectileDamage: 18, projectileType: ProjectileType.Projectile2, range: 560 },
+  { entityType: "Robin", health: 225, fireRate: 1.5, projectileDamage: 22, projectileType: ProjectileType.Projectile2, range: 570 },
+  { entityType: "Sparrow", health: 300, fireRate: 1.4, projectileDamage: 28, projectileType: ProjectileType.Projectile3, range: 580 },
+  { entityType: "Hornet", health: 398, fireRate: 1.3, projectileDamage: 35, projectileType: ProjectileType.Projectile3, range: 590 },
+  { entityType: "Dart", health: 525, fireRate: 1.2, projectileDamage: 42, projectileType: ProjectileType.Projectile3, range: 600 },
+  { entityType: "Scout", health: 705, fireRate: 1.1, projectileDamage: 52, projectileType: ProjectileType.Projectile3, range: 610 },
+  { entityType: "Hawk", health: 938, fireRate: 1.0, projectileDamage: 62, projectileType: ProjectileType.Projectile4, range: 620 },
+  { entityType: "Dynamo", health: 1257, fireRate: 0.95, projectileDamage: 80, projectileType: ProjectileType.Projectile4, range: 630 },
+  { entityType: "Harrier", health: 1670, fireRate: 0.9, projectileDamage: 100, projectileType: ProjectileType.Projectile4, range: 640 },
+  { entityType: "Raptor", health: 2213, fireRate: 0.85, projectileDamage: 125, projectileType: ProjectileType.Projectile4, range: 650 },
+  { entityType: "Eagle", health: 2945, fireRate: 0.8, projectileDamage: 155, projectileType: ProjectileType.Projectile5, range: 660 },
+  { entityType: "Corsair", health: 3920, fireRate: 0.8, projectileDamage: 190, projectileType: ProjectileType.Projectile5, range: 670 },
+  { entityType: "Vanguard", health: 5213, fireRate: 0.75, projectileDamage: 235, projectileType: ProjectileType.Projectile5, range: 680 },
+  { entityType: "Titan", health: 6938, fireRate: 0.7, projectileDamage: 290, projectileType: ProjectileType.Projectile6, range: 690 },
+  { entityType: "Dreadnought", health: 9225, fireRate: 0.7, projectileDamage: 355, projectileType: ProjectileType.Projectile6, range: 700 },
+  { entityType: "Leviathan", health: 12263, fireRate: 0.65, projectileDamage: 430, projectileType: ProjectileType.Projectile6, range: 710 },
+  { entityType: "Flagship", health: 16313, fireRate: 0.6, projectileDamage: 530, projectileType: ProjectileType.Projectile6, range: 720 },
 ];
 
-export const BOSS_CATALOG: EnemyConfig[] = [
-  { ...ENEMY_CATALOG[0], health: 240, power: 100, projectileDamage: 10, xpReward: 15, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[1], health: 336, power: 138, projectileDamage: 12, xpReward: 15, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[2], health: 424, power: 175, projectileDamage: 18, xpReward: 20, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[3], health: 576, power: 238, projectileDamage: 22, xpReward: 20, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[4], health: 760, power: 312, projectileDamage: 28, xpReward: 25, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[5], health: 1024, power: 425, projectileDamage: 35, xpReward: 30, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[6], health: 1360, power: 562, projectileDamage: 45, xpReward: 35, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[7], health: 1800, power: 750, projectileDamage: 55, xpReward: 45, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[8], health: 2400, power: 1000, projectileDamage: 70, xpReward: 50, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[9], health: 3184, power: 1325, projectileDamage: 88, xpReward: 60, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[10], health: 4200, power: 1750, projectileDamage: 105, xpReward: 70, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[11], health: 5640, power: 2350, projectileDamage: 130, xpReward: 85, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[12], health: 7504, power: 3125, projectileDamage: 155, xpReward: 100, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[13], health: 10056, power: 4188, projectileDamage: 200, xpReward: 120, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[14], health: 13360, power: 5562, projectileDamage: 250, xpReward: 145, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[15], health: 17704, power: 7375, projectileDamage: 312, xpReward: 170, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[16], health: 23560, power: 9812, projectileDamage: 388, xpReward: 200, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[17], health: 31360, power: 13062, projectileDamage: 475, xpReward: 240, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[18], health: 41704, power: 17375, projectileDamage: 588, xpReward: 285, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[19], health: 55504, power: 23125, projectileDamage: 725, xpReward: 335, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[20], health: 73800, power: 30750, projectileDamage: 888, xpReward: 400, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[21], health: 98104, power: 40875, projectileDamage: 1075, xpReward: 475, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-  { ...ENEMY_CATALOG[22], health: 130504, power: 54375, projectileDamage: 1325, xpReward: 560, sizeScale: 2.2, speedMultiplier: 0.45, isBoss: true },
-];
+export const ENEMY_CATALOG: EnemyConfig[] = ENEMY_BASE_CATALOG.map(createEnemyConfig);
+
+export const BOSS_CATALOG: EnemyConfig[] = ENEMY_CATALOG.map(createBossConfig);
 
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [
   { entityType: "Spur", health: 300, projectileDamage: 40, projectileType: ProjectileType.Projectile5, chargesRequired: 8, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0 },
