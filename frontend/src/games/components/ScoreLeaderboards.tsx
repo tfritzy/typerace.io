@@ -62,9 +62,13 @@ function LeaderboardTable<T extends GameScore | GameHighScore>({
               key={row.id}
               className="grid grid-cols-[28px_28px_1fr_auto] items-center gap-2 py-1 text-sm"
             >
-              <span className="text-muted-foreground tabular-nums text-right">
-                {index + 1}
-              </span>
+              {index < 3 ? (
+                <div aria-hidden="true" />
+              ) : (
+                <span className="text-muted-foreground tabular-nums text-right">
+                  {index + 1}
+                </span>
+              )}
               {index < 3 ? (
                 <PlayerAvatar
                   size={22}
