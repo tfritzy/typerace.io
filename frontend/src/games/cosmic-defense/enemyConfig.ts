@@ -70,23 +70,24 @@ export const SHIP_HITBOX_MAP: Record<EntityType, ShipHitbox> = {
   Clipper: { hitWidth: 66, hitHeight: 54 },
 };
 
-export interface EnemyConfig {
+export interface EnemyBaseConfig {
   entityType: EntityType;
   health: number;
-  power: number;
   fireRate: number;
   projectileDamage: number;
   projectileType: ProjectileType;
   range: number;
+}
+
+export type EnemyConfig = EnemyBaseConfig & {
+  power: number;
   xpReward: number;
   sizeScale: number;
   speed: number;
   isBoss: boolean;
-}
+};
 
-const ENEMY_DEFAULTS = { xpReward: 0, sizeScale: 1, isBoss: false } satisfies Pick<EnemyConfig, "xpReward" | "sizeScale" | "isBoss">;
-
-type EnemyBaseConfig = Pick<EnemyConfig, "entityType" | "health" | "fireRate" | "projectileDamage" | "projectileType" | "range">;
+const ENEMY_DEFAULTS = { xpReward: 0, sizeScale: 1, isBoss: false } satisfies Partial<EnemyConfig>;
 
 const ENEMY_POWER_HEALTH_RATIO = 4 / 3;
 const ENEMY_POWER_ROUNDING = 5;
