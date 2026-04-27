@@ -380,12 +380,11 @@ function findNearestTarget(
   let bestScore = -Infinity;
   let found = false;
   const mode = entity.targetingMode;
-  let randomCount = 0;
 
-  for (const other of state.entities) {
-    if (other.team !== Team.Enemy) continue;
-
-    if (mode === TargetingMode.Random) {
+  if (mode === TargetingMode.Random) {
+    let randomCount = 0;
+    for (const other of state.entities) {
+      if (other.team !== Team.Enemy) continue;
       randomCount++;
       if (randomCount === 1 || Math.random() * randomCount < 1) {
         _targetResult.x = other.x;
@@ -393,8 +392,12 @@ function findNearestTarget(
         _targetResult.entity = other;
         found = true;
       }
-      continue;
     }
+    return found ? _targetResult : null;
+  }
+
+  for (const other of state.entities) {
+    if (other.team !== Team.Enemy) continue;
 
     let score: number;
     switch (mode) {
