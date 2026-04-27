@@ -35,9 +35,9 @@ export const GameCanvas = () => {
   const [pendingChoice, setPendingChoice] = useState(true);
   const [level, setLevel] = useState(1);
   const [xp, setXp] = useState(0);
+  const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
   const [score, setScore] = useState(0);
   const [totalKills, setTotalKills] = useState(0);
-  const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
   const publishScore = useMemo(
     () =>
       throttle((nextScore: number) => {
