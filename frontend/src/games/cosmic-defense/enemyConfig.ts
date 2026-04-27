@@ -112,8 +112,8 @@ function calculateEnemyPower(health: number): number {
 }
 
 function calculateEnemyXpReward(power: number, zeroBasedTier: number): number {
-  const rewardTier = zeroBasedTier + 1;
-  return Math.round(Math.pow(power, ENEMY_XP_POWER_EXPONENT) * ENEMY_XP_POWER_SCALE + rewardTier * ENEMY_XP_TIER_BONUS);
+  const oneBasedTier = zeroBasedTier + 1;
+  return Math.round(Math.pow(power, ENEMY_XP_POWER_EXPONENT) * ENEMY_XP_POWER_SCALE + oneBasedTier * ENEMY_XP_TIER_BONUS);
 }
 
 function createEnemyConfig(baseConfig: EnemyBaseConfig, zeroBasedTier: number): EnemyConfig {
