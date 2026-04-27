@@ -387,7 +387,7 @@ function findNearestTarget(
 
     if (mode === TargetingMode.Random) {
       randomCount++;
-      if (Math.random() * randomCount < 1) {
+      if (randomCount === 1 || Math.random() * randomCount < 1) {
         _targetResult.x = other.x;
         _targetResult.y = other.y;
         _targetResult.entity = other;
