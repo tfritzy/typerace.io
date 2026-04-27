@@ -10,11 +10,10 @@ const LASER_RANGE = 2200;
 const INSTANT_SCORE_PER_XP = 10;
 
 export enum TargetingMode {
-  NearestToShip = 0,
-  NearestToPlanet = 1,
-  Strongest = 2,
-  Weakest = 3,
-  LowestHealth = 4,
+  NearestToPlanet = 0,
+  Strongest = 1,
+  Weakest = 2,
+  Random = 3,
 }
 
 export interface EntityState {
@@ -273,7 +272,7 @@ function makeBaseEntity(
     laserDamage: 0,
     kills: 0,
     damageDealt: 0,
-    targetingMode: TargetingMode.NearestToShip,
+    targetingMode: TargetingMode.NearestToPlanet,
     level: 0,
     freezeStacks: 0,
     chainCount: 0,
@@ -381,9 +380,21 @@ function findNearestTarget(
   let bestScore = -Infinity;
   let found = false;
   const mode = entity.targetingMode;
+  let randomCount = 0;
 
   for (const other of state.entities) {
     if (other.team !== Team.Enemy) continue;
+
+    if (mode === TargetingMode.Random) {
+      randomCount++;
+      if (Math.random() * randomCount < 1) {
+        _targetResult.x = other.x;
+        _targetResult.y = other.y;
+        _targetResult.entity = other;
+        found = true;
+      }
+      continue;
+    }
 
     let score: number;
     switch (mode) {
@@ -397,9 +408,6 @@ function findNearestTarget(
         score = other.maxHealth;
         break;
       case TargetingMode.Weakest:
-        score = -other.maxHealth;
-        break;
-      case TargetingMode.LowestHealth:
         score = -other.health;
         break;
       default: {

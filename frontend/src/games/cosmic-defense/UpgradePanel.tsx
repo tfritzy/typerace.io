@@ -20,11 +20,10 @@ const PANEL_MAX_TOP = 55;
 const PANEL_WIDTH = 170;
 
 const TARGETING_OPTIONS: { mode: TargetingMode; label: string }[] = [
-  { mode: TargetingMode.NearestToShip, label: "Nearest" },
   { mode: TargetingMode.NearestToPlanet, label: "Closest to planet" },
   { mode: TargetingMode.Strongest, label: "Strongest" },
   { mode: TargetingMode.Weakest, label: "Weakest" },
-  { mode: TargetingMode.LowestHealth, label: "Most damaged" },
+  { mode: TargetingMode.Random, label: "Random" },
 ];
 
 export const InspectionPanel = ({
@@ -46,7 +45,7 @@ export const InspectionPanel = ({
   );
 
   const currentPreview = shipPreviews.get(currentType);
-  const currentTargeting = entity?.targetingMode ?? TargetingMode.NearestToShip;
+  const currentTargeting = entity?.targetingMode ?? TargetingMode.NearestToPlanet;
 
   return (
     <>
