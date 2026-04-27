@@ -789,7 +789,7 @@ const TIER_OFFSET = 30;
 const BASE_SPAWN_RATE = 0.6;
 const MAX_SPAWN_RATE = 4.0;
 const SPAWN_RAMP_TIME = 240;
-export const BOSS_WARNING_LEAD_TIME = 4;
+export const BOSS_WARNING_LEAD_TIME_SECONDS = 4;
 const BOSS_SPAWN_TIME_OFFSET = TIER_SPREAD / 2;
 const BOSS_TIER_COUNT = BOSS_CATALOG.length - 1;
 
@@ -847,7 +847,7 @@ export function updateSpawner(state: GameState, dt: number): void {
   const bossTier = state.spawner.nextBossTier;
   if (bossTier < BOSS_TIER_COUNT) {
     const bossSpawnTime = TIER_OFFSET + bossTier * TIER_SPREAD + BOSS_SPAWN_TIME_OFFSET;
-    if (state.spawner.warnedBossTier < bossTier && state.spawner.elapsed >= bossSpawnTime - BOSS_WARNING_LEAD_TIME) {
+    if (state.spawner.warnedBossTier < bossTier && state.spawner.elapsed >= bossSpawnTime - BOSS_WARNING_LEAD_TIME_SECONDS) {
       state.spawner.warnedBossTier = bossTier;
       state.onBossApproaching.emit();
     }

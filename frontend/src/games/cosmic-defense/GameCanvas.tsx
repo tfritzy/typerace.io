@@ -3,7 +3,7 @@ import { useMatch } from "react-router-dom";
 import { getLanguageFromSlug } from "../../utils/modes";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
-import { BOSS_WARNING_LEAD_TIME, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
+import { BOSS_WARNING_LEAD_TIME_SECONDS, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
 import type { EntityState } from "./state";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
@@ -15,7 +15,7 @@ import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
 const UI_REFERENCE_WIDTH = 700;
-const BOSS_ANNOUNCEMENT_DURATION_MS = BOSS_WARNING_LEAD_TIME * 1000;
+const BOSS_ANNOUNCEMENT_DURATION_MS = BOSS_WARNING_LEAD_TIME_SECONDS * 1000;
 
 export const GameCanvas = () => {
   const languageGameMatch = useMatch("/:lang/games/:gameId");

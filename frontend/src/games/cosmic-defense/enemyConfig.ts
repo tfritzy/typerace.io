@@ -89,21 +89,6 @@ export type EnemyConfig = EnemyBaseConfig & {
 
 const ENEMY_DEFAULTS = { xpReward: 0, sizeScale: 1, isBoss: false } satisfies Partial<EnemyConfig>;
 
-const ENEMY_POWER_HEALTH_RATIO = 4 / 3;
-const ENEMY_POWER_ROUNDING = 5;
-const ENEMY_XP_POWER_SCALE = 0.28;
-const ENEMY_XP_POWER_EXPONENT = 0.6;
-const ENEMY_XP_TIER_BONUS = 0.01;
-const ENEMY_BASE_SPEED = 30;
-const ENEMY_SPEED_FACTOR = 0.75;
-const ENEMY_SPEED_TIER_BONUS = 1.6;
-const BOSS_HEALTH_MULTIPLIER = 8;
-const BOSS_POWER_MULTIPLIER = 2.5;
-const BOSS_PROJECTILE_DAMAGE_MULTIPLIER = 2.5;
-const BOSS_XP_MULTIPLIER = 5;
-const BOSS_SIZE_SCALE = 2.2;
-const BOSS_SPEED_MULTIPLIER = 0.45;
-
 function roundToNearestEven(value: number): number {
   const floor = Math.floor(value);
   const fraction = value - floor;
@@ -112,16 +97,16 @@ function roundToNearestEven(value: number): number {
 }
 
 function calculateEnemyPower(health: number): number {
-  return Math.floor((health * ENEMY_POWER_HEALTH_RATIO) / ENEMY_POWER_ROUNDING) * ENEMY_POWER_ROUNDING;
+  return Math.floor((health * 4 / 3) / 5) * 5;
 }
 
 function calculateEnemyXpReward(power: number, zeroBasedTier: number): number {
   const oneBasedTier = zeroBasedTier + 1;
-  return Math.round(Math.pow(power, ENEMY_XP_POWER_EXPONENT) * ENEMY_XP_POWER_SCALE + oneBasedTier * ENEMY_XP_TIER_BONUS);
+  return Math.round(Math.pow(power, 0.6) * 0.28 + oneBasedTier * 0.01);
 }
 
 function calculateEnemySpeed(zeroBasedTier: number): number {
-  return (ENEMY_BASE_SPEED + zeroBasedTier * ENEMY_SPEED_TIER_BONUS) * ENEMY_SPEED_FACTOR;
+  return (30 + zeroBasedTier * 1.6) * 0.75;
 }
 
 function createEnemyConfig(baseConfig: EnemyBaseConfig, zeroBasedTier: number): EnemyConfig {
@@ -138,12 +123,12 @@ function createEnemyConfig(baseConfig: EnemyBaseConfig, zeroBasedTier: number): 
 function createBossConfig(config: EnemyConfig): EnemyConfig {
   return {
     ...config,
-    health: config.health * BOSS_HEALTH_MULTIPLIER,
-    power: roundToNearestEven(config.power * BOSS_POWER_MULTIPLIER),
-    projectileDamage: roundToNearestEven(config.projectileDamage * BOSS_PROJECTILE_DAMAGE_MULTIPLIER),
-    xpReward: config.xpReward * BOSS_XP_MULTIPLIER,
-    sizeScale: BOSS_SIZE_SCALE,
-    speed: config.speed * BOSS_SPEED_MULTIPLIER,
+    health: config.health * 8,
+    power: roundToNearestEven(config.power * 2.5),
+    projectileDamage: roundToNearestEven(config.projectileDamage * 2.5),
+    xpReward: config.xpReward * 5,
+    sizeScale: 2.2,
+    speed: config.speed * 0.45,
     isBoss: true,
   };
 }
