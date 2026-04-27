@@ -4,10 +4,10 @@ import type { EntityState } from "./state";
 const HEALTH_BAR_WIDTH = 28;
 const HEALTH_BAR_HEIGHT = 3;
 const HEALTH_BAR_OFFSET = -18;
-const BOSS_HEALTH_BAR_WIDTH = 82;
-const BOSS_HEALTH_BAR_HEIGHT = 8;
-const BOSS_HEALTH_BAR_OFFSET = -54;
-const BOSS_HEALTH_BAR_TICKS = 6;
+const BOSS_HEALTH_BAR_WIDTH = 100;
+const BOSS_HEALTH_BAR_HEIGHT = 10;
+const BOSS_HEALTH_BAR_OFFSET = -60;
+const BOSS_HEALTH_BAR_TICKS = 4;
 
 function getHealthBarColor(ratio: number): number {
   return ratio > 0.6 ? 0x4ade80 : ratio > 0.3 ? 0xfbbf24 : 0xef4444;
@@ -49,37 +49,28 @@ function drawBossHealthBar(g: Graphics, ratio: number): void {
   const barColor = getHealthBarColor(ratio);
   const left = -BOSS_HEALTH_BAR_WIDTH / 2;
 
-  g.roundRect(left - 6, -6, BOSS_HEALTH_BAR_WIDTH + 12, BOSS_HEALTH_BAR_HEIGHT + 12, 6);
-  g.fill({ color: 0x11111b, alpha: 0.75 });
-  g.stroke({ color: 0xf9e2af, alpha: 0.9, width: 2 });
+  g.roundRect(left - 1, -1, BOSS_HEALTH_BAR_WIDTH + 2, BOSS_HEALTH_BAR_HEIGHT + 2, 4);
+  g.fill({ color: barColor, alpha: 0.18 });
+  g.stroke({ color: barColor, alpha: 0.6, width: 1 });
 
-  g.rect(left - 2, -2, BOSS_HEALTH_BAR_WIDTH + 4, BOSS_HEALTH_BAR_HEIGHT + 4);
-  g.stroke({ color: 0xfab387, alpha: 0.5, width: 1 });
-
-  g.rect(left, 0, BOSS_HEALTH_BAR_WIDTH, BOSS_HEALTH_BAR_HEIGHT);
-  g.fill({ color: 0x000000, alpha: 0.75 });
+  g.roundRect(left, 0, BOSS_HEALTH_BAR_WIDTH, BOSS_HEALTH_BAR_HEIGHT, 3);
+  g.fill({ color: 0x000000, alpha: 0.7 });
 
   if (ratio > 0) {
-    g.rect(left, 0, BOSS_HEALTH_BAR_WIDTH * ratio, BOSS_HEALTH_BAR_HEIGHT);
+    g.roundRect(left, 0, BOSS_HEALTH_BAR_WIDTH * ratio, BOSS_HEALTH_BAR_HEIGHT, 3);
     g.fill({ color: barColor });
+  }
+
+  if (ratio > 0 && ratio < 1) {
+    const fillWidth = BOSS_HEALTH_BAR_WIDTH * ratio;
+    g.roundRect(left + 1, 1, fillWidth - 2, Math.floor(BOSS_HEALTH_BAR_HEIGHT / 2) - 1, 2);
+    g.fill({ color: 0xffffff, alpha: 0.12 });
   }
 
   for (let i = 1; i < BOSS_HEALTH_BAR_TICKS; i++) {
     const x = left + (BOSS_HEALTH_BAR_WIDTH / BOSS_HEALTH_BAR_TICKS) * i;
-    g.moveTo(x, -3);
-    g.lineTo(x, BOSS_HEALTH_BAR_HEIGHT + 3);
-    g.stroke({ color: 0xf9e2af, alpha: 0.55, width: 1 });
+    g.moveTo(x, 1);
+    g.lineTo(x, BOSS_HEALTH_BAR_HEIGHT - 1);
+    g.stroke({ color: 0x000000, alpha: 0.45, width: 1.5 });
   }
-
-  g.moveTo(left - 10, BOSS_HEALTH_BAR_HEIGHT / 2);
-  g.lineTo(left - 3, -4);
-  g.lineTo(left - 3, BOSS_HEALTH_BAR_HEIGHT + 4);
-  g.closePath();
-  g.fill({ color: 0xf9e2af, alpha: 0.75 });
-
-  g.moveTo(-left + 10, BOSS_HEALTH_BAR_HEIGHT / 2);
-  g.lineTo(-left + 3, -4);
-  g.lineTo(-left + 3, BOSS_HEALTH_BAR_HEIGHT + 4);
-  g.closePath();
-  g.fill({ color: 0xf9e2af, alpha: 0.75 });
 }

@@ -4,7 +4,7 @@ import { getLanguageFromSlug } from "../../utils/modes";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { BOSS_WARNING_LEAD_TIME_SECONDS, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
-import type { EntityState } from "./state";
+import type { EntityState, BossSpawnedData } from "./state";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
 import { PlacementOverlay } from "./PlacementOverlay";
@@ -35,6 +35,10 @@ export const GameCanvas = () => {
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
   const [totalKills, setTotalKills] = useState(0);
   const [bossApproaching, setBossApproaching] = useState(false);
+  const [bossEntityId, setBossEntityId] = useState<number | null>(null);
+  const [bossEntityType, setBossEntityType] = useState<string>("");
+  const [bossHealth, setBossHealth] = useState(0);
+  const [bossMaxHealth, setBossMaxHealth] = useState(0);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -68,6 +72,8 @@ export const GameCanvas = () => {
     let unsubXPChanged: (() => void) | null = null;
     let unsubEnemyEntityDeath: (() => void) | null = null;
     let unsubBossApproaching: (() => void) | null = null;
+    let unsubBossSpawned: (() => void) | null = null;
+    let unsubBossDefeated: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -100,6 +106,17 @@ export const GameCanvas = () => {
             if (!cancelled) setBossApproaching(false);
           }, BOSS_ANNOUNCEMENT_DURATION_MS);
         });
+        unsubBossSpawned = game.state.onBossSpawned.subscribe((data: BossSpawnedData) => {
+          if (cancelled) return;
+          setBossEntityId(data.id);
+          setBossEntityType(data.entityType);
+          setBossMaxHealth(data.maxHealth);
+          setBossHealth(data.maxHealth);
+        });
+        unsubBossDefeated = game.state.onBossDefeated.subscribe(() => {
+          if (cancelled) return;
+          setBossEntityId(null);
+        });
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -111,10 +128,27 @@ export const GameCanvas = () => {
       unsubXPChanged?.();
       unsubEnemyEntityDeath?.();
       unsubBossApproaching?.();
+      unsubBossSpawned?.();
+      unsubBossDefeated?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
   }, [gameId, language]);
+
+  useEffect(() => {
+    if (!bossEntityId) return;
+    const interval = setInterval(() => {
+      const game = gameRef.current;
+      if (!game) return;
+      const entity = game.state.entityById.get(bossEntityId);
+      if (!entity) {
+        setBossEntityId(null);
+        return;
+      }
+      setBossHealth(Math.max(0, entity.health));
+    }, 50);
+    return () => clearInterval(interval);
+  }, [bossEntityId]);
 
   const handleSlotClick = useCallback((slot: PlacementSlot) => {
     if (pendingChoice) return;
@@ -232,6 +266,84 @@ export const GameCanvas = () => {
             <div className="text-[10px] uppercase tracking-[0.36em] text-[#fab387]">Warning</div>
             <div className="mt-1 text-[16px] font-bold uppercase tracking-[0.08em] text-[#f9e2af]">
               large disturbance in warp space detected
+            </div>
+          </div>
+        )}
+        {bossEntityId !== null && (
+          <div
+            className="absolute bottom-0 left-0 right-0 z-20 px-4 pb-3 pt-2"
+            style={{ background: "linear-gradient(to top, rgba(10,10,26,0.82) 0%, transparent 100%)" }}
+          >
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span
+                  className="text-[9px] font-bold uppercase tracking-[0.3em]"
+                  style={{ color: "rgba(243,139,168,0.7)" }}
+                >
+                  Boss
+                </span>
+                <span
+                  className="text-[12px] font-bold uppercase tracking-[0.15em]"
+                  style={{ color: "#f38ba8" }}
+                >
+                  {bossEntityType}
+                </span>
+              </div>
+              <span
+                className="text-[10px] font-semibold tabular-nums"
+                style={{ color: "rgba(243,139,168,0.6)" }}
+              >
+                {bossMaxHealth > 0 ? Math.round((bossHealth / bossMaxHealth) * 100) : 0}%
+              </span>
+            </div>
+            <div
+              className="relative w-full overflow-hidden"
+              style={{
+                height: 14,
+                borderRadius: 4,
+                background: "rgba(0,0,0,0.6)",
+                border: "1px solid rgba(243,139,168,0.3)",
+                boxShadow: "0 0 10px rgba(243,139,168,0.12)",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  height: "100%",
+                  width: `${bossMaxHealth > 0 ? Math.max(0, Math.min(100, (bossHealth / bossMaxHealth) * 100)) : 0}%`,
+                  background: "linear-gradient(90deg, #c0364a, #f38ba8)",
+                  borderRadius: 4,
+                  transition: "width 0.08s linear",
+                  boxShadow: "0 0 8px rgba(243,139,168,0.5)",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  right: 0,
+                  height: "40%",
+                  borderRadius: "4px 4px 0 0",
+                  background: "rgba(255,255,255,0.06)",
+                  pointerEvents: "none",
+                }}
+              />
+              {[25, 50, 75].map((pct) => (
+                <div
+                  key={pct}
+                  style={{
+                    position: "absolute",
+                    left: `${pct}%`,
+                    top: 1,
+                    bottom: 1,
+                    width: 1,
+                    background: "rgba(0,0,0,0.5)",
+                  }}
+                />
+              ))}
             </div>
           </div>
         )}
