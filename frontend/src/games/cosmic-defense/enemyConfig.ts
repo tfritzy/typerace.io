@@ -84,7 +84,7 @@ export interface EnemyConfig {
   isBoss: boolean;
 }
 
-const ENEMY_DEFAULTS = { sizeScale: 1, speedMultiplier: 1, isBoss: false } satisfies Pick<EnemyConfig, "sizeScale" | "speedMultiplier" | "isBoss">;
+const ENEMY_DEFAULTS = { xpReward: 0, sizeScale: 1, speedMultiplier: 1, isBoss: false };
 
 export interface FriendlyConfig {
   entityType: EntityType;
