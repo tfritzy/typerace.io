@@ -11,12 +11,12 @@ import {
 } from "spacetimedb";
 
 export default __t.row({
-  id: __t.string().primaryKey(),
-  gameId: __t.string(),
-  language: __t.string(),
-  playerId: __t.identity(),
-  playerName: __t.string(),
-  value: __t.i32(),
-  timestamp: __t.i64(),
-  timeMs: __t.i64(),
+  id: __t.string().primaryKey().name("Id"),
+  gameId: __t.string().name("GameId"),
+  language: __t.string().name("Language"),
+  playerId: __t.identity().name("PlayerId"),
+  playerName: __t.string().name("PlayerName"),
+  value: __t.i32().name("Value"),
+  timestamp: __t.i64().name("Timestamp"),
+  timeMs: __t.i64().name("TimeMs"),
 });

@@ -15,21 +15,21 @@ import GameState from "./game_state_type";
 
 
 export default __t.row({
-  id: __t.string().primaryKey(),
-  phrase: __t.string(),
-  createdAt: __t.i64(),
-  racingStartedAt: __t.i64(),
-  countdownDurationMs: __t.i64(),
+  id: __t.string().primaryKey().name("Id"),
+  phrase: __t.string().name("Phrase"),
+  createdAt: __t.i64().name("CreatedAt"),
+  racingStartedAt: __t.i64().name("RacingStartedAt"),
+  countdownDurationMs: __t.i64().name("CountdownDurationMs"),
   get state() {
-    return GameState;
+    return GameState.name("State");
   },
   get gameMode() {
-    return GameMode;
+    return GameMode.name("GameMode");
   },
   get gameType() {
-    return GameType;
+    return GameType.name("GameType");
   },
-  placements: __t.array(__t.identity()),
-  owner: __t.option(__t.identity()),
-  attribution: __t.option(__t.string()),
+  placements: __t.array(__t.identity()).name("Placements"),
+  owner: __t.option(__t.identity()).name("Owner"),
+  attribution: __t.option(__t.string()).name("Attribution"),
 });

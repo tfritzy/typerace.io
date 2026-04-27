@@ -13,23 +13,23 @@ import PlayerColor from "./player_color_type";
 
 
 export default __t.row({
-  id: __t.string().primaryKey(),
-  playerId: __t.identity(),
-  playerPublicId: __t.string(),
-  gameId: __t.string(),
-  playerName: __t.string(),
-  playerLevel: __t.i32(),
-  progressIndex: __t.i32(),
-  isBot: __t.bool(),
-  isAnonymous: __t.bool(),
-  createdAt: __t.i64(),
-  characterHistory: __t.byteArray(),
-  time: __t.i64(),
-  placement: __t.i32(),
-  joinCode: __t.string(),
-  wpm: __t.f64(),
+  id: __t.string().primaryKey().name("Id"),
+  playerId: __t.identity().name("PlayerId"),
+  playerPublicId: __t.string().name("PlayerPublicId"),
+  gameId: __t.string().name("GameId"),
+  playerName: __t.string().name("PlayerName"),
+  playerLevel: __t.i32().name("PlayerLevel"),
+  progressIndex: __t.i32().name("ProgressIndex"),
+  isBot: __t.bool().name("IsBot"),
+  isAnonymous: __t.bool().name("IsAnonymous"),
+  createdAt: __t.i64().name("CreatedAt"),
+  characterHistory: __t.byteArray().name("CharacterHistory"),
+  time: __t.i64().name("Time"),
+  placement: __t.i32().name("Placement"),
+  joinCode: __t.string().name("JoinCode"),
+  wpm: __t.f64().name("Wpm"),
   get playerColor() {
-    return PlayerColor;
+    return PlayerColor.name("PlayerColor");
   },
-  highestProgress: __t.i32(),
+  highestProgress: __t.i32().name("HighestProgress"),
 });

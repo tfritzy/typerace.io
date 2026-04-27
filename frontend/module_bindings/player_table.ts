@@ -14,23 +14,23 @@ import PlayerColor from "./player_color_type";
 
 
 export default __t.row({
-  identity: __t.identity().primaryKey(),
-  playerId: __t.string(),
-  name: __t.string(),
-  totalGames: __t.i32(),
-  wins: __t.i32(),
-  level: __t.i32(),
-  xp: __t.i32(),
-  xpRequiredForNextLevel: __t.i32(),
-  totalWordsTyped: __t.i32(),
-  totalTimeSpentMs: __t.i64(),
-  isBot: __t.bool(),
+  identity: __t.identity().primaryKey().name("Identity"),
+  playerId: __t.string().name("PlayerId"),
+  name: __t.string().name("Name"),
+  totalGames: __t.i32().name("TotalGames"),
+  wins: __t.i32().name("Wins"),
+  level: __t.i32().name("Level"),
+  xp: __t.i32().name("Xp"),
+  xpRequiredForNextLevel: __t.i32().name("XpRequiredForNextLevel"),
+  totalWordsTyped: __t.i32().name("TotalWordsTyped"),
+  totalTimeSpentMs: __t.i64().name("TotalTimeSpentMs"),
+  isBot: __t.bool().name("IsBot"),
   get botConfig() {
-    return __t.option(BotConfig);
+    return __t.option(BotConfig).name("BotConfig");
   },
   get color() {
-    return PlayerColor;
+    return PlayerColor.name("Color");
   },
-  isAnonymous: __t.bool(),
-  lastGameDate: __t.i64(),
+  isAnonymous: __t.bool().name("IsAnonymous"),
+  lastGameDate: __t.i64().name("LastGameDate"),
 });

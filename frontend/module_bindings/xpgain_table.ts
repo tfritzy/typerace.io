@@ -13,13 +13,13 @@ import XpMultiplier from "./xp_multiplier_type";
 
 
 export default __t.row({
-  id: __t.string().primaryKey(),
-  playerId: __t.identity(),
-  gameId: __t.string(),
-  timestamp: __t.i64(),
-  baseXp: __t.i32(),
+  id: __t.string().primaryKey().name("Id"),
+  playerId: __t.identity().name("PlayerId"),
+  gameId: __t.string().name("GameId"),
+  timestamp: __t.i64().name("Timestamp"),
+  baseXp: __t.i32().name("BaseXp"),
   get multipliers() {
-    return __t.array(XpMultiplier);
+    return __t.array(XpMultiplier).name("Multipliers");
   },
-  totalXp: __t.i32(),
+  totalXp: __t.i32().name("TotalXp"),
 });
