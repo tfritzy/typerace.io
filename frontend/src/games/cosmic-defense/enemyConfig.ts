@@ -100,7 +100,7 @@ const BOSS_XP_MULTIPLIER = 5;
 const BOSS_SIZE_SCALE = 2.2;
 const BOSS_SPEED_MULTIPLIER = 0.45;
 
-function roundBossValue(value: number): number {
+function roundToNearestEven(value: number): number {
   const floor = Math.floor(value);
   const fraction = value - floor;
   if (fraction !== 0.5) return Math.round(value);
@@ -111,18 +111,18 @@ function calculateEnemyPower(health: number): number {
   return Math.floor((health * ENEMY_POWER_HEALTH_RATIO) / ENEMY_POWER_ROUNDING) * ENEMY_POWER_ROUNDING;
 }
 
-function calculateEnemyXpReward(power: number, tier: number): number {
-  const rewardTier = tier + 1;
+function calculateEnemyXpReward(power: number, zeroBasedTier: number): number {
+  const rewardTier = zeroBasedTier + 1;
   return Math.round(Math.pow(power, ENEMY_XP_POWER_EXPONENT) * ENEMY_XP_POWER_SCALE + rewardTier * ENEMY_XP_TIER_BONUS);
 }
 
-function createEnemyConfig(baseConfig: EnemyBaseConfig, tier: number): EnemyConfig {
+function createEnemyConfig(baseConfig: EnemyBaseConfig, zeroBasedTier: number): EnemyConfig {
   const power = calculateEnemyPower(baseConfig.health);
   return {
     ...ENEMY_DEFAULTS,
     ...baseConfig,
     power,
-    xpReward: calculateEnemyXpReward(power, tier),
+    xpReward: calculateEnemyXpReward(power, zeroBasedTier),
   };
 }
 
@@ -130,8 +130,8 @@ function createBossConfig(config: EnemyConfig): EnemyConfig {
   return {
     ...config,
     health: config.health * BOSS_HEALTH_MULTIPLIER,
-    power: roundBossValue(config.power * BOSS_POWER_MULTIPLIER),
-    projectileDamage: roundBossValue(config.projectileDamage * BOSS_PROJECTILE_DAMAGE_MULTIPLIER),
+    power: roundToNearestEven(config.power * BOSS_POWER_MULTIPLIER),
+    projectileDamage: roundToNearestEven(config.projectileDamage * BOSS_PROJECTILE_DAMAGE_MULTIPLIER),
     xpReward: config.xpReward * BOSS_XP_MULTIPLIER,
     sizeScale: BOSS_SIZE_SCALE,
     speedMultiplier: BOSS_SPEED_MULTIPLIER,
@@ -183,7 +183,7 @@ const ENEMY_BASE_CATALOG: EnemyBaseConfig[] = [
   { entityType: "Flagship", health: 16313, fireRate: 0.6, projectileDamage: 530, projectileType: ProjectileType.Projectile6, range: 720 },
 ];
 
-export const ENEMY_CATALOG: EnemyConfig[] = ENEMY_BASE_CATALOG.map((baseConfig, tier) => createEnemyConfig(baseConfig, tier));
+export const ENEMY_CATALOG: EnemyConfig[] = ENEMY_BASE_CATALOG.map((baseConfig, zeroBasedTier) => createEnemyConfig(baseConfig, zeroBasedTier));
 
 export const BOSS_CATALOG: EnemyConfig[] = ENEMY_CATALOG.map(createBossConfig);
 
