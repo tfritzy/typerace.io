@@ -1,9 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useMatch } from "react-router-dom";
-import { useDatabase } from "../../contexts/SpacetimeContext";
 import { getLanguageFromSlug } from "../../utils/modes";
-import { createScoreProof } from "../../utils/scoreProof";
-import { throttle } from "../../utils/throttle";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
@@ -12,15 +9,14 @@ import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
 import { PlacementOverlay } from "./PlacementOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
+import { ScoreHud } from "./ScoreHud";
 import { ShipChoiceOverlay } from "./ShipChoiceOverlay";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
 const UI_REFERENCE_WIDTH = 700;
-const SCORE_PUBLISH_INTERVAL_MS = 10_000;
 
 export const GameCanvas = () => {
-  const conn = useDatabase();
   const languageGameMatch = useMatch("/:lang/games/:gameId");
   const gameMatch = useMatch("/games/:gameId");
   const gameId = languageGameMatch?.params.gameId ?? gameMatch?.params.gameId ?? "";
@@ -36,21 +32,7 @@ export const GameCanvas = () => {
   const [level, setLevel] = useState(1);
   const [xp, setXp] = useState(0);
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
-  const [score, setScore] = useState(0);
   const [totalKills, setTotalKills] = useState(0);
-  const publishScore = useMemo(
-    () =>
-      throttle((nextScore: number) => {
-        if (!conn) return;
-        conn.reducers.publishScore({
-          gameId,
-          language,
-          score: nextScore,
-          scoreProof: createScoreProof(gameId, language, nextScore),
-        });
-      }, SCORE_PUBLISH_INTERVAL_MS),
-    [conn, gameId, language]
-  );
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -77,7 +59,7 @@ export const GameCanvas = () => {
 
   useEffect(() => {
     const div = containerRef.current;
-    if (!div) return;
+    if (!div || !gameId || !language) return;
 
     let cancelled = false;
     let unsubLevelUp: (() => void) | null = null;
@@ -95,7 +77,6 @@ export const GameCanvas = () => {
         setPendingChoice(game.state.pendingChoice);
         setLevel(game.state.level);
         setXp(game.state.xp);
-        setScore(game.state.score);
         setTotalKills(game.state.totalKills);
         setXpNeeded(xpForNextLevel(game.state.level));
         unsubLevelUp = game.state.onLevelUp.subscribe(() => {
@@ -108,9 +89,7 @@ export const GameCanvas = () => {
           setXpNeeded(data.xpNeeded);
         });
         unsubEnemyEntityDeath = game.state.onEnemyEntityDeath.subscribe(() => {
-          setScore(game.state.score);
           setTotalKills(game.state.totalKills);
-          publishScore(game.state.score);
         });
       })
       .catch((err) => {
@@ -122,11 +101,10 @@ export const GameCanvas = () => {
       unsubLevelUp?.();
       unsubXPChanged?.();
       unsubEnemyEntityDeath?.();
-      publishScore.cancel();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
-  }, [publishScore]);
+  }, [gameId, language]);
 
   const handleSlotClick = useCallback((slot: PlacementSlot) => {
     if (pendingChoice) return;
@@ -228,6 +206,7 @@ export const GameCanvas = () => {
               />
             </div>
           </div>
+          <ScoreHud game={gameRef.current} gameId={gameId} language={language} />
           <div className="flex items-center gap-2 mt-1">
             <div className="w-8 h-8 rounded border border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.04)]" />
             <div className="w-8 h-8 rounded border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)]" />
@@ -235,10 +214,6 @@ export const GameCanvas = () => {
             <div className="flex items-center gap-1">
               <span className="text-[12px]">💀</span>
               <span className="text-[11px] text-[#a6adc8] font-semibold">{totalKills}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-[11px] text-[#585b70]">Score</span>
-              <span className="text-[11px] text-[#cdd6f4] font-semibold">{score.toLocaleString()}</span>
             </div>
           </div>
         </div>
