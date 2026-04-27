@@ -310,8 +310,8 @@ function spawnInRightThird(): { x: number; y: number } {
 
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
   const { x, y } = spawnInRightThird();
-  const { speedMultiplier, ...entityConfig } = config;
-  const speed = (ENEMY_BASE_SPEED + Math.random() * ENEMY_SPEED_VARIANCE) * ENEMY_SPEED_FACTOR * speedMultiplier;
+  const { speedMultiplier: configuredSpeedMultiplier, ...entityConfig } = config;
+  const speed = (ENEMY_BASE_SPEED + Math.random() * ENEMY_SPEED_VARIANCE) * ENEMY_SPEED_FACTOR * configuredSpeedMultiplier;
   const baseEntity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
   const entity: EntityState = {
     ...baseEntity,
