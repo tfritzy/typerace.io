@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, ExplosionType, Team, getExplosionType } from "./types";
-import { ENEMY_CATALOG, BOSS_CATALOG, SHIP_HITBOX_MAP, type BossConfig, type EnemyConfig, type FriendlyConfig, xpForEnemy, getScaledConfig } from "./enemyConfig";
+import { ENEMY_CATALOG, BOSS_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, xpForEnemy, getScaledConfig } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 
 export const PLANET_X = 200;
@@ -171,7 +171,6 @@ export interface GameState {
   onXPChanged: GameDataEvent<XPData>;
   onLevelUp: GameEvent;
   onBossApproaching: GameEvent;
-  onBossSpawned: GameEvent;
 }
 
 let gameState: GameState | null = null;
@@ -222,7 +221,6 @@ export function createGameState(): GameState {
     onXPChanged: new GameDataEvent<XPData>(),
     onLevelUp: new GameEvent(),
     onBossApproaching: new GameEvent(),
-    onBossSpawned: new GameEvent(),
   };
 
   gameState = state;
@@ -309,47 +307,22 @@ function spawnInRightThird(): { x: number; y: number } {
 
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
   const { x, y } = spawnInRightThird();
-  const speed = (30 + Math.random() * 52.5) * 0.75;
-  const entity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
-  entity.health = config.health;
-  entity.maxHealth = config.health;
-  entity.power = config.power;
-  entity.fireRate = config.fireRate;
-  entity.projectileDamage = config.projectileDamage;
-  entity.projectileType = config.projectileType;
-  entity.fireTimer = Math.random() * config.fireRate;
-  entity.rotation = Math.PI;
-  entity.displayRotation = Math.PI;
-  entity.speed = speed;
-  entity.vx = -speed;
-  entity.xpReward = xpForEnemy(config);
-  entity.range = config.range;
-  addEntity(state, entity);
-}
-
-function spawnBossEntity(state: GameState, config: BossConfig): void {
-  const { x, y } = spawnInRightThird();
   const speed = (30 + Math.random() * 52.5) * 0.75 * config.speedMultiplier;
-  const entity = makeBaseEntity(state, config.entityType, x, y, Team.Enemy, ColorPreset.Preset4);
-  entity.health = config.health;
-  entity.maxHealth = config.health;
-  entity.power = config.power;
-  entity.fireRate = config.fireRate;
-  entity.projectileDamage = config.projectileDamage;
-  entity.projectileType = config.projectileType;
-  entity.fireTimer = Math.random() * config.fireRate;
-  entity.rotation = Math.PI;
-  entity.displayRotation = Math.PI;
-  entity.speed = speed;
-  entity.vx = -speed;
-  entity.xpReward = config.xpReward;
-  entity.range = config.range;
-  entity.sizeScale = config.sizeScale;
-  entity.isBoss = true;
-  entity.hitHalfW *= config.sizeScale;
-  entity.hitHalfH *= config.sizeScale;
+  const baseEntity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
+  const entity: EntityState = {
+    ...baseEntity,
+    ...config,
+    maxHealth: config.health,
+    fireTimer: Math.random() * config.fireRate,
+    rotation: Math.PI,
+    displayRotation: Math.PI,
+    speed,
+    vx: -speed,
+    hitHalfW: baseEntity.hitHalfW * config.sizeScale,
+    hitHalfH: baseEntity.hitHalfH * config.sizeScale,
+    xpReward: xpForEnemy(config),
+  };
   addEntity(state, entity);
-  state.onBossSpawned.emit();
 }
 
 export function spawnAlliedEntity(
@@ -793,7 +766,7 @@ const TIER_OFFSET = 30;
 const BASE_SPAWN_RATE = 0.6;
 const MAX_SPAWN_RATE = 4.0;
 const SPAWN_RAMP_TIME = 240;
-const BOSS_WARNING_LEAD_TIME = 4;
+export const BOSS_WARNING_LEAD_TIME = 4;
 const BOSS_SPAWN_TIME_OFFSET = TIER_SPREAD / 2;
 const BOSS_TIER_COUNT = BOSS_CATALOG.length - 1;
 
@@ -856,7 +829,7 @@ export function updateSpawner(state: GameState, dt: number): void {
       state.onBossApproaching.emit();
     }
     if (state.spawner.elapsed >= bossSpawnTime) {
-      spawnBossEntity(state, BOSS_CATALOG[bossTier]);
+      spawnEntity(state, BOSS_CATALOG[bossTier], Team.Enemy);
       state.spawner.nextBossTier++;
     }
   }

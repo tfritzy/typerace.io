@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
-import { TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
+import { BOSS_WARNING_LEAD_TIME, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
 import type { EntityState } from "./state";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
@@ -12,7 +12,7 @@ import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
 const UI_REFERENCE_WIDTH = 700;
-const BOSS_ANNOUNCEMENT_DURATION_MS = 4000;
+const BOSS_ANNOUNCEMENT_DURATION_MS = BOSS_WARNING_LEAD_TIME * 1000;
 
 export const GameCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -62,7 +62,6 @@ export const GameCanvas = () => {
     let unsubXPChanged: (() => void) | null = null;
     let unsubEnemyEntityDeath: (() => void) | null = null;
     let unsubBossApproaching: (() => void) | null = null;
-    let unsubBossSpawned: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -97,9 +96,6 @@ export const GameCanvas = () => {
             if (!cancelled) setBossApproaching(false);
           }, BOSS_ANNOUNCEMENT_DURATION_MS);
         });
-        unsubBossSpawned = game.state.onBossSpawned.subscribe(() => {
-          setBossApproaching(false);
-        });
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -111,7 +107,6 @@ export const GameCanvas = () => {
       unsubXPChanged?.();
       unsubEnemyEntityDeath?.();
       unsubBossApproaching?.();
-      unsubBossSpawned?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
