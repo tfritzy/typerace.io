@@ -100,7 +100,7 @@ const BOSS_XP_MULTIPLIER = 5;
 const BOSS_SIZE_SCALE = 2.2;
 const BOSS_SPEED_MULTIPLIER = 0.45;
 
-function roundHalfEven(value: number): number {
+function roundBossValue(value: number): number {
   const floor = Math.floor(value);
   const fraction = value - floor;
   if (fraction !== 0.5) return Math.round(value);
@@ -112,7 +112,8 @@ function calculateEnemyPower(health: number): number {
 }
 
 function calculateEnemyXpReward(power: number, tier: number): number {
-  return Math.round(Math.pow(power, ENEMY_XP_POWER_EXPONENT) * ENEMY_XP_POWER_SCALE + tier * ENEMY_XP_TIER_BONUS);
+  const rewardTier = tier + 1;
+  return Math.round(Math.pow(power, ENEMY_XP_POWER_EXPONENT) * ENEMY_XP_POWER_SCALE + rewardTier * ENEMY_XP_TIER_BONUS);
 }
 
 function createEnemyConfig(baseConfig: EnemyBaseConfig, tier: number): EnemyConfig {
@@ -129,8 +130,8 @@ function createBossConfig(config: EnemyConfig): EnemyConfig {
   return {
     ...config,
     health: config.health * BOSS_HEALTH_MULTIPLIER,
-    power: roundHalfEven(config.power * BOSS_POWER_MULTIPLIER),
-    projectileDamage: roundHalfEven(config.projectileDamage * BOSS_PROJECTILE_DAMAGE_MULTIPLIER),
+    power: roundBossValue(config.power * BOSS_POWER_MULTIPLIER),
+    projectileDamage: roundBossValue(config.projectileDamage * BOSS_PROJECTILE_DAMAGE_MULTIPLIER),
     xpReward: config.xpReward * BOSS_XP_MULTIPLIER,
     sizeScale: BOSS_SIZE_SCALE,
     speedMultiplier: BOSS_SPEED_MULTIPLIER,
