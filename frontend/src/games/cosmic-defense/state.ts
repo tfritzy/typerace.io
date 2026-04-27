@@ -7,7 +7,7 @@ export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
-const INSTANT_SCORE_PER_XP = 10;
+const SCORE_PER_XP = 10;
 
 export enum TargetingMode {
   NearestToShip = 0,
@@ -132,6 +132,10 @@ export interface XPData {
   xpNeeded: number;
 }
 
+export interface ScoreData {
+  score: number;
+}
+
 export interface LaserBeam {
   id: number;
   x1: number;
@@ -165,6 +169,7 @@ export interface GameState {
   onDamageDealt: GameDataEvent<DamageData>;
   onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
   onXPChanged: GameDataEvent<XPData>;
+  onScoreChanged: GameDataEvent<ScoreData>;
   onLevelUp: GameEvent;
 }
 
@@ -212,6 +217,7 @@ export function createGameState(): GameState {
     onDamageDealt: new GameDataEvent<DamageData>(),
     onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
     onXPChanged: new GameDataEvent<XPData>(),
+    onScoreChanged: new GameDataEvent<ScoreData>(),
     onLevelUp: new GameEvent(),
   };
 
@@ -438,7 +444,8 @@ function dealDamageToEntity(
     if (target.team === Team.Enemy) {
       state.totalKills++;
       const xpAmount = target.xpReward;
-      state.score += xpAmount * INSTANT_SCORE_PER_XP;
+      state.score += xpAmount * SCORE_PER_XP;
+      state.onScoreChanged.emit({ score: state.score });
       state.onEnemyEntityDeath.emit({
         x: target.x,
         y: target.y,

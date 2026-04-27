@@ -9,17 +9,10 @@ import {
   type AlgebraicTypeType as __AlgebraicTypeType,
   type Infer as __Infer,
 } from "spacetimedb";
-import XpMultiplier from "./xp_multiplier_type";
 
-
-export default __t.row({
-  id: __t.string().primaryKey(),
-  playerId: __t.identity(),
+export default {
   gameId: __t.string(),
-  timestamp: __t.i64(),
-  baseXp: __t.i32(),
-  get multipliers() {
-    return __t.array(XpMultiplier);
-  },
-  totalXp: __t.i32(),
-});
+  language: __t.string(),
+  score: __t.i32(),
+  scoreProof: __t.i64(),
+};

@@ -9,27 +9,14 @@ import {
   type AlgebraicTypeType as __AlgebraicTypeType,
   type Infer as __Infer,
 } from "spacetimedb";
-import GameMode from "./game_mode_type";
-import GameType from "./game_type_type";
-
 
 export default __t.row({
   id: __t.string().primaryKey(),
-  playerId: __t.identity(),
   gameId: __t.string(),
-  get gameMode() {
-    return GameMode;
-  },
-  get gameType() {
-    return GameType;
-  },
-  year: __t.i32(),
-  month: __t.i32(),
-  date: __t.i64(),
+  language: __t.string(),
+  playerId: __t.identity(),
+  playerName: __t.string(),
+  value: __t.i32(),
+  timestamp: __t.i64(),
   timeMs: __t.i64(),
-  placement: __t.i32(),
-  wpm: __t.f64(),
-  xpGained: __t.i32(),
-  eloChange: __t.i32(),
-  day: __t.string(),
 });
