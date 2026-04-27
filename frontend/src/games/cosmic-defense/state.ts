@@ -382,18 +382,17 @@ function findNearestTarget(
   const mode = entity.targetingMode;
 
   if (mode === TargetingMode.Random) {
-    let randomCount = 0;
-    for (const other of state.entities) {
-      if (other.team !== Team.Enemy) continue;
-      randomCount++;
-      if (randomCount === 1 || Math.random() * randomCount < 1) {
-        _targetResult.x = other.x;
-        _targetResult.y = other.y;
-        _targetResult.entity = other;
-        found = true;
-      }
+    if (!state.entities.some((other) => other.team === Team.Enemy)) {
+      return null;
     }
-    return found ? _targetResult : null;
+    let target = state.entities[Math.floor(Math.random() * state.entities.length)];
+    while (target.team !== Team.Enemy) {
+      target = state.entities[Math.floor(Math.random() * state.entities.length)];
+    }
+    _targetResult.x = target.x;
+    _targetResult.y = target.y;
+    _targetResult.entity = target;
+    return _targetResult;
   }
 
   for (const other of state.entities) {
