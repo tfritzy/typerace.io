@@ -13,10 +13,10 @@ import GameMode from "./game_mode_type";
 
 
 export default __t.row({
-  id: __t.string().primaryKey().name("Id"),
-  playerId: __t.identity().name("PlayerId"),
+  id: __t.string().primaryKey(),
+  playerId: __t.identity(),
   get gameMode() {
-    return GameMode.name("GameMode");
+    return GameMode;
   },
-  rating: __t.i32().name("Rating"),
+  rating: __t.i32(),
 });

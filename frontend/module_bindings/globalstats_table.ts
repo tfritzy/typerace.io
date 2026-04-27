@@ -13,12 +13,12 @@ import GameModeCount from "./game_mode_count_type";
 
 
 export default __t.row({
-  date: __t.string().primaryKey().name("Date"),
+  date: __t.string().primaryKey(),
   get stats() {
-    return __t.array(GameModeCount).name("Stats");
+    return __t.array(GameModeCount);
   },
   get total() {
-    return GameModeCount.name("Total");
+    return GameModeCount;
   },
-  dailyActivePlayers: __t.i32().name("DailyActivePlayers"),
+  dailyActivePlayers: __t.i32(),
 });
