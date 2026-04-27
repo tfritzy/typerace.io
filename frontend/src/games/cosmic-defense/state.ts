@@ -8,6 +8,9 @@ export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
 const INSTANT_SCORE_PER_XP = 10;
+const ENEMY_BASE_SPEED = 30;
+const ENEMY_SPEED_VARIANCE = 52.5;
+const ENEMY_SPEED_FACTOR = 0.75;
 
 export enum TargetingMode {
   NearestToShip = 0,
@@ -307,10 +310,9 @@ function spawnInRightThird(): { x: number; y: number } {
 
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
   const { x, y } = spawnInRightThird();
-  const speed = (30 + Math.random() * 52.5) * 0.75 * config.speedMultiplier;
+  const { speedMultiplier, ...entityConfig } = config;
+  const speed = (ENEMY_BASE_SPEED + Math.random() * ENEMY_SPEED_VARIANCE) * ENEMY_SPEED_FACTOR * speedMultiplier;
   const baseEntity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
-  const { entityType, health, power, fireRate, projectileDamage, projectileType, range, xpReward, sizeScale, isBoss } = config;
-  const entityConfig = { entityType, health, power, fireRate, projectileDamage, projectileType, range, xpReward, sizeScale, isBoss };
   const entity: EntityState = {
     ...baseEntity,
     ...entityConfig,
@@ -320,8 +322,8 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     displayRotation: Math.PI,
     speed,
     vx: -speed,
-    hitHalfW: baseEntity.hitHalfW * config.sizeScale,
-    hitHalfH: baseEntity.hitHalfH * config.sizeScale,
+    hitHalfW: baseEntity.hitHalfW * entityConfig.sizeScale,
+    hitHalfH: baseEntity.hitHalfH * entityConfig.sizeScale,
     xpReward: xpForEnemy(config),
   };
   addEntity(state, entity);
