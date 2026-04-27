@@ -49,27 +49,25 @@ function LeaderboardTable<T extends GameScore | GameHighScore>({
   rows: T[];
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <div className="mb-3 border-b border-border pb-3">
-        <h2 className="text-base font-semibold text-foreground">{title}</h2>
-      </div>
+    <div>
+      <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {title}
+      </h2>
       {rows.length === 0 ? (
-        <div className="flex min-h-[160px] items-center justify-center">
-          <p className="text-sm text-muted-foreground">No scores yet.</p>
-        </div>
+        <p className="text-sm text-muted-foreground">No scores yet.</p>
       ) : (
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col">
           {rows.map((row, index) => (
             <div
               key={row.id}
-              className="grid grid-cols-[36px_32px_1fr_auto] items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-muted transition-colors"
+              className="grid grid-cols-[28px_28px_1fr_auto] items-center gap-2 py-1 text-sm"
             >
-              <span className="text-center text-muted-foreground tabular-nums">
-                #{index + 1}
+              <span className="text-muted-foreground tabular-nums text-right">
+                {index + 1}
               </span>
               {index < 3 ? (
                 <PlayerAvatar
-                  size={28}
+                  size={22}
                   identity={row.playerId.toHexString()}
                   placement={index + 1}
                 />
@@ -79,7 +77,7 @@ function LeaderboardTable<T extends GameScore | GameHighScore>({
               <span className="text-foreground truncate">
                 {row.playerName}
               </span>
-              <span className="text-accent-primary font-semibold tabular-nums">
+              <span className="text-accent-primary tabular-nums">
                 {row.value.toLocaleString()}
               </span>
             </div>
@@ -149,7 +147,7 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
   const allTimeScores = useMemo(() => sortByScore(highScores), [highScores]);
 
   return (
-    <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <section className="grid grid-cols-2 gap-8">
       <LeaderboardTable title="Top scores today" rows={dailyScores} />
       <LeaderboardTable title="All-time high scores" rows={allTimeScores} />
     </section>
