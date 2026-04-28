@@ -11,7 +11,7 @@ export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps)
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "c" || e.key === "C") {
+      if (e.key.toLowerCase() === "c") {
         e.preventDefault();
         onContinue();
       }
