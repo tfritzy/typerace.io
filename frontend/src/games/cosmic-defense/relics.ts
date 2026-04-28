@@ -3,7 +3,7 @@ export type RelicId = "stellar_core" | "void_crystal" | "charge_matrix";
 export interface RelicEffects {
   damageMultiplier: number;
   enemySpeedMultiplier: number;
-  chargeMultiplier: number;
+  extraChargePerKeystroke: number;
 }
 
 export interface RelicDefinition {
@@ -32,20 +32,24 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "charge_matrix",
     name: "Charge Matrix",
-    description: "Charged weapons accumulate 20% more charge per keystroke.",
+    description: "Charged weapons gain +1 charge per keystroke.",
     sprite: "/futuristic_pixel_icons/Blue Cosmic Ring.png",
-    effects: { chargeMultiplier: 1.2 },
+    effects: { extraChargePerKeystroke: 1 },
   },
 ];
 
+export const RELIC_MAP: Map<RelicId, RelicDefinition> = new Map(
+  RELIC_CATALOG.map((r) => [r.id, r])
+);
+
 export function computeRelicEffects(relics: RelicId[]): RelicEffects {
-  const result: RelicEffects = { damageMultiplier: 1, enemySpeedMultiplier: 1, chargeMultiplier: 1 };
+  const result: RelicEffects = { damageMultiplier: 1, enemySpeedMultiplier: 1, extraChargePerKeystroke: 0 };
   for (const relicId of relics) {
-    const def = RELIC_CATALOG.find((r) => r.id === relicId);
+    const def = RELIC_MAP.get(relicId);
     if (!def) continue;
     if (def.effects.damageMultiplier !== undefined) result.damageMultiplier *= def.effects.damageMultiplier;
     if (def.effects.enemySpeedMultiplier !== undefined) result.enemySpeedMultiplier *= def.effects.enemySpeedMultiplier;
-    if (def.effects.chargeMultiplier !== undefined) result.chargeMultiplier *= def.effects.chargeMultiplier;
+    if (def.effects.extraChargePerKeystroke !== undefined) result.extraChargePerKeystroke += def.effects.extraChargePerKeystroke;
   }
   return result;
 }

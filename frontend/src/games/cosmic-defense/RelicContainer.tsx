@@ -1,16 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import type { CosmicDefenseGame } from "./game";
-import { RELIC_CATALOG, type RelicId } from "./relics";
+import { RELIC_MAP, type RelicId } from "./relics";
 import { RelicDropOverlay } from "./RelicDropOverlay";
-
-const RELIC_BY_ID = new Map(RELIC_CATALOG.map((r) => [r.id, r]));
 
 interface RelicContainerProps {
   game: CosmicDefenseGame | null;
-  onPendingChange: (pending: boolean) => void;
 }
 
-export const RelicContainer = ({ game, onPendingChange }: RelicContainerProps) => {
+export const RelicContainer = ({ game }: RelicContainerProps) => {
   const [pendingRelic, setPendingRelic] = useState<RelicId | null>(null);
   const [collectedRelics, setCollectedRelics] = useState<RelicId[]>([]);
 
@@ -24,20 +21,19 @@ export const RelicContainer = ({ game, onPendingChange }: RelicContainerProps) =
     const unsub = game.state.onRelicDropped.subscribe((relicId) => {
       setCollectedRelics([...game.state.relics]);
       setPendingRelic(relicId);
-      onPendingChange(true);
     });
     return unsub;
-  }, [game, onPendingChange]);
+  }, [game]);
 
   const handleContinue = useCallback(() => {
     setPendingRelic(null);
-    onPendingChange(false);
-  }, [onPendingChange]);
+    game?.setPaused(false);
+  }, [game]);
 
   return (
     <>
       {collectedRelics.map((relicId) => {
-        const relic = RELIC_BY_ID.get(relicId);
+        const relic = RELIC_MAP.get(relicId);
         if (!relic) return null;
         return (
           <div

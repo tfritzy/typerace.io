@@ -38,7 +38,6 @@ export const GameCanvas = () => {
   const [totalKills, setTotalKills] = useState(0);
   const [bossApproaching, setBossApproaching] = useState(false);
   const [bossEntityId, setBossEntityId] = useState<number | null>(null);
-  const [relicPending, setRelicPending] = useState(false);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -49,8 +48,8 @@ export const GameCanvas = () => {
   useEffect(() => {
     const game = gameRef.current;
     if (!game) return;
-    game.setPaused(selectedSlot !== null || pendingChoice || relicPending);
-  }, [selectedSlot, pendingChoice, relicPending]);
+    game.setPaused(selectedSlot !== null || pendingChoice);
+  }, [selectedSlot, pendingChoice]);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -234,7 +233,7 @@ export const GameCanvas = () => {
           </div>
           <ScoreHud game={gameRef.current} gameId={gameId} language={language} />
           <div className="flex items-center gap-2 mt-1">
-            <RelicContainer game={gameRef.current} onPendingChange={setRelicPending} />
+            <RelicContainer game={gameRef.current} />
             <div className="flex-1" />
             <div className="flex items-center gap-1">
               <span className="text-[12px]">💀</span>
@@ -275,7 +274,7 @@ export const GameCanvas = () => {
             level={level}
           />
         )}
-        <PhraseOverlay gameRef={gameRef} isPaused={selectedSlot !== null || pendingChoice || relicPending} />
+        <PhraseOverlay gameRef={gameRef} isPaused={selectedSlot !== null || pendingChoice} />
       </div>
     </div>
   );

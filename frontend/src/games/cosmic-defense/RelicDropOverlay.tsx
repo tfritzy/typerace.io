@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from "react";
-import { RELIC_CATALOG, type RelicId } from "./relics";
+import { RELIC_MAP, type RelicId } from "./relics";
 
 interface RelicDropOverlayProps {
   relicId: RelicId;
@@ -7,11 +7,11 @@ interface RelicDropOverlayProps {
 }
 
 export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps) => {
-  const relic = RELIC_CATALOG.find((r) => r.id === relicId);
+  const relic = RELIC_MAP.get(relicId);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.code === "Space" || e.code === "Enter") {
+      if (e.key === "c" || e.key === "C") {
         e.preventDefault();
         onContinue();
       }
@@ -102,7 +102,7 @@ export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps)
                 color: "#f9e2af",
               }}
             >
-              Space
+              C
             </span>
           </button>
         </div>
