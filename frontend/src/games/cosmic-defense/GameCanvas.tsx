@@ -4,7 +4,8 @@ import { getLanguageFromSlug } from "../../utils/modes";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { BOSS_WARNING_LEAD_TIME_SECONDS, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
-import type { EntityState } from "./state";
+import type { EntityState, BossSpawnedData } from "./state";
+import { BossHealthBar } from "./BossHealthBar";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
 import { PlacementOverlay } from "./PlacementOverlay";
@@ -35,6 +36,7 @@ export const GameCanvas = () => {
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
   const [totalKills, setTotalKills] = useState(0);
   const [bossApproaching, setBossApproaching] = useState(false);
+  const [bossEntityId, setBossEntityId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -68,6 +70,8 @@ export const GameCanvas = () => {
     let unsubXPChanged: (() => void) | null = null;
     let unsubEnemyEntityDeath: (() => void) | null = null;
     let unsubBossApproaching: (() => void) | null = null;
+    let unsubBossSpawned: (() => void) | null = null;
+    let unsubBossDefeated: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -100,6 +104,14 @@ export const GameCanvas = () => {
             if (!cancelled) setBossApproaching(false);
           }, BOSS_ANNOUNCEMENT_DURATION_MS);
         });
+        unsubBossSpawned = game.state.onBossSpawned.subscribe((data: BossSpawnedData) => {
+          if (cancelled) return;
+          setBossEntityId(data.id);
+        });
+        unsubBossDefeated = game.state.onBossDefeated.subscribe(() => {
+          if (cancelled) return;
+          setBossEntityId(null);
+        });
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -111,6 +123,8 @@ export const GameCanvas = () => {
       unsubXPChanged?.();
       unsubEnemyEntityDeath?.();
       unsubBossApproaching?.();
+      unsubBossSpawned?.();
+      unsubBossDefeated?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -234,6 +248,9 @@ export const GameCanvas = () => {
               large disturbance in warp space detected
             </div>
           </div>
+        )}
+        {bossEntityId !== null && gameRef.current && (
+          <BossHealthBar state={gameRef.current.state} entityId={bossEntityId} />
         )}
         <PlacementOverlay
           slots={slots}

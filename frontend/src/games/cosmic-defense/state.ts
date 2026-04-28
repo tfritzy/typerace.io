@@ -143,6 +143,12 @@ export interface BossApproachingData {
   entityType: EntityType;
 }
 
+export interface BossSpawnedData {
+  id: number;
+  entityType: EntityType;
+  maxHealth: number;
+}
+
 export interface LaserBeam {
   id: number;
   x1: number;
@@ -179,6 +185,8 @@ export interface GameState {
   onScoreChanged: GameDataEvent<ScoreData>;
   onLevelUp: GameEvent;
   onBossApproaching: GameEvent;
+  onBossSpawned: GameDataEvent<BossSpawnedData>;
+  onBossDefeated: GameEvent;
 }
 
 let gameState: GameState | null = null;
@@ -230,6 +238,8 @@ export function createGameState(): GameState {
     onScoreChanged: new GameDataEvent<ScoreData>(),
     onLevelUp: new GameEvent(),
     onBossApproaching: new GameEvent(),
+    onBossSpawned: new GameDataEvent<BossSpawnedData>(),
+    onBossDefeated: new GameEvent(),
   };
 
   gameState = state;
@@ -329,6 +339,9 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
     hitHalfH: baseEntity.hitHalfH * config.sizeScale,
   };
   addEntity(state, entity);
+  if (entity.isBoss) {
+    state.onBossSpawned.emit({ id: entity.id, entityType: entity.entityType, maxHealth: entity.maxHealth });
+  }
 }
 
 export function spawnAlliedEntity(
@@ -479,6 +492,9 @@ function dealDamageToEntity(
         entityType: target.entityType,
         xpAmount,
       });
+      if (target.isBoss) {
+        state.onBossDefeated.emit();
+      }
     }
     const idx = state.entities.indexOf(target);
     if (idx >= 0) removeEntityAt(state, idx);
