@@ -1,11 +1,11 @@
 import { Container, Graphics } from "pixi.js";
 import { awardXP, type EntityDeathData, type GameState } from "./state";
 
-const GEM_SIZE = 4;
 const POP_SPEED = 100;
 const POP_DURATION = 0.3;
 const GRAVITY = 200;
-const GEM_MAX_LIFE = 3.0;
+const HOVER_DURATION = 1.5;
+const GEM_MAX_LIFE = 12.0;
 const COLLECTION_DIST = 8;
 const LERP_START = 0.5;
 const LERP_END = 12;
@@ -16,21 +16,35 @@ const TARGET_Y = 20;
 interface GemColors {
   fill: number;
   edge: number;
-  glow: number;
 }
 
-const GEM_TIERS: { minXp: number; colors: GemColors; size: number }[] = [
-  { minXp: 20, colors: { fill: 0xf9e2af, edge: 0xfab387, glow: 0xf9e2af }, size: 7 },
-  { minXp: 10, colors: { fill: 0xcba6f7, edge: 0xb4befe, glow: 0xcba6f7 }, size: 6 },
-  { minXp: 5, colors: { fill: 0x89b4fa, edge: 0x74c7ec, glow: 0x89b4fa }, size: 5 },
-  { minXp: 0, colors: { fill: 0xa6e3a1, edge: 0x94e2d5, glow: 0xa6e3a1 }, size: GEM_SIZE },
+interface GemType {
+  xp: number;
+  colors: GemColors;
+  size: number;
+}
+
+const GEM_TYPES: GemType[] = [
+  { xp: 3,  colors: { fill: 0xa6e3a1, edge: 0x94e2d5 }, size: 10 },
+  { xp: 9,  colors: { fill: 0x89b4fa, edge: 0x74c7ec }, size: 14 },
+  { xp: 25, colors: { fill: 0xcba6f7, edge: 0xb4befe }, size: 18 },
+  { xp: 70, colors: { fill: 0xf9e2af, edge: 0xfab387 }, size: 24 },
 ];
 
-function getTier(xp: number): typeof GEM_TIERS[number] {
-  for (const tier of GEM_TIERS) {
-    if (xp >= tier.minXp) return tier;
+function rollGemType(expectedXp: number): GemType {
+  if (expectedXp <= GEM_TYPES[0].xp) return GEM_TYPES[0];
+  if (expectedXp >= GEM_TYPES[GEM_TYPES.length - 1].xp) return GEM_TYPES[GEM_TYPES.length - 1];
+
+  for (let i = 0; i < GEM_TYPES.length - 1; i++) {
+    const lo = GEM_TYPES[i];
+    const hi = GEM_TYPES[i + 1];
+    if (expectedXp >= lo.xp && expectedXp <= hi.xp) {
+      const pHigh = (expectedXp - lo.xp) / (hi.xp - lo.xp);
+      return Math.random() < pHigh ? hi : lo;
+    }
   }
-  return GEM_TIERS[GEM_TIERS.length - 1];
+
+  return GEM_TYPES[GEM_TYPES.length - 1];
 }
 
 interface ActiveGem {
@@ -41,6 +55,8 @@ interface ActiveGem {
   vx: number;
   vy: number;
   xpAmount: number;
+  hoverX: number;
+  hoverY: number;
 }
 
 export class GemManager {
@@ -59,11 +75,11 @@ export class GemManager {
     });
   }
 
-  private spawn(x: number, y: number, xpAmount: number): void {
-    const tier = getTier(xpAmount);
+  private spawn(x: number, y: number, expectedXp: number): void {
+    const gemType = rollGemType(expectedXp);
     const g = new Graphics();
 
-    const s = tier.size;
+    const s = gemType.size;
     g.moveTo(0, -s);
     g.lineTo(s * 0.6, -s * 0.2);
     g.lineTo(s * 0.6, s * 0.4);
@@ -71,8 +87,8 @@ export class GemManager {
     g.lineTo(-s * 0.6, s * 0.4);
     g.lineTo(-s * 0.6, -s * 0.2);
     g.closePath();
-    g.fill({ color: tier.colors.fill, alpha: 0.9 });
-    g.stroke({ color: tier.colors.edge, width: 1.5, alpha: 1 });
+    g.fill({ color: gemType.colors.fill, alpha: 0.9 });
+    g.stroke({ color: gemType.colors.edge, width: 1.5, alpha: 1 });
 
     g.moveTo(-s * 0.3, -s * 0.5);
     g.lineTo(s * 0.1, -s * 0.1);
@@ -96,7 +112,9 @@ export class GemManager {
       y,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
-      xpAmount,
+      xpAmount: gemType.xp,
+      hoverX: x,
+      hoverY: y,
     });
   }
 
@@ -115,6 +133,16 @@ export class GemManager {
         gem.vy += GRAVITY * dt;
         gem.x += gem.vx * dt;
         gem.y += gem.vy * dt;
+        gem.hoverX = gem.x;
+        gem.hoverY = gem.y;
+        gem.g.x = gem.x;
+        gem.g.y = gem.y;
+      } else if (gem.elapsed < POP_DURATION + HOVER_DURATION) {
+        const hoverT = gem.elapsed - POP_DURATION;
+        gem.g.x = gem.hoverX;
+        gem.g.y = gem.hoverY + Math.sin(hoverT * Math.PI * 2.5) * 4;
+        gem.x = gem.hoverX;
+        gem.y = gem.hoverY;
       } else {
         const dx = TARGET_X - gem.x;
         const dy = TARGET_Y - gem.y;
@@ -127,14 +155,13 @@ export class GemManager {
           continue;
         }
 
-        const homingTime = gem.elapsed - POP_DURATION;
+        const homingTime = gem.elapsed - POP_DURATION - HOVER_DURATION;
         const t = 1 - Math.exp(-dt * (LERP_START + homingTime * LERP_END));
         gem.x += dx * t;
         gem.y += dy * t;
+        gem.g.x = gem.x;
+        gem.g.y = gem.y;
       }
-
-      gem.g.x = gem.x;
-      gem.g.y = gem.y;
 
       const easeInDur = 0.15;
       if (gem.elapsed < easeInDur) {
@@ -144,9 +171,9 @@ export class GemManager {
         gem.g.scale.set(1);
       }
 
-      const dist = Math.sqrt((TARGET_X - gem.x) ** 2 + (TARGET_Y - gem.y) ** 2);
+      const distToTarget = Math.sqrt((TARGET_X - gem.g.x) ** 2 + (TARGET_Y - gem.g.y) ** 2);
       const fadeDist = 40;
-      gem.g.alpha = dist < fadeDist ? dist / fadeDist : 1;
+      gem.g.alpha = distToTarget < fadeDist ? distToTarget / fadeDist : 1;
       gem.g.rotation = gem.elapsed * Math.PI * 3;
     }
   }
