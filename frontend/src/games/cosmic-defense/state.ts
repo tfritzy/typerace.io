@@ -555,6 +555,9 @@ export function updateState(state: GameState, dt: number): void {
   const prevSecond = Math.floor(state.time.time - dt);
   const curSecond = Math.floor(state.time.time);
   if (curSecond > prevSecond) {
+    if (state.relicEffects.planetRegenPerSecond > 0) {
+      state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetRegenPerSecond);
+    }
     for (let i = state.entities.length - 1; i >= 0; i--) {
       const e = state.entities[i];
       if (e.team !== Team.Enemy) continue;
@@ -815,10 +818,9 @@ function activateAbility(state: GameState, e: EntityState): void {
 }
 
 export function onCorrectKeystroke(state: GameState): void {
-  const chargesPerKeystroke = 1 + state.relicEffects.extraChargePerKeystroke;
   for (const e of state.entities) {
     if (e.chargesRequired <= 0) continue;
-    e.charge += chargesPerKeystroke;
+    e.charge += 1;
     activateAbility(state, e);
   }
 }

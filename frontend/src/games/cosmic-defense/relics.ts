@@ -3,7 +3,7 @@ export type RelicId = "stellar_core" | "void_crystal" | "charge_matrix";
 export interface RelicEffects {
   damageMultiplier: number;
   enemySpeedMultiplier: number;
-  extraChargePerKeystroke: number;
+  planetRegenPerSecond: number;
 }
 
 export interface RelicDefinition {
@@ -32,9 +32,9 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "charge_matrix",
     name: "Charge Matrix",
-    description: "Charged weapons gain +1 charge per keystroke.",
+    description: "The planet regenerates 2 HP per second.",
     sprite: "/futuristic_pixel_icons/Blue Cosmic Ring.png",
-    effects: { extraChargePerKeystroke: 1 },
+    effects: { planetRegenPerSecond: 2 },
   },
 ];
 
@@ -43,13 +43,13 @@ export const RELIC_MAP: Map<RelicId, RelicDefinition> = new Map(
 );
 
 export function computeRelicEffects(relics: RelicId[]): RelicEffects {
-  const result: RelicEffects = { damageMultiplier: 1, enemySpeedMultiplier: 1, extraChargePerKeystroke: 0 };
+  const result: RelicEffects = { damageMultiplier: 1, enemySpeedMultiplier: 1, planetRegenPerSecond: 0 };
   for (const relicId of relics) {
     const def = RELIC_MAP.get(relicId);
     if (!def) continue;
     if (def.effects.damageMultiplier !== undefined) result.damageMultiplier *= def.effects.damageMultiplier;
     if (def.effects.enemySpeedMultiplier !== undefined) result.enemySpeedMultiplier *= def.effects.enemySpeedMultiplier;
-    if (def.effects.extraChargePerKeystroke !== undefined) result.extraChargePerKeystroke += def.effects.extraChargePerKeystroke;
+    if (def.effects.planetRegenPerSecond !== undefined) result.planetRegenPerSecond += def.effects.planetRegenPerSecond;
   }
   return result;
 }
