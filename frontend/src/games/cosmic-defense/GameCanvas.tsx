@@ -3,7 +3,7 @@ import { useMatch } from "react-router-dom";
 import { getLanguageFromSlug } from "../../utils/modes";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
-import { BOSS_WARNING_LEAD_TIME_SECONDS, TargetingMode, levelUpEntity, xpForNextLevel, addRelic } from "./state";
+import { BOSS_WARNING_LEAD_TIME_SECONDS, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
 import type { EntityState, BossSpawnedData } from "./state";
 import { BossHealthBar } from "./BossHealthBar";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
@@ -12,8 +12,7 @@ import { PlacementOverlay } from "./PlacementOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
 import { ScoreHud } from "./ScoreHud";
 import { ShipChoiceOverlay } from "./ShipChoiceOverlay";
-import { RelicDropOverlay } from "./RelicDropOverlay";
-import { RELIC_CATALOG, type RelicId } from "./relics";
+import { RelicContainer } from "./RelicContainer";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
@@ -39,8 +38,7 @@ export const GameCanvas = () => {
   const [totalKills, setTotalKills] = useState(0);
   const [bossApproaching, setBossApproaching] = useState(false);
   const [bossEntityId, setBossEntityId] = useState<number | null>(null);
-  const [pendingRelic, setPendingRelic] = useState<RelicId | null>(null);
-  const [collectedRelics, setCollectedRelics] = useState<RelicId[]>([]);
+  const [relicPending, setRelicPending] = useState(false);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -51,8 +49,8 @@ export const GameCanvas = () => {
   useEffect(() => {
     const game = gameRef.current;
     if (!game) return;
-    game.setPaused(selectedSlot !== null || pendingChoice || pendingRelic !== null);
-  }, [selectedSlot, pendingChoice, pendingRelic]);
+    game.setPaused(selectedSlot !== null || pendingChoice || relicPending);
+  }, [selectedSlot, pendingChoice, relicPending]);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -76,7 +74,6 @@ export const GameCanvas = () => {
     let unsubBossApproaching: (() => void) | null = null;
     let unsubBossSpawned: (() => void) | null = null;
     let unsubBossDefeated: (() => void) | null = null;
-    let unsubRelicDropped: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -117,10 +114,6 @@ export const GameCanvas = () => {
           if (cancelled) return;
           setBossEntityId(null);
         });
-        unsubRelicDropped = game.state.onRelicDropped.subscribe((relicId) => {
-          if (cancelled) return;
-          setPendingRelic(relicId);
-        });
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -134,7 +127,6 @@ export const GameCanvas = () => {
       unsubBossApproaching?.();
       unsubBossSpawned?.();
       unsubBossDefeated?.();
-      unsubRelicDropped?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -179,15 +171,6 @@ export const GameCanvas = () => {
     game.state.spawner.paused = false;
     setPendingChoice(false);
   }, [slots]);
-
-  const handleRelicContinue = useCallback(() => {
-    const game = gameRef.current;
-    if (!game || !pendingRelic) return;
-    addRelic(game.state, pendingRelic);
-    setCollectedRelics((prev) => [...prev, pendingRelic]);
-    setPendingRelic(null);
-    game.state.spawner.paused = false;
-  }, [pendingRelic]);
 
   const handleCloseInspection = useCallback(() => {
     setSelectedSlot(null);
@@ -251,29 +234,7 @@ export const GameCanvas = () => {
           </div>
           <ScoreHud game={gameRef.current} gameId={gameId} language={language} />
           <div className="flex items-center gap-2 mt-1">
-            {collectedRelics.slice(0, 6).map((relicId, i) => {
-              const relic = RELIC_CATALOG.find((r) => r.id === relicId);
-              if (!relic) return null;
-              return (
-                <div
-                  key={i}
-                  className="w-8 h-8 rounded border border-[rgba(249,226,175,0.3)] bg-[rgba(249,226,175,0.06)] flex items-center justify-center"
-                  title={`${relic.name}: ${relic.description}`}
-                >
-                  <img
-                    src={relic.sprite}
-                    alt={relic.name}
-                    style={{ width: 22, height: 22, imageRendering: "pixelated" }}
-                  />
-                </div>
-              );
-            })}
-            {collectedRelics.length === 0 && (
-              <>
-                <div className="w-8 h-8 rounded border border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.04)]" />
-                <div className="w-8 h-8 rounded border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)]" />
-              </>
-            )}
+            <RelicContainer game={gameRef.current} onPendingChange={setRelicPending} />
             <div className="flex-1" />
             <div className="flex items-center gap-1">
               <span className="text-[12px]">💀</span>
@@ -314,10 +275,7 @@ export const GameCanvas = () => {
             level={level}
           />
         )}
-        {pendingRelic && (
-          <RelicDropOverlay relicId={pendingRelic} onContinue={handleRelicContinue} />
-        )}
-        <PhraseOverlay gameRef={gameRef} isPaused={selectedSlot !== null || pendingChoice || pendingRelic !== null} />
+        <PhraseOverlay gameRef={gameRef} isPaused={selectedSlot !== null || pendingChoice || relicPending} />
       </div>
     </div>
   );

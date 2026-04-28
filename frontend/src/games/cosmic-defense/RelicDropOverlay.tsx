@@ -8,7 +8,6 @@ interface RelicDropOverlayProps {
 
 export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps) => {
   const relic = RELIC_CATALOG.find((r) => r.id === relicId);
-  if (!relic) return null;
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -21,9 +20,12 @@ export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps)
   );
 
   useEffect(() => {
+    if (!relic) return;
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
+  }, [handleKeyDown, relic]);
+
+  if (!relic) return null;
 
   return (
     <>
