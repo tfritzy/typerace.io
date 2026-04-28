@@ -60,24 +60,21 @@ function LeaderboardTable<T extends GameScore | GameHighScore>({
           {rows.map((row, index) => (
             <div
               key={row.id}
-              className="grid grid-cols-[28px_28px_1fr_auto] items-center gap-2 py-1 text-sm"
+              className="grid grid-cols-[28px_1fr_auto] items-center gap-x-2 py-1 text-sm"
             >
-              {index < 3 ? (
-                <div aria-hidden="true" />
-              ) : (
-                <span className="text-muted-foreground tabular-nums text-right">
-                  {index + 1}
-                </span>
-              )}
-              {index < 3 ? (
-                <PlayerAvatar
-                  size={22}
-                  identity={row.playerId.toHexString()}
-                  placement={index + 1}
-                />
-              ) : (
-                <div aria-hidden="true" />
-              )}
+              <div className="flex items-center justify-center">
+                {index < 3 ? (
+                  <PlayerAvatar
+                    size={22}
+                    identity={row.playerId.toHexString()}
+                    placement={index + 1}
+                  />
+                ) : (
+                  <span className="text-muted-foreground tabular-nums text-center w-full">
+                    {index + 1}
+                  </span>
+                )}
+              </div>
               <span className="text-foreground truncate">
                 {row.playerName}
               </span>
