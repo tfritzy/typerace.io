@@ -2,6 +2,7 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, ExplosionType, Team, getExplosionType } from "./types";
 import { ENEMY_CATALOG, BOSS_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
+import { RELIC_CATALOG, type RelicId } from "./relics";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -178,6 +179,7 @@ export interface GameState {
   totalKills: number;
   level: number;
   pendingChoice: boolean;
+  relics: RelicId[];
   onPlanetDamaged: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
   onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
@@ -187,6 +189,7 @@ export interface GameState {
   onBossApproaching: GameEvent;
   onBossSpawned: GameDataEvent<BossSpawnedData>;
   onBossDefeated: GameEvent;
+  onRelicDropped: GameDataEvent<RelicId>;
 }
 
 let gameState: GameState | null = null;
@@ -231,6 +234,7 @@ export function createGameState(): GameState {
     totalKills: 0,
     level: 1,
     pendingChoice: true,
+    relics: [],
     onPlanetDamaged: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
     onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
@@ -240,6 +244,7 @@ export function createGameState(): GameState {
     onBossApproaching: new GameEvent(),
     onBossSpawned: new GameDataEvent<BossSpawnedData>(),
     onBossDefeated: new GameEvent(),
+    onRelicDropped: new GameDataEvent<RelicId>(),
   };
 
   gameState = state;
@@ -473,8 +478,14 @@ function dealDamageToEntity(
   target: EntityState,
   damage: number
 ): boolean {
-  target.health -= damage;
-  if (attacker) attacker.damageDealt += damage;
+  let effectiveDamage = damage;
+  if (attacker?.team === Team.Allied && effectiveDamage > 0) {
+    let stellarCount = 0;
+    for (const r of state.relics) if (r === "stellar_core") stellarCount++;
+    if (stellarCount > 0) effectiveDamage = Math.round(effectiveDamage * Math.pow(1.25, stellarCount));
+  }
+  target.health -= effectiveDamage;
+  if (attacker) attacker.damageDealt += effectiveDamage;
 
   const killed = target.health <= 0;
 
@@ -494,6 +505,8 @@ function dealDamageToEntity(
       });
       if (target.isBoss) {
         state.onBossDefeated.emit();
+        const relicIndex = (state.spawner.nextBossTier - 1) % RELIC_CATALOG.length;
+        state.onRelicDropped.emit(RELIC_CATALOG[relicIndex].id);
       }
     }
     const idx = state.entities.indexOf(target);
@@ -530,6 +543,10 @@ export function updateState(state: GameState, dt: number): void {
   state.time.time += dt;
 
   if (state.spawner.paused) return;
+
+  let voidCrystalCount = 0;
+  for (const r of state.relics) if (r === "void_crystal") voidCrystalCount++;
+  const enemySpeedMultiplier = voidCrystalCount > 0 ? Math.pow(0.7, voidCrystalCount) : 1;
 
   const prevSecond = Math.floor(state.time.time - dt);
   const curSecond = Math.floor(state.time.time);
@@ -576,7 +593,8 @@ export function updateState(state: GameState, dt: number): void {
     }
 
     if (!inRange && e.speed > 0 && !isFrozen) {
-      e.vx = -e.speed;
+      const effectiveSpeed = e.team === Team.Enemy ? e.speed * enemySpeedMultiplier : e.speed;
+      e.vx = -effectiveSpeed;
       e.vy = 0;
       e.x += e.vx * dt;
       e.y += e.vy * dt;
@@ -793,11 +811,18 @@ function activateAbility(state: GameState, e: EntityState): void {
 }
 
 export function onCorrectKeystroke(state: GameState): void {
+  let chargeMatrixCount = 0;
+  for (const r of state.relics) if (r === "charge_matrix") chargeMatrixCount++;
+  const chargesPerKeystroke = 1 + chargeMatrixCount;
   for (const e of state.entities) {
     if (e.chargesRequired <= 0) continue;
-    e.charge++;
+    e.charge += chargesPerKeystroke;
     activateAbility(state, e);
   }
+}
+
+export function addRelic(state: GameState, relicId: RelicId): void {
+  state.relics.push(relicId);
 }
 
 const TIER_SPREAD = 90;
