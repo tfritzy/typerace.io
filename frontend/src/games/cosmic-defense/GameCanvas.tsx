@@ -5,7 +5,7 @@ import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { BOSS_WARNING_LEAD_TIME_SECONDS, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
 import type { EntityState, BossSpawnedData } from "./state";
-import { BossHealthBar } from "../components/BossHealthBar";
+import { BossHealthBar } from "./BossHealthBar";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
 import { PlacementOverlay } from "./PlacementOverlay";
@@ -37,9 +37,6 @@ export const GameCanvas = () => {
   const [totalKills, setTotalKills] = useState(0);
   const [bossApproaching, setBossApproaching] = useState(false);
   const [bossEntityId, setBossEntityId] = useState<number | null>(null);
-  const [bossEntityType, setBossEntityType] = useState<string>("");
-  const [bossHealth, setBossHealth] = useState(0);
-  const [bossMaxHealth, setBossMaxHealth] = useState(0);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -110,9 +107,6 @@ export const GameCanvas = () => {
         unsubBossSpawned = game.state.onBossSpawned.subscribe((data: BossSpawnedData) => {
           if (cancelled) return;
           setBossEntityId(data.id);
-          setBossEntityType(data.entityType);
-          setBossMaxHealth(data.maxHealth);
-          setBossHealth(data.maxHealth);
         });
         unsubBossDefeated = game.state.onBossDefeated.subscribe(() => {
           if (cancelled) return;
@@ -135,21 +129,6 @@ export const GameCanvas = () => {
       gameRef.current = null;
     };
   }, [gameId, language]);
-
-  useEffect(() => {
-    if (!bossEntityId) return;
-    const interval = setInterval(() => {
-      const game = gameRef.current;
-      if (!game) return;
-      const entity = game.state.entityById.get(bossEntityId);
-      if (!entity) {
-        setBossEntityId(null);
-        return;
-      }
-      setBossHealth(Math.max(0, entity.health));
-    }, 150);
-    return () => clearInterval(interval);
-  }, [bossEntityId]);
 
   const handleSlotClick = useCallback((slot: PlacementSlot) => {
     if (pendingChoice) return;
@@ -270,8 +249,8 @@ export const GameCanvas = () => {
             </div>
           </div>
         )}
-        {bossEntityId !== null && (
-          <BossHealthBar health={bossHealth} maxHealth={bossMaxHealth} name={bossEntityType} />
+        {bossEntityId !== null && gameRef.current && (
+          <BossHealthBar state={gameRef.current.state} entityId={bossEntityId} />
         )}
         <PlacementOverlay
           slots={slots}

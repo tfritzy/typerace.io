@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 
-const GHOST_SHRINK_PER_SEC = 18;
-const GHOST_DELAY_MS = 300;
+const GHOST_SHRINK_PER_SEC = 36;
+const GHOST_DELAY_MS = 100;
 
-interface BossHealthBarProps {
+interface AnimatedHealthBarProps {
   health: number;
   maxHealth: number;
   name: string;
 }
 
-export const BossHealthBar = ({ health, maxHealth, name }: BossHealthBarProps) => {
+export const AnimatedHealthBar = ({ health, maxHealth, name }: AnimatedHealthBarProps) => {
   const toPct = (h: number) =>
     maxHealth > 0 ? Math.max(0, Math.min(100, (h / maxHealth) * 100)) : 0;
 
