@@ -815,10 +815,10 @@ function activateAbility(state: GameState, e: EntityState): void {
 }
 
 export function onCorrectKeystroke(state: GameState): void {
-  const chargesPerKeystroke = state.relicEffects.chargeMultiplier;
+  const chargeMultiplier = state.relicEffects.chargeMultiplier;
   for (const e of state.entities) {
     if (e.chargesRequired <= 0) continue;
-    e.charge += chargesPerKeystroke;
+    e.charge += chargeMultiplier;
     activateAbility(state, e);
   }
 }

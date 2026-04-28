@@ -3,6 +3,8 @@ import type { CosmicDefenseGame } from "./game";
 import { RELIC_CATALOG, type RelicId } from "./relics";
 import { RelicDropOverlay } from "./RelicDropOverlay";
 
+const RELIC_BY_ID = new Map(RELIC_CATALOG.map((r) => [r.id, r]));
+
 interface RelicContainerProps {
   game: CosmicDefenseGame | null;
   onPendingChange: (pending: boolean) => void;
@@ -35,7 +37,7 @@ export const RelicContainer = ({ game, onPendingChange }: RelicContainerProps) =
   return (
     <>
       {collectedRelics.map((relicId) => {
-        const relic = RELIC_CATALOG.find((r) => r.id === relicId);
+        const relic = RELIC_BY_ID.get(relicId);
         if (!relic) return null;
         return (
           <div
