@@ -148,9 +148,11 @@ export const ScoreLeaderboards = ({ gameId, language }: ScoreLeaderboardsProps) 
   const allTimeScores = useMemo(() => sortByScore(highScores), [highScores]);
 
   return (
-    <section className="grid grid-cols-2 gap-8">
-      <LeaderboardTable title="Top scores today" rows={dailyScores} />
-      <LeaderboardTable title="All-time high scores" rows={allTimeScores} />
+    <section className="mx-auto w-full max-w-2xl">
+      <div className="grid grid-cols-2 gap-8">
+        <LeaderboardTable title="Top scores today" rows={dailyScores} />
+        <LeaderboardTable title="All-time high scores" rows={allTimeScores} />
+      </div>
     </section>
   );
 };
