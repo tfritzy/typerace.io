@@ -75,8 +75,8 @@ export const PlayerAvatar = memo(({
         >
             {crownColor && (
                 <div
-                    className="absolute -top-[14px] left-1/2 -translate-x-1/2 z-10 animate-[crownDescend_0.6s_ease-out]"
-                    style={{ filter: `drop-shadow(0 -1px 6px ${crownColor})` }}
+                    className="absolute left-1/2 -translate-x-1/2 z-10 animate-[crownDescend_0.6s_ease-out]"
+                    style={{ top: -(size * 0.35), filter: `drop-shadow(0 -1px 6px ${crownColor})` }}
                 >
                     <Crown
                         size={size * 0.5}
