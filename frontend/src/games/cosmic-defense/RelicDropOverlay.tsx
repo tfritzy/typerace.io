@@ -7,7 +7,8 @@ interface RelicDropOverlayProps {
 }
 
 export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps) => {
-  const relic = RELIC_CATALOG.find((r) => r.id === relicId)!;
+  const relic = RELIC_CATALOG.find((r) => r.id === relicId);
+  if (!relic) return null;
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {

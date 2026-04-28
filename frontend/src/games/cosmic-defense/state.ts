@@ -505,8 +505,11 @@ function dealDamageToEntity(
       });
       if (target.isBoss) {
         state.onBossDefeated.emit();
-        const relicIndex = (state.spawner.nextBossTier - 1) % RELIC_CATALOG.length;
-        state.onRelicDropped.emit(RELIC_CATALOG[relicIndex].id);
+        const unowned = RELIC_CATALOG.filter((r) => !state.relics.includes(r.id));
+        if (unowned.length > 0) {
+          const relicIndex = (state.spawner.nextBossTier - 1) % unowned.length;
+          state.onRelicDropped.emit(unowned[relicIndex].id);
+        }
       }
     }
     const idx = state.entities.indexOf(target);

@@ -252,7 +252,8 @@ export const GameCanvas = () => {
           <ScoreHud game={gameRef.current} gameId={gameId} language={language} />
           <div className="flex items-center gap-2 mt-1">
             {collectedRelics.slice(0, 6).map((relicId, i) => {
-              const relic = RELIC_CATALOG.find((r) => r.id === relicId)!;
+              const relic = RELIC_CATALOG.find((r) => r.id === relicId);
+              if (!relic) return null;
               return (
                 <div
                   key={i}
