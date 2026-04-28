@@ -64,7 +64,7 @@ export class ExplosionManager {
     const textures = this.getExplosionTextures(exp.explosionType);
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
-    sprite.scale.set(EXPLOSION_SCALE);
+    sprite.scale.set(exp.halfScale ? EXPLOSION_SCALE * 0.5 : EXPLOSION_SCALE);
     sprite.animationSpeed = EXPLOSION_ANIMATION_SPEED;
     sprite.loop = false;
     sprite.onComplete = () => {

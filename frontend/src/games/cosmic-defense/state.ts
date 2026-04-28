@@ -75,6 +75,7 @@ export interface ExplosionState {
   x: number;
   y: number;
   explosionType: ExplosionType | undefined;
+  halfScale: boolean;
 }
 
 export interface SpawnState {
@@ -505,8 +506,8 @@ function dealDamageToEntity(
   return killed;
 }
 
-function spawnExplosion(state: GameState, entityType: EntityType, x: number, y: number): void {
-  state.explosions.push({ id: state.nextId++, x, y, explosionType: getExplosionType(entityType) });
+function spawnExplosion(state: GameState, entityType: EntityType, x: number, y: number, halfScale = false): void {
+  state.explosions.push({ id: state.nextId++, x, y, explosionType: getExplosionType(entityType), halfScale });
 }
 
 function performInstantHit(
@@ -515,7 +516,7 @@ function performInstantHit(
   target: { x: number; y: number; entity: EntityState | null },
   damage: number
 ): void {
-  spawnExplosion(state, shooter.entityType, target.x, target.y);
+  spawnExplosion(state, shooter.entityType, target.x, target.y, true);
 
   if (target.entity) {
     dealDamageToEntity(state, shooter, target.entity, damage);
@@ -620,7 +621,7 @@ export function updateState(state: GameState, dt: number): void {
       const target = shot.targetEntityId !== null ? state.entityById.get(shot.targetEntityId) : null;
       if (target) {
         if (shooter.plasmaStacksApplied > 0) target.plasmaStacks += shooter.plasmaStacksApplied;
-        spawnExplosion(state, shooter.entityType, target.x, target.y);
+        spawnExplosion(state, shooter.entityType, target.x, target.y, true);
         dealDamageToEntity(state, shooter, target, dmg);
       }
     }
@@ -716,7 +717,7 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
 
   while (currentTarget && chainsRemaining >= 0) {
     hitIds.add(currentTarget.id);
-    spawnExplosion(state, e.entityType, currentTarget.x, currentTarget.y);
+    spawnExplosion(state, e.entityType, currentTarget.x, currentTarget.y, true);
     dealDamageToEntity(state, e, currentTarget, dmg);
 
     chainsRemaining--;
