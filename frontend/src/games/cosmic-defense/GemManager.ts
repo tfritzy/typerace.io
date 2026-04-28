@@ -172,7 +172,6 @@ export class GemManager {
       const distToTarget = Math.sqrt((TARGET_X - gem.x) ** 2 + (TARGET_Y - gem.y) ** 2);
       const fadeDist = 40;
       gem.g.alpha = distToTarget < fadeDist ? distToTarget / fadeDist : 1;
-      gem.g.rotation = gem.elapsed * Math.PI * 3;
     }
   }
 
