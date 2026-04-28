@@ -141,8 +141,6 @@ export class GemManager {
         const hoverT = gem.elapsed - POP_DURATION;
         gem.g.x = gem.hoverX;
         gem.g.y = gem.hoverY + Math.sin(hoverT * Math.PI * 2.5) * 4;
-        gem.x = gem.hoverX;
-        gem.y = gem.hoverY;
       } else {
         const dx = TARGET_X - gem.x;
         const dy = TARGET_Y - gem.y;
@@ -171,7 +169,7 @@ export class GemManager {
         gem.g.scale.set(1);
       }
 
-      const distToTarget = Math.sqrt((TARGET_X - gem.g.x) ** 2 + (TARGET_Y - gem.g.y) ** 2);
+      const distToTarget = Math.sqrt((TARGET_X - gem.x) ** 2 + (TARGET_Y - gem.y) ** 2);
       const fadeDist = 40;
       gem.g.alpha = distToTarget < fadeDist ? distToTarget / fadeDist : 1;
       gem.g.rotation = gem.elapsed * Math.PI * 3;
