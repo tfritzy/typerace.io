@@ -224,11 +224,14 @@ export const GameCanvas = () => {
                 style={{
                   width: `${Math.min(100, (xp / xpNeeded) * 100)}%`,
                   borderRadius: 4,
-                  background: "linear-gradient(90deg, #f9e2af, #fab387)",
+                  background: "#f9e2af",
                   transition: "width 0.2s ease-out",
                 }}
               />
             </div>
+            <span className="text-[10px] text-[rgba(249,226,175,0.6)] font-semibold tabular-nums whitespace-nowrap">
+              {xp} / {xpNeeded}
+            </span>
           </div>
           <ScoreHud game={gameRef.current} gameId={gameId} language={language} />
           <div className="flex items-center gap-2 mt-1">
