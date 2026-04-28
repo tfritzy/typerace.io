@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
+const GHOST_SHRINK_PER_SEC = 18;
+const GHOST_DELAY_MS = 300;
+
 interface BossHealthBarProps {
   health: number;
   maxHealth: number;
@@ -7,37 +10,69 @@ interface BossHealthBarProps {
 }
 
 export const BossHealthBar = ({ health, maxHealth, name }: BossHealthBarProps) => {
-  const healthPct = maxHealth > 0 ? Math.max(0, Math.min(100, (health / maxHealth) * 100)) : 0;
+  const toPct = (h: number) =>
+    maxHealth > 0 ? Math.max(0, Math.min(100, (h / maxHealth) * 100)) : 0;
+
+  const healthPct = toPct(health);
+
   const prevHealthRef = useRef(health);
+  const ghostPctRef = useRef(healthPct);
+  const targetPctRef = useRef(healthPct);
   const [ghostPct, setGhostPct] = useState(healthPct);
-  const [ghostTransition, setGhostTransition] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const rafRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number | null>(null);
+  const shrinkingRef = useRef(false);
+  const delayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const startShrinking = () => {
+    shrinkingRef.current = true;
+    lastTimeRef.current = null;
+    const animate = (now: number) => {
+      if (lastTimeRef.current === null) lastTimeRef.current = now;
+      const dt = (now - lastTimeRef.current) / 1000;
+      lastTimeRef.current = now;
+      const next = Math.max(targetPctRef.current, ghostPctRef.current - GHOST_SHRINK_PER_SEC * dt);
+      ghostPctRef.current = next;
+      setGhostPct(next);
+      if (next > targetPctRef.current) {
+        rafRef.current = requestAnimationFrame(animate);
+      } else {
+        shrinkingRef.current = false;
+      }
+    };
+    rafRef.current = requestAnimationFrame(animate);
+  };
 
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (delayTimerRef.current) clearTimeout(delayTimerRef.current);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
   useEffect(() => {
-    const newPct = maxHealth > 0 ? Math.max(0, Math.min(100, (health / maxHealth) * 100)) : 0;
+    targetPctRef.current = healthPct;
 
     if (health < prevHealthRef.current) {
-      const prevPct = maxHealth > 0 ? Math.max(0, Math.min(100, (prevHealthRef.current / maxHealth) * 100)) : 0;
-      setGhostPct(prevPct);
-      setGhostTransition(false);
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => {
-        setGhostTransition(true);
-        setGhostPct(newPct);
-      }, 300);
-    } else {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      setGhostTransition(false);
-      setGhostPct(newPct);
+      const prevPct = toPct(prevHealthRef.current);
+      if (prevPct > ghostPctRef.current) {
+        ghostPctRef.current = prevPct;
+        setGhostPct(prevPct);
+      }
+      if (!shrinkingRef.current && !delayTimerRef.current) {
+        delayTimerRef.current = setTimeout(() => {
+          delayTimerRef.current = null;
+          startShrinking();
+        }, GHOST_DELAY_MS);
+      }
+    } else if (health > prevHealthRef.current) {
+      ghostPctRef.current = healthPct;
+      setGhostPct(healthPct);
     }
 
     prevHealthRef.current = health;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [health, maxHealth]);
 
   return (
@@ -49,20 +84,20 @@ export const BossHealthBar = ({ health, maxHealth, name }: BossHealthBarProps) =
         <div className="flex items-center gap-2">
           <span
             className="text-[9px] font-bold uppercase tracking-[0.3em]"
-            style={{ color: "rgba(243,139,168,0.7)" }}
+            style={{ color: "rgba(180,30,60,0.8)" }}
           >
             Boss
           </span>
           <span
             className="text-[12px] font-bold uppercase tracking-[0.15em]"
-            style={{ color: "#f38ba8" }}
+            style={{ color: "#e03050" }}
           >
             {name}
           </span>
         </div>
         <span
           className="text-[10px] font-semibold tabular-nums"
-          style={{ color: "rgba(243,139,168,0.6)" }}
+          style={{ color: "rgba(200,50,80,0.7)" }}
         >
           {Math.round(health)} / {maxHealth}
         </span>
@@ -73,7 +108,7 @@ export const BossHealthBar = ({ health, maxHealth, name }: BossHealthBarProps) =
           height: 14,
           borderRadius: 4,
           background: "rgba(0,0,0,0.6)",
-          border: "1px solid rgba(243,139,168,0.3)",
+          border: "1px solid rgba(180,30,60,0.4)",
         }}
       >
         <div
@@ -83,9 +118,8 @@ export const BossHealthBar = ({ health, maxHealth, name }: BossHealthBarProps) =
             top: 0,
             height: "100%",
             width: `${ghostPct}%`,
-            background: "rgba(255,255,255,0.75)",
+            background: "rgba(255,255,255,0.7)",
             borderRadius: 4,
-            transition: ghostTransition ? "width 0.5s ease-out" : "none",
           }}
         />
         <div
@@ -95,7 +129,7 @@ export const BossHealthBar = ({ health, maxHealth, name }: BossHealthBarProps) =
             top: 0,
             height: "100%",
             width: `${healthPct}%`,
-            background: "#f38ba8",
+            background: "#c0192f",
             borderRadius: 4,
           }}
         />
