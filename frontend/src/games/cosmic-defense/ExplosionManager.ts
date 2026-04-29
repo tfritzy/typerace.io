@@ -4,6 +4,7 @@ import type { GameState, ExplosionState } from "./state";
 import { ExplosionType } from "./types";
 
 const EXPLOSION_SCALE = 3;
+const BASE_EXPLOSION_RADIUS = 120;
 const EXPLOSION_ANIMATION_SPEED = 0.30;
 
 export class ExplosionManager {
@@ -64,7 +65,7 @@ export class ExplosionManager {
     const textures = this.getExplosionTextures(exp.explosionType);
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
-    sprite.scale.set(EXPLOSION_SCALE);
+    sprite.scale.set(EXPLOSION_SCALE * 0.5 + (exp.explosionRadius / BASE_EXPLOSION_RADIUS) * EXPLOSION_SCALE * 0.5);
     sprite.animationSpeed = EXPLOSION_ANIMATION_SPEED;
     sprite.loop = false;
     sprite.onComplete = () => {

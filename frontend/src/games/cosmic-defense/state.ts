@@ -76,6 +76,7 @@ export interface ExplosionState {
   x: number;
   y: number;
   explosionType: ExplosionType | undefined;
+  explosionRadius: number;
 }
 
 export interface SpawnState {
@@ -524,8 +525,8 @@ function dealDamageToEntity(
   return killed;
 }
 
-function spawnExplosion(state: GameState, entityType: EntityType, x: number, y: number): void {
-  state.explosions.push({ id: state.nextId++, x, y, explosionType: getExplosionType(entityType) });
+function spawnExplosion(state: GameState, entityType: EntityType, x: number, y: number, explosionRadius = 0): void {
+  state.explosions.push({ id: state.nextId++, x, y, explosionType: getExplosionType(entityType), explosionRadius });
 }
 
 function performInstantHit(
@@ -534,7 +535,7 @@ function performInstantHit(
   target: { x: number; y: number; entity: EntityState | null },
   damage: number
 ): void {
-  spawnExplosion(state, shooter.entityType, target.x, target.y);
+  spawnExplosion(state, shooter.entityType, target.x, target.y, shooter.explosionRadius);
 
   if (target.entity) {
     dealDamageToEntity(state, shooter, target.entity, damage);
@@ -626,7 +627,7 @@ export function updateState(state: GameState, dt: number): void {
     const dmg = getBuffedDamage(shooter, shooter.projectileDamage);
 
     if (shooter.explosionRadius > 0) {
-      spawnExplosion(state, shooter.entityType, shot.targetX, shot.targetY);
+      spawnExplosion(state, shooter.entityType, shot.targetX, shot.targetY, shooter.explosionRadius);
       const r2 = shooter.explosionRadius * shooter.explosionRadius;
       for (let j = state.entities.length - 1; j >= 0; j--) {
         const other = state.entities[j];

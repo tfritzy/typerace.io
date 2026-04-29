@@ -4,9 +4,8 @@ import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import type { EntityType } from "./types";
 import type { PlacementSlot } from "./PlacementPoints";
 
-const DAMAGE_ROLES = new Set([
-  "sniper", "laser", "dual_shot", "pierce_laser", "freeze",
-  "plasma", "shooter", "ice_beam", "plasma_single", "chain", "mac_cannon",
+const CONSISTENT_DAMAGE_ROLES = new Set([
+  "sniper", "laser", "dual_shot", "pierce_laser", "shooter", "chain", "mac_cannon",
 ]);
 
 interface ShipChoiceOverlayProps {
@@ -29,7 +28,7 @@ function generateChoices(slots: PlacementSlot[]): EntityType[] {
       pool = SHIP_BLUEPRINTS.map((bp) => bp.entityType);
     } else {
       pool = SHIP_BLUEPRINTS
-        .filter((bp) => DAMAGE_ROLES.has(bp.role))
+        .filter((bp) => CONSISTENT_DAMAGE_ROLES.has(bp.role))
         .map((bp) => bp.entityType);
     }
   } else {
