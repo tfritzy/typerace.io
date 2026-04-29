@@ -17,6 +17,14 @@ function generatePhrase(wordCount: number): string {
   return words.join(" ");
 }
 
+function countCorrectChars(typed: string, phrase: string): number {
+  let count = 0;
+  for (let i = 0; i < typed.length && i < phrase.length; i++) {
+    if (typed[i] === phrase[i]) count++;
+  }
+  return count;
+}
+
 const CHAR_COUNT = 22;
 const HOTKEYS = new Set(["1", "2", "3"]);
 
@@ -35,6 +43,7 @@ export const PhraseOverlay = ({
   const phraseRef = useRef(phrase);
   const checkpointRef = useRef(checkpoint);
   const inputRef = useRef<HTMLInputElement>(null);
+  const chargesGrantedRef = useRef(0);
 
   const processInput = useCallback(
     (key: string, ctrlKey: boolean) => {
@@ -59,9 +68,6 @@ export const PhraseOverlay = ({
         }
       } else {
         currentTyped = currentTyped + key;
-        if (key === currentPhrase[currentTyped.length - 1]) {
-          gameRef.current?.onCorrectKeystroke();
-        }
       }
 
       while (currentPhrase.length - currentTyped.length < CHAR_COUNT) {
@@ -70,11 +76,23 @@ export const PhraseOverlay = ({
 
       while (currentTyped.length > CHAR_COUNT * 2) {
         const spaceI = currentPhrase.indexOf(" ") + 1;
+        for (let i = 0; i < spaceI && i < currentTyped.length && i < currentPhrase.length; i++) {
+          if (currentTyped[i] === currentPhrase[i]) {
+            chargesGrantedRef.current = Math.max(0, chargesGrantedRef.current - 1);
+          }
+        }
         currentPhrase = currentPhrase.substring(spaceI);
         currentTyped = currentTyped.substring(spaceI);
         currentCheckpoint -= spaceI;
         skipTransition.current = true;
       }
+
+      const newCorrect = countCorrectChars(currentTyped, currentPhrase);
+      const delta = Math.max(0, newCorrect - chargesGrantedRef.current);
+      for (let i = 0; i < delta; i++) {
+        gameRef.current?.onCorrectKeystroke();
+      }
+      chargesGrantedRef.current = Math.max(chargesGrantedRef.current, newCorrect);
 
       typedRef.current = currentTyped;
       phraseRef.current = currentPhrase;
@@ -115,24 +133,51 @@ export const PhraseOverlay = ({
 
     const onInput = () => {
       if (isPaused) {
-        input.value = "";
+        input.value = typedRef.current.substring(checkpointRef.current);
         return;
       }
-      const val = input.value;
-      if (val.length > 0) {
-        for (const char of val) {
-          processInput(char, false);
-        }
-        input.value = "";
+
+      const newInputVal = input.value;
+      const committedLen = checkpointRef.current;
+      const committedTyped = typedRef.current.substring(0, committedLen);
+      let newTyped = committedTyped + newInputVal;
+      let newPhrase = phraseRef.current;
+
+      while (newPhrase.length - newTyped.length < CHAR_COUNT) {
+        newPhrase += " " + getRandomWord(getLangCode());
       }
+
+      const newCorrect = countCorrectChars(newTyped, newPhrase);
+      const delta = Math.max(0, newCorrect - chargesGrantedRef.current);
+      for (let i = 0; i < delta; i++) {
+        gameRef.current?.onCorrectKeystroke();
+      }
+      chargesGrantedRef.current = Math.max(chargesGrantedRef.current, newCorrect);
+
+      let newCheckpoint = committedLen;
+      for (let i = committedLen; i < newTyped.length && i < newPhrase.length; i++) {
+        if (newPhrase[i] === " ") {
+          newCheckpoint = i + 1;
+        }
+      }
+
+      if (newCheckpoint > committedLen) {
+        input.value = newTyped.substring(newCheckpoint);
+      }
+
+      typedRef.current = newTyped;
+      phraseRef.current = newPhrase;
+      checkpointRef.current = newCheckpoint;
+      setTyped(newTyped);
+      setPhrase(newPhrase);
+      setCheckpoint(newCheckpoint);
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (isPaused) return;
       if (HOTKEYS.has(e.key)) return;
-      if (e.key === "Backspace") {
+      if (e.key === "Backspace" && input.value.length === 0) {
         e.preventDefault();
-        processInput("Backspace", e.ctrlKey);
       }
     };
 
@@ -142,7 +187,7 @@ export const PhraseOverlay = ({
       input.removeEventListener("input", onInput);
       input.removeEventListener("keydown", onKeyDown);
     };
-  }, [isPaused, processInput]);
+  }, [isPaused, gameRef]);
 
   const chars = useMemo(() => {
     const c = [];
@@ -193,7 +238,6 @@ export const PhraseOverlay = ({
         ref={inputRef}
         type="text"
         autoCapitalize="off"
-        autoCorrect="off"
         autoComplete="off"
         spellCheck={false}
         style={{
