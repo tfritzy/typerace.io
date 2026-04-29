@@ -43,7 +43,7 @@ export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps)
       `}</style>
 
       <div
-        className="absolute inset-0 z-40"
+        className="fixed inset-0 z-40"
         style={{
           background:
             "radial-gradient(ellipse 75% 75% at 50% 50%, rgba(0,0,0,0.88) 30%, rgba(0,0,0,0.55) 65%, rgba(0,0,0,0.0) 100%)",
@@ -51,7 +51,7 @@ export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps)
       />
 
       <div
-        className="absolute inset-0 z-50 flex flex-col items-center justify-center"
+        className="fixed inset-0 z-50 flex flex-col items-center justify-center"
         style={{ pointerEvents: "auto" }}
       >
         <img
