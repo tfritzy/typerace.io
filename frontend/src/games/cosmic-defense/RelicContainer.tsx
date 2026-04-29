@@ -32,29 +32,21 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
 
   return (
     <>
-      {collectedRelics.map((relicId) => {
-        const relic = RELIC_MAP.get(relicId);
-        if (!relic) return null;
-        return (
-          <div
-            key={relicId}
-            className="w-8 h-8 rounded border border-[rgba(249,226,175,0.3)] bg-[rgba(249,226,175,0.06)] flex items-center justify-center"
-            title={`${relic.name}: ${relic.description}`}
-          >
+      <div className="flex items-center gap-1">
+        {collectedRelics.map((relicId) => {
+          const relic = RELIC_MAP.get(relicId);
+          if (!relic) return null;
+          return (
             <img
+              key={relicId}
               src={relic.sprite}
               alt={relic.name}
+              title={`${relic.name}: ${relic.description}`}
               style={{ width: 22, height: 22, imageRendering: "pixelated" }}
             />
-          </div>
-        );
-      })}
-      {collectedRelics.length === 0 && (
-        <>
-          <div className="w-8 h-8 rounded border border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.04)]" />
-          <div className="w-8 h-8 rounded border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)]" />
-        </>
-      )}
+          );
+        })}
+      </div>
       {pendingRelic && (
         <RelicDropOverlay relicId={pendingRelic} onContinue={handleContinue} />
       )}
