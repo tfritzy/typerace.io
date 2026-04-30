@@ -1,7 +1,7 @@
 import { Container, Graphics } from "pixi.js";
 import type { GameState } from "./state";
+import { CHAIN_LINE_DURATION } from "./constants";
 
-const CHAIN_LINE_DURATION = 0.5;
 const CHAIN_LINE_COLOR = 0x44aaff;
 const CHAIN_LINE_ALPHA = 0.35;
 const CHAIN_LINE_WIDTH = 2;

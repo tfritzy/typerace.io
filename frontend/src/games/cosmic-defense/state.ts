@@ -1,4 +1,4 @@
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, CHAIN_LINE_DURATION } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, ExplosionType, Team, getExplosionType } from "./types";
 import { ENEMY_CATALOG, BOSS_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
@@ -606,7 +606,6 @@ export function updateState(state: GameState, dt: number): void {
     }
   }
 
-  const CHAIN_LINE_DURATION = 0.5;
   for (let i = state.chainLines.length - 1; i >= 0; i--) {
     if (state.time.time - state.chainLines[i].time > CHAIN_LINE_DURATION) {
       state.chainLines.splice(i, 1);
