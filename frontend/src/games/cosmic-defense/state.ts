@@ -483,8 +483,12 @@ function dealDamageToEntity(
   damage: number
 ): boolean {
   let effectiveDamage = damage;
-  if (attacker?.team === Team.Allied && effectiveDamage > 0) {
-    effectiveDamage = Math.round(effectiveDamage * state.relicEffects.damageMultiplier);
+  if (attacker?.team === Team.Allied && target.team === Team.Enemy) {
+    if (effectiveDamage > 0) {
+      effectiveDamage = Math.round(effectiveDamage * state.relicEffects.damageMultiplier);
+    }
+    if (state.relicEffects.freezeStacksBonus > 0) target.freezeStacks += state.relicEffects.freezeStacksBonus;
+    if (state.relicEffects.plasmaStacksBonus > 0) target.plasmaStacks += state.relicEffects.plasmaStacksBonus;
   }
   target.health -= effectiveDamage;
   if (attacker) attacker.damageDealt += effectiveDamage;
@@ -589,7 +593,7 @@ export function updateState(state: GameState, dt: number): void {
         e.rotation = Math.atan2(dy, dx);
 
         if (e.chargesRequired <= 0 && !isFrozen) {
-          e.fireTimer -= dt;
+          e.fireTimer -= dt / state.relicEffects.enemyFireSlowMultiplier;
           if (e.fireTimer <= 0) {
             e.fireTimer += e.fireRate;
             performInstantHit(state, e, target, e.projectileDamage);
@@ -628,8 +632,11 @@ export function updateState(state: GameState, dt: number): void {
     const dmg = getBuffedDamage(shooter, shooter.projectileDamage);
 
     if (shooter.explosionRadius > 0) {
-      spawnExplosion(state, shooter.entityType, shot.targetX, shot.targetY, shooter.explosionRadius);
-      const r2 = shooter.explosionRadius * shooter.explosionRadius;
+      const effectiveRadius = shooter.team === Team.Allied
+        ? shooter.explosionRadius * state.relicEffects.explosionRadiusMultiplier
+        : shooter.explosionRadius;
+      spawnExplosion(state, shooter.entityType, shot.targetX, shot.targetY, effectiveRadius);
+      const r2 = effectiveRadius * effectiveRadius;
       for (let j = state.entities.length - 1; j >= 0; j--) {
         const other = state.entities[j];
         if (other.team !== Team.Enemy) continue;
@@ -824,14 +831,20 @@ export function onCorrectKeystroke(state: GameState): void {
   }
   for (const e of state.entities) {
     if (e.chargesRequired <= 0) continue;
-    e.charge += 1;
+    e.charge += 1 + state.relicEffects.bonusChargesPerKeystroke;
     activateAbility(state, e);
   }
 }
 
+const BASE_MAX_PLANET_HEALTH = 1000;
+
 function addRelic(state: GameState, relicId: RelicId): void {
   state.relics.push(relicId);
   state.relicEffects = computeRelicEffects(state.relics);
+  const newMax = Math.round(BASE_MAX_PLANET_HEALTH * state.relicEffects.planetMaxHealthMultiplier);
+  const diff = newMax - state.maxPlanetHealth;
+  state.maxPlanetHealth = newMax;
+  state.planetHealth = Math.min(newMax, state.planetHealth + diff);
 }
 
 const TIER_SPREAD = 90;
@@ -907,7 +920,7 @@ export function updateSpawner(state: GameState, dt: number): void {
     }
   }
 
-  const rate = getSpawnRate(state.spawner.elapsed);
+  const rate = getSpawnRate(state.spawner.elapsed) * state.relicEffects.spawnRateMultiplier;
   state.spawner.spawnAccumulator += rate * dt;
 
   const weights = getTierWeights(state.spawner.elapsed);
@@ -930,7 +943,7 @@ export function xpForNextLevel(level: number): number {
 
 export function awardXP(state: GameState, amount: number): void {
   if (state.pendingChoice) return;
-  state.xp += amount;
+  state.xp += Math.round(amount * state.relicEffects.xpMultiplier);
   const needed = xpForNextLevel(state.level);
   if (state.xp >= needed) {
     state.xp -= needed;
