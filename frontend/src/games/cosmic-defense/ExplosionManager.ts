@@ -67,7 +67,7 @@ export class ExplosionManager {
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
     sprite.scale.set(EXPLOSION_SCALE * 0.5 + (exp.explosionRadius / BASE_EXPLOSION_RADIUS) * EXPLOSION_SCALE * 0.5);
-    sprite.animationSpeed = exp.explosionType === ExplosionType.ChainHit ? 1.5 : EXPLOSION_ANIMATION_SPEED;
+    sprite.animationSpeed = EXPLOSION_ANIMATION_SPEED;
     sprite.loop = false;
     sprite.onComplete = () => {
       this.completedIds.add(exp.id);
