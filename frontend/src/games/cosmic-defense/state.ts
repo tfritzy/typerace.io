@@ -484,11 +484,9 @@ function dealDamageToEntity(
 ): boolean {
   let effectiveDamage = damage;
   if (attacker?.team === Team.Allied && target.team === Team.Enemy) {
-    if (effectiveDamage > 0) {
-      effectiveDamage = Math.round(effectiveDamage * state.relicEffects.damageMultiplier);
-    }
-    if (state.relicEffects.freezeStacksBonus > 0) target.freezeStacks += state.relicEffects.freezeStacksBonus;
-    if (state.relicEffects.plasmaStacksBonus > 0) target.plasmaStacks += state.relicEffects.plasmaStacksBonus;
+    effectiveDamage = Math.round(effectiveDamage * state.relicEffects.damageMultiplier);
+    target.freezeStacks += state.relicEffects.freezeStacksBonus;
+    target.plasmaStacks += state.relicEffects.plasmaStacksBonus;
   }
   target.health -= effectiveDamage;
   if (attacker) attacker.damageDealt += effectiveDamage;
@@ -842,9 +840,9 @@ function addRelic(state: GameState, relicId: RelicId): void {
   state.relics.push(relicId);
   state.relicEffects = computeRelicEffects(state.relics);
   const newMax = Math.round(BASE_MAX_PLANET_HEALTH * state.relicEffects.planetMaxHealthMultiplier);
-  const diff = newMax - state.maxPlanetHealth;
+  const maxHealthIncrease = newMax - state.maxPlanetHealth;
   state.maxPlanetHealth = newMax;
-  state.planetHealth = Math.min(newMax, state.planetHealth + diff);
+  state.planetHealth = Math.min(newMax, state.planetHealth + maxHealthIncrease);
 }
 
 const TIER_SPREAD = 90;
