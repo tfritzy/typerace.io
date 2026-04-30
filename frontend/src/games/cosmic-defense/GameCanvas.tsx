@@ -12,6 +12,7 @@ import { PlacementOverlay } from "./PlacementOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
 import { ScoreHud } from "./ScoreHud";
 import { ShipChoiceOverlay } from "./ShipChoiceOverlay";
+import { RelicContainer } from "./RelicContainer";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
 
@@ -235,8 +236,7 @@ export const GameCanvas = () => {
           </div>
           <ScoreHud game={gameRef.current} gameId={gameId} language={language} />
           <div className="flex items-center gap-2 mt-1">
-            <div className="w-8 h-8 rounded border border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.04)]" />
-            <div className="w-8 h-8 rounded border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)]" />
+            <RelicContainer game={gameRef.current} />
             <div className="flex-1" />
             <div className="flex items-center gap-1">
               <span className="text-[12px]">💀</span>
