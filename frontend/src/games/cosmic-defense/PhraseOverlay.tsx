@@ -19,10 +19,31 @@ function generatePhrase(wordCount: number): string {
 
 function countCorrectChars(typed: string, phrase: string): number {
   let count = 0;
-  for (let i = 0; i < typed.length && i < phrase.length; i++) {
-    if (typed[i] === phrase[i]) count++;
+  const len = Math.min(typed.length, phrase.length);
+  for (let i = 0; i < len; i++) {
+    const typedChar = typed[i];
+    const phraseChar = phrase[i];
+    if (typedChar === phraseChar) {
+      count++;
+    }
   }
   return count;
+}
+
+function grantNewCharges(
+  newCorrectCount: number,
+  chargesGrantedRef: React.MutableRefObject<number>,
+  game: CosmicDefenseGame | null,
+): void {
+  const alreadyGranted = chargesGrantedRef.current;
+  const newCharges = newCorrectCount - alreadyGranted;
+  if (newCharges <= 0) {
+    return;
+  }
+  for (let i = 0; i < newCharges; i++) {
+    game?.onCorrectKeystroke();
+  }
+  chargesGrantedRef.current = newCorrectCount;
 }
 
 const CHAR_COUNT = 22;
@@ -76,23 +97,26 @@ export const PhraseOverlay = ({
 
       while (currentTyped.length > CHAR_COUNT * 2) {
         const spaceI = currentPhrase.indexOf(" ") + 1;
-        for (let i = 0; i < spaceI && i < currentTyped.length && i < currentPhrase.length; i++) {
-          if (currentTyped[i] === currentPhrase[i]) {
-            chargesGrantedRef.current = Math.max(0, chargesGrantedRef.current - 1);
+
+        for (let i = 0; i < spaceI; i++) {
+          const withinTyped = i < currentTyped.length;
+          const withinPhrase = i < currentPhrase.length;
+          if (withinTyped && withinPhrase && currentTyped[i] === currentPhrase[i]) {
+            chargesGrantedRef.current = chargesGrantedRef.current - 1;
+            if (chargesGrantedRef.current < 0) {
+              chargesGrantedRef.current = 0;
+            }
           }
         }
+
         currentPhrase = currentPhrase.substring(spaceI);
         currentTyped = currentTyped.substring(spaceI);
         currentCheckpoint -= spaceI;
         skipTransition.current = true;
       }
 
-      const newCorrect = countCorrectChars(currentTyped, currentPhrase);
-      const delta = Math.max(0, newCorrect - chargesGrantedRef.current);
-      for (let i = 0; i < delta; i++) {
-        gameRef.current?.onCorrectKeystroke();
-      }
-      chargesGrantedRef.current = Math.max(chargesGrantedRef.current, newCorrect);
+      const newCorrectCount = countCorrectChars(currentTyped, currentPhrase);
+      grantNewCharges(newCorrectCount, chargesGrantedRef, gameRef.current);
 
       typedRef.current = currentTyped;
       phraseRef.current = currentPhrase;
@@ -147,21 +171,19 @@ export const PhraseOverlay = ({
         newPhrase += " " + getRandomWord(getLangCode());
       }
 
-      const newCorrect = countCorrectChars(newTyped, newPhrase);
-      const delta = Math.max(0, newCorrect - chargesGrantedRef.current);
-      for (let i = 0; i < delta; i++) {
-        gameRef.current?.onCorrectKeystroke();
-      }
-      chargesGrantedRef.current = Math.max(chargesGrantedRef.current, newCorrect);
+      const newCorrectCount = countCorrectChars(newTyped, newPhrase);
+      grantNewCharges(newCorrectCount, chargesGrantedRef, gameRef.current);
 
       let newCheckpoint = committedLen;
-      for (let i = committedLen; i < newTyped.length && i < newPhrase.length; i++) {
-        if (newPhrase[i] === " ") {
+      for (let i = committedLen; i < newTyped.length; i++) {
+        const withinPhrase = i < newPhrase.length;
+        if (withinPhrase && newPhrase[i] === " ") {
           newCheckpoint = i + 1;
         }
       }
 
-      if (newCheckpoint > committedLen) {
+      const wordBoundaryAdvanced = newCheckpoint > committedLen;
+      if (wordBoundaryAdvanced) {
         input.value = newTyped.substring(newCheckpoint);
       }
 
