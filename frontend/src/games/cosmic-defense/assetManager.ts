@@ -31,6 +31,7 @@ export class AssetManager {
   private hawkExplosionSheet_: Spritesheet;
   private mothExplosionSheet_: Spritesheet;
   private warpInSheet_: Spritesheet;
+  private chainHitSheet_: Spritesheet;
 
   constructor(loaded: Record<string, unknown>) {
     const presetAliasValues = Object.values(COLOR_PRESET_ALIASES);
@@ -53,6 +54,7 @@ export class AssetManager {
     this.hawkExplosionSheet_ = loaded["hawk-explosion"] as Spritesheet;
     this.mothExplosionSheet_ = loaded["moth-explosion"] as Spritesheet;
     this.warpInSheet_ = loaded["warp-in"] as Spritesheet;
+    this.chainHitSheet_ = loaded["chain-hit"] as Spritesheet;
 
     this.applyNearestNeighbor();
   }
@@ -148,6 +150,14 @@ export class AssetManager {
     return textures;
   }
 
+  getChainHitTextures(): Texture[] {
+    const textures: Texture[] = [];
+    for (let i = 0; i < 153; i++) {
+      textures.push(this.chainHitSheet_.textures[`chain-hit-${i}`]);
+    }
+    return textures;
+  }
+
   static async load(manifest: AssetsManifest): Promise<AssetManager> {
     const bundle = manifest.bundles[0];
     Assets.addBundle(bundle.name, bundle.assets);
@@ -191,5 +201,6 @@ export class AssetManager {
     setNearestNeighbor(this.hawkExplosionSheet_);
     setNearestNeighbor(this.mothExplosionSheet_);
     setNearestNeighbor(this.warpInSheet_);
+    setNearestNeighbor(this.chainHitSheet_);
   }
 }

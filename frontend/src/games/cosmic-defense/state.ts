@@ -8,6 +8,7 @@ export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
 const SCORE_PER_XP = 10;
+const MAX_CHAIN_JUMP_DISTANCE = 300;
 
 export enum TargetingMode {
   NearestToPlanet = 0,
@@ -160,11 +161,21 @@ export interface LaserBeam {
   width: number;
 }
 
+export interface ChainLine {
+  id: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  time: number;
+}
+
 export interface GameState {
   entities: EntityState[];
   entityById: Map<number, EntityState>;
   explosions: ExplosionState[];
   laserBeams: LaserBeam[];
+  chainLines: ChainLine[];
   pendingShots: PendingShot[];
   time: {
     time: number;
@@ -215,6 +226,7 @@ export function createGameState(): GameState {
     entityById: new Map(),
     explosions: [],
     laserBeams: [],
+    chainLines: [],
     pendingShots: [],
     time: { time: 0, deltaTime: 0 },
     nextId: 1,
@@ -594,6 +606,13 @@ export function updateState(state: GameState, dt: number): void {
     }
   }
 
+  const CHAIN_LINE_DURATION = 0.5;
+  for (let i = state.chainLines.length - 1; i >= 0; i--) {
+    if (state.time.time - state.chainLines[i].time > CHAIN_LINE_DURATION) {
+      state.chainLines.splice(i, 1);
+    }
+  }
+
   for (let i = state.pendingShots.length - 1; i >= 0; i--) {
     const shot = state.pendingShots[i];
     if (state.time.time < shot.fireAt) continue;
@@ -714,6 +733,7 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
   const hitIds = new Set<number>();
   let currentTarget: EntityState | null = target.entity;
   let chainsRemaining = e.chainCount;
+  const maxJumpDistSq = MAX_CHAIN_JUMP_DISTANCE * MAX_CHAIN_JUMP_DISTANCE;
 
   while (currentTarget && chainsRemaining >= 0) {
     hitIds.add(currentTarget.id);
@@ -730,12 +750,22 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
       const cx = other.x - currentTarget.x;
       const cy = other.y - currentTarget.y;
       const d = cx * cx + cy * cy;
-      if (d < nearestDist) {
+      if (d < nearestDist && d <= maxJumpDistSq) {
         nearestDist = d;
         nearest = other;
       }
     }
     if (!nearest) break;
+
+    state.chainLines.push({
+      id: state.nextId++,
+      x1: currentTarget.x,
+      y1: currentTarget.y,
+      x2: nearest.x,
+      y2: nearest.y,
+      time: state.time.time,
+    });
+
     currentTarget = nearest;
   }
 }
