@@ -1,4 +1,4 @@
-import { CANVAS_WIDTH, CANVAS_HEIGHT, CHAIN_LINE_DURATION } from "./constants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { type EntityType, ColorPreset, ProjectileType, ExplosionType, Team, getExplosionType } from "./types";
 import { ENEMY_CATALOG, BOSS_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
@@ -161,21 +161,11 @@ export interface LaserBeam {
   width: number;
 }
 
-export interface ChainLine {
-  id: number;
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-  time: number;
-}
-
 export interface GameState {
   entities: EntityState[];
   entityById: Map<number, EntityState>;
   explosions: ExplosionState[];
   laserBeams: LaserBeam[];
-  chainLines: ChainLine[];
   pendingShots: PendingShot[];
   time: {
     time: number;
@@ -226,7 +216,6 @@ export function createGameState(): GameState {
     entityById: new Map(),
     explosions: [],
     laserBeams: [],
-    chainLines: [],
     pendingShots: [],
     time: { time: 0, deltaTime: 0 },
     nextId: 1,
@@ -606,12 +595,6 @@ export function updateState(state: GameState, dt: number): void {
     }
   }
 
-  for (let i = state.chainLines.length - 1; i >= 0; i--) {
-    if (state.time.time - state.chainLines[i].time > CHAIN_LINE_DURATION) {
-      state.chainLines.splice(i, 1);
-    }
-  }
-
   for (let i = state.pendingShots.length - 1; i >= 0; i--) {
     const shot = state.pendingShots[i];
     if (state.time.time < shot.fireAt) continue;
@@ -755,15 +738,6 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
       }
     }
     if (!nearest) break;
-
-    state.chainLines.push({
-      id: state.nextId++,
-      x1: currentTarget.x,
-      y1: currentTarget.y,
-      x2: nearest.x,
-      y2: nearest.y,
-      time: state.time.time,
-    });
 
     currentTarget = nearest;
   }
