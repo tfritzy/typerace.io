@@ -57,6 +57,7 @@ export class ExplosionManager {
       case ExplosionType.IceExplosive: return this.assets.getIceExplosionTextures();
       case ExplosionType.Explosive:    return this.assets.getHawkExplosionTextures();
       case ExplosionType.MothHit:      return this.assets.getMothExplosionTextures();
+      case ExplosionType.ChainHit:     return this.assets.getChainHitTextures();
       default:                         return this.assets.getMothExplosionTextures();
     }
   }

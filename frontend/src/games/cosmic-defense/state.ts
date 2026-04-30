@@ -9,6 +9,7 @@ export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
 const SCORE_PER_XP = 10;
+const MAX_CHAIN_JUMP_DISTANCE = 300;
 
 export enum TargetingMode {
   NearestToPlanet = 0,
@@ -736,6 +737,7 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
   const hitIds = new Set<number>();
   let currentTarget: EntityState | null = target.entity;
   let chainsRemaining = e.chainCount;
+  const maxJumpDistSq = MAX_CHAIN_JUMP_DISTANCE * MAX_CHAIN_JUMP_DISTANCE;
 
   while (currentTarget && chainsRemaining >= 0) {
     hitIds.add(currentTarget.id);
@@ -752,12 +754,13 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
       const cx = other.x - currentTarget.x;
       const cy = other.y - currentTarget.y;
       const d = cx * cx + cy * cy;
-      if (d < nearestDist) {
+      if (d < nearestDist && d <= maxJumpDistSq) {
         nearestDist = d;
         nearest = other;
       }
     }
     if (!nearest) break;
+
     currentTarget = nearest;
   }
 }
