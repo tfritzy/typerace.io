@@ -11,7 +11,9 @@ export type RelicId =
   | "plasma_weave"
   | "jammer_array"
   | "surge_catalyst"
-  | "flow_state";
+  | "flow_state"
+  | "warp_disruptor"
+  | "echo_chamber";
 
 export interface RelicEffects {
   damageMultiplier: number;
@@ -27,6 +29,8 @@ export interface RelicEffects {
   enemyFireSlowMultiplier: number;
   planetRegenPerPerfectWord: number;
   streakDamageBonus: number;
+  streakEnemySlowBonus: number;
+  xpPerPerfectWord: number;
 }
 
 export interface RelicDefinition {
@@ -125,9 +129,23 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "flow_state",
     name: "Flow State",
-    description: "For each perfect word in your streak, allied weapons deal 3% more damage.",
+    description: "For each perfect word in your streak, allied weapons deal 3% more damage (max 25%).",
     sprite: "/futuristic_pixel_icons/Orange Star Shards.png",
     effects: { streakDamageBonus: 0.03 },
+  },
+  {
+    id: "warp_disruptor",
+    name: "Warp Disruptor",
+    description: "For each perfect word in your streak, enemies move 2% slower (max 20%).",
+    sprite: "/futuristic_pixel_icons/Darkblue Cosmic Ring.png",
+    effects: { streakEnemySlowBonus: 0.02 },
+  },
+  {
+    id: "echo_chamber",
+    name: "Echo Chamber",
+    description: "Completing a word with no errors grants 5 XP.",
+    sprite: "/futuristic_pixel_icons/Amber Crystal.png",
+    effects: { xpPerPerfectWord: 5 },
   },
 ];
 
@@ -150,6 +168,8 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     enemyFireSlowMultiplier: 1,
     planetRegenPerPerfectWord: 0,
     streakDamageBonus: 0,
+    streakEnemySlowBonus: 0,
+    xpPerPerfectWord: 0,
   };
   for (const relicId of relics) {
     const def = RELIC_MAP.get(relicId);
@@ -167,6 +187,8 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     if (def.effects.enemyFireSlowMultiplier !== undefined) result.enemyFireSlowMultiplier *= def.effects.enemyFireSlowMultiplier;
     if (def.effects.planetRegenPerPerfectWord !== undefined) result.planetRegenPerPerfectWord += def.effects.planetRegenPerPerfectWord;
     if (def.effects.streakDamageBonus !== undefined) result.streakDamageBonus += def.effects.streakDamageBonus;
+    if (def.effects.streakEnemySlowBonus !== undefined) result.streakEnemySlowBonus += def.effects.streakEnemySlowBonus;
+    if (def.effects.xpPerPerfectWord !== undefined) result.xpPerPerfectWord += def.effects.xpPerPerfectWord;
   }
   return result;
 }

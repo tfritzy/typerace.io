@@ -486,7 +486,7 @@ function dealDamageToEntity(
 ): boolean {
   let effectiveDamage = damage;
   if (attacker?.team === Team.Allied && target.team === Team.Enemy) {
-    const streakMultiplier = 1 + state.perfectWordStreak * state.relicEffects.streakDamageBonus;
+    const streakMultiplier = Math.min(1.25, 1 + state.perfectWordStreak * state.relicEffects.streakDamageBonus);
     effectiveDamage = Math.round(effectiveDamage * state.relicEffects.damageMultiplier * streakMultiplier);
     if (state.relicEffects.freezeStacksBonus > 0 && attacker.freezeStacks > 0) target.freezeStacks += state.relicEffects.freezeStacksBonus;
     if (state.relicEffects.plasmaStacksBonus > 0 && attacker.plasmaStacksApplied > 0) target.plasmaStacks += state.relicEffects.plasmaStacksBonus;
@@ -610,7 +610,8 @@ export function updateState(state: GameState, dt: number): void {
     }
 
     if (!inRange && e.speed > 0 && !isFrozen) {
-      const effectiveSpeed = e.team === Team.Enemy ? e.speed * enemySpeedMultiplier : e.speed;
+      const streakSlow = 1 - Math.min(0.20, state.perfectWordStreak * state.relicEffects.streakEnemySlowBonus);
+      const effectiveSpeed = e.team === Team.Enemy ? e.speed * enemySpeedMultiplier * streakSlow : e.speed;
       e.vx = -effectiveSpeed;
       e.vy = 0;
       e.x += e.vx * dt;
@@ -847,6 +848,9 @@ export function onPerfectWord(state: GameState): void {
   state.perfectWordStreak++;
   if (state.relicEffects.planetRegenPerPerfectWord > 0) {
     state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetRegenPerPerfectWord);
+  }
+  if (state.relicEffects.xpPerPerfectWord > 0) {
+    awardXP(state, state.relicEffects.xpPerPerfectWord);
   }
   if (state.relicEffects.bonusChargesPerPerfectWord > 0) {
     for (const e of state.entities) {
