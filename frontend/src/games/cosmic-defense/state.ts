@@ -10,6 +10,9 @@ const PLASMA_DAMAGE_PER_TICK = 5;
 const LASER_RANGE = 2200;
 const SCORE_PER_XP = 10;
 const MAX_CHAIN_JUMP_DISTANCE = 300;
+const MAX_STREAK_CHARGE_MULTIPLIER = 2;
+const MIN_SPLASH_DAMAGE_PER_ENEMY = 1;
+const STREAK_MILESTONE_INTERVAL = 5;
 
 export enum TargetingMode {
   NearestToPlanet = 0,
@@ -490,6 +493,9 @@ function dealDamageToEntity(
     effectiveDamage = Math.round(effectiveDamage * state.relicEffects.damageMultiplier * streakMultiplier);
     if (state.relicEffects.freezeStacksBonus > 0 && attacker.freezeStacks > 0) target.freezeStacks += state.relicEffects.freezeStacksBonus;
     if (state.relicEffects.plasmaStacksBonus > 0 && attacker.plasmaStacksApplied > 0) target.plasmaStacks += state.relicEffects.plasmaStacksBonus;
+    if (state.relicEffects.lifeStealPercent > 0) {
+      state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + Math.ceil(effectiveDamage * state.relicEffects.lifeStealPercent));
+    }
   }
   target.health -= effectiveDamage;
   if (attacker) attacker.damageDealt += effectiveDamage;
@@ -500,6 +506,9 @@ function dealDamageToEntity(
     if (attacker) attacker.kills++;
     if (target.team === Team.Enemy) {
       state.totalKills++;
+      if (state.relicEffects.planetHealPerKill > 0) {
+        state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetHealPerKill);
+      }
       const xpAmount = target.xpReward;
       state.score += xpAmount * SCORE_PER_XP;
       state.onScoreChanged.emit({ score: state.score });
@@ -610,8 +619,7 @@ export function updateState(state: GameState, dt: number): void {
     }
 
     if (!inRange && e.speed > 0 && !isFrozen) {
-      const streakSlow = 1 - Math.min(0.20, state.perfectWordStreak * state.relicEffects.streakEnemySlowBonus);
-      const effectiveSpeed = e.team === Team.Enemy ? e.speed * enemySpeedMultiplier * streakSlow : e.speed;
+      const effectiveSpeed = e.team === Team.Enemy ? e.speed * enemySpeedMultiplier : e.speed;
       e.vx = -effectiveSpeed;
       e.vy = 0;
       e.x += e.vx * dt;
@@ -652,6 +660,7 @@ export function updateState(state: GameState, dt: number): void {
         const dy = other.y - shot.targetY;
         if (dx * dx + dy * dy > r2) continue;
         if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
+        if (shooter.team === Team.Allied && state.relicEffects.explosionPlasmaStacks > 0) other.plasmaStacks += state.relicEffects.explosionPlasmaStacks;
         if (shooter.freezeStacks > 0) other.freezeStacks += shooter.freezeStacks;
         if (dmg > 0) dealDamageToEntity(state, shooter, other, dmg);
       }
@@ -707,7 +716,7 @@ function fireLaser(state: GameState, e: EntityState): void {
   const endX = e.x + nx * beamLen;
   const endY = e.y + ny * beamLen;
 
-  const dmg = getBuffedDamage(e, e.laserDamage);
+  const dmg = getBuffedDamage(e, Math.round(e.laserDamage * state.relicEffects.laserDamageMultiplier));
   const searchRange = piercing ? LASER_RANGE : len + 20;
   const extraHitRadius = e.beamWidth * 5;
 
@@ -751,7 +760,7 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
 
   const hitIds = new Set<number>();
   let currentTarget: EntityState | null = target.entity;
-  let chainsRemaining = e.chainCount;
+  let chainsRemaining = e.chainCount + (e.chainCount > 0 ? state.relicEffects.bonusChainCount : 0);
   const maxJumpDistSq = MAX_CHAIN_JUMP_DISTANCE * MAX_CHAIN_JUMP_DISTANCE;
 
   while (currentTarget && chainsRemaining >= 0) {
@@ -798,7 +807,7 @@ function activateAbility(state: GameState, e: EntityState): void {
       for (const ally of state.entities) {
         if (ally.id === e.id || ally.team !== Team.Allied) continue;
         if (ally.chargesRequired <= 0 || ally.chargesGranted > 0) continue;
-        ally.charge += e.chargesGranted;
+        ally.charge += e.chargesGranted + state.relicEffects.bonusChargesGranted;
         activateAbility(state, ally);
       }
       continue;
@@ -825,7 +834,8 @@ function activateAbility(state: GameState, e: EntityState): void {
     }
 
     if (e.projectileDamage > 0 || e.plasmaStacksApplied > 0) {
-      for (let f = 0; f < e.fireCount; f++) {
+      const fireCount = e.fireCount + state.relicEffects.bonusFireCount;
+      for (let f = 0; f < fireCount; f++) {
         fireShot(state, e);
       }
       continue;
@@ -837,9 +847,12 @@ export function onCorrectKeystroke(state: GameState): void {
   if (state.relicEffects.planetRegenPerKeystroke > 0) {
     state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetRegenPerKeystroke);
   }
+  const chargeGain = state.relicEffects.streakChargeBonus > 0
+    ? Math.min(MAX_STREAK_CHARGE_MULTIPLIER, 1 + state.perfectWordStreak * state.relicEffects.streakChargeBonus)
+    : 1;
   for (const e of state.entities) {
     if (e.chargesRequired <= 0) continue;
-    e.charge += 1;
+    e.charge += chargeGain;
     activateAbility(state, e);
   }
 }
@@ -859,6 +872,22 @@ export function onPerfectWord(state: GameState): void {
       activateAbility(state, e);
     }
   }
+  if (state.relicEffects.perfectWordSplashDamage > 0) {
+    const enemies = state.entities.filter(e => e.team === Team.Enemy);
+    if (enemies.length > 0) {
+      const dmg = Math.max(MIN_SPLASH_DAMAGE_PER_ENEMY, Math.round(state.relicEffects.perfectWordSplashDamage / enemies.length));
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        dealDamageToEntity(state, null, enemies[i], dmg);
+      }
+    }
+  }
+  if (state.relicEffects.streakMilestoneDamage > 0 && state.perfectWordStreak % STREAK_MILESTONE_INTERVAL === 0) {
+    for (let i = state.entities.length - 1; i >= 0; i--) {
+      if (state.entities[i].team === Team.Enemy) {
+        dealDamageToEntity(state, null, state.entities[i], state.relicEffects.streakMilestoneDamage);
+      }
+    }
+  }
 }
 
 export function onWordWithError(state: GameState): void {
@@ -867,7 +896,13 @@ export function onWordWithError(state: GameState): void {
 
 function addRelic(state: GameState, relicId: RelicId): void {
   state.relics.push(relicId);
+  const prevEffects = state.relicEffects;
   state.relicEffects = computeRelicEffects(state.relics);
+  const healthIncrease = state.relicEffects.maxPlanetHealthBonus - prevEffects.maxPlanetHealthBonus;
+  if (healthIncrease > 0) {
+    state.maxPlanetHealth += healthIncrease;
+    state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + healthIncrease);
+  }
 }
 
 const TIER_SPREAD = 90;
