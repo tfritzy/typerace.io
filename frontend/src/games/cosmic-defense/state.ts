@@ -183,6 +183,7 @@ export interface GameState {
   pendingChoice: boolean;
   relics: RelicId[];
   relicEffects: RelicEffects;
+  perfectWordStreak: number;
   onPlanetDamaged: GameEvent;
   onDamageDealt: GameDataEvent<DamageData>;
   onEnemyEntityDeath: GameDataEvent<EntityDeathData>;
@@ -239,6 +240,7 @@ export function createGameState(): GameState {
     pendingChoice: true,
     relics: [],
     relicEffects: computeRelicEffects([]),
+    perfectWordStreak: 0,
     onPlanetDamaged: new GameEvent(),
     onDamageDealt: new GameDataEvent<DamageData>(),
     onEnemyEntityDeath: new GameDataEvent<EntityDeathData>(),
@@ -484,9 +486,10 @@ function dealDamageToEntity(
 ): boolean {
   let effectiveDamage = damage;
   if (attacker?.team === Team.Allied && target.team === Team.Enemy) {
-    effectiveDamage = Math.round(effectiveDamage * state.relicEffects.damageMultiplier);
-    target.freezeStacks += state.relicEffects.freezeStacksBonus;
-    target.plasmaStacks += state.relicEffects.plasmaStacksBonus;
+    const streakMultiplier = 1 + state.perfectWordStreak * state.relicEffects.streakDamageBonus;
+    effectiveDamage = Math.round(effectiveDamage * state.relicEffects.damageMultiplier * streakMultiplier);
+    if (state.relicEffects.freezeStacksBonus > 0 && attacker.freezeStacks > 0) target.freezeStacks += state.relicEffects.freezeStacksBonus;
+    if (state.relicEffects.plasmaStacksBonus > 0 && attacker.plasmaStacksApplied > 0) target.plasmaStacks += state.relicEffects.plasmaStacksBonus;
   }
   target.health -= effectiveDamage;
   if (attacker) attacker.damageDealt += effectiveDamage;
@@ -543,7 +546,10 @@ function performInstantHit(
   if (target.entity) {
     dealDamageToEntity(state, shooter, target.entity, damage);
   } else {
-    state.planetHealth = Math.max(0, state.planetHealth - damage);
+    const reducedDamage = shooter.team === Team.Enemy
+      ? Math.round(damage * state.relicEffects.planetDamageReduction)
+      : damage;
+    state.planetHealth = Math.max(0, state.planetHealth - reducedDamage);
     state.onPlanetDamaged.emit();
   }
 }
@@ -559,6 +565,9 @@ export function updateState(state: GameState, dt: number): void {
   const prevSecond = Math.floor(state.time.time - dt);
   const curSecond = Math.floor(state.time.time);
   if (curSecond > prevSecond) {
+    if (state.relicEffects.planetHealPerSecond > 0) {
+      state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetHealPerSecond);
+    }
     for (let i = state.entities.length - 1; i >= 0; i--) {
       const e = state.entities[i];
       if (e.team !== Team.Enemy) continue;
@@ -829,20 +838,32 @@ export function onCorrectKeystroke(state: GameState): void {
   }
   for (const e of state.entities) {
     if (e.chargesRequired <= 0) continue;
-    e.charge += 1 + state.relicEffects.bonusChargesPerKeystroke;
+    e.charge += 1;
     activateAbility(state, e);
   }
 }
 
-const BASE_MAX_PLANET_HEALTH = 1000;
+export function onPerfectWord(state: GameState): void {
+  state.perfectWordStreak++;
+  if (state.relicEffects.planetRegenPerPerfectWord > 0) {
+    state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetRegenPerPerfectWord);
+  }
+  if (state.relicEffects.bonusChargesPerPerfectWord > 0) {
+    for (const e of state.entities) {
+      if (e.chargesRequired <= 0) continue;
+      e.charge += state.relicEffects.bonusChargesPerPerfectWord;
+      activateAbility(state, e);
+    }
+  }
+}
+
+export function onWordWithError(state: GameState): void {
+  state.perfectWordStreak = 0;
+}
 
 function addRelic(state: GameState, relicId: RelicId): void {
   state.relics.push(relicId);
   state.relicEffects = computeRelicEffects(state.relics);
-  const newMax = Math.round(BASE_MAX_PLANET_HEALTH * state.relicEffects.planetMaxHealthMultiplier);
-  const maxHealthIncrease = newMax - state.maxPlanetHealth;
-  state.maxPlanetHealth = newMax;
-  state.planetHealth = Math.min(newMax, state.planetHealth + maxHealthIncrease);
 }
 
 const TIER_SPREAD = 90;
@@ -918,7 +939,7 @@ export function updateSpawner(state: GameState, dt: number): void {
     }
   }
 
-  const rate = getSpawnRate(state.spawner.elapsed) * state.relicEffects.spawnRateMultiplier;
+  const rate = getSpawnRate(state.spawner.elapsed);
   state.spawner.spawnAccumulator += rate * dt;
 
   const weights = getTierWeights(state.spawner.elapsed);
