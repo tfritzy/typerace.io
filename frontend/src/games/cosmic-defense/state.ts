@@ -798,6 +798,12 @@ function activateBuffer(state: GameState, e: EntityState): void {
   }
 }
 
+function grantCharge(state: GameState, e: EntityState, amount: number): void {
+  if (e.chargesRequired <= 0) return;
+  e.charge += amount;
+  activateAbility(state, e);
+}
+
 function activateAbility(state: GameState, e: EntityState): void {
   if (e.chargesRequired <= 0) return;
   while (e.charge >= e.chargesRequired) {
@@ -807,8 +813,7 @@ function activateAbility(state: GameState, e: EntityState): void {
       for (const ally of state.entities) {
         if (ally.id === e.id || ally.team !== Team.Allied) continue;
         if (ally.chargesRequired <= 0 || ally.chargesGranted > 0) continue;
-        ally.charge += e.chargesGranted + state.relicEffects.bonusChargesGranted;
-        activateAbility(state, ally);
+        grantCharge(state, ally, e.chargesGranted + state.relicEffects.bonusChargesGranted);
       }
       continue;
     }
@@ -851,9 +856,7 @@ export function onCorrectKeystroke(state: GameState): void {
     ? Math.min(MAX_STREAK_CHARGE_MULTIPLIER, 1 + state.perfectWordStreak * state.relicEffects.streakChargeBonus)
     : 1;
   for (const e of state.entities) {
-    if (e.chargesRequired <= 0) continue;
-    e.charge += chargeGain;
-    activateAbility(state, e);
+    grantCharge(state, e, chargeGain);
   }
 }
 
@@ -867,9 +870,7 @@ export function onPerfectWord(state: GameState): void {
   }
   if (state.relicEffects.bonusChargesPerPerfectWord > 0) {
     for (const e of state.entities) {
-      if (e.chargesRequired <= 0) continue;
-      e.charge += state.relicEffects.bonusChargesPerPerfectWord;
-      activateAbility(state, e);
+      grantCharge(state, e, state.relicEffects.bonusChargesPerPerfectWord);
     }
   }
   if (state.relicEffects.perfectWordSplashDamage > 0) {
