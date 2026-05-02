@@ -10,7 +10,8 @@ import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
 import { PlacementOverlay } from "./PlacementOverlay";
 import { PhraseOverlay } from "./PhraseOverlay";
-import { ScoreHud } from "./ScoreHud";
+import { Skull } from "lucide-react";
+import { Score } from "./Score";
 import { ShipChoiceOverlay } from "./ShipChoiceOverlay";
 import { RelicContainer } from "./RelicContainer";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
@@ -234,10 +235,10 @@ export const GameCanvas = () => {
           <div className="flex items-center justify-between mt-1">
             <RelicContainer game={gameRef.current} />
             <div className="flex items-center gap-1">
-              <ScoreHud game={gameRef.current} gameId={gameId} language={language} />
+              <Score game={gameRef.current} gameId={gameId} language={language} />
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-[12px]">💀</span>
+              <Skull className="w-3 h-3 text-[#a6adc8]" />
               <span className="text-[11px] text-[#a6adc8] font-semibold">{totalKills}</span>
             </div>
             <div className="flex items-center gap-1">

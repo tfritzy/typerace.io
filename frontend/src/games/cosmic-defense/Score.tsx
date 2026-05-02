@@ -6,13 +6,13 @@ import type { CosmicDefenseGame } from "./game";
 
 const SCORE_PUBLISH_INTERVAL_MS = 10_000;
 
-type ScoreHudProps = {
+type ScoreProps = {
   game: CosmicDefenseGame | null;
   gameId: string;
   language: string;
 };
 
-export const ScoreHud = ({ game, gameId, language }: ScoreHudProps) => {
+export const Score = ({ game, gameId, language }: ScoreProps) => {
   const conn = useDatabase();
   const [score, setScore] = useState(0);
   const publishScore = useCallback((nextScore: number) => {
