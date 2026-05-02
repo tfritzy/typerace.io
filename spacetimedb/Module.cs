@@ -1924,7 +1924,18 @@ public static partial class Module
             return 0;
         }
 
-        return (int)Math.Round(25.0 * Math.Pow(level, 2));
+        if (level >= 20)
+        {
+            return 500;
+        }
+
+        int startXp = 200;
+        int endXp = 500;
+        int startLevel = 2;
+        int endLevel = 20;
+
+        double progress = (double)(level - startLevel) / (endLevel - startLevel);
+        return (int)Math.Round(startXp + (endXp - startXp) * progress);
     }
 
     private static int UpdatePlayerElo(ReducerContext ctx, Identity playerId, Game game, int placement)
