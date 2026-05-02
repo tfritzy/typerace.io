@@ -73,11 +73,6 @@ export interface ProjectileState {
   vx: number;
   vy: number;
   shooterId: number;
-  targetX: number;
-  targetY: number;
-  targetEntityId: number | null;
-  distToTarget: number;
-  traveled: number;
 }
 
 export interface ExplosionState {
@@ -413,6 +408,21 @@ function checkCollisions(state: GameState): void {
   }
 }
 
+function segmentPointDistSq(ax: number, ay: number, bx: number, by: number, px: number, py: number): number {
+  const abx = bx - ax;
+  const aby = by - ay;
+  const abLenSq = abx * abx + aby * aby;
+  if (abLenSq === 0) {
+    const dx = px - ax; const dy = py - ay;
+    return dx * dx + dy * dy;
+  }
+  const t = Math.max(0, Math.min(1, ((px - ax) * abx + (py - ay) * aby) / abLenSq));
+  const cx = ax + t * abx;
+  const cy = ay + t * aby;
+  const dx = px - cx; const dy = py - cy;
+  return dx * dx + dy * dy;
+}
+
 const _targetResult = { x: 0, y: 0, entity: null as EntityState | null };
 
 function findNearestTarget(
@@ -737,15 +747,35 @@ export function updateState(state: GameState, dt: number): void {
 
   for (let i = state.projectiles.length - 1; i >= 0; i--) {
     const proj = state.projectiles[i];
+    const oldX = proj.x;
+    const oldY = proj.y;
     proj.x += proj.vx * dt;
     proj.y += proj.vy * dt;
-    proj.traveled += PROJECTILE_SPEED * dt;
 
-    if (proj.traveled < proj.distToTarget) continue;
-    state.projectiles.splice(i, 1);
+    if (!isInBounds(proj.x, proj.y)) {
+      state.projectiles.splice(i, 1);
+      continue;
+    }
 
     const shooter = state.entityById.get(proj.shooterId);
-    if (!shooter) continue;
+    if (!shooter) {
+      state.projectiles.splice(i, 1);
+      continue;
+    }
+
+    let hitEnemy: EntityState | null = null;
+    for (let j = state.entities.length - 1; j >= 0; j--) {
+      const other = state.entities[j];
+      if (other.team !== Team.Enemy) continue;
+      const r = Math.max(other.hitHalfW, other.hitHalfH);
+      if (segmentPointDistSq(oldX, oldY, proj.x, proj.y, other.x, other.y) <= r * r) {
+        hitEnemy = other;
+        break;
+      }
+    }
+
+    if (!hitEnemy) continue;
+    state.projectiles.splice(i, 1);
 
     const dmg = getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter));
 
@@ -753,25 +783,22 @@ export function updateState(state: GameState, dt: number): void {
       const effectiveRadius = shooter.team === Team.Allied
         ? shooter.explosionRadius * state.relicEffects.explosionRadiusMultiplier
         : shooter.explosionRadius;
-      spawnExplosion(state, shooter.entityType, proj.targetX, proj.targetY, effectiveRadius);
+      spawnExplosion(state, shooter.entityType, hitEnemy.x, hitEnemy.y, effectiveRadius);
       const r2 = effectiveRadius * effectiveRadius;
       for (let j = state.entities.length - 1; j >= 0; j--) {
         const other = state.entities[j];
         if (other.team !== Team.Enemy) continue;
-        const dx = other.x - proj.targetX;
-        const dy = other.y - proj.targetY;
+        const dx = other.x - hitEnemy.x;
+        const dy = other.y - hitEnemy.y;
         if (dx * dx + dy * dy > r2) continue;
         if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
         if (shooter.freezeStacks > 0) applyFreezeStacks(state, other, shooter.freezeStacks);
         if (dmg > 0) dealDamageToEntity(state, shooter, other, dmg);
       }
     } else {
-      const target = proj.targetEntityId !== null ? state.entityById.get(proj.targetEntityId) : null;
-      if (target) {
-        if (shooter.plasmaStacksApplied > 0) target.plasmaStacks += shooter.plasmaStacksApplied;
-        spawnExplosion(state, shooter.entityType, target.x, target.y);
-        dealDamageToEntity(state, shooter, target, dmg);
-      }
+      if (shooter.plasmaStacksApplied > 0) hitEnemy.plasmaStacks += shooter.plasmaStacksApplied;
+      spawnExplosion(state, shooter.entityType, hitEnemy.x, hitEnemy.y);
+      dealDamageToEntity(state, shooter, hitEnemy, dmg);
     }
   }
 }
@@ -808,11 +835,6 @@ function fireShot(state: GameState, e: EntityState): void {
     vx: (dx / dist) * PROJECTILE_SPEED,
     vy: (dy / dist) * PROJECTILE_SPEED,
     shooterId: e.id,
-    targetX: target.x,
-    targetY: target.y,
-    targetEntityId: target.entity?.id ?? null,
-    distToTarget: dist,
-    traveled: 0,
   });
 }
 
