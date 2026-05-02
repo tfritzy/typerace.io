@@ -36,10 +36,10 @@ export type RelicId =
   | "permafrost"
   | "blizzard"
   | "superheated"
-  | "arctic_core"
+  | "cryo_field"
   | "cryo_recharge"
-  | "thermal_shock"
-  | "flash_freeze";
+  | "ice_armor"
+  | "frost_nova";
 
 export interface RelicEffects {
   damageMultiplier: number;
@@ -79,10 +79,10 @@ export interface RelicEffects {
   blizzardFreezeInterval: number;
   blizzardFreezeStacks: number;
   plasmaSlow: number;
-  iceDamageMultiplier: number;
+  regenPerFrozenEnemy: number;
   chargesOnFrozenKill: number;
-  thermalShockDamage: number;
-  frozenPlasmaMult: number;
+  planetFreezeOnHit: number;
+  frostNovaDamage: number;
 }
 
 export interface RelicDefinition {
@@ -340,32 +340,32 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     effects: { plasmaSlow: 0.3 },
   },
   {
-    id: "arctic_core",
-    name: "Arctic Core",
-    description: "Ice ships deal 25% more damage.",
+    id: "cryo_field",
+    name: "Cryo Field",
+    description: "Planet regenerates 1 HP per second for each frozen enemy.",
     sprite: "/futuristic_pixel_icons/Blue Star Crystal.png",
-    effects: { iceDamageMultiplier: 1.25 },
+    effects: { regenPerFrozenEnemy: 1 },
   },
   {
     id: "cryo_recharge",
     name: "Cryo Recharge",
-    description: "Killing a frozen enemy grants all ships 2 charges.",
+    description: "Killing a frozen enemy grants all ships 1 charge.",
     sprite: "/futuristic_pixel_icons/Turqoise Ring.png",
-    effects: { chargesOnFrozenKill: 2 },
+    effects: { chargesOnFrozenKill: 1 },
   },
   {
-    id: "thermal_shock",
-    name: "Thermal Shock",
-    description: "Applying freeze to a burning enemy deals 30 damage and removes all plasma stacks.",
+    id: "ice_armor",
+    name: "Ice Armor",
+    description: "When the planet takes damage, freeze the attacker for 2 seconds.",
     sprite: "/futuristic_pixel_icons/Orange Star Shards.png",
-    effects: { thermalShockDamage: 30 },
+    effects: { planetFreezeOnHit: 2 },
   },
   {
-    id: "flash_freeze",
-    name: "Flash Freeze",
-    description: "Plasma tick damage against frozen enemies is doubled.",
+    id: "frost_nova",
+    name: "Frost Nova",
+    description: "When an enemy is frozen, it takes 15 instant damage.",
     sprite: "/futuristic_pixel_icons/Light Crystal.png",
-    effects: { frozenPlasmaMult: 2 },
+    effects: { frostNovaDamage: 15 },
   },
 ];
 
@@ -412,10 +412,10 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     blizzardFreezeInterval: 0,
     blizzardFreezeStacks: 0,
     plasmaSlow: 0,
-    iceDamageMultiplier: 1,
+    regenPerFrozenEnemy: 0,
     chargesOnFrozenKill: 0,
-    thermalShockDamage: 0,
-    frozenPlasmaMult: 1,
+    planetFreezeOnHit: 0,
+    frostNovaDamage: 0,
   };
   for (const relicId of relics) {
     const def = RELIC_MAP.get(relicId);
@@ -457,10 +457,10 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     if (def.effects.blizzardFreezeInterval !== undefined) result.blizzardFreezeInterval += def.effects.blizzardFreezeInterval;
     if (def.effects.blizzardFreezeStacks !== undefined) result.blizzardFreezeStacks += def.effects.blizzardFreezeStacks;
     if (def.effects.plasmaSlow !== undefined) result.plasmaSlow += def.effects.plasmaSlow;
-    if (def.effects.iceDamageMultiplier !== undefined) result.iceDamageMultiplier *= def.effects.iceDamageMultiplier;
+    if (def.effects.regenPerFrozenEnemy !== undefined) result.regenPerFrozenEnemy += def.effects.regenPerFrozenEnemy;
     if (def.effects.chargesOnFrozenKill !== undefined) result.chargesOnFrozenKill += def.effects.chargesOnFrozenKill;
-    if (def.effects.thermalShockDamage !== undefined) result.thermalShockDamage += def.effects.thermalShockDamage;
-    if (def.effects.frozenPlasmaMult !== undefined) result.frozenPlasmaMult *= def.effects.frozenPlasmaMult;
+    if (def.effects.planetFreezeOnHit !== undefined) result.planetFreezeOnHit += def.effects.planetFreezeOnHit;
+    if (def.effects.frostNovaDamage !== undefined) result.frostNovaDamage += def.effects.frostNovaDamage;
   }
   return result;
 }

@@ -497,11 +497,10 @@ function applyDeathExplosion(state: GameState, origin: EntityState, apply: (e: E
 
 function applyFreezeStacks(state: GameState, target: EntityState, stacks: number): void {
   if (stacks <= 0) return;
-  const wasBurning = target.plasmaStacks > 0;
+  const wasFrozen = target.freezeStacks > 0;
   target.freezeStacks += stacks;
-  if (state.relicEffects.thermalShockDamage > 0 && wasBurning) {
-    target.plasmaStacks = 0;
-    dealDamageToEntity(state, null, target, state.relicEffects.thermalShockDamage);
+  if (!wasFrozen && state.relicEffects.frostNovaDamage > 0) {
+    dealDamageToEntity(state, null, target, state.relicEffects.frostNovaDamage);
   }
 }
 
@@ -630,9 +629,14 @@ function performInstantHit(
       ? Math.round(damage * state.relicEffects.planetDamageReduction)
       : damage;
     state.planetHealth = Math.max(0, state.planetHealth - reducedDamage);
-    if (shooter.team === Team.Enemy && reducedDamage > 0 && state.relicEffects.chargesOnPlanetDamage > 0) {
-      for (const e of state.entities) {
-        grantCharge(state, e, state.relicEffects.chargesOnPlanetDamage);
+    if (shooter.team === Team.Enemy && reducedDamage > 0) {
+      if (state.relicEffects.chargesOnPlanetDamage > 0) {
+        for (const e of state.entities) {
+          grantCharge(state, e, state.relicEffects.chargesOnPlanetDamage);
+        }
+      }
+      if (state.relicEffects.planetFreezeOnHit > 0) {
+        applyFreezeStacks(state, shooter, state.relicEffects.planetFreezeOnHit);
       }
     }
     state.onPlanetDamaged.emit();
@@ -653,13 +657,18 @@ export function updateState(state: GameState, dt: number): void {
     if (state.relicEffects.planetHealPerSecond > 0) {
       state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetHealPerSecond);
     }
+    if (state.relicEffects.regenPerFrozenEnemy > 0) {
+      const frozenCount = state.entities.filter(e => e.team === Team.Enemy && e.freezeStacks > 0).length;
+      if (frozenCount > 0) {
+        state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + frozenCount * state.relicEffects.regenPerFrozenEnemy);
+      }
+    }
     for (let i = state.entities.length - 1; i >= 0; i--) {
       const e = state.entities[i];
       if (e.team !== Team.Enemy) continue;
 
       if (e.plasmaStacks > 0) {
-        const frozenBonus = state.relicEffects.frozenPlasmaMult > 1 && e.freezeStacks > 0 ? state.relicEffects.frozenPlasmaMult : 1;
-        const dmg = e.plasmaStacks * PLASMA_DAMAGE_PER_TICK * state.relicEffects.plasmaDamageMultiplier * frozenBonus;
+        const dmg = e.plasmaStacks * PLASMA_DAMAGE_PER_TICK * state.relicEffects.plasmaDamageMultiplier;
         e.plasmaStacks = Math.max(0, e.plasmaStacks - 1);
         if (dealDamageToEntity(state, null, e, dmg)) continue;
       }
@@ -764,7 +773,6 @@ function getEffectiveProjectileDamage(state: GameState, shooter: EntityState): n
   let mult = 1;
   if (shooter.team === Team.Allied) {
     if (shooter.damageType === DamageType.Physical) mult = state.relicEffects.projectileDamageMultiplier;
-    else if (shooter.damageType === DamageType.Ice) mult = state.relicEffects.iceDamageMultiplier;
   }
   return Math.round(shooter.projectileDamage * mult);
 }
@@ -804,9 +812,7 @@ function fireLaser(state: GameState, e: EntityState): void {
 
   const laserMult = e.damageType === DamageType.Laser
     ? state.relicEffects.laserDamageMultiplier
-    : e.damageType === DamageType.Ice
-      ? state.relicEffects.iceDamageMultiplier
-      : 1;
+    : 1;
   const dmg = getBuffedDamage(e, Math.round(e.laserDamage * laserMult));
   const searchRange = piercing ? LASER_RANGE : len + 20;
   const extraHitRadius = e.beamWidth * 5;
