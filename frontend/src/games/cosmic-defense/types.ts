@@ -10,16 +10,6 @@ export enum Team {
   Enemy,
 }
 
-export enum ProjectileType {
-  Tiny = 0,
-  Projectile1 = 1,
-  Projectile2 = 2,
-  Projectile3 = 3,
-  Projectile4 = 4,
-  Projectile5 = 5,
-  Projectile6 = 6,
-}
-
 export enum DamageType {
   Physical = "physical",
   Laser = "laser",

@@ -1,5 +1,5 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT, MAX_VITAL_MATRIX_BONUS } from "./constants";
-import { type EntityType, ColorPreset, ProjectileType, ExplosionType, Team, getExplosionType, DamageType } from "./types";
+import { type EntityType, ColorPreset, ExplosionType, Team, getExplosionType, DamageType } from "./types";
 import { ENEMY_CATALOG, BOSS_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } from "./relics";
@@ -34,7 +34,6 @@ export interface EntityState {
   team: Team;
   fireRate: number;
   projectileDamage: number;
-  projectileType: ProjectileType;
   fireTimer: number;
   rotation: number;
   displayRotation: number;
@@ -297,7 +296,6 @@ function makeBaseEntity(
     team,
     fireRate: 0,
     projectileDamage: 0,
-    projectileType: ProjectileType.Tiny,
     fireTimer: 0,
     rotation: 0,
     displayRotation: 0,
@@ -372,7 +370,6 @@ export function spawnAlliedEntity(
   entity.health = scaled.health;
   entity.maxHealth = scaled.health;
   entity.projectileDamage = scaled.projectileDamage;
-  entity.projectileType = config.projectileType;
   entity.chargesRequired = config.chargesRequired;
   entity.role = getShipRole(config.entityType);
   entity.plasmaStacksApplied = config.plasmaStacks;

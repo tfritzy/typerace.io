@@ -1,5 +1,5 @@
 import { Assets, type Application, type AssetsManifest, Sprite, type Spritesheet, type Texture } from "pixi.js";
-import { ColorPreset, type EntityType, type ProjectileType, getShipEntityIndex } from "./types";
+import { ColorPreset, type EntityType, getShipEntityIndex } from "./types";
 import { applyPaletteSwap } from "../planetary-defense/ships";
 
 const COLOR_PRESET_ALIASES: Record<ColorPreset, string> = {
@@ -24,7 +24,6 @@ export class AssetManager {
   private spaceshipsColormap_: Spritesheet;
   private spaceshipsShield_: Spritesheet;
   private colorPresets_: Record<string, Texture>;
-  private projectileSheets_: Spritesheet[];
   private plasmaExplosionSheet_: Spritesheet;
   private shipDeathExplosionSheet_: Spritesheet;
   private iceExplosionSheet_: Spritesheet;
@@ -44,10 +43,6 @@ export class AssetManager {
     this.colorPresets_ = Object.fromEntries(
       presetAliasValues.map((a) => [a, loaded[a] as Texture])
     );
-    this.projectileSheets_ = [];
-    for (let i = 1; i <= 6; i++) {
-      this.projectileSheets_.push(loaded[`projectile-${i}`] as Spritesheet);
-    }
     this.plasmaExplosionSheet_ = loaded["plasma-explosion"] as Spritesheet;
     this.shipDeathExplosionSheet_ = loaded["ship-death-explosion"] as Spritesheet;
     this.iceExplosionSheet_ = loaded["ice-explosion"] as Spritesheet;
@@ -82,15 +77,6 @@ export class AssetManager {
   getShieldTexture(entityType: EntityType): Texture {
     const frameIndex = getShipEntityIndex(entityType);
     return this.spaceshipsShield_.textures[`shield-${frameIndex}`];
-  }
-
-  getProjectileTextures(projectileType: ProjectileType): Texture[] {
-    const sheet = this.projectileSheets_[projectileType - 1];
-    const textures: Texture[] = [];
-    for (let i = 0; i < 5; i++) {
-      textures.push(sheet.textures[`proj-${projectileType}-${i}`]);
-    }
-    return textures;
   }
 
   getPlasmaExplosionTextures(): Texture[] {
@@ -191,9 +177,6 @@ export class AssetManager {
     setNearestNeighbor(this.spaceshipsShield_);
     for (const tex of Object.values(this.colorPresets_)) {
       setTextureNearest(tex);
-    }
-    for (const sheet of this.projectileSheets_) {
-      setNearestNeighbor(sheet);
     }
     setNearestNeighbor(this.plasmaExplosionSheet_);
     setNearestNeighbor(this.shipDeathExplosionSheet_);

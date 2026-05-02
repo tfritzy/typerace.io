@@ -1,4 +1,4 @@
-import { type EntityType, ProjectileType, DamageType } from "./types";
+import { type EntityType, DamageType } from "./types";
 
 export interface ShipHitbox {
   hitWidth: number;
@@ -75,7 +75,6 @@ export interface EnemyBaseConfig {
   health: number;
   fireRate: number;
   projectileDamage: number;
-  projectileType: ProjectileType;
   range: number;
 }
 
@@ -136,7 +135,6 @@ export interface FriendlyConfig {
   entityType: EntityType;
   health: number;
   projectileDamage: number;
-  projectileType: ProjectileType;
   chargesRequired: number;
   plasmaStacks: number;
   laserDamage: number;
@@ -151,29 +149,29 @@ export interface FriendlyConfig {
 }
 
 const ENEMY_BASE_CATALOG: EnemyBaseConfig[] = [
-  { entityType: "Pulse", health: 30, fireRate: 2.2, projectileDamage: 4, projectileType: ProjectileType.Tiny, range: 500 },
-  { entityType: "Buckler", health: 42, fireRate: 2.1, projectileDamage: 5, projectileType: ProjectileType.Tiny, range: 510 },
-  { entityType: "Pip", health: 53, fireRate: 2.0, projectileDamage: 7, projectileType: ProjectileType.Tiny, range: 520 },
-  { entityType: "Flea", health: 72, fireRate: 1.9, projectileDamage: 9, projectileType: ProjectileType.Tiny, range: 530 },
-  { entityType: "Needle", health: 95, fireRate: 1.8, projectileDamage: 11, projectileType: ProjectileType.Projectile2, range: 540 },
-  { entityType: "Bolt", health: 128, fireRate: 1.7, projectileDamage: 14, projectileType: ProjectileType.Projectile2, range: 550 },
-  { entityType: "Cricket", health: 170, fireRate: 1.6, projectileDamage: 18, projectileType: ProjectileType.Projectile2, range: 560 },
-  { entityType: "Robin", health: 225, fireRate: 1.5, projectileDamage: 22, projectileType: ProjectileType.Projectile2, range: 570 },
-  { entityType: "Sparrow", health: 300, fireRate: 1.4, projectileDamage: 28, projectileType: ProjectileType.Projectile3, range: 580 },
-  { entityType: "Hornet", health: 398, fireRate: 1.3, projectileDamage: 35, projectileType: ProjectileType.Projectile3, range: 590 },
-  { entityType: "Dart", health: 525, fireRate: 1.2, projectileDamage: 42, projectileType: ProjectileType.Projectile3, range: 600 },
-  { entityType: "Scout", health: 705, fireRate: 1.1, projectileDamage: 52, projectileType: ProjectileType.Projectile3, range: 610 },
-  { entityType: "Hawk", health: 938, fireRate: 1.0, projectileDamage: 62, projectileType: ProjectileType.Projectile4, range: 620 },
-  { entityType: "Dynamo", health: 1257, fireRate: 0.95, projectileDamage: 80, projectileType: ProjectileType.Projectile4, range: 630 },
-  { entityType: "Harrier", health: 1670, fireRate: 0.9, projectileDamage: 100, projectileType: ProjectileType.Projectile4, range: 640 },
-  { entityType: "Raptor", health: 2213, fireRate: 0.85, projectileDamage: 125, projectileType: ProjectileType.Projectile4, range: 650 },
-  { entityType: "Eagle", health: 2945, fireRate: 0.8, projectileDamage: 155, projectileType: ProjectileType.Projectile5, range: 660 },
-  { entityType: "Corsair", health: 3920, fireRate: 0.8, projectileDamage: 190, projectileType: ProjectileType.Projectile5, range: 670 },
-  { entityType: "Vanguard", health: 5213, fireRate: 0.75, projectileDamage: 235, projectileType: ProjectileType.Projectile5, range: 680 },
-  { entityType: "Titan", health: 6938, fireRate: 0.7, projectileDamage: 290, projectileType: ProjectileType.Projectile6, range: 690 },
-  { entityType: "Dreadnought", health: 9225, fireRate: 0.7, projectileDamage: 355, projectileType: ProjectileType.Projectile6, range: 700 },
-  { entityType: "Leviathan", health: 12263, fireRate: 0.65, projectileDamage: 430, projectileType: ProjectileType.Projectile6, range: 710 },
-  { entityType: "Flagship", health: 16313, fireRate: 0.6, projectileDamage: 530, projectileType: ProjectileType.Projectile6, range: 720 },
+  { entityType: "Pulse", health: 30, fireRate: 2.2, projectileDamage: 4, range: 500 },
+  { entityType: "Buckler", health: 42, fireRate: 2.1, projectileDamage: 5, range: 510 },
+  { entityType: "Pip", health: 53, fireRate: 2.0, projectileDamage: 7, range: 520 },
+  { entityType: "Flea", health: 72, fireRate: 1.9, projectileDamage: 9, range: 530 },
+  { entityType: "Needle", health: 95, fireRate: 1.8, projectileDamage: 11, range: 540 },
+  { entityType: "Bolt", health: 128, fireRate: 1.7, projectileDamage: 14, range: 550 },
+  { entityType: "Cricket", health: 170, fireRate: 1.6, projectileDamage: 18, range: 560 },
+  { entityType: "Robin", health: 225, fireRate: 1.5, projectileDamage: 22, range: 570 },
+  { entityType: "Sparrow", health: 300, fireRate: 1.4, projectileDamage: 28, range: 580 },
+  { entityType: "Hornet", health: 398, fireRate: 1.3, projectileDamage: 35, range: 590 },
+  { entityType: "Dart", health: 525, fireRate: 1.2, projectileDamage: 42, range: 600 },
+  { entityType: "Scout", health: 705, fireRate: 1.1, projectileDamage: 52, range: 610 },
+  { entityType: "Hawk", health: 938, fireRate: 1.0, projectileDamage: 62, range: 620 },
+  { entityType: "Dynamo", health: 1257, fireRate: 0.95, projectileDamage: 80, range: 630 },
+  { entityType: "Harrier", health: 1670, fireRate: 0.9, projectileDamage: 100, range: 640 },
+  { entityType: "Raptor", health: 2213, fireRate: 0.85, projectileDamage: 125, range: 650 },
+  { entityType: "Eagle", health: 2945, fireRate: 0.8, projectileDamage: 155, range: 660 },
+  { entityType: "Corsair", health: 3920, fireRate: 0.8, projectileDamage: 190, range: 670 },
+  { entityType: "Vanguard", health: 5213, fireRate: 0.75, projectileDamage: 235, range: 680 },
+  { entityType: "Titan", health: 6938, fireRate: 0.7, projectileDamage: 290, range: 690 },
+  { entityType: "Dreadnought", health: 9225, fireRate: 0.7, projectileDamage: 355, range: 700 },
+  { entityType: "Leviathan", health: 12263, fireRate: 0.65, projectileDamage: 430, range: 710 },
+  { entityType: "Flagship", health: 16313, fireRate: 0.6, projectileDamage: 530, range: 720 },
 ];
 
 export const ENEMY_CATALOG: EnemyConfig[] = ENEMY_BASE_CATALOG.map((baseConfig, zeroBasedTier) => createEnemyConfig(baseConfig, zeroBasedTier));
@@ -181,19 +179,19 @@ export const ENEMY_CATALOG: EnemyConfig[] = ENEMY_BASE_CATALOG.map((baseConfig, 
 export const BOSS_CATALOG: EnemyConfig[] = ENEMY_CATALOG.map(createBossConfig);
 
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [
-  { entityType: "Spur", health: 300, projectileDamage: 40, projectileType: ProjectileType.Projectile5, chargesRequired: 8, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
-  { entityType: "Ember", health: 200, projectileDamage: 7, projectileType: ProjectileType.Projectile1, chargesRequired: 3, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
-  { entityType: "Corona", health: 150, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 1, plasmaStacks: 0, laserDamage: 5, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser },
-  { entityType: "Pip", health: 150, projectileDamage: 8, projectileType: ProjectileType.Tiny, chargesRequired: 2, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 2, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
-  { entityType: "Eagle", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 6, plasmaStacks: 3, laserDamage: 10, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Plasma },
-  { entityType: "Needle", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, plasmaStacks: 0, laserDamage: 3, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser },
-  { entityType: "Flare", health: 300, projectileDamage: 8, projectileType: ProjectileType.Projectile4, chargesRequired: 8, plasmaStacks: 0, laserDamage: 0, freezeStacks: 3, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0, damageType: DamageType.Ice },
-  { entityType: "Dart", health: 200, projectileDamage: 0, projectileType: ProjectileType.Projectile3, chargesRequired: 6, plasmaStacks: 2, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0.33, damageType: DamageType.Plasma },
-  { entityType: "Moth", health: 200, projectileDamage: 20, projectileType: ProjectileType.Projectile1, chargesRequired: 4, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
-  { entityType: "Prism", health: 150, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 2, plasmaStacks: 0, laserDamage: 4, freezeStacks: 2, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Ice },
-  { entityType: "Hawk", health: 200, projectileDamage: 10, projectileType: ProjectileType.Projectile2, chargesRequired: 6, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0, damageType: DamageType.Physical },
-  { entityType: "Nova", health: 180, projectileDamage: 5, projectileType: ProjectileType.Projectile1, chargesRequired: 5, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 3, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
-  { entityType: "Lance", health: 400, projectileDamage: 0, projectileType: ProjectileType.Projectile6, chargesRequired: 14, plasmaStacks: 0, laserDamage: 30, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 6, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser },
+  { entityType: "Spur", health: 300, projectileDamage: 40, chargesRequired: 8, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
+  { entityType: "Ember", health: 200, projectileDamage: 7, chargesRequired: 3, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
+  { entityType: "Corona", health: 150, projectileDamage: 0, chargesRequired: 1, plasmaStacks: 0, laserDamage: 5, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser },
+  { entityType: "Pip", health: 150, projectileDamage: 8, chargesRequired: 2, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 2, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
+  { entityType: "Eagle", health: 200, projectileDamage: 0, chargesRequired: 6, plasmaStacks: 3, laserDamage: 10, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Plasma },
+  { entityType: "Needle", health: 200, projectileDamage: 0, chargesRequired: 4, plasmaStacks: 0, laserDamage: 3, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser },
+  { entityType: "Flare", health: 300, projectileDamage: 8, chargesRequired: 8, plasmaStacks: 0, laserDamage: 0, freezeStacks: 3, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0, damageType: DamageType.Ice },
+  { entityType: "Dart", health: 200, projectileDamage: 0, chargesRequired: 6, plasmaStacks: 2, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0.33, damageType: DamageType.Plasma },
+  { entityType: "Moth", health: 200, projectileDamage: 20, chargesRequired: 4, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
+  { entityType: "Prism", health: 150, projectileDamage: 0, chargesRequired: 2, plasmaStacks: 0, laserDamage: 4, freezeStacks: 2, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Ice },
+  { entityType: "Hawk", health: 200, projectileDamage: 10, chargesRequired: 6, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0, damageType: DamageType.Physical },
+  { entityType: "Nova", health: 180, projectileDamage: 5, chargesRequired: 5, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 3, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
+  { entityType: "Lance", health: 400, projectileDamage: 0, chargesRequired: 14, plasmaStacks: 0, laserDamage: 30, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 6, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser },
 ];
 
 export const FRIENDLY_CONFIG_MAP = new Map<string, FriendlyConfig>(
