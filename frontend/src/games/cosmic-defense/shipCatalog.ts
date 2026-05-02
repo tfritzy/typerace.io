@@ -1,5 +1,5 @@
 import { type EntityType, ColorPreset } from "./types";
-import { Crosshair, Gauge, Flame, Zap, Focus, Shield, Snowflake, Link, Bomb, Swords, Sparkles, Waves, Target } from "lucide-react";
+import { Crosshair, Gauge, Flame, Zap, Focus, Shield, Snowflake, Link, Bomb, Swords, Sparkles, Waves, Target, Repeat2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export type ShipRole =
@@ -15,7 +15,8 @@ export type ShipRole =
   | "ice_beam"
   | "plasma_single"
   | "chain"
-  | "mac_cannon";
+  | "mac_cannon"
+  | "bouncing";
 
 export const ROLE_META: Record<ShipRole, { icon: LucideIcon; label: string; color: string }> = {
   sniper: { icon: Target, label: "Sniper", color: "#f38ba8" },
@@ -31,6 +32,7 @@ export const ROLE_META: Record<ShipRole, { icon: LucideIcon; label: string; colo
   plasma_single: { icon: Bomb, label: "Plasma", color: "#eba0ac" },
   chain: { icon: Link, label: "Chain", color: "#a6e3a1" },
   mac_cannon: { icon: Shield, label: "MAC Cannon", color: "#cdd6f4" },
+  bouncing: { icon: Repeat2, label: "Bouncing", color: "#89b4fa" },
 };
 
 export interface ShipBlueprint {
@@ -54,6 +56,7 @@ export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   { entityType: "Hawk", colorPreset: ColorPreset.Preset1, role: "plasma_single", description: "Heavy plasma rounds" },
   { entityType: "Nova", colorPreset: ColorPreset.Preset1, role: "chain", description: "Bouncing chain shots" },
   { entityType: "Lance", colorPreset: ColorPreset.Preset1, role: "mac_cannon", description: "Wide piercing cannon" },
+  { entityType: "Bolt", colorPreset: ColorPreset.Preset2, role: "bouncing", description: "Ricocheting blue projectiles" },
 ];
 
 export const SHIP_BLUEPRINT_MAP = new Map<string, ShipBlueprint>();

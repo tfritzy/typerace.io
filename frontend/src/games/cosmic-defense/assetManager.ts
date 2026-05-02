@@ -133,6 +133,14 @@ export class AssetManager {
     return textures;
   }
 
+  getBouncingExplosionTextures(): Texture[] {
+    const textures: Texture[] = [];
+    for (let i = 0; i < 14; i++) {
+      textures.push(this.plasmaExplosionSheet_.textures[`exp-8-${i}`]);
+    }
+    return textures;
+  }
+
   getShipTextureSize(entityType: EntityType): { width: number; height: number } {
     const frameIndex = getShipEntityIndex(entityType);
     const tex = this.spaceships_.textures[`ship-${frameIndex}`];

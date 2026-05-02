@@ -195,6 +195,7 @@ export const FRIENDLY_CATALOG: FriendlyConfig[] = [
   { entityType: "Hawk", health: 200, projectileDamage: 10, projectileType: ProjectileType.Projectile2, chargesRequired: 6, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0 },
   { entityType: "Nova", health: 180, projectileDamage: 5, projectileType: ProjectileType.Projectile1, chargesRequired: 5, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 3, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0 },
   { entityType: "Lance", health: 400, projectileDamage: 0, projectileType: ProjectileType.Projectile6, chargesRequired: 14, plasmaStacks: 0, chargesGranted: 0, laserDamage: 30, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 6, explosionRadius: 0, hitDelay: 0 },
+  { entityType: "Bolt", health: 220, projectileDamage: 8, projectileType: ProjectileType.Projectile2, chargesRequired: 7, plasmaStacks: 0, chargesGranted: 0, laserDamage: 0, freezeStacks: 0, chainCount: 4, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0 },
 ];
 
 export const FRIENDLY_CONFIG_MAP = new Map<string, FriendlyConfig>(

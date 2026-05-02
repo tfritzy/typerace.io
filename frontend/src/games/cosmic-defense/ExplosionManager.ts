@@ -58,6 +58,7 @@ export class ExplosionManager {
       case ExplosionType.Explosive:    return this.assets.getHawkExplosionTextures();
       case ExplosionType.MothHit:      return this.assets.getMothExplosionTextures();
       case ExplosionType.ChainHit:     return this.assets.getChainHitTextures();
+      case ExplosionType.BouncingHit:  return this.assets.getBouncingExplosionTextures();
       default:                         return this.assets.getMothExplosionTextures();
     }
   }
@@ -66,8 +67,11 @@ export class ExplosionManager {
     const textures = this.getExplosionTextures(exp.explosionType);
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
-    sprite.scale.set(EXPLOSION_SCALE * 0.5 + (exp.explosionRadius / BASE_EXPLOSION_RADIUS) * EXPLOSION_SCALE * 0.5);
-    sprite.animationSpeed = EXPLOSION_ANIMATION_SPEED;
+    const baseScale = EXPLOSION_SCALE * 0.5 + (exp.explosionRadius / BASE_EXPLOSION_RADIUS) * EXPLOSION_SCALE * 0.5;
+    const scaleMult = exp.explosionType === ExplosionType.BouncingHit ? 0.5 : 1;
+    const speedMult = exp.explosionType === ExplosionType.BouncingHit ? 2 : 1;
+    sprite.scale.set(baseScale * scaleMult);
+    sprite.animationSpeed = EXPLOSION_ANIMATION_SPEED * speedMult;
     sprite.loop = false;
     sprite.onComplete = () => {
       this.completedIds.add(exp.id);
