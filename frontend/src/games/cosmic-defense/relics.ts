@@ -23,7 +23,11 @@ export type RelicId =
   | "photon_surge"
   | "void_rupture"
   | "kinetic_mirror"
-  | "chrono_burst";
+  | "plasma_amplifier"
+  | "death_nova"
+  | "cryo_shatter"
+  | "frost_chain"
+  | "first_strike";
 
 export interface RelicEffects {
   damageMultiplier: number;
@@ -52,6 +56,11 @@ export interface RelicEffects {
   explosionPlasmaStacks: number;
   lifeStealPercent: number;
   streakMilestoneDamage: number;
+  plasmaDamageMultiplier: number;
+  deathNovaPlasmaStacks: number;
+  frozenDamageMultiplier: number;
+  frostChainFreezeStacks: number;
+  firstStrikeDamageBonus: number;
 }
 
 export interface RelicDefinition {
@@ -206,14 +215,14 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "cascade_protocol",
     name: "Kill Drive",
-    description: "Allied ships gain 3 charges when they destroy an enemy.",
+    description: "The killing ship gains 1 charge when it destroys an enemy.",
     sprite: "/futuristic_pixel_icons/Lightning Icon.png",
-    effects: { chargesPerKill: 3 },
+    effects: { chargesPerKill: 1 },
   },
   {
     id: "photon_surge",
     name: "Photon Surge",
-    description: "Completing a word with no errors deals 25 damage split among all enemies on screen.",
+    description: "Completing a word with no errors deals 25 damage to a random enemy.",
     sprite: "/futuristic_pixel_icons/Bluerite Orb.png",
     effects: { perfectWordSplashDamage: 25 },
   },
@@ -237,6 +246,41 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Every 5th consecutive perfect word triggers a shockwave dealing 50 damage to all enemies.",
     sprite: "/futuristic_pixel_icons/Onyx Star Shards.png",
     effects: { streakMilestoneDamage: 50 },
+  },
+  {
+    id: "plasma_amplifier",
+    name: "Plasma Amplifier",
+    description: "Plasma deals 2x more damage.",
+    sprite: "/futuristic_pixel_icons/Red Circuit.png",
+    effects: { plasmaDamageMultiplier: 2 },
+  },
+  {
+    id: "death_nova",
+    name: "Death Nova",
+    description: "When an enemy dies, it explodes applying 5 plasma stacks to nearby enemies.",
+    sprite: "/futuristic_pixel_icons/Green Grenade.png",
+    effects: { deathNovaPlasmaStacks: 5 },
+  },
+  {
+    id: "cryo_shatter",
+    name: "Cryo Shatter",
+    description: "Frozen enemies take 2x damage.",
+    sprite: "/futuristic_pixel_icons/Ice Pack.png",
+    effects: { frozenDamageMultiplier: 2 },
+  },
+  {
+    id: "frost_chain",
+    name: "Frost Chain",
+    description: "When a frozen enemy dies, it explodes freezing nearby enemies for 1 second.",
+    sprite: "/futuristic_pixel_icons/Turqoise Ring.png",
+    effects: { frostChainFreezeStacks: 1 },
+  },
+  {
+    id: "first_strike",
+    name: "First Strike",
+    description: "Undamaged enemies take 50% more damage.",
+    sprite: "/futuristic_pixel_icons/Bolt.png",
+    effects: { firstStrikeDamageBonus: 0.5 },
   },
 ];
 
@@ -272,6 +316,11 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     explosionPlasmaStacks: 0,
     lifeStealPercent: 0,
     streakMilestoneDamage: 0,
+    plasmaDamageMultiplier: 1,
+    deathNovaPlasmaStacks: 0,
+    frozenDamageMultiplier: 1,
+    frostChainFreezeStacks: 0,
+    firstStrikeDamageBonus: 0,
   };
   for (const relicId of relics) {
     const def = RELIC_MAP.get(relicId);
@@ -302,6 +351,11 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     if (def.effects.explosionPlasmaStacks !== undefined) result.explosionPlasmaStacks += def.effects.explosionPlasmaStacks;
     if (def.effects.lifeStealPercent !== undefined) result.lifeStealPercent += def.effects.lifeStealPercent;
     if (def.effects.streakMilestoneDamage !== undefined) result.streakMilestoneDamage += def.effects.streakMilestoneDamage;
+    if (def.effects.plasmaDamageMultiplier !== undefined) result.plasmaDamageMultiplier *= def.effects.plasmaDamageMultiplier;
+    if (def.effects.deathNovaPlasmaStacks !== undefined) result.deathNovaPlasmaStacks += def.effects.deathNovaPlasmaStacks;
+    if (def.effects.frozenDamageMultiplier !== undefined) result.frozenDamageMultiplier *= def.effects.frozenDamageMultiplier;
+    if (def.effects.frostChainFreezeStacks !== undefined) result.frostChainFreezeStacks += def.effects.frostChainFreezeStacks;
+    if (def.effects.firstStrikeDamageBonus !== undefined) result.firstStrikeDamageBonus += def.effects.firstStrikeDamageBonus;
   }
   return result;
 }

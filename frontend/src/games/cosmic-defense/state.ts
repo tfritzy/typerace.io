@@ -10,9 +10,9 @@ const PLASMA_DAMAGE_PER_TICK = 1;
 const LASER_RANGE = 2200;
 const SCORE_PER_XP = 10;
 const MAX_CHAIN_JUMP_DISTANCE = 300;
-const MIN_SPLASH_DAMAGE_PER_ENEMY = 1;
 const STREAK_MILESTONE_INTERVAL = 5;
 const MAX_VITAL_MATRIX_BONUS = 500;
+const DEATH_EXPLOSION_RADIUS = 100;
 
 export enum TargetingMode {
   NearestToPlanet = 0,
@@ -493,6 +493,12 @@ function dealDamageToEntity(
   if (attacker?.team === Team.Allied && target.team === Team.Enemy) {
     const streakMultiplier = Math.min(1.25, 1 + state.perfectWordStreak * state.relicEffects.streakDamageBonus);
     effectiveDamage = Math.round(effectiveDamage * state.relicEffects.damageMultiplier * streakMultiplier);
+    if (state.relicEffects.frozenDamageMultiplier > 1 && target.freezeStacks > 0) {
+      effectiveDamage = Math.round(effectiveDamage * state.relicEffects.frozenDamageMultiplier);
+    }
+    if (state.relicEffects.firstStrikeDamageBonus > 0 && target.health === target.maxHealth) {
+      effectiveDamage = Math.round(effectiveDamage * (1 + state.relicEffects.firstStrikeDamageBonus));
+    }
     if (state.relicEffects.freezeStacksBonus > 0 && attacker.freezeStacks > 0) target.freezeStacks += state.relicEffects.freezeStacksBonus;
     if (state.relicEffects.plasmaStacksBonus > 0 && attacker.plasmaStacksApplied > 0) target.plasmaStacks += state.relicEffects.plasmaStacksBonus;
     if (state.relicEffects.lifeStealPercent > 0) {
@@ -519,6 +525,24 @@ function dealDamageToEntity(
       }
       if (attacker && attacker.team === Team.Allied && state.relicEffects.chargesPerKill > 0) {
         grantCharge(state, attacker, state.relicEffects.chargesPerKill);
+      }
+      if (state.relicEffects.deathNovaPlasmaStacks > 0) {
+        const r2 = DEATH_EXPLOSION_RADIUS * DEATH_EXPLOSION_RADIUS;
+        for (const other of state.entities) {
+          if (other.team !== Team.Enemy || other.id === target.id) continue;
+          const dx = other.x - target.x;
+          const dy = other.y - target.y;
+          if (dx * dx + dy * dy <= r2) other.plasmaStacks += state.relicEffects.deathNovaPlasmaStacks;
+        }
+      }
+      if (state.relicEffects.frostChainFreezeStacks > 0 && target.freezeStacks > 0) {
+        const r2 = DEATH_EXPLOSION_RADIUS * DEATH_EXPLOSION_RADIUS;
+        for (const other of state.entities) {
+          if (other.team !== Team.Enemy || other.id === target.id) continue;
+          const dx = other.x - target.x;
+          const dy = other.y - target.y;
+          if (dx * dx + dy * dy <= r2) other.freezeStacks += state.relicEffects.frostChainFreezeStacks;
+        }
       }
       const xpAmount = target.xpReward;
       state.score += xpAmount * SCORE_PER_XP;
@@ -593,7 +617,7 @@ export function updateState(state: GameState, dt: number): void {
       if (e.team !== Team.Enemy) continue;
 
       if (e.plasmaStacks > 0) {
-        const dmg = e.plasmaStacks * PLASMA_DAMAGE_PER_TICK;
+        const dmg = e.plasmaStacks * PLASMA_DAMAGE_PER_TICK * state.relicEffects.plasmaDamageMultiplier;
         e.plasmaStacks = Math.max(0, e.plasmaStacks - 1);
         if (dealDamageToEntity(state, null, e, dmg)) continue;
       }
@@ -894,10 +918,8 @@ export function onPerfectWord(state: GameState): void {
   if (state.relicEffects.perfectWordSplashDamage > 0) {
     const enemies = state.entities.filter(e => e.team === Team.Enemy);
     if (enemies.length > 0) {
-      const dmg = Math.max(MIN_SPLASH_DAMAGE_PER_ENEMY, Math.round(state.relicEffects.perfectWordSplashDamage / enemies.length));
-      for (let i = enemies.length - 1; i >= 0; i--) {
-        dealDamageToEntity(state, null, enemies[i], dmg);
-      }
+      const target = enemies[Math.floor(Math.random() * enemies.length)];
+      dealDamageToEntity(state, null, target, state.relicEffects.perfectWordSplashDamage);
     }
   }
   if (state.relicEffects.streakMilestoneDamage > 0 && state.perfectWordStreak % STREAK_MILESTONE_INTERVAL === 0) {

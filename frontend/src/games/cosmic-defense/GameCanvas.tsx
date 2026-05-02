@@ -5,8 +5,6 @@ import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { BOSS_WARNING_LEAD_TIME_SECONDS, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
 import type { EntityState, BossSpawnedData } from "./state";
-import type { RelicEffects } from "./relics";
-import { computeRelicEffects } from "./relics";
 import { BossHealthBar } from "./BossHealthBar";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
@@ -40,7 +38,6 @@ export const GameCanvas = () => {
   const [totalKills, setTotalKills] = useState(0);
   const [bossApproaching, setBossApproaching] = useState(false);
   const [bossEntityId, setBossEntityId] = useState<number | null>(null);
-  const [relicEffects, setRelicEffects] = useState<RelicEffects>(() => computeRelicEffects([]));
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -119,7 +116,6 @@ export const GameCanvas = () => {
         });
         unsubRelicDropped = game.state.onRelicDropped.subscribe(() => {
           if (cancelled) return;
-          setRelicEffects(game.state.relicEffects);
         });
       })
       .catch((err) => {
@@ -268,8 +264,6 @@ export const GameCanvas = () => {
           slots={slots}
           onSlotClick={handleSlotClick}
           activeSlotIndex={selectedSlot?.index ?? null}
-          entityById={gameRef.current?.state?.entityById}
-          relicEffects={relicEffects}
         />
         {selectedSlot && selectedSlot.occupant && !pendingChoice && (
           <InspectionPanel
