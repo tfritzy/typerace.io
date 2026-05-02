@@ -502,6 +502,9 @@ function applyFreezeStacks(state: GameState, target: EntityState, stacks: number
   if (!wasFrozen && state.relicEffects.frostNovaDamage > 0) {
     dealDamageToEntity(state, null, target, state.relicEffects.frostNovaDamage);
   }
+  if (state.relicEffects.plasmaOnFreezeApply > 0) {
+    target.plasmaStacks += state.relicEffects.plasmaOnFreezeApply;
+  }
 }
 
 function dealDamageToEntity(
@@ -657,20 +660,21 @@ export function updateState(state: GameState, dt: number): void {
     if (state.relicEffects.planetHealPerSecond > 0) {
       state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetHealPerSecond);
     }
-    if (state.relicEffects.regenPerFrozenEnemy > 0) {
-      const frozenCount = state.entities.filter(e => e.team === Team.Enemy && e.freezeStacks > 0).length;
-      if (frozenCount > 0) {
-        state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + frozenCount * state.relicEffects.regenPerFrozenEnemy);
-      }
-    }
     for (let i = state.entities.length - 1; i >= 0; i--) {
       const e = state.entities[i];
       if (e.team !== Team.Enemy) continue;
 
       if (e.plasmaStacks > 0) {
+        if (state.relicEffects.healPerPlasmaTick > 0) {
+          state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.healPerPlasmaTick);
+        }
+        const prevStacks = e.plasmaStacks;
         const dmg = e.plasmaStacks * PLASMA_DAMAGE_PER_TICK * state.relicEffects.plasmaDamageMultiplier;
         e.plasmaStacks = Math.max(0, e.plasmaStacks - 1);
         if (dealDamageToEntity(state, null, e, dmg)) continue;
+        if (prevStacks > 0 && e.plasmaStacks === 0 && state.relicEffects.plasmaExpiredDamage > 0) {
+          if (dealDamageToEntity(state, null, e, state.relicEffects.plasmaExpiredDamage)) continue;
+        }
       }
 
       if (e.freezeStacks > 0) {
@@ -985,6 +989,18 @@ export function onPerfectWord(state: GameState): void {
     for (const e of state.entities) {
       if (e.team === Team.Enemy) e.freezeStacks += state.relicEffects.blizzardFreezeStacks;
     }
+  }
+  if (state.relicEffects.freezeOnPerfectWord > 0) {
+    let nearest: EntityState | null = null;
+    let nearestDistSq = Infinity;
+    for (const e of state.entities) {
+      if (e.team !== Team.Enemy) continue;
+      const dx = e.x - 0;
+      const dy = e.y - 0;
+      const distSq = dx * dx + dy * dy;
+      if (distSq < nearestDistSq) { nearestDistSq = distSq; nearest = e; }
+    }
+    if (nearest) applyFreezeStacks(state, nearest, state.relicEffects.freezeOnPerfectWord);
   }
 }
 

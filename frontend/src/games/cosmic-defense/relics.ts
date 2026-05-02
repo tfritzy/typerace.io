@@ -36,9 +36,12 @@ export type RelicId =
   | "permafrost"
   | "blizzard"
   | "superheated"
-  | "cryo_field"
+  | "cryo_surge"
   | "cryo_recharge"
   | "ice_armor"
+  | "afterburn"
+  | "meltdown"
+  | "static_discharge"
   | "frost_nova";
 
 export interface RelicEffects {
@@ -79,10 +82,13 @@ export interface RelicEffects {
   blizzardFreezeInterval: number;
   blizzardFreezeStacks: number;
   plasmaSlow: number;
-  regenPerFrozenEnemy: number;
   chargesOnFrozenKill: number;
   planetFreezeOnHit: number;
   frostNovaDamage: number;
+  freezeOnPerfectWord: number;
+  healPerPlasmaTick: number;
+  plasmaExpiredDamage: number;
+  plasmaOnFreezeApply: number;
 }
 
 export interface RelicDefinition {
@@ -340,11 +346,11 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     effects: { plasmaSlow: 0.3 },
   },
   {
-    id: "cryo_field",
-    name: "Cryo Field",
-    description: "Planet regenerates 1 HP per second for each frozen enemy.",
+    id: "cryo_surge",
+    name: "Cryo Surge",
+    description: "Completing a word with no errors freezes the nearest enemy for 2 seconds.",
     sprite: "/futuristic_pixel_icons/Blue Star Crystal.png",
-    effects: { regenPerFrozenEnemy: 1 },
+    effects: { freezeOnPerfectWord: 2 },
   },
   {
     id: "cryo_recharge",
@@ -366,6 +372,27 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "When an enemy is frozen, it takes 15 instant damage.",
     sprite: "/futuristic_pixel_icons/Light Crystal.png",
     effects: { frostNovaDamage: 15 },
+  },
+  {
+    id: "afterburn",
+    name: "Afterburn",
+    description: "Each plasma tick heals the planet for 1 HP.",
+    sprite: "/futuristic_pixel_icons/Red Starcrystal.png",
+    effects: { healPerPlasmaTick: 1 },
+  },
+  {
+    id: "meltdown",
+    name: "Meltdown",
+    description: "When an enemy's plasma stacks expire, it takes 30 bonus damage.",
+    sprite: "/futuristic_pixel_icons/Orange Star Shards.png",
+    effects: { plasmaExpiredDamage: 30 },
+  },
+  {
+    id: "static_discharge",
+    name: "Static Discharge",
+    description: "Applying freeze to an enemy also applies 2 plasma stacks.",
+    sprite: "/futuristic_pixel_icons/Turqoise Ring.png",
+    effects: { plasmaOnFreezeApply: 2 },
   },
 ];
 
@@ -412,10 +439,13 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     blizzardFreezeInterval: 0,
     blizzardFreezeStacks: 0,
     plasmaSlow: 0,
-    regenPerFrozenEnemy: 0,
     chargesOnFrozenKill: 0,
     planetFreezeOnHit: 0,
     frostNovaDamage: 0,
+    freezeOnPerfectWord: 0,
+    healPerPlasmaTick: 0,
+    plasmaExpiredDamage: 0,
+    plasmaOnFreezeApply: 0,
   };
   for (const relicId of relics) {
     const def = RELIC_MAP.get(relicId);
@@ -457,10 +487,13 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     if (def.effects.blizzardFreezeInterval !== undefined) result.blizzardFreezeInterval += def.effects.blizzardFreezeInterval;
     if (def.effects.blizzardFreezeStacks !== undefined) result.blizzardFreezeStacks += def.effects.blizzardFreezeStacks;
     if (def.effects.plasmaSlow !== undefined) result.plasmaSlow += def.effects.plasmaSlow;
-    if (def.effects.regenPerFrozenEnemy !== undefined) result.regenPerFrozenEnemy += def.effects.regenPerFrozenEnemy;
     if (def.effects.chargesOnFrozenKill !== undefined) result.chargesOnFrozenKill += def.effects.chargesOnFrozenKill;
     if (def.effects.planetFreezeOnHit !== undefined) result.planetFreezeOnHit += def.effects.planetFreezeOnHit;
     if (def.effects.frostNovaDamage !== undefined) result.frostNovaDamage += def.effects.frostNovaDamage;
+    if (def.effects.freezeOnPerfectWord !== undefined) result.freezeOnPerfectWord += def.effects.freezeOnPerfectWord;
+    if (def.effects.healPerPlasmaTick !== undefined) result.healPerPlasmaTick += def.effects.healPerPlasmaTick;
+    if (def.effects.plasmaExpiredDamage !== undefined) result.plasmaExpiredDamage += def.effects.plasmaExpiredDamage;
+    if (def.effects.plasmaOnFreezeApply !== undefined) result.plasmaOnFreezeApply += def.effects.plasmaOnFreezeApply;
   }
   return result;
 }
