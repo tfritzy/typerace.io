@@ -73,7 +73,6 @@ export const GameCanvas = () => {
     let unsubBossApproaching: (() => void) | null = null;
     let unsubBossSpawned: (() => void) | null = null;
     let unsubBossDefeated: (() => void) | null = null;
-    let unsubRelicDropped: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -114,9 +113,6 @@ export const GameCanvas = () => {
           if (cancelled) return;
           setBossEntityId(null);
         });
-        unsubRelicDropped = game.state.onRelicDropped.subscribe(() => {
-          if (cancelled) return;
-        });
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -130,7 +126,6 @@ export const GameCanvas = () => {
       unsubBossApproaching?.();
       unsubBossSpawned?.();
       unsubBossDefeated?.();
-      unsubRelicDropped?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };

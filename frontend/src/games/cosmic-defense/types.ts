@@ -21,9 +21,10 @@ export enum ProjectileType {
 }
 
 export enum DamageType {
-  None = "none",
+  Physical = "physical",
   Laser = "laser",
-  Cannon = "cannon",
+  Plasma = "plasma",
+  Ice = "ice",
 }
 
 export enum ExplosionType {

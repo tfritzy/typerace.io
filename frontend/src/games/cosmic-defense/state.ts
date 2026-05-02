@@ -328,7 +328,7 @@ function makeBaseEntity(
     hitDelay: 0,
     sizeScale: 1,
     isBoss: false,
-    damageType: DamageType.None,
+    damageType: DamageType.Physical,
   };
 }
 
@@ -511,8 +511,14 @@ function dealDamageToEntity(
     if (state.relicEffects.firstStrikeDamageBonus > 0 && target.health === target.maxHealth) {
       effectiveDamage = Math.round(effectiveDamage * (1 + state.relicEffects.firstStrikeDamageBonus));
     }
+    if (state.relicEffects.plasmaDamageBonusPerStack > 0 && target.plasmaStacks > 0) {
+      effectiveDamage = Math.round(effectiveDamage * (1 + target.plasmaStacks * state.relicEffects.plasmaDamageBonusPerStack));
+    }
     if (state.relicEffects.freezeStacksBonus > 0 && attacker.freezeStacks > 0) target.freezeStacks += state.relicEffects.freezeStacksBonus;
     if (state.relicEffects.plasmaStacksBonus > 0 && attacker.plasmaStacksApplied > 0) target.plasmaStacks += state.relicEffects.plasmaStacksBonus;
+    if (state.relicEffects.physicalAgainstPlasmaStacks > 0 && attacker.damageType === DamageType.Physical && target.plasmaStacks > 0) {
+      target.plasmaStacks += state.relicEffects.physicalAgainstPlasmaStacks;
+    }
     if (state.relicEffects.lifeStealPercent > 0) {
       state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + Math.ceil(effectiveDamage * state.relicEffects.lifeStealPercent));
     }
@@ -543,6 +549,21 @@ function dealDamageToEntity(
       }
       if (state.relicEffects.frostChainFreezeStacks > 0 && target.freezeStacks > 0) {
         applyDeathExplosion(state, target, (other) => { other.freezeStacks += state.relicEffects.frostChainFreezeStacks; });
+      }
+      if (state.relicEffects.plasmaDeathSpread > 0 && target.plasmaStacks > 0) {
+        applyDeathExplosion(state, target, (other) => { other.plasmaStacks += state.relicEffects.plasmaDeathSpread; });
+      }
+      if (state.relicEffects.freezeKillSpread > 0 && target.freezeStacks > 0) {
+        let nearest: EntityState | null = null;
+        let nearestDistSq = Infinity;
+        for (const other of state.entities) {
+          if (other.team !== Team.Enemy || other.id === target.id || other.freezeStacks > 0) continue;
+          const dx = other.x - target.x;
+          const dy = other.y - target.y;
+          const distSq = dx * dx + dy * dy;
+          if (distSq < nearestDistSq) { nearestDistSq = distSq; nearest = other; }
+        }
+        if (nearest) nearest.freezeStacks += state.relicEffects.freezeKillSpread;
       }
       const xpAmount = target.xpReward;
       state.score += xpAmount * SCORE_PER_XP;
@@ -594,6 +615,11 @@ function performInstantHit(
       ? Math.round(damage * state.relicEffects.planetDamageReduction)
       : damage;
     state.planetHealth = Math.max(0, state.planetHealth - reducedDamage);
+    if (shooter.team === Team.Enemy && reducedDamage > 0 && state.relicEffects.chargesOnPlanetDamage > 0) {
+      for (const e of state.entities) {
+        grantCharge(state, e, state.relicEffects.chargesOnPlanetDamage);
+      }
+    }
     state.onPlanetDamaged.emit();
   }
 }
@@ -695,7 +721,6 @@ export function updateState(state: GameState, dt: number): void {
         const dy = other.y - shot.targetY;
         if (dx * dx + dy * dy > r2) continue;
         if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
-        if (shooter.team === Team.Allied && state.relicEffects.explosionPlasmaStacks > 0) other.plasmaStacks += state.relicEffects.explosionPlasmaStacks;
         if (shooter.freezeStacks > 0) other.freezeStacks += shooter.freezeStacks;
         if (dmg > 0) dealDamageToEntity(state, shooter, other, dmg);
       }
@@ -719,9 +744,10 @@ function getBuffedDamage(e: EntityState, baseDamage: number): number {
 }
 
 function getEffectiveProjectileDamage(state: GameState, shooter: EntityState): number {
-  return shooter.team === Team.Allied
-    ? Math.round(shooter.projectileDamage * state.relicEffects.projectileDamageMultiplier)
-    : shooter.projectileDamage;
+  const mult = shooter.team === Team.Allied && shooter.damageType === DamageType.Physical
+    ? state.relicEffects.projectileDamageMultiplier
+    : 1;
+  return Math.round(shooter.projectileDamage * mult);
 }
 
 function fireShot(state: GameState, e: EntityState): void {
@@ -900,11 +926,6 @@ export function onCorrectKeystroke(state: GameState): void {
 
 export function onPerfectWord(state: GameState): void {
   state.perfectWordStreak++;
-  if (state.relicEffects.chargesPerAnyWord > 0) {
-    for (const e of state.entities) {
-      grantCharge(state, e, state.relicEffects.chargesPerAnyWord);
-    }
-  }
   if (state.relicEffects.planetRegenPerPerfectWord > 0) {
     state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetRegenPerPerfectWord);
   }
@@ -930,15 +951,16 @@ export function onPerfectWord(state: GameState): void {
       }
     }
   }
+  if (state.relicEffects.blizzardFreezeInterval > 0 && state.relicEffects.blizzardFreezeStacks > 0 &&
+      state.perfectWordStreak % state.relicEffects.blizzardFreezeInterval === 0) {
+    for (const e of state.entities) {
+      if (e.team === Team.Enemy) e.freezeStacks += state.relicEffects.blizzardFreezeStacks;
+    }
+  }
 }
 
 export function onWordWithError(state: GameState): void {
   state.perfectWordStreak = 0;
-  if (state.relicEffects.chargesPerAnyWord > 0) {
-    for (const e of state.entities) {
-      grantCharge(state, e, state.relicEffects.chargesPerAnyWord);
-    }
-  }
 }
 
 function addRelic(state: GameState, relicId: RelicId): void {
