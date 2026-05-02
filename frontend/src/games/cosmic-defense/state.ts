@@ -925,7 +925,7 @@ export function setSpawnerPaused(state: GameState, paused: boolean): void {
 }
 
 export function xpForNextLevel(level: number): number {
-  return 30 + level * 8;
+  return Math.round(5 * Math.pow(level, 1.8));
 }
 
 export function awardXP(state: GameState, amount: number): void {

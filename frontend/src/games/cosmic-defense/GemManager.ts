@@ -25,10 +25,11 @@ interface GemType {
 }
 
 const GEM_TYPES: GemType[] = [
-  { xp: 3,  colors: { fill: 0xa6e3a1, edge: 0x94e2d5 }, size: 10 },
-  { xp: 9,  colors: { fill: 0x89b4fa, edge: 0x74c7ec }, size: 14 },
-  { xp: 25, colors: { fill: 0xcba6f7, edge: 0xb4befe }, size: 18 },
-  { xp: 70, colors: { fill: 0xf9e2af, edge: 0xfab387 }, size: 24 },
+  { xp: 3,   colors: { fill: 0xa6e3a1, edge: 0x94e2d5 }, size: 10 },
+  { xp: 9,   colors: { fill: 0x89b4fa, edge: 0x74c7ec }, size: 14 },
+  { xp: 25,  colors: { fill: 0xcba6f7, edge: 0xb4befe }, size: 18 },
+  { xp: 70,  colors: { fill: 0xf9e2af, edge: 0xfab387 }, size: 24 },
+  { xp: 250, colors: { fill: 0xff6b6b, edge: 0xe55c7b }, size: 32 },
 ];
 
 function rollGemType(expectedXp: number): GemType {
