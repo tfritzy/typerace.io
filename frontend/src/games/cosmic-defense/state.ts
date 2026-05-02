@@ -12,6 +12,7 @@ const SCORE_PER_XP = 10;
 const MAX_CHAIN_JUMP_DISTANCE = 300;
 const STREAK_MILESTONE_INTERVAL = 5;
 const DEATH_EXPLOSION_RADIUS = 100;
+export const PROJECTILE_SPEED = 2400;
 
 export enum TargetingMode {
   NearestToPlanet = 0,
@@ -65,12 +66,18 @@ export interface EntityState {
   damageType: DamageType;
 }
 
-export interface PendingShot {
-  fireAt: number;
+export interface ProjectileState {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
   shooterId: number;
   targetX: number;
   targetY: number;
   targetEntityId: number | null;
+  distToTarget: number;
+  traveled: number;
 }
 
 export interface ExplosionState {
@@ -168,7 +175,7 @@ export interface GameState {
   entityById: Map<number, EntityState>;
   explosions: ExplosionState[];
   laserBeams: LaserBeam[];
-  pendingShots: PendingShot[];
+  projectiles: ProjectileState[];
   time: {
     time: number;
     deltaTime: number;
@@ -223,7 +230,7 @@ export function createGameState(): GameState {
     entityById: new Map(),
     explosions: [],
     laserBeams: [],
-    pendingShots: [],
+    projectiles: [],
     time: { time: 0, deltaTime: 0 },
     nextId: 1,
     planetHealth: 1000,
@@ -728,12 +735,16 @@ export function updateState(state: GameState, dt: number): void {
     }
   }
 
-  for (let i = state.pendingShots.length - 1; i >= 0; i--) {
-    const shot = state.pendingShots[i];
-    if (state.time.time < shot.fireAt) continue;
-    state.pendingShots.splice(i, 1);
+  for (let i = state.projectiles.length - 1; i >= 0; i--) {
+    const proj = state.projectiles[i];
+    proj.x += proj.vx * dt;
+    proj.y += proj.vy * dt;
+    proj.traveled += PROJECTILE_SPEED * dt;
 
-    const shooter = state.entityById.get(shot.shooterId);
+    if (proj.traveled < proj.distToTarget) continue;
+    state.projectiles.splice(i, 1);
+
+    const shooter = state.entityById.get(proj.shooterId);
     if (!shooter) continue;
 
     const dmg = getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter));
@@ -742,20 +753,20 @@ export function updateState(state: GameState, dt: number): void {
       const effectiveRadius = shooter.team === Team.Allied
         ? shooter.explosionRadius * state.relicEffects.explosionRadiusMultiplier
         : shooter.explosionRadius;
-      spawnExplosion(state, shooter.entityType, shot.targetX, shot.targetY, effectiveRadius);
+      spawnExplosion(state, shooter.entityType, proj.targetX, proj.targetY, effectiveRadius);
       const r2 = effectiveRadius * effectiveRadius;
       for (let j = state.entities.length - 1; j >= 0; j--) {
         const other = state.entities[j];
         if (other.team !== Team.Enemy) continue;
-        const dx = other.x - shot.targetX;
-        const dy = other.y - shot.targetY;
+        const dx = other.x - proj.targetX;
+        const dy = other.y - proj.targetY;
         if (dx * dx + dy * dy > r2) continue;
         if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
         if (shooter.freezeStacks > 0) applyFreezeStacks(state, other, shooter.freezeStacks);
         if (dmg > 0) dealDamageToEntity(state, shooter, other, dmg);
       }
     } else {
-      const target = shot.targetEntityId !== null ? state.entityById.get(shot.targetEntityId) : null;
+      const target = proj.targetEntityId !== null ? state.entityById.get(proj.targetEntityId) : null;
       if (target) {
         if (shooter.plasmaStacksApplied > 0) target.plasmaStacks += shooter.plasmaStacksApplied;
         spawnExplosion(state, shooter.entityType, target.x, target.y);
@@ -785,12 +796,23 @@ function fireShot(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
 
-  state.pendingShots.push({
-    fireAt: state.time.time + e.hitDelay,
+  const dx = target.x - e.x;
+  const dy = target.y - e.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist === 0) return;
+
+  state.projectiles.push({
+    id: state.nextId++,
+    x: e.x,
+    y: e.y,
+    vx: (dx / dist) * PROJECTILE_SPEED,
+    vy: (dy / dist) * PROJECTILE_SPEED,
     shooterId: e.id,
     targetX: target.x,
     targetY: target.y,
     targetEntityId: target.entity?.id ?? null,
+    distToTarget: dist,
+    traveled: 0,
   });
 }
 
