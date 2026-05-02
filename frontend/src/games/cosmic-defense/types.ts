@@ -34,8 +34,7 @@ export const ENTITY_EXPLOSION_TYPES: Partial<Record<EntityType, ExplosionType>> 
   Flare: ExplosionType.IceExplosive,
   Hawk: ExplosionType.Explosive,
   Moth: ExplosionType.MothHit,
-  Nova: ExplosionType.ChainHit,
-  Bolt: ExplosionType.BouncingHit,
+  Nova: ExplosionType.BouncingHit,
 };
 
 export function getExplosionType(entityType: EntityType): ExplosionType | undefined {
