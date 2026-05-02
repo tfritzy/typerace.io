@@ -62,6 +62,8 @@ export interface EntityState {
   hitDelay: number;
   sizeScale: number;
   isBoss: boolean;
+  projectileSpeed: number;
+  projectileColor: number;
 }
 
 export interface PendingShot {
@@ -70,6 +72,23 @@ export interface PendingShot {
   targetX: number;
   targetY: number;
   targetEntityId: number | null;
+}
+
+export interface FlyingProjectile {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  speed: number;
+  damage: number;
+  shooterId: number;
+  shooterEntityType: EntityType;
+  targetEntityId: number | null;
+  targetX: number;
+  targetY: number;
+  color: number;
+  radius: number;
 }
 
 export interface ExplosionState {
@@ -168,6 +187,7 @@ export interface GameState {
   explosions: ExplosionState[];
   laserBeams: LaserBeam[];
   pendingShots: PendingShot[];
+  flyingProjectiles: FlyingProjectile[];
   time: {
     time: number;
     deltaTime: number;
@@ -221,6 +241,7 @@ export function createGameState(): GameState {
     explosions: [],
     laserBeams: [],
     pendingShots: [],
+    flyingProjectiles: [],
     time: { time: 0, deltaTime: 0 },
     nextId: 1,
     planetHealth: 1000,
@@ -321,6 +342,8 @@ function makeBaseEntity(
     hitDelay: 0,
     sizeScale: 1,
     isBoss: false,
+    projectileSpeed: 0,
+    projectileColor: 0,
   };
 }
 
@@ -380,6 +403,8 @@ export function spawnAlliedEntity(
   entity.beamWidth = config.beamWidth;
   entity.explosionRadius = scaled.explosionRadius;
   entity.hitDelay = config.hitDelay;
+  entity.projectileSpeed = config.projectileSpeed;
+  entity.projectileColor = config.projectileColor;
   addEntity(state, entity);
   return entity.id;
 }
@@ -649,6 +674,41 @@ export function updateState(state: GameState, dt: number): void {
       }
     }
   }
+
+  for (let i = state.flyingProjectiles.length - 1; i >= 0; i--) {
+    const proj = state.flyingProjectiles[i];
+
+    const target = proj.targetEntityId !== null ? state.entityById.get(proj.targetEntityId) : null;
+    if (target) {
+      proj.targetX = target.x;
+      proj.targetY = target.y;
+    }
+
+    const tdx = proj.targetX - proj.x;
+    const tdy = proj.targetY - proj.y;
+    const tlen = Math.sqrt(tdx * tdx + tdy * tdy);
+
+    if (tlen < FLYING_PROJECTILE_HIT_RADIUS || (tlen > 0 && tlen < proj.speed * dt)) {
+      state.flyingProjectiles.splice(i, 1);
+      if (target) {
+        const shooter = state.entityById.get(proj.shooterId) ?? null;
+        spawnExplosion(state, proj.shooterEntityType, target.x, target.y);
+        dealDamageToEntity(state, shooter, target, proj.damage);
+      }
+      continue;
+    }
+
+    if (tlen > 0) {
+      proj.vx = (tdx / tlen) * proj.speed;
+      proj.vy = (tdy / tlen) * proj.speed;
+    }
+    proj.x += proj.vx * dt;
+    proj.y += proj.vy * dt;
+
+    if (!isInBounds(proj.x, proj.y)) {
+      state.flyingProjectiles.splice(i, 1);
+    }
+  }
 }
 
 function getBuffedDamage(e: EntityState, baseDamage: number): number {
@@ -669,6 +729,39 @@ function fireShot(state: GameState, e: EntityState): void {
     targetX: target.x,
     targetY: target.y,
     targetEntityId: target.entity?.id ?? null,
+  });
+}
+
+const FLYING_PROJECTILE_HIT_RADIUS = 16;
+
+function fireFlyingProjectile(state: GameState, e: EntityState): void {
+  const target = findNearestTarget(state, e);
+  if (!target) return;
+
+  const dx = target.x - e.x;
+  const dy = target.y - e.y;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  if (len === 0) return;
+
+  const nx = dx / len;
+  const ny = dy / len;
+  const damage = getBuffedDamage(e, e.projectileDamage);
+
+  state.flyingProjectiles.push({
+    id: state.nextId++,
+    x: e.x,
+    y: e.y,
+    vx: nx * e.projectileSpeed,
+    vy: ny * e.projectileSpeed,
+    speed: e.projectileSpeed,
+    damage,
+    shooterId: e.id,
+    shooterEntityType: e.entityType,
+    targetEntityId: target.entity?.id ?? null,
+    targetX: target.x,
+    targetY: target.y,
+    color: e.projectileColor,
+    radius: 4,
   });
 }
 
@@ -811,7 +904,11 @@ function activateAbility(state: GameState, e: EntityState): void {
 
     if (e.projectileDamage > 0 || e.plasmaStacksApplied > 0) {
       for (let f = 0; f < e.fireCount; f++) {
-        fireShot(state, e);
+        if (e.projectileSpeed > 0) {
+          fireFlyingProjectile(state, e);
+        } else {
+          fireShot(state, e);
+        }
       }
       continue;
     }
