@@ -1924,7 +1924,7 @@ public static partial class Module
             return 0;
         }
 
-        return (int)Math.Round(50.0 * Math.Pow(level, 2));
+        return (int)Math.Round(25.0 * Math.Pow(level, 2));
     }
 
     private static int UpdatePlayerElo(ReducerContext ctx, Identity playerId, Game game, int placement)
