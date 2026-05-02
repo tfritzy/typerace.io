@@ -3,9 +3,18 @@ import type { AssetManager } from "./assetManager";
 import type { GameState, ExplosionState } from "./state";
 import { ExplosionType } from "./types";
 
-const EXPLOSION_SCALE = 3;
-const BASE_EXPLOSION_RADIUS = 120;
-const EXPLOSION_ANIMATION_SPEED = 0.30;
+interface ExplosionConfig {
+  scale: number;
+  speed: number;
+}
+
+const EXPLOSION_TYPE_CONFIGS: Record<ExplosionType, ExplosionConfig> = {
+  [ExplosionType.PlasmaExplosive]: { scale: 3,   speed: 0.30 },
+  [ExplosionType.IceExplosive]:    { scale: 3,   speed: 0.30 },
+  [ExplosionType.Explosive]:       { scale: 3,   speed: 0.30 },
+  [ExplosionType.MothHit]:         { scale: 3,   speed: 0.30 },
+  [ExplosionType.ChainHit]:        { scale: 1.5, speed: 0.60 },
+};
 
 export class ExplosionManager {
   readonly layer: Container;
@@ -54,11 +63,11 @@ export class ExplosionManager {
   private getExplosionTextures(explosionType: ExplosionType | undefined): Texture[] {
     switch (explosionType) {
       case ExplosionType.PlasmaExplosive: return this.assets.getPlasmaExplosionTextures();
-      case ExplosionType.IceExplosive: return this.assets.getIceExplosionTextures();
-      case ExplosionType.Explosive:    return this.assets.getHawkExplosionTextures();
-      case ExplosionType.MothHit:      return this.assets.getMothExplosionTextures();
-      case ExplosionType.ChainHit:     return this.assets.getChainHitTextures();
-      default:                         return this.assets.getMothExplosionTextures();
+      case ExplosionType.IceExplosive:    return this.assets.getIceExplosionTextures();
+      case ExplosionType.Explosive:       return this.assets.getHawkExplosionTextures();
+      case ExplosionType.MothHit:         return this.assets.getMothExplosionTextures();
+      case ExplosionType.ChainHit:        return this.assets.getChainHitTextures();
+      default:                            return this.assets.getMothExplosionTextures();
     }
   }
 
@@ -66,8 +75,9 @@ export class ExplosionManager {
     const textures = this.getExplosionTextures(exp.explosionType);
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
-    sprite.scale.set(EXPLOSION_SCALE * 0.5 + (exp.explosionRadius / BASE_EXPLOSION_RADIUS) * EXPLOSION_SCALE * 0.5);
-    sprite.animationSpeed = EXPLOSION_ANIMATION_SPEED;
+    const config = exp.explosionType !== undefined ? EXPLOSION_TYPE_CONFIGS[exp.explosionType] : undefined;
+    sprite.scale.set(config?.scale ?? 3);
+    sprite.animationSpeed = config?.speed ?? 0.30;
     sprite.loop = false;
     sprite.onComplete = () => {
       this.completedIds.add(exp.id);
