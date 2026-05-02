@@ -215,7 +215,7 @@ export const GameCanvas = () => {
             <div
               className="relative flex-1 overflow-hidden"
               style={{
-                height: 12,
+                height: 7,
                 borderRadius: 4,
                 background: "rgba(255,255,255,0.08)",
                 border: "1px solid rgba(249,226,175,0.3)",
