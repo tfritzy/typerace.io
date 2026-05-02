@@ -6,13 +6,13 @@ import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } f
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
-const PLASMA_DAMAGE_PER_TICK = 5;
+const PLASMA_DAMAGE_PER_TICK = 1;
 const LASER_RANGE = 2200;
 const SCORE_PER_XP = 10;
 const MAX_CHAIN_JUMP_DISTANCE = 300;
-const MAX_STREAK_CHARGE_MULTIPLIER = 2;
 const MIN_SPLASH_DAMAGE_PER_ENEMY = 1;
 const STREAK_MILESTONE_INTERVAL = 5;
+const MAX_VITAL_MATRIX_BONUS = 500;
 
 export enum TargetingMode {
   NearestToPlanet = 0,
@@ -182,6 +182,7 @@ export interface GameState {
   xp: number;
   score: number;
   totalKills: number;
+  planetHealthFromKills: number;
   level: number;
   pendingChoice: boolean;
   relics: RelicId[];
@@ -239,6 +240,7 @@ export function createGameState(): GameState {
     xp: 0,
     score: 0,
     totalKills: 0,
+    planetHealthFromKills: 0,
     level: 1,
     pendingChoice: true,
     relics: [],
@@ -509,6 +511,15 @@ function dealDamageToEntity(
       if (state.relicEffects.planetHealPerKill > 0) {
         state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetHealPerKill);
       }
+      if (state.relicEffects.maxPlanetHealthPerKill > 0 && state.planetHealthFromKills < MAX_VITAL_MATRIX_BONUS) {
+        const bonus = Math.min(MAX_VITAL_MATRIX_BONUS - state.planetHealthFromKills, state.relicEffects.maxPlanetHealthPerKill);
+        state.planetHealthFromKills += bonus;
+        state.maxPlanetHealth += bonus;
+        state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + bonus);
+      }
+      if (attacker && attacker.team === Team.Allied && state.relicEffects.chargesPerKill > 0) {
+        grantCharge(state, attacker, state.relicEffects.chargesPerKill);
+      }
       const xpAmount = target.xpReward;
       state.score += xpAmount * SCORE_PER_XP;
       state.onScoreChanged.emit({ score: state.score });
@@ -645,7 +656,10 @@ export function updateState(state: GameState, dt: number): void {
     const shooter = state.entityById.get(shot.shooterId);
     if (!shooter) continue;
 
-    const dmg = getBuffedDamage(shooter, shooter.projectileDamage);
+    const baseProjDmg = shooter.team === Team.Allied
+      ? Math.round(shooter.projectileDamage * state.relicEffects.projectileDamageMultiplier)
+      : shooter.projectileDamage;
+    const dmg = getBuffedDamage(shooter, baseProjDmg);
 
     if (shooter.explosionRadius > 0) {
       const effectiveRadius = shooter.team === Team.Allied
@@ -756,11 +770,14 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target || !target.entity) return;
 
-  const dmg = getBuffedDamage(e, e.projectileDamage);
+  const rawChainDmg = e.team === Team.Allied
+    ? Math.round(e.projectileDamage * state.relicEffects.projectileDamageMultiplier)
+    : e.projectileDamage;
+  const dmg = getBuffedDamage(e, rawChainDmg);
 
   const hitIds = new Set<number>();
   let currentTarget: EntityState | null = target.entity;
-  let chainsRemaining = e.chainCount + (e.chainCount > 0 ? state.relicEffects.bonusChainCount : 0);
+  let chainsRemaining = e.chainCount;
   const maxJumpDistSq = MAX_CHAIN_JUMP_DISTANCE * MAX_CHAIN_JUMP_DISTANCE;
 
   while (currentTarget && chainsRemaining >= 0) {
@@ -839,8 +856,7 @@ function activateAbility(state: GameState, e: EntityState): void {
     }
 
     if (e.projectileDamage > 0 || e.plasmaStacksApplied > 0) {
-      const fireCount = e.fireCount + state.relicEffects.bonusFireCount;
-      for (let f = 0; f < fireCount; f++) {
+      for (let f = 0; f < e.fireCount; f++) {
         fireShot(state, e);
       }
       continue;
@@ -852,16 +868,18 @@ export function onCorrectKeystroke(state: GameState): void {
   if (state.relicEffects.planetRegenPerKeystroke > 0) {
     state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetRegenPerKeystroke);
   }
-  const chargeGain = state.relicEffects.streakChargeBonus > 0
-    ? Math.min(MAX_STREAK_CHARGE_MULTIPLIER, 1 + state.perfectWordStreak * state.relicEffects.streakChargeBonus)
-    : 1;
   for (const e of state.entities) {
-    grantCharge(state, e, chargeGain);
+    grantCharge(state, e, 1);
   }
 }
 
 export function onPerfectWord(state: GameState): void {
   state.perfectWordStreak++;
+  if (state.relicEffects.chargesPerAnyWord > 0) {
+    for (const e of state.entities) {
+      grantCharge(state, e, state.relicEffects.chargesPerAnyWord);
+    }
+  }
   if (state.relicEffects.planetRegenPerPerfectWord > 0) {
     state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetRegenPerPerfectWord);
   }
@@ -893,6 +911,11 @@ export function onPerfectWord(state: GameState): void {
 
 export function onWordWithError(state: GameState): void {
   state.perfectWordStreak = 0;
+  if (state.relicEffects.chargesPerAnyWord > 0) {
+    for (const e of state.entities) {
+      grantCharge(state, e, state.relicEffects.chargesPerAnyWord);
+    }
+  }
 }
 
 function addRelic(state: GameState, relicId: RelicId): void {

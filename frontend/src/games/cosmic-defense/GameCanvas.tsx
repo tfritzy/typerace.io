@@ -5,6 +5,8 @@ import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { BOSS_WARNING_LEAD_TIME_SECONDS, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
 import type { EntityState, BossSpawnedData } from "./state";
+import type { RelicEffects } from "./relics";
+import { computeRelicEffects } from "./relics";
 import { BossHealthBar } from "./BossHealthBar";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
@@ -38,6 +40,7 @@ export const GameCanvas = () => {
   const [totalKills, setTotalKills] = useState(0);
   const [bossApproaching, setBossApproaching] = useState(false);
   const [bossEntityId, setBossEntityId] = useState<number | null>(null);
+  const [relicEffects, setRelicEffects] = useState<RelicEffects>(() => computeRelicEffects([]));
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -73,6 +76,7 @@ export const GameCanvas = () => {
     let unsubBossApproaching: (() => void) | null = null;
     let unsubBossSpawned: (() => void) | null = null;
     let unsubBossDefeated: (() => void) | null = null;
+    let unsubRelicDropped: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -113,6 +117,10 @@ export const GameCanvas = () => {
           if (cancelled) return;
           setBossEntityId(null);
         });
+        unsubRelicDropped = game.state.onRelicDropped.subscribe(() => {
+          if (cancelled) return;
+          setRelicEffects(game.state.relicEffects);
+        });
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -126,6 +134,7 @@ export const GameCanvas = () => {
       unsubBossApproaching?.();
       unsubBossSpawned?.();
       unsubBossDefeated?.();
+      unsubRelicDropped?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -259,6 +268,8 @@ export const GameCanvas = () => {
           slots={slots}
           onSlotClick={handleSlotClick}
           activeSlotIndex={selectedSlot?.index ?? null}
+          entityById={gameRef.current?.state?.entityById}
+          relicEffects={relicEffects}
         />
         {selectedSlot && selectedSlot.occupant && !pendingChoice && (
           <InspectionPanel

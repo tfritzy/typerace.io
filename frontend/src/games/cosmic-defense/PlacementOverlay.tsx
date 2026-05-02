@@ -2,17 +2,43 @@ import { useState } from "react";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { SLOT_HIT_RADIUS } from "./PlacementPoints";
 import type { PlacementSlot } from "./PlacementPoints";
+import type { EntityState, RelicEffects } from "./state";
 
 interface PlacementOverlayProps {
   slots: PlacementSlot[];
   onSlotClick: (slot: PlacementSlot) => void;
   activeSlotIndex: number | null;
+  entityById?: Map<number, EntityState>;
+  relicEffects?: RelicEffects;
+}
+
+const BADGE_RADIUS = 3;
+const BADGE_SPACING = 8;
+const BADGE_Y_OFFSET = SLOT_HIT_RADIUS + 6;
+
+function computeBadges(entity: EntityState, fx: RelicEffects): { color: string; key: string }[] {
+  const badges: { color: string; key: string }[] = [];
+  if (fx.laserDamageMultiplier > 1 && entity.laserDamage > 0)
+    badges.push({ color: "#cba6f7", key: "laser" });
+  if (fx.projectileDamageMultiplier > 1 && entity.projectileDamage > 0)
+    badges.push({ color: "#fab387", key: "proj" });
+  if (fx.plasmaStacksBonus > 0 && entity.plasmaStacksApplied > 0)
+    badges.push({ color: "#f38ba8", key: "plasma" });
+  if (fx.freezeStacksBonus > 0 && entity.freezeStacks > 0)
+    badges.push({ color: "#89dceb", key: "freeze" });
+  if (fx.bonusChargesGranted > 0 && entity.chargesGranted > 0)
+    badges.push({ color: "#a6e3a1", key: "charge" });
+  if ((fx.explosionRadiusMultiplier > 1 || fx.explosionPlasmaStacks > 0) && entity.explosionRadius > 0)
+    badges.push({ color: "#f9e2af", key: "aoe" });
+  return badges;
 }
 
 export const PlacementOverlay = ({
   slots,
   onSlotClick,
   activeSlotIndex,
+  entityById,
+  relicEffects,
 }: PlacementOverlayProps) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
@@ -27,6 +53,8 @@ export const PlacementOverlay = ({
         const isActive = activeSlotIndex === slot.index;
         const isHovered = hoveredIndex === slot.index;
         const isEmpty = !slot.occupant;
+        const entity = entityById && slot.entityId != null ? entityById.get(slot.entityId) : undefined;
+        const badges = entity && relicEffects ? computeBadges(entity, relicEffects) : [];
         return (
           <g key={slot.index}>
             {slot.occupant && (
@@ -61,6 +89,16 @@ export const PlacementOverlay = ({
                 style={{ pointerEvents: "none" }}
               />
             )}
+            {badges.map((badge, i) => (
+              <circle
+                key={badge.key}
+                cx={slot.x - ((badges.length - 1) * BADGE_SPACING) / 2 + i * BADGE_SPACING}
+                cy={slot.y + BADGE_Y_OFFSET}
+                r={BADGE_RADIUS}
+                fill={badge.color}
+                style={{ pointerEvents: "none" }}
+              />
+            ))}
           </g>
         );
       })}

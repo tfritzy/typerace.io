@@ -31,6 +31,7 @@ export interface RelicEffects {
   planetRegenPerKeystroke: number;
   xpMultiplier: number;
   bonusChargesPerPerfectWord: number;
+  chargesPerAnyWord: number;
   explosionRadiusMultiplier: number;
   planetHealPerSecond: number;
   planetDamageReduction: number;
@@ -39,14 +40,14 @@ export interface RelicEffects {
   enemyFireSlowMultiplier: number;
   planetRegenPerPerfectWord: number;
   streakDamageBonus: number;
-  streakChargeBonus: number;
   xpPerPerfectWord: number;
   laserDamageMultiplier: number;
+  projectileDamageMultiplier: number;
   planetHealPerKill: number;
+  chargesPerKill: number;
   maxPlanetHealthBonus: number;
-  bonusFireCount: number;
+  maxPlanetHealthPerKill: number;
   bonusChargesGranted: number;
-  bonusChainCount: number;
   perfectWordSplashDamage: number;
   explosionPlasmaStacks: number;
   lifeStealPercent: number;
@@ -121,14 +122,14 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "glacial_emitter",
     name: "Glacial Emitter",
-    description: "Freezing attacks slow enemies for 1 additional second.",
+    description: "Freezing attacks apply 1 additional freeze stack to enemies hit.",
     sprite: "/futuristic_pixel_icons/Turqoise Crystal.png",
     effects: { freezeStacksBonus: 1 },
   },
   {
     id: "plasma_weave",
     name: "Plasma Weave",
-    description: "Burning attacks apply 1 additional second of plasma.",
+    description: "Burning attacks apply 1 additional stack of plasma to enemies hit.",
     sprite: "/futuristic_pixel_icons/Purple Starcrystal.png",
     effects: { plasmaStacksBonus: 1 },
   },
@@ -149,16 +150,16 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "flow_state",
     name: "Flow State",
-    description: "For each perfect word in your streak, allied weapons deal 3% more damage (max 25%).",
+    description: "For each perfect word in your streak, allied weapons deal 1% more damage (max 25%).",
     sprite: "/futuristic_pixel_icons/Orange Star Shards.png",
-    effects: { streakDamageBonus: 0.03 },
+    effects: { streakDamageBonus: 0.01 },
   },
   {
     id: "overclock",
     name: "Overclock",
-    description: "Each consecutive perfect word in your streak makes keystrokes grant 5% more charges (max 2×).",
+    description: "Completing any word, even with errors, gives all allied ships 1 charge.",
     sprite: "/futuristic_pixel_icons/Orange Chip.png",
-    effects: { streakChargeBonus: 0.05 },
+    effects: { chargesPerAnyWord: 1 },
   },
   {
     id: "echo_chamber",
@@ -184,16 +185,16 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "vital_matrix",
     name: "Vital Matrix",
-    description: "Planet maximum HP is increased by 100.",
+    description: "Each enemy kill permanently increases planet max HP by 1 (up to +500).",
     sprite: "/futuristic_pixel_icons/Health Pack.png",
-    effects: { maxPlanetHealthBonus: 100 },
+    effects: { maxPlanetHealthPerKill: 1 },
   },
   {
     id: "prism_array",
-    name: "Prism Array",
-    description: "Projectile ships fire 1 additional shot per activation.",
+    name: "Kinetic Amp",
+    description: "Allied projectile weapons deal 20% more damage.",
     sprite: "/futuristic_pixel_icons/Blue Neon Bullet.png",
-    effects: { bonusFireCount: 1 },
+    effects: { projectileDamageMultiplier: 1.2 },
   },
   {
     id: "signal_boost",
@@ -204,10 +205,10 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   },
   {
     id: "cascade_protocol",
-    name: "Cascade Protocol",
-    description: "Chain lightning strikes 2 additional targets.",
+    name: "Kill Drive",
+    description: "Allied ships gain 3 charges when they destroy an enemy.",
     sprite: "/futuristic_pixel_icons/Lightning Icon.png",
-    effects: { bonusChainCount: 2 },
+    effects: { chargesPerKill: 3 },
   },
   {
     id: "photon_surge",
@@ -219,23 +220,23 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "void_rupture",
     name: "Void Rupture",
-    description: "Allied AoE explosions apply 1 second of plasma to all enemies hit.",
+    description: "Allied AoE explosions apply 10 stacks of plasma to all enemies hit.",
     sprite: "/futuristic_pixel_icons/Purple Grenade.png",
-    effects: { explosionPlasmaStacks: 1 },
+    effects: { explosionPlasmaStacks: 10 },
   },
   {
     id: "kinetic_mirror",
     name: "Kinetic Mirror",
-    description: "15% of damage dealt to enemies is restored to the planet as HP.",
+    description: "5% of damage dealt to enemies is restored to the planet as HP.",
     sprite: "/futuristic_pixel_icons/Pink Heart Crystal.png",
-    effects: { lifeStealPercent: 0.15 },
+    effects: { lifeStealPercent: 0.05 },
   },
   {
     id: "chrono_burst",
     name: "Chrono Burst",
-    description: "Every 5th consecutive perfect word triggers a shockwave dealing 20 damage to all enemies.",
+    description: "Every 5th consecutive perfect word triggers a shockwave dealing 50 damage to all enemies.",
     sprite: "/futuristic_pixel_icons/Onyx Star Shards.png",
-    effects: { streakMilestoneDamage: 20 },
+    effects: { streakMilestoneDamage: 50 },
   },
 ];
 
@@ -250,6 +251,7 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     planetRegenPerKeystroke: 0,
     xpMultiplier: 1,
     bonusChargesPerPerfectWord: 0,
+    chargesPerAnyWord: 0,
     explosionRadiusMultiplier: 1,
     planetHealPerSecond: 0,
     planetDamageReduction: 1,
@@ -258,14 +260,14 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     enemyFireSlowMultiplier: 1,
     planetRegenPerPerfectWord: 0,
     streakDamageBonus: 0,
-    streakChargeBonus: 0,
     xpPerPerfectWord: 0,
     laserDamageMultiplier: 1,
+    projectileDamageMultiplier: 1,
     planetHealPerKill: 0,
+    chargesPerKill: 0,
     maxPlanetHealthBonus: 0,
-    bonusFireCount: 0,
+    maxPlanetHealthPerKill: 0,
     bonusChargesGranted: 0,
-    bonusChainCount: 0,
     perfectWordSplashDamage: 0,
     explosionPlasmaStacks: 0,
     lifeStealPercent: 0,
@@ -279,6 +281,7 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     if (def.effects.planetRegenPerKeystroke !== undefined) result.planetRegenPerKeystroke += def.effects.planetRegenPerKeystroke;
     if (def.effects.xpMultiplier !== undefined) result.xpMultiplier *= def.effects.xpMultiplier;
     if (def.effects.bonusChargesPerPerfectWord !== undefined) result.bonusChargesPerPerfectWord += def.effects.bonusChargesPerPerfectWord;
+    if (def.effects.chargesPerAnyWord !== undefined) result.chargesPerAnyWord += def.effects.chargesPerAnyWord;
     if (def.effects.explosionRadiusMultiplier !== undefined) result.explosionRadiusMultiplier *= def.effects.explosionRadiusMultiplier;
     if (def.effects.planetHealPerSecond !== undefined) result.planetHealPerSecond += def.effects.planetHealPerSecond;
     if (def.effects.planetDamageReduction !== undefined) result.planetDamageReduction *= def.effects.planetDamageReduction;
@@ -287,14 +290,14 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     if (def.effects.enemyFireSlowMultiplier !== undefined) result.enemyFireSlowMultiplier *= def.effects.enemyFireSlowMultiplier;
     if (def.effects.planetRegenPerPerfectWord !== undefined) result.planetRegenPerPerfectWord += def.effects.planetRegenPerPerfectWord;
     if (def.effects.streakDamageBonus !== undefined) result.streakDamageBonus += def.effects.streakDamageBonus;
-    if (def.effects.streakChargeBonus !== undefined) result.streakChargeBonus += def.effects.streakChargeBonus;
     if (def.effects.xpPerPerfectWord !== undefined) result.xpPerPerfectWord += def.effects.xpPerPerfectWord;
     if (def.effects.laserDamageMultiplier !== undefined) result.laserDamageMultiplier *= def.effects.laserDamageMultiplier;
+    if (def.effects.projectileDamageMultiplier !== undefined) result.projectileDamageMultiplier *= def.effects.projectileDamageMultiplier;
     if (def.effects.planetHealPerKill !== undefined) result.planetHealPerKill += def.effects.planetHealPerKill;
+    if (def.effects.chargesPerKill !== undefined) result.chargesPerKill += def.effects.chargesPerKill;
     if (def.effects.maxPlanetHealthBonus !== undefined) result.maxPlanetHealthBonus += def.effects.maxPlanetHealthBonus;
-    if (def.effects.bonusFireCount !== undefined) result.bonusFireCount += def.effects.bonusFireCount;
+    if (def.effects.maxPlanetHealthPerKill !== undefined) result.maxPlanetHealthPerKill += def.effects.maxPlanetHealthPerKill;
     if (def.effects.bonusChargesGranted !== undefined) result.bonusChargesGranted += def.effects.bonusChargesGranted;
-    if (def.effects.bonusChainCount !== undefined) result.bonusChainCount += def.effects.bonusChainCount;
     if (def.effects.perfectWordSplashDamage !== undefined) result.perfectWordSplashDamage += def.effects.perfectWordSplashDamage;
     if (def.effects.explosionPlasmaStacks !== undefined) result.explosionPlasmaStacks += def.effects.explosionPlasmaStacks;
     if (def.effects.lifeStealPercent !== undefined) result.lifeStealPercent += def.effects.lifeStealPercent;
