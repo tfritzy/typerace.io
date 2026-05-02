@@ -570,6 +570,18 @@ function dealDamageToEntity(
       if (state.relicEffects.plasmaDeathSpread > 0 && target.plasmaStacks > 0) {
         applyDeathExplosion(state, target, (other) => { other.plasmaStacks += state.relicEffects.plasmaDeathSpread; });
       }
+      if (state.relicEffects.plasmaDeathTransfer > 0 && target.plasmaStacks > 0) {
+        let nearest: EntityState | null = null;
+        let nearestDistSq = Infinity;
+        for (const other of state.entities) {
+          if (other.team !== Team.Enemy || other.id === target.id) continue;
+          const dx = other.x - target.x;
+          const dy = other.y - target.y;
+          const distSq = dx * dx + dy * dy;
+          if (distSq < nearestDistSq) { nearestDistSq = distSq; nearest = other; }
+        }
+        if (nearest) nearest.plasmaStacks += target.plasmaStacks;
+      }
       if (state.relicEffects.freezeKillSpread > 0 && target.freezeStacks > 0) {
         let nearest: EntityState | null = null;
         let nearestDistSq = Infinity;
@@ -665,16 +677,6 @@ export function updateState(state: GameState, dt: number): void {
       if (e.team !== Team.Enemy) continue;
 
       if (e.plasmaStacks > 0) {
-        if (state.relicEffects.plasmaTickSpread > 0) {
-          let nearest: EntityState | null = null;
-          let nearestDist = Infinity;
-          for (const other of state.entities) {
-            if (other.team !== Team.Enemy || other.id === e.id) continue;
-            const d = (other.x - e.x) ** 2 + (other.y - e.y) ** 2;
-            if (d < nearestDist) { nearest = other; nearestDist = d; }
-          }
-          if (nearest) nearest.plasmaStacks += state.relicEffects.plasmaTickSpread;
-        }
         const prevStacks = e.plasmaStacks;
         const dmg = e.plasmaStacks * PLASMA_DAMAGE_PER_TICK * state.relicEffects.plasmaDamageMultiplier;
         e.plasmaStacks = Math.max(0, e.plasmaStacks - 1);

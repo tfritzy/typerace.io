@@ -85,7 +85,7 @@ export interface RelicEffects {
   planetFreezeOnHit: number;
   frostNovaDamage: number;
   freezeOnPerfectWord: number;
-  plasmaTickSpread: number;
+  plasmaDeathTransfer: number;
   plasmaExpiredDamage: number;
   plasmaOnFreezeApply: number;
 }
@@ -375,9 +375,9 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "pyroclasm",
     name: "Pyroclasm",
-    description: "Each plasma tick on an enemy spreads 1 plasma stack to the nearest other enemy.",
+    description: "When an enemy with plasma stacks dies, its plasma stacks are transferred to the nearest enemy.",
     sprite: "/futuristic_pixel_icons/Red Starcrystal.png",
-    effects: { plasmaTickSpread: 1 },
+    effects: { plasmaDeathTransfer: 1 },
   },
   {
     id: "meltdown",
@@ -441,7 +441,7 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     planetFreezeOnHit: 0,
     frostNovaDamage: 0,
     freezeOnPerfectWord: 0,
-    plasmaTickSpread: 0,
+    plasmaDeathTransfer: 0,
     plasmaExpiredDamage: 0,
     plasmaOnFreezeApply: 0,
   };
@@ -488,7 +488,7 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     if (def.effects.planetFreezeOnHit !== undefined) result.planetFreezeOnHit += def.effects.planetFreezeOnHit;
     if (def.effects.frostNovaDamage !== undefined) result.frostNovaDamage += def.effects.frostNovaDamage;
     if (def.effects.freezeOnPerfectWord !== undefined) result.freezeOnPerfectWord += def.effects.freezeOnPerfectWord;
-    if (def.effects.plasmaTickSpread !== undefined) result.plasmaTickSpread += def.effects.plasmaTickSpread;
+    if (def.effects.plasmaDeathTransfer !== undefined) result.plasmaDeathTransfer += def.effects.plasmaDeathTransfer;
     if (def.effects.plasmaExpiredDamage !== undefined) result.plasmaExpiredDamage += def.effects.plasmaExpiredDamage;
     if (def.effects.plasmaOnFreezeApply !== undefined) result.plasmaOnFreezeApply += def.effects.plasmaOnFreezeApply;
   }
