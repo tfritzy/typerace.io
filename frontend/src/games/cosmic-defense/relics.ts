@@ -23,6 +23,7 @@ export type RelicId =
   | "photon_surge"
   | "void_rupture"
   | "kinetic_mirror"
+  | "chrono_burst"
   | "plasma_amplifier"
   | "death_nova"
   | "cryo_shatter"

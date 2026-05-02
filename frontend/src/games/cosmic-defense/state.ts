@@ -483,6 +483,16 @@ function findNearestTarget(
   return found ? _targetResult : null;
 }
 
+function applyDeathExplosion(state: GameState, origin: EntityState, apply: (e: EntityState) => void): void {
+  const r2 = DEATH_EXPLOSION_RADIUS * DEATH_EXPLOSION_RADIUS;
+  for (const other of state.entities) {
+    if (other.team !== Team.Enemy || other.id === origin.id) continue;
+    const dx = other.x - origin.x;
+    const dy = other.y - origin.y;
+    if (dx * dx + dy * dy <= r2) apply(other);
+  }
+}
+
 function dealDamageToEntity(
   state: GameState,
   attacker: EntityState | null,
@@ -527,22 +537,10 @@ function dealDamageToEntity(
         grantCharge(state, attacker, state.relicEffects.chargesPerKill);
       }
       if (state.relicEffects.deathNovaPlasmaStacks > 0) {
-        const r2 = DEATH_EXPLOSION_RADIUS * DEATH_EXPLOSION_RADIUS;
-        for (const other of state.entities) {
-          if (other.team !== Team.Enemy || other.id === target.id) continue;
-          const dx = other.x - target.x;
-          const dy = other.y - target.y;
-          if (dx * dx + dy * dy <= r2) other.plasmaStacks += state.relicEffects.deathNovaPlasmaStacks;
-        }
+        applyDeathExplosion(state, target, (other) => { other.plasmaStacks += state.relicEffects.deathNovaPlasmaStacks; });
       }
       if (state.relicEffects.frostChainFreezeStacks > 0 && target.freezeStacks > 0) {
-        const r2 = DEATH_EXPLOSION_RADIUS * DEATH_EXPLOSION_RADIUS;
-        for (const other of state.entities) {
-          if (other.team !== Team.Enemy || other.id === target.id) continue;
-          const dx = other.x - target.x;
-          const dy = other.y - target.y;
-          if (dx * dx + dy * dy <= r2) other.freezeStacks += state.relicEffects.frostChainFreezeStacks;
-        }
+        applyDeathExplosion(state, target, (other) => { other.freezeStacks += state.relicEffects.frostChainFreezeStacks; });
       }
       const xpAmount = target.xpReward;
       state.score += xpAmount * SCORE_PER_XP;
