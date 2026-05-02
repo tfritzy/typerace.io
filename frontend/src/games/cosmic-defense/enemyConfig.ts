@@ -100,9 +100,8 @@ function calculateEnemyPower(health: number): number {
   return Math.floor((health * 4 / 3) / 5) * 5;
 }
 
-function calculateEnemyXpReward(power: number, zeroBasedTier: number): number {
-  const oneBasedTier = zeroBasedTier + 1;
-  return Math.round(Math.pow(power, 0.6) * 0.28 + oneBasedTier * 0.01);
+function calculateEnemyXpReward(power: number): number {
+  return Math.round(Math.pow(power, 0.72) * 0.2);
 }
 
 function calculateEnemySpeed(zeroBasedTier: number): number {
@@ -115,7 +114,7 @@ function createEnemyConfig(baseConfig: EnemyBaseConfig, zeroBasedTier: number): 
     ...ENEMY_DEFAULTS,
     ...baseConfig,
     power,
-    xpReward: calculateEnemyXpReward(power, zeroBasedTier),
+    xpReward: calculateEnemyXpReward(power),
     speed: calculateEnemySpeed(zeroBasedTier),
   };
 }
