@@ -1,5 +1,5 @@
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
-import { type EntityType, ColorPreset, ProjectileType, ExplosionType, Team, getExplosionType } from "./types";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, MAX_VITAL_MATRIX_BONUS } from "./constants";
+import { type EntityType, ColorPreset, ProjectileType, ExplosionType, Team, getExplosionType, DamageType } from "./types";
 import { ENEMY_CATALOG, BOSS_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } from "./relics";
@@ -11,7 +11,6 @@ const LASER_RANGE = 2200;
 const SCORE_PER_XP = 10;
 const MAX_CHAIN_JUMP_DISTANCE = 300;
 const STREAK_MILESTONE_INTERVAL = 5;
-const MAX_VITAL_MATRIX_BONUS = 500;
 const DEATH_EXPLOSION_RADIUS = 100;
 
 export enum TargetingMode {
@@ -65,6 +64,7 @@ export interface EntityState {
   hitDelay: number;
   sizeScale: number;
   isBoss: boolean;
+  damageType: DamageType;
 }
 
 export interface PendingShot {
@@ -328,6 +328,7 @@ function makeBaseEntity(
     hitDelay: 0,
     sizeScale: 1,
     isBoss: false,
+    damageType: DamageType.None,
   };
 }
 
@@ -387,6 +388,7 @@ export function spawnAlliedEntity(
   entity.beamWidth = config.beamWidth;
   entity.explosionRadius = scaled.explosionRadius;
   entity.hitDelay = config.hitDelay;
+  entity.damageType = config.damageType;
   addEntity(state, entity);
   return entity.id;
 }
@@ -755,7 +757,8 @@ function fireLaser(state: GameState, e: EntityState): void {
   const endX = e.x + nx * beamLen;
   const endY = e.y + ny * beamLen;
 
-  const dmg = getBuffedDamage(e, Math.round(e.laserDamage * state.relicEffects.laserDamageMultiplier));
+  const laserMult = e.damageType === DamageType.Laser ? state.relicEffects.laserDamageMultiplier : 1;
+  const dmg = getBuffedDamage(e, Math.round(e.laserDamage * laserMult));
   const searchRange = piercing ? LASER_RANGE : len + 20;
   const extraHitRadius = e.beamWidth * 5;
 

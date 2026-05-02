@@ -1,3 +1,5 @@
+import { MAX_VITAL_MATRIX_BONUS } from "./constants";
+
 export type RelicId =
   | "stellar_core"
   | "void_crystal"
@@ -181,7 +183,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "resonance_field",
     name: "Resonance Field",
-    description: "Allied laser and beam damage is 20% higher.",
+    description: "Allied laser ships deal 20% more damage.",
     sprite: "/futuristic_pixel_icons/Laser Rifle Blue.png",
     effects: { laserDamageMultiplier: 1.2 },
   },
@@ -195,7 +197,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "vital_matrix",
     name: "Vital Matrix",
-    description: "Each enemy kill permanently increases planet max HP by 1 (up to +500).",
+    description: `Each enemy kill permanently increases planet max HP by 1 (up to +${MAX_VITAL_MATRIX_BONUS}).`,
     sprite: "/futuristic_pixel_icons/Health Pack.png",
     effects: { maxPlanetHealthPerKill: 1 },
   },
