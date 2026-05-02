@@ -26,7 +26,6 @@ export class AssetManager {
   private colorPresets_: Record<string, Texture>;
   private projectileSheets_: Spritesheet[];
   private plasmaExplosionSheet_: Spritesheet;
-  private blueExplosionSheet_: Spritesheet;
   private shipDeathExplosionSheet_: Spritesheet;
   private iceExplosionSheet_: Spritesheet;
   private hawkExplosionSheet_: Spritesheet;
@@ -50,7 +49,6 @@ export class AssetManager {
       this.projectileSheets_.push(loaded[`projectile-${i}`] as Spritesheet);
     }
     this.plasmaExplosionSheet_ = loaded["plasma-explosion"] as Spritesheet;
-    this.blueExplosionSheet_ = loaded["blue-explosion"] as Spritesheet;
     this.shipDeathExplosionSheet_ = loaded["ship-death-explosion"] as Spritesheet;
     this.iceExplosionSheet_ = loaded["ice-explosion"] as Spritesheet;
     this.hawkExplosionSheet_ = loaded["hawk-explosion"] as Spritesheet;
@@ -135,14 +133,6 @@ export class AssetManager {
     return textures;
   }
 
-  getBouncingExplosionTextures(): Texture[] {
-    const textures: Texture[] = [];
-    for (let i = 0; i < 14; i++) {
-      textures.push(this.blueExplosionSheet_.textures[`blue-exp-${i}`]);
-    }
-    return textures;
-  }
-
   getShipTextureSize(entityType: EntityType): { width: number; height: number } {
     const frameIndex = getShipEntityIndex(entityType);
     const tex = this.spaceships_.textures[`ship-${frameIndex}`];
@@ -162,7 +152,7 @@ export class AssetManager {
 
   getChainHitTextures(): Texture[] {
     const textures: Texture[] = [];
-    for (let i = 0; i < 17; i++) {
+    for (let i = 0; i < 14; i++) {
       textures.push(this.chainHitSheet_.textures[`chain-hit-${i}`]);
     }
     return textures;
@@ -206,7 +196,6 @@ export class AssetManager {
       setNearestNeighbor(sheet);
     }
     setNearestNeighbor(this.plasmaExplosionSheet_);
-    setNearestNeighbor(this.blueExplosionSheet_);
     setNearestNeighbor(this.shipDeathExplosionSheet_);
     setNearestNeighbor(this.iceExplosionSheet_);
     setNearestNeighbor(this.hawkExplosionSheet_);

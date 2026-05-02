@@ -52,7 +52,7 @@ export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   { entityType: "Moth", colorPreset: ColorPreset.Preset1, role: "shooter", description: "Reliable standard fire" },
   { entityType: "Prism", colorPreset: ColorPreset.Preset1, role: "ice_beam", description: "Freezing piercing beam" },
   { entityType: "Hawk", colorPreset: ColorPreset.Preset1, role: "plasma_single", description: "Heavy plasma rounds" },
-  { entityType: "Nova", colorPreset: ColorPreset.Preset1, role: "chain", description: "Ricocheting chain shots" },
+  { entityType: "Nova", colorPreset: ColorPreset.Preset1, role: "chain", description: "Bouncing chain shots" },
   { entityType: "Lance", colorPreset: ColorPreset.Preset1, role: "mac_cannon", description: "Wide piercing cannon" },
 ];
 

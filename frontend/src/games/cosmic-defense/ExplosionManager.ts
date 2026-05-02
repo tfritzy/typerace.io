@@ -7,6 +7,15 @@ const EXPLOSION_SCALE = 3;
 const BASE_EXPLOSION_RADIUS = 120;
 const EXPLOSION_ANIMATION_SPEED = 0.30;
 
+interface ExplosionConfig {
+  scaleMult: number;
+  speedMult: number;
+}
+
+const EXPLOSION_TYPE_CONFIGS: Partial<Record<ExplosionType, ExplosionConfig>> = {
+  [ExplosionType.BouncingHit]: { scaleMult: 0.5, speedMult: 2 },
+};
+
 export class ExplosionManager {
   readonly layer: Container;
 
@@ -54,12 +63,12 @@ export class ExplosionManager {
   private getExplosionTextures(explosionType: ExplosionType | undefined): Texture[] {
     switch (explosionType) {
       case ExplosionType.PlasmaExplosive: return this.assets.getPlasmaExplosionTextures();
-      case ExplosionType.IceExplosive: return this.assets.getIceExplosionTextures();
-      case ExplosionType.Explosive:    return this.assets.getHawkExplosionTextures();
-      case ExplosionType.MothHit:      return this.assets.getMothExplosionTextures();
-      case ExplosionType.ChainHit:     return this.assets.getChainHitTextures();
-      case ExplosionType.BouncingHit:  return this.assets.getBouncingExplosionTextures();
-      default:                         return this.assets.getMothExplosionTextures();
+      case ExplosionType.IceExplosive:    return this.assets.getIceExplosionTextures();
+      case ExplosionType.Explosive:       return this.assets.getHawkExplosionTextures();
+      case ExplosionType.MothHit:         return this.assets.getMothExplosionTextures();
+      case ExplosionType.ChainHit:        return this.assets.getChainHitTextures();
+      case ExplosionType.BouncingHit:     return this.assets.getChainHitTextures();
+      default:                            return this.assets.getMothExplosionTextures();
     }
   }
 
@@ -68,10 +77,9 @@ export class ExplosionManager {
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
     const baseScale = EXPLOSION_SCALE * 0.5 + (exp.explosionRadius / BASE_EXPLOSION_RADIUS) * EXPLOSION_SCALE * 0.5;
-    const scaleMult = exp.explosionType === ExplosionType.BouncingHit ? 0.5 : 1;
-    const speedMult = exp.explosionType === ExplosionType.BouncingHit ? 2 : 1;
-    sprite.scale.set(baseScale * scaleMult);
-    sprite.animationSpeed = EXPLOSION_ANIMATION_SPEED * speedMult;
+    const config = exp.explosionType !== undefined ? EXPLOSION_TYPE_CONFIGS[exp.explosionType] : undefined;
+    sprite.scale.set(baseScale * (config?.scaleMult ?? 1));
+    sprite.animationSpeed = EXPLOSION_ANIMATION_SPEED * (config?.speedMult ?? 1);
     sprite.loop = false;
     sprite.onComplete = () => {
       this.completedIds.add(exp.id);
