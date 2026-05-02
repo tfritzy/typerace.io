@@ -495,6 +495,20 @@ function applyDeathExplosion(state: GameState, origin: EntityState, apply: (e: E
   }
 }
 
+function findNearestEnemy(state: GameState, origin: EntityState, predicate?: (e: EntityState) => boolean): EntityState | null {
+  let nearest: EntityState | null = null;
+  let nearestDistSq = Infinity;
+  for (const other of state.entities) {
+    if (other.team !== Team.Enemy || other.id === origin.id) continue;
+    if (predicate && !predicate(other)) continue;
+    const dx = other.x - origin.x;
+    const dy = other.y - origin.y;
+    const distSq = dx * dx + dy * dy;
+    if (distSq < nearestDistSq) { nearestDistSq = distSq; nearest = other; }
+  }
+  return nearest;
+}
+
 function applyFreezeStacks(state: GameState, target: EntityState, stacks: number): void {
   if (stacks <= 0) return;
   const wasFrozen = target.freezeStacks > 0;
@@ -571,27 +585,11 @@ function dealDamageToEntity(
         applyDeathExplosion(state, target, (other) => { other.plasmaStacks += state.relicEffects.plasmaDeathSpread; });
       }
       if (state.relicEffects.plasmaDeathTransfer > 0 && target.plasmaStacks > 0) {
-        let nearest: EntityState | null = null;
-        let nearestDistSq = Infinity;
-        for (const other of state.entities) {
-          if (other.team !== Team.Enemy || other.id === target.id) continue;
-          const dx = other.x - target.x;
-          const dy = other.y - target.y;
-          const distSq = dx * dx + dy * dy;
-          if (distSq < nearestDistSq) { nearestDistSq = distSq; nearest = other; }
-        }
+        const nearest = findNearestEnemy(state, target);
         if (nearest) nearest.plasmaStacks += target.plasmaStacks;
       }
       if (state.relicEffects.freezeKillSpread > 0 && target.freezeStacks > 0) {
-        let nearest: EntityState | null = null;
-        let nearestDistSq = Infinity;
-        for (const other of state.entities) {
-          if (other.team !== Team.Enemy || other.id === target.id || other.freezeStacks > 0) continue;
-          const dx = other.x - target.x;
-          const dy = other.y - target.y;
-          const distSq = dx * dx + dy * dy;
-          if (distSq < nearestDistSq) { nearestDistSq = distSq; nearest = other; }
-        }
+        const nearest = findNearestEnemy(state, target, (e) => e.freezeStacks === 0);
         if (nearest) nearest.freezeStacks += state.relicEffects.freezeKillSpread;
       }
       const xpAmount = target.xpReward;
