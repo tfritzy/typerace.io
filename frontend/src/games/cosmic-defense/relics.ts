@@ -20,7 +20,6 @@ export type RelicId =
   | "entropy_siphon"
   | "vital_matrix"
   | "prism_array"
-  | "signal_boost"
   | "cascade_protocol"
   | "photon_surge"
   | "infernal_chain"
@@ -65,7 +64,6 @@ export interface RelicEffects {
   planetHealPerKill: number;
   chargesPerKill: number;
   maxPlanetHealthPerKill: number;
-  bonusChargesGranted: number;
   perfectWordSplashDamage: number;
   plasmaDeathSpread: number;
   lifeStealPercent: number;
@@ -231,13 +229,6 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Allied physical weapons deal 20% more damage.",
     sprite: "/futuristic_pixel_icons/Blue Neon Bullet.png",
     effects: { projectileDamageMultiplier: 1.2 },
-  },
-  {
-    id: "signal_boost",
-    name: "Signal Boost",
-    description: "Charge-granting ships send 1 extra charge per activation.",
-    sprite: "/futuristic_pixel_icons/Green Circuit.png",
-    effects: { bonusChargesGranted: 1 },
   },
   {
     id: "cascade_protocol",
@@ -421,7 +412,6 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     planetHealPerKill: 0,
     chargesPerKill: 0,
     maxPlanetHealthPerKill: 0,
-    bonusChargesGranted: 0,
     perfectWordSplashDamage: 0,
     plasmaDeathSpread: 0,
     lifeStealPercent: 0,
@@ -468,7 +458,6 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     if (def.effects.planetHealPerKill !== undefined) result.planetHealPerKill += def.effects.planetHealPerKill;
     if (def.effects.chargesPerKill !== undefined) result.chargesPerKill += def.effects.chargesPerKill;
     if (def.effects.maxPlanetHealthPerKill !== undefined) result.maxPlanetHealthPerKill += def.effects.maxPlanetHealthPerKill;
-    if (def.effects.bonusChargesGranted !== undefined) result.bonusChargesGranted += def.effects.bonusChargesGranted;
     if (def.effects.perfectWordSplashDamage !== undefined) result.perfectWordSplashDamage += def.effects.perfectWordSplashDamage;
     if (def.effects.plasmaDeathSpread !== undefined) result.plasmaDeathSpread += def.effects.plasmaDeathSpread;
     if (def.effects.lifeStealPercent !== undefined) result.lifeStealPercent += def.effects.lifeStealPercent;

@@ -48,7 +48,6 @@ export interface EntityState {
   role: ShipRole | null;
   plasmaStacks: number;
   plasmaStacksApplied: number;
-  chargesGranted: number;
   laserDamage: number;
   kills: number;
   damageDealt: number;
@@ -312,7 +311,6 @@ function makeBaseEntity(
     role: null,
     plasmaStacks: 0,
     plasmaStacksApplied: 0,
-    chargesGranted: 0,
     laserDamage: 0,
     kills: 0,
     damageDealt: 0,
@@ -378,7 +376,6 @@ export function spawnAlliedEntity(
   entity.chargesRequired = config.chargesRequired;
   entity.role = getShipRole(config.entityType);
   entity.plasmaStacksApplied = config.plasmaStacks;
-  entity.chargesGranted = scaled.chargesGranted;
   entity.laserDamage = scaled.laserDamage;
   entity.level = level;
   entity.freezeStacks = scaled.freezeStacks;
@@ -511,9 +508,8 @@ function findNearestEnemy(state: GameState, origin: EntityState, predicate?: (e:
 
 function applyFreezeStacks(state: GameState, target: EntityState, stacks: number): void {
   if (stacks <= 0) return;
-  const wasFrozen = target.freezeStacks > 0;
   target.freezeStacks += stacks;
-  if (!wasFrozen && state.relicEffects.frostNovaDamage > 0) {
+  if (state.relicEffects.frostNovaDamage > 0) {
     dealDamageToEntity(state, null, target, state.relicEffects.frostNovaDamage);
   }
   if (state.relicEffects.plasmaOnFreezeApply > 0) {
@@ -844,6 +840,7 @@ function fireLaser(state: GameState, e: EntityState): void {
     if (perpDist > hitRadius) continue;
 
     if (e.freezeStacks > 0) applyFreezeStacks(state, other, e.freezeStacks);
+    if (e.plasmaStacksApplied > 0) other.plasmaStacks += e.plasmaStacksApplied;
 
     dealDamageToEntity(state, e, other, dmg);
     if (!piercing) break;
@@ -901,7 +898,7 @@ function activateBuffer(state: GameState, e: EntityState): void {
   for (const ally of state.entities) {
     if (ally.id === e.id || ally.team !== Team.Allied) continue;
     if (ally.chargesRequired <= 0) continue;
-    if (ally.chargesGranted > 0 || ally.buffMultiplier > 0) continue;
+    if (ally.buffMultiplier > 0) continue;
     ally.buffedNextAttack = true;
   }
 }
@@ -916,15 +913,6 @@ function activateAbility(state: GameState, e: EntityState): void {
   if (e.chargesRequired <= 0) return;
   while (e.charge >= e.chargesRequired) {
     e.charge -= e.chargesRequired;
-
-    if (e.chargesGranted > 0) {
-      for (const ally of state.entities) {
-        if (ally.id === e.id || ally.team !== Team.Allied) continue;
-        if (ally.chargesRequired <= 0 || ally.chargesGranted > 0) continue;
-        grantCharge(state, ally, e.chargesGranted + state.relicEffects.bonusChargesGranted);
-      }
-      continue;
-    }
 
     if (e.buffMultiplier > 0) {
       activateBuffer(state, e);
@@ -1135,7 +1123,6 @@ export function levelUpEntity(state: GameState, entityId: number, config: Friend
   entity.health = scaled.health;
   entity.projectileDamage = scaled.projectileDamage;
   entity.laserDamage = scaled.laserDamage;
-  entity.chargesGranted = scaled.chargesGranted;
   entity.chainCount = scaled.chainCount;
   entity.freezeStacks = scaled.freezeStacks;
   entity.buffMultiplier = scaled.buffMultiplier;
