@@ -34,7 +34,12 @@ export type RelicId =
   | "plasma_feedback"
   | "volatile_ignition"
   | "permafrost"
-  | "blizzard";
+  | "blizzard"
+  | "superheated"
+  | "arctic_core"
+  | "cryo_recharge"
+  | "thermal_shock"
+  | "flash_freeze";
 
 export interface RelicEffects {
   damageMultiplier: number;
@@ -73,6 +78,11 @@ export interface RelicEffects {
   freezeKillSpread: number;
   blizzardFreezeInterval: number;
   blizzardFreezeStacks: number;
+  plasmaSlow: number;
+  iceDamageMultiplier: number;
+  chargesOnFrozenKill: number;
+  thermalShockDamage: number;
+  frozenPlasmaMult: number;
 }
 
 export interface RelicDefinition {
@@ -322,6 +332,41 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     sprite: "/futuristic_pixel_icons/Crystal.png",
     effects: { blizzardFreezeInterval: 10, blizzardFreezeStacks: 3 },
   },
+  {
+    id: "superheated",
+    name: "Superheated",
+    description: "Enemies with plasma stacks move 30% slower.",
+    sprite: "/futuristic_pixel_icons/Red Starcrystal.png",
+    effects: { plasmaSlow: 0.3 },
+  },
+  {
+    id: "arctic_core",
+    name: "Arctic Core",
+    description: "Ice ships deal 25% more damage.",
+    sprite: "/futuristic_pixel_icons/Blue Star Crystal.png",
+    effects: { iceDamageMultiplier: 1.25 },
+  },
+  {
+    id: "cryo_recharge",
+    name: "Cryo Recharge",
+    description: "Killing a frozen enemy grants all ships 2 charges.",
+    sprite: "/futuristic_pixel_icons/Turqoise Ring.png",
+    effects: { chargesOnFrozenKill: 2 },
+  },
+  {
+    id: "thermal_shock",
+    name: "Thermal Shock",
+    description: "Applying freeze to a burning enemy deals 30 damage and removes all plasma stacks.",
+    sprite: "/futuristic_pixel_icons/Orange Star Shards.png",
+    effects: { thermalShockDamage: 30 },
+  },
+  {
+    id: "flash_freeze",
+    name: "Flash Freeze",
+    description: "Plasma tick damage against frozen enemies is doubled.",
+    sprite: "/futuristic_pixel_icons/Light Crystal.png",
+    effects: { frozenPlasmaMult: 2 },
+  },
 ];
 
 export const RELIC_MAP: Map<RelicId, RelicDefinition> = new Map(
@@ -366,6 +411,11 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     freezeKillSpread: 0,
     blizzardFreezeInterval: 0,
     blizzardFreezeStacks: 0,
+    plasmaSlow: 0,
+    iceDamageMultiplier: 1,
+    chargesOnFrozenKill: 0,
+    thermalShockDamage: 0,
+    frozenPlasmaMult: 1,
   };
   for (const relicId of relics) {
     const def = RELIC_MAP.get(relicId);
@@ -406,6 +456,11 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     if (def.effects.freezeKillSpread !== undefined) result.freezeKillSpread += def.effects.freezeKillSpread;
     if (def.effects.blizzardFreezeInterval !== undefined) result.blizzardFreezeInterval += def.effects.blizzardFreezeInterval;
     if (def.effects.blizzardFreezeStacks !== undefined) result.blizzardFreezeStacks += def.effects.blizzardFreezeStacks;
+    if (def.effects.plasmaSlow !== undefined) result.plasmaSlow += def.effects.plasmaSlow;
+    if (def.effects.iceDamageMultiplier !== undefined) result.iceDamageMultiplier *= def.effects.iceDamageMultiplier;
+    if (def.effects.chargesOnFrozenKill !== undefined) result.chargesOnFrozenKill += def.effects.chargesOnFrozenKill;
+    if (def.effects.thermalShockDamage !== undefined) result.thermalShockDamage += def.effects.thermalShockDamage;
+    if (def.effects.frozenPlasmaMult !== undefined) result.frozenPlasmaMult *= def.effects.frozenPlasmaMult;
   }
   return result;
 }

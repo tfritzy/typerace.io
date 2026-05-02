@@ -495,6 +495,16 @@ function applyDeathExplosion(state: GameState, origin: EntityState, apply: (e: E
   }
 }
 
+function applyFreezeStacks(state: GameState, target: EntityState, stacks: number): void {
+  if (stacks <= 0) return;
+  const wasBurning = target.plasmaStacks > 0;
+  target.freezeStacks += stacks;
+  if (state.relicEffects.thermalShockDamage > 0 && wasBurning) {
+    target.plasmaStacks = 0;
+    dealDamageToEntity(state, null, target, state.relicEffects.thermalShockDamage);
+  }
+}
+
 function dealDamageToEntity(
   state: GameState,
   attacker: EntityState | null,
@@ -514,7 +524,7 @@ function dealDamageToEntity(
     if (state.relicEffects.plasmaDamageBonusPerStack > 0 && target.plasmaStacks > 0) {
       effectiveDamage = Math.round(effectiveDamage * (1 + target.plasmaStacks * state.relicEffects.plasmaDamageBonusPerStack));
     }
-    if (state.relicEffects.freezeStacksBonus > 0 && attacker.freezeStacks > 0) target.freezeStacks += state.relicEffects.freezeStacksBonus;
+    if (state.relicEffects.freezeStacksBonus > 0 && attacker.freezeStacks > 0) applyFreezeStacks(state, target, state.relicEffects.freezeStacksBonus);
     if (state.relicEffects.plasmaStacksBonus > 0 && attacker.plasmaStacksApplied > 0) target.plasmaStacks += state.relicEffects.plasmaStacksBonus;
     if (state.relicEffects.physicalAgainstPlasmaStacks > 0 && attacker.damageType === DamageType.Physical && target.plasmaStacks > 0) {
       target.plasmaStacks += state.relicEffects.physicalAgainstPlasmaStacks;
@@ -543,6 +553,11 @@ function dealDamageToEntity(
       }
       if (attacker && attacker.team === Team.Allied && state.relicEffects.chargesPerKill > 0) {
         grantCharge(state, attacker, state.relicEffects.chargesPerKill);
+      }
+      if (state.relicEffects.chargesOnFrozenKill > 0 && target.freezeStacks > 0) {
+        for (const e of state.entities) {
+          if (e.team === Team.Allied) grantCharge(state, e, state.relicEffects.chargesOnFrozenKill);
+        }
       }
       if (state.relicEffects.deathNovaPlasmaStacks > 0) {
         applyDeathExplosion(state, target, (other) => { other.plasmaStacks += state.relicEffects.deathNovaPlasmaStacks; });
@@ -643,7 +658,8 @@ export function updateState(state: GameState, dt: number): void {
       if (e.team !== Team.Enemy) continue;
 
       if (e.plasmaStacks > 0) {
-        const dmg = e.plasmaStacks * PLASMA_DAMAGE_PER_TICK * state.relicEffects.plasmaDamageMultiplier;
+        const frozenBonus = state.relicEffects.frozenPlasmaMult > 1 && e.freezeStacks > 0 ? state.relicEffects.frozenPlasmaMult : 1;
+        const dmg = e.plasmaStacks * PLASMA_DAMAGE_PER_TICK * state.relicEffects.plasmaDamageMultiplier * frozenBonus;
         e.plasmaStacks = Math.max(0, e.plasmaStacks - 1);
         if (dealDamageToEntity(state, null, e, dmg)) continue;
       }
@@ -680,7 +696,8 @@ export function updateState(state: GameState, dt: number): void {
     }
 
     if (!inRange && e.speed > 0 && !isFrozen) {
-      const effectiveSpeed = e.team === Team.Enemy ? e.speed * enemySpeedMultiplier : e.speed;
+      const plasmaPenalty = state.relicEffects.plasmaSlow > 0 && e.plasmaStacks > 0 ? (1 - state.relicEffects.plasmaSlow) : 1;
+      const effectiveSpeed = e.team === Team.Enemy ? e.speed * enemySpeedMultiplier * plasmaPenalty : e.speed;
       e.vx = -effectiveSpeed;
       e.vy = 0;
       e.x += e.vx * dt;
@@ -721,7 +738,7 @@ export function updateState(state: GameState, dt: number): void {
         const dy = other.y - shot.targetY;
         if (dx * dx + dy * dy > r2) continue;
         if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
-        if (shooter.freezeStacks > 0) other.freezeStacks += shooter.freezeStacks;
+        if (shooter.freezeStacks > 0) applyFreezeStacks(state, other, shooter.freezeStacks);
         if (dmg > 0) dealDamageToEntity(state, shooter, other, dmg);
       }
     } else {
@@ -744,9 +761,11 @@ function getBuffedDamage(e: EntityState, baseDamage: number): number {
 }
 
 function getEffectiveProjectileDamage(state: GameState, shooter: EntityState): number {
-  const mult = shooter.team === Team.Allied && shooter.damageType === DamageType.Physical
-    ? state.relicEffects.projectileDamageMultiplier
-    : 1;
+  let mult = 1;
+  if (shooter.team === Team.Allied) {
+    if (shooter.damageType === DamageType.Physical) mult = state.relicEffects.projectileDamageMultiplier;
+    else if (shooter.damageType === DamageType.Ice) mult = state.relicEffects.iceDamageMultiplier;
+  }
   return Math.round(shooter.projectileDamage * mult);
 }
 
@@ -783,7 +802,11 @@ function fireLaser(state: GameState, e: EntityState): void {
   const endX = e.x + nx * beamLen;
   const endY = e.y + ny * beamLen;
 
-  const laserMult = e.damageType === DamageType.Laser ? state.relicEffects.laserDamageMultiplier : 1;
+  const laserMult = e.damageType === DamageType.Laser
+    ? state.relicEffects.laserDamageMultiplier
+    : e.damageType === DamageType.Ice
+      ? state.relicEffects.iceDamageMultiplier
+      : 1;
   const dmg = getBuffedDamage(e, Math.round(e.laserDamage * laserMult));
   const searchRange = piercing ? LASER_RANGE : len + 20;
   const extraHitRadius = e.beamWidth * 5;
@@ -803,7 +826,7 @@ function fireLaser(state: GameState, e: EntityState): void {
     const hitRadius = Math.max(other.hitHalfW, other.hitHalfH) + extraHitRadius;
     if (perpDist > hitRadius) continue;
 
-    if (e.freezeStacks > 0) other.freezeStacks += e.freezeStacks;
+    if (e.freezeStacks > 0) applyFreezeStacks(state, other, e.freezeStacks);
 
     dealDamageToEntity(state, e, other, dmg);
     if (!piercing) break;
