@@ -25,8 +25,9 @@ function makeState(relics: RelicId[] = []): GameState {
 }
 
 function makeEnemy(state: GameState, overrides: Partial<EntityState> = {}): EntityState {
+  const expectedId = state.nextId;
   spawnEntity(state, ENEMY_CATALOG[0], Team.Enemy);
-  const entity = state.entities[state.entities.length - 1];
+  const entity = state.entityById.get(expectedId)!;
   entity.x = PLANET_X + 200;
   entity.y = PLANET_Y;
   entity.vx = 0;
