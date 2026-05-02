@@ -230,17 +230,20 @@ export const GameCanvas = () => {
                 }}
               />
             </div>
-            <span className="text-[10px] text-[rgba(249,226,175,0.6)] font-semibold tabular-nums whitespace-nowrap">
-              {xp} / {xpNeeded}
-            </span>
           </div>
-          <ScoreHud game={gameRef.current} gameId={gameId} language={language} />
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center justify-between mt-1">
             <RelicContainer game={gameRef.current} />
-            <div className="flex-1" />
+            <div className="flex items-center gap-1">
+              <ScoreHud game={gameRef.current} gameId={gameId} language={language} />
+            </div>
             <div className="flex items-center gap-1">
               <span className="text-[12px]">💀</span>
               <span className="text-[11px] text-[#a6adc8] font-semibold">{totalKills}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] text-[rgba(249,226,175,0.6)] font-semibold tabular-nums whitespace-nowrap">
+                {xp} / {xpNeeded}
+              </span>
             </div>
           </div>
         </div>

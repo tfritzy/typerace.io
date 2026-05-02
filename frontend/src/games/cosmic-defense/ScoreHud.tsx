@@ -48,9 +48,9 @@ export const ScoreHud = ({ game, gameId, language }: ScoreHudProps) => {
   }, [game, throttledPublishScore]);
 
   return (
-    <div className="mt-1 flex items-center gap-1">
+    <>
       <span className="text-[11px] text-[#585b70]">Score</span>
       <span className="text-[11px] text-[#cdd6f4] font-semibold">{score.toLocaleString()}</span>
-    </div>
+    </>
   );
 };
