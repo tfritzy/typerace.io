@@ -995,9 +995,7 @@ export function onPerfectWord(state: GameState): void {
     let nearestDistSq = Infinity;
     for (const e of state.entities) {
       if (e.team !== Team.Enemy) continue;
-      const dx = e.x - 0;
-      const dy = e.y - 0;
-      const distSq = dx * dx + dy * dy;
+      const distSq = e.x * e.x + e.y * e.y;
       if (distSq < nearestDistSq) { nearestDistSq = distSq; nearest = e; }
     }
     if (nearest) applyFreezeStacks(state, nearest, state.relicEffects.freezeOnPerfectWord);
