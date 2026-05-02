@@ -59,8 +59,21 @@ export const PhraseOverlay = ({
         }
       } else {
         currentTyped = currentTyped + key;
-        if (key === currentPhrase[currentTyped.length - 1]) {
+        const typedPos = currentTyped.length - 1;
+        const phraseChar = currentPhrase[typedPos];
+        if (key === phraseChar) {
           gameRef.current?.onCorrectKeystroke();
+          if (phraseChar === " ") {
+            const wordStart = currentPhrase.lastIndexOf(" ", typedPos - 1) + 1;
+            let perfect = true;
+            for (let i = wordStart; i < typedPos; i++) {
+              if (currentTyped[i] !== currentPhrase[i]) {
+                perfect = false;
+                break;
+              }
+            }
+            gameRef.current?.onWordCompleted(perfect);
+          }
         }
       }
 

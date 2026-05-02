@@ -10,7 +10,7 @@ import { DamageNumberManager } from "./DamageNumberManager";
 import { LaserBeamManager } from "./LaserBeamManager";
 import { GemManager } from "./GemManager";
 import { AssetManager } from "./assetManager";
-import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, setSpawnerPaused } from "./state";
+import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, onPerfectWord as stateOnPerfectWord, onWordWithError as stateOnWordWithError, setSpawnerPaused } from "./state";
 import type { GameState } from "./state";
 import type { EntityType } from "./types";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
@@ -49,6 +49,14 @@ export class CosmicDefenseGame {
 
   onCorrectKeystroke(): void {
     stateOnCorrectKeystroke(this.state);
+  }
+
+  onWordCompleted(perfect: boolean): void {
+    if (perfect) {
+      stateOnPerfectWord(this.state);
+    } else {
+      stateOnWordWithError(this.state);
+    }
   }
 
   private buildScene(assetManager: AssetManager): void {
