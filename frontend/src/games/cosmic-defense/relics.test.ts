@@ -297,15 +297,13 @@ describe('cryo_surge', () => {
 });
 
 describe('frost_nova', () => {
-  it('deals damage when enemy is frozen regardless of prior freeze state', () => {
-    const state = makeState(['frost_nova']);
-    const enemy = makeEnemy(state, { health: 100, freezeStacks: 5 });
+  it('deals damage each time freeze is applied, even if already frozen', () => {
+    const state = makeState(['cryo_surge', 'frost_nova']);
+    const enemy = makeEnemy(state, { health: 200 });
     onPerfectWord(state);
-    const stateWithCryoSurge = makeState(['cryo_surge', 'frost_nova']);
-    const enemy2 = makeEnemy(stateWithCryoSurge, { health: 100, freezeStacks: 5 });
-    onPerfectWord(stateWithCryoSurge);
-    expect(enemy2.health).toBe(100 - 15);
-    expect(enemy).toBeTruthy();
+    expect(enemy.health).toBe(200 - 15);
+    onPerfectWord(state);
+    expect(enemy.health).toBe(200 - 30);
   });
 });
 
