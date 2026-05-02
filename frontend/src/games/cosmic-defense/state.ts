@@ -665,8 +665,15 @@ export function updateState(state: GameState, dt: number): void {
       if (e.team !== Team.Enemy) continue;
 
       if (e.plasmaStacks > 0) {
-        if (state.relicEffects.healPerPlasmaTick > 0) {
-          state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.healPerPlasmaTick);
+        if (state.relicEffects.plasmaTickSpread > 0) {
+          let nearest: EntityState | null = null;
+          let nearestDist = Infinity;
+          for (const other of state.entities) {
+            if (other.team !== Team.Enemy || other.id === e.id) continue;
+            const d = (other.x - e.x) ** 2 + (other.y - e.y) ** 2;
+            if (d < nearestDist) { nearest = other; nearestDist = d; }
+          }
+          if (nearest) nearest.plasmaStacks += state.relicEffects.plasmaTickSpread;
         }
         const prevStacks = e.plasmaStacks;
         const dmg = e.plasmaStacks * PLASMA_DAMAGE_PER_TICK * state.relicEffects.plasmaDamageMultiplier;
@@ -1008,13 +1015,7 @@ export function onWordWithError(state: GameState): void {
 
 function addRelic(state: GameState, relicId: RelicId): void {
   state.relics.push(relicId);
-  const prevEffects = state.relicEffects;
   state.relicEffects = computeRelicEffects(state.relics);
-  const healthIncrease = state.relicEffects.maxPlanetHealthBonus - prevEffects.maxPlanetHealthBonus;
-  if (healthIncrease > 0) {
-    state.maxPlanetHealth += healthIncrease;
-    state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + healthIncrease);
-  }
 }
 
 const TIER_SPREAD = 90;

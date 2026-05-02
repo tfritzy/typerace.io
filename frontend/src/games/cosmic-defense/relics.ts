@@ -39,7 +39,7 @@ export type RelicId =
   | "cryo_surge"
   | "cryo_recharge"
   | "ice_armor"
-  | "afterburn"
+  | "pyroclasm"
   | "meltdown"
   | "static_discharge"
   | "frost_nova";
@@ -64,7 +64,6 @@ export interface RelicEffects {
   projectileDamageMultiplier: number;
   planetHealPerKill: number;
   chargesPerKill: number;
-  maxPlanetHealthBonus: number;
   maxPlanetHealthPerKill: number;
   bonusChargesGranted: number;
   perfectWordSplashDamage: number;
@@ -86,7 +85,7 @@ export interface RelicEffects {
   planetFreezeOnHit: number;
   frostNovaDamage: number;
   freezeOnPerfectWord: number;
-  healPerPlasmaTick: number;
+  plasmaTickSpread: number;
   plasmaExpiredDamage: number;
   plasmaOnFreezeApply: number;
 }
@@ -374,11 +373,11 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     effects: { frostNovaDamage: 15 },
   },
   {
-    id: "afterburn",
-    name: "Afterburn",
-    description: "Each plasma tick heals the planet for 1 HP.",
+    id: "pyroclasm",
+    name: "Pyroclasm",
+    description: "Each plasma tick on an enemy spreads 1 plasma stack to the nearest other enemy.",
     sprite: "/futuristic_pixel_icons/Red Starcrystal.png",
-    effects: { healPerPlasmaTick: 1 },
+    effects: { plasmaTickSpread: 1 },
   },
   {
     id: "meltdown",
@@ -421,7 +420,6 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     projectileDamageMultiplier: 1,
     planetHealPerKill: 0,
     chargesPerKill: 0,
-    maxPlanetHealthBonus: 0,
     maxPlanetHealthPerKill: 0,
     bonusChargesGranted: 0,
     perfectWordSplashDamage: 0,
@@ -443,7 +441,7 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     planetFreezeOnHit: 0,
     frostNovaDamage: 0,
     freezeOnPerfectWord: 0,
-    healPerPlasmaTick: 0,
+    plasmaTickSpread: 0,
     plasmaExpiredDamage: 0,
     plasmaOnFreezeApply: 0,
   };
@@ -469,7 +467,6 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     if (def.effects.projectileDamageMultiplier !== undefined) result.projectileDamageMultiplier *= def.effects.projectileDamageMultiplier;
     if (def.effects.planetHealPerKill !== undefined) result.planetHealPerKill += def.effects.planetHealPerKill;
     if (def.effects.chargesPerKill !== undefined) result.chargesPerKill += def.effects.chargesPerKill;
-    if (def.effects.maxPlanetHealthBonus !== undefined) result.maxPlanetHealthBonus += def.effects.maxPlanetHealthBonus;
     if (def.effects.maxPlanetHealthPerKill !== undefined) result.maxPlanetHealthPerKill += def.effects.maxPlanetHealthPerKill;
     if (def.effects.bonusChargesGranted !== undefined) result.bonusChargesGranted += def.effects.bonusChargesGranted;
     if (def.effects.perfectWordSplashDamage !== undefined) result.perfectWordSplashDamage += def.effects.perfectWordSplashDamage;
@@ -491,7 +488,7 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     if (def.effects.planetFreezeOnHit !== undefined) result.planetFreezeOnHit += def.effects.planetFreezeOnHit;
     if (def.effects.frostNovaDamage !== undefined) result.frostNovaDamage += def.effects.frostNovaDamage;
     if (def.effects.freezeOnPerfectWord !== undefined) result.freezeOnPerfectWord += def.effects.freezeOnPerfectWord;
-    if (def.effects.healPerPlasmaTick !== undefined) result.healPerPlasmaTick += def.effects.healPerPlasmaTick;
+    if (def.effects.plasmaTickSpread !== undefined) result.plasmaTickSpread += def.effects.plasmaTickSpread;
     if (def.effects.plasmaExpiredDamage !== undefined) result.plasmaExpiredDamage += def.effects.plasmaExpiredDamage;
     if (def.effects.plasmaOnFreezeApply !== undefined) result.plasmaOnFreezeApply += def.effects.plasmaOnFreezeApply;
   }
