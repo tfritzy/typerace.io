@@ -6,13 +6,13 @@ import type { CosmicDefenseGame } from "./game";
 
 const SCORE_PUBLISH_INTERVAL_MS = 10_000;
 
-type ScoreHudProps = {
+type ScoreProps = {
   game: CosmicDefenseGame | null;
   gameId: string;
   language: string;
 };
 
-export const ScoreHud = ({ game, gameId, language }: ScoreHudProps) => {
+export const Score = ({ game, gameId, language }: ScoreProps) => {
   const conn = useDatabase();
   const [score, setScore] = useState(0);
   const publishScore = useCallback((nextScore: number) => {
@@ -48,9 +48,9 @@ export const ScoreHud = ({ game, gameId, language }: ScoreHudProps) => {
   }, [game, throttledPublishScore]);
 
   return (
-    <div className="mt-1 flex items-center gap-1">
+    <>
       <span className="text-[11px] text-[#585b70]">Score</span>
       <span className="text-[11px] text-[#cdd6f4] font-semibold">{score.toLocaleString()}</span>
-    </div>
+    </>
   );
 };

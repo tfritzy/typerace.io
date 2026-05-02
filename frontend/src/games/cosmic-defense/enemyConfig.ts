@@ -100,9 +100,8 @@ function calculateEnemyPower(health: number): number {
   return Math.floor((health * 4 / 3) / 5) * 5;
 }
 
-function calculateEnemyXpReward(power: number, zeroBasedTier: number): number {
-  const oneBasedTier = zeroBasedTier + 1;
-  return Math.round(Math.pow(power, 0.6) * 0.28 + oneBasedTier * 0.01);
+function calculateEnemyXpReward(power: number): number {
+  return Math.round(Math.pow(power, 0.72) * 0.2);
 }
 
 function calculateEnemySpeed(zeroBasedTier: number): number {
@@ -115,7 +114,7 @@ function createEnemyConfig(baseConfig: EnemyBaseConfig, zeroBasedTier: number): 
     ...ENEMY_DEFAULTS,
     ...baseConfig,
     power,
-    xpReward: calculateEnemyXpReward(power, zeroBasedTier),
+    xpReward: calculateEnemyXpReward(power),
     speed: calculateEnemySpeed(zeroBasedTier),
   };
 }
@@ -185,12 +184,12 @@ export const FRIENDLY_CATALOG: FriendlyConfig[] = [
   { entityType: "Spur", health: 300, projectileDamage: 40, projectileType: ProjectileType.Projectile5, chargesRequired: 8, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
   { entityType: "Ember", health: 200, projectileDamage: 7, projectileType: ProjectileType.Projectile1, chargesRequired: 3, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
   { entityType: "Corona", health: 150, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 1, plasmaStacks: 0, laserDamage: 5, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser },
-  { entityType: "Pip", health: 150, projectileDamage: 4, projectileType: ProjectileType.Tiny, chargesRequired: 2, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 2, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
+  { entityType: "Pip", health: 150, projectileDamage: 8, projectileType: ProjectileType.Tiny, chargesRequired: 2, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 2, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
   { entityType: "Eagle", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 6, plasmaStacks: 3, laserDamage: 10, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Plasma },
   { entityType: "Needle", health: 200, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 4, plasmaStacks: 0, laserDamage: 3, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser },
   { entityType: "Flare", health: 300, projectileDamage: 8, projectileType: ProjectileType.Projectile4, chargesRequired: 8, plasmaStacks: 0, laserDamage: 0, freezeStacks: 3, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0, damageType: DamageType.Ice },
   { entityType: "Dart", health: 200, projectileDamage: 0, projectileType: ProjectileType.Projectile3, chargesRequired: 6, plasmaStacks: 2, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0.33, damageType: DamageType.Plasma },
-  { entityType: "Moth", health: 200, projectileDamage: 10, projectileType: ProjectileType.Projectile1, chargesRequired: 4, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
+  { entityType: "Moth", health: 200, projectileDamage: 20, projectileType: ProjectileType.Projectile1, chargesRequired: 4, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
   { entityType: "Prism", health: 150, projectileDamage: 0, projectileType: ProjectileType.Tiny, chargesRequired: 2, plasmaStacks: 0, laserDamage: 4, freezeStacks: 2, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Ice },
   { entityType: "Hawk", health: 200, projectileDamage: 10, projectileType: ProjectileType.Projectile2, chargesRequired: 6, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0, damageType: DamageType.Physical },
   { entityType: "Nova", health: 180, projectileDamage: 5, projectileType: ProjectileType.Projectile1, chargesRequired: 5, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 3, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
