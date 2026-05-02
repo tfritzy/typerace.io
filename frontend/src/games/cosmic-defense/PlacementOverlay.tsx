@@ -2,7 +2,8 @@ import { useState } from "react";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "./constants";
 import { SLOT_HIT_RADIUS } from "./PlacementPoints";
 import type { PlacementSlot } from "./PlacementPoints";
-import type { EntityState, RelicEffects } from "./state";
+import type { EntityState } from "./state";
+import type { RelicEffects } from "./relics";
 
 interface PlacementOverlayProps {
   slots: PlacementSlot[];

@@ -656,10 +656,7 @@ export function updateState(state: GameState, dt: number): void {
     const shooter = state.entityById.get(shot.shooterId);
     if (!shooter) continue;
 
-    const baseProjDmg = shooter.team === Team.Allied
-      ? Math.round(shooter.projectileDamage * state.relicEffects.projectileDamageMultiplier)
-      : shooter.projectileDamage;
-    const dmg = getBuffedDamage(shooter, baseProjDmg);
+    const dmg = getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter));
 
     if (shooter.explosionRadius > 0) {
       const effectiveRadius = shooter.team === Team.Allied
@@ -695,6 +692,12 @@ function getBuffedDamage(e: EntityState, baseDamage: number): number {
     return Math.round(baseDamage * 2);
   }
   return baseDamage;
+}
+
+function getEffectiveProjectileDamage(state: GameState, shooter: EntityState): number {
+  return shooter.team === Team.Allied
+    ? Math.round(shooter.projectileDamage * state.relicEffects.projectileDamageMultiplier)
+    : shooter.projectileDamage;
 }
 
 function fireShot(state: GameState, e: EntityState): void {
@@ -770,10 +773,7 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target || !target.entity) return;
 
-  const rawChainDmg = e.team === Team.Allied
-    ? Math.round(e.projectileDamage * state.relicEffects.projectileDamageMultiplier)
-    : e.projectileDamage;
-  const dmg = getBuffedDamage(e, rawChainDmg);
+  const dmg = getBuffedDamage(e, getEffectiveProjectileDamage(state, e));
 
   const hitIds = new Set<number>();
   let currentTarget: EntityState | null = target.entity;
