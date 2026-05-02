@@ -22,10 +22,3 @@
     "scale": 1
   }
 }
-  "meta": {
-    "image": "17.png",
-    "format": "RGBA8888",
-    "size": { "w": 896, "h": 576 },
-    "scale": 1
-  }
-}

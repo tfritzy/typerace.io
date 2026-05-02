@@ -12,8 +12,12 @@ interface ExplosionConfig {
   speedMult: number;
 }
 
-const EXPLOSION_TYPE_CONFIGS: Partial<Record<ExplosionType, ExplosionConfig>> = {
-  [ExplosionType.BouncingHit]: { scaleMult: 0.5, speedMult: 2 },
+const EXPLOSION_TYPE_CONFIGS: Record<ExplosionType, ExplosionConfig> = {
+  [ExplosionType.PlasmaExplosive]: { scaleMult: 1,   speedMult: 1 },
+  [ExplosionType.IceExplosive]:    { scaleMult: 1,   speedMult: 1 },
+  [ExplosionType.Explosive]:       { scaleMult: 1,   speedMult: 1 },
+  [ExplosionType.MothHit]:         { scaleMult: 1,   speedMult: 1 },
+  [ExplosionType.ChainHit]:        { scaleMult: 0.5, speedMult: 2 },
 };
 
 export class ExplosionManager {
@@ -67,7 +71,6 @@ export class ExplosionManager {
       case ExplosionType.Explosive:       return this.assets.getHawkExplosionTextures();
       case ExplosionType.MothHit:         return this.assets.getMothExplosionTextures();
       case ExplosionType.ChainHit:        return this.assets.getChainHitTextures();
-      case ExplosionType.BouncingHit:     return this.assets.getChainHitTextures();
       default:                            return this.assets.getMothExplosionTextures();
     }
   }

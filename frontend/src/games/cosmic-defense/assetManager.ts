@@ -152,7 +152,7 @@ export class AssetManager {
 
   getChainHitTextures(): Texture[] {
     const textures: Texture[] = [];
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 17; i++) {
       textures.push(this.chainHitSheet_.textures[`chain-hit-${i}`]);
     }
     return textures;
