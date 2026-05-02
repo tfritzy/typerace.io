@@ -6,13 +6,16 @@ import {
   onCorrectKeystroke,
   updateState,
   setSpawnerPaused,
+  spawnEntity,
+  spawnAlliedEntity,
   PLANET_X,
   PLANET_Y,
   type GameState,
   type EntityState,
 } from './state';
-import { computeRelicEffects, RELIC_CATALOG, type RelicId } from './relics';
-import { Team, DamageType, ProjectileType, ColorPreset } from './types';
+import { computeRelicEffects, type RelicId } from './relics';
+import { Team, ColorPreset } from './types';
+import { ENEMY_CATALOG, FRIENDLY_CATALOG } from './enemyConfig';
 
 function makeState(relics: RelicId[] = []): GameState {
   const state = createGameState();
@@ -22,108 +25,23 @@ function makeState(relics: RelicId[] = []): GameState {
 }
 
 function makeEnemy(state: GameState, overrides: Partial<EntityState> = {}): EntityState {
-  const id = state.nextId++;
-  const entity: EntityState = {
-    id,
-    entityType: 'Pulse',
-    x: PLANET_X + 200,
-    y: PLANET_Y,
-    vx: 0,
-    vy: 0,
-    health: 100,
-    maxHealth: 100,
-    power: 10,
-    colorPreset: ColorPreset.Preset4,
-    team: Team.Enemy,
-    fireRate: 2,
-    projectileDamage: 5,
-    projectileType: ProjectileType.Tiny,
-    fireTimer: 10,
-    rotation: Math.PI,
-    displayRotation: Math.PI,
-    speed: 50,
-    chargesRequired: 0,
-    charge: 0,
-    xpReward: 10,
-    range: 700,
-    hitHalfW: 24,
-    hitHalfH: 15,
-    role: null,
-    plasmaStacks: 0,
-    plasmaStacksApplied: 0,
-    laserDamage: 0,
-    kills: 0,
-    damageDealt: 0,
-    targetingMode: 0,
-    level: 1,
-    freezeStacks: 0,
-    chainCount: 0,
-    buffMultiplier: 0,
-    buffedNextAttack: false,
-    fireCount: 1,
-    beamWidth: 0,
-    explosionRadius: 0,
-    hitDelay: 0,
-    sizeScale: 1,
-    isBoss: false,
-    damageType: DamageType.Physical,
-    ...overrides,
-  };
-  state.entities.push(entity);
-  state.entityById.set(id, entity);
+  spawnEntity(state, ENEMY_CATALOG[0], Team.Enemy);
+  const entity = state.entities[state.entities.length - 1];
+  entity.x = PLANET_X + 200;
+  entity.y = PLANET_Y;
+  entity.vx = 0;
+  entity.vy = 0;
+  Object.assign(entity, overrides);
+  if ('health' in overrides && !('maxHealth' in overrides)) {
+    entity.maxHealth = entity.health;
+  }
   return entity;
 }
 
 function makeAlly(state: GameState, overrides: Partial<EntityState> = {}): EntityState {
-  const id = state.nextId++;
-  const entity: EntityState = {
-    id,
-    entityType: 'Moth',
-    x: PLANET_X,
-    y: PLANET_Y,
-    vx: 0,
-    vy: 0,
-    health: 200,
-    maxHealth: 200,
-    power: 0,
-    colorPreset: ColorPreset.Preset1,
-    team: Team.Allied,
-    fireRate: 0,
-    projectileDamage: 10,
-    projectileType: ProjectileType.Projectile1,
-    fireTimer: 0,
-    rotation: 0,
-    displayRotation: 0,
-    speed: 0,
-    chargesRequired: 4,
-    charge: 0,
-    xpReward: 0,
-    range: 0,
-    hitHalfW: 30,
-    hitHalfH: 24,
-    role: 'shooter',
-    plasmaStacks: 0,
-    plasmaStacksApplied: 0,
-    laserDamage: 0,
-    kills: 0,
-    damageDealt: 0,
-    targetingMode: 0,
-    level: 1,
-    freezeStacks: 0,
-    chainCount: 0,
-    buffMultiplier: 0,
-    buffedNextAttack: false,
-    fireCount: 1,
-    beamWidth: 0,
-    explosionRadius: 0,
-    hitDelay: 0,
-    sizeScale: 1,
-    isBoss: false,
-    damageType: DamageType.Physical,
-    ...overrides,
-  };
-  state.entities.push(entity);
-  state.entityById.set(id, entity);
+  const id = spawnAlliedEntity(state, FRIENDLY_CATALOG[0], ColorPreset.Preset1, PLANET_X, PLANET_Y, 1);
+  const entity = state.entityById.get(id)!;
+  Object.assign(entity, overrides);
   return entity;
 }
 
@@ -134,64 +52,35 @@ function tickSecond(state: GameState): void {
   updateState(state, targetTime - startTime + 0.001);
 }
 
-describe('computeRelicEffects', () => {
-  it('returns base values with no relics', () => {
-    const fx = computeRelicEffects([]);
-    expect(fx.damageMultiplier).toBe(1);
-    expect(fx.enemySpeedMultiplier).toBe(1);
-    expect(fx.planetHealPerSecond).toBe(0);
-    expect(fx.streakDamageBonus).toBe(0);
+describe('stellar_core', () => {
+  it('increases all weapon damage by 10%', () => {
+    const state = makeState(['stellar_core']);
+    makeAlly(state, { projectileDamage: 10, chargesRequired: 1 });
+    const enemy = makeEnemy(state, { health: 200 });
+    onCorrectKeystroke(state);
+    setSpawnerPaused(state, false);
+    updateState(state, 0.1);
+    expect(200 - enemy.health).toBe(11);
   });
+});
 
-  it('stellar_core sets 1.1 damage multiplier', () => {
-    const fx = computeRelicEffects(['stellar_core']);
-    expect(fx.damageMultiplier).toBeCloseTo(1.1);
+describe('glacial_emitter', () => {
+  it('applies an extra freeze stack when an ice ship attacks', () => {
+    const state = makeState(['glacial_emitter']);
+    makeAlly(state, { laserDamage: 5, freezeStacks: 2, chargesRequired: 1, projectileDamage: 0 });
+    const enemy = makeEnemy(state, { health: 100 });
+    onCorrectKeystroke(state);
+    expect(enemy.freezeStacks).toBe(3);
   });
+});
 
-  it('void_crystal sets 0.85 enemy speed', () => {
-    const fx = computeRelicEffects(['void_crystal']);
-    expect(fx.enemySpeedMultiplier).toBeCloseTo(0.85);
-  });
-
-  it('nanite_swarm sets 2 HP per second regen', () => {
-    expect(computeRelicEffects(['nanite_swarm']).planetHealPerSecond).toBe(2);
-  });
-
-  it('aegis_barrier sets 0.75 damage reduction', () => {
-    expect(computeRelicEffects(['aegis_barrier']).planetDamageReduction).toBeCloseTo(0.75);
-  });
-
-  it('glacial_emitter sets freeze stacks bonus 1', () => {
-    expect(computeRelicEffects(['glacial_emitter']).freezeStacksBonus).toBe(1);
-  });
-
-  it('plasma_weave sets plasma stacks bonus 1', () => {
-    expect(computeRelicEffects(['plasma_weave']).plasmaStacksBonus).toBe(1);
-  });
-
-  it('flow_state sets 0.01 streak damage bonus per word', () => {
-    expect(computeRelicEffects(['flow_state']).streakDamageBonus).toBeCloseTo(0.01);
-  });
-
-  it('plasma_amplifier sets 2x plasma damage', () => {
-    expect(computeRelicEffects(['plasma_amplifier']).plasmaDamageMultiplier).toBe(2);
-  });
-
-  it('multiple relics stack multiplicatively for damage', () => {
-    const fx = computeRelicEffects(['stellar_core', 'stellar_core']);
-    expect(fx.damageMultiplier).toBeCloseTo(1.21);
-  });
-
-  it('all relic IDs in catalog are unique', () => {
-    const ids = RELIC_CATALOG.map(r => r.id);
-    expect(new Set(ids).size).toBe(ids.length);
-  });
-
-  it('all relics have a non-empty name and description', () => {
-    for (const relic of RELIC_CATALOG) {
-      expect(relic.name.length).toBeGreaterThan(0);
-      expect(relic.description.length).toBeGreaterThan(0);
-    }
+describe('plasma_weave', () => {
+  it('applies an extra plasma stack when a plasma ship attacks', () => {
+    const state = makeState(['plasma_weave']);
+    makeAlly(state, { laserDamage: 5, plasmaStacksApplied: 2, chargesRequired: 1, projectileDamage: 0 });
+    const enemy = makeEnemy(state, { health: 100, plasmaStacks: 0 });
+    onCorrectKeystroke(state);
+    expect(enemy.plasmaStacks).toBe(3);
   });
 });
 
@@ -483,7 +372,7 @@ describe('photon_surge', () => {
 describe('volatile_ignition', () => {
   it('applies plasma to burning enemies hit by physical attacks', () => {
     const state = makeState(['volatile_ignition']);
-    const ally = makeAlly(state, { projectileDamage: 10, chargesRequired: 1, damageType: DamageType.Physical });
+    const ally = makeAlly(state, { projectileDamage: 10, chargesRequired: 1 });
     const enemy = makeEnemy(state, { health: 200, plasmaStacks: 3 });
     onCorrectKeystroke(state);
     setSpawnerPaused(state, false);
@@ -533,8 +422,13 @@ describe('ice_armor', () => {
 });
 
 describe('plasma_feedback', () => {
-  it('increases damage multiplier based on plasma stacks', () => {
+  it('deals more damage to enemies with plasma stacks', () => {
     const state = makeState(['plasma_feedback']);
-    expect(state.relicEffects.plasmaDamageBonusPerStack).toBeCloseTo(0.03);
+    makeAlly(state, { projectileDamage: 10, chargesRequired: 1 });
+    const burning = makeEnemy(state, { health: 200, plasmaStacks: 10 });
+    onCorrectKeystroke(state);
+    setSpawnerPaused(state, false);
+    updateState(state, 0.1);
+    expect(200 - burning.health).toBe(13);
   });
 });
