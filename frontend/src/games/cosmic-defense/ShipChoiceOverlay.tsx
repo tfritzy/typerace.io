@@ -69,10 +69,10 @@ export const ShipChoiceOverlay = ({
   return (
     <>
       <div
-        className="absolute inset-0 z-40"
+        className="absolute inset-0 z-40 animate-fadeIn"
         style={{ background: "rgba(0,0,0,0.6)" }}
       />
-      <div className="absolute inset-0 z-50 flex flex-col items-center justify-center"
+      <div className="absolute inset-0 z-50 flex flex-col items-center justify-center animate-fadeIn"
         style={{ pointerEvents: "auto" }}
       >
         <div className="text-[#cdd6f4] text-[22px] font-semibold mb-1"
