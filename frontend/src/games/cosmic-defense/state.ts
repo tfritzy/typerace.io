@@ -82,6 +82,53 @@ export interface PendingShot {
   targetY: number;
 }
 
+class MinHeap<T> {
+  private data: T[] = [];
+  constructor(private readonly compare: (a: T, b: T) => number) {}
+
+  push(item: T): void {
+    this.data.push(item);
+    this.siftUp(this.data.length - 1);
+  }
+
+  peek(): T | undefined { return this.data[0]; }
+
+  pop(): T | undefined {
+    if (this.data.length === 0) return undefined;
+    const top = this.data[0];
+    const last = this.data.pop()!;
+    if (this.data.length > 0) {
+      this.data[0] = last;
+      this.siftDown(0);
+    }
+    return top;
+  }
+
+  get size(): number { return this.data.length; }
+
+  private siftUp(i: number): void {
+    while (i > 0) {
+      const parent = (i - 1) >> 1;
+      if (this.compare(this.data[i], this.data[parent]) >= 0) break;
+      [this.data[i], this.data[parent]] = [this.data[parent], this.data[i]];
+      i = parent;
+    }
+  }
+
+  private siftDown(i: number): void {
+    const n = this.data.length;
+    while (true) {
+      let smallest = i;
+      const l = 2 * i + 1, r = 2 * i + 2;
+      if (l < n && this.compare(this.data[l], this.data[smallest]) < 0) smallest = l;
+      if (r < n && this.compare(this.data[r], this.data[smallest]) < 0) smallest = r;
+      if (smallest === i) break;
+      [this.data[i], this.data[smallest]] = [this.data[smallest], this.data[i]];
+      i = smallest;
+    }
+  }
+}
+
 export interface ExplosionState {
   id: number;
   x: number;
@@ -178,7 +225,7 @@ export interface GameState {
   explosions: ExplosionState[];
   laserBeams: LaserBeam[];
   projectiles: ProjectileState[];
-  pendingShots: PendingShot[];
+  pendingShots: MinHeap<PendingShot>;
   time: {
     time: number;
     deltaTime: number;
@@ -234,7 +281,7 @@ export function createGameState(): GameState {
     explosions: [],
     laserBeams: [],
     projectiles: [],
-    pendingShots: [],
+    pendingShots: new MinHeap<PendingShot>((a, b) => a.fireAt - b.fireAt),
     time: { time: 0, deltaTime: 0 },
     nextId: 1,
     planetHealth: 1000,
@@ -754,35 +801,34 @@ function tickLaserBeams(state: GameState): void {
 
 function applyProjectileHit(state: GameState, shooter: EntityState, hitEntity: EntityState): void {
   const damage = getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter));
+
+  let affected: EntityState[];
   if (shooter.explosionRadius > 0) {
     const effectiveRadius = shooter.team === Team.Allied
       ? shooter.explosionRadius * state.relicEffects.explosionRadiusMultiplier
       : shooter.explosionRadius;
-    spawnExplosion(state, shooter.entityType, hitEntity.x, hitEntity.y, effectiveRadius);
     const r2 = effectiveRadius * effectiveRadius;
-    for (let j = state.entities.length - 1; j >= 0; j--) {
-      const other = state.entities[j];
-      if (other.team !== Team.Enemy) continue;
-      const dx = other.x - hitEntity.x;
-      const dy = other.y - hitEntity.y;
-      if (dx * dx + dy * dy > r2) continue;
-      other.plasmaStacks += shooter.plasmaStacksApplied;
-      if (shooter.freezeStacks > 0) applyFreezeStacks(state, other, shooter.freezeStacks);
-      if (damage > 0) dealDamageToEntity(state, shooter, other, damage);
-    }
+    affected = state.entities.filter(e => {
+      if (e.team !== Team.Enemy) return false;
+      const dx = e.x - hitEntity.x, dy = e.y - hitEntity.y;
+      return dx * dx + dy * dy <= r2;
+    });
+    spawnExplosion(state, shooter.entityType, hitEntity.x, hitEntity.y, effectiveRadius);
   } else {
-    hitEntity.plasmaStacks += shooter.plasmaStacksApplied;
+    affected = [hitEntity];
     spawnExplosion(state, shooter.entityType, hitEntity.x, hitEntity.y);
-    dealDamageToEntity(state, shooter, hitEntity, damage);
+  }
+
+  for (const target of affected) {
+    target.plasmaStacks += shooter.plasmaStacksApplied;
+    if (shooter.freezeStacks > 0) applyFreezeStacks(state, target, shooter.freezeStacks);
+    if (damage > 0) dealDamageToEntity(state, shooter, target, damage);
   }
 }
 
 function tickPendingShots(state: GameState): void {
-  for (let i = state.pendingShots.length - 1; i >= 0; i--) {
-    const shot = state.pendingShots[i];
-    if (state.time.time < shot.fireAt) continue;
-    state.pendingShots.splice(i, 1);
-
+  while (state.pendingShots.size > 0 && state.pendingShots.peek()!.fireAt <= state.time.time) {
+    const shot = state.pendingShots.pop()!;
     const shooter = state.entityById.get(shot.shooterId);
     if (!shooter) continue;
 
