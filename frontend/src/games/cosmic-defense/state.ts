@@ -3,7 +3,7 @@ import { type EntityType, ColorPreset, ExplosionType, Team, getExplosionType, Da
 import { ENEMY_CATALOG, BOSS_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } from "./relics";
-import { MinHeap } from "./MinHeap";
+import { MinHeap } from "../../utils/MinHeap";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -74,6 +74,8 @@ export interface ProjectileState {
   vx: number;
   vy: number;
   shooterId: number;
+  bouncesRemaining: number;
+  hitIds: Set<number>;
 }
 
 export interface PendingShot {
@@ -678,11 +680,10 @@ function performInstantHit(
   target: { x: number; y: number; entity: EntityState | null },
   damage: number
 ): void {
-  spawnExplosion(state, shooter.entityType, target.x, target.y, shooter.explosionRadius);
-
   if (target.entity) {
-    dealDamageToEntity(state, shooter, target.entity, damage);
+    applyExplosion(state, shooter, target.entity, damage);
   } else {
+    spawnExplosion(state, shooter.entityType, target.x, target.y, shooter.explosionRadius);
     const reducedDamage = shooter.team === Team.Enemy
       ? Math.round(damage * state.relicEffects.planetDamageReduction)
       : damage;
@@ -800,6 +801,8 @@ function tickPendingShots(state: GameState): void {
       vx: (dx / dist) * PROJECTILE_SPEED,
       vy: (dy / dist) * PROJECTILE_SPEED,
       shooterId: shooter.id,
+      bouncesRemaining: shooter.chainCount,
+      hitIds: new Set(),
     });
   }
 }
@@ -819,12 +822,39 @@ function tickProjectiles(state: GameState, dt: number): void {
 
     for (let j = state.entities.length - 1; j >= 0; j--) {
       const other = state.entities[j];
-      if (other.team !== Team.Enemy) continue;
+      if (other.team !== Team.Enemy || proj.hitIds.has(other.id)) continue;
       const r = Math.max(other.hitHalfW, other.hitHalfH);
       if (segmentPointDistSq(oldX, oldY, proj.x, proj.y, other.x, other.y) > r * r) continue;
       const shooter = state.entityById.get(proj.shooterId);
       if (shooter) applyProjectileHit(state, shooter, other);
       state.projectiles.splice(i, 1);
+
+      if (proj.bouncesRemaining > 0) {
+        proj.hitIds.add(other.id);
+        let nearest: EntityState | null = null;
+        let nearestDist = Infinity;
+        const maxJumpDistSq = MAX_CHAIN_JUMP_DISTANCE * MAX_CHAIN_JUMP_DISTANCE;
+        for (const candidate of state.entities) {
+          if (candidate.team !== Team.Enemy || proj.hitIds.has(candidate.id)) continue;
+          const cx = candidate.x - other.x, cy = candidate.y - other.y;
+          const d = cx * cx + cy * cy;
+          if (d < nearestDist && d <= maxJumpDistSq) { nearestDist = d; nearest = candidate; }
+        }
+        if (nearest) {
+          const bx = nearest.x - other.x, by = nearest.y - other.y;
+          const bd = Math.sqrt(bx * bx + by * by);
+          state.projectiles.push({
+            id: state.nextId++,
+            x: other.x,
+            y: other.y,
+            vx: (bx / bd) * PROJECTILE_SPEED,
+            vy: (by / bd) * PROJECTILE_SPEED,
+            shooterId: proj.shooterId,
+            bouncesRemaining: proj.bouncesRemaining - 1,
+            hitIds: new Set(proj.hitIds),
+          });
+        }
+      }
       break;
     }
   }
@@ -976,44 +1006,13 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target || !target.entity) return;
 
-  const hitIds = new Set<number>();
-  const targets: EntityState[] = [];
-  let currentTarget: EntityState | null = target.entity;
-  let chainsRemaining = e.chainCount;
-  const maxJumpDistSq = MAX_CHAIN_JUMP_DISTANCE * MAX_CHAIN_JUMP_DISTANCE;
-
-  while (currentTarget && chainsRemaining >= 0) {
-    hitIds.add(currentTarget.id);
-    targets.push(currentTarget);
-    chainsRemaining--;
-    if (chainsRemaining < 0) break;
-
-    let nearest: EntityState | null = null;
-    let nearestDist = Infinity;
-    for (const other of state.entities) {
-      if (other.team !== Team.Enemy || hitIds.has(other.id)) continue;
-      const cx = other.x - currentTarget.x;
-      const cy = other.y - currentTarget.y;
-      const d = cx * cx + cy * cy;
-      if (d < nearestDist && d <= maxJumpDistSq) {
-        nearestDist = d;
-        nearest = other;
-      }
-    }
-    if (!nearest) break;
-
-    currentTarget = nearest;
-  }
-
-  for (const t of targets) {
-    const lead = computeLeadPosition(e.x, e.y, t.x, t.y, t.vx, t.vy, PROJECTILE_SPEED);
-    state.pendingShots.push({
-      fireAt: state.time.time + e.hitDelay,
-      shooterId: e.id,
-      targetX: lead.x,
-      targetY: lead.y,
-    });
-  }
+  const lead = computeLeadPosition(e.x, e.y, target.x, target.y, target.entity.vx, target.entity.vy, PROJECTILE_SPEED);
+  state.pendingShots.push({
+    fireAt: state.time.time + e.hitDelay,
+    shooterId: e.id,
+    targetX: lead.x,
+    targetY: lead.y,
+  });
 }
 
 function activateBuffer(state: GameState, e: EntityState): void {
