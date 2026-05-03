@@ -73,14 +73,7 @@ export interface ProjectileState {
   vx: number;
   vy: number;
   shooterId: number;
-}
-
-export interface PendingShot {
-  fireAt: number;
-  shooterId: number;
-  targetX: number;
-  targetY: number;
-  targetEntityId: number | null;
+  damage: number;
 }
 
 export interface ExplosionState {
@@ -179,7 +172,6 @@ export interface GameState {
   explosions: ExplosionState[];
   laserBeams: LaserBeam[];
   projectiles: ProjectileState[];
-  pendingShots: PendingShot[];
   time: {
     time: number;
     deltaTime: number;
@@ -235,7 +227,6 @@ export function createGameState(): GameState {
     explosions: [],
     laserBeams: [],
     projectiles: [],
-    pendingShots: [],
     time: { time: 0, deltaTime: 0 },
     nextId: 1,
     planetHealth: 1000,
@@ -753,6 +744,30 @@ function tickLaserBeams(state: GameState): void {
   }
 }
 
+function applyProjectileHit(state: GameState, shooter: EntityState, damage: number, hitEntity: EntityState): void {
+  if (shooter.explosionRadius > 0) {
+    const effectiveRadius = shooter.team === Team.Allied
+      ? shooter.explosionRadius * state.relicEffects.explosionRadiusMultiplier
+      : shooter.explosionRadius;
+    spawnExplosion(state, shooter.entityType, hitEntity.x, hitEntity.y, effectiveRadius);
+    const r2 = effectiveRadius * effectiveRadius;
+    for (let j = state.entities.length - 1; j >= 0; j--) {
+      const other = state.entities[j];
+      if (other.team !== Team.Enemy) continue;
+      const dx = other.x - hitEntity.x;
+      const dy = other.y - hitEntity.y;
+      if (dx * dx + dy * dy > r2) continue;
+      if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
+      if (shooter.freezeStacks > 0) applyFreezeStacks(state, other, shooter.freezeStacks);
+      if (damage > 0) dealDamageToEntity(state, shooter, other, damage);
+    }
+  } else {
+    if (shooter.plasmaStacksApplied > 0) hitEntity.plasmaStacks += shooter.plasmaStacksApplied;
+    spawnExplosion(state, shooter.entityType, hitEntity.x, hitEntity.y);
+    dealDamageToEntity(state, shooter, hitEntity, damage);
+  }
+}
+
 function tickProjectiles(state: GameState, dt: number): void {
   for (let i = state.projectiles.length - 1; i >= 0; i--) {
     const proj = state.projectiles[i];
@@ -766,53 +781,18 @@ function tickProjectiles(state: GameState, dt: number): void {
       continue;
     }
 
+    let hit = false;
     for (let j = state.entities.length - 1; j >= 0; j--) {
       const other = state.entities[j];
       if (other.team !== Team.Enemy) continue;
       const r = Math.max(other.hitHalfW, other.hitHalfH);
-      if (segmentPointDistSq(oldX, oldY, proj.x, proj.y, other.x, other.y) <= r * r) {
-        state.projectiles.splice(i, 1);
-        break;
-      }
+      if (segmentPointDistSq(oldX, oldY, proj.x, proj.y, other.x, other.y) > r * r) continue;
+      const shooter = state.entityById.get(proj.shooterId);
+      if (shooter) applyProjectileHit(state, shooter, proj.damage, other);
+      hit = true;
+      break;
     }
-  }
-}
-
-function tickPendingShots(state: GameState): void {
-  for (let i = state.pendingShots.length - 1; i >= 0; i--) {
-    const shot = state.pendingShots[i];
-    if (state.time.time < shot.fireAt) continue;
-    state.pendingShots.splice(i, 1);
-
-    const shooter = state.entityById.get(shot.shooterId);
-    if (!shooter) continue;
-
-    const dmg = getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter));
-
-    if (shooter.explosionRadius > 0) {
-      const effectiveRadius = shooter.team === Team.Allied
-        ? shooter.explosionRadius * state.relicEffects.explosionRadiusMultiplier
-        : shooter.explosionRadius;
-      spawnExplosion(state, shooter.entityType, shot.targetX, shot.targetY, effectiveRadius);
-      const r2 = effectiveRadius * effectiveRadius;
-      for (let j = state.entities.length - 1; j >= 0; j--) {
-        const other = state.entities[j];
-        if (other.team !== Team.Enemy) continue;
-        const dx = other.x - shot.targetX;
-        const dy = other.y - shot.targetY;
-        if (dx * dx + dy * dy > r2) continue;
-        if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
-        if (shooter.freezeStacks > 0) applyFreezeStacks(state, other, shooter.freezeStacks);
-        if (dmg > 0) dealDamageToEntity(state, shooter, other, dmg);
-      }
-    } else {
-      const target = shot.targetEntityId !== null ? state.entityById.get(shot.targetEntityId) : null;
-      if (target) {
-        if (shooter.plasmaStacksApplied > 0) target.plasmaStacks += shooter.plasmaStacksApplied;
-        spawnExplosion(state, shooter.entityType, target.x, target.y);
-        dealDamageToEntity(state, shooter, target, dmg);
-      }
-    }
+    if (hit) state.projectiles.splice(i, 1);
   }
 }
 
@@ -827,7 +807,6 @@ export function updateState(state: GameState, dt: number): void {
   checkCollisions(state);
   tickLaserBeams(state);
   tickProjectiles(state, dt);
-  tickPendingShots(state);
 }
 
 function getBuffedDamage(e: EntityState, baseDamage: number): number {
@@ -902,14 +881,7 @@ function fireShot(state: GameState, e: EntityState): void {
     vx: (aimDx / aimDist) * PROJECTILE_SPEED,
     vy: (aimDy / aimDist) * PROJECTILE_SPEED,
     shooterId: e.id,
-  });
-
-  state.pendingShots.push({
-    fireAt: state.time.time + lead.t,
-    shooterId: e.id,
-    targetX: lead.x,
-    targetY: lead.y,
-    targetEntityId: target.entity?.id ?? null,
+    damage: getBuffedDamage(e, getEffectiveProjectileDamage(state, e)),
   });
 }
 
@@ -977,6 +949,8 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target || !target.entity) return;
 
+  const damage = getBuffedDamage(e, getEffectiveProjectileDamage(state, e));
+
   const hitIds = new Set<number>();
   const targets: EntityState[] = [];
   let currentTarget: EntityState | null = target.entity;
@@ -1020,14 +994,7 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
       vx: (dx / dist) * PROJECTILE_SPEED,
       vy: (dy / dist) * PROJECTILE_SPEED,
       shooterId: e.id,
-    });
-
-    state.pendingShots.push({
-      fireAt: state.time.time + lead.t,
-      shooterId: e.id,
-      targetX: lead.x,
-      targetY: lead.y,
-      targetEntityId: t.id,
+      damage,
     });
   }
 }
