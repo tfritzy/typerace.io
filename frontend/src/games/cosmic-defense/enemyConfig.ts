@@ -89,6 +89,7 @@ const ENEMY_FIRE_RATE = 1.2;
 const BASE_PROJECTILE_DAMAGE = 8;
 const DAMAGE_GROWTH = 1.008;
 const BASE_RANGE = 500;
+const ENEMY_SPEED = 45;
 
 function roundToNearestEven(value: number): number {
   const floor = Math.floor(value);
@@ -105,9 +106,6 @@ function calculateEnemyXpReward(power: number): number {
   return Math.round(Math.pow(power, 0.72) * 0.2);
 }
 
-function calculateEnemySpeed(virtualTier: number): number {
-  return (30 + virtualTier * 1.6) * 0.75;
-}
 
 export const ENEMY_SHIP_TYPES: EntityType[] = [
   "Pulse", "Buckler", "Pip", "Flea", "Needle", "Bolt", "Cricket", "Robin",
@@ -132,7 +130,7 @@ export function createEnemyConfigForVirtualTier(virtualTier: number): EnemyConfi
     power,
     xpReward: calculateEnemyXpReward(power),
     sizeScale: 1,
-    speed: calculateEnemySpeed(virtualTier),
+    speed: ENEMY_SPEED,
     isBoss: false,
   };
 }
