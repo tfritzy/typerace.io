@@ -171,6 +171,7 @@ export interface LaserBeam {
   y2: number;
   time: number;
   width: number;
+  color: number;
 }
 
 export interface GameState {
@@ -922,6 +923,8 @@ function fireLaser(state: GameState, e: EntityState): void {
     if (!piercing) break;
   }
 
+  const beamColor = e.role === "plasma_beam" ? 0xff2222 : 0x89b4fa;
+
   state.laserBeams.push({
     id: state.nextId++,
     x1: startX,
@@ -930,6 +933,7 @@ function fireLaser(state: GameState, e: EntityState): void {
     y2: endY,
     time: state.time.time,
     width: e.beamWidth,
+    color: beamColor,
   });
 }
 
