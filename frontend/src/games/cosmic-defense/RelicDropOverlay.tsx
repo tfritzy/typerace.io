@@ -30,15 +30,13 @@ export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps)
   return (
     <>
       <style>{`
-        @keyframes relic-icon-drop {
-          0%   { transform: translateY(-60px) scale(0.3) rotate(-8deg); opacity: 0; }
-          55%  { transform: translateY(6px)   scale(1.08) rotate(2deg); opacity: 1; }
-          75%  { transform: translateY(-3px)  scale(0.97) rotate(-1deg); opacity: 1; }
-          100% { transform: translateY(0)     scale(1)    rotate(0deg); opacity: 1; }
+        @keyframes relic-fade-in {
+          from { opacity: 0; transform: scale(0.92); }
+          to   { opacity: 1; transform: scale(1); }
         }
-        @keyframes relic-content-in {
-          from { transform: translateY(20px); opacity: 0; }
-          to   { transform: translateY(0);    opacity: 1; }
+        @keyframes relic-backdrop-in {
+          from { opacity: 0; }
+          to   { opacity: 1; }
         }
       `}</style>
 
@@ -47,6 +45,7 @@ export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps)
         style={{
           background:
             "radial-gradient(ellipse 75% 75% at 50% 50%, rgba(0,0,0,0.88) 30%, rgba(0,0,0,0.55) 65%, rgba(0,0,0,0.0) 100%)",
+          animation: "relic-backdrop-in 0.35s ease-out forwards",
         }}
       />
 
@@ -54,7 +53,10 @@ export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps)
         className="fixed inset-0 z-50 flex items-center justify-center"
         style={{ pointerEvents: "auto" }}
       >
-        <div className="flex flex-col items-center">
+        <div
+          className="flex flex-col items-center"
+          style={{ animation: "relic-fade-in 0.35s ease-out forwards" }}
+        >
           <img
             src={relic.sprite}
             alt={relic.name}
@@ -63,13 +65,11 @@ export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps)
               height: 96,
               imageRendering: "pixelated",
               filter: "drop-shadow(0 0 24px rgba(249,226,175,0.55))",
-              animation: "relic-icon-drop 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards",
             }}
           />
 
           <div
             style={{
-              animation: "relic-content-in 0.4s ease-out 0.55s both",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",

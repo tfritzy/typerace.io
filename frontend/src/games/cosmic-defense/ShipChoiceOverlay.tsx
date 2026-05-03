@@ -68,12 +68,22 @@ export const ShipChoiceOverlay = ({
 
   return (
     <>
+      <style>{`
+        @keyframes levelup-in {
+          from { opacity: 0; transform: scale(0.96); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes levelup-backdrop-in {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+      `}</style>
       <div
         className="absolute inset-0 z-40"
-        style={{ background: "rgba(0,0,0,0.6)" }}
+        style={{ background: "rgba(0,0,0,0.6)", animation: "levelup-backdrop-in 0.3s ease-out forwards" }}
       />
       <div className="absolute inset-0 z-50 flex flex-col items-center justify-center"
-        style={{ pointerEvents: "auto" }}
+        style={{ pointerEvents: "auto", animation: "levelup-in 0.3s ease-out forwards" }}
       >
         <div className="text-[#cdd6f4] text-[22px] font-semibold mb-1"
           style={{ fontFamily: "system-ui, sans-serif" }}
