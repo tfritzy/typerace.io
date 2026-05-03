@@ -119,9 +119,9 @@ class MinHeap<T> {
     const n = this.data.length;
     while (true) {
       let smallest = i;
-      const l = 2 * i + 1, r = 2 * i + 2;
-      if (l < n && this.compare(this.data[l], this.data[smallest]) < 0) smallest = l;
-      if (r < n && this.compare(this.data[r], this.data[smallest]) < 0) smallest = r;
+      const leftChild = 2 * i + 1, rightChild = 2 * i + 2;
+      if (leftChild < n && this.compare(this.data[leftChild], this.data[smallest]) < 0) smallest = leftChild;
+      if (rightChild < n && this.compare(this.data[rightChild], this.data[smallest]) < 0) smallest = rightChild;
       if (smallest === i) break;
       [this.data[i], this.data[smallest]] = [this.data[smallest], this.data[i]];
       i = smallest;
@@ -807,11 +807,11 @@ function applyProjectileHit(state: GameState, shooter: EntityState, hitEntity: E
     const effectiveRadius = shooter.team === Team.Allied
       ? shooter.explosionRadius * state.relicEffects.explosionRadiusMultiplier
       : shooter.explosionRadius;
-    const r2 = effectiveRadius * effectiveRadius;
+    const radiusSquared = effectiveRadius * effectiveRadius;
     affected = state.entities.filter(e => {
       if (e.team !== Team.Enemy) return false;
       const dx = e.x - hitEntity.x, dy = e.y - hitEntity.y;
-      return dx * dx + dy * dy <= r2;
+      return dx * dx + dy * dy <= radiusSquared;
     });
     spawnExplosion(state, shooter.entityType, hitEntity.x, hitEntity.y, effectiveRadius);
   } else {
