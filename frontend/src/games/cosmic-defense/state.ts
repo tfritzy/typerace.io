@@ -12,6 +12,7 @@ const SCORE_PER_XP = 10;
 const MAX_CHAIN_JUMP_DISTANCE = 300;
 const STREAK_MILESTONE_INTERVAL = 5;
 const DEATH_EXPLOSION_RADIUS = 100;
+export const PROJECTILE_SPEED = 2400;
 
 export enum TargetingMode {
   NearestToPlanet = 0,
@@ -63,6 +64,15 @@ export interface EntityState {
   sizeScale: number;
   isBoss: boolean;
   damageType: DamageType;
+}
+
+export interface ProjectileState {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  shooterId: number;
 }
 
 export interface PendingShot {
@@ -168,6 +178,7 @@ export interface GameState {
   entityById: Map<number, EntityState>;
   explosions: ExplosionState[];
   laserBeams: LaserBeam[];
+  projectiles: ProjectileState[];
   pendingShots: PendingShot[];
   time: {
     time: number;
@@ -223,6 +234,7 @@ export function createGameState(): GameState {
     entityById: new Map(),
     explosions: [],
     laserBeams: [],
+    projectiles: [],
     pendingShots: [],
     time: { time: 0, deltaTime: 0 },
     nextId: 1,
@@ -404,6 +416,21 @@ function checkCollisions(state: GameState): void {
       removeEntityAt(state, i);
     }
   }
+}
+
+function segmentPointDistSq(ax: number, ay: number, bx: number, by: number, px: number, py: number): number {
+  const abx = bx - ax;
+  const aby = by - ay;
+  const abLenSq = abx * abx + aby * aby;
+  if (abLenSq === 0) {
+    const dx = px - ax; const dy = py - ay;
+    return dx * dx + dy * dy;
+  }
+  const t = Math.max(0, Math.min(1, ((px - ax) * abx + (py - ay) * aby) / abLenSq));
+  const cx = ax + t * abx;
+  const cy = ay + t * aby;
+  const dx = px - cx; const dy = py - cy;
+  return dx * dx + dy * dy;
 }
 
 const _targetResult = { x: 0, y: 0, entity: null as EntityState | null };
@@ -649,39 +676,36 @@ function performInstantHit(
   }
 }
 
-export function updateState(state: GameState, dt: number): void {
-  state.time.deltaTime = dt;
-  state.time.time += dt;
-
-  if (state.spawner.paused) return;
-
-  const enemySpeedMultiplier = state.relicEffects.enemySpeedMultiplier;
-
+function tickPerSecond(state: GameState, dt: number): void {
   const prevSecond = Math.floor(state.time.time - dt);
   const curSecond = Math.floor(state.time.time);
-  if (curSecond > prevSecond) {
-    if (state.relicEffects.planetHealPerSecond > 0) {
-      state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetHealPerSecond);
+  if (curSecond <= prevSecond) return;
+
+  if (state.relicEffects.planetHealPerSecond > 0) {
+    state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetHealPerSecond);
+  }
+  for (let i = state.entities.length - 1; i >= 0; i--) {
+    const e = state.entities[i];
+    if (e.team !== Team.Enemy) continue;
+
+    if (e.plasmaStacks > 0) {
+      const prevStacks = e.plasmaStacks;
+      const dmg = e.plasmaStacks * PLASMA_DAMAGE_PER_TICK * state.relicEffects.plasmaDamageMultiplier;
+      e.plasmaStacks = Math.max(0, e.plasmaStacks - 1);
+      if (dealDamageToEntity(state, null, e, dmg)) continue;
+      if (prevStacks > 0 && e.plasmaStacks === 0 && state.relicEffects.plasmaExpiredDamage > 0) {
+        if (dealDamageToEntity(state, null, e, state.relicEffects.plasmaExpiredDamage)) continue;
+      }
     }
-    for (let i = state.entities.length - 1; i >= 0; i--) {
-      const e = state.entities[i];
-      if (e.team !== Team.Enemy) continue;
 
-      if (e.plasmaStacks > 0) {
-        const prevStacks = e.plasmaStacks;
-        const dmg = e.plasmaStacks * PLASMA_DAMAGE_PER_TICK * state.relicEffects.plasmaDamageMultiplier;
-        e.plasmaStacks = Math.max(0, e.plasmaStacks - 1);
-        if (dealDamageToEntity(state, null, e, dmg)) continue;
-        if (prevStacks > 0 && e.plasmaStacks === 0 && state.relicEffects.plasmaExpiredDamage > 0) {
-          if (dealDamageToEntity(state, null, e, state.relicEffects.plasmaExpiredDamage)) continue;
-        }
-      }
-
-      if (e.freezeStacks > 0) {
-        e.freezeStacks = Math.max(0, e.freezeStacks - 1);
-      }
+    if (e.freezeStacks > 0) {
+      e.freezeStacks = Math.max(0, e.freezeStacks - 1);
     }
   }
+}
+
+function tickEntities(state: GameState, dt: number): void {
+  const enemySpeedMultiplier = state.relicEffects.enemySpeedMultiplier;
 
   for (const e of state.entities) {
     const isFrozen = e.team === Team.Enemy && e.freezeStacks > 0;
@@ -718,16 +742,43 @@ export function updateState(state: GameState, dt: number): void {
       e.rotation = Math.atan2(e.vy, e.vx);
     }
   }
+}
 
-  checkCollisions(state);
-
+function tickLaserBeams(state: GameState): void {
   const LASER_BEAM_DURATION = 0.35;
   for (let i = state.laserBeams.length - 1; i >= 0; i--) {
     if (state.time.time - state.laserBeams[i].time > LASER_BEAM_DURATION) {
       state.laserBeams.splice(i, 1);
     }
   }
+}
 
+function tickProjectiles(state: GameState, dt: number): void {
+  for (let i = state.projectiles.length - 1; i >= 0; i--) {
+    const proj = state.projectiles[i];
+    const oldX = proj.x;
+    const oldY = proj.y;
+    proj.x += proj.vx * dt;
+    proj.y += proj.vy * dt;
+
+    if (!isInBounds(proj.x, proj.y)) {
+      state.projectiles.splice(i, 1);
+      continue;
+    }
+
+    for (let j = state.entities.length - 1; j >= 0; j--) {
+      const other = state.entities[j];
+      if (other.team !== Team.Enemy) continue;
+      const r = Math.max(other.hitHalfW, other.hitHalfH);
+      if (segmentPointDistSq(oldX, oldY, proj.x, proj.y, other.x, other.y) <= r * r) {
+        state.projectiles.splice(i, 1);
+        break;
+      }
+    }
+  }
+}
+
+function tickPendingShots(state: GameState): void {
   for (let i = state.pendingShots.length - 1; i >= 0; i--) {
     const shot = state.pendingShots[i];
     if (state.time.time < shot.fireAt) continue;
@@ -765,6 +816,20 @@ export function updateState(state: GameState, dt: number): void {
   }
 }
 
+export function updateState(state: GameState, dt: number): void {
+  state.time.deltaTime = dt;
+  state.time.time += dt;
+
+  if (state.spawner.paused) return;
+
+  tickPerSecond(state, dt);
+  tickEntities(state, dt);
+  checkCollisions(state);
+  tickLaserBeams(state);
+  tickProjectiles(state, dt);
+  tickPendingShots(state);
+}
+
 function getBuffedDamage(e: EntityState, baseDamage: number): number {
   if (e.buffedNextAttack) {
     e.buffedNextAttack = false;
@@ -784,6 +849,20 @@ function getEffectiveProjectileDamage(state: GameState, shooter: EntityState): n
 function fireShot(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
+
+  const dx = target.x - e.x;
+  const dy = target.y - e.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist === 0) return;
+
+  state.projectiles.push({
+    id: state.nextId++,
+    x: e.x,
+    y: e.y,
+    vx: (dx / dist) * PROJECTILE_SPEED,
+    vy: (dy / dist) * PROJECTILE_SPEED,
+    shooterId: e.id,
+  });
 
   state.pendingShots.push({
     fireAt: state.time.time + e.hitDelay,
