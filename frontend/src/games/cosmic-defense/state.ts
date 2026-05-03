@@ -757,12 +757,12 @@ function applyProjectileHit(state: GameState, shooter: EntityState, damage: numb
       const dx = other.x - hitEntity.x;
       const dy = other.y - hitEntity.y;
       if (dx * dx + dy * dy > r2) continue;
-      if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
+      other.plasmaStacks += shooter.plasmaStacksApplied;
       if (shooter.freezeStacks > 0) applyFreezeStacks(state, other, shooter.freezeStacks);
       if (damage > 0) dealDamageToEntity(state, shooter, other, damage);
     }
   } else {
-    if (shooter.plasmaStacksApplied > 0) hitEntity.plasmaStacks += shooter.plasmaStacksApplied;
+    hitEntity.plasmaStacks += shooter.plasmaStacksApplied;
     spawnExplosion(state, shooter.entityType, hitEntity.x, hitEntity.y);
     dealDamageToEntity(state, shooter, hitEntity, damage);
   }
@@ -781,7 +781,6 @@ function tickProjectiles(state: GameState, dt: number): void {
       continue;
     }
 
-    let hit = false;
     for (let j = state.entities.length - 1; j >= 0; j--) {
       const other = state.entities[j];
       if (other.team !== Team.Enemy) continue;
@@ -789,10 +788,9 @@ function tickProjectiles(state: GameState, dt: number): void {
       if (segmentPointDistSq(oldX, oldY, proj.x, proj.y, other.x, other.y) > r * r) continue;
       const shooter = state.entityById.get(proj.shooterId);
       if (shooter) applyProjectileHit(state, shooter, proj.damage, other);
-      hit = true;
+      state.projectiles.splice(i, 1);
       break;
     }
-    if (hit) state.projectiles.splice(i, 1);
   }
 }
 
