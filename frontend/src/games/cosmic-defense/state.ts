@@ -1099,11 +1099,10 @@ export const BOSS_WARNING_LEAD_TIME_SECONDS = 4;
 const TIER_WEIGHT_WINDOW = 8;
 const MIN_ENEMIES_ON_SCREEN = 10;
 const BOSS_WARNING_ENEMIES_REMAINING = 8;
-const ENEMIES_PER_WAVE_BASE = 20;
-const ENEMIES_PER_WAVE_SCALE = 10;
+const ENEMIES_PER_WAVE = 50;
 
-function getEnemiesInWave(wave: number): number {
-  return ENEMIES_PER_WAVE_BASE + wave * ENEMIES_PER_WAVE_SCALE;
+function getEnemiesInWave(_wave: number): number {
+  return ENEMIES_PER_WAVE;
 }
 
 function binomialWeight(t: number, n: number, k: number): number {
