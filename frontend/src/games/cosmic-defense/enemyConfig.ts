@@ -126,7 +126,7 @@ export function createEnemyConfigForVirtualTier(virtualTier: number): EnemyConfi
     Math.pow(WITHIN_LOOP_HEALTH_FACTOR, slotIndex) *
     Math.pow(LOOP_HEALTH_MULTIPLIER, loopCount)
   );
-  const fireRate = BASE_FIRE_RATE - (BASE_FIRE_RATE - MIN_FIRE_RATE) * (slotIndex / (N - 1));
+  const fireRate = BASE_FIRE_RATE - (BASE_FIRE_RATE - MIN_FIRE_RATE) * (slotIndex / Math.max(1, N - 1));
   const projectileDamage = Math.max(1, Math.round(Math.pow(health, 0.75) * 0.3));
   const range = BASE_RANGE + slotIndex * RANGE_PER_SLOT;
   const power = calculateEnemyPower(health);

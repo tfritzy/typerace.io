@@ -1128,7 +1128,7 @@ function getTierWeights(elapsed: number): { startTier: number; weights: number[]
 function pickEnemyTier(startTier: number, weights: number[]): number {
   let total = 0;
   for (const w of weights) total += w;
-  if (total === 0) return startTier;
+  if (total === 0) return startTier + Math.floor(weights.length / 2);
 
   let r = Math.random() * total;
   for (let i = 0; i < weights.length; i++) {
