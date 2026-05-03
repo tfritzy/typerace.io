@@ -95,8 +95,10 @@ export interface SpawnState {
   elapsed: number;
   spawnAccumulator: number;
   paused: boolean;
-  nextBossTier: number;
-  warnedBossTier: number;
+  currentWave: number;
+  enemiesSpawnedInWave: number;
+  enemiesInWave: number;
+  bossWarned: boolean;
 }
 
 export class GameEvent {
@@ -245,8 +247,10 @@ export function createGameState(): GameState {
       elapsed: 0,
       spawnAccumulator: 0,
       paused: true,
-      nextBossTier: 0,
-      warnedBossTier: -1,
+      currentWave: 0,
+      enemiesSpawnedInWave: 0,
+      enemiesInWave: getEnemiesInWave(0),
+      bossWarned: false,
     },
     xp: 0,
     score: 0,
@@ -627,7 +631,7 @@ function dealDamageToEntity(
         state.onBossDefeated.emit();
         const unowned = RELIC_CATALOG.filter((r) => !state.relics.includes(r.id));
         if (unowned.length > 0) {
-          const relicIndex = (state.spawner.nextBossTier - 1) % unowned.length;
+          const relicIndex = (state.spawner.currentWave - 1) % unowned.length;
           const relicId = unowned[relicIndex].id;
           addRelic(state, relicId);
           state.spawner.paused = true;
@@ -1092,8 +1096,15 @@ const BASE_SPAWN_RATE = 0.6;
 const MAX_SPAWN_RATE = 4.0;
 const SPAWN_RAMP_TIME = 240;
 export const BOSS_WARNING_LEAD_TIME_SECONDS = 4;
-const BOSS_SPAWN_TIME_OFFSET = TIER_SPREAD / 2;
 const TIER_WEIGHT_WINDOW = 8;
+const MIN_ENEMIES_ON_SCREEN = 10;
+const BOSS_WARNING_ENEMIES_REMAINING = 8;
+const ENEMIES_PER_WAVE_BASE = 20;
+const ENEMIES_PER_WAVE_SCALE = 10;
+
+function getEnemiesInWave(wave: number): number {
+  return ENEMIES_PER_WAVE_BASE + wave * ENEMIES_PER_WAVE_SCALE;
+}
 
 function binomialWeight(t: number, n: number, k: number): number {
   const p = Math.max(0, Math.min(1, t));
@@ -1143,31 +1154,52 @@ function getSpawnRate(elapsed: number): number {
   return BASE_SPAWN_RATE + (MAX_SPAWN_RATE - BASE_SPAWN_RATE) * t;
 }
 
+function spawnWaveEnemy(state: GameState, startTier: number, weights: number[]): void {
+  const virtualTier = pickEnemyTier(startTier, weights);
+  spawnEntity(state, createEnemyConfigForVirtualTier(virtualTier), Team.Enemy);
+  state.spawner.enemiesSpawnedInWave++;
+}
+
 export function updateSpawner(state: GameState, dt: number): void {
   if (state.spawner.paused) return;
 
   state.spawner.elapsed += dt;
 
-  const bossTier = state.spawner.nextBossTier;
-  const bossSpawnTime = TIER_OFFSET + bossTier * TIER_SPREAD + BOSS_SPAWN_TIME_OFFSET;
-  if (state.spawner.warnedBossTier < bossTier && state.spawner.elapsed >= bossSpawnTime - BOSS_WARNING_LEAD_TIME_SECONDS) {
-    state.spawner.warnedBossTier = bossTier;
+  const spawner = state.spawner;
+  const remaining = spawner.enemiesInWave - spawner.enemiesSpawnedInWave;
+
+  if (!spawner.bossWarned && remaining <= BOSS_WARNING_ENEMIES_REMAINING) {
+    spawner.bossWarned = true;
     state.onBossApproaching.emit();
   }
-  if (state.spawner.elapsed >= bossSpawnTime) {
-    spawnEntity(state, createBossConfigForVirtualTier(bossTier), Team.Enemy);
-    state.spawner.nextBossTier++;
+
+  if (remaining <= 0) {
+    const completedWave = spawner.currentWave;
+    spawner.currentWave++;
+    spawnEntity(state, createBossConfigForVirtualTier(completedWave), Team.Enemy);
+    spawner.enemiesSpawnedInWave = 0;
+    spawner.enemiesInWave = getEnemiesInWave(spawner.currentWave);
+    spawner.bossWarned = false;
+    return;
   }
 
-  const rate = getSpawnRate(state.spawner.elapsed);
-  state.spawner.spawnAccumulator += rate * dt;
+  const { startTier, weights } = getTierWeights(spawner.elapsed);
 
-  const { startTier, weights } = getTierWeights(state.spawner.elapsed);
+  const rate = getSpawnRate(spawner.elapsed);
+  spawner.spawnAccumulator += rate * dt;
 
-  while (state.spawner.spawnAccumulator >= 1) {
-    state.spawner.spawnAccumulator -= 1;
-    const virtualTier = pickEnemyTier(startTier, weights);
-    spawnEntity(state, createEnemyConfigForVirtualTier(virtualTier), Team.Enemy);
+  while (spawner.spawnAccumulator >= 1 && spawner.enemiesSpawnedInWave < spawner.enemiesInWave) {
+    spawner.spawnAccumulator -= 1;
+    spawnWaveEnemy(state, startTier, weights);
+  }
+
+  const enemiesOnScreen = state.entities.filter((e) => e.team === Team.Enemy && !e.isBoss).length;
+  const fillCount = Math.min(
+    Math.max(0, MIN_ENEMIES_ON_SCREEN - enemiesOnScreen),
+    spawner.enemiesInWave - spawner.enemiesSpawnedInWave
+  );
+  for (let i = 0; i < fillCount; i++) {
+    spawnWaveEnemy(state, startTier, weights);
   }
 }
 
