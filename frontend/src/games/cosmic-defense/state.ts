@@ -1192,7 +1192,11 @@ export function updateSpawner(state: GameState, dt: number): void {
     spawnWaveEnemy(state, startTier, weights);
   }
 
-  const enemiesOnScreen = state.entities.filter((e) => e.team === Team.Enemy && !e.isBoss).length;
+  let enemiesOnScreen = 0;
+  for (let i = 0; i < state.entities.length; i++) {
+    const e = state.entities[i];
+    if (e.team === Team.Enemy && !e.isBoss) enemiesOnScreen++;
+  }
   const fillCount = Math.min(
     Math.max(0, MIN_ENEMIES_ON_SCREEN - enemiesOnScreen),
     spawner.enemiesInWave - spawner.enemiesSpawnedInWave
