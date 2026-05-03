@@ -84,12 +84,11 @@ export interface EnemyConfig {
 }
 
 const BASE_HEALTH = 30;
-const WITHIN_LOOP_HEALTH_FACTOR = 1.33;
-const LOOP_HEALTH_MULTIPLIER = 5;
-const BASE_FIRE_RATE = 2.2;
-const MIN_FIRE_RATE = 0.6;
+const HEALTH_GROWTH = 1.33;
+const ENEMY_FIRE_RATE = 1.2;
+const BASE_PROJECTILE_DAMAGE = 8;
+const DAMAGE_GROWTH = 1.008;
 const BASE_RANGE = 500;
-const RANGE_PER_SLOT = 10;
 
 function roundToNearestEven(value: number): number {
   const floor = Math.floor(value);
@@ -119,24 +118,17 @@ export const ENEMY_SHIP_TYPES: EntityType[] = [
 export function createEnemyConfigForVirtualTier(virtualTier: number): EnemyConfig {
   const N = ENEMY_SHIP_TYPES.length;
   const slotIndex = virtualTier % N;
-  const loopCount = Math.floor(virtualTier / N);
 
-  const health = Math.round(
-    BASE_HEALTH *
-    Math.pow(WITHIN_LOOP_HEALTH_FACTOR, slotIndex) *
-    Math.pow(LOOP_HEALTH_MULTIPLIER, loopCount)
-  );
-  const fireRate = BASE_FIRE_RATE - (BASE_FIRE_RATE - MIN_FIRE_RATE) * (slotIndex / Math.max(1, N - 1));
-  const projectileDamage = Math.max(1, Math.round(Math.pow(health, 0.75) * 0.3));
-  const range = BASE_RANGE + slotIndex * RANGE_PER_SLOT;
+  const health = Math.round(BASE_HEALTH * Math.pow(HEALTH_GROWTH, virtualTier));
+  const projectileDamage = Math.max(1, Math.round(BASE_PROJECTILE_DAMAGE * Math.pow(DAMAGE_GROWTH, virtualTier)));
   const power = calculateEnemyPower(health);
 
   return {
     entityType: ENEMY_SHIP_TYPES[slotIndex],
     health,
-    fireRate,
+    fireRate: ENEMY_FIRE_RATE,
     projectileDamage,
-    range,
+    range: BASE_RANGE,
     power,
     xpReward: calculateEnemyXpReward(power),
     sizeScale: 1,
