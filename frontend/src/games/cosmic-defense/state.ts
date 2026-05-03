@@ -846,29 +846,69 @@ function getEffectiveProjectileDamage(state: GameState, shooter: EntityState): n
   return Math.round(shooter.projectileDamage * mult);
 }
 
+function computeLeadPosition(
+  sx: number, sy: number,
+  tx: number, ty: number,
+  tvx: number, tvy: number,
+  speed: number
+): { x: number; y: number; t: number } {
+  const dx = tx - sx;
+  const dy = ty - sy;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  let aimX = tx;
+  let aimY = ty;
+  let t = dist / speed;
+
+  const a = tvx * tvx + tvy * tvy - speed * speed;
+  const b = 2 * (dx * tvx + dy * tvy);
+  const c = dx * dx + dy * dy;
+
+  if (Math.abs(a) < 0.01) {
+    if (Math.abs(b) > 0.01) {
+      const lt = -c / b;
+      if (lt > 0) { t = lt; aimX = tx + tvx * lt; aimY = ty + tvy * lt; }
+    }
+  } else {
+    const disc = b * b - 4 * a * c;
+    if (disc >= 0) {
+      const sqrtD = Math.sqrt(disc);
+      const t1 = (-b - sqrtD) / (2 * a);
+      const t2 = (-b + sqrtD) / (2 * a);
+      const best = t1 > 0 ? t1 : (t2 > 0 ? t2 : -1);
+      if (best > 0) { t = best; aimX = tx + tvx * best; aimY = ty + tvy * best; }
+    }
+  }
+
+  return { x: aimX, y: aimY, t };
+}
+
 function fireShot(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
 
-  const dx = target.x - e.x;
-  const dy = target.y - e.y;
-  const dist = Math.sqrt(dx * dx + dy * dy);
-  if (dist === 0) return;
+  const tvx = target.entity?.vx ?? 0;
+  const tvy = target.entity?.vy ?? 0;
+  const lead = computeLeadPosition(e.x, e.y, target.x, target.y, tvx, tvy, PROJECTILE_SPEED);
+
+  const aimDx = lead.x - e.x;
+  const aimDy = lead.y - e.y;
+  const aimDist = Math.sqrt(aimDx * aimDx + aimDy * aimDy);
+  if (aimDist === 0) return;
 
   state.projectiles.push({
     id: state.nextId++,
     x: e.x,
     y: e.y,
-    vx: (dx / dist) * PROJECTILE_SPEED,
-    vy: (dy / dist) * PROJECTILE_SPEED,
+    vx: (aimDx / aimDist) * PROJECTILE_SPEED,
+    vy: (aimDy / aimDist) * PROJECTILE_SPEED,
     shooterId: e.id,
   });
 
   state.pendingShots.push({
-    fireAt: state.time.time + e.hitDelay,
+    fireAt: state.time.time + lead.t,
     shooterId: e.id,
-    targetX: target.x,
-    targetY: target.y,
+    targetX: lead.x,
+    targetY: lead.y,
     targetEntityId: target.entity?.id ?? null,
   });
 }
@@ -937,18 +977,15 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target || !target.entity) return;
 
-  const dmg = getBuffedDamage(e, getEffectiveProjectileDamage(state, e));
-
   const hitIds = new Set<number>();
+  const targets: EntityState[] = [];
   let currentTarget: EntityState | null = target.entity;
   let chainsRemaining = e.chainCount;
   const maxJumpDistSq = MAX_CHAIN_JUMP_DISTANCE * MAX_CHAIN_JUMP_DISTANCE;
 
   while (currentTarget && chainsRemaining >= 0) {
     hitIds.add(currentTarget.id);
-    spawnExplosion(state, e.entityType, currentTarget.x, currentTarget.y);
-    dealDamageToEntity(state, e, currentTarget, dmg);
-
+    targets.push(currentTarget);
     chainsRemaining--;
     if (chainsRemaining < 0) break;
 
@@ -967,6 +1004,31 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
     if (!nearest) break;
 
     currentTarget = nearest;
+  }
+
+  for (const t of targets) {
+    const lead = computeLeadPosition(e.x, e.y, t.x, t.y, t.vx, t.vy, PROJECTILE_SPEED);
+    const dx = lead.x - e.x;
+    const dy = lead.y - e.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist === 0) continue;
+
+    state.projectiles.push({
+      id: state.nextId++,
+      x: e.x,
+      y: e.y,
+      vx: (dx / dist) * PROJECTILE_SPEED,
+      vy: (dy / dist) * PROJECTILE_SPEED,
+      shooterId: e.id,
+    });
+
+    state.pendingShots.push({
+      fireAt: state.time.time + lead.t,
+      shooterId: e.id,
+      targetX: t.x,
+      targetY: t.y,
+      targetEntityId: t.id,
+    });
   }
 }
 
