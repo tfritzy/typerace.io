@@ -29,23 +29,11 @@ export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps)
 
   return (
     <>
-      <style>{`
-        @keyframes relic-fade-in {
-          from { opacity: 0; transform: scale(0.92); }
-          to   { opacity: 1; transform: scale(1); }
-        }
-        @keyframes relic-backdrop-in {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-      `}</style>
-
       <div
-        className="fixed inset-0 z-40"
+        className="fixed inset-0 z-40 animate-fadeIn"
         style={{
           background:
             "radial-gradient(ellipse 75% 75% at 50% 50%, rgba(0,0,0,0.88) 30%, rgba(0,0,0,0.55) 65%, rgba(0,0,0,0.0) 100%)",
-          animation: "relic-backdrop-in 0.35s ease-out forwards",
         }}
       />
 
@@ -53,10 +41,7 @@ export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps)
         className="fixed inset-0 z-50 flex items-center justify-center"
         style={{ pointerEvents: "auto" }}
       >
-        <div
-          className="flex flex-col items-center"
-          style={{ animation: "relic-fade-in 0.35s ease-out forwards" }}
-        >
+        <div className="flex flex-col items-center animate-fadeIn">
           <img
             src={relic.sprite}
             alt={relic.name}
