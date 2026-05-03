@@ -74,8 +74,6 @@ export interface ProjectileState {
   vx: number;
   vy: number;
   shooterId: number;
-  bouncesRemaining: number;
-  hitIds: Set<number>;
 }
 
 export interface PendingShot {
@@ -780,7 +778,28 @@ function tickLaserBeams(state: GameState): void {
 }
 
 function applyProjectileHit(state: GameState, shooter: EntityState, hitEntity: EntityState): void {
-  applyExplosion(state, shooter, hitEntity, getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter)));
+  const damage = getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter));
+  applyExplosion(state, shooter, hitEntity, damage);
+
+  if (shooter.chainCount > 0) {
+    const hitIds = new Set<number>([hitEntity.id]);
+    let current = hitEntity;
+    const maxJumpDistSq = MAX_CHAIN_JUMP_DISTANCE * MAX_CHAIN_JUMP_DISTANCE;
+    for (let bounces = 0; bounces < shooter.chainCount; bounces++) {
+      let nearest: EntityState | null = null;
+      let nearestDist = Infinity;
+      for (const candidate of state.entities) {
+        if (candidate.team !== Team.Enemy || hitIds.has(candidate.id)) continue;
+        const cx = candidate.x - current.x, cy = candidate.y - current.y;
+        const d = cx * cx + cy * cy;
+        if (d < nearestDist && d <= maxJumpDistSq) { nearestDist = d; nearest = candidate; }
+      }
+      if (!nearest) break;
+      hitIds.add(nearest.id);
+      applyExplosion(state, shooter, nearest, damage);
+      current = nearest;
+    }
+  }
 }
 
 function tickPendingShots(state: GameState): void {
@@ -801,8 +820,6 @@ function tickPendingShots(state: GameState): void {
       vx: (dx / dist) * PROJECTILE_SPEED,
       vy: (dy / dist) * PROJECTILE_SPEED,
       shooterId: shooter.id,
-      bouncesRemaining: shooter.chainCount,
-      hitIds: new Set(),
     });
   }
 }
@@ -822,39 +839,12 @@ function tickProjectiles(state: GameState, dt: number): void {
 
     for (let j = state.entities.length - 1; j >= 0; j--) {
       const other = state.entities[j];
-      if (other.team !== Team.Enemy || proj.hitIds.has(other.id)) continue;
+      if (other.team !== Team.Enemy) continue;
       const r = Math.max(other.hitHalfW, other.hitHalfH);
       if (segmentPointDistSq(oldX, oldY, proj.x, proj.y, other.x, other.y) > r * r) continue;
       const shooter = state.entityById.get(proj.shooterId);
       if (shooter) applyProjectileHit(state, shooter, other);
       state.projectiles.splice(i, 1);
-
-      if (proj.bouncesRemaining > 0) {
-        proj.hitIds.add(other.id);
-        let nearest: EntityState | null = null;
-        let nearestDist = Infinity;
-        const maxJumpDistSq = MAX_CHAIN_JUMP_DISTANCE * MAX_CHAIN_JUMP_DISTANCE;
-        for (const candidate of state.entities) {
-          if (candidate.team !== Team.Enemy || proj.hitIds.has(candidate.id)) continue;
-          const cx = candidate.x - other.x, cy = candidate.y - other.y;
-          const d = cx * cx + cy * cy;
-          if (d < nearestDist && d <= maxJumpDistSq) { nearestDist = d; nearest = candidate; }
-        }
-        if (nearest) {
-          const bx = nearest.x - other.x, by = nearest.y - other.y;
-          const bd = Math.sqrt(bx * bx + by * by);
-          state.projectiles.push({
-            id: state.nextId++,
-            x: other.x,
-            y: other.y,
-            vx: (bx / bd) * PROJECTILE_SPEED,
-            vy: (by / bd) * PROJECTILE_SPEED,
-            shooterId: proj.shooterId,
-            bouncesRemaining: proj.bouncesRemaining - 1,
-            hitIds: new Set(proj.hitIds),
-          });
-        }
-      }
       break;
     }
   }
