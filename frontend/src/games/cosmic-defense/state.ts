@@ -1016,26 +1016,13 @@ function activateAbility(state: GameState, e: EntityState): void {
       continue;
     }
 
-    if (e.chainCount > 0) {
-      fireShot(state, e);
-      continue;
-    }
-
     if (e.laserDamage > 0) {
       fireLaser(state, e);
       continue;
     }
 
-    if (e.explosionRadius > 0) {
+    for (let f = 0; f < e.fireCount; f++) {
       fireShot(state, e);
-      continue;
-    }
-
-    if (e.projectileDamage > 0 || e.plasmaStacksApplied > 0) {
-      for (let f = 0; f < e.fireCount; f++) {
-        fireShot(state, e);
-      }
-      continue;
     }
   }
 }
