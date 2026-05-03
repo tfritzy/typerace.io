@@ -1025,8 +1025,8 @@ function fireChainProjectile(state: GameState, e: EntityState): void {
     state.pendingShots.push({
       fireAt: state.time.time + lead.t,
       shooterId: e.id,
-      targetX: t.x,
-      targetY: t.y,
+      targetX: lead.x,
+      targetY: lead.y,
       targetEntityId: t.id,
     });
   }
