@@ -29,9 +29,22 @@ export class LaserBeamManager {
       const alpha = Math.max(0, 1 - age / BEAM_DURATION);
 
       g.clear();
+
       g.moveTo(beam.x1, beam.y1);
       g.lineTo(beam.x2, beam.y2);
-      g.stroke({ width: beam.width, color: 0x89b4fa, alpha });
+      g.stroke({ width: beam.width * 5, color: beam.color, alpha: alpha * 0.15 });
+
+      g.moveTo(beam.x1, beam.y1);
+      g.lineTo(beam.x2, beam.y2);
+      g.stroke({ width: beam.width * 2.5, color: beam.color, alpha: alpha * 0.45 });
+
+      g.moveTo(beam.x1, beam.y1);
+      g.lineTo(beam.x2, beam.y2);
+      g.stroke({ width: beam.width, color: beam.color, alpha });
+
+      g.moveTo(beam.x1, beam.y1);
+      g.lineTo(beam.x2, beam.y2);
+      g.stroke({ width: Math.max(1, beam.width * 0.35), color: 0xffffff, alpha });
     }
 
     for (const [id, g] of this.displayObjects) {
