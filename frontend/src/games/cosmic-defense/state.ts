@@ -3,6 +3,7 @@ import { type EntityType, ColorPreset, ExplosionType, Team, getExplosionType, Da
 import { ENEMY_CATALOG, BOSS_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } from "./relics";
+import { MinHeap } from "./MinHeap";
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
@@ -80,53 +81,6 @@ export interface PendingShot {
   shooterId: number;
   targetX: number;
   targetY: number;
-}
-
-class MinHeap<T> {
-  private data: T[] = [];
-  constructor(private readonly compare: (a: T, b: T) => number) {}
-
-  push(item: T): void {
-    this.data.push(item);
-    this.siftUp(this.data.length - 1);
-  }
-
-  peek(): T | undefined { return this.data[0]; }
-
-  pop(): T | undefined {
-    if (this.data.length === 0) return undefined;
-    const top = this.data[0];
-    const last = this.data.pop()!;
-    if (this.data.length > 0) {
-      this.data[0] = last;
-      this.siftDown(0);
-    }
-    return top;
-  }
-
-  get size(): number { return this.data.length; }
-
-  private siftUp(i: number): void {
-    while (i > 0) {
-      const parent = (i - 1) >> 1;
-      if (this.compare(this.data[i], this.data[parent]) >= 0) break;
-      [this.data[i], this.data[parent]] = [this.data[parent], this.data[i]];
-      i = parent;
-    }
-  }
-
-  private siftDown(i: number): void {
-    const n = this.data.length;
-    while (true) {
-      let smallest = i;
-      const leftChild = 2 * i + 1, rightChild = 2 * i + 2;
-      if (leftChild < n && this.compare(this.data[leftChild], this.data[smallest]) < 0) smallest = leftChild;
-      if (rightChild < n && this.compare(this.data[rightChild], this.data[smallest]) < 0) smallest = rightChild;
-      if (smallest === i) break;
-      [this.data[i], this.data[smallest]] = [this.data[smallest], this.data[i]];
-      i = smallest;
-    }
-  }
 }
 
 export interface ExplosionState {
@@ -693,6 +647,31 @@ function spawnExplosion(state: GameState, entityType: EntityType, x: number, y: 
   state.explosions.push({ id: state.nextId++, x, y, explosionType: getExplosionType(entityType), explosionRadius });
 }
 
+function applyExplosion(state: GameState, shooter: EntityState, hitEntity: EntityState, damage: number): void {
+  const effectiveRadius = shooter.team === Team.Allied
+    ? shooter.explosionRadius * state.relicEffects.explosionRadiusMultiplier
+    : shooter.explosionRadius;
+
+  spawnExplosion(state, shooter.entityType, hitEntity.x, hitEntity.y, effectiveRadius);
+
+  if (effectiveRadius > 0) {
+    const radiusSquared = effectiveRadius * effectiveRadius;
+    for (let j = state.entities.length - 1; j >= 0; j--) {
+      const target = state.entities[j];
+      if (target.team !== Team.Enemy) continue;
+      const dx = target.x - hitEntity.x, dy = target.y - hitEntity.y;
+      if (dx * dx + dy * dy > radiusSquared) continue;
+      target.plasmaStacks += shooter.plasmaStacksApplied;
+      if (shooter.freezeStacks > 0) applyFreezeStacks(state, target, shooter.freezeStacks);
+      if (damage > 0) dealDamageToEntity(state, shooter, target, damage);
+    }
+  } else {
+    hitEntity.plasmaStacks += shooter.plasmaStacksApplied;
+    if (shooter.freezeStacks > 0) applyFreezeStacks(state, hitEntity, shooter.freezeStacks);
+    if (damage > 0) dealDamageToEntity(state, shooter, hitEntity, damage);
+  }
+}
+
 function performInstantHit(
   state: GameState,
   shooter: EntityState,
@@ -800,30 +779,7 @@ function tickLaserBeams(state: GameState): void {
 }
 
 function applyProjectileHit(state: GameState, shooter: EntityState, hitEntity: EntityState): void {
-  const damage = getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter));
-
-  let affected: EntityState[];
-  if (shooter.explosionRadius > 0) {
-    const effectiveRadius = shooter.team === Team.Allied
-      ? shooter.explosionRadius * state.relicEffects.explosionRadiusMultiplier
-      : shooter.explosionRadius;
-    const radiusSquared = effectiveRadius * effectiveRadius;
-    affected = state.entities.filter(e => {
-      if (e.team !== Team.Enemy) return false;
-      const dx = e.x - hitEntity.x, dy = e.y - hitEntity.y;
-      return dx * dx + dy * dy <= radiusSquared;
-    });
-    spawnExplosion(state, shooter.entityType, hitEntity.x, hitEntity.y, effectiveRadius);
-  } else {
-    affected = [hitEntity];
-    spawnExplosion(state, shooter.entityType, hitEntity.x, hitEntity.y);
-  }
-
-  for (const target of affected) {
-    target.plasmaStacks += shooter.plasmaStacksApplied;
-    if (shooter.freezeStacks > 0) applyFreezeStacks(state, target, shooter.freezeStacks);
-    if (damage > 0) dealDamageToEntity(state, shooter, target, damage);
-  }
+  applyExplosion(state, shooter, hitEntity, getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter)));
 }
 
 function tickPendingShots(state: GameState): void {
