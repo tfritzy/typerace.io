@@ -32,19 +32,23 @@ export class LaserBeamManager {
 
       g.moveTo(beam.x1, beam.y1);
       g.lineTo(beam.x2, beam.y2);
-      g.stroke({ width: beam.width * 5, color: beam.color, alpha: alpha * 0.15 });
+      g.stroke({ width: beam.width * 28, color: beam.color, alpha: alpha * 0.07 });
 
       g.moveTo(beam.x1, beam.y1);
       g.lineTo(beam.x2, beam.y2);
-      g.stroke({ width: beam.width * 2.5, color: beam.color, alpha: alpha * 0.45 });
+      g.stroke({ width: beam.width * 14, color: beam.color, alpha: alpha * 0.15 });
 
       g.moveTo(beam.x1, beam.y1);
       g.lineTo(beam.x2, beam.y2);
-      g.stroke({ width: beam.width, color: beam.color, alpha });
+      g.stroke({ width: beam.width * 6, color: beam.color, alpha: alpha * 0.4 });
 
       g.moveTo(beam.x1, beam.y1);
       g.lineTo(beam.x2, beam.y2);
-      g.stroke({ width: Math.max(1, beam.width * 0.35), color: 0xffffff, alpha });
+      g.stroke({ width: beam.width * 2.5, color: beam.color, alpha });
+
+      g.moveTo(beam.x1, beam.y1);
+      g.lineTo(beam.x2, beam.y2);
+      g.stroke({ width: Math.max(1, beam.width * 0.8), color: 0xffffff, alpha });
     }
 
     for (const [id, g] of this.displayObjects) {
