@@ -838,8 +838,8 @@ export function updateState(state: GameState, dt: number): void {
   tickEntities(state, dt);
   checkCollisions(state);
   tickLaserBeams(state);
-  tickProjectiles(state, dt);
   tickPendingShots(state);
+  tickProjectiles(state, dt);
 }
 
 function getBuffedDamage(e: EntityState, baseDamage: number): number {
