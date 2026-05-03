@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT, MAX_VITAL_MATRIX_BONUS } from "./constants";
 import { type EntityType, ColorPreset, ExplosionType, Team, getExplosionType, DamageType } from "./types";
-import { ENEMY_CATALOG, BOSS_CATALOG, SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig } from "./enemyConfig";
+import { SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig, createEnemyConfigForVirtualTier, createBossConfigForVirtualTier } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } from "./relics";
 
@@ -1093,7 +1093,7 @@ const MAX_SPAWN_RATE = 4.0;
 const SPAWN_RAMP_TIME = 240;
 export const BOSS_WARNING_LEAD_TIME_SECONDS = 4;
 const BOSS_SPAWN_TIME_OFFSET = TIER_SPREAD / 2;
-const BOSS_TIER_COUNT = BOSS_CATALOG.length - 1;
+const TIER_WEIGHT_WINDOW = 8;
 
 function binomialWeight(t: number, n: number, k: number): number {
   const p = Math.max(0, Math.min(1, t));
@@ -1108,32 +1108,34 @@ function binomialWeight(t: number, n: number, k: number): number {
   return coeff * Math.pow(p, k) * Math.pow(1 - p, n - k);
 }
 
-function getTierWeights(elapsed: number): number[] {
-  const tierCount = ENEMY_CATALOG.length;
-  const weights: number[] = new Array(tierCount).fill(0);
+function getTierWeights(elapsed: number): { startTier: number; weights: number[] } {
+  const centerTier = Math.max(0, Math.floor((elapsed - TIER_OFFSET) / TIER_SPREAD));
+  const startTier = Math.max(0, centerTier - TIER_WEIGHT_WINDOW);
+  const endTier = centerTier + TIER_WEIGHT_WINDOW;
+  const weights: number[] = [];
 
-  for (let i = 0; i < tierCount; i++) {
+  for (let i = startTier; i <= endTier; i++) {
     const center = TIER_OFFSET + i * TIER_SPREAD;
     const n = 20;
     const t = (elapsed - (center - TIER_SPREAD)) / (TIER_SPREAD * 2);
     const w = binomialWeight(t, n, Math.floor(n / 2));
-    weights[i] = Math.max(0, w);
+    weights.push(Math.max(0, w));
   }
 
-  return weights;
+  return { startTier, weights };
 }
 
-function pickEnemyTier(weights: number[]): number {
+function pickEnemyTier(startTier: number, weights: number[]): number {
   let total = 0;
   for (const w of weights) total += w;
-  if (total === 0) return 0;
+  if (total === 0) return startTier + Math.floor(weights.length / 2);
 
   let r = Math.random() * total;
   for (let i = 0; i < weights.length; i++) {
     r -= weights[i];
-    if (r <= 0) return i;
+    if (r <= 0) return startTier + i;
   }
-  return weights.length - 1;
+  return startTier + weights.length - 1;
 }
 
 function getSpawnRate(elapsed: number): number {
@@ -1147,28 +1149,25 @@ export function updateSpawner(state: GameState, dt: number): void {
   state.spawner.elapsed += dt;
 
   const bossTier = state.spawner.nextBossTier;
-  if (bossTier < BOSS_TIER_COUNT) {
-    const bossSpawnTime = TIER_OFFSET + bossTier * TIER_SPREAD + BOSS_SPAWN_TIME_OFFSET;
-    if (state.spawner.warnedBossTier < bossTier && state.spawner.elapsed >= bossSpawnTime - BOSS_WARNING_LEAD_TIME_SECONDS) {
-      state.spawner.warnedBossTier = bossTier;
-      state.onBossApproaching.emit();
-    }
-    if (state.spawner.elapsed >= bossSpawnTime) {
-      spawnEntity(state, BOSS_CATALOG[bossTier], Team.Enemy);
-      state.spawner.nextBossTier++;
-    }
+  const bossSpawnTime = TIER_OFFSET + bossTier * TIER_SPREAD + BOSS_SPAWN_TIME_OFFSET;
+  if (state.spawner.warnedBossTier < bossTier && state.spawner.elapsed >= bossSpawnTime - BOSS_WARNING_LEAD_TIME_SECONDS) {
+    state.spawner.warnedBossTier = bossTier;
+    state.onBossApproaching.emit();
+  }
+  if (state.spawner.elapsed >= bossSpawnTime) {
+    spawnEntity(state, createBossConfigForVirtualTier(bossTier), Team.Enemy);
+    state.spawner.nextBossTier++;
   }
 
   const rate = getSpawnRate(state.spawner.elapsed);
   state.spawner.spawnAccumulator += rate * dt;
 
-  const weights = getTierWeights(state.spawner.elapsed);
+  const { startTier, weights } = getTierWeights(state.spawner.elapsed);
 
   while (state.spawner.spawnAccumulator >= 1) {
     state.spawner.spawnAccumulator -= 1;
-    const tierIndex = pickEnemyTier(weights);
-    const config = ENEMY_CATALOG[tierIndex];
-    spawnEntity(state, config, Team.Enemy);
+    const virtualTier = pickEnemyTier(startTier, weights);
+    spawnEntity(state, createEnemyConfigForVirtualTier(virtualTier), Team.Enemy);
   }
 }
 
