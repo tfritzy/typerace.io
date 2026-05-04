@@ -94,6 +94,7 @@ export interface RelicDefinition {
   description: string;
   sprite: string;
   effects: Partial<RelicEffects>;
+  displayValue?: string;
 }
 
 export const RELIC_CATALOG: RelicDefinition[] = [
@@ -103,6 +104,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Allied weapons deal 10% more damage.",
     sprite: "/futuristic_pixel_icons/Blue Core.png",
     effects: { damageMultiplier: 1.1 },
+    displayValue: "+10%",
   },
   {
     id: "void_crystal",
@@ -110,6 +112,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Enemies move 15% slower.",
     sprite: "/futuristic_pixel_icons/Blue Star Crystal.png",
     effects: { enemySpeedMultiplier: 0.85 },
+    displayValue: "-15%",
   },
   {
     id: "charge_matrix",
@@ -117,6 +120,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "The planet regenerates 1 HP per keystroke.",
     sprite: "/futuristic_pixel_icons/Blue Cosmic Ring.png",
     effects: { planetRegenPerKeystroke: 1 },
+    displayValue: "1",
   },
   {
     id: "neural_harvester",
@@ -124,6 +128,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Gems grant 10% more XP.",
     sprite: "/futuristic_pixel_icons/Green Starcrystal.png",
     effects: { xpMultiplier: 1.10 },
+    displayValue: "+10%",
   },
   {
     id: "overcharge_coil",
@@ -131,6 +136,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Completing a word with no errors grants all ships an extra charge.",
     sprite: "/futuristic_pixel_icons/Orange Core.png",
     effects: { bonusChargesPerPerfectWord: 1 },
+    displayValue: "+1",
   },
   {
     id: "inferno_lens",
@@ -138,6 +144,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Explosion radii are 30% larger.",
     sprite: "/futuristic_pixel_icons/Orange Power Orb.png",
     effects: { explosionRadiusMultiplier: 1.3 },
+    displayValue: "+30%",
   },
   {
     id: "nanite_swarm",
@@ -145,6 +152,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "The planet passively regenerates 2 HP per second.",
     sprite: "/futuristic_pixel_icons/Green Core.png",
     effects: { planetHealPerSecond: 2 },
+    displayValue: "2",
   },
   {
     id: "aegis_barrier",
@@ -152,6 +160,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "The planet takes 25% less damage from enemies.",
     sprite: "/futuristic_pixel_icons/Amber Neon Shield.png",
     effects: { planetDamageReduction: 0.75 },
+    displayValue: "-25%",
   },
   {
     id: "glacial_emitter",
@@ -159,6 +168,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Freezing attacks apply 1 additional freeze stack to enemies hit.",
     sprite: "/futuristic_pixel_icons/Turqoise Crystal.png",
     effects: { freezeStacksBonus: 1 },
+    displayValue: "+1",
   },
   {
     id: "plasma_weave",
@@ -166,6 +176,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Plasma attacks apply 1 additional stack of plasma.",
     sprite: "/futuristic_pixel_icons/Purple Starcrystal.png",
     effects: { plasmaStacksBonus: 1 },
+    displayValue: "+1",
   },
   {
     id: "jammer_array",
@@ -173,6 +184,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Enemies fire 25% slower.",
     sprite: "/futuristic_pixel_icons/Blue Chip.png",
     effects: { enemyFireSlowMultiplier: 1.25 },
+    displayValue: "-25%",
   },
   {
     id: "surge_catalyst",
@@ -180,6 +192,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Completing a word with no errors restores 20 HP to the planet.",
     sprite: "/futuristic_pixel_icons/Pink Crystal.png",
     effects: { planetRegenPerPerfectWord: 20 },
+    displayValue: "20",
   },
   {
     id: "flow_state",
@@ -187,6 +200,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "For each word with no errors in your streak, allied weapons deal 1% more damage (max 25%).",
     sprite: "/futuristic_pixel_icons/Orange Star Shards.png",
     effects: { streakDamageBonus: 0.01 },
+    displayValue: "1%",
   },
   {
     id: "surge_protocol",
@@ -194,6 +208,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "When the planet takes damage, all ships gain 1 charge.",
     sprite: "/futuristic_pixel_icons/Orange Chip.png",
     effects: { chargesOnPlanetDamage: 1 },
+    displayValue: "+1",
   },
   {
     id: "echo_chamber",
@@ -201,6 +216,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Completing a word with no errors grants 5 XP.",
     sprite: "/futuristic_pixel_icons/Amber Crystal.png",
     effects: { xpPerPerfectWord: 5 },
+    displayValue: "5",
   },
   {
     id: "resonance_field",
@@ -208,6 +224,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Allied laser ships deal 20% more damage.",
     sprite: "/futuristic_pixel_icons/Laser Rifle Blue.png",
     effects: { laserDamageMultiplier: 1.2 },
+    displayValue: "+20%",
   },
   {
     id: "entropy_siphon",
@@ -215,6 +232,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Each enemy kill restores 3 HP to the planet.",
     sprite: "/futuristic_pixel_icons/Red Heart Crystal.png",
     effects: { planetHealPerKill: 3 },
+    displayValue: "3",
   },
   {
     id: "vital_matrix",
@@ -222,6 +240,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: `Each enemy kill permanently increases planet max HP by 1 (up to +${MAX_VITAL_MATRIX_BONUS}).`,
     sprite: "/futuristic_pixel_icons/Health Pack.png",
     effects: { maxPlanetHealthPerKill: 1 },
+    displayValue: "+1",
   },
   {
     id: "prism_array",
@@ -229,6 +248,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Allied physical weapons deal 20% more damage.",
     sprite: "/futuristic_pixel_icons/Blue Neon Bullet.png",
     effects: { projectileDamageMultiplier: 1.2 },
+    displayValue: "+20%",
   },
   {
     id: "cascade_protocol",
@@ -236,6 +256,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "The killing ship gains 1 charge when it destroys an enemy.",
     sprite: "/futuristic_pixel_icons/Lightning Icon.png",
     effects: { chargesPerKill: 1 },
+    displayValue: "+1",
   },
   {
     id: "photon_surge",
@@ -243,6 +264,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Completing a word with no errors deals 25 damage to a random enemy.",
     sprite: "/futuristic_pixel_icons/Bluerite Orb.png",
     effects: { perfectWordSplashDamage: 25 },
+    displayValue: "25",
   },
   {
     id: "infernal_chain",
@@ -250,6 +272,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "When a burning enemy dies, nearby enemies gain 5 plasma stacks.",
     sprite: "/futuristic_pixel_icons/Purple Grenade.png",
     effects: { plasmaDeathSpread: 5 },
+    displayValue: "5",
   },
   {
     id: "kinetic_mirror",
@@ -257,6 +280,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "5% of damage dealt to enemies is restored to the planet as HP.",
     sprite: "/futuristic_pixel_icons/Pink Heart Crystal.png",
     effects: { lifeStealPercent: 0.05 },
+    displayValue: "5%",
   },
   {
     id: "chrono_burst",
@@ -264,6 +288,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Every 5th consecutive word with no errors triggers a shockwave dealing 50 damage to all enemies.",
     sprite: "/futuristic_pixel_icons/Onyx Star Shards.png",
     effects: { streakMilestoneDamage: 50 },
+    displayValue: "50",
   },
   {
     id: "plasma_amplifier",
@@ -271,6 +296,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Plasma deals 2x more damage.",
     sprite: "/futuristic_pixel_icons/Red Circuit.png",
     effects: { plasmaDamageMultiplier: 2 },
+    displayValue: "2×",
   },
   {
     id: "death_nova",
@@ -278,6 +304,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "When an enemy dies, it explodes applying 5 plasma stacks to nearby enemies.",
     sprite: "/futuristic_pixel_icons/Green Grenade.png",
     effects: { deathNovaPlasmaStacks: 5 },
+    displayValue: "5",
   },
   {
     id: "cryo_shatter",
@@ -285,6 +312,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Frozen enemies take 2x damage.",
     sprite: "/futuristic_pixel_icons/Ice Pack.png",
     effects: { frozenDamageMultiplier: 2 },
+    displayValue: "2×",
   },
   {
     id: "frost_chain",
@@ -292,6 +320,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "When a frozen enemy dies, it explodes freezing nearby enemies for 1 second.",
     sprite: "/futuristic_pixel_icons/Turqoise Ring.png",
     effects: { frostChainFreezeStacks: 1 },
+    displayValue: "1s",
   },
   {
     id: "first_strike",
@@ -299,6 +328,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Undamaged enemies take 50% more damage.",
     sprite: "/futuristic_pixel_icons/Bolt.png",
     effects: { firstStrikeDamageBonus: 0.5 },
+    displayValue: "+50%",
   },
   {
     id: "plasma_feedback",
@@ -306,6 +336,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Each plasma stack on an enemy increases the damage it takes by 3%.",
     sprite: "/futuristic_pixel_icons/Orange Crystal.png",
     effects: { plasmaDamageBonusPerStack: 0.03 },
+    displayValue: "3%",
   },
   {
     id: "volatile_ignition",
@@ -313,6 +344,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Physical attacks against burning enemies apply 2 plasma stacks.",
     sprite: "/futuristic_pixel_icons/Darkred Cosmic Ring.png",
     effects: { physicalAgainstPlasmaStacks: 2 },
+    displayValue: "2",
   },
   {
     id: "permafrost",
@@ -320,6 +352,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "When a frozen enemy is killed, the nearest unfrozen enemy is frozen for 2 seconds.",
     sprite: "/futuristic_pixel_icons/Light Crystal.png",
     effects: { freezeKillSpread: 2 },
+    displayValue: "2s",
   },
   {
     id: "blizzard",
@@ -327,6 +360,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Every 10 consecutive words with no errors, freeze all enemies for 3 seconds.",
     sprite: "/futuristic_pixel_icons/Crystal.png",
     effects: { blizzardFreezeInterval: 10, blizzardFreezeStacks: 3 },
+    displayValue: "3s",
   },
   {
     id: "superheated",
@@ -334,6 +368,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Enemies with plasma stacks move 30% slower.",
     sprite: "/futuristic_pixel_icons/Red Starcrystal.png",
     effects: { plasmaSlow: 0.3 },
+    displayValue: "-30%",
   },
   {
     id: "cryo_surge",
@@ -341,6 +376,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Completing a word with no errors freezes the nearest enemy for 2 seconds.",
     sprite: "/futuristic_pixel_icons/Blue Star Crystal.png",
     effects: { freezeOnPerfectWord: 2 },
+    displayValue: "2s",
   },
   {
     id: "cryo_recharge",
@@ -348,6 +384,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Killing a frozen enemy grants all ships 1 charge.",
     sprite: "/futuristic_pixel_icons/Turqoise Ring.png",
     effects: { chargesOnFrozenKill: 1 },
+    displayValue: "+1",
   },
   {
     id: "ice_armor",
@@ -355,6 +392,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "When the planet takes damage, freeze the attacker for 2 seconds.",
     sprite: "/futuristic_pixel_icons/Orange Star Shards.png",
     effects: { planetFreezeOnHit: 2 },
+    displayValue: "2s",
   },
   {
     id: "frost_nova",
@@ -362,6 +400,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "When an enemy is frozen, it takes 15 instant damage.",
     sprite: "/futuristic_pixel_icons/Light Crystal.png",
     effects: { frostNovaDamage: 15 },
+    displayValue: "15",
   },
   {
     id: "pyroclasm",
@@ -376,6 +415,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "When an enemy's plasma stacks expire, it takes 30 bonus damage.",
     sprite: "/futuristic_pixel_icons/Orange Star Shards.png",
     effects: { plasmaExpiredDamage: 30 },
+    displayValue: "30",
   },
   {
     id: "static_discharge",
@@ -383,6 +423,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     description: "Applying freeze to an enemy also applies 2 plasma stacks.",
     sprite: "/futuristic_pixel_icons/Turqoise Ring.png",
     effects: { plasmaOnFreezeApply: 2 },
+    displayValue: "2",
   },
 ];
 
