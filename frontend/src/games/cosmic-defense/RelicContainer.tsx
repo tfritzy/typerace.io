@@ -32,7 +32,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
 
   return (
     <>
-      <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-1">
         {collectedRelics.map((relicId) => {
           const relic = RELIC_MAP.get(relicId);
           if (!relic) return null;
