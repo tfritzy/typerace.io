@@ -89,7 +89,7 @@ const ENEMY_FIRE_RATE = 1.2;
 const BASE_PROJECTILE_DAMAGE = 8;
 const DAMAGE_GROWTH = 1.008;
 const BASE_RANGE = 500;
-const ENEMY_SPEED = 45;
+const ENEMY_SPEED = 22.5;
 
 function roundToNearestEven(value: number): number {
   const floor = Math.floor(value);
