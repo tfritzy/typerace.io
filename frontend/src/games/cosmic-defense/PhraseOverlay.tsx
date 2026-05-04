@@ -19,7 +19,6 @@ function generatePhrase(wordCount: number): string {
 
 const CHAR_COUNT = 22;
 const HOTKEYS = new Set(["1", "2", "3"]);
-const AUTO_TYPER_KEY = "`";
 const AUTO_TYPER_INTERVAL_MS = Math.round(60000 / 250);
 
 export const PhraseOverlay = ({
@@ -32,7 +31,6 @@ export const PhraseOverlay = ({
   const [typed, setTyped] = useState<string>("");
   const [phrase, setPhrase] = useState<string>(() => generatePhrase(5));
   const [checkpoint, setCheckpoint] = useState<number>(0);
-  const [autoTyping, setAutoTyping] = useState(false);
   const skipTransition = useRef(false);
   const typedRef = useRef(typed);
   const phraseRef = useRef(phrase);
@@ -106,11 +104,6 @@ export const PhraseOverlay = ({
     (e: KeyboardEvent) => {
       if (isPaused) return;
       if (e.target === inputRef.current) return;
-      if (e.key === AUTO_TYPER_KEY) {
-        e.preventDefault();
-        setAutoTyping((prev) => !prev);
-        return;
-      }
       if (HOTKEYS.has(e.key)) return;
       if (e.metaKey || e.altKey) return;
 
@@ -131,7 +124,7 @@ export const PhraseOverlay = ({
   }, [handleKey]);
 
   useEffect(() => {
-    if (!autoTyping || isPaused) return;
+    if (isPaused) return;
     const interval = setInterval(() => {
       const nextChar = phraseRef.current[typedRef.current.length];
       if (nextChar !== undefined) {
@@ -139,7 +132,7 @@ export const PhraseOverlay = ({
       }
     }, AUTO_TYPER_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [autoTyping, isPaused, processInput]);
+  }, [isPaused, processInput]);
 
   useEffect(() => {
     const input = inputRef.current;
@@ -238,25 +231,6 @@ export const PhraseOverlay = ({
           pointerEvents: "none",
         }}
       />
-      {autoTyping && (
-        <div
-          className="absolute bottom-4 left-1/2 -translate-x-1/2"
-          style={{
-            pointerEvents: "none",
-            background: "rgba(17,17,27,0.75)",
-            border: "1px solid rgba(166,227,161,0.5)",
-            borderRadius: 6,
-            padding: "2px 8px",
-            color: "#a6e3a1",
-            fontSize: 10,
-            fontWeight: 600,
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-          }}
-        >
-          auto-typer on
-        </div>
-      )}
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ pointerEvents: "auto", cursor: "text", visibility: isPaused ? "hidden" : "visible" }}
