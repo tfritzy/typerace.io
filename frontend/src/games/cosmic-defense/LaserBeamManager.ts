@@ -2,6 +2,8 @@ import { BlurFilter, Container, Graphics } from "pixi.js";
 import type { GameState } from "./state";
 
 const BEAM_DURATION = 0.35;
+const GLOW_BLUR_STRENGTH = 12;
+const GLOW_BLUR_QUALITY = 4;
 
 export class LaserBeamManager {
   readonly layer: Container;
@@ -16,7 +18,7 @@ export class LaserBeamManager {
     this.layer = new Container();
     this.glowContainer = new Container();
     this.coreContainer = new Container();
-    this.glowContainer.filters = [new BlurFilter({ strength: 12, quality: 4 })];
+    this.glowContainer.filters = [new BlurFilter({ strength: GLOW_BLUR_STRENGTH, quality: GLOW_BLUR_QUALITY })];
     this.layer.addChild(this.glowContainer);
     this.layer.addChild(this.coreContainer);
   }
