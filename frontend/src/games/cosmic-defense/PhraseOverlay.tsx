@@ -19,14 +19,15 @@ function generatePhrase(wordCount: number): string {
 
 const CHAR_COUNT = 22;
 const HOTKEYS = new Set(["1", "2", "3"]);
-const AUTO_TYPER_INTERVAL_MS = Math.round(60000 / 750);
 
 export const PhraseOverlay = ({
   gameRef,
   isPaused,
+  autoTyperWpm,
 }: {
   gameRef: React.RefObject<CosmicDefenseGame | null>;
   isPaused: boolean;
+  autoTyperWpm: number;
 }) => {
   const [typed, setTyped] = useState<string>("");
   const [phrase, setPhrase] = useState<string>(() => generatePhrase(5));
@@ -125,14 +126,15 @@ export const PhraseOverlay = ({
 
   useEffect(() => {
     if (isPaused) return;
+    const intervalMs = Math.round(60000 / (autoTyperWpm * 5));
     const interval = setInterval(() => {
       const nextChar = phraseRef.current[typedRef.current.length];
       if (nextChar !== undefined) {
         processInput(nextChar, false);
       }
-    }, AUTO_TYPER_INTERVAL_MS);
+    }, intervalMs);
     return () => clearInterval(interval);
-  }, [isPaused, processInput]);
+  }, [isPaused, processInput, autoTyperWpm]);
 
   useEffect(() => {
     const input = inputRef.current;
