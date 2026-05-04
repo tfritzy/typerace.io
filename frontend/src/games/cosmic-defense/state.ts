@@ -1,5 +1,5 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT, MAX_VITAL_MATRIX_BONUS } from "./constants";
-import { type EntityType, ColorPreset, ExplosionType, Team, getExplosionType, DamageType } from "./types";
+import { type EntityType, ColorPreset, ExplosionType, Team, getExplosionType, DamageType, FireMode } from "./types";
 import { SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig, createEnemyConfigForWave, createBossConfigForVirtualTier, ENEMY_SHIP_TYPES, getWaveHealthMultiplier } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } from "./relics";
@@ -64,6 +64,7 @@ export interface EntityState {
   sizeScale: number;
   isBoss: boolean;
   damageType: DamageType;
+  fireMode: FireMode;
 }
 
 export interface ProjectileState {
@@ -344,6 +345,7 @@ function makeBaseEntity(
     sizeScale: 1,
     isBoss: false,
     damageType: DamageType.Physical,
+    fireMode: FireMode.Projectile,
   };
 }
 
@@ -402,6 +404,7 @@ export function spawnAlliedEntity(
   entity.explosionRadius = scaled.explosionRadius;
   entity.hitDelay = config.hitDelay;
   entity.damageType = config.damageType;
+  entity.fireMode = config.fireMode;
   addEntity(state, entity);
   return entity.id;
 }
@@ -1015,7 +1018,7 @@ function activateAbility(state: GameState, e: EntityState): void {
       continue;
     }
 
-    if (e.laserDamage > 0 || (e.beamWidth > 0 && e.plasmaStacksApplied > 0)) {
+    if (e.fireMode === FireMode.Laser) {
       fireLaser(state, e);
       continue;
     }
