@@ -52,6 +52,8 @@ export const GameCanvas = () => {
     if (selectedSlot !== null) {
       game.addPauseReason("inspection");
       return () => game.removePauseReason("inspection");
+    } else {
+      game.removePauseReason("inspection");
     }
   }, [selectedSlot]);
 
@@ -61,6 +63,8 @@ export const GameCanvas = () => {
     if (pendingChoice) {
       game.addPauseReason("pendingChoice");
       return () => game.removePauseReason("pendingChoice");
+    } else {
+      game.removePauseReason("pendingChoice");
     }
   }, [pendingChoice]);
 
