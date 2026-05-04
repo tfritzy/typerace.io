@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT, MAX_VITAL_MATRIX_BONUS } from "./constants";
 import { type EntityType, ColorPreset, ExplosionType, Team, getExplosionType, DamageType } from "./types";
-import { SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig, createEnemyConfigForVirtualTier, createEnemyConfigForWave, createBossConfigForVirtualTier, ENEMY_SHIP_TYPES, getWaveHealthMultiplier } from "./enemyConfig";
+import { SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig, createEnemyConfigForWave, createBossConfigForVirtualTier, ENEMY_SHIP_TYPES, getWaveHealthMultiplier } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } from "./relics";
 
@@ -250,8 +250,8 @@ export function createGameState(): GameState {
       paused: true,
       currentWave: 0,
       enemiesSpawnedInWave: 0,
-      waveShipTypeIndex: Math.floor(ENEMY_SHIP_TYPES.length / 2),
-      enemiesInWave: getEnemiesInWave(Math.floor(ENEMY_SHIP_TYPES.length / 2)),
+      waveShipTypeIndex: INITIAL_WAVE_SHIP_TYPE_INDEX,
+      enemiesInWave: getEnemiesInWave(INITIAL_WAVE_SHIP_TYPE_INDEX),
       bossWarned: false,
     },
     xp: 0,
@@ -1102,10 +1102,12 @@ const TIER_WEIGHT_WINDOW = 8;
 const MIN_ENEMIES_ON_SCREEN = 10;
 const BOSS_WARNING_ENEMIES_REMAINING = 8;
 const ENEMIES_PER_WAVE = 50;
+const MIN_ENEMIES_PER_WAVE = 5;
+const INITIAL_WAVE_SHIP_TYPE_INDEX = Math.floor(ENEMY_SHIP_TYPES.length / 2);
 
 function getEnemiesInWave(shipTypeIndex: number): number {
   const multiplier = getWaveHealthMultiplier(shipTypeIndex);
-  return Math.max(5, Math.round(ENEMIES_PER_WAVE / multiplier));
+  return Math.max(MIN_ENEMIES_PER_WAVE, Math.round(ENEMIES_PER_WAVE / multiplier));
 }
 
 function binomialWeight(t: number, n: number, k: number): number {
