@@ -4,7 +4,7 @@ import { getLanguageFromSlug } from "../../utils/modes";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { BOSS_WARNING_LEAD_TIME_SECONDS, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
-import type { EntityState, BossSpawnedData } from "./state";
+import type { EntityState, BossSpawnedData, BossDefeatedData } from "./state";
 import { BossHealthBar } from "./BossHealthBar";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
@@ -38,7 +38,7 @@ export const GameCanvas = () => {
   const [xpNeeded, setXpNeeded] = useState(() => xpForNextLevel(1));
   const [totalKills, setTotalKills] = useState(0);
   const [bossApproaching, setBossApproaching] = useState(false);
-  const [bossEntityId, setBossEntityId] = useState<number | null>(null);
+  const [bossEntityIds, setBossEntityIds] = useState<number[]>([]);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -108,11 +108,11 @@ export const GameCanvas = () => {
         });
         unsubBossSpawned = game.state.onBossSpawned.subscribe((data: BossSpawnedData) => {
           if (cancelled) return;
-          setBossEntityId(data.id);
+          setBossEntityIds((prev) => [...prev, data.id]);
         });
-        unsubBossDefeated = game.state.onBossDefeated.subscribe(() => {
+        unsubBossDefeated = game.state.onBossDefeated.subscribe((data: BossDefeatedData) => {
           if (cancelled) return;
-          setBossEntityId(null);
+          setBossEntityIds((prev) => prev.filter((id) => id !== data.id));
         });
       })
       .catch((err) => {
@@ -256,8 +256,12 @@ export const GameCanvas = () => {
             </div>
           </div>
         )}
-        {bossEntityId !== null && gameRef.current && (
-          <BossHealthBar state={gameRef.current.state} entityId={bossEntityId} />
+        {bossEntityIds.length > 0 && gameRef.current && (
+          <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-col">
+            {bossEntityIds.map((id) => (
+              <BossHealthBar key={id} state={gameRef.current!.state} entityId={id} />
+            ))}
+          </div>
         )}
         <PlacementOverlay
           slots={slots}

@@ -77,7 +77,7 @@ export const AnimatedHealthBar = ({ health, maxHealth, name }: AnimatedHealthBar
 
   return (
     <div
-      className="absolute bottom-0 left-0 right-0 z-20 px-4 pb-3 pt-2"
+      className="px-4 pb-3 pt-2"
       style={{ background: "linear-gradient(to top, rgba(10,10,26,0.82) 0%, transparent 100%)" }}
     >
       <div className="flex items-center justify-between mb-1">
