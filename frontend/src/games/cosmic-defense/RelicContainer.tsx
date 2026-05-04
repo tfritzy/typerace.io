@@ -7,6 +7,9 @@ interface RelicContainerProps {
   game: CosmicDefenseGame | null;
 }
 
+const RELIC_ICON_SIZE = 22;
+const RELICS_PER_ROW = 8;
+
 export const RelicContainer = ({ game }: RelicContainerProps) => {
   const [pendingRelic, setPendingRelic] = useState<RelicId | null>(null);
   const [collectedRelics, setCollectedRelics] = useState<RelicId[]>([]);
@@ -32,7 +35,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
 
   return (
     <>
-      <div className="flex items-center gap-1">
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${RELICS_PER_ROW}, ${RELIC_ICON_SIZE}px)`, gap: 4 }}>
         {collectedRelics.map((relicId) => {
           const relic = RELIC_MAP.get(relicId);
           if (!relic) return null;
