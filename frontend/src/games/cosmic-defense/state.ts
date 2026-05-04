@@ -7,6 +7,7 @@ import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } f
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 1;
+const BURN_DAMAGE_PER_STACK = 3;
 const LASER_RANGE = 2200;
 const SCORE_PER_XP = 10;
 const MAX_CHAIN_JUMP_DISTANCE = 300;
@@ -48,6 +49,8 @@ export interface EntityState {
   role: ShipRole | null;
   plasmaStacks: number;
   plasmaStacksApplied: number;
+  burnStacks: number;
+  burnStacksApplied: number;
   laserDamage: number;
   kills: number;
   damageDealt: number;
@@ -136,6 +139,7 @@ export interface DamageData {
   amount: number;
   x: number;
   y: number;
+  isBurn?: boolean;
 }
 
 export interface EntityDeathData {
@@ -328,6 +332,8 @@ function makeBaseEntity(
     role: null,
     plasmaStacks: 0,
     plasmaStacksApplied: 0,
+    burnStacks: 0,
+    burnStacksApplied: 0,
     laserDamage: 0,
     kills: 0,
     damageDealt: 0,
@@ -392,6 +398,7 @@ export function spawnAlliedEntity(
   entity.chargesRequired = config.chargesRequired;
   entity.role = getShipRole(config.entityType);
   entity.plasmaStacksApplied = config.plasmaStacks;
+  entity.burnStacksApplied = config.burnStacksApplied;
   entity.laserDamage = scaled.laserDamage;
   entity.level = level;
   entity.freezeStacks = scaled.freezeStacks;
@@ -552,7 +559,8 @@ function dealDamageToEntity(
   state: GameState,
   attacker: EntityState | null,
   target: EntityState,
-  damage: number
+  damage: number,
+  isBurn?: boolean
 ): boolean {
   let effectiveDamage = damage;
   if (attacker?.team === Team.Allied && target.team === Team.Enemy) {
@@ -645,7 +653,7 @@ function dealDamageToEntity(
     if (idx >= 0) removeEntityAt(state, idx);
   }
 
-  state.onDamageDealt.emit({ amount: damage, x: target.x, y: target.y });
+  state.onDamageDealt.emit({ amount: damage, x: target.x, y: target.y, isBurn });
 
   return killed;
 }
@@ -703,6 +711,12 @@ function tickPerSecond(state: GameState, dt: number): void {
       if (prevStacks > 0 && e.plasmaStacks === 0 && state.relicEffects.plasmaExpiredDamage > 0) {
         if (dealDamageToEntity(state, null, e, state.relicEffects.plasmaExpiredDamage)) continue;
       }
+    }
+
+    if (e.burnStacks > 0) {
+      const dmg = e.burnStacks * BURN_DAMAGE_PER_STACK;
+      e.burnStacks = Math.max(0, e.burnStacks - 1);
+      if (dealDamageToEntity(state, null, e, dmg, true)) continue;
     }
 
     if (e.freezeStacks > 0) {
@@ -809,6 +823,7 @@ function tickPendingShots(state: GameState): void {
         const dy = other.y - shot.targetY;
         if (dx * dx + dy * dy > r2) continue;
         if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
+        if (shooter.burnStacksApplied > 0) other.burnStacks += shooter.burnStacksApplied;
         if (shooter.freezeStacks > 0) applyFreezeStacks(state, other, shooter.freezeStacks);
         if (dmg > 0) dealDamageToEntity(state, shooter, other, dmg);
       }
@@ -816,6 +831,7 @@ function tickPendingShots(state: GameState): void {
       const target = shot.targetEntityId !== null ? state.entityById.get(shot.targetEntityId) : null;
       if (target) {
         if (shooter.plasmaStacksApplied > 0) target.plasmaStacks += shooter.plasmaStacksApplied;
+        if (shooter.burnStacksApplied > 0) target.burnStacks += shooter.burnStacksApplied;
         spawnExplosion(state, shooter.entityType, target.x, target.y);
         dealDamageToEntity(state, shooter, target, dmg);
       }
