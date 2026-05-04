@@ -929,7 +929,12 @@ function fireLaser(state: GameState, e: EntityState): void {
     if (!piercing) break;
   }
 
-  const beamColor = e.role === "plasma_beam" ? 0xff2222 : 0x89b4fa;
+  const beamColor =
+    e.role === "plasma_beam"  ? 0xff4422 :
+    e.role === "ice_beam"     ? 0x89b4fa :
+    e.role === "laser"        ? 0xb060e0 :
+    e.role === "pierce_laser" ? 0x50e878 :
+    0x89b4fa;
 
   state.laserBeams.push({
     id: state.nextId++,
