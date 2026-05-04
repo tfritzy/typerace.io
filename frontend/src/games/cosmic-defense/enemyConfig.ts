@@ -192,7 +192,7 @@ export const FRIENDLY_CATALOG: FriendlyConfig[] = [
   { entityType: "Ember", health: 200, projectileDamage: 7, chargesRequired: 3, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
   { entityType: "Corona", health: 150, projectileDamage: 0, chargesRequired: 1, plasmaStacks: 0, laserDamage: 5, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser },
   { entityType: "Pip", health: 150, projectileDamage: 8, chargesRequired: 2, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 2, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
-  { entityType: "Eagle", health: 200, projectileDamage: 0, chargesRequired: 6, plasmaStacks: 3, laserDamage: 10, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Plasma },
+  { entityType: "Eagle", health: 200, projectileDamage: 0, chargesRequired: 6, plasmaStacks: 10, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Plasma },
   { entityType: "Needle", health: 200, projectileDamage: 0, chargesRequired: 4, plasmaStacks: 0, laserDamage: 3, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser },
   { entityType: "Flare", health: 300, projectileDamage: 8, chargesRequired: 8, plasmaStacks: 0, laserDamage: 0, freezeStacks: 3, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0, damageType: DamageType.Ice },
   { entityType: "Dart", health: 200, projectileDamage: 0, chargesRequired: 6, plasmaStacks: 2, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0.33, damageType: DamageType.Plasma },
@@ -217,6 +217,7 @@ export function getScaledConfig(config: FriendlyConfig, level: number): Friendly
     laserDamage: Math.round(config.laserDamage * mult),
     chainCount: config.chainCount > 0 ? config.chainCount + (level - 1) : 0,
     freezeStacks: config.freezeStacks > 0 ? config.freezeStacks + (level - 1) : 0,
+    plasmaStacks: config.plasmaStacks > 0 ? config.plasmaStacks + (level - 1) : 0,
     buffMultiplier: config.buffMultiplier > 0 ? config.buffMultiplier + (level - 1) * 0.5 : 0,
     explosionRadius: config.explosionRadius > 0 ? config.explosionRadius + (level - 1) * 10 : 0,
   };

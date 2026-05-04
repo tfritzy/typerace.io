@@ -391,7 +391,7 @@ export function spawnAlliedEntity(
   entity.projectileDamage = scaled.projectileDamage;
   entity.chargesRequired = config.chargesRequired;
   entity.role = getShipRole(config.entityType);
-  entity.plasmaStacksApplied = config.plasmaStacks;
+  entity.plasmaStacksApplied = scaled.plasmaStacks;
   entity.laserDamage = scaled.laserDamage;
   entity.level = level;
   entity.freezeStacks = scaled.freezeStacks;
@@ -1015,7 +1015,7 @@ function activateAbility(state: GameState, e: EntityState): void {
       continue;
     }
 
-    if (e.laserDamage > 0) {
+    if (e.laserDamage > 0 || (e.beamWidth > 0 && e.plasmaStacksApplied > 0)) {
       fireLaser(state, e);
       continue;
     }
