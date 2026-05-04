@@ -63,4 +63,4 @@ export const RAILGUN_DAMAGE = 50;
 export const RAILGUN_SPEED = 800;
 
 export const AUTO_TYPE_ENABLED = true;
-export const AUTO_TYPE_INTERVAL = .2;
+export const AUTO_TYPE_INTERVAL = 0.08;

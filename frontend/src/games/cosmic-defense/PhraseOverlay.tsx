@@ -19,7 +19,7 @@ function generatePhrase(wordCount: number): string {
 
 const CHAR_COUNT = 22;
 const HOTKEYS = new Set(["1", "2", "3"]);
-const AUTO_TYPER_INTERVAL_MS = Math.round(60000 / 250);
+const AUTO_TYPER_INTERVAL_MS = Math.round(60000 / 750);
 
 export const PhraseOverlay = ({
   gameRef,
