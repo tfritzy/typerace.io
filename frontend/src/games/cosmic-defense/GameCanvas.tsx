@@ -256,13 +256,16 @@ export const GameCanvas = () => {
             </div>
           </div>
         )}
-        {bossEntityIds.length > 0 && gameRef.current && (
-          <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-col">
-            {bossEntityIds.map((id) => (
-              <BossHealthBar key={id} state={gameRef.current!.state} entityId={id} />
-            ))}
-          </div>
-        )}
+        {bossEntityIds.length > 0 && gameRef.current && (() => {
+          const gameState = gameRef.current.state;
+          return (
+            <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-col">
+              {bossEntityIds.map((id) => (
+                <BossHealthBar key={id} state={gameState} entityId={id} />
+              ))}
+            </div>
+          );
+        })()}
         <PlacementOverlay
           slots={slots}
           onSlotClick={handleSlotClick}
