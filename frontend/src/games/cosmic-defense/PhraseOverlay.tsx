@@ -19,6 +19,7 @@ function generatePhrase(wordCount: number): string {
 
 const CHAR_COUNT = 22;
 const HOTKEYS = new Set(["1", "2", "3"]);
+const AUTO_TYPER_INTERVAL_MS = Math.round(60000 / 250);
 
 export const PhraseOverlay = ({
   gameRef,
@@ -121,6 +122,17 @@ export const PhraseOverlay = ({
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [handleKey]);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      const nextChar = phraseRef.current[typedRef.current.length];
+      if (nextChar !== undefined) {
+        processInput(nextChar, false);
+      }
+    }, AUTO_TYPER_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [isPaused, processInput]);
 
   useEffect(() => {
     const input = inputRef.current;
