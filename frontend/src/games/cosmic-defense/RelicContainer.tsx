@@ -8,9 +8,7 @@ interface RelicContainerProps {
 }
 
 const RELIC_ICON_SIZE = 22;
-const RELIC_ICON_GAP = 4;
 const RELICS_PER_ROW = 8;
-const RELIC_ROW_MAX_WIDTH = RELICS_PER_ROW * RELIC_ICON_SIZE + (RELICS_PER_ROW - 1) * RELIC_ICON_GAP;
 
 export const RelicContainer = ({ game }: RelicContainerProps) => {
   const [pendingRelic, setPendingRelic] = useState<RelicId | null>(null);
@@ -37,7 +35,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-1" style={{ maxWidth: RELIC_ROW_MAX_WIDTH }}>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${RELICS_PER_ROW}, ${RELIC_ICON_SIZE}px)`, gap: 4 }}>
         {collectedRelics.map((relicId) => {
           const relic = RELIC_MAP.get(relicId);
           if (!relic) return null;
