@@ -135,6 +135,25 @@ export function createEnemyConfigForVirtualTier(virtualTier: number): EnemyConfi
   };
 }
 
+export function getWaveHealthMultiplier(shipTypeIndex: number): number {
+  const N = ENEMY_SHIP_TYPES.length;
+  return 0.25 * Math.pow(16, shipTypeIndex / (N - 1));
+}
+
+export function createEnemyConfigForWave(virtualTier: number, shipTypeIndex: number): EnemyConfig {
+  const base = createEnemyConfigForVirtualTier(virtualTier);
+  const multiplier = getWaveHealthMultiplier(shipTypeIndex);
+  const health = Math.max(1, Math.round(base.health * multiplier));
+  const power = calculateEnemyPower(health);
+  return {
+    ...base,
+    entityType: ENEMY_SHIP_TYPES[shipTypeIndex],
+    health,
+    power,
+    xpReward: calculateEnemyXpReward(power),
+  };
+}
+
 export function createBossConfigForVirtualTier(virtualTier: number): EnemyConfig {
   const base = createEnemyConfigForVirtualTier(virtualTier);
   return {

@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT, MAX_VITAL_MATRIX_BONUS } from "./constants";
 import { type EntityType, ColorPreset, ExplosionType, Team, getExplosionType, DamageType } from "./types";
-import { SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig, createEnemyConfigForVirtualTier, createBossConfigForVirtualTier } from "./enemyConfig";
+import { SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig, createEnemyConfigForWave, createBossConfigForVirtualTier, ENEMY_SHIP_TYPES, getWaveHealthMultiplier } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } from "./relics";
 
@@ -99,6 +99,7 @@ export interface SpawnState {
   enemiesSpawnedInWave: number;
   enemiesInWave: number;
   bossWarned: boolean;
+  waveShipTypeIndex: number;
 }
 
 export class GameEvent {
@@ -249,7 +250,8 @@ export function createGameState(): GameState {
       paused: true,
       currentWave: 0,
       enemiesSpawnedInWave: 0,
-      enemiesInWave: getEnemiesInWave(0),
+      waveShipTypeIndex: INITIAL_WAVE_SHIP_TYPE_INDEX,
+      enemiesInWave: getEnemiesInWave(INITIAL_WAVE_SHIP_TYPE_INDEX),
       bossWarned: false,
     },
     xp: 0,
@@ -1100,9 +1102,12 @@ const TIER_WEIGHT_WINDOW = 8;
 const MIN_ENEMIES_ON_SCREEN = 10;
 const BOSS_WARNING_ENEMIES_REMAINING = 8;
 const ENEMIES_PER_WAVE = 50;
+const MIN_ENEMIES_PER_WAVE = 5;
+const INITIAL_WAVE_SHIP_TYPE_INDEX = Math.floor(ENEMY_SHIP_TYPES.length / 2);
 
-function getEnemiesInWave(_wave: number): number {
-  return ENEMIES_PER_WAVE;
+function getEnemiesInWave(shipTypeIndex: number): number {
+  const multiplier = getWaveHealthMultiplier(shipTypeIndex);
+  return Math.max(MIN_ENEMIES_PER_WAVE, Math.round(ENEMIES_PER_WAVE / multiplier));
 }
 
 function binomialWeight(t: number, n: number, k: number): number {
@@ -1155,7 +1160,7 @@ function getSpawnRate(elapsed: number): number {
 
 function spawnWaveEnemy(state: GameState, startTier: number, weights: number[]): void {
   const virtualTier = pickEnemyTier(startTier, weights);
-  spawnEntity(state, createEnemyConfigForVirtualTier(virtualTier), Team.Enemy);
+  spawnEntity(state, createEnemyConfigForWave(virtualTier, state.spawner.waveShipTypeIndex), Team.Enemy);
   state.spawner.enemiesSpawnedInWave++;
 }
 
@@ -1176,8 +1181,9 @@ export function updateSpawner(state: GameState, dt: number): void {
     const completedWave = spawner.currentWave;
     spawner.currentWave++;
     spawnEntity(state, createBossConfigForVirtualTier(completedWave), Team.Enemy);
+    spawner.waveShipTypeIndex = Math.floor(Math.random() * ENEMY_SHIP_TYPES.length);
     spawner.enemiesSpawnedInWave = 0;
-    spawner.enemiesInWave = getEnemiesInWave(spawner.currentWave);
+    spawner.enemiesInWave = getEnemiesInWave(spawner.waveShipTypeIndex);
     spawner.bossWarned = false;
     return;
   }
