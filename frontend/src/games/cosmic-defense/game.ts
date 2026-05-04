@@ -11,7 +11,7 @@ import { LaserBeamManager } from "./LaserBeamManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { GemManager } from "./GemManager";
 import { AssetManager } from "./assetManager";
-import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, onPerfectWord as stateOnPerfectWord, onWordWithError as stateOnWordWithError, setSpawnerPaused } from "./state";
+import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, onPerfectWord as stateOnPerfectWord, onWordWithError as stateOnWordWithError, addPauseReason, removePauseReason } from "./state";
 import type { GameState } from "./state";
 import type { EntityType } from "./types";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
@@ -97,8 +97,12 @@ export class CosmicDefenseGame {
     world.addChild(this.damageNumberManager.container);
   }
 
-  setPaused(paused: boolean): void {
-    setSpawnerPaused(this.state, paused);
+  addPauseReason(reason: string): void {
+    addPauseReason(this.state, reason);
+  }
+
+  removePauseReason(reason: string): void {
+    removePauseReason(this.state, reason);
   }
 
   private update(dt: number): void {

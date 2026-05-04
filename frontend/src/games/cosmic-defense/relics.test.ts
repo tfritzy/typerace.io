@@ -5,7 +5,7 @@ import {
   onWordWithError,
   onCorrectKeystroke,
   updateState,
-  setSpawnerPaused,
+  removePauseReason,
   spawnEntity,
   spawnAlliedEntity,
   PLANET_X,
@@ -47,7 +47,7 @@ function makeAlly(state: GameState, overrides: Partial<EntityState> = {}): Entit
 }
 
 function tickSecond(state: GameState): void {
-  setSpawnerPaused(state, false);
+  removePauseReason(state, "pendingChoice");
   const startTime = state.time.time;
   const targetTime = Math.floor(startTime) + 1;
   updateState(state, targetTime - startTime + 0.001);
@@ -59,7 +59,7 @@ describe('stellar_core', () => {
     makeAlly(state, { projectileDamage: 10, chargesRequired: 1 });
     const enemy = makeEnemy(state, { health: 200 });
     onCorrectKeystroke(state);
-    setSpawnerPaused(state, false);
+    removePauseReason(state, "pendingChoice");
     updateState(state, 0.1);
     expect(200 - enemy.health).toBe(11);
   });
@@ -138,7 +138,7 @@ describe('void_crystal', () => {
   it('reduces enemy movement speed', () => {
     const state = makeState(['void_crystal']);
     const enemy = makeEnemy(state, { speed: 100, x: PLANET_X + 1000, y: PLANET_Y, range: 700 });
-    setSpawnerPaused(state, false);
+    removePauseReason(state, "pendingChoice");
     updateState(state, 0.1);
     expect(enemy.vx).toBeLessThan(0);
     expect(Math.abs(enemy.vx)).toBeCloseTo(100 * 0.85, 1);
@@ -159,7 +159,7 @@ describe('aegis_barrier', () => {
     const state = makeState(['aegis_barrier']);
     state.planetHealth = 1000;
     makeEnemy(state, { projectileDamage: 100, range: 0, speed: 0, x: PLANET_X + 10, y: PLANET_Y, fireTimer: 99 });
-    setSpawnerPaused(state, false);
+    removePauseReason(state, "pendingChoice");
     updateState(state, 0.1);
     expect(state.planetHealth).toBeGreaterThan(925);
   });
@@ -170,7 +170,7 @@ describe('surge_protocol', () => {
     const state = makeState(['surge_protocol']);
     const ally = makeAlly(state, { chargesRequired: 4 });
     makeEnemy(state, { projectileDamage: 10, range: 0, speed: 0, x: PLANET_X + 5, y: PLANET_Y, fireTimer: 0 });
-    setSpawnerPaused(state, false);
+    removePauseReason(state, "pendingChoice");
     updateState(state, 0.1);
     expect(ally.charge).toBeGreaterThan(0);
   });
@@ -304,7 +304,7 @@ describe('cryo_shatter', () => {
     const ally = makeAlly(state, { projectileDamage: 10, chargesRequired: 1 });
     const frozenEnemy = makeEnemy(state, { health: 200, freezeStacks: 3 });
     onCorrectKeystroke(state);
-    setSpawnerPaused(state, false);
+    removePauseReason(state, "pendingChoice");
     updateState(state, 0.1);
     const damageDone = 200 - frozenEnemy.health;
     expect(damageDone).toBe(20);
@@ -318,7 +318,7 @@ describe('first_strike', () => {
     const ally = makeAlly(state, { projectileDamage: 10, chargesRequired: 1 });
     const fresh = makeEnemy(state, { health: 200, maxHealth: 200 });
     onCorrectKeystroke(state);
-    setSpawnerPaused(state, false);
+    removePauseReason(state, "pendingChoice");
     updateState(state, 0.1);
     expect(200 - fresh.health).toBe(15);
     expect(ally).toBeTruthy();
@@ -332,7 +332,7 @@ describe('kinetic_mirror', () => {
     const ally = makeAlly(state, { projectileDamage: 100, chargesRequired: 1 });
     makeEnemy(state, { health: 200 });
     onCorrectKeystroke(state);
-    setSpawnerPaused(state, false);
+    removePauseReason(state, "pendingChoice");
     updateState(state, 0.1);
     expect(state.planetHealth).toBeGreaterThan(500);
     expect(ally).toBeTruthy();
@@ -376,7 +376,7 @@ describe('volatile_ignition', () => {
     const ally = makeAlly(state, { projectileDamage: 10, chargesRequired: 1 });
     const enemy = makeEnemy(state, { health: 200, plasmaStacks: 3 });
     onCorrectKeystroke(state);
-    setSpawnerPaused(state, false);
+    removePauseReason(state, "pendingChoice");
     updateState(state, 0.1);
     expect(enemy.plasmaStacks).toBeGreaterThan(3);
     expect(ally).toBeTruthy();
@@ -399,7 +399,7 @@ describe('superheated', () => {
     const state = makeState(['superheated']);
     const slowEnemy = makeEnemy(state, { speed: 100, plasmaStacks: 3, x: PLANET_X + 1000, y: PLANET_Y, range: 700 });
     const normalEnemy = makeEnemy(state, { speed: 100, plasmaStacks: 0, x: PLANET_X + 1000, y: PLANET_Y + 300, range: 700 });
-    setSpawnerPaused(state, false);
+    removePauseReason(state, "pendingChoice");
     updateState(state, 0.1);
     expect(Math.abs(slowEnemy.vx)).toBeLessThan(Math.abs(normalEnemy.vx));
   });
@@ -416,7 +416,7 @@ describe('ice_armor', () => {
       y: PLANET_Y,
       fireTimer: 0,
     });
-    setSpawnerPaused(state, false);
+    removePauseReason(state, "pendingChoice");
     updateState(state, 0.1);
     expect(attacker.freezeStacks).toBeGreaterThan(0);
   });
@@ -428,7 +428,7 @@ describe('plasma_feedback', () => {
     makeAlly(state, { projectileDamage: 10, chargesRequired: 1 });
     const burning = makeEnemy(state, { health: 200, plasmaStacks: 10 });
     onCorrectKeystroke(state);
-    setSpawnerPaused(state, false);
+    removePauseReason(state, "pendingChoice");
     updateState(state, 0.1);
     expect(200 - burning.health).toBe(13);
   });
