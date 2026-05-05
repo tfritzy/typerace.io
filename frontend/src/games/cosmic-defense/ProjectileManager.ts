@@ -1,16 +1,70 @@
-import { Container, Graphics } from "pixi.js";
+import { BlurFilter, Container, Graphics } from "pixi.js";
 import type { GameState } from "./state";
+import type { EntityType } from "./types";
 
-const SQUARE_SIZE = 4;
-const PROJECTILE_COLOR = 0xffd700;
+const PROJECTILE_RADIUS = 6;
+const GLOW_BLUR_STRENGTH = 10;
+const GLOW_BLUR_QUALITY = 3;
+const DEFAULT_COLOR = 0xffd700;
+const GLOW_OUTER_RADIUS_MULTIPLIER = 3;
+const GLOW_INNER_RADIUS_MULTIPLIER = 1.8;
+const GLOW_OUTER_ALPHA = 0.35;
+const GLOW_INNER_ALPHA = 0.6;
+const CORE_HIGHLIGHT_RADIUS_MULTIPLIER = 0.45;
+const CORE_HIGHLIGHT_COLOR = 0xffffff;
+
+const PROJECTILE_COLORS: Partial<Record<EntityType, number>> = {
+  Pulse: 0xffffaa,
+  Buckler: 0x99aacc,
+  Pip: 0x88bbff,
+  Flea: 0x99ff88,
+  Needle: 0x00ffee,
+  Bolt: 0xffee00,
+  Cricket: 0xaaff44,
+  Robin: 0xff9933,
+  Sparrow: 0xffcc44,
+  Hornet: 0xff8800,
+  Dart: 0xcc44ff,
+  Scout: 0x4488ff,
+  Hawk: 0xff5500,
+  Dynamo: 0x0088ff,
+  Harrier: 0xff4400,
+  Raptor: 0xffaa00,
+  Eagle: 0xff6600,
+  Corsair: 0xff2233,
+  Vanguard: 0x4455ff,
+  Titan: 0xcc1122,
+  Dreadnought: 0xaa0011,
+  Leviathan: 0x880022,
+  Flagship: 0xffcc00,
+  Spur: 0xffdd00,
+  Ember: 0xff7700,
+  Moth: 0x44ff99,
+  Flare: 0x88eeff,
+  Nova: 0x99ff44,
+};
+
+function getProjectileColor(state: GameState, shooterId: number): number {
+  const shooter = state.entityById.get(shooterId);
+  if (!shooter) return DEFAULT_COLOR;
+  return PROJECTILE_COLORS[shooter.entityType] ?? DEFAULT_COLOR;
+}
 
 export class ProjectileManager {
   readonly layer: Container;
-  private displayObjects = new Map<number, Graphics>();
+  private glowContainer: Container;
+  private coreContainer: Container;
+  private glowObjects = new Map<number, Graphics>();
+  private coreObjects = new Map<number, Graphics>();
   private activeIds = new Set<number>();
 
   constructor() {
     this.layer = new Container();
+    this.glowContainer = new Container();
+    this.coreContainer = new Container();
+    this.glowContainer.filters = [new BlurFilter({ strength: GLOW_BLUR_STRENGTH, quality: GLOW_BLUR_QUALITY })];
+    this.layer.addChild(this.glowContainer);
+    this.layer.addChild(this.coreContainer);
   }
 
   update(state: GameState): void {
@@ -18,29 +72,56 @@ export class ProjectileManager {
 
     for (const proj of state.projectiles) {
       this.activeIds.add(proj.id);
-      let g = this.displayObjects.get(proj.id);
-      if (!g) {
-        g = new Graphics();
-        g.rect(-SQUARE_SIZE / 2, -SQUARE_SIZE / 2, SQUARE_SIZE, SQUARE_SIZE);
-        g.fill({ color: PROJECTILE_COLOR });
-        this.layer.addChild(g);
-        this.displayObjects.set(proj.id, g);
+
+      let glow = this.glowObjects.get(proj.id);
+      let core = this.coreObjects.get(proj.id);
+      if (!glow || !core) {
+        const color = getProjectileColor(state, proj.shooterId);
+        if (!glow) {
+          glow = new Graphics();
+          glow.circle(0, 0, PROJECTILE_RADIUS * GLOW_OUTER_RADIUS_MULTIPLIER);
+          glow.fill({ color, alpha: GLOW_OUTER_ALPHA });
+          glow.circle(0, 0, PROJECTILE_RADIUS * GLOW_INNER_RADIUS_MULTIPLIER);
+          glow.fill({ color, alpha: GLOW_INNER_ALPHA });
+          this.glowContainer.addChild(glow);
+          this.glowObjects.set(proj.id, glow);
+        }
+        if (!core) {
+          core = new Graphics();
+          core.circle(0, 0, PROJECTILE_RADIUS);
+          core.fill({ color });
+          core.circle(0, 0, PROJECTILE_RADIUS * CORE_HIGHLIGHT_RADIUS_MULTIPLIER);
+          core.fill({ color: CORE_HIGHLIGHT_COLOR });
+          this.coreContainer.addChild(core);
+          this.coreObjects.set(proj.id, core);
+        }
       }
-      g.x = proj.x;
-      g.y = proj.y;
+
+      glow.x = proj.x;
+      glow.y = proj.y;
+      core.x = proj.x;
+      core.y = proj.y;
     }
 
-    for (const [id, g] of this.displayObjects) {
+    for (const [id, g] of this.glowObjects) {
       if (!this.activeIds.has(id)) {
         g.destroy();
-        this.displayObjects.delete(id);
+        this.glowObjects.delete(id);
+      }
+    }
+    for (const [id, g] of this.coreObjects) {
+      if (!this.activeIds.has(id)) {
+        g.destroy();
+        this.coreObjects.delete(id);
       }
     }
   }
 
   destroy(): void {
-    for (const g of this.displayObjects.values()) g.destroy();
-    this.displayObjects.clear();
+    for (const g of this.glowObjects.values()) g.destroy();
+    this.glowObjects.clear();
+    for (const g of this.coreObjects.values()) g.destroy();
+    this.coreObjects.clear();
     this.layer.destroy();
   }
 }
