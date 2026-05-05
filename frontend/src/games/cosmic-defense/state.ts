@@ -908,15 +908,14 @@ function fireShot(state: GameState, e: EntityState): void {
 }
 
 function fireLaser(state: GameState, e: EntityState): void {
-  const target = findNearestTarget(state, e);
-  if (!target) return;
+  if (!findNearestTarget(state, e)) return;
 
   state.pendingShots.push({
     fireAt: state.time.time,
     shooterId: e.id,
-    targetX: target.x,
-    targetY: target.y,
-    targetEntityId: target.entity?.id ?? null,
+    targetX: 0,
+    targetY: 0,
+    targetEntityId: null,
     fireMode: FireMode.Laser,
   });
 }
