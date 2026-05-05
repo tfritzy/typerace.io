@@ -84,39 +84,6 @@ export interface EnemyConfig {
   projectileColor: number;
 }
 
-const DEFAULT_PROJECTILE_COLOR = 0xffd700;
-
-const ENEMY_SHIP_PROJECTILE_COLORS: Partial<Record<EntityType, number>> = {
-  Pulse: 0xffffaa,
-  Buckler: 0x99aacc,
-  Pip: 0x88bbff,
-  Flea: 0x99ff88,
-  Needle: 0x00ffee,
-  Bolt: 0xffee00,
-  Cricket: 0xaaff44,
-  Robin: 0xff9933,
-  Sparrow: 0xffcc44,
-  Hornet: 0xff8800,
-  Dart: 0xcc44ff,
-  Scout: 0x4488ff,
-  Hawk: 0xff5500,
-  Dynamo: 0x0088ff,
-  Harrier: 0xff4400,
-  Raptor: 0xffaa00,
-  Eagle: 0xff6600,
-  Corsair: 0xff2233,
-  Vanguard: 0x4455ff,
-  Titan: 0xcc1122,
-  Dreadnought: 0xaa0011,
-  Leviathan: 0x880022,
-  Flagship: 0xffcc00,
-};
-
-export function getProjectileColorForType(entityType: EntityType): number {
-  return ENEMY_SHIP_PROJECTILE_COLORS[entityType] ?? DEFAULT_PROJECTILE_COLOR;
-}
-
-
 const BASE_HEALTH = 30;
 const HEALTH_GROWTH = 1.33;
 const ENEMY_FIRE_RATE = 1.2;
@@ -141,22 +108,50 @@ function calculateEnemyXpReward(power: number): number {
 }
 
 
-export const ENEMY_SHIP_TYPES: EntityType[] = [
-  "Pulse", "Buckler", "Pip", "Flea", "Needle", "Bolt", "Cricket", "Robin",
-  "Sparrow", "Hornet", "Dart", "Scout", "Hawk", "Dynamo", "Harrier", "Raptor",
-  "Eagle", "Corsair", "Vanguard", "Titan", "Dreadnought", "Leviathan", "Flagship",
+interface EnemyShipBaseConfig {
+  entityType: EntityType;
+  projectileColor: number;
+}
+
+export const ENEMY_SHIP_CATALOG: EnemyShipBaseConfig[] = [
+  { entityType: "Pulse",       projectileColor: 0xffffaa },
+  { entityType: "Buckler",     projectileColor: 0x99aacc },
+  { entityType: "Pip",         projectileColor: 0x88bbff },
+  { entityType: "Flea",        projectileColor: 0x99ff88 },
+  { entityType: "Needle",      projectileColor: 0x00ffee },
+  { entityType: "Bolt",        projectileColor: 0xffee00 },
+  { entityType: "Cricket",     projectileColor: 0xaaff44 },
+  { entityType: "Robin",       projectileColor: 0xff9933 },
+  { entityType: "Sparrow",     projectileColor: 0xffcc44 },
+  { entityType: "Hornet",      projectileColor: 0xff8800 },
+  { entityType: "Dart",        projectileColor: 0xcc44ff },
+  { entityType: "Scout",       projectileColor: 0x4488ff },
+  { entityType: "Hawk",        projectileColor: 0xff5500 },
+  { entityType: "Dynamo",      projectileColor: 0x0088ff },
+  { entityType: "Harrier",     projectileColor: 0xff4400 },
+  { entityType: "Raptor",      projectileColor: 0xffaa00 },
+  { entityType: "Eagle",       projectileColor: 0xff6600 },
+  { entityType: "Corsair",     projectileColor: 0xff2233 },
+  { entityType: "Vanguard",    projectileColor: 0x4455ff },
+  { entityType: "Titan",       projectileColor: 0xcc1122 },
+  { entityType: "Dreadnought", projectileColor: 0xaa0011 },
+  { entityType: "Leviathan",   projectileColor: 0x880022 },
+  { entityType: "Flagship",    projectileColor: 0xffcc00 },
 ];
 
+export const ENEMY_SHIP_TYPES: EntityType[] = ENEMY_SHIP_CATALOG.map(c => c.entityType);
+
 export function createEnemyConfigForVirtualTier(virtualTier: number): EnemyConfig {
-  const N = ENEMY_SHIP_TYPES.length;
+  const N = ENEMY_SHIP_CATALOG.length;
   const slotIndex = virtualTier % N;
+  const ship = ENEMY_SHIP_CATALOG[slotIndex];
 
   const health = Math.round(BASE_HEALTH * Math.pow(HEALTH_GROWTH, virtualTier));
   const projectileDamage = Math.max(1, Math.round(BASE_PROJECTILE_DAMAGE * Math.pow(DAMAGE_GROWTH, virtualTier)));
   const power = calculateEnemyPower(health);
 
   return {
-    entityType: ENEMY_SHIP_TYPES[slotIndex],
+    entityType: ship.entityType,
     health,
     fireRate: ENEMY_FIRE_RATE,
     projectileDamage,
@@ -166,7 +161,7 @@ export function createEnemyConfigForVirtualTier(virtualTier: number): EnemyConfi
     sizeScale: 1,
     speed: ENEMY_SPEED,
     isBoss: false,
-    projectileColor: getProjectileColorForType(ENEMY_SHIP_TYPES[slotIndex]),
+    projectileColor: ship.projectileColor,
   };
 }
 
@@ -180,12 +175,14 @@ export function createEnemyConfigForWave(virtualTier: number, shipTypeIndex: num
   const multiplier = getWaveHealthMultiplier(shipTypeIndex);
   const health = Math.max(1, Math.round(base.health * multiplier));
   const power = calculateEnemyPower(health);
+  const ship = ENEMY_SHIP_CATALOG[shipTypeIndex];
   return {
     ...base,
-    entityType: ENEMY_SHIP_TYPES[shipTypeIndex],
+    entityType: ship.entityType,
     health,
     power,
     xpReward: calculateEnemyXpReward(power),
+    projectileColor: ship.projectileColor,
   };
 }
 
