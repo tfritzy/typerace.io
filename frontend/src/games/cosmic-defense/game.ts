@@ -97,8 +97,8 @@ export class CosmicDefenseGame {
     world.addChild(this.damageNumberManager.container);
   }
 
-  pause(reason: string): void {
-    pauseGame(this.state, reason);
+  pause(): void {
+    pauseGame(this.state);
   }
 
   unpause(): void {
@@ -108,7 +108,7 @@ export class CosmicDefenseGame {
   private update(dt: number): void {
     this.explosionManager.update(this.state);
     this.damageNumberManager.update(dt);
-    if (this.state.pauseReason !== null) return;
+    if (this.state.paused) return;
     updateState(this.state, dt);
     this.enemyManager.update(this.state, dt);
     this.laserBeamManager.update(this.state);

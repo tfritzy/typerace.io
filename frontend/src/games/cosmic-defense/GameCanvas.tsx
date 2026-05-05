@@ -50,7 +50,7 @@ export const GameCanvas = () => {
     const game = gameRef.current;
     if (!game) return;
     if (selectedSlot !== null) {
-      game.pause("inspection");
+      game.pause();
       return () => game.unpause();
     }
   }, [selectedSlot]);
@@ -59,7 +59,7 @@ export const GameCanvas = () => {
     const game = gameRef.current;
     if (!game) return;
     if (pendingChoice) {
-      game.pause("pendingChoice");
+      game.pause();
       return () => game.unpause();
     }
   }, [pendingChoice]);
