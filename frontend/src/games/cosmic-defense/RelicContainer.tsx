@@ -45,8 +45,8 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
         {collectedRelics.map((relicId) => {
           const relic = RELIC_MAP.get(relicId);
           if (!relic) return null;
-          const streakBonus = relicId === "flow_state"
-            ? Math.round(Math.min(25, streak * (relic.effects.streakDamageBonus ?? 0.01) * 100))
+          const streakBonus = relicId === "flow_state" && relic.effects.streakDamageBonus !== undefined
+            ? Math.round(Math.min(25, streak * relic.effects.streakDamageBonus * 100))
             : null;
           return (
             <div
