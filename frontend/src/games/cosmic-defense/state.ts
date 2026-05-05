@@ -82,7 +82,6 @@ export interface PendingShot {
   targetX: number;
   targetY: number;
   targetEntityId: number | null;
-  fireMode: FireMode;
 }
 
 export interface ExplosionState {
@@ -815,7 +814,7 @@ function tickPendingShots(state: GameState): void {
     const shooter = state.entityById.get(shot.shooterId);
     if (!shooter) continue;
 
-    if (shot.fireMode === FireMode.Laser) {
+    if (shooter.fireMode === FireMode.Laser) {
       executeLaserShot(state, shooter);
       continue;
     }
@@ -903,7 +902,6 @@ function fireShot(state: GameState, e: EntityState): void {
     targetX: target.x,
     targetY: target.y,
     targetEntityId: target.entity?.id ?? null,
-    fireMode: FireMode.Projectile,
   });
 }
 
@@ -917,43 +915,42 @@ function fireLaser(state: GameState, e: EntityState): void {
     targetX: target.x,
     targetY: target.y,
     targetEntityId: target.entity?.id ?? null,
-    fireMode: FireMode.Laser,
   });
 }
 
-function executeLaserShot(state: GameState, shooter: EntityState): void {
-  const target = findNearestTarget(state, shooter);
+function executeLaserShot(state: GameState, e: EntityState): void {
+  const target = findNearestTarget(state, e);
   if (!target) return;
 
-  const dx = target.x - shooter.x;
-  const dy = target.y - shooter.y;
+  const dx = target.x - e.x;
+  const dy = target.y - e.y;
   const len = Math.sqrt(dx * dx + dy * dy);
   if (len === 0) return;
 
   const nx = dx / len;
   const ny = dy / len;
-  const piercing = shooter.role !== "laser";
+  const piercing = e.role !== "laser";
 
   const muzzleOffset = 12;
-  const startX = shooter.x + nx * muzzleOffset;
-  const startY = shooter.y + ny * muzzleOffset;
+  const startX = e.x + nx * muzzleOffset;
+  const startY = e.y + ny * muzzleOffset;
   const beamLen = piercing ? LASER_RANGE : len;
-  const endX = shooter.x + nx * beamLen;
-  const endY = shooter.y + ny * beamLen;
+  const endX = e.x + nx * beamLen;
+  const endY = e.y + ny * beamLen;
 
-  const laserMult = shooter.damageType === DamageType.Laser
+  const laserMult = e.damageType === DamageType.Laser
     ? state.relicEffects.laserDamageMultiplier
     : 1;
-  const dmg = getBuffedDamage(shooter, Math.round(shooter.laserDamage * laserMult));
+  const dmg = getBuffedDamage(e, Math.round(e.laserDamage * laserMult));
   const searchRange = piercing ? LASER_RANGE : len + 20;
-  const extraHitRadius = shooter.beamWidth * 5;
+  const extraHitRadius = e.beamWidth * 5;
 
   for (let i = state.entities.length - 1; i >= 0; i--) {
     const other = state.entities[i];
     if (other.team !== Team.Enemy) continue;
 
-    const ex = other.x - shooter.x;
-    const ey = other.y - shooter.y;
+    const ex = other.x - e.x;
+    const ey = other.y - e.y;
     const proj = ex * nx + ey * ny;
     if (proj < 0 || proj > searchRange) continue;
 
@@ -963,18 +960,18 @@ function executeLaserShot(state: GameState, shooter: EntityState): void {
     const hitRadius = Math.max(other.hitHalfW, other.hitHalfH) + extraHitRadius;
     if (perpDist > hitRadius) continue;
 
-    if (shooter.freezeStacks > 0) applyFreezeStacks(state, other, shooter.freezeStacks);
-    if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
+    if (e.freezeStacks > 0) applyFreezeStacks(state, other, e.freezeStacks);
+    if (e.plasmaStacksApplied > 0) other.plasmaStacks += e.plasmaStacksApplied;
 
-    dealDamageToEntity(state, shooter, other, dmg);
+    dealDamageToEntity(state, e, other, dmg);
     if (!piercing) break;
   }
 
   const beamColor =
-    shooter.role === "plasma_beam"  ? 0xff4422 :
-    shooter.role === "ice_beam"     ? 0x89b4fa :
-    shooter.role === "laser"        ? 0xb060e0 :
-    shooter.role === "pierce_laser" ? 0x50e878 :
+    e.role === "plasma_beam"  ? 0xff4422 :
+    e.role === "ice_beam"     ? 0x89b4fa :
+    e.role === "laser"        ? 0xb060e0 :
+    e.role === "pierce_laser" ? 0x50e878 :
     0x89b4fa;
 
   state.laserBeams.push({
@@ -984,7 +981,7 @@ function executeLaserShot(state: GameState, shooter: EntityState): void {
     x2: endX,
     y2: endY,
     time: state.time.time,
-    width: shooter.beamWidth,
+    width: e.beamWidth,
     color: beamColor,
   });
 }
