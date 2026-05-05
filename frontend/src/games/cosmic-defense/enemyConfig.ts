@@ -163,7 +163,7 @@ export function createBossConfigForVirtualTier(virtualTier: number): EnemyConfig
     projectileDamage: roundToNearestEven(base.projectileDamage * 2.5),
     xpReward: base.xpReward * 5,
     sizeScale: 2.2,
-    speed: base.speed * 0.45,
+    speed: base.speed,
     isBoss: true,
   };
 }

@@ -167,6 +167,10 @@ export interface BossSpawnedData {
   maxHealth: number;
 }
 
+export interface BossDefeatedData {
+  id: number;
+}
+
 export interface LaserBeam {
   id: number;
   x1: number;
@@ -210,7 +214,7 @@ export interface GameState {
   onLevelUp: GameEvent;
   onBossApproaching: GameEvent;
   onBossSpawned: GameDataEvent<BossSpawnedData>;
-  onBossDefeated: GameEvent;
+  onBossDefeated: GameDataEvent<BossDefeatedData>;
   onRelicDropped: GameDataEvent<RelicId>;
 }
 
@@ -272,7 +276,7 @@ export function createGameState(): GameState {
     onLevelUp: new GameEvent(),
     onBossApproaching: new GameEvent(),
     onBossSpawned: new GameDataEvent<BossSpawnedData>(),
-    onBossDefeated: new GameEvent(),
+    onBossDefeated: new GameDataEvent<BossDefeatedData>(),
     onRelicDropped: new GameDataEvent<RelicId>(),
   };
 
@@ -633,7 +637,7 @@ function dealDamageToEntity(
         xpAmount,
       });
       if (target.isBoss) {
-        state.onBossDefeated.emit();
+        state.onBossDefeated.emit({ id: target.id });
         const unowned = RELIC_CATALOG.filter((r) => !state.relics.includes(r.id));
         if (unowned.length > 0) {
           const relicIndex = (state.spawner.currentWave - 1) % unowned.length;
