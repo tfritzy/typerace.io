@@ -15,7 +15,6 @@ export enum DamageType {
   Laser = "laser",
   Plasma = "plasma",
   Ice = "ice",
-  Burn = "burn",
 }
 
 export enum ExplosionType {

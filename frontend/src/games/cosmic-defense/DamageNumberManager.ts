@@ -37,8 +37,8 @@ export class DamageNumberManager {
     const vx = Math.cos(angle) * INITIAL_SPEED;
     const vy = Math.sin(angle) * INITIAL_SPEED;
 
-    const fillColor = data.isBurn ? 0xff4400 : 0xffffff;
-    const strokeColor = data.isBurn ? 0x7a1a00 : 0x000000;
+    const fillColor = data.isPlasma ? 0xff4400 : 0xffffff;
+    const strokeColor = data.isPlasma ? 0x7a1a00 : 0x000000;
 
     const text = new Text({
       text: String(Math.round(data.amount)),
