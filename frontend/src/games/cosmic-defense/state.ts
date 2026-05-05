@@ -138,6 +138,7 @@ export interface DamageData {
   amount: number;
   x: number;
   y: number;
+  isPlasma?: boolean;
 }
 
 export interface EntityDeathData {
@@ -560,7 +561,8 @@ function dealDamageToEntity(
   state: GameState,
   attacker: EntityState | null,
   target: EntityState,
-  damage: number
+  damage: number,
+  isPlasma = false
 ): boolean {
   let effectiveDamage = damage;
   if (attacker?.team === Team.Allied && target.team === Team.Enemy) {
@@ -653,7 +655,7 @@ function dealDamageToEntity(
     if (idx >= 0) removeEntityAt(state, idx);
   }
 
-  state.onDamageDealt.emit({ amount: damage, x: target.x, y: target.y });
+  state.onDamageDealt.emit({ amount: damage, x: target.x, y: target.y, isPlasma });
 
   return killed;
 }
@@ -704,7 +706,7 @@ function tickHalfSecond(state: GameState, dt: number): void {
       const prevStacks = e.plasmaStacks;
       const dmg = e.plasmaStacks * PLASMA_DAMAGE_PER_TICK * state.relicEffects.plasmaDamageMultiplier;
       e.plasmaStacks = Math.max(0, e.plasmaStacks - 1);
-      if (dealDamageToEntity(state, null, e, dmg)) continue;
+      if (dealDamageToEntity(state, null, e, dmg, true)) continue;
       if (prevStacks > 0 && e.plasmaStacks === 0 && state.relicEffects.plasmaExpiredDamage > 0) {
         if (dealDamageToEntity(state, null, e, state.relicEffects.plasmaExpiredDamage)) continue;
       }

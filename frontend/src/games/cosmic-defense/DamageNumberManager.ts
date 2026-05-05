@@ -37,14 +37,17 @@ export class DamageNumberManager {
     const vx = Math.cos(angle) * INITIAL_SPEED;
     const vy = Math.sin(angle) * INITIAL_SPEED;
 
+    const fillColor = data.isPlasma ? 0xff4400 : 0xffffff;
+    const strokeColor = data.isPlasma ? 0x7a1a00 : 0x000000;
+
     const text = new Text({
       text: String(Math.round(data.amount)),
       style: {
         fontFamily: "Arial",
         fontSize: FONT_SIZE,
         fontWeight: "700",
-        fill: 0xffffff,
-        stroke: { color: 0x000000, width: STROKE_WIDTH },
+        fill: fillColor,
+        stroke: { color: strokeColor, width: STROKE_WIDTH },
       },
     });
     text.anchor.set(0.5);
