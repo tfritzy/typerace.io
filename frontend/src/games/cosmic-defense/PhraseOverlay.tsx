@@ -19,7 +19,6 @@ function generatePhrase(wordCount: number): string {
 
 const CHAR_COUNT = 22;
 const HOTKEYS = new Set(["1", "2", "3"]);
-const AUTO_TYPER_INTERVAL_MS = Math.round(60000 / 250);
 
 export const PhraseOverlay = ({
   gameRef,
@@ -28,6 +27,7 @@ export const PhraseOverlay = ({
   gameRef: React.RefObject<CosmicDefenseGame | null>;
   isPaused: boolean;
 }) => {
+  const [autoTyperWpm, setAutoTyperWpm] = useState(150);
   const [typed, setTyped] = useState<string>("");
   const [phrase, setPhrase] = useState<string>(() => generatePhrase(5));
   const [checkpoint, setCheckpoint] = useState<number>(0);
@@ -125,14 +125,15 @@ export const PhraseOverlay = ({
 
   useEffect(() => {
     if (isPaused) return;
+    const intervalMs = Math.round(60000 / (autoTyperWpm * 5));
     const interval = setInterval(() => {
       const nextChar = phraseRef.current[typedRef.current.length];
       if (nextChar !== undefined) {
         processInput(nextChar, false);
       }
-    }, AUTO_TYPER_INTERVAL_MS);
+    }, intervalMs);
     return () => clearInterval(interval);
-  }, [isPaused, processInput]);
+  }, [isPaused, processInput, autoTyperWpm]);
 
   useEffect(() => {
     const input = inputRef.current;
@@ -268,6 +269,23 @@ export const PhraseOverlay = ({
             }}
           />
         </div>
+      </div>
+      <div
+        className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2"
+        style={{ pointerEvents: "auto" }}
+      >
+        <span className="text-[11px] text-[rgba(255,255,255,0.6)] font-mono whitespace-nowrap">
+          {autoTyperWpm} wpm
+        </span>
+        <input
+          type="range"
+          min={10}
+          max={300}
+          step={10}
+          value={autoTyperWpm}
+          onChange={(e) => setAutoTyperWpm(Number(e.target.value))}
+          style={{ width: 120, accentColor: "rgba(249,226,175,0.8)" }}
+        />
       </div>
     </div>
   );
