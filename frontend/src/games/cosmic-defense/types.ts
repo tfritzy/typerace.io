@@ -17,6 +17,11 @@ export enum DamageType {
   Ice = "ice",
 }
 
+export enum FireMode {
+  Projectile = "projectile",
+  Laser = "laser",
+}
+
 export enum ExplosionType {
   PlasmaExplosive = 1,
   IceExplosive = 2,
