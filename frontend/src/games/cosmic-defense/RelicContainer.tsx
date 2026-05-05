@@ -1,26 +1,53 @@
 import { useCallback, useEffect, useState } from "react";
 import type { CosmicDefenseGame } from "./game";
-import { RELIC_MAP, type RelicId } from "./relics";
+import { RELIC_MAP, type RelicId, type RelicDefinition } from "./relics";
 import { RelicDropOverlay } from "./RelicDropOverlay";
+import { STREAK_MILESTONE_INTERVAL } from "./state";
+import { MAX_VITAL_MATRIX_BONUS } from "./constants";
 
 interface RelicContainerProps {
   game: CosmicDefenseGame | null;
+}
+
+function getRelicBadge(
+  relicId: RelicId,
+  relic: RelicDefinition,
+  streak: number,
+  killHealthBonus: number,
+): string | null {
+  switch (relicId) {
+    case "flow_state":
+      if (relic.effects.streakDamageBonus === undefined) return null;
+      return `+${Math.round(Math.min(25, streak * relic.effects.streakDamageBonus * 100))}%`;
+    case "vital_matrix":
+      return `+${Math.min(MAX_VITAL_MATRIX_BONUS, killHealthBonus)}`;
+    case "chrono_burst":
+      return `${streak % STREAK_MILESTONE_INTERVAL}`;
+    case "blizzard":
+      if (relic.effects.blizzardFreezeInterval === undefined) return null;
+      return `${streak % relic.effects.blizzardFreezeInterval}`;
+    default:
+      return null;
+  }
 }
 
 export const RelicContainer = ({ game }: RelicContainerProps) => {
   const [pendingRelic, setPendingRelic] = useState<RelicId | null>(null);
   const [collectedRelics, setCollectedRelics] = useState<RelicId[]>([]);
   const [streak, setStreak] = useState(0);
+  const [killHealthBonus, setKillHealthBonus] = useState(0);
 
   useEffect(() => {
     if (!game) {
       setCollectedRelics([]);
       setPendingRelic(null);
       setStreak(0);
+      setKillHealthBonus(0);
       return;
     }
     setCollectedRelics([...game.state.relics]);
     setStreak(game.state.perfectWordStreak);
+    setKillHealthBonus(game.state.planetHealthFromKills);
     const unsubRelic = game.state.onRelicDropped.subscribe((relicId) => {
       setCollectedRelics([...game.state.relics]);
       setPendingRelic(relicId);
@@ -28,9 +55,13 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
     const unsubStreak = game.state.onStreakChanged.subscribe((s) => {
       setStreak(s);
     });
+    const unsubKills = game.state.onEnemyEntityDeath.subscribe(() => {
+      setKillHealthBonus(game.state.planetHealthFromKills);
+    });
     return () => {
       unsubRelic();
       unsubStreak();
+      unsubKills();
     };
   }, [game]);
 
@@ -45,9 +76,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
         {collectedRelics.map((relicId) => {
           const relic = RELIC_MAP.get(relicId);
           if (!relic) return null;
-          const streakBonus = relicId === "flow_state" && relic.effects.streakDamageBonus !== undefined
-            ? Math.round(Math.min(25, streak * relic.effects.streakDamageBonus * 100))
-            : null;
+          const badge = getRelicBadge(relicId, relic, streak, killHealthBonus);
           return (
             <div
               key={relicId}
@@ -59,7 +88,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
                 title={`${relic.name}: ${relic.description}`}
                 style={{ width: 22, height: 22, imageRendering: "pixelated" }}
               />
-              {streakBonus !== null && (
+              {badge !== null && (
                 <span
                   style={{
                     position: "absolute",
@@ -76,7 +105,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  +{streakBonus}%
+                  {badge}
                 </span>
               )}
             </div>
