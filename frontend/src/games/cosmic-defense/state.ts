@@ -687,14 +687,11 @@ function performInstantHit(
   }
 }
 
-function tickPerSecond(state: GameState, dt: number): void {
-  const prevSecond = Math.floor(state.time.time - dt);
-  const curSecond = Math.floor(state.time.time);
-  if (curSecond <= prevSecond) return;
+function tickHalfSecond(state: GameState, dt: number): void {
+  const prevHalf = Math.floor((state.time.time - dt) * 2);
+  const curHalf = Math.floor(state.time.time * 2);
+  if (curHalf <= prevHalf) return;
 
-  if (state.relicEffects.planetHealPerSecond > 0) {
-    state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetHealPerSecond);
-  }
   for (let i = state.entities.length - 1; i >= 0; i--) {
     const e = state.entities[i];
     if (e.team !== Team.Enemy) continue;
@@ -708,6 +705,20 @@ function tickPerSecond(state: GameState, dt: number): void {
         if (dealDamageToEntity(state, null, e, state.relicEffects.plasmaExpiredDamage)) continue;
       }
     }
+  }
+}
+
+function tickPerSecond(state: GameState, dt: number): void {
+  const prevSecond = Math.floor(state.time.time - dt);
+  const curSecond = Math.floor(state.time.time);
+  if (curSecond <= prevSecond) return;
+
+  if (state.relicEffects.planetHealPerSecond > 0) {
+    state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetHealPerSecond);
+  }
+  for (let i = state.entities.length - 1; i >= 0; i--) {
+    const e = state.entities[i];
+    if (e.team !== Team.Enemy) continue;
 
     if (e.freezeStacks > 0) {
       e.freezeStacks = Math.max(0, e.freezeStacks - 1);
@@ -839,6 +850,7 @@ export function updateState(state: GameState, dt: number): void {
   if (state.spawner.paused) return;
 
   tickPerSecond(state, dt);
+  tickHalfSecond(state, dt);
   tickEntities(state, dt);
   checkCollisions(state);
   tickLaserBeams(state);
