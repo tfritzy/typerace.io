@@ -18,9 +18,9 @@ function getRelicBadge(
   switch (relicId) {
     case "flow_state":
       if (relic.effects.streakDamageBonus === undefined) return null;
-      return `+${Math.round(Math.min(25, streak * relic.effects.streakDamageBonus * 100))}%`;
+      return `${Math.round(Math.min(25, streak * relic.effects.streakDamageBonus * 100))}`;
     case "vital_matrix":
-      return `+${Math.min(MAX_VITAL_MATRIX_BONUS, killHealthBonus)}`;
+      return `${Math.min(MAX_VITAL_MATRIX_BONUS, killHealthBonus)}`;
     case "chrono_burst":
       return `${streak % STREAK_MILESTONE_INTERVAL}`;
     case "blizzard":
