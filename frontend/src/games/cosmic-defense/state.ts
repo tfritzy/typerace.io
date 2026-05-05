@@ -895,7 +895,7 @@ function fireShot(state: GameState, e: EntityState): void {
   });
 
   state.pendingShots.push({
-    fireAt: state.time.time + e.hitDelay,
+    fireAt: state.time.time + dist / PROJECTILE_SPEED,
     shooterId: e.id,
     targetX: target.x,
     targetY: target.y,
