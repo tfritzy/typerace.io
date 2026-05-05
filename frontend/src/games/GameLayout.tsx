@@ -10,7 +10,6 @@ type GameLayoutProps = {
   children: ReactNode;
   aspectRatio?: number;
   viewportChromeOffsetPx?: number;
-  controls?: ReactNode;
 };
 
 export const GameLayout = ({
@@ -18,7 +17,6 @@ export const GameLayout = ({
   children,
   aspectRatio = 16 / 9,
   viewportChromeOffsetPx = 220,
-  controls,
 }: GameLayoutProps) => {
   const languageGameMatch = useMatch("/:lang/games/:gameId");
   const gameMatch = useMatch("/games/:gameId");
@@ -55,7 +53,6 @@ export const GameLayout = ({
               </div>
             </div>
           </section>
-          {controls}
           {gameId && <ScoreLeaderboards gameId={gameId} language={language} />}
         </div>
       </main>

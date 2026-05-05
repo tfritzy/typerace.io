@@ -20,7 +20,7 @@ import type { EntityType } from "./types";
 const UI_REFERENCE_WIDTH = 700;
 const BOSS_ANNOUNCEMENT_DURATION_MS = BOSS_WARNING_LEAD_TIME_SECONDS * 1000;
 
-export const GameCanvas = ({ autoTyperWpm }: { autoTyperWpm: number }) => {
+export const GameCanvas = () => {
   const languageGameMatch = useMatch("/:lang/games/:gameId");
   const gameMatch = useMatch("/games/:gameId");
   const gameId = languageGameMatch?.params.gameId ?? gameMatch?.params.gameId ?? "";
@@ -281,7 +281,7 @@ export const GameCanvas = ({ autoTyperWpm }: { autoTyperWpm: number }) => {
             level={level}
           />
         )}
-        <PhraseOverlay gameRef={gameRef} isPaused={selectedSlot !== null || pendingChoice} autoTyperWpm={autoTyperWpm} />
+        <PhraseOverlay gameRef={gameRef} isPaused={selectedSlot !== null || pendingChoice} />
       </div>
     </div>
   );

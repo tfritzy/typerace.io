@@ -23,12 +23,11 @@ const HOTKEYS = new Set(["1", "2", "3"]);
 export const PhraseOverlay = ({
   gameRef,
   isPaused,
-  autoTyperWpm,
 }: {
   gameRef: React.RefObject<CosmicDefenseGame | null>;
   isPaused: boolean;
-  autoTyperWpm: number;
 }) => {
+  const [autoTyperWpm, setAutoTyperWpm] = useState(150);
   const [typed, setTyped] = useState<string>("");
   const [phrase, setPhrase] = useState<string>(() => generatePhrase(5));
   const [checkpoint, setCheckpoint] = useState<number>(0);
@@ -270,6 +269,23 @@ export const PhraseOverlay = ({
             }}
           />
         </div>
+      </div>
+      <div
+        className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2"
+        style={{ pointerEvents: "auto" }}
+      >
+        <span className="text-[11px] text-[rgba(255,255,255,0.6)] font-mono whitespace-nowrap">
+          {autoTyperWpm} wpm
+        </span>
+        <input
+          type="range"
+          min={10}
+          max={300}
+          step={10}
+          value={autoTyperWpm}
+          onChange={(e) => setAutoTyperWpm(Number(e.target.value))}
+          style={{ width: 120, accentColor: "rgba(249,226,175,0.8)" }}
+        />
       </div>
     </div>
   );
