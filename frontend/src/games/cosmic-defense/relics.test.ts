@@ -14,7 +14,7 @@ import {
   type EntityState,
 } from './state';
 import { computeRelicEffects, type RelicId } from './relics';
-import { Team, ColorPreset } from './types';
+import { Team, ColorPreset, FireMode } from './types';
 import { ENEMY_CATALOG, FRIENDLY_CATALOG } from './enemyConfig';
 
 function makeState(relics: RelicId[] = []): GameState {
@@ -68,7 +68,7 @@ describe('stellar_core', () => {
 describe('glacial_emitter', () => {
   it('applies an extra freeze stack when an ice ship attacks', () => {
     const state = makeState(['glacial_emitter']);
-    makeAlly(state, { laserDamage: 5, freezeStacks: 2, chargesRequired: 1, projectileDamage: 0 });
+    makeAlly(state, { laserDamage: 5, freezeStacks: 2, chargesRequired: 1, projectileDamage: 0, fireMode: FireMode.Laser });
     const enemy = makeEnemy(state, { health: 100 });
     onCorrectKeystroke(state);
     expect(enemy.freezeStacks).toBe(3);
@@ -78,7 +78,7 @@ describe('glacial_emitter', () => {
 describe('plasma_weave', () => {
   it('applies an extra plasma stack when a plasma ship attacks', () => {
     const state = makeState(['plasma_weave']);
-    makeAlly(state, { laserDamage: 5, plasmaStacksApplied: 2, chargesRequired: 1, projectileDamage: 0 });
+    makeAlly(state, { laserDamage: 5, plasmaStacksApplied: 2, chargesRequired: 1, projectileDamage: 0, fireMode: FireMode.Laser });
     const enemy = makeEnemy(state, { health: 100, plasmaStacks: 0 });
     onCorrectKeystroke(state);
     expect(enemy.plasmaStacks).toBe(3);
