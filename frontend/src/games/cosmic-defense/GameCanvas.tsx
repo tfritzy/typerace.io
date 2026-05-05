@@ -51,7 +51,7 @@ export const GameCanvas = () => {
     if (!game) return;
     if (selectedSlot !== null) {
       game.pause("inspection");
-      return () => game.unpause("inspection");
+      return () => game.unpause();
     }
   }, [selectedSlot]);
 
@@ -60,7 +60,7 @@ export const GameCanvas = () => {
     if (!game) return;
     if (pendingChoice) {
       game.pause("pendingChoice");
-      return () => game.unpause("pendingChoice");
+      return () => game.unpause();
     }
   }, [pendingChoice]);
 
@@ -180,7 +180,7 @@ export const GameCanvas = () => {
     }
 
     game.state.pendingChoice = false;
-    game.unpause("pendingChoice");
+    game.unpause();
     setPendingChoice(false);
   }, [slots]);
 

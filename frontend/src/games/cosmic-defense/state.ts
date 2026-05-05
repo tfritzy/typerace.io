@@ -1221,10 +1221,8 @@ export function pauseGame(state: GameState, reason: string): void {
   state.pauseReason = reason;
 }
 
-export function unpauseGame(state: GameState, reason: string): void {
-  if (state.pauseReason === reason) {
-    state.pauseReason = null;
-  }
+export function unpauseGame(state: GameState): void {
+  state.pauseReason = null;
 }
 
 export function xpForNextLevel(level: number): number {

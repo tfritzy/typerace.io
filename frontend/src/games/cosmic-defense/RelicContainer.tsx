@@ -30,7 +30,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
 
   const handleContinue = useCallback(() => {
     setPendingRelic(null);
-    game?.unpause("relic");
+    game?.unpause();
   }, [game]);
 
   return (

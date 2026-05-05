@@ -101,8 +101,8 @@ export class CosmicDefenseGame {
     pauseGame(this.state, reason);
   }
 
-  unpause(reason: string): void {
-    unpauseGame(this.state, reason);
+  unpause(): void {
+    unpauseGame(this.state);
   }
 
   private update(dt: number): void {
