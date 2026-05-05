@@ -183,26 +183,24 @@ export interface FriendlyConfig {
   explosionRadius: number;
   hitDelay: number;
   damageType: DamageType;
-  burnDuration: number;
-  burnDamagePerTick: number;
 }
 
 export const ENEMY_CATALOG: EnemyConfig[] = ENEMY_SHIP_TYPES.map((_, i) => createEnemyConfigForVirtualTier(i));
 
 export const FRIENDLY_CATALOG: FriendlyConfig[] = [
-  { entityType: "Spur", health: 300, projectileDamage: 40, chargesRequired: 8, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical, burnDuration: 0, burnDamagePerTick: 0 },
-  { entityType: "Ember", health: 200, projectileDamage: 0, chargesRequired: 3, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Burn, burnDuration: 4, burnDamagePerTick: 6 },
-  { entityType: "Corona", health: 150, projectileDamage: 0, chargesRequired: 1, plasmaStacks: 0, laserDamage: 5, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser, burnDuration: 0, burnDamagePerTick: 0 },
-  { entityType: "Pip", health: 150, projectileDamage: 8, chargesRequired: 2, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 2, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical, burnDuration: 0, burnDamagePerTick: 0 },
-  { entityType: "Eagle", health: 200, projectileDamage: 0, chargesRequired: 6, plasmaStacks: 3, laserDamage: 10, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Plasma, burnDuration: 0, burnDamagePerTick: 0 },
-  { entityType: "Needle", health: 200, projectileDamage: 0, chargesRequired: 4, plasmaStacks: 0, laserDamage: 3, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser, burnDuration: 0, burnDamagePerTick: 0 },
-  { entityType: "Flare", health: 300, projectileDamage: 8, chargesRequired: 8, plasmaStacks: 0, laserDamage: 0, freezeStacks: 3, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0, damageType: DamageType.Ice, burnDuration: 0, burnDamagePerTick: 0 },
-  { entityType: "Dart", health: 200, projectileDamage: 0, chargesRequired: 6, plasmaStacks: 2, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0.33, damageType: DamageType.Plasma, burnDuration: 0, burnDamagePerTick: 0 },
-  { entityType: "Moth", health: 200, projectileDamage: 20, chargesRequired: 4, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical, burnDuration: 0, burnDamagePerTick: 0 },
-  { entityType: "Prism", health: 150, projectileDamage: 0, chargesRequired: 2, plasmaStacks: 0, laserDamage: 4, freezeStacks: 2, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Ice, burnDuration: 0, burnDamagePerTick: 0 },
-  { entityType: "Hawk", health: 200, projectileDamage: 10, chargesRequired: 6, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0, damageType: DamageType.Physical, burnDuration: 0, burnDamagePerTick: 0 },
-  { entityType: "Nova", health: 180, projectileDamage: 5, chargesRequired: 5, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 3, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical, burnDuration: 0, burnDamagePerTick: 0 },
-  { entityType: "Lance", health: 400, projectileDamage: 0, chargesRequired: 14, plasmaStacks: 0, laserDamage: 30, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 6, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser, burnDuration: 0, burnDamagePerTick: 0 },
+  { entityType: "Spur", health: 300, projectileDamage: 40, chargesRequired: 8, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
+  { entityType: "Ember", health: 200, projectileDamage: 7, chargesRequired: 3, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Burn },
+  { entityType: "Corona", health: 150, projectileDamage: 0, chargesRequired: 1, plasmaStacks: 0, laserDamage: 5, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser },
+  { entityType: "Pip", health: 150, projectileDamage: 8, chargesRequired: 2, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 2, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
+  { entityType: "Eagle", health: 200, projectileDamage: 0, chargesRequired: 6, plasmaStacks: 3, laserDamage: 10, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Plasma },
+  { entityType: "Needle", health: 200, projectileDamage: 0, chargesRequired: 4, plasmaStacks: 0, laserDamage: 3, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser },
+  { entityType: "Flare", health: 300, projectileDamage: 8, chargesRequired: 8, plasmaStacks: 0, laserDamage: 0, freezeStacks: 3, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0, damageType: DamageType.Ice },
+  { entityType: "Dart", health: 200, projectileDamage: 0, chargesRequired: 6, plasmaStacks: 2, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0.33, damageType: DamageType.Plasma },
+  { entityType: "Moth", health: 200, projectileDamage: 20, chargesRequired: 4, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
+  { entityType: "Prism", health: 150, projectileDamage: 0, chargesRequired: 2, plasmaStacks: 0, laserDamage: 4, freezeStacks: 2, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 2, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Ice },
+  { entityType: "Hawk", health: 200, projectileDamage: 10, chargesRequired: 6, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 120, hitDelay: 0, damageType: DamageType.Physical },
+  { entityType: "Nova", health: 180, projectileDamage: 5, chargesRequired: 5, plasmaStacks: 0, laserDamage: 0, freezeStacks: 0, chainCount: 3, buffMultiplier: 0, fireCount: 1, beamWidth: 0, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Physical },
+  { entityType: "Lance", health: 400, projectileDamage: 0, chargesRequired: 14, plasmaStacks: 0, laserDamage: 30, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, beamWidth: 6, explosionRadius: 0, hitDelay: 0, damageType: DamageType.Laser },
 ];
 
 export const FRIENDLY_CONFIG_MAP = new Map<string, FriendlyConfig>(
@@ -221,7 +219,5 @@ export function getScaledConfig(config: FriendlyConfig, level: number): Friendly
     freezeStacks: config.freezeStacks > 0 ? config.freezeStacks + (level - 1) : 0,
     buffMultiplier: config.buffMultiplier > 0 ? config.buffMultiplier + (level - 1) * 0.5 : 0,
     explosionRadius: config.explosionRadius > 0 ? config.explosionRadius + (level - 1) * 10 : 0,
-    burnDamagePerTick: config.burnDamagePerTick > 0 ? Math.round(config.burnDamagePerTick * mult) : 0,
-    burnDuration: config.burnDuration > 0 ? config.burnDuration + (level - 1) * 0.5 : 0,
   };
 }

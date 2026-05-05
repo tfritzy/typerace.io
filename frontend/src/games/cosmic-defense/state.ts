@@ -7,7 +7,6 @@ import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } f
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
 const PLASMA_DAMAGE_PER_TICK = 1;
-const BURN_TICK_INTERVAL = 0.5;
 const LASER_RANGE = 2200;
 const SCORE_PER_XP = 10;
 const MAX_CHAIN_JUMP_DISTANCE = 300;
@@ -49,9 +48,6 @@ export interface EntityState {
   role: ShipRole | null;
   plasmaStacks: number;
   plasmaStacksApplied: number;
-  burnTimeRemaining: number;
-  burnDamagePerTick: number;
-  burnDurationApplied: number;
   laserDamage: number;
   kills: number;
   damageDealt: number;
@@ -333,9 +329,6 @@ function makeBaseEntity(
     role: null,
     plasmaStacks: 0,
     plasmaStacksApplied: 0,
-    burnTimeRemaining: 0,
-    burnDamagePerTick: 0,
-    burnDurationApplied: 0,
     laserDamage: 0,
     kills: 0,
     damageDealt: 0,
@@ -400,8 +393,6 @@ export function spawnAlliedEntity(
   entity.chargesRequired = config.chargesRequired;
   entity.role = getShipRole(config.entityType);
   entity.plasmaStacksApplied = config.plasmaStacks;
-  entity.burnDurationApplied = scaled.burnDuration;
-  entity.burnDamagePerTick = scaled.burnDamagePerTick;
   entity.laserDamage = scaled.laserDamage;
   entity.level = level;
   entity.freezeStacks = scaled.freezeStacks;
@@ -562,8 +553,7 @@ function dealDamageToEntity(
   state: GameState,
   attacker: EntityState | null,
   target: EntityState,
-  damage: number,
-  isBurn?: boolean
+  damage: number
 ): boolean {
   let effectiveDamage = damage;
   if (attacker?.team === Team.Allied && target.team === Team.Enemy) {
@@ -656,7 +646,7 @@ function dealDamageToEntity(
     if (idx >= 0) removeEntityAt(state, idx);
   }
 
-  state.onDamageDealt.emit({ amount: damage, x: target.x, y: target.y, isBurn });
+  state.onDamageDealt.emit({ amount: damage, x: target.x, y: target.y, isBurn: attacker?.damageType === DamageType.Burn });
 
   return killed;
 }
@@ -719,21 +709,6 @@ function tickPerSecond(state: GameState, dt: number): void {
     if (e.freezeStacks > 0) {
       e.freezeStacks = Math.max(0, e.freezeStacks - 1);
     }
-  }
-}
-
-function tickBurn(state: GameState, dt: number): void {
-  const prevTick = Math.floor((state.time.time - dt) / BURN_TICK_INTERVAL);
-  const curTick = Math.floor(state.time.time / BURN_TICK_INTERVAL);
-  if (curTick <= prevTick) return;
-
-  for (let i = state.entities.length - 1; i >= 0; i--) {
-    const e = state.entities[i];
-    if (e.team !== Team.Enemy || e.burnTimeRemaining <= 0) continue;
-
-    const dmg = e.burnDamagePerTick;
-    e.burnTimeRemaining = Math.max(0, e.burnTimeRemaining - BURN_TICK_INTERVAL);
-    if (dealDamageToEntity(state, null, e, dmg, true)) continue;
   }
 }
 
@@ -835,10 +810,6 @@ function tickPendingShots(state: GameState): void {
         const dy = other.y - shot.targetY;
         if (dx * dx + dy * dy > r2) continue;
         if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
-        if (shooter.burnDurationApplied > 0) {
-          other.burnTimeRemaining = Math.max(other.burnTimeRemaining, shooter.burnDurationApplied);
-          other.burnDamagePerTick = Math.max(other.burnDamagePerTick, shooter.burnDamagePerTick);
-        }
         if (shooter.freezeStacks > 0) applyFreezeStacks(state, other, shooter.freezeStacks);
         if (dmg > 0) dealDamageToEntity(state, shooter, other, dmg);
       }
@@ -846,10 +817,6 @@ function tickPendingShots(state: GameState): void {
       const target = shot.targetEntityId !== null ? state.entityById.get(shot.targetEntityId) : null;
       if (target) {
         if (shooter.plasmaStacksApplied > 0) target.plasmaStacks += shooter.plasmaStacksApplied;
-        if (shooter.burnDurationApplied > 0) {
-          target.burnTimeRemaining = Math.max(target.burnTimeRemaining, shooter.burnDurationApplied);
-          target.burnDamagePerTick = Math.max(target.burnDamagePerTick, shooter.burnDamagePerTick);
-        }
         spawnExplosion(state, shooter.entityType, target.x, target.y);
         dealDamageToEntity(state, shooter, target, dmg);
       }
@@ -864,7 +831,6 @@ export function updateState(state: GameState, dt: number): void {
   if (state.spawner.paused) return;
 
   tickPerSecond(state, dt);
-  tickBurn(state, dt);
   tickEntities(state, dt);
   checkCollisions(state);
   tickLaserBeams(state);

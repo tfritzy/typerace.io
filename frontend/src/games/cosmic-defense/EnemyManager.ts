@@ -141,13 +141,7 @@ export class EnemyManager {
       display.y = entity.y;
       entity.displayRotation = approachAngle(entity.displayRotation, entity.rotation, maxStep);
       display.rotation = entity.displayRotation;
-      if (entity.burnTimeRemaining > 0) {
-        display.tint = 0xff8800;
-      } else if (entity.freezeStacks > 0) {
-        display.tint = 0x88bbff;
-      } else {
-        display.tint = 0xffffff;
-      }
+      display.tint = entity.freezeStacks > 0 ? 0x88bbff : 0xffffff;
 
       this.updateHealthBar(entity);
     }

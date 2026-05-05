@@ -40,7 +40,7 @@ export interface ShipBlueprint {
 
 export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   { entityType: "Spur", colorPreset: ColorPreset.Preset1, role: "sniper", description: "Devastating long-range strikes" },
-  { entityType: "Ember", colorPreset: ColorPreset.Preset1, role: "shooter", description: "Sets enemies on fire" },
+  { entityType: "Ember", colorPreset: ColorPreset.Preset1, role: "shooter", description: "Rapid light fire" },
   { entityType: "Corona", colorPreset: ColorPreset.Preset1, role: "laser", description: "Focused energy beam" },
   { entityType: "Pip", colorPreset: ColorPreset.Preset1, role: "dual_shot", description: "Twin-barrel barrage" },
   { entityType: "Eagle", colorPreset: ColorPreset.Preset1, role: "plasma_beam", description: "Burning laser beam" },
