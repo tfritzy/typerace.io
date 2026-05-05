@@ -82,7 +82,7 @@ export interface PendingShot {
   targetX: number;
   targetY: number;
   targetEntityId: number | null;
-  isLaser: boolean;
+  fireMode: FireMode;
 }
 
 export interface ExplosionState {
@@ -813,7 +813,7 @@ function tickPendingShots(state: GameState): void {
     const shooter = state.entityById.get(shot.shooterId);
     if (!shooter) continue;
 
-    if (shot.isLaser) {
+    if (shot.fireMode === FireMode.Laser) {
       executeLaserShot(state, shooter);
       continue;
     }
@@ -902,7 +902,7 @@ function fireShot(state: GameState, e: EntityState): void {
     targetX: target.x,
     targetY: target.y,
     targetEntityId: target.entity?.id ?? null,
-    isLaser: false,
+    fireMode: FireMode.Projectile,
   });
 }
 
@@ -916,7 +916,7 @@ function fireLaser(state: GameState, e: EntityState): void {
     targetX: target.x,
     targetY: target.y,
     targetEntityId: target.entity?.id ?? null,
-    isLaser: true,
+    fireMode: FireMode.Laser,
   });
 }
 
