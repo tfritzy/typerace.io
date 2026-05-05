@@ -95,7 +95,6 @@ export interface ExplosionState {
 export interface SpawnState {
   elapsed: number;
   spawnAccumulator: number;
-  paused: boolean;
   currentWave: number;
   enemiesSpawnedInWave: number;
   enemiesInWave: number;
@@ -204,6 +203,7 @@ export interface GameState {
   planetHealthFromKills: number;
   level: number;
   pendingChoice: boolean;
+  paused: boolean;
   relics: RelicId[];
   relicEffects: RelicEffects;
   perfectWordStreak: number;
@@ -253,7 +253,6 @@ export function createGameState(): GameState {
     spawner: {
       elapsed: 0,
       spawnAccumulator: 0,
-      paused: true,
       currentWave: 0,
       enemiesSpawnedInWave: 0,
       waveShipTypeIndex: INITIAL_WAVE_SHIP_TYPE_INDEX,
@@ -266,6 +265,7 @@ export function createGameState(): GameState {
     planetHealthFromKills: 0,
     level: 1,
     pendingChoice: true,
+    paused: true,
     relics: [],
     relicEffects: computeRelicEffects([]),
     perfectWordStreak: 0,
@@ -645,7 +645,7 @@ function dealDamageToEntity(
           const relicIndex = (state.spawner.currentWave - 1) % unowned.length;
           const relicId = unowned[relicIndex].id;
           addRelic(state, relicId);
-          state.spawner.paused = true;
+          pauseGame(state);
           state.onRelicDropped.emit(relicId);
         }
       }
@@ -847,8 +847,7 @@ export function updateState(state: GameState, dt: number): void {
   state.time.deltaTime = dt;
   state.time.time += dt;
 
-  if (state.spawner.paused) return;
-
+  if (state.paused) return;
   tickPerSecond(state, dt);
   tickHalfSecond(state, dt);
   tickEntities(state, dt);
@@ -1191,9 +1190,7 @@ function spawnWaveEnemy(state: GameState, startTier: number, weights: number[]):
 }
 
 export function updateSpawner(state: GameState, dt: number): void {
-  if (state.spawner.paused) return;
-
-  state.spawner.elapsed += dt;
+  if (state.paused) return;
 
   const spawner = state.spawner;
   const remaining = spawner.enemiesInWave - spawner.enemiesSpawnedInWave;
@@ -1238,8 +1235,12 @@ export function updateSpawner(state: GameState, dt: number): void {
   }
 }
 
-export function setSpawnerPaused(state: GameState, paused: boolean): void {
-  state.spawner.paused = paused;
+export function pauseGame(state: GameState): void {
+  state.paused = true;
+}
+
+export function unpauseGame(state: GameState): void {
+  state.paused = false;
 }
 
 export function xpForNextLevel(level: number): number {
@@ -1254,7 +1255,7 @@ export function awardXP(state: GameState, amount: number): void {
     state.xp -= needed;
     state.level++;
     state.pendingChoice = true;
-    state.spawner.paused = true;
+    pauseGame(state);
     state.onLevelUp.emit();
   }
   state.onXPChanged.emit({ xp: state.xp, level: state.level, xpNeeded: xpForNextLevel(state.level) });
