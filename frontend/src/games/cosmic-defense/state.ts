@@ -65,6 +65,7 @@ export interface EntityState {
   isBoss: boolean;
   damageType: DamageType;
   fireMode: FireMode;
+  projectileColor: number;
 }
 
 export interface ProjectileState {
@@ -350,6 +351,7 @@ function makeBaseEntity(
     isBoss: false,
     damageType: DamageType.Physical,
     fireMode: FireMode.Projectile,
+    projectileColor: 0xffd700,
   };
 }
 
@@ -409,6 +411,7 @@ export function spawnAlliedEntity(
   entity.hitDelay = config.hitDelay;
   entity.damageType = config.damageType;
   entity.fireMode = config.fireMode;
+  entity.projectileColor = config.projectileColor;
   addEntity(state, entity);
   return entity.id;
 }
@@ -948,13 +951,6 @@ function fireLaser(state: GameState, e: EntityState): void {
     if (!piercing) break;
   }
 
-  const beamColor =
-    e.role === "plasma_beam"  ? 0xff4422 :
-    e.role === "ice_beam"     ? 0x89b4fa :
-    e.role === "laser"        ? 0xb060e0 :
-    e.role === "pierce_laser" ? 0x50e878 :
-    0x89b4fa;
-
   state.laserBeams.push({
     id: state.nextId++,
     x1: startX,
@@ -963,7 +959,7 @@ function fireLaser(state: GameState, e: EntityState): void {
     y2: endY,
     time: state.time.time,
     width: e.beamWidth,
-    color: beamColor,
+    color: e.projectileColor,
   });
 }
 

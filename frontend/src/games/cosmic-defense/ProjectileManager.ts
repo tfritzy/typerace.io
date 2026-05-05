@@ -1,6 +1,5 @@
 import { BlurFilter, Container, Graphics } from "pixi.js";
 import type { GameState } from "./state";
-import type { EntityType } from "./types";
 
 const PROJECTILE_RADIUS = 6;
 const GLOW_BLUR_STRENGTH = 10;
@@ -13,41 +12,8 @@ const GLOW_INNER_ALPHA = 0.6;
 const CORE_HIGHLIGHT_RADIUS_MULTIPLIER = 0.45;
 const CORE_HIGHLIGHT_COLOR = 0xffffff;
 
-const PROJECTILE_COLORS: Partial<Record<EntityType, number>> = {
-  Pulse: 0xffffaa,
-  Buckler: 0x99aacc,
-  Pip: 0x88bbff,
-  Flea: 0x99ff88,
-  Needle: 0x00ffee,
-  Bolt: 0xffee00,
-  Cricket: 0xaaff44,
-  Robin: 0xff9933,
-  Sparrow: 0xffcc44,
-  Hornet: 0xff8800,
-  Dart: 0xcc44ff,
-  Scout: 0x4488ff,
-  Hawk: 0xff5500,
-  Dynamo: 0x0088ff,
-  Harrier: 0xff4400,
-  Raptor: 0xffaa00,
-  Eagle: 0xff6600,
-  Corsair: 0xff2233,
-  Vanguard: 0x4455ff,
-  Titan: 0xcc1122,
-  Dreadnought: 0xaa0011,
-  Leviathan: 0x880022,
-  Flagship: 0xffcc00,
-  Spur: 0xffdd00,
-  Ember: 0xff7700,
-  Moth: 0x44ff99,
-  Flare: 0x88eeff,
-  Nova: 0x99ff44,
-};
-
 function getProjectileColor(state: GameState, shooterId: number): number {
-  const shooter = state.entityById.get(shooterId);
-  if (!shooter) return DEFAULT_COLOR;
-  return PROJECTILE_COLORS[shooter.entityType] ?? DEFAULT_COLOR;
+  return state.entityById.get(shooterId)?.projectileColor ?? DEFAULT_COLOR;
 }
 
 export class ProjectileManager {
