@@ -50,10 +50,10 @@ export const GameCanvas = () => {
     const game = gameRef.current;
     if (!game) return;
     if (selectedSlot !== null) {
-      game.addPauseReason("inspection");
-      return () => game.removePauseReason("inspection");
+      game.pause("inspection");
+      return () => game.unpause("inspection");
     } else {
-      game.removePauseReason("inspection");
+      game.unpause("inspection");
     }
   }, [selectedSlot]);
 
@@ -61,10 +61,10 @@ export const GameCanvas = () => {
     const game = gameRef.current;
     if (!game) return;
     if (pendingChoice) {
-      game.addPauseReason("pendingChoice");
-      return () => game.removePauseReason("pendingChoice");
+      game.pause("pendingChoice");
+      return () => game.unpause("pendingChoice");
     } else {
-      game.removePauseReason("pendingChoice");
+      game.unpause("pendingChoice");
     }
   }, [pendingChoice]);
 
@@ -184,7 +184,7 @@ export const GameCanvas = () => {
     }
 
     game.state.pendingChoice = false;
-    game.removePauseReason("pendingChoice");
+    game.unpause("pendingChoice");
     setPendingChoice(false);
   }, [slots]);
 

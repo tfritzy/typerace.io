@@ -197,7 +197,7 @@ export interface GameState {
   planetHealthFromKills: number;
   level: number;
   pendingChoice: boolean;
-  pauseReasons: Set<string>;
+  pauseReason: string | null;
   relics: RelicId[];
   relicEffects: RelicEffects;
   perfectWordStreak: number;
@@ -259,7 +259,7 @@ export function createGameState(): GameState {
     planetHealthFromKills: 0,
     level: 1,
     pendingChoice: true,
-    pauseReasons: new Set(["pendingChoice"]),
+    pauseReason: "pendingChoice",
     relics: [],
     relicEffects: computeRelicEffects([]),
     perfectWordStreak: 0,
@@ -636,7 +636,7 @@ function dealDamageToEntity(
           const relicIndex = (state.spawner.currentWave - 1) % unowned.length;
           const relicId = unowned[relicIndex].id;
           addRelic(state, relicId);
-          addPauseReason(state, "relic");
+          pauseGame(state, "relic");
           state.onRelicDropped.emit(relicId);
         }
       }
@@ -827,7 +827,7 @@ export function updateState(state: GameState, dt: number): void {
   state.time.deltaTime = dt;
   state.time.time += dt;
 
-  if (state.pauseReasons.size > 0) return;
+  if (state.pauseReason !== null) return;
 
   tickPerSecond(state, dt);
   tickEntities(state, dt);
@@ -1170,7 +1170,7 @@ function spawnWaveEnemy(state: GameState, startTier: number, weights: number[]):
 }
 
 export function updateSpawner(state: GameState, dt: number): void {
-  if (state.pauseReasons.size > 0) return;
+  if (state.pauseReason !== null) return;
 
   state.spawner.elapsed += dt;
 
@@ -1217,12 +1217,14 @@ export function updateSpawner(state: GameState, dt: number): void {
   }
 }
 
-export function addPauseReason(state: GameState, reason: string): void {
-  state.pauseReasons.add(reason);
+export function pauseGame(state: GameState, reason: string): void {
+  state.pauseReason = reason;
 }
 
-export function removePauseReason(state: GameState, reason: string): void {
-  state.pauseReasons.delete(reason);
+export function unpauseGame(state: GameState, reason: string): void {
+  if (state.pauseReason === reason) {
+    state.pauseReason = null;
+  }
 }
 
 export function xpForNextLevel(level: number): number {
@@ -1237,7 +1239,7 @@ export function awardXP(state: GameState, amount: number): void {
     state.xp -= needed;
     state.level++;
     state.pendingChoice = true;
-    addPauseReason(state, "pendingChoice");
+    pauseGame(state, "pendingChoice");
     state.onLevelUp.emit();
   }
   state.onXPChanged.emit({ xp: state.xp, level: state.level, xpNeeded: xpForNextLevel(state.level) });
