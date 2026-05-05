@@ -106,16 +106,15 @@ export class CosmicDefenseGame {
   }
 
   private update(dt: number): void {
-    if (this.state.pauseReason === null) {
-      updateState(this.state, dt);
-      this.enemyManager.update(this.state, dt);
-      this.laserBeamManager.update(this.state);
-      this.projectileManager.update(this.state);
-      this.shipManager.update(this.state, dt);
-      this.gemManager.update(this.state, dt);
-    }
     this.explosionManager.update(this.state);
     this.damageNumberManager.update(dt);
+    if (this.state.pauseReason !== null) return;
+    updateState(this.state, dt);
+    this.enemyManager.update(this.state, dt);
+    this.laserBeamManager.update(this.state);
+    this.projectileManager.update(this.state);
+    this.shipManager.update(this.state, dt);
+    this.gemManager.update(this.state, dt);
   }
 
   destroy(): void {
