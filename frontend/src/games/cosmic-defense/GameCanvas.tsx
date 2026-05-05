@@ -49,8 +49,20 @@ export const GameCanvas = () => {
   useEffect(() => {
     const game = gameRef.current;
     if (!game) return;
-    game.setPaused(selectedSlot !== null || pendingChoice);
-  }, [selectedSlot, pendingChoice]);
+    if (selectedSlot !== null) {
+      game.pause();
+      return () => game.unpause();
+    }
+  }, [selectedSlot]);
+
+  useEffect(() => {
+    const game = gameRef.current;
+    if (!game) return;
+    if (pendingChoice) {
+      game.pause();
+      return () => game.unpause();
+    }
+  }, [pendingChoice]);
 
   useEffect(() => {
     const div = containerRef.current;
@@ -168,7 +180,7 @@ export const GameCanvas = () => {
     }
 
     game.state.pendingChoice = false;
-    game.state.spawner.paused = false;
+    game.unpause();
     setPendingChoice(false);
   }, [slots]);
 
