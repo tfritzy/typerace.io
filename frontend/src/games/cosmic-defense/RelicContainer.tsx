@@ -10,19 +10,28 @@ interface RelicContainerProps {
 export const RelicContainer = ({ game }: RelicContainerProps) => {
   const [pendingRelic, setPendingRelic] = useState<RelicId | null>(null);
   const [collectedRelics, setCollectedRelics] = useState<RelicId[]>([]);
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
     if (!game) {
       setCollectedRelics([]);
       setPendingRelic(null);
+      setStreak(0);
       return;
     }
     setCollectedRelics([...game.state.relics]);
-    const unsub = game.state.onRelicDropped.subscribe((relicId) => {
+    setStreak(game.state.perfectWordStreak);
+    const unsubRelic = game.state.onRelicDropped.subscribe((relicId) => {
       setCollectedRelics([...game.state.relics]);
       setPendingRelic(relicId);
     });
-    return unsub;
+    const unsubStreak = game.state.onStreakChanged.subscribe((s) => {
+      setStreak(s);
+    });
+    return () => {
+      unsubRelic();
+      unsubStreak();
+    };
   }, [game]);
 
   const handleContinue = useCallback(() => {
@@ -36,6 +45,9 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
         {collectedRelics.map((relicId) => {
           const relic = RELIC_MAP.get(relicId);
           if (!relic) return null;
+          const streakBonus = relicId === "flow_state"
+            ? Math.round(Math.min(25, streak * (relic.effects.streakDamageBonus ?? 0.01) * 100))
+            : null;
           return (
             <div
               key={relicId}
@@ -47,7 +59,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
                 title={`${relic.name}: ${relic.description}`}
                 style={{ width: 22, height: 22, imageRendering: "pixelated" }}
               />
-              {relic.displayValue && (
+              {streakBonus !== null && (
                 <span
                   style={{
                     position: "absolute",
@@ -64,7 +76,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {relic.displayValue}
+                  +{streakBonus}%
                 </span>
               )}
             </div>

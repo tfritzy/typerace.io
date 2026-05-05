@@ -211,6 +211,7 @@ export interface GameState {
   onBossSpawned: GameDataEvent<BossSpawnedData>;
   onBossDefeated: GameEvent;
   onRelicDropped: GameDataEvent<RelicId>;
+  onStreakChanged: GameDataEvent<number>;
 }
 
 let gameState: GameState | null = null;
@@ -273,6 +274,7 @@ export function createGameState(): GameState {
     onBossSpawned: new GameDataEvent<BossSpawnedData>(),
     onBossDefeated: new GameEvent(),
     onRelicDropped: new GameDataEvent<RelicId>(),
+    onStreakChanged: new GameDataEvent<number>(),
   };
 
   gameState = state;
@@ -1040,6 +1042,7 @@ export function onCorrectKeystroke(state: GameState): void {
 
 export function onPerfectWord(state: GameState): void {
   state.perfectWordStreak++;
+  state.onStreakChanged.emit(state.perfectWordStreak);
   if (state.relicEffects.planetRegenPerPerfectWord > 0) {
     state.planetHealth = Math.min(state.maxPlanetHealth, state.planetHealth + state.relicEffects.planetRegenPerPerfectWord);
   }
@@ -1085,6 +1088,7 @@ export function onPerfectWord(state: GameState): void {
 
 export function onWordWithError(state: GameState): void {
   state.perfectWordStreak = 0;
+  state.onStreakChanged.emit(0);
 }
 
 function addRelic(state: GameState, relicId: RelicId): void {
