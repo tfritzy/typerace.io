@@ -52,8 +52,6 @@ export const GameCanvas = () => {
     if (selectedSlot !== null) {
       game.pause("inspection");
       return () => game.unpause("inspection");
-    } else {
-      game.unpause("inspection");
     }
   }, [selectedSlot]);
 
@@ -63,8 +61,6 @@ export const GameCanvas = () => {
     if (pendingChoice) {
       game.pause("pendingChoice");
       return () => game.unpause("pendingChoice");
-    } else {
-      game.unpause("pendingChoice");
     }
   }, [pendingChoice]);
 
