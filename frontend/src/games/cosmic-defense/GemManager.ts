@@ -94,13 +94,13 @@ export class GemManager {
 
   private spawn(x: number, y: number, expectedXp: number): void {
     const gemType = rollGemType(expectedXp);
-    const s = gemType.size / 2;
+    const radius = gemType.size / 2;
     const color = gemType.colors.fill;
 
     const glow = new Graphics();
-    glow.circle(0, 0, s * GLOW_OUTER_RADIUS_MULTIPLIER);
+    glow.circle(0, 0, radius * GLOW_OUTER_RADIUS_MULTIPLIER);
     glow.fill({ color, alpha: GLOW_OUTER_ALPHA });
-    glow.circle(0, 0, s * GLOW_INNER_RADIUS_MULTIPLIER);
+    glow.circle(0, 0, radius * GLOW_INNER_RADIUS_MULTIPLIER);
     glow.fill({ color, alpha: GLOW_INNER_ALPHA });
     glow.x = x;
     glow.y = y;
@@ -108,13 +108,13 @@ export class GemManager {
     this.glowLayer.addChild(glow);
 
     const core = new Graphics();
-    core.moveTo(0, -s);
-    core.lineTo(s * 0.65, 0);
-    core.lineTo(0, s);
-    core.lineTo(-s * 0.65, 0);
+    core.moveTo(0, -radius);
+    core.lineTo(radius * 0.65, 0);
+    core.lineTo(0, radius);
+    core.lineTo(-radius * 0.65, 0);
     core.closePath();
     core.fill({ color });
-    core.circle(0, 0, s * CORE_HIGHLIGHT_RADIUS_MULTIPLIER);
+    core.circle(0, 0, radius * CORE_HIGHLIGHT_RADIUS_MULTIPLIER);
     core.fill({ color: 0xffffff, alpha: 0.7 });
     core.x = x;
     core.y = y;
@@ -191,8 +191,9 @@ export class GemManager {
       }
 
       const easeInDur = 0.15;
+      const progress = gem.elapsed / easeInDur;
       const scale = gem.elapsed < easeInDur
-        ? gem.elapsed / easeInDur * (2 - gem.elapsed / easeInDur)
+        ? progress * (2 - progress)
         : 1;
       gem.glow.scale.set(scale);
       gem.core.scale.set(scale);
