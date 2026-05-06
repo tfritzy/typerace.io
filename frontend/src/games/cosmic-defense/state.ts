@@ -892,17 +892,11 @@ export function updateState(state: GameState, dt: number): void {
 
   if (state.paused) return;
   tickPerSecond(state, dt);
-  if (state.paused) return;
   tickHalfSecond(state, dt);
-  if (state.paused) return;
   tickEntities(state, dt);
-  if (state.paused) return;
   checkCollisions(state);
-  if (state.paused) return;
   tickLaserBeams(state);
-  if (state.paused) return;
   tickPendingShots(state);
-  if (state.paused) return;
   tickProjectiles(state, dt);
 }
 
