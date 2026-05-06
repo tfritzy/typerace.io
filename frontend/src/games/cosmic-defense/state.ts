@@ -699,6 +699,7 @@ function tickHalfSecond(state: GameState, dt: number): void {
   if (curHalf <= prevHalf) return;
 
   for (let i = state.entities.length - 1; i >= 0; i--) {
+    if (state.paused) break;
     const e = state.entities[i];
     if (e.team !== Team.Enemy) continue;
 
@@ -891,11 +892,17 @@ export function updateState(state: GameState, dt: number): void {
 
   if (state.paused) return;
   tickPerSecond(state, dt);
+  if (state.paused) return;
   tickHalfSecond(state, dt);
+  if (state.paused) return;
   tickEntities(state, dt);
+  if (state.paused) return;
   checkCollisions(state);
+  if (state.paused) return;
   tickLaserBeams(state);
+  if (state.paused) return;
   tickPendingShots(state);
+  if (state.paused) return;
   tickProjectiles(state, dt);
 }
 
