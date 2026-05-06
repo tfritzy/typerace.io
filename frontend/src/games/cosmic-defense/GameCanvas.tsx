@@ -261,7 +261,7 @@ export const GameCanvas = () => {
           </div>
         </div>
         {bossApproaching && (
-          <div className="absolute top-20 left-1/2 z-20 -translate-x-1/2 rounded-lg border border-[#f9e2af] bg-[rgba(17,17,27,0.78)] px-5 py-3 text-center shadow-[0_0_28px_rgba(249,226,175,0.28)]">
+          <div className="absolute top-20 left-1/2 z-[1] -translate-x-1/2 rounded-lg border border-[#f9e2af] bg-[rgba(17,17,27,0.78)] px-5 py-3 text-center shadow-[0_0_28px_rgba(249,226,175,0.28)]" style={{ pointerEvents: "none" }}>
             <div className="text-[10px] uppercase tracking-[0.36em] text-[#fab387]">Warning</div>
             <div className="mt-1 text-[16px] font-bold uppercase tracking-[0.08em] text-[#f9e2af]">
               large disturbance in warp space detected
@@ -271,7 +271,7 @@ export const GameCanvas = () => {
         {bossEntityIds.length > 0 && gameRef.current && (() => {
           const gameState = gameRef.current.state;
           return (
-            <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-col">
+            <div className="absolute bottom-0 left-0 right-0 z-[1] flex flex-col" style={{ pointerEvents: "none" }}>
               {bossEntityIds.map((id) => (
                 <BossHealthBar key={id} state={gameState} entityId={id} />
               ))}
