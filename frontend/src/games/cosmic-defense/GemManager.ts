@@ -1,10 +1,6 @@
 import { BlurFilter, Container, Graphics } from "pixi.js";
 import { awardXP, type EntityDeathData, type GameState } from "./state";
 
-const POP_SPEED = 100;
-const POP_DURATION = 0.3;
-const GRAVITY = 200;
-const HOVER_DURATION = 1.5;
 const GEM_MAX_LIFE = 12.0;
 const COLLECTION_DIST = 8;
 const LERP_START = 0.5;
@@ -62,11 +58,7 @@ interface ActiveGem {
   elapsed: number;
   x: number;
   y: number;
-  vx: number;
-  vy: number;
   xpAmount: number;
-  hoverX: number;
-  hoverY: number;
 }
 
 export class GemManager {
@@ -121,20 +113,13 @@ export class GemManager {
     core.scale.set(0);
     this.coreLayer.addChild(core);
 
-    const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.8;
-    const speed = POP_SPEED * (0.7 + Math.random() * 0.6);
-
     this.active.push({
       glow,
       core,
       elapsed: 0,
       x,
       y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
       xpAmount: gemType.xp,
-      hoverX: x,
-      hoverY: y,
     });
   }
 
@@ -150,45 +135,25 @@ export class GemManager {
         continue;
       }
 
-      if (gem.elapsed < POP_DURATION) {
-        gem.vy += GRAVITY * dt;
-        gem.x += gem.vx * dt;
-        gem.y += gem.vy * dt;
-        gem.hoverX = gem.x;
-        gem.hoverY = gem.y;
-        gem.glow.x = gem.x;
-        gem.glow.y = gem.y;
-        gem.core.x = gem.x;
-        gem.core.y = gem.y;
-      } else if (gem.elapsed < POP_DURATION + HOVER_DURATION) {
-        const hoverT = gem.elapsed - POP_DURATION;
-        const displayY = gem.hoverY + Math.sin(hoverT * Math.PI * 2.5) * 4;
-        gem.glow.x = gem.hoverX;
-        gem.glow.y = displayY;
-        gem.core.x = gem.hoverX;
-        gem.core.y = displayY;
-      } else {
-        const dx = TARGET_X - gem.x;
-        const dy = TARGET_Y - gem.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+      const dx = TARGET_X - gem.x;
+      const dy = TARGET_Y - gem.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist < COLLECTION_DIST) {
-          awardXP(state, gem.xpAmount);
-          gem.glow.destroy();
-          gem.core.destroy();
-          this.active.splice(i, 1);
-          continue;
-        }
-
-        const homingTime = gem.elapsed - POP_DURATION - HOVER_DURATION;
-        const t = 1 - Math.exp(-dt * (LERP_START + homingTime * LERP_END));
-        gem.x += dx * t;
-        gem.y += dy * t;
-        gem.glow.x = gem.x;
-        gem.glow.y = gem.y;
-        gem.core.x = gem.x;
-        gem.core.y = gem.y;
+      if (dist < COLLECTION_DIST) {
+        awardXP(state, gem.xpAmount);
+        gem.glow.destroy();
+        gem.core.destroy();
+        this.active.splice(i, 1);
+        continue;
       }
+
+      const t = 1 - Math.exp(-dt * (LERP_START + gem.elapsed * LERP_END));
+      gem.x += dx * t;
+      gem.y += dy * t;
+      gem.glow.x = gem.x;
+      gem.glow.y = gem.y;
+      gem.core.x = gem.x;
+      gem.core.y = gem.y;
 
       const easeInDur = 0.15;
       const progress = gem.elapsed / easeInDur;
