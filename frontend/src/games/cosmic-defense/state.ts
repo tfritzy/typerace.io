@@ -58,7 +58,7 @@ export interface EntityState {
   buffMultiplier: number;
   buffedNextAttack: boolean;
   fireCount: number;
-  beamWidth: number;
+  projectileSize: number;
   explosionRadius: number;
   hitDelay: number;
   sizeScale: number;
@@ -75,7 +75,6 @@ export interface ProjectileState {
   vx: number;
   vy: number;
   shooterId: number;
-  damage: number;
 }
 
 export interface PendingShot {
@@ -344,7 +343,7 @@ function makeBaseEntity(
     buffMultiplier: 0,
     buffedNextAttack: false,
     fireCount: 1,
-    beamWidth: 0,
+    projectileSize: 5,
     explosionRadius: 0,
     hitDelay: 0,
     sizeScale: 1,
@@ -406,7 +405,7 @@ export function spawnAlliedEntity(
   entity.chainCount = scaled.chainCount;
   entity.buffMultiplier = scaled.buffMultiplier;
   entity.fireCount = config.fireCount;
-  entity.beamWidth = config.beamWidth;
+  entity.projectileSize = config.projectileSize;
   entity.explosionRadius = scaled.explosionRadius;
   entity.hitDelay = config.hitDelay;
   entity.damageType = config.damageType;
@@ -821,7 +820,6 @@ function tickPendingShots(state: GameState): void {
       vx: (dx / dist) * PROJECTILE_SPEED,
       vy: (dy / dist) * PROJECTILE_SPEED,
       shooterId: shooter.id,
-      damage: shooter.projectileDamage,
     });
   }
 }
@@ -965,7 +963,7 @@ function fireLaser(state: GameState, e: EntityState): void {
 
   const dmg = getEffectiveDamage(state, e);
   const searchRange = piercing ? LASER_RANGE : len + 20;
-  const extraHitRadius = e.beamWidth * 5;
+  const extraHitRadius = e.projectileSize * 5;
 
   for (let i = state.entities.length - 1; i >= 0; i--) {
     const other = state.entities[i];
@@ -993,7 +991,7 @@ function fireLaser(state: GameState, e: EntityState): void {
     x2: endX,
     y2: endY,
     time: state.time.time,
-    width: e.beamWidth,
+    width: e.projectileSize,
     color: e.projectileColor,
   });
 }
