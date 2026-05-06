@@ -12,7 +12,7 @@ const SCORE_PER_XP = 10;
 const MAX_CHAIN_JUMP_DISTANCE = 300;
 const STREAK_MILESTONE_INTERVAL = 5;
 const DEATH_EXPLOSION_RADIUS = 100;
-export const PROJECTILE_SPEED = 2400;
+export const PROJECTILE_SPEED = 1600;
 
 export enum TargetingMode {
   NearestToPlanet = 0,
@@ -75,6 +75,7 @@ export interface ProjectileState {
   vx: number;
   vy: number;
   shooterId: number;
+  damage: number;
 }
 
 export interface PendingShot {
@@ -820,6 +821,7 @@ function tickPendingShots(state: GameState): void {
       vx: (dx / dist) * PROJECTILE_SPEED,
       vy: (dy / dist) * PROJECTILE_SPEED,
       shooterId: shooter.id,
+      damage: shooter.projectileDamage,
     });
   }
 }

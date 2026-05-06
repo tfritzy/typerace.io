@@ -2,6 +2,9 @@ import { BlurFilter, Container, Graphics } from "pixi.js";
 import type { GameState } from "./state";
 
 const PROJECTILE_RADIUS = 6;
+const REFERENCE_DAMAGE = 15;
+const MIN_PROJECTILE_RADIUS = 3;
+const MAX_PROJECTILE_RADIUS = 9;
 const GLOW_BLUR_STRENGTH = 10;
 const GLOW_BLUR_QUALITY = 3;
 const DEFAULT_COLOR = 0xffd700;
@@ -11,6 +14,11 @@ const GLOW_OUTER_ALPHA = 0.35;
 const GLOW_INNER_ALPHA = 0.6;
 const CORE_HIGHLIGHT_RADIUS_MULTIPLIER = 0.45;
 const CORE_HIGHLIGHT_COLOR = 0xffffff;
+
+function getProjectileRadius(damage: number): number {
+  const scaled = PROJECTILE_RADIUS * Math.sqrt(damage / REFERENCE_DAMAGE);
+  return Math.max(MIN_PROJECTILE_RADIUS, Math.min(MAX_PROJECTILE_RADIUS, scaled));
+}
 
 function getProjectileColor(state: GameState, shooterId: number): number {
   return state.entityById.get(shooterId)?.projectileColor ?? DEFAULT_COLOR;
@@ -43,20 +51,21 @@ export class ProjectileManager {
       let core = this.coreObjects.get(proj.id);
       if (!glow || !core) {
         const color = getProjectileColor(state, proj.shooterId);
+        const radius = getProjectileRadius(proj.damage);
         if (!glow) {
           glow = new Graphics();
-          glow.circle(0, 0, PROJECTILE_RADIUS * GLOW_OUTER_RADIUS_MULTIPLIER);
+          glow.circle(0, 0, radius * GLOW_OUTER_RADIUS_MULTIPLIER);
           glow.fill({ color, alpha: GLOW_OUTER_ALPHA });
-          glow.circle(0, 0, PROJECTILE_RADIUS * GLOW_INNER_RADIUS_MULTIPLIER);
+          glow.circle(0, 0, radius * GLOW_INNER_RADIUS_MULTIPLIER);
           glow.fill({ color, alpha: GLOW_INNER_ALPHA });
           this.glowContainer.addChild(glow);
           this.glowObjects.set(proj.id, glow);
         }
         if (!core) {
           core = new Graphics();
-          core.circle(0, 0, PROJECTILE_RADIUS);
+          core.circle(0, 0, radius);
           core.fill({ color });
-          core.circle(0, 0, PROJECTILE_RADIUS * CORE_HIGHLIGHT_RADIUS_MULTIPLIER);
+          core.circle(0, 0, radius * CORE_HIGHLIGHT_RADIUS_MULTIPLIER);
           core.fill({ color: CORE_HIGHLIGHT_COLOR });
           this.coreContainer.addChild(core);
           this.coreObjects.set(proj.id, core);
