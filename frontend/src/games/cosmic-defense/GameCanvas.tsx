@@ -39,6 +39,7 @@ export const GameCanvas = () => {
   const [totalKills, setTotalKills] = useState(0);
   const [bossApproaching, setBossApproaching] = useState(false);
   const [bossEntityIds, setBossEntityIds] = useState<number[]>([]);
+  const [gamePaused, setGamePaused] = useState(true);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -86,6 +87,7 @@ export const GameCanvas = () => {
     let unsubBossApproaching: (() => void) | null = null;
     let unsubBossSpawned: (() => void) | null = null;
     let unsubBossDefeated: (() => void) | null = null;
+    let unsubPauseStateChanged: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -96,6 +98,7 @@ export const GameCanvas = () => {
         gameRef.current = game;
         setShipPreviews(game.shipPreviews);
         setPendingChoice(game.state.pendingChoice);
+        setGamePaused(game.state.paused);
         setLevel(game.state.level);
         setXp(game.state.xp);
         setTotalKills(game.state.totalKills);
@@ -126,6 +129,10 @@ export const GameCanvas = () => {
           if (cancelled) return;
           setBossEntityIds((prev) => prev.filter((id) => id !== data.id));
         });
+        unsubPauseStateChanged = game.state.onPauseStateChanged.subscribe((paused) => {
+          if (cancelled) return;
+          setGamePaused(paused);
+        });
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -139,6 +146,7 @@ export const GameCanvas = () => {
       unsubBossApproaching?.();
       unsubBossSpawned?.();
       unsubBossDefeated?.();
+      unsubPauseStateChanged?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -300,7 +308,7 @@ export const GameCanvas = () => {
             level={level}
           />
         )}
-        <PhraseOverlay gameRef={gameRef} isPaused={selectedSlot !== null || pendingChoice} />
+        <PhraseOverlay gameRef={gameRef} isPaused={gamePaused} />
       </div>
     </div>
   );

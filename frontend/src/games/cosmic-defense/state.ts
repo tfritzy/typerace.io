@@ -216,6 +216,7 @@ export interface GameState {
   onBossSpawned: GameDataEvent<BossSpawnedData>;
   onBossDefeated: GameDataEvent<BossDefeatedData>;
   onRelicDropped: GameDataEvent<RelicId>;
+  onPauseStateChanged: GameDataEvent<boolean>;
 }
 
 let gameState: GameState | null = null;
@@ -278,6 +279,7 @@ export function createGameState(): GameState {
     onBossSpawned: new GameDataEvent<BossSpawnedData>(),
     onBossDefeated: new GameDataEvent<BossDefeatedData>(),
     onRelicDropped: new GameDataEvent<RelicId>(),
+    onPauseStateChanged: new GameDataEvent<boolean>(),
   };
 
   gameState = state;
@@ -808,20 +810,28 @@ function tickPendingShots(state: GameState): void {
       targetY = PLANET_Y;
     }
 
-    const dx = targetX - shooter.x;
-    const dy = targetY - shooter.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist === 0) continue;
-
-    state.projectiles.push({
-      id: state.nextId++,
-      x: shooter.x,
-      y: shooter.y,
-      vx: (dx / dist) * PROJECTILE_SPEED,
-      vy: (dy / dist) * PROJECTILE_SPEED,
-      shooterId: shooter.id,
-    });
+    if (shooter.fireMode === FireMode.Laser) {
+      executeLaserShot(state, shooter, targetX, targetY);
+    } else {
+      executeProjectileShot(state, shooter, targetX, targetY);
+    }
   }
+}
+
+function executeProjectileShot(state: GameState, shooter: EntityState, targetX: number, targetY: number): void {
+  const dx = targetX - shooter.x;
+  const dy = targetY - shooter.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist === 0) return;
+
+  state.projectiles.push({
+    id: state.nextId++,
+    x: shooter.x,
+    y: shooter.y,
+    vx: (dx / dist) * PROJECTILE_SPEED,
+    vy: (dy / dist) * PROJECTILE_SPEED,
+    shooterId: shooter.id,
+  });
 }
 
 function applyHitEffects(state: GameState, shooter: EntityState, target: EntityState, dmg: number): void {
@@ -944,9 +954,16 @@ function fireShot(state: GameState, e: EntityState): void {
 function fireLaser(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
+  state.pendingShots.push({
+    fireAt: state.time.time + e.hitDelay,
+    shooterId: e.id,
+    targetEntityId: target.entity?.id ?? null,
+  });
+}
 
-  const dx = target.x - e.x;
-  const dy = target.y - e.y;
+function executeLaserShot(state: GameState, e: EntityState, targetX: number, targetY: number): void {
+  const dx = targetX - e.x;
+  const dy = targetY - e.y;
   const len = Math.sqrt(dx * dx + dy * dy);
   if (len === 0) return;
 
@@ -1265,10 +1282,12 @@ export function updateSpawner(state: GameState, dt: number): void {
 
 export function pauseGame(state: GameState): void {
   state.paused = true;
+  state.onPauseStateChanged.emit(true);
 }
 
 export function unpauseGame(state: GameState): void {
   state.paused = false;
+  state.onPauseStateChanged.emit(false);
 }
 
 export function xpForNextLevel(level: number): number {
