@@ -80,6 +80,7 @@ export interface ProjectileState {
 export interface PendingShot {
   fireAt: number;
   shooterId: number;
+  targetEntityId: number | null;
 }
 
 export interface ExplosionState {
@@ -789,11 +790,26 @@ function tickPendingShots(state: GameState): void {
     const shooter = state.entityById.get(shot.shooterId);
     if (!shooter) continue;
 
-    const target = findNearestTarget(state, shooter);
-    if (!target) continue;
+    let targetX: number;
+    let targetY: number;
+    if (shot.targetEntityId !== null) {
+      const targetEntity = state.entityById.get(shot.targetEntityId);
+      if (targetEntity) {
+        targetX = targetEntity.x;
+        targetY = targetEntity.y;
+      } else {
+        const fallback = findNearestTarget(state, shooter);
+        if (!fallback) continue;
+        targetX = fallback.x;
+        targetY = fallback.y;
+      }
+    } else {
+      targetX = PLANET_X;
+      targetY = PLANET_Y;
+    }
 
-    const dx = target.x - shooter.x;
-    const dy = target.y - shooter.y;
+    const dx = targetX - shooter.x;
+    const dy = targetY - shooter.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
     if (dist === 0) continue;
 
@@ -818,7 +834,7 @@ function applyProjectileHit(state: GameState, proj: ProjectileState, hitEntity: 
   const shooter = state.entityById.get(proj.shooterId);
   if (!shooter) return;
 
-  const dmg = getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter));
+  const dmg = getEffectiveDamage(state, shooter);
   const explosionRadius = shooter.explosionRadius > 0
     ? (shooter.team === Team.Allied ? shooter.explosionRadius * state.relicEffects.explosionRadiusMultiplier : shooter.explosionRadius)
     : 0;
@@ -899,10 +915,29 @@ function getEffectiveProjectileDamage(state: GameState, shooter: EntityState): n
   return Math.round(shooter.projectileDamage * mult);
 }
 
+function getEffectiveLaserDamage(state: GameState, shooter: EntityState): number {
+  const mult = shooter.damageType === DamageType.Laser
+    ? state.relicEffects.laserDamageMultiplier
+    : 1;
+  return Math.round(shooter.laserDamage * mult);
+}
+
+function getEffectiveDamage(state: GameState, shooter: EntityState): number {
+  return getBuffedDamage(
+    shooter,
+    shooter.laserDamage > 0
+      ? getEffectiveLaserDamage(state, shooter)
+      : getEffectiveProjectileDamage(state, shooter)
+  );
+}
+
 function fireShot(state: GameState, e: EntityState): void {
+  const target = findNearestTarget(state, e);
+  if (!target) return;
   state.pendingShots.push({
     fireAt: state.time.time + e.hitDelay,
     shooterId: e.id,
+    targetEntityId: target.entity?.id ?? null,
   });
 }
 
@@ -926,10 +961,7 @@ function fireLaser(state: GameState, e: EntityState): void {
   const endX = e.x + nx * beamLen;
   const endY = e.y + ny * beamLen;
 
-  const laserMult = e.damageType === DamageType.Laser
-    ? state.relicEffects.laserDamageMultiplier
-    : 1;
-  const dmg = getBuffedDamage(e, Math.round(e.laserDamage * laserMult));
+  const dmg = getEffectiveDamage(state, e);
   const searchRange = piercing ? LASER_RANGE : len + 20;
   const extraHitRadius = e.beamWidth * 5;
 
