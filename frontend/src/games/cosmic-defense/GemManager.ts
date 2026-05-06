@@ -137,9 +137,9 @@ export class GemManager {
 
       const dx = TARGET_X - gem.x;
       const dy = TARGET_Y - gem.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const distSq = dx * dx + dy * dy;
 
-      if (dist < COLLECTION_DIST) {
+      if (distSq < COLLECTION_DIST * COLLECTION_DIST) {
         awardXP(state, gem.xpAmount);
         gem.glow.destroy();
         gem.core.destroy();
@@ -163,9 +163,8 @@ export class GemManager {
       gem.glow.scale.set(scale);
       gem.core.scale.set(scale);
 
-      const distToTarget = Math.sqrt((TARGET_X - gem.x) ** 2 + (TARGET_Y - gem.y) ** 2);
       const fadeDist = 40;
-      const alpha = distToTarget < fadeDist ? distToTarget / fadeDist : 1;
+      const alpha = distSq < fadeDist * fadeDist ? Math.sqrt(distSq) / fadeDist : 1;
       gem.glow.alpha = alpha;
       gem.core.alpha = alpha;
     }
