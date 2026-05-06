@@ -1,4 +1,4 @@
-import { Container, Graphics } from "pixi.js";
+import { BlurFilter, Container, Graphics } from "pixi.js";
 import { awardXP, type EntityDeathData, type GameState } from "./state";
 
 const POP_SPEED = 100;
@@ -12,6 +12,14 @@ const LERP_END = 12;
 
 const TARGET_X = 60;
 const TARGET_Y = 20;
+
+const GLOW_BLUR_STRENGTH = 12;
+const GLOW_BLUR_QUALITY = 3;
+const GLOW_OUTER_RADIUS_MULTIPLIER = 2.5;
+const GLOW_INNER_RADIUS_MULTIPLIER = 1.5;
+const GLOW_OUTER_ALPHA = 0.3;
+const GLOW_INNER_ALPHA = 0.55;
+const CORE_HIGHLIGHT_RADIUS_MULTIPLIER = 0.35;
 
 interface GemColors {
   fill: number;
@@ -49,7 +57,8 @@ function rollGemType(expectedXp: number): GemType {
 }
 
 interface ActiveGem {
-  g: Graphics;
+  glow: Graphics;
+  core: Graphics;
   elapsed: number;
   x: number;
   y: number;
@@ -62,12 +71,19 @@ interface ActiveGem {
 
 export class GemManager {
   readonly layer: Container;
+  private glowLayer: Container;
+  private coreLayer: Container;
 
   private active: ActiveGem[] = [];
   private unsub: (() => void) | null = null;
 
   constructor() {
     this.layer = new Container();
+    this.glowLayer = new Container();
+    this.coreLayer = new Container();
+    this.glowLayer.filters = [new BlurFilter({ strength: GLOW_BLUR_STRENGTH, quality: GLOW_BLUR_QUALITY })];
+    this.layer.addChild(this.glowLayer);
+    this.layer.addChild(this.coreLayer);
   }
 
   subscribe(state: GameState): void {
@@ -78,36 +94,39 @@ export class GemManager {
 
   private spawn(x: number, y: number, expectedXp: number): void {
     const gemType = rollGemType(expectedXp);
-    const g = new Graphics();
+    const s = gemType.size / 2;
+    const color = gemType.colors.fill;
 
-    const s = gemType.size;
-    g.moveTo(0, -s);
-    g.lineTo(s * 0.6, -s * 0.2);
-    g.lineTo(s * 0.6, s * 0.4);
-    g.lineTo(0, s);
-    g.lineTo(-s * 0.6, s * 0.4);
-    g.lineTo(-s * 0.6, -s * 0.2);
-    g.closePath();
-    g.fill({ color: gemType.colors.fill, alpha: 0.9 });
-    g.stroke({ color: gemType.colors.edge, width: 1.5, alpha: 1 });
+    const glow = new Graphics();
+    glow.circle(0, 0, s * GLOW_OUTER_RADIUS_MULTIPLIER);
+    glow.fill({ color, alpha: GLOW_OUTER_ALPHA });
+    glow.circle(0, 0, s * GLOW_INNER_RADIUS_MULTIPLIER);
+    glow.fill({ color, alpha: GLOW_INNER_ALPHA });
+    glow.x = x;
+    glow.y = y;
+    glow.scale.set(0);
+    this.glowLayer.addChild(glow);
 
-    g.moveTo(-s * 0.3, -s * 0.5);
-    g.lineTo(s * 0.1, -s * 0.1);
-    g.lineTo(-s * 0.2, s * 0.1);
-    g.closePath();
-    g.fill({ color: 0xffffff, alpha: 0.3 });
-
-    g.x = x;
-    g.y = y;
-    g.scale.set(0);
-
-    this.layer.addChild(g);
+    const core = new Graphics();
+    core.moveTo(0, -s);
+    core.lineTo(s * 0.65, 0);
+    core.lineTo(0, s);
+    core.lineTo(-s * 0.65, 0);
+    core.closePath();
+    core.fill({ color });
+    core.circle(0, 0, s * CORE_HIGHLIGHT_RADIUS_MULTIPLIER);
+    core.fill({ color: 0xffffff, alpha: 0.7 });
+    core.x = x;
+    core.y = y;
+    core.scale.set(0);
+    this.coreLayer.addChild(core);
 
     const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 0.8;
     const speed = POP_SPEED * (0.7 + Math.random() * 0.6);
 
     this.active.push({
-      g,
+      glow,
+      core,
       elapsed: 0,
       x,
       y,
@@ -125,7 +144,8 @@ export class GemManager {
       gem.elapsed += dt;
 
       if (gem.elapsed >= GEM_MAX_LIFE) {
-        gem.g.destroy();
+        gem.glow.destroy();
+        gem.core.destroy();
         this.active.splice(i, 1);
         continue;
       }
@@ -136,12 +156,17 @@ export class GemManager {
         gem.y += gem.vy * dt;
         gem.hoverX = gem.x;
         gem.hoverY = gem.y;
-        gem.g.x = gem.x;
-        gem.g.y = gem.y;
+        gem.glow.x = gem.x;
+        gem.glow.y = gem.y;
+        gem.core.x = gem.x;
+        gem.core.y = gem.y;
       } else if (gem.elapsed < POP_DURATION + HOVER_DURATION) {
         const hoverT = gem.elapsed - POP_DURATION;
-        gem.g.x = gem.hoverX;
-        gem.g.y = gem.hoverY + Math.sin(hoverT * Math.PI * 2.5) * 4;
+        const displayY = gem.hoverY + Math.sin(hoverT * Math.PI * 2.5) * 4;
+        gem.glow.x = gem.hoverX;
+        gem.glow.y = displayY;
+        gem.core.x = gem.hoverX;
+        gem.core.y = displayY;
       } else {
         const dx = TARGET_X - gem.x;
         const dy = TARGET_Y - gem.y;
@@ -149,7 +174,8 @@ export class GemManager {
 
         if (dist < COLLECTION_DIST) {
           awardXP(state, gem.xpAmount);
-          gem.g.destroy();
+          gem.glow.destroy();
+          gem.core.destroy();
           this.active.splice(i, 1);
           continue;
         }
@@ -158,27 +184,33 @@ export class GemManager {
         const t = 1 - Math.exp(-dt * (LERP_START + homingTime * LERP_END));
         gem.x += dx * t;
         gem.y += dy * t;
-        gem.g.x = gem.x;
-        gem.g.y = gem.y;
+        gem.glow.x = gem.x;
+        gem.glow.y = gem.y;
+        gem.core.x = gem.x;
+        gem.core.y = gem.y;
       }
 
       const easeInDur = 0.15;
-      if (gem.elapsed < easeInDur) {
-        const p = gem.elapsed / easeInDur;
-        gem.g.scale.set(p * (2 - p));
-      } else {
-        gem.g.scale.set(1);
-      }
+      const scale = gem.elapsed < easeInDur
+        ? gem.elapsed / easeInDur * (2 - gem.elapsed / easeInDur)
+        : 1;
+      gem.glow.scale.set(scale);
+      gem.core.scale.set(scale);
 
       const distToTarget = Math.sqrt((TARGET_X - gem.x) ** 2 + (TARGET_Y - gem.y) ** 2);
       const fadeDist = 40;
-      gem.g.alpha = distToTarget < fadeDist ? distToTarget / fadeDist : 1;
+      const alpha = distToTarget < fadeDist ? distToTarget / fadeDist : 1;
+      gem.glow.alpha = alpha;
+      gem.core.alpha = alpha;
     }
   }
 
   destroy(): void {
     this.unsub?.();
-    for (const gem of this.active) gem.g.destroy();
+    for (const gem of this.active) {
+      gem.glow.destroy();
+      gem.core.destroy();
+    }
     this.active.length = 0;
     this.layer.destroy();
   }
