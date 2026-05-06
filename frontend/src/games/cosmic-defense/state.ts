@@ -81,7 +81,6 @@ export interface PendingShot {
   fireAt: number;
   shooterId: number;
   targetEntityId: number | null;
-  isLaser?: boolean;
 }
 
 export interface ExplosionState {
@@ -811,25 +810,28 @@ function tickPendingShots(state: GameState): void {
       targetY = PLANET_Y;
     }
 
-    if (shot.isLaser) {
+    if (shooter.fireMode === FireMode.Laser) {
       executeLaserShot(state, shooter, targetX, targetY);
-      continue;
+    } else {
+      executeProjectileShot(state, shooter, targetX, targetY);
     }
-
-    const dx = targetX - shooter.x;
-    const dy = targetY - shooter.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist === 0) continue;
-
-    state.projectiles.push({
-      id: state.nextId++,
-      x: shooter.x,
-      y: shooter.y,
-      vx: (dx / dist) * PROJECTILE_SPEED,
-      vy: (dy / dist) * PROJECTILE_SPEED,
-      shooterId: shooter.id,
-    });
   }
+}
+
+function executeProjectileShot(state: GameState, shooter: EntityState, targetX: number, targetY: number): void {
+  const dx = targetX - shooter.x;
+  const dy = targetY - shooter.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  if (dist === 0) return;
+
+  state.projectiles.push({
+    id: state.nextId++,
+    x: shooter.x,
+    y: shooter.y,
+    vx: (dx / dist) * PROJECTILE_SPEED,
+    vy: (dy / dist) * PROJECTILE_SPEED,
+    shooterId: shooter.id,
+  });
 }
 
 function applyHitEffects(state: GameState, shooter: EntityState, target: EntityState, dmg: number): void {
@@ -956,7 +958,6 @@ function fireLaser(state: GameState, e: EntityState): void {
     fireAt: state.time.time + e.hitDelay,
     shooterId: e.id,
     targetEntityId: target.entity?.id ?? null,
-    isLaser: true,
   });
 }
 
