@@ -80,8 +80,6 @@ export interface ProjectileState {
 export interface PendingShot {
   fireAt: number;
   shooterId: number;
-  targetX: number;
-  targetY: number;
   targetEntityId: number | null;
 }
 
@@ -783,6 +781,81 @@ function tickLaserBeams(state: GameState): void {
   }
 }
 
+function tickPendingShots(state: GameState): void {
+  for (let i = state.pendingShots.length - 1; i >= 0; i--) {
+    const shot = state.pendingShots[i];
+    if (state.time.time < shot.fireAt) continue;
+    state.pendingShots.splice(i, 1);
+
+    const shooter = state.entityById.get(shot.shooterId);
+    if (!shooter) continue;
+
+    let targetX: number;
+    let targetY: number;
+    if (shot.targetEntityId !== null) {
+      const targetEntity = state.entityById.get(shot.targetEntityId);
+      if (targetEntity) {
+        targetX = targetEntity.x;
+        targetY = targetEntity.y;
+      } else {
+        const fallback = findNearestTarget(state, shooter);
+        if (!fallback) continue;
+        targetX = fallback.x;
+        targetY = fallback.y;
+      }
+    } else {
+      targetX = PLANET_X;
+      targetY = PLANET_Y;
+    }
+
+    const dx = targetX - shooter.x;
+    const dy = targetY - shooter.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist === 0) continue;
+
+    state.projectiles.push({
+      id: state.nextId++,
+      x: shooter.x,
+      y: shooter.y,
+      vx: (dx / dist) * PROJECTILE_SPEED,
+      vy: (dy / dist) * PROJECTILE_SPEED,
+      shooterId: shooter.id,
+    });
+  }
+}
+
+function applyHitEffects(state: GameState, shooter: EntityState, target: EntityState, dmg: number): void {
+  if (shooter.plasmaStacksApplied > 0) target.plasmaStacks += shooter.plasmaStacksApplied;
+  if (shooter.freezeStacks > 0) applyFreezeStacks(state, target, shooter.freezeStacks);
+  dealDamageToEntity(state, shooter, target, dmg);
+}
+
+function applyProjectileHit(state: GameState, proj: ProjectileState, hitEntity: EntityState): void {
+  const shooter = state.entityById.get(proj.shooterId);
+  if (!shooter) return;
+
+  const dmg = getEffectiveDamage(state, shooter);
+  const explosionRadius = shooter.explosionRadius > 0
+    ? (shooter.team === Team.Allied ? shooter.explosionRadius * state.relicEffects.explosionRadiusMultiplier : shooter.explosionRadius)
+    : 0;
+
+  if (explosionRadius > 0) {
+    spawnExplosion(state, shooter.entityType, proj.x, proj.y, explosionRadius);
+    const r2 = explosionRadius * explosionRadius;
+    for (let k = state.entities.length - 1; k >= 0; k--) {
+      const splash = state.entities[k];
+      if (splash.team !== Team.Enemy) continue;
+      const ex = splash.x - proj.x;
+      const ey = splash.y - proj.y;
+      if (ex * ex + ey * ey > r2) continue;
+      applyHitEffects(state, shooter, splash, dmg);
+    }
+  } else {
+    spawnExplosion(state, shooter.entityType, hitEntity.x, hitEntity.y);
+    applyHitEffects(state, shooter, hitEntity, dmg);
+  }
+}
+
 function tickProjectiles(state: GameState, dt: number): void {
   for (let i = state.projectiles.length - 1; i >= 0; i--) {
     const proj = state.projectiles[i];
@@ -796,52 +869,18 @@ function tickProjectiles(state: GameState, dt: number): void {
       continue;
     }
 
+    let collided = false;
     for (let j = state.entities.length - 1; j >= 0; j--) {
       const other = state.entities[j];
       if (other.team !== Team.Enemy) continue;
       const r = Math.max(other.hitHalfW, other.hitHalfH);
-      if (segmentPointDistSq(oldX, oldY, proj.x, proj.y, other.x, other.y) <= r * r) {
-        state.projectiles.splice(i, 1);
-        break;
-      }
+      if (segmentPointDistSq(oldX, oldY, proj.x, proj.y, other.x, other.y) > r * r) continue;
+      applyProjectileHit(state, proj, other);
+      collided = true;
+      break;
     }
-  }
-}
-
-function tickPendingShots(state: GameState): void {
-  for (let i = state.pendingShots.length - 1; i >= 0; i--) {
-    const shot = state.pendingShots[i];
-    if (state.time.time < shot.fireAt) continue;
-    state.pendingShots.splice(i, 1);
-
-    const shooter = state.entityById.get(shot.shooterId);
-    if (!shooter) continue;
-
-    const dmg = getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter));
-
-    if (shooter.explosionRadius > 0) {
-      const effectiveRadius = shooter.team === Team.Allied
-        ? shooter.explosionRadius * state.relicEffects.explosionRadiusMultiplier
-        : shooter.explosionRadius;
-      spawnExplosion(state, shooter.entityType, shot.targetX, shot.targetY, effectiveRadius);
-      const r2 = effectiveRadius * effectiveRadius;
-      for (let j = state.entities.length - 1; j >= 0; j--) {
-        const other = state.entities[j];
-        if (other.team !== Team.Enemy) continue;
-        const dx = other.x - shot.targetX;
-        const dy = other.y - shot.targetY;
-        if (dx * dx + dy * dy > r2) continue;
-        if (shooter.plasmaStacksApplied > 0) other.plasmaStacks += shooter.plasmaStacksApplied;
-        if (shooter.freezeStacks > 0) applyFreezeStacks(state, other, shooter.freezeStacks);
-        if (dmg > 0) dealDamageToEntity(state, shooter, other, dmg);
-      }
-    } else {
-      const target = shot.targetEntityId !== null ? state.entityById.get(shot.targetEntityId) : null;
-      if (target) {
-        if (shooter.plasmaStacksApplied > 0) target.plasmaStacks += shooter.plasmaStacksApplied;
-        spawnExplosion(state, shooter.entityType, target.x, target.y);
-        dealDamageToEntity(state, shooter, target, dmg);
-      }
+    if (collided) {
+      state.projectiles.splice(i, 1);
     }
   }
 }
@@ -856,8 +895,8 @@ export function updateState(state: GameState, dt: number): void {
   tickEntities(state, dt);
   checkCollisions(state);
   tickLaserBeams(state);
-  tickProjectiles(state, dt);
   tickPendingShots(state);
+  tickProjectiles(state, dt);
 }
 
 function getBuffedDamage(e: EntityState, baseDamage: number): number {
@@ -876,29 +915,28 @@ function getEffectiveProjectileDamage(state: GameState, shooter: EntityState): n
   return Math.round(shooter.projectileDamage * mult);
 }
 
+function getEffectiveLaserDamage(state: GameState, shooter: EntityState): number {
+  const mult = shooter.damageType === DamageType.Laser
+    ? state.relicEffects.laserDamageMultiplier
+    : 1;
+  return Math.round(shooter.laserDamage * mult);
+}
+
+function getEffectiveDamage(state: GameState, shooter: EntityState): number {
+  return getBuffedDamage(
+    shooter,
+    shooter.laserDamage > 0
+      ? getEffectiveLaserDamage(state, shooter)
+      : getEffectiveProjectileDamage(state, shooter)
+  );
+}
+
 function fireShot(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
-
-  const dx = target.x - e.x;
-  const dy = target.y - e.y;
-  const dist = Math.sqrt(dx * dx + dy * dy);
-  if (dist === 0) return;
-
-  state.projectiles.push({
-    id: state.nextId++,
-    x: e.x,
-    y: e.y,
-    vx: (dx / dist) * PROJECTILE_SPEED,
-    vy: (dy / dist) * PROJECTILE_SPEED,
-    shooterId: e.id,
-  });
-
   state.pendingShots.push({
     fireAt: state.time.time + e.hitDelay,
     shooterId: e.id,
-    targetX: target.x,
-    targetY: target.y,
     targetEntityId: target.entity?.id ?? null,
   });
 }
@@ -923,10 +961,7 @@ function fireLaser(state: GameState, e: EntityState): void {
   const endX = e.x + nx * beamLen;
   const endY = e.y + ny * beamLen;
 
-  const laserMult = e.damageType === DamageType.Laser
-    ? state.relicEffects.laserDamageMultiplier
-    : 1;
-  const dmg = getBuffedDamage(e, Math.round(e.laserDamage * laserMult));
+  const dmg = getEffectiveDamage(state, e);
   const searchRange = piercing ? LASER_RANGE : len + 20;
   const extraHitRadius = e.beamWidth * 5;
 
@@ -945,10 +980,7 @@ function fireLaser(state: GameState, e: EntityState): void {
     const hitRadius = Math.max(other.hitHalfW, other.hitHalfH) + extraHitRadius;
     if (perpDist > hitRadius) continue;
 
-    if (e.freezeStacks > 0) applyFreezeStacks(state, other, e.freezeStacks);
-    if (e.plasmaStacksApplied > 0) other.plasmaStacks += e.plasmaStacksApplied;
-
-    dealDamageToEntity(state, e, other, dmg);
+    applyHitEffects(state, e, other, dmg);
     if (!piercing) break;
   }
 
