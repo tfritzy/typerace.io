@@ -28,7 +28,7 @@ function makeEnemy(state: GameState, overrides: Partial<EntityState> = {}): Enti
   const expectedId = state.nextId;
   spawnEntity(state, ENEMY_CATALOG[0], Team.Enemy);
   const entity = state.entityById.get(expectedId)!;
-  entity.x = PLANET_X + 200;
+  entity.x = PLANET_X + 100;
   entity.y = PLANET_Y;
   entity.vx = 0;
   entity.vy = 0;

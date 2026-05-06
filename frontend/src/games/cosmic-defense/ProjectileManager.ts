@@ -1,7 +1,7 @@
 import { BlurFilter, Container, Graphics } from "pixi.js";
 import type { GameState } from "./state";
 
-const PROJECTILE_RADIUS = 6;
+const DEFAULT_PROJECTILE_SIZE = 5;
 const GLOW_BLUR_STRENGTH = 10;
 const GLOW_BLUR_QUALITY = 3;
 const DEFAULT_COLOR = 0xffd700;
@@ -14,6 +14,10 @@ const CORE_HIGHLIGHT_COLOR = 0xffffff;
 
 function getProjectileColor(state: GameState, shooterId: number): number {
   return state.entityById.get(shooterId)?.projectileColor ?? DEFAULT_COLOR;
+}
+
+function getProjectileSize(state: GameState, shooterId: number): number {
+  return state.entityById.get(shooterId)?.projectileSize ?? DEFAULT_PROJECTILE_SIZE;
 }
 
 export class ProjectileManager {
@@ -43,20 +47,21 @@ export class ProjectileManager {
       let core = this.coreObjects.get(proj.id);
       if (!glow || !core) {
         const color = getProjectileColor(state, proj.shooterId);
+        const size = getProjectileSize(state, proj.shooterId);
         if (!glow) {
           glow = new Graphics();
-          glow.circle(0, 0, PROJECTILE_RADIUS * GLOW_OUTER_RADIUS_MULTIPLIER);
+          glow.circle(0, 0, size * GLOW_OUTER_RADIUS_MULTIPLIER);
           glow.fill({ color, alpha: GLOW_OUTER_ALPHA });
-          glow.circle(0, 0, PROJECTILE_RADIUS * GLOW_INNER_RADIUS_MULTIPLIER);
+          glow.circle(0, 0, size * GLOW_INNER_RADIUS_MULTIPLIER);
           glow.fill({ color, alpha: GLOW_INNER_ALPHA });
           this.glowContainer.addChild(glow);
           this.glowObjects.set(proj.id, glow);
         }
         if (!core) {
           core = new Graphics();
-          core.circle(0, 0, PROJECTILE_RADIUS);
+          core.circle(0, 0, size);
           core.fill({ color });
-          core.circle(0, 0, PROJECTILE_RADIUS * CORE_HIGHLIGHT_RADIUS_MULTIPLIER);
+          core.circle(0, 0, size * CORE_HIGHLIGHT_RADIUS_MULTIPLIER);
           core.fill({ color: CORE_HIGHLIGHT_COLOR });
           this.coreContainer.addChild(core);
           this.coreObjects.set(proj.id, core);
