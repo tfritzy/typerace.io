@@ -5,8 +5,8 @@ import { collectDroppedRelic, type GameState, type RelicDropData } from "./state
 const RELIC_RENDER_SIZE = 96;
 const RELIC_MAX_LIFE = 8;
 const COLLECTION_DISTANCE = 16;
-const LERP_START = 0.5;
-const LERP_END = 12;
+const INITIAL_MOVE_STRENGTH = 0.5;
+const MOVE_ACCELERATION = 12;
 const TARGET_X = 60;
 const TARGET_Y = 20;
 const GLOW_BLUR_STRENGTH = 16;
@@ -105,7 +105,7 @@ export class RelicPickupManager {
         continue;
       }
 
-      const t = 1 - Math.exp(-dt * (LERP_START + relicDrop.elapsed * LERP_END));
+      const t = 1 - Math.exp(-dt * (INITIAL_MOVE_STRENGTH + relicDrop.elapsed * MOVE_ACCELERATION));
       relicDrop.x += dx * t;
       relicDrop.y += dy * t;
       relicDrop.glow.x = relicDrop.x;
