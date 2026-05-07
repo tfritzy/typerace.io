@@ -10,13 +10,13 @@ type GameOverScreenProps = {
 export const GameOverScreen = ({ wave, score, kills, onPlayAgain }: GameOverScreenProps) => {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
+  const handleCopy = useCallback(() => {
     const text = `☄️ Cosmic Defense — Wave ${wave} | Score: ${score.toLocaleString()} | Kills: ${kills}`;
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }).catch(() => {});
-  };
+  }, [wave, score, kills]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key.toLowerCase() === "r") {
@@ -27,7 +27,7 @@ export const GameOverScreen = ({ wave, score, kills, onPlayAgain }: GameOverScre
       e.preventDefault();
       handleCopy();
     }
-  }, [onPlayAgain]);
+  }, [onPlayAgain, handleCopy]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
