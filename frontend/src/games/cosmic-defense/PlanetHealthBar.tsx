@@ -4,7 +4,7 @@ import type { GameState } from "./state";
 import { HealthCard, type HealthCardTheme } from "../components/HealthCard";
 
 interface PlanetHealthBarProps {
-  state: GameState;
+  state: GameState | null;
 }
 
 function planetTheme(ratio: number): HealthCardTheme {
@@ -26,14 +26,16 @@ function planetTheme(ratio: number): HealthCardTheme {
 }
 
 export const PlanetHealthBar = ({ state }: PlanetHealthBarProps) => {
-  const [health, setHealth] = useState(() => state.planetHealth);
-  const [maxHealth, setMaxHealth] = useState(() => state.maxPlanetHealth);
+  const [health, setHealth] = useState(state?.planetHealth ?? 1000);
+  const [maxHealth, setMaxHealth] = useState(state?.maxPlanetHealth ?? 1000);
 
   useEffect(() => {
+    if (!state) return;
     const sync = () => {
       setHealth(Math.max(0, state.planetHealth));
       setMaxHealth(state.maxPlanetHealth);
     };
+    sync();
     const unsub = state.onPlanetDamaged.subscribe(sync);
     const interval = setInterval(sync, 250);
     return () => {
