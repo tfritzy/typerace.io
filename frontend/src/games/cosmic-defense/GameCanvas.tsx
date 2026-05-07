@@ -4,7 +4,7 @@ import { getLanguageFromSlug } from "../../utils/modes";
 import { createCosmicDefenseGame } from "./game";
 import type { CosmicDefenseGame } from "./game";
 import { BOSS_WARNING_LEAD_TIME_SECONDS, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
-import type { EntityState, BossSpawnedData, BossDefeatedData } from "./state";
+import type { EntityState, BossSpawnedData, BossDefeatedData, GameState } from "./state";
 import { BossHealthBar } from "./BossHealthBar";
 import { PlanetHealthBar } from "./PlanetHealthBar";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
@@ -41,7 +41,7 @@ export const GameCanvas = () => {
   const [bossApproaching, setBossApproaching] = useState(false);
   const [bossEntityIds, setBossEntityIds] = useState<number[]>([]);
   const [gamePaused, setGamePaused] = useState(true);
-  const [gameReady, setGameReady] = useState(false);
+  const [gameState, setGameState] = useState<GameState | null>(null);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -101,7 +101,7 @@ export const GameCanvas = () => {
         setShipPreviews(game.shipPreviews);
         setPendingChoice(game.state.pendingChoice);
         setGamePaused(game.state.paused);
-        setGameReady(true);
+        setGameState(game.state);
         setLevel(game.state.level);
         setXp(game.state.xp);
         setTotalKills(game.state.totalKills);
@@ -152,7 +152,7 @@ export const GameCanvas = () => {
       unsubPauseStateChanged?.();
       gameRef.current?.destroy();
       gameRef.current = null;
-      setGameReady(false);
+      setGameState(null);
     };
   }, [gameId, language]);
 
@@ -280,15 +280,15 @@ export const GameCanvas = () => {
             </div>
           </div>
         )}
-        {gameReady && gameRef.current && (
+        {gameState && (
           <div className="absolute bottom-3 left-3 z-[1] pointer-events-none">
-            <PlanetHealthBar state={gameRef.current.state} />
+            <PlanetHealthBar state={gameState} />
           </div>
         )}
-        {bossEntityIds.length > 0 && gameRef.current && (
+        {bossEntityIds.length > 0 && gameState && (
           <div className="absolute bottom-3 right-3 z-[1] flex flex-row-reverse flex-wrap gap-2 pointer-events-none">
             {bossEntityIds.map((id) => (
-              <BossHealthBar key={id} state={gameRef.current!.state} entityId={id} />
+              <BossHealthBar key={id} state={gameState} entityId={id} />
             ))}
           </div>
         )}
