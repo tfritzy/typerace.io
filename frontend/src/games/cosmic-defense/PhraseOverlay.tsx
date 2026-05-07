@@ -27,7 +27,7 @@ export const PhraseOverlay = ({
   gameRef: React.RefObject<CosmicDefenseGame | null>;
   isPaused: boolean;
 }) => {
-  const [autoTyperWpm, setAutoTyperWpm] = useState(150);
+  const [autoTyperWpm, setAutoTyperWpm] = useState(50);
   const [typed, setTyped] = useState<string>("");
   const [phrase, setPhrase] = useState<string>(() => generatePhrase(5));
   const [checkpoint, setCheckpoint] = useState<number>(0);
@@ -124,7 +124,7 @@ export const PhraseOverlay = ({
   }, [handleKey]);
 
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || autoTyperWpm <= 0) return;
     const intervalMs = Math.round(60000 / (autoTyperWpm * 5));
     const interval = setInterval(() => {
       const nextChar = phraseRef.current[typedRef.current.length];
@@ -279,7 +279,7 @@ export const PhraseOverlay = ({
         </span>
         <input
           type="range"
-          min={10}
+          min={0}
           max={300}
           step={10}
           value={autoTyperWpm}
