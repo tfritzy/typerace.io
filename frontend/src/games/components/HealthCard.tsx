@@ -71,8 +71,7 @@ export const HealthCard = ({ health, maxHealth, label, icon, theme }: HealthCard
         ghostPctRef.current = prevPct;
         setGhostPct(prevPct);
       }
-      if (!shrinkingRef.current) {
-        if (delayTimerRef.current) clearTimeout(delayTimerRef.current);
+      if (!shrinkingRef.current && !delayTimerRef.current) {
         delayTimerRef.current = setTimeout(() => {
           delayTimerRef.current = null;
           startShrinking();
