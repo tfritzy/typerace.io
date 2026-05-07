@@ -170,6 +170,12 @@ export interface BossDefeatedData {
   id: number;
 }
 
+export interface RelicDropData {
+  relicId: RelicId;
+  x: number;
+  y: number;
+}
+
 export interface LaserBeam {
   id: number;
   x1: number;
@@ -204,6 +210,7 @@ export interface GameState {
   pendingChoice: boolean;
   paused: boolean;
   relics: RelicId[];
+  pendingRelicDrops: RelicId[];
   relicEffects: RelicEffects;
   perfectWordStreak: number;
   onPlanetDamaged: GameEvent;
@@ -215,7 +222,8 @@ export interface GameState {
   onBossApproaching: GameEvent;
   onBossSpawned: GameDataEvent<BossSpawnedData>;
   onBossDefeated: GameDataEvent<BossDefeatedData>;
-  onRelicDropped: GameDataEvent<RelicId>;
+  onRelicDropped: GameDataEvent<RelicDropData>;
+  onRelicCollected: GameDataEvent<RelicId>;
   onPauseStateChanged: GameDataEvent<boolean>;
   onGameOver: GameEvent;
 }
@@ -268,6 +276,7 @@ export function createGameState(): GameState {
     pendingChoice: true,
     paused: true,
     relics: [],
+    pendingRelicDrops: [],
     relicEffects: computeRelicEffects([]),
     perfectWordStreak: 0,
     onPlanetDamaged: new GameEvent(),
@@ -279,7 +288,8 @@ export function createGameState(): GameState {
     onBossApproaching: new GameEvent(),
     onBossSpawned: new GameDataEvent<BossSpawnedData>(),
     onBossDefeated: new GameDataEvent<BossDefeatedData>(),
-    onRelicDropped: new GameDataEvent<RelicId>(),
+    onRelicDropped: new GameDataEvent<RelicDropData>(),
+    onRelicCollected: new GameDataEvent<RelicId>(),
     onPauseStateChanged: new GameDataEvent<boolean>(),
     onGameOver: new GameEvent(),
   };
@@ -645,13 +655,12 @@ function dealDamageToEntity(
       });
       if (target.isBoss) {
         state.onBossDefeated.emit({ id: target.id });
-        const unowned = RELIC_CATALOG.filter((r) => !state.relics.includes(r.id));
+        const unowned = RELIC_CATALOG.filter((r) => !state.relics.includes(r.id) && !state.pendingRelicDrops.includes(r.id));
         if (unowned.length > 0) {
           const relicIndex = (state.spawner.currentWave - 1) % unowned.length;
           const relicId = unowned[relicIndex].id;
-          addRelic(state, relicId);
-          pauseGame(state);
-          state.onRelicDropped.emit(relicId);
+          state.pendingRelicDrops.push(relicId);
+          state.onRelicDropped.emit({ relicId, x: target.x, y: target.y });
         }
       }
     }
@@ -1166,6 +1175,16 @@ export function onWordWithError(state: GameState): void {
 function addRelic(state: GameState, relicId: RelicId): void {
   state.relics.push(relicId);
   state.relicEffects = computeRelicEffects(state.relics);
+}
+
+export function collectDroppedRelic(state: GameState, relicId: RelicId): void {
+  const pendingIndex = state.pendingRelicDrops.indexOf(relicId);
+  if (pendingIndex < 0) return;
+  state.pendingRelicDrops.splice(pendingIndex, 1);
+  if (state.relics.includes(relicId)) return;
+  addRelic(state, relicId);
+  pauseGame(state);
+  state.onRelicCollected.emit(relicId);
 }
 
 const TIER_SPREAD = 90;

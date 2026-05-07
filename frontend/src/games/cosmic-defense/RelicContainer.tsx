@@ -21,7 +21,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
       return;
     }
     setCollectedRelics([...game.state.relics]);
-    const unsub = game.state.onRelicDropped.subscribe((relicId) => {
+    const unsub = game.state.onRelicCollected.subscribe((relicId) => {
       setCollectedRelics([...game.state.relics]);
       setPendingRelic(relicId);
     });

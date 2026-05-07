@@ -10,6 +10,7 @@ import { DamageNumberManager } from "./DamageNumberManager";
 import { LaserBeamManager } from "./LaserBeamManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { GemManager } from "./GemManager";
+import { RelicPickupManager } from "./RelicPickupManager";
 import { AssetManager } from "./assetManager";
 import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, onPerfectWord as stateOnPerfectWord, onWordWithError as stateOnWordWithError, pauseGame, unpauseGame } from "./state";
 import type { GameState } from "./state";
@@ -30,6 +31,7 @@ export class CosmicDefenseGame {
   private laserBeamManager!: LaserBeamManager;
   private projectileManager!: ProjectileManager;
   private gemManager!: GemManager;
+  private relicPickupManager!: RelicPickupManager;
   shipManager!: ShipManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
@@ -92,6 +94,10 @@ export class CosmicDefenseGame {
     this.gemManager.subscribe(this.state);
     world.addChild(this.gemManager.layer);
 
+    this.relicPickupManager = new RelicPickupManager();
+    this.relicPickupManager.subscribe(this.state);
+    world.addChild(this.relicPickupManager.layer);
+
     this.damageNumberManager = new DamageNumberManager();
     this.damageNumberManager.subscribe(this.state);
     world.addChild(this.damageNumberManager.container);
@@ -115,6 +121,7 @@ export class CosmicDefenseGame {
     this.projectileManager.update(this.state);
     this.shipManager.update(this.state, dt);
     this.gemManager.update(this.state, dt);
+    this.relicPickupManager.update(this.state, dt);
   }
 
   destroy(): void {
@@ -129,6 +136,7 @@ export class CosmicDefenseGame {
     this.laserBeamManager.destroy();
     this.projectileManager.destroy();
     this.gemManager.destroy();
+    this.relicPickupManager.destroy();
     this.damageNumberManager.destroy();
     this.shipManager.destroy();
     this.app.destroy(true);
