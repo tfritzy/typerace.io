@@ -217,6 +217,7 @@ export interface GameState {
   onBossDefeated: GameDataEvent<BossDefeatedData>;
   onRelicDropped: GameDataEvent<RelicId>;
   onPauseStateChanged: GameDataEvent<boolean>;
+  onGameOver: GameEvent;
 }
 
 let gameState: GameState | null = null;
@@ -280,6 +281,7 @@ export function createGameState(): GameState {
     onBossDefeated: new GameDataEvent<BossDefeatedData>(),
     onRelicDropped: new GameDataEvent<RelicId>(),
     onPauseStateChanged: new GameDataEvent<boolean>(),
+    onGameOver: new GameEvent(),
   };
 
   gameState = state;
@@ -681,6 +683,10 @@ function performInstantHit(
       ? Math.round(damage * state.relicEffects.planetDamageReduction)
       : damage;
     state.planetHealth = Math.max(0, state.planetHealth - reducedDamage);
+    if (state.planetHealth === 0 && !state.paused) {
+      pauseGame(state);
+      state.onGameOver.emit();
+    }
     if (shooter.team === Team.Enemy && reducedDamage > 0) {
       if (state.relicEffects.chargesOnPlanetDamage > 0) {
         for (const e of state.entities) {
