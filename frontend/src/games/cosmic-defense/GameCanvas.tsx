@@ -6,6 +6,7 @@ import type { CosmicDefenseGame } from "./game";
 import { BOSS_WARNING_LEAD_TIME_SECONDS, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
 import type { EntityState, BossSpawnedData, BossDefeatedData } from "./state";
 import { BossHealthBar } from "./BossHealthBar";
+import { PlanetHealthBar } from "./PlanetHealthBar";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
 import { PlacementOverlay } from "./PlacementOverlay";
@@ -40,6 +41,7 @@ export const GameCanvas = () => {
   const [bossApproaching, setBossApproaching] = useState(false);
   const [bossEntityIds, setBossEntityIds] = useState<number[]>([]);
   const [gamePaused, setGamePaused] = useState(true);
+  const [gameReady, setGameReady] = useState(false);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -99,6 +101,7 @@ export const GameCanvas = () => {
         setShipPreviews(game.shipPreviews);
         setPendingChoice(game.state.pendingChoice);
         setGamePaused(game.state.paused);
+        setGameReady(true);
         setLevel(game.state.level);
         setXp(game.state.xp);
         setTotalKills(game.state.totalKills);
@@ -149,6 +152,7 @@ export const GameCanvas = () => {
       unsubPauseStateChanged?.();
       gameRef.current?.destroy();
       gameRef.current = null;
+      setGameReady(false);
     };
   }, [gameId, language]);
 
@@ -286,6 +290,11 @@ export const GameCanvas = () => {
             </div>
           );
         })()}
+        {gameReady && gameRef.current && (
+          <div className="absolute bottom-3 left-3 z-[1]">
+            <PlanetHealthBar state={gameRef.current.state} />
+          </div>
+        )}
         <PlacementOverlay
           slots={slots}
           onSlotClick={handleSlotClick}
