@@ -6,6 +6,7 @@ import type { CosmicDefenseGame } from "./game";
 import { BOSS_WARNING_LEAD_TIME_SECONDS, TargetingMode, levelUpEntity, xpForNextLevel } from "./state";
 import type { EntityState, BossSpawnedData, BossDefeatedData } from "./state";
 import { BossHealthBar } from "./BossHealthBar";
+import { PlanetHealthBar } from "./PlanetHealthBar";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
 import { InspectionPanel } from "./UpgradePanel";
 import { PlacementOverlay } from "./PlacementOverlay";
@@ -276,16 +277,16 @@ export const GameCanvas = () => {
             </div>
           </div>
         )}
-        {bossEntityIds.length > 0 && gameRef.current && (() => {
-          const gameState = gameRef.current.state;
-          return (
-            <div className="absolute bottom-0 left-0 right-0 z-[1] flex flex-col pointer-events-none">
-              {bossEntityIds.map((id) => (
-                <BossHealthBar key={id} state={gameState} entityId={id} />
-              ))}
-            </div>
-          );
-        })()}
+        <div className="absolute bottom-3 left-3 z-[1] pointer-events-none">
+          <PlanetHealthBar state={gameRef.current?.state ?? null} />
+        </div>
+        {bossEntityIds.length > 0 && gameRef.current && (
+          <div className="absolute bottom-3 right-3 z-[1] flex flex-row-reverse flex-wrap gap-2 pointer-events-none">
+            {bossEntityIds.map((id) => (
+              <BossHealthBar key={id} state={gameRef.current!.state} entityId={id} />
+            ))}
+          </div>
+        )}
         <PlacementOverlay
           slots={slots}
           onSlotClick={handleSlotClick}
