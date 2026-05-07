@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Skull, Copy, Check, RotateCcw } from "lucide-react";
+import { useState, useCallback, useEffect } from "react";
 
 type GameOverScreenProps = {
   wave: number;
@@ -12,71 +11,180 @@ export const GameOverScreen = ({ wave, score, kills, onPlayAgain }: GameOverScre
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    const text = `🌍 Cosmic Defense\nWave: ${wave} | Score: ${score.toLocaleString()} | Kills: ${kills}`;
+    const text = `☄️ Cosmic Defense — Wave ${wave} | Score: ${score.toLocaleString()} | Kills: ${kills}`;
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }).catch(() => {});
   };
 
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key.toLowerCase() === "r") {
+      e.preventDefault();
+      onPlayAgain();
+    }
+    if (e.key.toLowerCase() === "c") {
+      e.preventDefault();
+      handleCopy();
+    }
+  }, [onPlayAgain]);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-[rgba(10,10,26,0.85)]">
+    <>
       <div
-        className="flex flex-col items-center gap-5 rounded-2xl border border-[rgba(249,226,175,0.25)] px-10 py-8 shadow-[0_0_48px_rgba(249,226,175,0.12)]"
-        style={{ background: "rgba(17,17,27,0.96)", minWidth: 260 }}
+        className="absolute inset-0 z-[60] animate-fadeIn"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 80% at 50% 50%, rgba(0,0,0,0.95) 20%, rgba(0,0,0,0.75) 65%, rgba(0,0,0,0.15) 100%)",
+        }}
+      />
+      <div
+        className="absolute inset-0 z-[70] flex items-center justify-center animate-fadeIn"
+        style={{ pointerEvents: "auto" }}
       >
-        <div className="flex flex-col items-center gap-1">
-          <Skull className="w-10 h-10 text-[#f38ba8]" />
-          <div className="text-[22px] font-bold uppercase tracking-[0.1em] text-[#f38ba8]">
+        <div className="flex flex-col items-center">
+          <div
+            className="text-[10px] uppercase tracking-[0.36em] mb-1.5"
+            style={{ color: "#f38ba8", opacity: 0.85 }}
+          >
+            Mission Failed
+          </div>
+          <div
+            className="text-[28px] font-bold uppercase tracking-[0.08em] mb-6 text-center"
+            style={{
+              color: "#f9e2af",
+              textShadow: "0 0 28px rgba(249,226,175,0.45)",
+            }}
+          >
             Planet Destroyed
           </div>
-        </div>
 
-        <div className="flex flex-col items-center gap-3 w-full">
-          <div className="flex w-full justify-between gap-6">
-            <div className="flex flex-col items-center flex-1 gap-0.5 rounded-xl border border-[rgba(255,255,255,0.06)] py-2.5 px-3" style={{ background: "rgba(255,255,255,0.04)" }}>
-              <span className="text-[10px] uppercase tracking-[0.18em] text-[#a6adc8]">Wave</span>
-              <span className="text-[20px] font-bold text-[#f9e2af] tabular-nums">{wave}</span>
+          <div className="flex gap-8 mb-7">
+            <div className="flex flex-col items-center gap-0.5">
+              <span
+                className="text-[10px] uppercase tracking-[0.28em]"
+                style={{ color: "#a6adc8", opacity: 0.7 }}
+              >
+                Wave
+              </span>
+              <span
+                className="text-[26px] font-bold tabular-nums"
+                style={{ color: "#f9e2af" }}
+              >
+                {wave}
+              </span>
             </div>
-            <div className="flex flex-col items-center flex-1 gap-0.5 rounded-xl border border-[rgba(255,255,255,0.06)] py-2.5 px-3" style={{ background: "rgba(255,255,255,0.04)" }}>
-              <span className="text-[10px] uppercase tracking-[0.18em] text-[#a6adc8]">Score</span>
-              <span className="text-[20px] font-bold text-[#cdd6f4] tabular-nums">{score.toLocaleString()}</span>
+            <div
+              style={{
+                width: 1,
+                alignSelf: "stretch",
+                background: "rgba(255,255,255,0.08)",
+              }}
+            />
+            <div className="flex flex-col items-center gap-0.5">
+              <span
+                className="text-[10px] uppercase tracking-[0.28em]"
+                style={{ color: "#a6adc8", opacity: 0.7 }}
+              >
+                Score
+              </span>
+              <span
+                className="text-[26px] font-bold tabular-nums"
+                style={{ color: "#cdd6f4" }}
+              >
+                {score.toLocaleString()}
+              </span>
             </div>
-            <div className="flex flex-col items-center flex-1 gap-0.5 rounded-xl border border-[rgba(255,255,255,0.06)] py-2.5 px-3" style={{ background: "rgba(255,255,255,0.04)" }}>
-              <span className="text-[10px] uppercase tracking-[0.18em] text-[#a6adc8]">Kills</span>
-              <span className="text-[20px] font-bold text-[#a6e3a1] tabular-nums">{kills}</span>
+            <div
+              style={{
+                width: 1,
+                alignSelf: "stretch",
+                background: "rgba(255,255,255,0.08)",
+              }}
+            />
+            <div className="flex flex-col items-center gap-0.5">
+              <span
+                className="text-[10px] uppercase tracking-[0.28em]"
+                style={{ color: "#a6adc8", opacity: 0.7 }}
+              >
+                Kills
+              </span>
+              <span
+                className="text-[26px] font-bold tabular-nums"
+                style={{ color: "#a6e3a1" }}
+              >
+                {kills}
+              </span>
             </div>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-2 w-full">
-          <button
-            onClick={handleCopy}
-            className="flex items-center justify-center gap-2 w-full rounded-xl border border-[rgba(249,226,175,0.2)] py-2 text-[13px] font-semibold text-[#f9e2af] transition-colors hover:bg-[rgba(249,226,175,0.08)] active:bg-[rgba(249,226,175,0.12)]"
-            style={{ background: "rgba(249,226,175,0.04)" }}
-          >
-            {copied ? (
-              <>
-                <Check className="w-4 h-4" />
-                Copied!
-              </>
-            ) : (
-              <>
-                <Copy className="w-4 h-4" />
-                Copy Results
-              </>
-            )}
-          </button>
-          <button
-            onClick={onPlayAgain}
-            className="flex items-center justify-center gap-2 w-full rounded-xl py-2.5 text-[13px] font-bold text-[#1e1e2e] transition-colors hover:opacity-90 active:opacity-80"
-            style={{ background: "#cdd6f4" }}
-          >
-            <RotateCcw className="w-4 h-4" />
-            Play Again
-          </button>
+          <div className="flex gap-3">
+            <button
+              className="flex items-center gap-2.5 rounded-lg px-5 py-2 font-semibold text-[12px] transition-all"
+              style={{
+                background: "rgba(249,226,175,0.08)",
+                border: "1px solid rgba(249,226,175,0.28)",
+                color: "#f9e2af",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(249,226,175,0.18)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(249,226,175,0.08)";
+              }}
+              onClick={handleCopy}
+            >
+              {copied ? "Copied!" : "Copy Results"}
+              <span
+                className="text-[10px] font-bold rounded px-1.5 py-0.5"
+                style={{
+                  background: "rgba(249,226,175,0.12)",
+                  border: "1px solid rgba(249,226,175,0.25)",
+                  color: "#f9e2af",
+                  opacity: 0.8,
+                }}
+              >
+                C
+              </span>
+            </button>
+            <button
+              className="flex items-center gap-2.5 rounded-lg px-5 py-2 font-semibold text-[12px] transition-all"
+              style={{
+                background: "rgba(249,226,175,0.12)",
+                border: "1px solid rgba(249,226,175,0.35)",
+                color: "#f9e2af",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(249,226,175,0.22)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(249,226,175,0.12)";
+              }}
+              onClick={onPlayAgain}
+            >
+              Play Again
+              <span
+                className="text-[10px] font-bold rounded px-1.5 py-0.5"
+                style={{
+                  background: "rgba(249,226,175,0.12)",
+                  border: "1px solid rgba(249,226,175,0.25)",
+                  color: "#f9e2af",
+                  opacity: 0.8,
+                }}
+              >
+                R
+              </span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
