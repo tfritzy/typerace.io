@@ -16,11 +16,12 @@ import { ShipChoiceOverlay } from "./ShipChoiceOverlay";
 import { RelicContainer } from "./RelicContainer";
 import { generateSlots, type PlacementSlot } from "./PlacementPoints";
 import type { EntityType } from "./types";
+import { GameOverScreen } from "./GameOverScreen";
 
 const UI_REFERENCE_WIDTH = 700;
 const BOSS_ANNOUNCEMENT_DURATION_MS = BOSS_WARNING_LEAD_TIME_SECONDS * 1000;
 
-export const GameCanvas = () => {
+const GameCanvasInner = ({ onPlayAgain }: { onPlayAgain: () => void }) => {
   const languageGameMatch = useMatch("/:lang/games/:gameId");
   const gameMatch = useMatch("/games/:gameId");
   const gameId = languageGameMatch?.params.gameId ?? gameMatch?.params.gameId ?? "";
@@ -40,6 +41,10 @@ export const GameCanvas = () => {
   const [bossApproaching, setBossApproaching] = useState(false);
   const [bossEntityIds, setBossEntityIds] = useState<number[]>([]);
   const [gamePaused, setGamePaused] = useState(true);
+  const [gameOver, setGameOver] = useState(false);
+  const [gameOverWave, setGameOverWave] = useState(0);
+  const [gameOverScore, setGameOverScore] = useState(0);
+  const [gameOverKills, setGameOverKills] = useState(0);
 
   useEffect(() => {
     if (!selectedSlot?.entityId) return;
@@ -88,6 +93,7 @@ export const GameCanvas = () => {
     let unsubBossSpawned: (() => void) | null = null;
     let unsubBossDefeated: (() => void) | null = null;
     let unsubPauseStateChanged: (() => void) | null = null;
+    let unsubGameOver: (() => void) | null = null;
 
     createCosmicDefenseGame(div)
       .then((game) => {
@@ -133,6 +139,13 @@ export const GameCanvas = () => {
           if (cancelled) return;
           setGamePaused(paused);
         });
+        unsubGameOver = game.state.onGameOver.subscribe(() => {
+          if (cancelled) return;
+          setGameOver(true);
+          setGameOverWave(game.state.spawner.currentWave);
+          setGameOverScore(game.state.score);
+          setGameOverKills(game.state.totalKills);
+        });
       })
       .catch((err) => {
         console.error("Failed to initialize Cosmic Defense:", err);
@@ -147,6 +160,7 @@ export const GameCanvas = () => {
       unsubBossSpawned?.();
       unsubBossDefeated?.();
       unsubPauseStateChanged?.();
+      unsubGameOver?.();
       gameRef.current?.destroy();
       gameRef.current = null;
     };
@@ -309,7 +323,20 @@ export const GameCanvas = () => {
           />
         )}
         <PhraseOverlay gameRef={gameRef} isPaused={gamePaused} />
+        {gameOver && (
+          <GameOverScreen
+            wave={gameOverWave}
+            score={gameOverScore}
+            kills={gameOverKills}
+            onPlayAgain={onPlayAgain}
+          />
+        )}
       </div>
     </div>
   );
+};
+
+export const GameCanvas = () => {
+  const [restartKey, setRestartKey] = useState(0);
+  return <GameCanvasInner key={restartKey} onPlayAgain={() => setRestartKey((k) => k + 1)} />;
 };
