@@ -280,17 +280,18 @@ export const GameCanvas = () => {
             </div>
           </div>
         )}
-        {gameReady && gameRef.current && (() => {
-          const gameState = gameRef.current.state;
-          return (
-            <div className="absolute bottom-3 left-3 z-[1] flex flex-row flex-wrap gap-2 pointer-events-none">
-              <PlanetHealthBar state={gameState} />
-              {bossEntityIds.map((id) => (
-                <BossHealthBar key={id} state={gameState} entityId={id} />
-              ))}
-            </div>
-          );
-        })()}
+        {gameReady && gameRef.current && (
+          <div className="absolute bottom-3 left-3 z-[1] pointer-events-none">
+            <PlanetHealthBar state={gameRef.current.state} />
+          </div>
+        )}
+        {bossEntityIds.length > 0 && gameRef.current && (
+          <div className="absolute bottom-3 right-3 z-[1] flex flex-row-reverse flex-wrap gap-2 pointer-events-none">
+            {bossEntityIds.map((id) => (
+              <BossHealthBar key={id} state={gameRef.current!.state} entityId={id} />
+            ))}
+          </div>
+        )}
         <PlacementOverlay
           slots={slots}
           onSlotClick={handleSlotClick}
