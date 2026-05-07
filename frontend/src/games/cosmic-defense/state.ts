@@ -655,7 +655,9 @@ function dealDamageToEntity(
       });
       if (target.isBoss) {
         state.onBossDefeated.emit({ id: target.id });
-        const unowned = RELIC_CATALOG.filter((r) => !state.relics.includes(r.id) && !state.pendingRelicDrops.includes(r.id));
+        const ownedRelics = new Set(state.relics);
+        const pendingRelics = new Set(state.pendingRelicDrops);
+        const unowned = RELIC_CATALOG.filter((r) => !ownedRelics.has(r.id) && !pendingRelics.has(r.id));
         if (unowned.length > 0) {
           const relicIndex = (state.spawner.currentWave - 1) % unowned.length;
           const relicId = unowned[relicIndex].id;
