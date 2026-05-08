@@ -106,15 +106,19 @@ export class CosmicDefenseGame {
   }
 
   private update(dt: number): void {
-    this.explosionManager.update(this.state);
-    this.damageNumberManager.update(dt);
-    if (this.state.paused) return;
-    updateState(this.state, dt);
-    this.enemyManager.update(this.state, dt);
-    this.laserBeamManager.update(this.state);
-    this.projectileManager.update(this.state);
-    this.shipManager.update(this.state, dt);
-    this.gemManager.update(this.state, dt);
+    try {
+      this.explosionManager.update(this.state);
+      this.damageNumberManager.update(dt);
+      if (this.state.paused) return;
+      updateState(this.state, dt);
+      this.enemyManager.update(this.state, dt);
+      this.laserBeamManager.update(this.state);
+      this.projectileManager.update(this.state);
+      this.shipManager.update(this.state, dt);
+      this.gemManager.update(this.state, dt);
+    } catch (e) {
+      console.error("Game loop error:", e);
+    }
   }
 
   destroy(): void {
