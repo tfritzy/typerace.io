@@ -9,6 +9,7 @@ const INITIAL_MOVE_STRENGTH = 0.5;
 const MOVE_ACCELERATION = 12;
 const TARGET_X = 60;
 const TARGET_Y = 20;
+const RELIC_GLOW_COLOR = 0xf9e2af;
 const GLOW_BLUR_STRENGTH = 16;
 const GLOW_BLUR_QUALITY = 3;
 const GLOW_OUTER_RADIUS = RELIC_RENDER_SIZE * 0.85;
@@ -53,9 +54,9 @@ export class RelicPickupManager {
 
     const glow = new Graphics();
     glow.circle(0, 0, GLOW_OUTER_RADIUS);
-    glow.fill({ color: 0xf9e2af, alpha: GLOW_OUTER_ALPHA });
+    glow.fill({ color: RELIC_GLOW_COLOR, alpha: GLOW_OUTER_ALPHA });
     glow.circle(0, 0, GLOW_INNER_RADIUS);
-    glow.fill({ color: 0xf9e2af, alpha: GLOW_INNER_ALPHA });
+    glow.fill({ color: RELIC_GLOW_COLOR, alpha: GLOW_INNER_ALPHA });
     glow.x = data.x;
     glow.y = data.y;
     glow.scale.set(0);
@@ -84,7 +85,7 @@ export class RelicPickupManager {
     }).catch(() => {
       if (sprite.destroyed) return;
       sprite.texture = Texture.WHITE;
-      sprite.tint = 0xf9e2af;
+      sprite.tint = RELIC_GLOW_COLOR;
     });
   }
 
