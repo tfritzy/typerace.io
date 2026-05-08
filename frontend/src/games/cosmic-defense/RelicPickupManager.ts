@@ -86,7 +86,7 @@ export class RelicPickupManager {
       if (sprite.destroyed) return;
       sprite.texture = Texture.WHITE;
       sprite.tint = RELIC_GLOW_COLOR;
-      console.warn("Failed to load relic pickup sprite texture", relic.sprite, error);
+      console.warn("Failed to load relic pickup sprite texture, using fallback:", relic.sprite, error);
     });
   }
 
