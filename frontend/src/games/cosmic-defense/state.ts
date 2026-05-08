@@ -1178,10 +1178,14 @@ function addRelic(state: GameState, relicId: RelicId): void {
 }
 
 export function collectDroppedRelic(state: GameState, relicId: RelicId): void {
+  if (state.relics.includes(relicId)) {
+    const existingPendingIndex = state.pendingRelicDrops.indexOf(relicId);
+    if (existingPendingIndex >= 0) state.pendingRelicDrops.splice(existingPendingIndex, 1);
+    return;
+  }
   const pendingIndex = state.pendingRelicDrops.indexOf(relicId);
   if (pendingIndex < 0) return;
   state.pendingRelicDrops.splice(pendingIndex, 1);
-  if (state.relics.includes(relicId)) return;
   addRelic(state, relicId);
   pauseGame(state);
   state.onRelicCollected.emit(relicId);

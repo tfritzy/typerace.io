@@ -87,6 +87,7 @@ export class RelicPickupManager {
       relicDrop.elapsed += dt;
 
       if (relicDrop.elapsed >= RELIC_MAX_LIFE) {
+        collectDroppedRelic(state, relicDrop.relicId);
         relicDrop.glow.destroy();
         relicDrop.sprite.destroy();
         this.active.splice(i, 1);
