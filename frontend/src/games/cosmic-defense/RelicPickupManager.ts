@@ -81,6 +81,10 @@ export class RelicPickupManager {
     void Assets.load<Texture>(relic.sprite).then((texture) => {
       if (sprite.destroyed) return;
       sprite.texture = texture;
+    }).catch(() => {
+      if (sprite.destroyed) return;
+      sprite.texture = Texture.WHITE;
+      sprite.tint = 0xf9e2af;
     });
   }
 
