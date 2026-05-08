@@ -1,8 +1,8 @@
-import { BlurFilter, Container, Graphics, Sprite } from "pixi.js";
+import { BlurFilter, Container, Graphics, Sprite, Texture } from "pixi.js";
 import { RELIC_MAP } from "./relics";
 import { collectDroppedRelic, type GameState, type RelicDropData } from "./state";
 
-const RELIC_RENDER_SIZE = 96;
+const RELIC_RENDER_SIZE = 64;
 const RELIC_MAX_LIFE = 8;
 const COLLECTION_DISTANCE = 16;
 const INITIAL_MOVE_STRENGTH = 0.5;
@@ -13,13 +13,14 @@ const GLOW_BLUR_STRENGTH = 16;
 const GLOW_BLUR_QUALITY = 3;
 const GLOW_OUTER_RADIUS = RELIC_RENDER_SIZE * 0.85;
 const GLOW_INNER_RADIUS = RELIC_RENDER_SIZE * 0.55;
-const GLOW_OUTER_ALPHA = 0.24;
-const GLOW_INNER_ALPHA = 0.45;
+const GLOW_OUTER_ALPHA = 0.16;
+const GLOW_INNER_ALPHA = 0.28;
 
 interface ActiveRelicDrop {
   relicId: RelicDropData["relicId"];
   glow: Graphics;
   sprite: Sprite;
+  baseSpriteScale: number;
   elapsed: number;
   x: number;
   y: number;
@@ -61,24 +62,31 @@ export class RelicPickupManager {
     glow.scale.set(0);
     this.glowLayer.addChild(glow);
 
-    const sprite = Sprite.from(relic.sprite);
+    const texture = Texture.from(relic.sprite);
+    const sprite = new Sprite(texture);
     sprite.anchor.set(0.5);
-    sprite.width = RELIC_RENDER_SIZE;
-    sprite.height = RELIC_RENDER_SIZE;
+    const activeDrop: ActiveRelicDrop = {
+      relicId: data.relicId,
+      glow,
+      sprite,
+      baseSpriteScale: 1,
+      elapsed: 0,
+      x: data.x,
+      y: data.y,
+    };
+    const applySpriteSize = () => {
+      const largestDimension = Math.max(texture.width, texture.height);
+      if (largestDimension <= 0) return;
+      activeDrop.baseSpriteScale = RELIC_RENDER_SIZE / largestDimension;
+    };
+    applySpriteSize();
+    texture.once("update", applySpriteSize);
     sprite.x = data.x;
     sprite.y = data.y;
     sprite.alpha = 0;
     sprite.scale.set(0);
     this.spriteLayer.addChild(sprite);
-
-    this.active.push({
-      relicId: data.relicId,
-      glow,
-      sprite,
-      elapsed: 0,
-      x: data.x,
-      y: data.y,
-    });
+    this.active.push(activeDrop);
   }
 
   update(state: GameState, dt: number): void {
@@ -118,7 +126,7 @@ export class RelicPickupManager {
       const progress = relicDrop.elapsed / easeInDur;
       const scale = relicDrop.elapsed < easeInDur ? progress * (2 - progress) : 1;
       relicDrop.glow.scale.set(scale);
-      relicDrop.sprite.scale.set(scale);
+      relicDrop.sprite.scale.set(relicDrop.baseSpriteScale * scale);
       relicDrop.sprite.alpha = scale;
     }
   }
