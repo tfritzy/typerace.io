@@ -1,4 +1,4 @@
-import { BlurFilter, Container, Graphics, Sprite } from "pixi.js";
+import { Assets, BlurFilter, Container, Graphics, Sprite, Texture } from "pixi.js";
 import { RELIC_MAP } from "./relics";
 import { collectDroppedRelic, type GameState, type RelicDropData } from "./state";
 
@@ -61,7 +61,7 @@ export class RelicPickupManager {
     glow.scale.set(0);
     this.glowLayer.addChild(glow);
 
-    const sprite = Sprite.from(relic.sprite);
+    const sprite = new Sprite(Texture.EMPTY);
     sprite.anchor.set(0.5);
     const activeDrop: ActiveRelicDrop = {
       relicId: data.relicId,
@@ -78,6 +78,10 @@ export class RelicPickupManager {
     sprite.height = 0;
     this.spriteLayer.addChild(sprite);
     this.active.push(activeDrop);
+    void Assets.load<Texture>(relic.sprite).then((texture) => {
+      if (sprite.destroyed) return;
+      sprite.texture = texture;
+    });
   }
 
   update(state: GameState, dt: number): void {
