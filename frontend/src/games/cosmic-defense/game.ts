@@ -109,7 +109,13 @@ export class CosmicDefenseGame {
     try {
       this.explosionManager.update(this.state);
       this.damageNumberManager.update(dt);
-      if (this.state.paused) return;
+    } catch (e) {
+      console.error("Game loop error (visual update):", e);
+    }
+
+    if (this.state.paused) return;
+
+    try {
       updateState(this.state, dt);
       this.enemyManager.update(this.state, dt);
       this.laserBeamManager.update(this.state);
@@ -117,7 +123,7 @@ export class CosmicDefenseGame {
       this.shipManager.update(this.state, dt);
       this.gemManager.update(this.state, dt);
     } catch (e) {
-      console.error("Game loop error:", e);
+      console.error("Game loop error (simulation update):", e);
     }
   }
 
