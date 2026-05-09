@@ -7,8 +7,8 @@ const PICKUP_DURATION_S = 0.7;
 const PICKUP_ARC_HEIGHT = 120;
 const PICKUP_TARGET_X = 120;
 const PICKUP_TARGET_Y = 74;
-const PICKUP_START_SIZE = 128;
-const PICKUP_END_SIZE = 44;
+const PICKUP_PREVIEW_SIZE = 128;
+const PICKUP_HUD_SIZE = 44;
 
 interface ActivePickup {
   relicId: RelicDropData["relicId"];
@@ -46,7 +46,7 @@ export class RelicPickupManager {
     this.state = state;
     this.unsub = state.onRelicDropped.subscribe((data) => {
       this.queuedPickups.push(data);
-      void this.processNextPickup();
+      this.triggerQueueProcessing();
     });
   }
 
@@ -63,8 +63,9 @@ export class RelicPickupManager {
       lerp(this.activePickup.startY, PICKUP_TARGET_Y, eased) -
       Math.sin(progress * Math.PI) * PICKUP_ARC_HEIGHT;
 
-    const startScale = PICKUP_START_SIZE / Math.max(sprite.texture.width, sprite.texture.height);
-    const endScale = PICKUP_END_SIZE / Math.max(sprite.texture.width, sprite.texture.height);
+    const spriteSize = Math.max(sprite.texture.width, sprite.texture.height);
+    const startScale = PICKUP_PREVIEW_SIZE / spriteSize;
+    const endScale = PICKUP_HUD_SIZE / spriteSize;
     sprite.scale.set(lerp(startScale, endScale, eased));
     sprite.alpha = progress < 0.85 ? 1 : lerp(1, 0.8, (progress - 0.85) / 0.15);
 
@@ -74,7 +75,7 @@ export class RelicPickupManager {
     sprite.destroy();
     this.activePickup = null;
     this.state?.onRelicPickupArrived.emit(relicId);
-    void this.processNextPickup();
+    this.triggerQueueProcessing();
   }
 
   destroy(): void {
@@ -92,7 +93,7 @@ export class RelicPickupManager {
   }
 
   private async processNextPickup(): Promise<void> {
-    if (this.destroyed || this.loadingPickup || this.activePickup || this.queuedPickups.length === 0) return;
+    if (!this.canProcessNextPickup()) return;
 
     const data = this.queuedPickups.shift();
     if (!data) return;
@@ -101,7 +102,7 @@ export class RelicPickupManager {
     const relic = RELIC_MAP.get(data.relicId);
     if (!relic) {
       this.loadingPickup = false;
-      void this.processNextPickup();
+      this.triggerQueueProcessing();
       return;
     }
 
@@ -117,7 +118,7 @@ export class RelicPickupManager {
     sprite.anchor.set(0.5);
     sprite.x = data.x;
     sprite.y = data.y;
-    const startScale = PICKUP_START_SIZE / Math.max(texture.width, texture.height);
+    const startScale = PICKUP_PREVIEW_SIZE / Math.max(texture.width, texture.height);
     sprite.scale.set(startScale);
     this.layer.addChild(sprite);
 
@@ -128,5 +129,15 @@ export class RelicPickupManager {
       startX: data.x,
       startY: data.y,
     };
+  }
+
+  private canProcessNextPickup(): boolean {
+    return !this.destroyed && !this.loadingPickup && !this.activePickup && this.queuedPickups.length > 0;
+  }
+
+  private triggerQueueProcessing(): void {
+    this.processNextPickup().catch((error: unknown) => {
+      console.error("Failed to process relic pickup animation:", error);
+    });
   }
 }
