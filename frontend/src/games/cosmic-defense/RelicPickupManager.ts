@@ -1,7 +1,7 @@
 import { Container, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import { RELIC_MAP } from "./relics";
-import { addRelic, type GameState, type RelicDropData } from "./state";
+import { GameDataEvent, addRelic, type GameState, type RelicDropData } from "./state";
 
 const PICKUP_DURATION_S = 0.7;
 const PICKUP_TARGET_X = 120;
@@ -27,6 +27,7 @@ function easeOutCubic(t: number): number {
 
 export class RelicPickupManager {
   readonly layer: Container;
+  readonly onCollected = new GameDataEvent<RelicDropData["relicId"]>();
 
   private assets: AssetManager;
   private state: GameState | null = null;
@@ -73,7 +74,7 @@ export class RelicPickupManager {
     this.activePickup = null;
     if (this.state) {
       addRelic(this.state, relicId);
-      this.state.onRelicPickupArrived.emit(relicId);
+      this.onCollected.emit(relicId);
     }
     this.triggerQueueProcessing();
   }

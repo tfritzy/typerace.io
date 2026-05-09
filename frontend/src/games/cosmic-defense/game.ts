@@ -16,6 +16,7 @@ import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeyst
 import type { GameState } from "./state";
 import type { EntityType } from "./types";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
+import type { RelicId } from "./relics";
 
 export class CosmicDefenseGame {
   private app: Application;
@@ -61,6 +62,10 @@ export class CosmicDefenseGame {
     } else {
       stateOnWordWithError(this.state);
     }
+  }
+
+  onRelicCollected(listener: (relicId: RelicId) => void): () => void {
+    return this.relicPickupManager.onCollected.subscribe(listener);
   }
 
   private buildScene(assetManager: AssetManager): void {

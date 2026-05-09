@@ -222,7 +222,6 @@ export interface GameState {
   onBossSpawned: GameDataEvent<BossSpawnedData>;
   onBossDefeated: GameDataEvent<BossDefeatedData>;
   onRelicDropped: GameDataEvent<RelicDropData>;
-  onRelicPickupArrived: GameDataEvent<RelicId>;
   onPauseStateChanged: GameDataEvent<boolean>;
   onGameOver: GameEvent;
 }
@@ -287,7 +286,6 @@ export function createGameState(): GameState {
     onBossSpawned: new GameDataEvent<BossSpawnedData>(),
     onBossDefeated: new GameDataEvent<BossDefeatedData>(),
     onRelicDropped: new GameDataEvent<RelicDropData>(),
-    onRelicPickupArrived: new GameDataEvent<RelicId>(),
     onPauseStateChanged: new GameDataEvent<boolean>(),
     onGameOver: new GameEvent(),
   };
