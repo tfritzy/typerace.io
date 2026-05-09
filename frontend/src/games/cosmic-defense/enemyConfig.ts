@@ -186,8 +186,8 @@ export function createEnemyConfigForWave(virtualTier: number, shipTypeIndex: num
   };
 }
 
-export function createBossConfigForVirtualTier(virtualTier: number): EnemyConfig {
-  const base = createEnemyConfigForVirtualTier(virtualTier);
+export function createBossConfigForWave(virtualTier: number, shipTypeIndex: number): EnemyConfig {
+  const base = createEnemyConfigForWave(virtualTier, shipTypeIndex);
   return {
     ...base,
     health: base.health * 8,

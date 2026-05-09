@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT, MAX_VITAL_MATRIX_BONUS } from "./constants";
 import { type EntityType, ColorPreset, ExplosionType, Team, getExplosionType, DamageType, FireMode } from "./types";
-import { SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig, createEnemyConfigForWave, createBossConfigForVirtualTier, ENEMY_SHIP_TYPES, getWaveHealthMultiplier } from "./enemyConfig";
+import { SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig, createEnemyConfigForWave, createBossConfigForWave, ENEMY_SHIP_TYPES, getWaveHealthMultiplier } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } from "./relics";
 
@@ -1229,6 +1229,18 @@ function pickEnemyTier(startTier: number, weights: number[]): number {
   return startTier + weights.length - 1;
 }
 
+function getRepresentativeTier(startTier: number, weights: number[]): number {
+  let totalWeight = 0;
+  let weightedTierTotal = 0;
+  for (let i = 0; i < weights.length; i++) {
+    const weight = Math.max(0, weights[i]);
+    totalWeight += weight;
+    weightedTierTotal += (startTier + i) * weight;
+  }
+  if (totalWeight <= 0) return startTier + Math.floor(weights.length / 2);
+  return Math.round(weightedTierTotal / totalWeight);
+}
+
 function getSpawnRate(elapsed: number): number {
   const t = Math.min(1, elapsed / SPAWN_RAMP_TIME);
   return BASE_SPAWN_RATE + (MAX_SPAWN_RATE - BASE_SPAWN_RATE) * t;
@@ -1252,9 +1264,10 @@ export function updateSpawner(state: GameState, dt: number): void {
   }
 
   if (remaining <= 0) {
-    const completedWave = spawner.currentWave;
+    const { startTier, weights } = getTierWeights(spawner.elapsed);
+    const bossTier = getRepresentativeTier(startTier, weights);
     spawner.currentWave++;
-    spawnEntity(state, createBossConfigForVirtualTier(completedWave), Team.Enemy);
+    spawnEntity(state, createBossConfigForWave(bossTier, spawner.waveShipTypeIndex), Team.Enemy);
     spawner.waveShipTypeIndex = Math.floor(Math.random() * ENEMY_SHIP_TYPES.length);
     spawner.enemiesSpawnedInWave = 0;
     spawner.enemiesInWave = getEnemiesInWave(spawner.waveShipTypeIndex);
