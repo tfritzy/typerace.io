@@ -31,10 +31,17 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
     return unsubArrived;
   }, [game]);
 
+  useEffect(() => {
+    if (!game || !pendingRelic) return;
+    game.pause();
+    return () => {
+      game.unpause();
+    };
+  }, [game, pendingRelic]);
+
   const handleContinue = useCallback(() => {
     setPendingRelic(null);
-    game?.unpause();
-  }, [game]);
+  }, []);
 
   return (
     <>
