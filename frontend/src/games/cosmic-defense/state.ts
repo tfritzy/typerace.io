@@ -292,10 +292,6 @@ export function createGameState(): GameState {
     onGameOver: new GameEvent(),
   };
 
-  state.onRelicPickupArrived.subscribe((relicId) => {
-    addRelic(state, relicId);
-  });
-
   gameState = state;
   for (const cb of stateCreatedListeners) cb();
   stateCreatedListeners.length = 0;
@@ -1177,6 +1173,10 @@ export function onWordWithError(state: GameState): void {
 function addRelic(state: GameState, relicId: RelicId): void {
   state.relics.push(relicId);
   state.relicEffects = computeRelicEffects(state.relics);
+}
+
+export function completeRelicPickup(state: GameState, relicId: RelicId): void {
+  addRelic(state, relicId);
 }
 
 const TIER_SPREAD = 90;

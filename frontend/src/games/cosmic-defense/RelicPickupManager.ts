@@ -1,7 +1,7 @@
 import { Container, Sprite } from "pixi.js";
 import type { AssetManager } from "./assetManager";
 import { RELIC_MAP } from "./relics";
-import type { GameState, RelicDropData } from "./state";
+import { completeRelicPickup, type GameState, type RelicDropData } from "./state";
 
 const PICKUP_DURATION_S = 0.7;
 const PICKUP_ARC_HEIGHT = 120;
@@ -74,7 +74,10 @@ export class RelicPickupManager {
     const relicId = this.activePickup.relicId;
     sprite.destroy();
     this.activePickup = null;
-    this.state?.onRelicPickupArrived.emit(relicId);
+    if (this.state) {
+      completeRelicPickup(this.state, relicId);
+      this.state.onRelicPickupArrived.emit(relicId);
+    }
     this.triggerQueueProcessing();
   }
 
