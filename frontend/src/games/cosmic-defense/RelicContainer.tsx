@@ -20,18 +20,28 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
       setPendingRelic(null);
       return;
     }
+
     setCollectedRelics([...game.state.relics]);
-    const unsub = game.state.onRelicDropped.subscribe((relicId) => {
+
+    const unsubArrived = game.onRelicCollected((relicId) => {
       setCollectedRelics([...game.state.relics]);
       setPendingRelic(relicId);
     });
-    return unsub;
+
+    return unsubArrived;
   }, [game]);
+
+  useEffect(() => {
+    if (!game || !pendingRelic) return;
+    game.pause();
+    return () => {
+      game.unpause();
+    };
+  }, [game, pendingRelic]);
 
   const handleContinue = useCallback(() => {
     setPendingRelic(null);
-    game?.unpause();
-  }, [game]);
+  }, []);
 
   return (
     <>
@@ -45,7 +55,11 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
               src={relic.sprite}
               alt={relic.name}
               title={`${relic.name}: ${relic.description}`}
-              style={{ width: 22, height: 22, imageRendering: "pixelated" }}
+              style={{
+                width: RELIC_ICON_SIZE,
+                height: RELIC_ICON_SIZE,
+                imageRendering: "pixelated",
+              }}
             />
           );
         })}

@@ -169,6 +169,12 @@ export class AssetManager {
     return previews;
   }
 
+  async loadTexture(src: string): Promise<Texture> {
+    const texture = await Assets.load(src) as Texture;
+    setTextureNearest(texture);
+    return texture;
+  }
+
   private applyNearestNeighbor(): void {
     setTextureNearest(this.background_);
     setNearestNeighbor(this.planets_);

@@ -170,6 +170,12 @@ export interface BossDefeatedData {
   id: number;
 }
 
+export interface RelicDropData {
+  relicId: RelicId;
+  x: number;
+  y: number;
+}
+
 export interface LaserBeam {
   id: number;
   x1: number;
@@ -215,7 +221,7 @@ export interface GameState {
   onBossApproaching: GameEvent;
   onBossSpawned: GameDataEvent<BossSpawnedData>;
   onBossDefeated: GameDataEvent<BossDefeatedData>;
-  onRelicDropped: GameDataEvent<RelicId>;
+  onRelicDropped: GameDataEvent<RelicDropData>;
   onPauseStateChanged: GameDataEvent<boolean>;
   onGameOver: GameEvent;
 }
@@ -279,7 +285,7 @@ export function createGameState(): GameState {
     onBossApproaching: new GameEvent(),
     onBossSpawned: new GameDataEvent<BossSpawnedData>(),
     onBossDefeated: new GameDataEvent<BossDefeatedData>(),
-    onRelicDropped: new GameDataEvent<RelicId>(),
+    onRelicDropped: new GameDataEvent<RelicDropData>(),
     onPauseStateChanged: new GameDataEvent<boolean>(),
     onGameOver: new GameEvent(),
   };
@@ -649,9 +655,7 @@ function dealDamageToEntity(
         if (unowned.length > 0) {
           const relicIndex = (state.spawner.currentWave - 1) % unowned.length;
           const relicId = unowned[relicIndex].id;
-          addRelic(state, relicId);
-          pauseGame(state);
-          state.onRelicDropped.emit(relicId);
+          state.onRelicDropped.emit({ relicId, x: target.x, y: target.y });
         }
       }
     }
@@ -1163,7 +1167,7 @@ export function onWordWithError(state: GameState): void {
   state.perfectWordStreak = 0;
 }
 
-function addRelic(state: GameState, relicId: RelicId): void {
+export function addRelic(state: GameState, relicId: RelicId): void {
   state.relics.push(relicId);
   state.relicEffects = computeRelicEffects(state.relics);
 }
