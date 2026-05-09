@@ -2,13 +2,13 @@ import { BlurFilter, Container, Graphics } from "pixi.js";
 import type { GameState } from "./state";
 
 const DEFAULT_PROJECTILE_SIZE = 5;
-const GLOW_BLUR_STRENGTH = 10;
+const GLOW_BLUR_STRENGTH = 4;
 const GLOW_BLUR_QUALITY = 3;
 const DEFAULT_COLOR = 0xffd700;
-const GLOW_OUTER_RADIUS_MULTIPLIER = 3;
-const GLOW_INNER_RADIUS_MULTIPLIER = 1.8;
-const GLOW_OUTER_ALPHA = 0.35;
-const GLOW_INNER_ALPHA = 0.6;
+const GLOW_OUTER_RADIUS_MULTIPLIER = 1.6;
+const GLOW_INNER_RADIUS_MULTIPLIER = 1.1;
+const GLOW_OUTER_ALPHA = 0.3;
+const GLOW_INNER_ALPHA = 0.55;
 const CORE_HIGHLIGHT_RADIUS_MULTIPLIER = 0.45;
 const CORE_HIGHLIGHT_COLOR = 0xffffff;
 
