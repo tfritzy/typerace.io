@@ -11,6 +11,7 @@ const RELIC_ICON_SIZE = 22;
 const RELICS_PER_ROW = 8;
 const FLYING_RELIC_SIZE = 104;
 const RELIC_FLIGHT_DURATION_MS = 700;
+const RELIC_FLIGHT_START_HEIGHT = 0.38;
 
 interface RelicFlightState {
   relicId: RelicId;
@@ -53,7 +54,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
 
     const targetRect = targetNode.getBoundingClientRect();
     const startX = window.innerWidth / 2 - FLYING_RELIC_SIZE / 2;
-    const startY = window.innerHeight * 0.38 - FLYING_RELIC_SIZE / 2;
+    const startY = window.innerHeight * RELIC_FLIGHT_START_HEIGHT - FLYING_RELIC_SIZE / 2;
     const endX = targetRect.left + targetRect.width / 2 - FLYING_RELIC_SIZE / 2;
     const endY = targetRect.top + targetRect.height / 2 - FLYING_RELIC_SIZE / 2;
 
@@ -66,11 +67,11 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
       active: false,
     });
 
-    let firstFrame = 0;
-    let secondFrame = 0;
+    let firstFrameId = 0;
+    let secondFrameId = 0;
 
-    firstFrame = window.requestAnimationFrame(() => {
-      secondFrame = window.requestAnimationFrame(() => {
+    firstFrameId = window.requestAnimationFrame(() => {
+      secondFrameId = window.requestAnimationFrame(() => {
         setFlight((current) =>
           current?.relicId === pendingRelic ? { ...current, active: true } : current
         );
@@ -78,8 +79,8 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
     });
 
     return () => {
-      window.cancelAnimationFrame(firstFrame);
-      window.cancelAnimationFrame(secondFrame);
+      window.cancelAnimationFrame(firstFrameId);
+      window.cancelAnimationFrame(secondFrameId);
     };
   }, [pendingRelic, popupRelic]);
 
