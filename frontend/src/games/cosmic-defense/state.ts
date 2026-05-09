@@ -1168,8 +1168,6 @@ function addRelic(state: GameState, relicId: RelicId): void {
   state.relicEffects = computeRelicEffects(state.relics);
 }
 
-const TIER_SPREAD = 90;
-const TIER_OFFSET = 30;
 const BASE_SPAWN_RATE = 0.6;
 const MAX_SPAWN_RATE = 4.0;
 const SPAWN_RAMP_TIME = 240;
@@ -1199,17 +1197,16 @@ function binomialWeight(t: number, n: number, k: number): number {
   return coeff * Math.pow(p, k) * Math.pow(1 - p, n - k);
 }
 
-function getTierWeights(elapsed: number): { startTier: number; weights: number[] } {
-  const centerTier = Math.max(0, Math.floor((elapsed - TIER_OFFSET) / TIER_SPREAD));
+function getTierWeights(currentWave: number): { startTier: number; weights: number[] } {
+  const centerTier = Math.max(0, currentWave);
   const startTier = Math.max(0, centerTier - TIER_WEIGHT_WINDOW);
   const endTier = centerTier + TIER_WEIGHT_WINDOW;
   const weights: number[] = [];
+  const n = endTier - startTier;
 
   for (let i = startTier; i <= endTier; i++) {
-    const center = TIER_OFFSET + i * TIER_SPREAD;
-    const n = 20;
-    const t = (elapsed - (center - TIER_SPREAD)) / (TIER_SPREAD * 2);
-    const w = binomialWeight(t, n, Math.floor(n / 2));
+    const k = i - startTier;
+    const w = binomialWeight(0.5, n, k);
     weights.push(Math.max(0, w));
   }
 
@@ -1252,8 +1249,7 @@ export function updateSpawner(state: GameState, dt: number): void {
   }
 
   if (remaining <= 0) {
-    const { startTier, weights } = getTierWeights(spawner.elapsed);
-    const bossTier = weights.length > 0 ? startTier + Math.floor(weights.length / 2) : startTier;
+    const bossTier = Math.max(0, spawner.currentWave);
     const completedWaveShipTypeIndex = spawner.waveShipTypeIndex;
     spawner.currentWave++;
     spawnEntity(state, createBossConfigForWave(bossTier, completedWaveShipTypeIndex), Team.Enemy);
@@ -1264,7 +1260,7 @@ export function updateSpawner(state: GameState, dt: number): void {
     return;
   }
 
-  const { startTier, weights } = getTierWeights(spawner.elapsed);
+  const { startTier, weights } = getTierWeights(spawner.currentWave);
 
   const rate = getSpawnRate(spawner.elapsed);
   spawner.spawnAccumulator += rate * dt;

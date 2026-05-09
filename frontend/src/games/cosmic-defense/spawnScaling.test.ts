@@ -1,24 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { createEnemyConfigForVirtualTier, createEnemyConfigForWave } from "./enemyConfig";
+import { createEnemyConfigForWave } from "./enemyConfig";
 import { createGameState, updateSpawner } from "./state";
 
-const TIER_SPREAD_SECONDS = 90;
-const TIER_OFFSET_SECONDS = 30;
-const TIER_WEIGHT_WINDOW = 8;
-
-function getRepresentativeTierForElapsed(elapsed: number): number {
-  const centerTier = Math.max(0, Math.floor((elapsed - TIER_OFFSET_SECONDS) / TIER_SPREAD_SECONDS));
-  const startTier = Math.max(0, centerTier - TIER_WEIGHT_WINDOW);
-  return startTier + TIER_WEIGHT_WINDOW;
-}
-
 describe("boss scaling", () => {
-  it("keeps boss health as a flat multiplier of the completed wave profile", () => {
+  it("uses current wave for boss tier health scaling", () => {
     const state = createGameState();
     state.paused = false;
-    const elapsed = 3600;
-    state.spawner.elapsed = elapsed;
-    state.spawner.currentWave = 100;
+    const wave = 100;
+    state.spawner.elapsed = 3;
+    state.spawner.currentWave = wave;
     state.spawner.waveShipTypeIndex = 22;
     state.spawner.enemiesInWave = state.spawner.enemiesSpawnedInWave;
 
@@ -27,19 +17,36 @@ describe("boss scaling", () => {
     const boss = state.entities.find((entity) => entity.isBoss);
     expect(boss).toBeTruthy();
 
-    const expectedTier = getRepresentativeTierForElapsed(elapsed);
-    const expectedHealth = createEnemyConfigForWave(expectedTier, 22).health * 8;
+    const expectedHealth = createEnemyConfigForWave(wave, 22).health * 8;
     expect(boss?.health).toBe(expectedHealth);
   });
 
-  it("shows why raw wave count for boss tier creates runaway health", () => {
-    const waveShipTypeIndex = 22;
-    const representativeTier = getRepresentativeTierForElapsed(3600);
-    const waveCount = 100;
+  it("keeps boss health independent from elapsed time for the same wave", () => {
+    const wave = 120;
+    const shipType = 22;
 
-    const waveScaledBossHealth = createEnemyConfigForWave(representativeTier, waveShipTypeIndex).health * 8;
-    const rawWaveCountBossHealth = createEnemyConfigForVirtualTier(waveCount).health * 8;
+    const earlyState = createGameState();
+    earlyState.paused = false;
+    earlyState.spawner.elapsed = 1;
+    earlyState.spawner.currentWave = wave;
+    earlyState.spawner.waveShipTypeIndex = shipType;
+    earlyState.spawner.enemiesInWave = earlyState.spawner.enemiesSpawnedInWave;
 
-    expect(rawWaveCountBossHealth).toBeGreaterThan(waveScaledBossHealth * 1_000_000);
+    const lateState = createGameState();
+    lateState.paused = false;
+    lateState.spawner.elapsed = 10_000;
+    lateState.spawner.currentWave = wave;
+    lateState.spawner.waveShipTypeIndex = shipType;
+    lateState.spawner.enemiesInWave = lateState.spawner.enemiesSpawnedInWave;
+
+    updateSpawner(earlyState, 0);
+    updateSpawner(lateState, 0);
+
+    const earlyBoss = earlyState.entities.find((entity) => entity.isBoss);
+    const lateBoss = lateState.entities.find((entity) => entity.isBoss);
+
+    const expectedHealth = createEnemyConfigForWave(wave, shipType).health * 8;
+    expect(earlyBoss?.health).toBe(expectedHealth);
+    expect(lateBoss?.health).toBe(expectedHealth);
   });
 });
