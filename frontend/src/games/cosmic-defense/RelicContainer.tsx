@@ -11,37 +11,35 @@ const RELIC_ICON_SIZE = 22;
 const RELICS_PER_ROW = 8;
 
 export const RelicContainer = ({ game }: RelicContainerProps) => {
-  const [pendingRelic, setPendingRelic] = useState<RelicId | null>(null);
+  const [showRelicOverlay, setShowRelicOverlay] = useState(false);
   const [collectedRelics, setCollectedRelics] = useState<RelicId[]>([]);
 
   useEffect(() => {
     if (!game) {
       setCollectedRelics([]);
-      setPendingRelic(null);
+      setShowRelicOverlay(false);
       return;
     }
 
     setCollectedRelics([...game.state.relics]);
 
-    const unsubArrived = game.onRelicCollected((relicId) => {
+    const unsubArrived = game.onRelicCollected(() => {
+      game.pause();
       setCollectedRelics([...game.state.relics]);
-      setPendingRelic(relicId);
+      setShowRelicOverlay(true);
     });
 
     return unsubArrived;
   }, [game]);
 
-  useEffect(() => {
-    if (!game || !pendingRelic) return;
-    game.pause();
-    return () => {
-      game.unpause();
-    };
-  }, [game, pendingRelic]);
-
   const handleContinue = useCallback(() => {
-    setPendingRelic(null);
-  }, []);
+    if (game) {
+      game.unpause();
+    }
+    setShowRelicOverlay(false);
+  }, [game]);
+
+  const latestRelicId = showRelicOverlay && collectedRelics.length > 0 ? collectedRelics[collectedRelics.length - 1] : null;
 
   return (
     <>
@@ -64,8 +62,8 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
           );
         })}
       </div>
-      {pendingRelic && (
-        <RelicDropOverlay relicId={pendingRelic} onContinue={handleContinue} />
+      {latestRelicId && (
+        <RelicDropOverlay relicId={latestRelicId} onContinue={handleContinue} />
       )}
     </>
   );
