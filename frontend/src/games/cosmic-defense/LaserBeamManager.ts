@@ -49,18 +49,18 @@ export class LaserBeamManager {
       glow.clear();
       glow.moveTo(beam.x1, beam.y1);
       glow.lineTo(beam.x2, beam.y2);
-      glow.stroke({ width: beam.width * 10, color: beam.color, alpha: alpha * 0.4 });
+      glow.stroke({ width: beam.width * 20, color: beam.color, alpha: alpha * 0.4 });
       glow.moveTo(beam.x1, beam.y1);
       glow.lineTo(beam.x2, beam.y2);
-      glow.stroke({ width: beam.width * 5, color: beam.color, alpha: alpha * 0.6 });
+      glow.stroke({ width: beam.width * 10, color: beam.color, alpha: alpha * 0.6 });
 
       core.clear();
       core.moveTo(beam.x1, beam.y1);
       core.lineTo(beam.x2, beam.y2);
-      core.stroke({ width: beam.width * 1.25, color: beam.color, alpha });
+      core.stroke({ width: beam.width * 2.5, color: beam.color, alpha });
       core.moveTo(beam.x1, beam.y1);
       core.lineTo(beam.x2, beam.y2);
-      core.stroke({ width: Math.max(1, beam.width * 0.4), color: 0xffffff, alpha });
+      core.stroke({ width: Math.max(1, beam.width * 0.8), color: 0xffffff, alpha });
     }
 
     for (const [id, g] of this.glowObjects) {
