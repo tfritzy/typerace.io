@@ -1,17 +1,7 @@
 import { useMemo, useEffect, useCallback } from "react";
-import {
-  Zap,
-  Heart,
-  Flame,
-  Snowflake,
-  Link as LinkIcon,
-  Bomb,
-  Keyboard,
-  type LucideIcon,
-} from "lucide-react";
-import { SHIP_BLUEPRINTS, ROLE_META } from "./shipCatalog";
+import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { FRIENDLY_CONFIG_MAP, getScaledConfig, type FriendlyConfig } from "./enemyConfig";
-import { DamageType, FireMode, type EntityType } from "./types";
+import { DamageType, type EntityType } from "./types";
 import type { PlacementSlot } from "./PlacementPoints";
 
 const CONSISTENT_DAMAGE_ROLES = new Set([
@@ -26,58 +16,45 @@ interface ShipChoiceOverlayProps {
 }
 
 interface StatRow {
-  icon: LucideIcon;
   label: string;
   value: string;
   color: string;
 }
 
-const DAMAGE_TYPE_LABEL: Record<DamageType, string> = {
-  [DamageType.Physical]: "physical",
-  [DamageType.Laser]: "laser",
-  [DamageType.Plasma]: "plasma",
-  [DamageType.Ice]: "ice",
-};
+function damageTypeLabel(t: DamageType): string {
+  if (t === DamageType.Physical) return "physical";
+  if (t === DamageType.Plasma) return "plasma";
+  if (t === DamageType.Ice) return "ice";
+  return "";
+}
 
-function formatDamage(config: FriendlyConfig): string {
-  if (config.fireMode === FireMode.Laser) {
-    if (config.laserDamage > 0) {
-      const typeLabel = DAMAGE_TYPE_LABEL[config.damageType] ?? "";
-      return `${config.laserDamage} ${typeLabel}/tick`.trim();
-    }
-    return "—";
-  }
-  const typeLabel = DAMAGE_TYPE_LABEL[config.damageType] ?? "";
-  if (config.projectileDamage <= 0) return "—";
-  if (config.fireCount > 1) {
-    return `${config.projectileDamage} × ${config.fireCount} ${typeLabel}`.trim();
-  }
-  return `${config.projectileDamage} ${typeLabel}`.trim();
+function damageTypeColor(t: DamageType): string {
+  if (t === DamageType.Physical) return "#f9e2af";
+  if (t === DamageType.Plasma) return "#cc88ff";
+  if (t === DamageType.Ice) return "#89dceb";
+  return "#f9e2af";
+}
+
+function formatDamageValue(amount: number, fireCount: number, type: DamageType): string {
+  const typeLabel = damageTypeLabel(type);
+  const numberPart = fireCount > 1 ? `${amount} × ${fireCount}` : `${amount}`;
+  return typeLabel ? `${numberPart} ${typeLabel}` : numberPart;
 }
 
 function getShipStats(config: FriendlyConfig): StatRow[] {
   const rows: StatRow[] = [];
 
-  const damageStr = formatDamage(config);
-  if (damageStr !== "—") {
+  const damageAmount = config.projectileDamage > 0 ? config.projectileDamage : config.laserDamage;
+  if (damageAmount > 0) {
     rows.push({
-      icon: Zap,
       label: "Damage",
-      value: damageStr,
-      color: "#f9e2af",
+      value: formatDamageValue(damageAmount, config.fireCount, config.damageType),
+      color: damageTypeColor(config.damageType),
     });
   }
 
-  rows.push({
-    icon: Keyboard,
-    label: "Words to fire",
-    value: `${config.chargesRequired}`,
-    color: "#cdd6f4",
-  });
-
   if (config.plasmaStacks > 0) {
     rows.push({
-      icon: Flame,
       label: "Plasma",
       value: `${config.plasmaStacks} stacks`,
       color: "#cc88ff",
@@ -85,18 +62,15 @@ function getShipStats(config: FriendlyConfig): StatRow[] {
   }
 
   if (config.freezeStacks > 0) {
-    const seconds = config.freezeStacks;
     rows.push({
-      icon: Snowflake,
       label: "Freeze",
-      value: `${seconds} sec`,
+      value: `${config.freezeStacks} sec`,
       color: "#89dceb",
     });
   }
 
   if (config.chainCount > 0) {
     rows.push({
-      icon: LinkIcon,
       label: "Chain",
       value: `${config.chainCount} jumps`,
       color: "#a6e3a1",
@@ -105,19 +79,11 @@ function getShipStats(config: FriendlyConfig): StatRow[] {
 
   if (config.explosionRadius > 0) {
     rows.push({
-      icon: Bomb,
       label: "Splash",
       value: `${config.explosionRadius} radius`,
       color: "#fab387",
     });
   }
-
-  rows.push({
-    icon: Heart,
-    label: "Health",
-    value: `${config.health}`,
-    color: "#f38ba8",
-  });
 
   return rows;
 }
@@ -152,12 +118,12 @@ function generateChoices(slots: PlacementSlot[]): EntityType[] {
 const CARD_WIDTH = 230;
 const CARD_HEIGHT = 360;
 
-interface CornerRankProps {
+interface CornerHotkeyProps {
   hotkey: number;
   flipped?: boolean;
 }
 
-const CornerRank = ({ hotkey, flipped }: CornerRankProps) => (
+const CornerHotkey = ({ hotkey, flipped }: CornerHotkeyProps) => (
   <div
     className="absolute flex items-center justify-center select-none pointer-events-none rounded-md"
     style={{
@@ -165,21 +131,49 @@ const CornerRank = ({ hotkey, flipped }: CornerRankProps) => (
       bottom: flipped ? 8 : "auto",
       left: flipped ? "auto" : 8,
       right: flipped ? 8 : "auto",
-      width: 24,
-      height: 24,
+      width: 26,
+      height: 26,
       background: "rgba(255,255,255,0.06)",
       border: "1px solid rgba(255,255,255,0.18)",
-      boxShadow: "0 1px 0 rgba(0,0,0,0.4)",
+      boxShadow: "0 1px 0 rgba(0,0,0,0.4), 0 0 0 2px rgba(0,0,0,0.25)",
       color: "#cdd6f4",
       fontFamily: "system-ui, sans-serif",
-      fontSize: 13,
+      fontSize: 14,
       fontWeight: 700,
-      letterSpacing: "-0.02em",
     }}
   >
     {hotkey}
   </div>
 );
+
+interface ChargeDotsProps {
+  charges: number;
+  accent: string;
+}
+
+const ChargeDots = ({ charges, accent }: ChargeDotsProps) => {
+  const dots = Array.from({ length: charges }, (_, i) => i);
+  return (
+    <div
+      className="flex flex-wrap gap-1 justify-center px-3"
+      style={{ maxWidth: "100%" }}
+    >
+      {dots.map((i) => (
+        <span
+          key={i}
+          style={{
+            width: 9,
+            height: 9,
+            borderRadius: "50%",
+            background: accent,
+            boxShadow: `0 0 4px ${accent}88, inset 0 1px 0 rgba(255,255,255,0.4)`,
+            border: "1px solid rgba(0,0,0,0.4)",
+          }}
+        />
+      ))}
+    </div>
+  );
+};
 
 interface ShipCardProps {
   entityType: EntityType;
@@ -205,13 +199,12 @@ const ShipCard = ({
     : baseConfig;
 
   const stats = getShipStats(displayConfig);
-  const role = ROLE_META[bp.role];
-  const RoleIcon = role.icon;
+  const accent = damageTypeColor(displayConfig.damageType);
 
   return (
     <button
       onClick={() => onSelect(entityType)}
-      className="relative flex flex-col rounded-xl cursor-pointer transition-all text-left overflow-hidden group"
+      className="relative flex flex-col rounded-xl cursor-pointer transition-all text-left overflow-hidden"
       style={{
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
@@ -222,9 +215,9 @@ const ShipCard = ({
           "0 18px 40px -18px rgba(0,0,0,0.85), 0 2px 0 rgba(255,255,255,0.04) inset",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = role.color;
+        e.currentTarget.style.borderColor = accent;
         e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.boxShadow = `0 24px 48px -16px rgba(0,0,0,0.9), 0 0 0 1px ${role.color}55, 0 0 24px -4px ${role.color}55, 0 2px 0 rgba(255,255,255,0.04) inset`;
+        e.currentTarget.style.boxShadow = `0 24px 48px -16px rgba(0,0,0,0.9), 0 0 0 1px ${accent}55, 0 0 24px -4px ${accent}55, 0 2px 0 rgba(255,255,255,0.04) inset`;
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)";
@@ -236,12 +229,12 @@ const ShipCard = ({
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(circle at 50% 22%, ${role.color}22 0%, transparent 55%)`,
+          background: `radial-gradient(circle at 50% 24%, ${accent}1f 0%, transparent 55%)`,
         }}
       />
 
-      <CornerRank hotkey={hotkey} />
-      <CornerRank hotkey={hotkey} flipped />
+      <CornerHotkey hotkey={hotkey} />
+      <CornerHotkey hotkey={hotkey} flipped />
 
       <div
         className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider"
@@ -263,16 +256,16 @@ const ShipCard = ({
       </div>
 
       <div
-        className="relative flex items-center justify-center mt-9 mb-1"
-        style={{ height: 92 }}
+        className="relative flex items-center justify-center mt-10 mb-1"
+        style={{ height: 96 }}
       >
         <div
           className="absolute"
           style={{
-            width: 110,
-            height: 110,
+            width: 120,
+            height: 120,
             borderRadius: "50%",
-            background: `radial-gradient(circle, ${role.color}33 0%, transparent 70%)`,
+            background: `radial-gradient(circle, ${accent}33 0%, transparent 70%)`,
           }}
         />
         {preview && (
@@ -280,32 +273,30 @@ const ShipCard = ({
             src={preview}
             alt={entityType}
             style={{
-              width: 72,
-              height: 72,
+              maxWidth: 96,
+              maxHeight: 96,
+              width: "auto",
+              height: "auto",
+              objectFit: "contain",
               imageRendering: "pixelated",
-              filter: `drop-shadow(0 4px 6px ${role.color}66)`,
+              filter: `drop-shadow(0 4px 6px ${accent}66)`,
             }}
           />
         )}
       </div>
 
-      <div className="relative flex flex-col items-center px-3">
+      <div className="relative flex flex-col items-center px-3 mt-1">
         <span
           className="text-[#cdd6f4] font-bold tracking-wide"
-          style={{ fontSize: 18, fontFamily: "system-ui, sans-serif" }}
+          style={{ fontSize: 19, fontFamily: "system-ui, sans-serif" }}
         >
           {entityType}
         </span>
         <span
-          className="flex items-center gap-1.5 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold"
-          style={{
-            background: `${role.color}1f`,
-            color: role.color,
-            border: `1px solid ${role.color}55`,
-          }}
+          className="text-[11px] text-[#a6adc8] mt-1 text-center leading-snug px-2"
+          style={{ fontFamily: "system-ui, sans-serif" }}
         >
-          <RoleIcon size={11} strokeWidth={2.5} />
-          {role.label}
+          {bp.description}
         </span>
       </div>
 
@@ -318,32 +309,29 @@ const ShipCard = ({
         }}
       />
 
-      <div className="relative flex flex-col gap-1.5 px-4">
-        {stats.map((s) => {
-          const StatIcon = s.icon;
-          return (
-            <div
-              key={s.label}
-              className="flex items-center justify-between text-[12px]"
-              style={{ fontFamily: "system-ui, sans-serif" }}
-            >
-              <span className="flex items-center gap-1.5 text-[#a6adc8]">
-                <StatIcon size={12} strokeWidth={2.25} color={s.color} />
-                {s.label}
-              </span>
-              <span className="font-semibold" style={{ color: s.color }}>
-                {s.value}
-              </span>
-            </div>
-          );
-        })}
+      <div className="relative flex flex-col items-center mb-2.5">
+        <span
+          className="text-[10px] uppercase tracking-[0.18em] text-[#7f849c] mb-1.5"
+          style={{ fontFamily: "system-ui, sans-serif" }}
+        >
+          {`${displayConfig.chargesRequired} charges`}
+        </span>
+        <ChargeDots charges={displayConfig.chargesRequired} accent={accent} />
       </div>
 
-      <div
-        className="relative mt-auto px-9 pb-4 pt-3 text-[11px] italic text-center text-[#7f849c]"
-        style={{ fontFamily: "system-ui, sans-serif" }}
-      >
-        {bp.description}
+      <div className="relative flex flex-col gap-1.5 px-5 mt-auto pb-9">
+        {stats.map((s) => (
+          <div
+            key={s.label}
+            className="flex items-center justify-between text-[12px]"
+            style={{ fontFamily: "system-ui, sans-serif" }}
+          >
+            <span className="text-[#a6adc8]">{s.label}</span>
+            <span className="font-semibold" style={{ color: s.color }}>
+              {s.value}
+            </span>
+          </div>
+        ))}
       </div>
     </button>
   );
