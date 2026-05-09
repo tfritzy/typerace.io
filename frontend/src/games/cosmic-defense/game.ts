@@ -11,6 +11,7 @@ import { LaserBeamManager } from "./LaserBeamManager";
 import { ProjectileManager } from "./ProjectileManager";
 import { GemManager } from "./GemManager";
 import { AssetManager } from "./assetManager";
+import { RelicPickupManager } from "./RelicPickupManager";
 import { createGameState, updateState, onCorrectKeystroke as stateOnCorrectKeystroke, onPerfectWord as stateOnPerfectWord, onWordWithError as stateOnWordWithError, pauseGame, unpauseGame } from "./state";
 import type { GameState } from "./state";
 import type { EntityType } from "./types";
@@ -30,6 +31,7 @@ export class CosmicDefenseGame {
   private laserBeamManager!: LaserBeamManager;
   private projectileManager!: ProjectileManager;
   private gemManager!: GemManager;
+  private relicPickupManager!: RelicPickupManager;
   shipManager!: ShipManager;
 
   private tickerCallback: ((ticker: { deltaMS: number }) => void) | null = null;
@@ -95,6 +97,10 @@ export class CosmicDefenseGame {
     this.damageNumberManager = new DamageNumberManager();
     this.damageNumberManager.subscribe(this.state);
     world.addChild(this.damageNumberManager.container);
+
+    this.relicPickupManager = new RelicPickupManager(assetManager);
+    this.relicPickupManager.subscribe(this.state);
+    this.app.stage.addChild(this.relicPickupManager.layer);
   }
 
   pause(): void {
@@ -109,6 +115,7 @@ export class CosmicDefenseGame {
     try {
       this.explosionManager.update(this.state);
       this.damageNumberManager.update(dt);
+      this.relicPickupManager.update(dt);
     } catch (e) {
       console.error("Game loop error (visual update):", e);
     }
@@ -140,6 +147,7 @@ export class CosmicDefenseGame {
     this.projectileManager.destroy();
     this.gemManager.destroy();
     this.damageNumberManager.destroy();
+    this.relicPickupManager.destroy();
     this.shipManager.destroy();
     this.app.destroy(true);
   }

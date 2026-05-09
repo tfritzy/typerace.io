@@ -170,6 +170,12 @@ export interface BossDefeatedData {
   id: number;
 }
 
+export interface RelicDropData {
+  relicId: RelicId;
+  x: number;
+  y: number;
+}
+
 export interface LaserBeam {
   id: number;
   x1: number;
@@ -215,7 +221,8 @@ export interface GameState {
   onBossApproaching: GameEvent;
   onBossSpawned: GameDataEvent<BossSpawnedData>;
   onBossDefeated: GameDataEvent<BossDefeatedData>;
-  onRelicDropped: GameDataEvent<RelicId>;
+  onRelicDropped: GameDataEvent<RelicDropData>;
+  onRelicPickupArrived: GameDataEvent<RelicId>;
   onPauseStateChanged: GameDataEvent<boolean>;
   onGameOver: GameEvent;
 }
@@ -279,7 +286,8 @@ export function createGameState(): GameState {
     onBossApproaching: new GameEvent(),
     onBossSpawned: new GameDataEvent<BossSpawnedData>(),
     onBossDefeated: new GameDataEvent<BossDefeatedData>(),
-    onRelicDropped: new GameDataEvent<RelicId>(),
+    onRelicDropped: new GameDataEvent<RelicDropData>(),
+    onRelicPickupArrived: new GameDataEvent<RelicId>(),
     onPauseStateChanged: new GameDataEvent<boolean>(),
     onGameOver: new GameEvent(),
   };
@@ -651,7 +659,7 @@ function dealDamageToEntity(
           const relicId = unowned[relicIndex].id;
           addRelic(state, relicId);
           pauseGame(state);
-          state.onRelicDropped.emit(relicId);
+          state.onRelicDropped.emit({ relicId, x: target.x, y: target.y });
         }
       }
     }
