@@ -1172,7 +1172,6 @@ const BASE_SPAWN_RATE = 0.6;
 const MAX_SPAWN_RATE = 4.0;
 const SPAWN_RAMP_TIME = 240;
 export const BOSS_WARNING_LEAD_TIME_SECONDS = 4;
-const TIER_WEIGHT_WINDOW = 8;
 const MIN_ENEMIES_ON_SCREEN = 10;
 const BOSS_WARNING_ENEMIES_REMAINING = 8;
 const ENEMIES_PER_WAVE = 50;
@@ -1184,55 +1183,13 @@ function getEnemiesInWave(shipTypeIndex: number): number {
   return Math.max(MIN_ENEMIES_PER_WAVE, Math.round(ENEMIES_PER_WAVE / multiplier));
 }
 
-function binomialWeight(t: number, n: number, k: number): number {
-  const p = Math.max(0, Math.min(1, t));
-  if (p === 0) return k === 0 ? 1 : 0;
-  if (p === 1) return k === n ? 1 : 0;
-
-  let coeff = 1;
-  for (let i = 0; i < k; i++) {
-    coeff *= (n - i) / (i + 1);
-  }
-
-  return coeff * Math.pow(p, k) * Math.pow(1 - p, n - k);
-}
-
-function getTierWeights(currentWave: number): { startTier: number; weights: number[] } {
-  const centerTier = Math.max(0, currentWave);
-  const startTier = Math.max(0, centerTier - TIER_WEIGHT_WINDOW);
-  const endTier = centerTier + TIER_WEIGHT_WINDOW;
-  const weights: number[] = [];
-  const n = endTier - startTier;
-
-  for (let i = startTier; i <= endTier; i++) {
-    const k = i - startTier;
-    const w = binomialWeight(0.5, n, k);
-    weights.push(Math.max(0, w));
-  }
-
-  return { startTier, weights };
-}
-
-function pickEnemyTier(startTier: number, weights: number[]): number {
-  let total = 0;
-  for (const w of weights) total += w;
-  if (total === 0) return startTier + Math.floor(weights.length / 2);
-
-  let r = Math.random() * total;
-  for (let i = 0; i < weights.length; i++) {
-    r -= weights[i];
-    if (r <= 0) return startTier + i;
-  }
-  return startTier + weights.length - 1;
-}
-
 function getSpawnRate(elapsed: number): number {
   const t = Math.min(1, elapsed / SPAWN_RAMP_TIME);
   return BASE_SPAWN_RATE + (MAX_SPAWN_RATE - BASE_SPAWN_RATE) * t;
 }
 
-function spawnWaveEnemy(state: GameState, startTier: number, weights: number[]): void {
-  const virtualTier = pickEnemyTier(startTier, weights);
+function spawnWaveEnemy(state: GameState): void {
+  const virtualTier = Math.max(0, state.spawner.currentWave);
   spawnEntity(state, createEnemyConfigForWave(virtualTier, state.spawner.waveShipTypeIndex), Team.Enemy);
   state.spawner.enemiesSpawnedInWave++;
 }
@@ -1260,14 +1217,12 @@ export function updateSpawner(state: GameState, dt: number): void {
     return;
   }
 
-  const { startTier, weights } = getTierWeights(spawner.currentWave);
-
   const rate = getSpawnRate(spawner.elapsed);
   spawner.spawnAccumulator += rate * dt;
 
   while (spawner.spawnAccumulator >= 1 && spawner.enemiesSpawnedInWave < spawner.enemiesInWave) {
     spawner.spawnAccumulator -= 1;
-    spawnWaveEnemy(state, startTier, weights);
+    spawnWaveEnemy(state);
   }
 
   let enemiesOnScreen = 0;
@@ -1280,7 +1235,7 @@ export function updateSpawner(state: GameState, dt: number): void {
     spawner.enemiesInWave - spawner.enemiesSpawnedInWave
   );
   for (let i = 0; i < fillCount; i++) {
-    spawnWaveEnemy(state, startTier, weights);
+    spawnWaveEnemy(state);
   }
 }
 

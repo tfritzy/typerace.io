@@ -1,24 +1,34 @@
 import { describe, expect, it } from "vitest";
 import { createEnemyConfigForWave } from "./enemyConfig";
 import { createGameState, updateSpawner } from "./state";
+import { Team } from "./types";
 
 describe("boss scaling", () => {
-  it("uses current wave for boss tier health scaling", () => {
+  it("keeps bosses in the same order of magnitude as the wave they spawn from", () => {
+    const wave = 42;
+    const shipType = 10;
     const state = createGameState();
     state.paused = false;
-    const wave = 100;
-    state.spawner.elapsed = 3;
+    state.spawner.elapsed = 1;
     state.spawner.currentWave = wave;
-    state.spawner.waveShipTypeIndex = 22;
-    state.spawner.enemiesInWave = state.spawner.enemiesSpawnedInWave;
+    state.spawner.waveShipTypeIndex = shipType;
+    state.spawner.enemiesInWave = 1;
+    state.spawner.enemiesSpawnedInWave = 0;
+    state.spawner.spawnAccumulator = 1;
 
+    updateSpawner(state, 0);
+
+    const waveEnemy = state.entities.find((entity) => entity.team === Team.Enemy && !entity.isBoss);
+    expect(waveEnemy).toBeTruthy();
+    expect(waveEnemy?.health).toBe(createEnemyConfigForWave(wave, shipType).health);
+
+    state.spawner.enemiesInWave = state.spawner.enemiesSpawnedInWave;
     updateSpawner(state, 0);
 
     const boss = state.entities.find((entity) => entity.isBoss);
     expect(boss).toBeTruthy();
-
-    const expectedHealth = createEnemyConfigForWave(wave, 22).health * 8;
-    expect(boss?.health).toBe(expectedHealth);
+    expect(boss?.health).toBe((waveEnemy?.health ?? 0) * 8);
+    expect((boss?.health ?? 0) / (waveEnemy?.health ?? 1)).toBeLessThan(10);
   });
 
   it("keeps boss health independent from elapsed time for the same wave", () => {
