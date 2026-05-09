@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useCallback } from "react";
-import { Flame, Snowflake, Zap, Swords } from "lucide-react";
+import { Flame, Snowflake, Swords } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
@@ -7,11 +7,10 @@ import { DamageType } from "./types";
 import type { EntityType } from "./types";
 import type { PlacementSlot } from "./PlacementPoints";
 
-const DAMAGE_TYPE_BADGE: Record<DamageType, { color: string; glow: string; Icon: LucideIcon }> = {
+const DAMAGE_TYPE_BADGE: Partial<Record<DamageType, { color: string; glow: string; Icon: LucideIcon }>> = {
   [DamageType.Physical]: { color: "#f97316", glow: "rgba(249,115,22,0.35)", Icon: Swords },
   [DamageType.Plasma]:   { color: "#a855f7", glow: "rgba(168,85,247,0.35)", Icon: Flame },
   [DamageType.Ice]:      { color: "#22d3ee", glow: "rgba(34,211,238,0.35)",  Icon: Snowflake },
-  [DamageType.Laser]:    { color: "#4ade80", glow: "rgba(74,222,128,0.35)",  Icon: Zap },
 };
 
 const CONSISTENT_DAMAGE_ROLES = new Set([
@@ -178,6 +177,7 @@ export const ShipChoiceOverlay = ({
                 )}
                 {config && (() => {
                   const badge = DAMAGE_TYPE_BADGE[config.damageType];
+                  if (!badge) return null;
                   const { Icon } = badge;
                   return (
                     <span
