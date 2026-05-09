@@ -67,11 +67,11 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
       active: false,
     });
 
-    let firstFrameId = 0;
-    let secondFrameId = 0;
+    let initialAnimationFrameId = 0;
+    let activationAnimationFrameId = 0;
 
-    firstFrameId = window.requestAnimationFrame(() => {
-      secondFrameId = window.requestAnimationFrame(() => {
+    initialAnimationFrameId = window.requestAnimationFrame(() => {
+      activationAnimationFrameId = window.requestAnimationFrame(() => {
         setFlight((current) =>
           current?.relicId === pendingRelic ? { ...current, active: true } : current
         );
@@ -79,8 +79,8 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
     });
 
     return () => {
-      window.cancelAnimationFrame(firstFrameId);
-      window.cancelAnimationFrame(secondFrameId);
+      window.cancelAnimationFrame(initialAnimationFrameId);
+      window.cancelAnimationFrame(activationAnimationFrameId);
     };
   }, [pendingRelic, popupRelic]);
 
@@ -97,7 +97,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
         {collectedRelics.map((relicId) => {
           const relic = RELIC_MAP.get(relicId);
           if (!relic) return null;
-          const isPendingFlight = pendingRelic === relicId && popupRelic !== relicId;
+          const isAnimatingToSlot = pendingRelic === relicId && popupRelic !== relicId;
           return (
             <div
               key={relicId}
@@ -114,7 +114,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
                   width: RELIC_ICON_SIZE,
                   height: RELIC_ICON_SIZE,
                   imageRendering: "pixelated",
-                  opacity: isPendingFlight ? 0 : 1,
+                  opacity: isAnimatingToSlot ? 0 : 1,
                   transition: "opacity 0.15s ease-out",
                 }}
               />
