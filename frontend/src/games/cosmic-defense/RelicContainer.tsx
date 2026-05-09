@@ -64,6 +64,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
                 height: RELIC_ICON_SIZE,
                 imageRendering: "pixelated",
                 opacity: animatingRelic === relicId ? 0 : 1,
+                transition: "opacity 0.15s ease-out",
               }}
             />
           );

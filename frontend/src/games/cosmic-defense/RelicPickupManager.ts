@@ -33,6 +33,8 @@ export class RelicPickupManager {
   private state: GameState | null = null;
   private unsub: (() => void) | null = null;
   private activePickup: ActivePickup | null = null;
+  private queuedPickups: RelicDropData[] = [];
+  private loadingPickup = false;
   private destroyed = false;
 
   constructor(assets: AssetManager) {
@@ -43,7 +45,8 @@ export class RelicPickupManager {
   subscribe(state: GameState): void {
     this.state = state;
     this.unsub = state.onRelicDropped.subscribe((data) => {
-      void this.spawn(data);
+      this.queuedPickups.push(data);
+      void this.processNextPickup();
     });
   }
 
@@ -71,6 +74,7 @@ export class RelicPickupManager {
     sprite.destroy();
     this.activePickup = null;
     this.state?.onRelicPickupArrived.emit(relicId);
+    void this.processNextPickup();
   }
 
   destroy(): void {
@@ -81,23 +85,33 @@ export class RelicPickupManager {
       this.activePickup.sprite.destroy();
       this.activePickup = null;
     }
+    this.queuedPickups = [];
+    this.loadingPickup = false;
     this.state = null;
     this.layer.destroy();
   }
 
-  private async spawn(data: RelicDropData): Promise<void> {
-    if (this.destroyed) return;
+  private async processNextPickup(): Promise<void> {
+    if (this.destroyed || this.loadingPickup || this.activePickup || this.queuedPickups.length === 0) return;
 
+    const data = this.queuedPickups.shift();
+    if (!data) return;
+
+    this.loadingPickup = true;
     const relic = RELIC_MAP.get(data.relicId);
-    if (!relic) return;
+    if (!relic) {
+      this.loadingPickup = false;
+      void this.processNextPickup();
+      return;
+    }
 
     const texture = await this.assets.loadTexture(relic.sprite);
-    if (this.destroyed || !this.state) return;
-
-    if (this.activePickup) {
-      this.activePickup.sprite.destroy();
-      this.activePickup = null;
+    if (this.destroyed || !this.state) {
+      this.loadingPickup = false;
+      return;
     }
+
+    this.loadingPickup = false;
 
     const sprite = new Sprite(texture);
     sprite.anchor.set(0.5);
