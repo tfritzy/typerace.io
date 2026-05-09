@@ -2,7 +2,7 @@ import { BlurFilter, Container, Graphics } from "pixi.js";
 import type { GameState } from "./state";
 
 const BEAM_DURATION = 0.35;
-const GLOW_BLUR_STRENGTH = 12;
+const GLOW_BLUR_STRENGTH = 4;
 const GLOW_BLUR_QUALITY = 4;
 
 export class LaserBeamManager {
@@ -49,10 +49,10 @@ export class LaserBeamManager {
       glow.clear();
       glow.moveTo(beam.x1, beam.y1);
       glow.lineTo(beam.x2, beam.y2);
-      glow.stroke({ width: beam.width * 20, color: beam.color, alpha: alpha * 0.4 });
+      glow.stroke({ width: beam.width * 6, color: beam.color, alpha: alpha * 0.4 });
       glow.moveTo(beam.x1, beam.y1);
       glow.lineTo(beam.x2, beam.y2);
-      glow.stroke({ width: beam.width * 10, color: beam.color, alpha: alpha * 0.6 });
+      glow.stroke({ width: beam.width * 3, color: beam.color, alpha: alpha * 0.6 });
 
       core.clear();
       core.moveTo(beam.x1, beam.y1);
