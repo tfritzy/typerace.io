@@ -1,8 +1,18 @@
 import { useMemo, useEffect, useCallback } from "react";
+import { Flame, Snowflake, Zap, Swords } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
+import { DamageType } from "./types";
 import type { EntityType } from "./types";
 import type { PlacementSlot } from "./PlacementPoints";
+
+const DAMAGE_TYPE_BADGE: Record<DamageType, { color: string; glow: string; Icon: LucideIcon }> = {
+  [DamageType.Physical]: { color: "#f97316", glow: "rgba(249,115,22,0.35)", Icon: Swords },
+  [DamageType.Plasma]:   { color: "#a855f7", glow: "rgba(168,85,247,0.35)", Icon: Flame },
+  [DamageType.Ice]:      { color: "#22d3ee", glow: "rgba(34,211,238,0.35)",  Icon: Snowflake },
+  [DamageType.Laser]:    { color: "#4ade80", glow: "rgba(74,222,128,0.35)",  Icon: Zap },
+};
 
 const CONSISTENT_DAMAGE_ROLES = new Set([
   "sniper", "laser", "dual_shot", "pierce_laser", "shooter", "chain", "mac_cannon",
@@ -166,6 +176,27 @@ export const ShipChoiceOverlay = ({
                     ))}
                   </div>
                 )}
+                {config && (() => {
+                  const badge = DAMAGE_TYPE_BADGE[config.damageType];
+                  const { Icon } = badge;
+                  return (
+                    <span
+                      className="absolute flex items-center justify-center rounded-full"
+                      style={{
+                        bottom: 8,
+                        left: 8,
+                        width: 24,
+                        height: 24,
+                        background: `rgba(12,14,30,0.92)`,
+                        border: `1.5px solid ${badge.color}`,
+                        boxShadow: `0 0 6px ${badge.glow}`,
+                        color: badge.color,
+                      }}
+                    >
+                      <Icon size={13} strokeWidth={2.2} />
+                    </span>
+                  );
+                })()}
                 <span
                   className="absolute left-1/2 -translate-x-1/2 text-[14px] font-bold rounded-md flex items-center justify-center"
                   style={{
