@@ -368,9 +368,9 @@ function makeBaseEntity(
   };
 }
 
-function spawnInRightThird(): { x: number; y: number } {
+function spawnInRightSixteenth(): { x: number; y: number } {
   const pad = 60;
-  const xStart = (CANVAS_WIDTH * 2) / 3;
+  const xStart = (CANVAS_WIDTH * 15) / 16;
   return {
     x: xStart + Math.random() * (CANVAS_WIDTH - xStart - pad),
     y: pad + Math.random() * (CANVAS_HEIGHT - pad * 2),
@@ -378,7 +378,7 @@ function spawnInRightThird(): { x: number; y: number } {
 }
 
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
-  const { x, y } = spawnInRightThird();
+  const { x, y } = spawnInRightSixteenth();
   const baseEntity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
   const entity: EntityState = {
     ...baseEntity,

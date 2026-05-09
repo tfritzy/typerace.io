@@ -9,7 +9,7 @@ import { approachAngle } from "./utils";
 import { drawHealthBar } from "./healthBar";
 
 const SHIP_DEATH_ANIMATION_SPEED = 0.6;
-const ENEMY_CONTAINER_SCALE = 1.5;
+const ENEMY_CONTAINER_SCALE = 2.25;
 const WARP_IN_ANIMATION_SPEED = 0.25;
 const WARP_FRAME_SIZE = 64;
 const WARP_SIZE_MULTIPLIER = 1.5;
