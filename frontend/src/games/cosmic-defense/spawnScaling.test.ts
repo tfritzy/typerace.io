@@ -27,8 +27,11 @@ describe("boss scaling", () => {
 
     const boss = state.entities.find((entity) => entity.isBoss);
     expect(boss).toBeTruthy();
-    expect(boss?.health).toBe((waveEnemy?.health ?? 0) * 8);
-    expect((boss?.health ?? 0) / (waveEnemy?.health ?? 1)).toBeLessThan(10);
+    expect(waveEnemy?.health).toBeGreaterThan(0);
+    expect(boss?.health).toBeGreaterThan(0);
+    const waveEnemyHealth = waveEnemy?.health ?? 0;
+    const bossHealth = boss?.health ?? 0;
+    expect(bossHealth).toBe(waveEnemyHealth * 8);
   });
 
   it("keeps boss health independent from elapsed time for the same wave", () => {
