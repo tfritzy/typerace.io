@@ -1253,9 +1253,10 @@ export function updateSpawner(state: GameState, dt: number): void {
 
   if (remaining <= 0) {
     const { startTier, weights } = getTierWeights(spawner.elapsed);
-    const bossTier = startTier + Math.floor(weights.length / 2);
+    const bossTier = weights.length > 0 ? startTier + Math.floor(weights.length / 2) : startTier;
+    const completedWaveShipTypeIndex = spawner.waveShipTypeIndex;
     spawner.currentWave++;
-    spawnEntity(state, createBossConfigForWave(bossTier, spawner.waveShipTypeIndex), Team.Enemy);
+    spawnEntity(state, createBossConfigForWave(bossTier, completedWaveShipTypeIndex), Team.Enemy);
     spawner.waveShipTypeIndex = Math.floor(Math.random() * ENEMY_SHIP_TYPES.length);
     spawner.enemiesSpawnedInWave = 0;
     spawner.enemiesInWave = getEnemiesInWave(spawner.waveShipTypeIndex);
