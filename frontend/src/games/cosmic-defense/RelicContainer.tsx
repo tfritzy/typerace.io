@@ -12,34 +12,23 @@ const RELICS_PER_ROW = 8;
 
 export const RelicContainer = ({ game }: RelicContainerProps) => {
   const [pendingRelic, setPendingRelic] = useState<RelicId | null>(null);
-  const [animatingRelic, setAnimatingRelic] = useState<RelicId | null>(null);
   const [collectedRelics, setCollectedRelics] = useState<RelicId[]>([]);
 
   useEffect(() => {
     if (!game) {
       setCollectedRelics([]);
       setPendingRelic(null);
-      setAnimatingRelic(null);
       return;
     }
 
     setCollectedRelics([...game.state.relics]);
 
-    const unsubDropped = game.state.onRelicDropped.subscribe((data) => {
-      setCollectedRelics([...game.state.relics]);
-      setAnimatingRelic(data.relicId);
-      setPendingRelic(null);
-    });
-
     const unsubArrived = game.state.onRelicPickupArrived.subscribe((relicId) => {
-      setAnimatingRelic(null);
+      setCollectedRelics([...game.state.relics]);
       setPendingRelic(relicId);
     });
 
-    return () => {
-      unsubDropped();
-      unsubArrived();
-    };
+    return unsubArrived;
   }, [game]);
 
   const handleContinue = useCallback(() => {
@@ -63,8 +52,6 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
                 width: RELIC_ICON_SIZE,
                 height: RELIC_ICON_SIZE,
                 imageRendering: "pixelated",
-                opacity: animatingRelic === relicId ? 0 : 1,
-                transition: "opacity 0.15s ease-out",
               }}
             />
           );

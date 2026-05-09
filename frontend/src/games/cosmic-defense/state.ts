@@ -292,6 +292,10 @@ export function createGameState(): GameState {
     onGameOver: new GameEvent(),
   };
 
+  state.onRelicPickupArrived.subscribe((relicId) => {
+    addRelic(state, relicId);
+  });
+
   gameState = state;
   for (const cb of stateCreatedListeners) cb();
   stateCreatedListeners.length = 0;
@@ -657,7 +661,6 @@ function dealDamageToEntity(
         if (unowned.length > 0) {
           const relicIndex = (state.spawner.currentWave - 1) % unowned.length;
           const relicId = unowned[relicIndex].id;
-          addRelic(state, relicId);
           pauseGame(state);
           state.onRelicDropped.emit({ relicId, x: target.x, y: target.y });
         }
