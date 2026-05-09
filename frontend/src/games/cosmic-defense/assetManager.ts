@@ -175,6 +175,11 @@ export class AssetManager {
     return texture;
   }
 
+  async preloadTextures(sources: string[]): Promise<void> {
+    const uniqueSources = [...new Set(sources)];
+    await Promise.all(uniqueSources.map((src) => this.loadTexture(src)));
+  }
+
   private applyNearestNeighbor(): void {
     setTextureNearest(this.background_);
     setNearestNeighbor(this.planets_);

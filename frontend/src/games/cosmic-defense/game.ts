@@ -17,6 +17,7 @@ import type { GameState } from "./state";
 import type { EntityType } from "./types";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import type { RelicId } from "./relics";
+import { RELIC_CATALOG } from "./relics";
 
 export class CosmicDefenseGame {
   private app: Application;
@@ -44,6 +45,7 @@ export class CosmicDefenseGame {
 
   async init(): Promise<void> {
     this.assetManager = await AssetManager.load(MANIFEST);
+    await this.assetManager.preloadTextures(RELIC_CATALOG.map((relic) => relic.sprite));
     this.buildScene(this.assetManager);
     const baseTypes = SHIP_BLUEPRINTS.map((bp) => bp.entityType);
     this.shipPreviews = await this.assetManager.generateShipPreviews(this.app, baseTypes);

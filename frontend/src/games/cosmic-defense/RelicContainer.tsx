@@ -24,6 +24,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
     setCollectedRelics([...game.state.relics]);
 
     const unsubArrived = game.onRelicCollected((relicId) => {
+      game.pause();
       setCollectedRelics([...game.state.relics]);
       setPendingRelic(relicId);
     });
@@ -31,17 +32,12 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
     return unsubArrived;
   }, [game]);
 
-  useEffect(() => {
-    if (!game || !pendingRelic) return;
-    game.pause();
-    return () => {
-      game.unpause();
-    };
-  }, [game, pendingRelic]);
-
   const handleContinue = useCallback(() => {
+    if (game) {
+      game.unpause();
+    }
     setPendingRelic(null);
-  }, []);
+  }, [game]);
 
   return (
     <>
