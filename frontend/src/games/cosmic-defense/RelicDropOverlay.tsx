@@ -46,10 +46,10 @@ export const RelicDropOverlay = ({ relicId, onContinue }: RelicDropOverlayProps)
             src={relic.sprite}
             alt={relic.name}
             style={{
-              width: 96,
-              height: 96,
+              width: 152,
+              height: 152,
               imageRendering: "pixelated",
-              filter: "drop-shadow(0 0 24px rgba(249,226,175,0.55))",
+              filter: "drop-shadow(0 0 30px rgba(249,226,175,0.6))",
             }}
           />
 
