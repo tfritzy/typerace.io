@@ -6,6 +6,8 @@ import { DamageType } from "./types";
 import type { EntityType } from "./types";
 import type { PlacementSlot } from "./PlacementPoints";
 
+const GEM_OFFSET = -20;
+
 const DAMAGE_TYPE_STYLE: Partial<Record<DamageType, { bg: string; border: string; glow: string }>> = {
   [DamageType.Physical]: { bg: "#92400e", border: "#f97316", glow: "rgba(249,115,22,0.6)" },
   [DamageType.Plasma]:   { bg: "#581c87", border: "#a855f7", glow: "rgba(168,85,247,0.6)" },
@@ -191,8 +193,8 @@ export const ShipChoiceOverlay = ({
                     <span
                       className="absolute flex items-center justify-center rounded-full font-black select-none"
                       style={{
-                        bottom: -20,
-                        left: -20,
+                        bottom: GEM_OFFSET,
+                        left: GEM_OFFSET,
                         width: 42,
                         height: 42,
                         fontSize: 17,
@@ -212,8 +214,8 @@ export const ShipChoiceOverlay = ({
                   <span
                     className="absolute flex items-center justify-center rounded-full font-black select-none"
                     style={{
-                      bottom: -20,
-                      right: -20,
+                      bottom: GEM_OFFSET,
+                      right: GEM_OFFSET,
                       width: 42,
                       height: 42,
                       fontSize: 17,
