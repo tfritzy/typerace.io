@@ -12,6 +12,7 @@ const RELICS_PER_ROW = 8;
 const FLYING_RELIC_SIZE = 104;
 const RELIC_FLIGHT_DURATION_MS = 700;
 const RELIC_FLIGHT_START_HEIGHT = 0.38;
+const FLIGHT_END_SCALE = RELIC_ICON_SIZE / FLYING_RELIC_SIZE;
 
 interface RelicFlightState {
   relicId: RelicId;
@@ -67,11 +68,11 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
       active: false,
     });
 
-    let initialAnimationFrameId = 0;
-    let activationAnimationFrameId = 0;
+    let initialFrameId = 0;
+    let activationFrameId = 0;
 
-    initialAnimationFrameId = window.requestAnimationFrame(() => {
-      activationAnimationFrameId = window.requestAnimationFrame(() => {
+    initialFrameId = window.requestAnimationFrame(() => {
+      activationFrameId = window.requestAnimationFrame(() => {
         setFlight((current) =>
           current?.relicId === pendingRelic ? { ...current, active: true } : current
         );
@@ -79,8 +80,8 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
     });
 
     return () => {
-      window.cancelAnimationFrame(initialAnimationFrameId);
-      window.cancelAnimationFrame(activationAnimationFrameId);
+      window.cancelAnimationFrame(initialFrameId);
+      window.cancelAnimationFrame(activationFrameId);
     };
   }, [pendingRelic, popupRelic]);
 
@@ -97,7 +98,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
         {collectedRelics.map((relicId) => {
           const relic = RELIC_MAP.get(relicId);
           if (!relic) return null;
-          const isAnimatingToSlot = pendingRelic === relicId && popupRelic !== relicId;
+          const isInFlight = pendingRelic === relicId && popupRelic !== relicId;
           return (
             <div
               key={relicId}
@@ -114,7 +115,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
                   width: RELIC_ICON_SIZE,
                   height: RELIC_ICON_SIZE,
                   imageRendering: "pixelated",
-                  opacity: isAnimatingToSlot ? 0 : 1,
+                  opacity: isInFlight ? 0 : 1,
                   transition: "opacity 0.15s ease-out",
                 }}
               />
@@ -143,7 +144,7 @@ export const RelicContainer = ({ game }: RelicContainerProps) => {
             zIndex: 45,
             filter: "drop-shadow(0 0 26px rgba(249,226,175,0.65))",
             transform: flight.active
-              ? `translate(${flight.endX - flight.startX}px, ${flight.endY - flight.startY}px) scale(0.24)`
+              ? `translate(${flight.endX - flight.startX}px, ${flight.endY - flight.startY}px) scale(${FLIGHT_END_SCALE})`
               : "translate(0px, 0px) scale(1)",
             opacity: flight.active ? 0.9 : 1,
             transition: `transform ${RELIC_FLIGHT_DURATION_MS}ms cubic-bezier(0.22, 1, 0.36, 1), opacity ${RELIC_FLIGHT_DURATION_MS}ms ease-out`,
