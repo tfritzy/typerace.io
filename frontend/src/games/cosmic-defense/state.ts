@@ -1229,18 +1229,6 @@ function pickEnemyTier(startTier: number, weights: number[]): number {
   return startTier + weights.length - 1;
 }
 
-function getRepresentativeTier(startTier: number, weights: number[]): number {
-  let totalWeight = 0;
-  let weightedTierTotal = 0;
-  for (let i = 0; i < weights.length; i++) {
-    const weight = Math.max(0, weights[i]);
-    totalWeight += weight;
-    weightedTierTotal += (startTier + i) * weight;
-  }
-  if (totalWeight <= 0) return startTier + Math.floor(weights.length / 2);
-  return Math.round(weightedTierTotal / totalWeight);
-}
-
 function getSpawnRate(elapsed: number): number {
   const t = Math.min(1, elapsed / SPAWN_RAMP_TIME);
   return BASE_SPAWN_RATE + (MAX_SPAWN_RATE - BASE_SPAWN_RATE) * t;
@@ -1265,7 +1253,7 @@ export function updateSpawner(state: GameState, dt: number): void {
 
   if (remaining <= 0) {
     const { startTier, weights } = getTierWeights(spawner.elapsed);
-    const bossTier = getRepresentativeTier(startTier, weights);
+    const bossTier = startTier + Math.floor(weights.length / 2);
     spawner.currentWave++;
     spawnEntity(state, createBossConfigForWave(bossTier, spawner.waveShipTypeIndex), Team.Enemy);
     spawner.waveShipTypeIndex = Math.floor(Math.random() * ENEMY_SHIP_TYPES.length);
