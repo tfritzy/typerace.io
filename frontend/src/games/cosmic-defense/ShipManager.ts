@@ -49,7 +49,7 @@ export class ShipManager {
 
     const container = new Container();
     container.addChild(shipSprite);
-    container.scale.set(1.5);
+    container.scale.set(2.25);
     container.x = entity.x;
     container.y = entity.y;
 
