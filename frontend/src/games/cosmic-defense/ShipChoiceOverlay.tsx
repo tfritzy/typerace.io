@@ -1,17 +1,25 @@
 import { useMemo, useEffect, useCallback } from "react";
-import { Flame, Snowflake, Swords } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { FRIENDLY_CONFIG_MAP } from "./enemyConfig";
+import type { FriendlyConfig } from "./enemyConfig";
 import { DamageType } from "./types";
 import type { EntityType } from "./types";
 import type { PlacementSlot } from "./PlacementPoints";
 
-const DAMAGE_TYPE_BADGE: Partial<Record<DamageType, { color: string; glow: string; Icon: LucideIcon }>> = {
-  [DamageType.Physical]: { color: "#f97316", glow: "rgba(249,115,22,0.35)", Icon: Swords },
-  [DamageType.Plasma]:   { color: "#a855f7", glow: "rgba(168,85,247,0.35)", Icon: Flame },
-  [DamageType.Ice]:      { color: "#22d3ee", glow: "rgba(34,211,238,0.35)",  Icon: Snowflake },
+const DAMAGE_TYPE_STYLE: Partial<Record<DamageType, { bg: string; border: string; glow: string }>> = {
+  [DamageType.Physical]: { bg: "#92400e", border: "#f97316", glow: "rgba(249,115,22,0.6)" },
+  [DamageType.Plasma]:   { bg: "#581c87", border: "#a855f7", glow: "rgba(168,85,247,0.6)" },
+  [DamageType.Ice]:      { bg: "#164e63", border: "#22d3ee", glow: "rgba(34,211,238,0.6)"  },
 };
+
+function getDisplayDamage(config: FriendlyConfig): number | null {
+  switch (config.damageType) {
+    case DamageType.Physical: return config.projectileDamage;
+    case DamageType.Plasma:   return config.plasmaStacks;
+    case DamageType.Ice:      return config.freezeStacks;
+    default:                  return null;
+  }
+}
 
 const CONSISTENT_DAMAGE_ROLES = new Set([
   "sniper", "laser", "dual_shot", "pierce_laser", "shooter", "chain", "mac_cannon",
@@ -176,27 +184,50 @@ export const ShipChoiceOverlay = ({
                   </div>
                 )}
                 {config && (() => {
-                  const badge = DAMAGE_TYPE_BADGE[config.damageType];
-                  if (!badge) return null;
-                  const { Icon } = badge;
+                  const dmgStyle = DAMAGE_TYPE_STYLE[config.damageType];
+                  const dmg = getDisplayDamage(config);
+                  if (!dmgStyle || dmg === null) return null;
                   return (
                     <span
-                      className="absolute flex items-center justify-center rounded-full"
+                      className="absolute flex items-center justify-center rounded-full font-black select-none"
                       style={{
-                        bottom: 8,
-                        left: 8,
-                        width: 24,
-                        height: 24,
-                        background: `rgba(12,14,30,0.92)`,
-                        border: `1.5px solid ${badge.color}`,
-                        boxShadow: `0 0 6px ${badge.glow}`,
-                        color: badge.color,
+                        bottom: -20,
+                        left: -20,
+                        width: 42,
+                        height: 42,
+                        fontSize: 17,
+                        background: dmgStyle.bg,
+                        border: `3px solid ${dmgStyle.border}`,
+                        boxShadow: `0 0 10px ${dmgStyle.glow}, inset 0 1px 0 rgba(255,255,255,0.2)`,
+                        color: "#fff",
+                        textShadow: "0 1px 3px rgba(0,0,0,0.9)",
+                        zIndex: 1,
                       }}
                     >
-                      <Icon size={13} strokeWidth={2.2} />
+                      {dmg}
                     </span>
                   );
                 })()}
+                {config && (
+                  <span
+                    className="absolute flex items-center justify-center rounded-full font-black select-none"
+                    style={{
+                      bottom: -20,
+                      right: -20,
+                      width: 42,
+                      height: 42,
+                      fontSize: 17,
+                      background: "#7f1d1d",
+                      border: "3px solid #ef4444",
+                      boxShadow: "0 0 10px rgba(239,68,68,0.6), inset 0 1px 0 rgba(255,255,255,0.2)",
+                      color: "#fff",
+                      textShadow: "0 1px 3px rgba(0,0,0,0.9)",
+                      zIndex: 1,
+                    }}
+                  >
+                    {config.health}
+                  </span>
+                )}
                 <span
                   className="absolute left-1/2 -translate-x-1/2 text-[14px] font-bold rounded-md flex items-center justify-center"
                   style={{
