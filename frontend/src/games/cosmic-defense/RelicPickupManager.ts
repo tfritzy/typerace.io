@@ -6,7 +6,7 @@ import { addRelic, type GameState, type RelicDropData } from "./state";
 const PICKUP_DURATION_S = 0.7;
 const PICKUP_TARGET_X = 120;
 const PICKUP_TARGET_Y = 74;
-const PICKUP_PREVIEW_SIZE = 128;
+const PICKUP_PREVIEW_SIZE = 112;
 const PICKUP_HUD_SIZE = 44;
 
 interface ActivePickup {
@@ -19,6 +19,10 @@ interface ActivePickup {
 
 function lerp(start: number, end: number, t: number): number {
   return start + (end - start) * t;
+}
+
+function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - t, 3);
 }
 
 export class RelicPickupManager {
@@ -50,16 +54,17 @@ export class RelicPickupManager {
 
     this.activePickup.elapsed += dt;
     const progress = Math.min(1, this.activePickup.elapsed / PICKUP_DURATION_S);
+    const easedProgress = easeOutCubic(progress);
     const sprite = this.activePickup.sprite;
 
-    sprite.x = lerp(this.activePickup.startX, PICKUP_TARGET_X, progress);
-    sprite.y = lerp(this.activePickup.startY, PICKUP_TARGET_Y, progress);
+    sprite.x = lerp(this.activePickup.startX, PICKUP_TARGET_X, easedProgress);
+    sprite.y = lerp(this.activePickup.startY, PICKUP_TARGET_Y, easedProgress);
 
     const spriteSize = Math.max(sprite.texture.width, sprite.texture.height);
     const startScale = PICKUP_PREVIEW_SIZE / spriteSize;
     const endScale = PICKUP_HUD_SIZE / spriteSize;
-    sprite.scale.set(lerp(startScale, endScale, progress));
-    sprite.alpha = progress < 0.85 ? 1 : lerp(1, 0.8, (progress - 0.85) / 0.15);
+    sprite.scale.set(lerp(startScale, endScale, easedProgress));
+    sprite.alpha = lerp(0.35, 1, easedProgress);
 
     if (progress < 1) return;
 
