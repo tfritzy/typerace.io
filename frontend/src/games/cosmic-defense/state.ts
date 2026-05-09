@@ -1170,13 +1170,9 @@ export function onWordWithError(state: GameState): void {
   state.perfectWordStreak = 0;
 }
 
-function addRelic(state: GameState, relicId: RelicId): void {
+export function addRelic(state: GameState, relicId: RelicId): void {
   state.relics.push(relicId);
   state.relicEffects = computeRelicEffects(state.relics);
-}
-
-export function completeRelicPickup(state: GameState, relicId: RelicId): void {
-  addRelic(state, relicId);
 }
 
 const TIER_SPREAD = 90;
