@@ -2,15 +2,16 @@ import { SHIP_BLUEPRINTS } from "../shipCatalog";
 import type { EntityType } from "../types";
 import type { PlacementSlot } from "../PlacementPoints";
 
-const CONSISTENT_DAMAGE_ROLES = new Set([
-  "sniper",
-  "laser",
-  "dual_shot",
-  "pierce_laser",
-  "shooter",
-  "chain",
-  "mac_cannon",
-]);
+const CONSISTENT_DAMAGERS: EntityType[] = [
+  "Spur",
+  "Ember",
+  "Corona",
+  "Pip",
+  "Needle",
+  "Moth",
+  "Nova",
+  "Lance",
+];
 
 export function generateChoices(slots: PlacementSlot[]): EntityType[] {
   const existing = new Set(
@@ -24,9 +25,7 @@ export function generateChoices(slots: PlacementSlot[]): EntityType[] {
     if (hasAnyShip) {
       pool = SHIP_BLUEPRINTS.map((bp) => bp.entityType);
     } else {
-      pool = SHIP_BLUEPRINTS.filter((bp) =>
-        CONSISTENT_DAMAGE_ROLES.has(bp.role)
-      ).map((bp) => bp.entityType);
+      pool = [...CONSISTENT_DAMAGERS];
     }
   } else {
     pool = [...existing];

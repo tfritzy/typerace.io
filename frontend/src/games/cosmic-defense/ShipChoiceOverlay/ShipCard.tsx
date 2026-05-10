@@ -1,8 +1,8 @@
 import { ChevronRight } from "lucide-react";
 import { FRIENDLY_CONFIG_MAP, getScaledConfig } from "../enemyConfig";
 import type { EntityType } from "../types";
-import { ACCENT_COLOR } from "./textSegments";
-import { getShipDescription } from "./descriptions";
+import { ACCENT_COLOR, plain } from "./textSegments";
+import { SHIP_BLUEPRINT_MAP } from "../shipCatalog";
 
 const CARD_WIDTH = 180;
 const CARD_HEIGHT = 270;
@@ -33,9 +33,13 @@ export const ShipCard = ({
     : baseConfig;
 
   const accent = ACCENT_COLOR;
-  const cardText = isUpgrade
-    ? getShipDescription(entityType, currentConfig, displayConfig)
-    : getShipDescription(entityType, displayConfig);
+  const blueprint = SHIP_BLUEPRINT_MAP.get(entityType);
+  const descriptionFn = blueprint?.descriptionFn;
+  const cardText = descriptionFn
+    ? isUpgrade
+      ? descriptionFn(currentConfig, displayConfig)
+      : descriptionFn(displayConfig)
+    : [plain("")];
   const charges = displayConfig.chargesRequired;
   const truncated = charges > 10;
   return (
