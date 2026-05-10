@@ -115,24 +115,21 @@ function generateChoices(slots: PlacementSlot[]): EntityType[] {
   return pool.slice(0, Math.min(3, pool.length));
 }
 
-const CARD_WIDTH = 230;
-const CARD_HEIGHT = 360;
+const CARD_WIDTH = 240;
+const CARD_HEIGHT = 410;
 
 interface CornerHotkeyProps {
   hotkey: number;
-  flipped?: boolean;
 }
 
-const CornerHotkey = ({ hotkey, flipped }: CornerHotkeyProps) => (
+const CornerHotkey = ({ hotkey }: CornerHotkeyProps) => (
   <div
     className="absolute flex items-center justify-center select-none pointer-events-none rounded-md"
     style={{
-      top: flipped ? "auto" : 8,
-      bottom: flipped ? 8 : "auto",
-      left: flipped ? "auto" : 8,
-      right: flipped ? 8 : "auto",
-      width: 26,
-      height: 26,
+      top: 10,
+      left: 10,
+      width: 28,
+      height: 28,
       background: "rgba(255,255,255,0.06)",
       border: "1px solid rgba(255,255,255,0.18)",
       boxShadow: "0 1px 0 rgba(0,0,0,0.4), 0 0 0 2px rgba(0,0,0,0.25)",
@@ -234,10 +231,9 @@ const ShipCard = ({
       />
 
       <CornerHotkey hotkey={hotkey} />
-      <CornerHotkey hotkey={hotkey} flipped />
 
       <div
-        className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider"
+        className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider"
         style={
           isUpgrade
             ? {
@@ -256,14 +252,14 @@ const ShipCard = ({
       </div>
 
       <div
-        className="relative flex items-center justify-center mt-10 mb-1"
-        style={{ height: 96 }}
+        className="relative flex items-center justify-center mt-12"
+        style={{ height: 110 }}
       >
         <div
           className="absolute"
           style={{
-            width: 120,
-            height: 120,
+            width: 140,
+            height: 140,
             borderRadius: "50%",
             background: `radial-gradient(circle, ${accent}33 0%, transparent 70%)`,
           }}
@@ -273,8 +269,8 @@ const ShipCard = ({
             src={preview}
             alt={entityType}
             style={{
-              maxWidth: 96,
-              maxHeight: 96,
+              maxWidth: 104,
+              maxHeight: 104,
               width: "auto",
               height: "auto",
               objectFit: "contain",
@@ -285,15 +281,15 @@ const ShipCard = ({
         )}
       </div>
 
-      <div className="relative flex flex-col items-center px-3 mt-1">
+      <div className="relative flex flex-col items-center px-5 mt-3">
         <span
           className="text-[#cdd6f4] font-bold tracking-wide"
-          style={{ fontSize: 19, fontFamily: "system-ui, sans-serif" }}
+          style={{ fontSize: 20, fontFamily: "system-ui, sans-serif" }}
         >
           {entityType}
         </span>
         <span
-          className="text-[11px] text-[#a6adc8] mt-1 text-center leading-snug px-2"
+          className="text-[12px] text-[#a6adc8] mt-1.5 text-center leading-snug"
           style={{ fontFamily: "system-ui, sans-serif" }}
         >
           {bp.description}
@@ -301,7 +297,7 @@ const ShipCard = ({
       </div>
 
       <div
-        className="mx-4 my-3"
+        className="mx-5 my-4"
         style={{
           height: 1,
           background:
@@ -309,21 +305,11 @@ const ShipCard = ({
         }}
       />
 
-      <div className="relative flex flex-col items-center mb-2.5">
-        <span
-          className="text-[10px] uppercase tracking-[0.18em] text-[#7f849c] mb-1.5"
-          style={{ fontFamily: "system-ui, sans-serif" }}
-        >
-          {`${displayConfig.chargesRequired} charges`}
-        </span>
-        <ChargeDots charges={displayConfig.chargesRequired} accent={accent} />
-      </div>
-
-      <div className="relative flex flex-col gap-1.5 px-5 mt-auto pb-9">
+      <div className="relative flex flex-col gap-2 px-6">
         {stats.map((s) => (
           <div
             key={s.label}
-            className="flex items-center justify-between text-[12px]"
+            className="flex items-center justify-between text-[12.5px]"
             style={{ fontFamily: "system-ui, sans-serif" }}
           >
             <span className="text-[#a6adc8]">{s.label}</span>
@@ -332,6 +318,16 @@ const ShipCard = ({
             </span>
           </div>
         ))}
+      </div>
+
+      <div className="relative flex flex-col items-center mt-auto pt-4 pb-5 px-4">
+        <span
+          className="text-[10px] uppercase tracking-[0.18em] text-[#7f849c] mb-2"
+          style={{ fontFamily: "system-ui, sans-serif" }}
+        >
+          {`${displayConfig.chargesRequired} charges`}
+        </span>
+        <ChargeDots charges={displayConfig.chargesRequired} accent={accent} />
       </div>
     </button>
   );
