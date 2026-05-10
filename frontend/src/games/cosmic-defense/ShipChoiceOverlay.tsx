@@ -221,7 +221,7 @@ const ShipCard = ({
     ? getCardText(entityType, currentConfig, displayConfig)
     : getCardText(entityType, displayConfig);
   const charges = displayConfig.chargesRequired;
-  const truncated = charges > 5;
+  const truncated = charges > 10;
 
   return (
     <button
@@ -314,32 +314,7 @@ const ShipCard = ({
           {entityType}
         </span>
         <div className="flex gap-1 ml-2 shrink-0 items-center">
-          {truncated ? (
-            <>
-              <span
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: "50%",
-                  background: `radial-gradient(circle at 30% 30%, ${accent} 0%, ${accent}cc 60%, ${accent}55 100%)`,
-                  boxShadow: `0 0 5px ${accent}cc, inset 0 1px 0 rgba(255,255,255,0.5)`,
-                  border: "1px solid rgba(0,0,0,0.5)",
-                }}
-              />
-              <span
-                style={{
-                  fontSize: 14,
-                  fontWeight: 700,
-                  color: accent,
-                  textShadow: `0 0 8px ${accent}66`,
-                  lineHeight: 1,
-                  fontFamily: "ui-monospace, SFMono-Regular, monospace",
-                }}
-              >
-                ×{charges}
-              </span>
-            </>
-          ) : (
+          {!truncated &&
             Array.from({ length: charges }, (_, i) => (
               <span
                 key={i}
@@ -352,8 +327,7 @@ const ShipCard = ({
                   border: "1px solid rgba(0,0,0,0.5)",
                 }}
               />
-            ))
-          )}
+            ))}
         </div>
       </div>
 
@@ -378,6 +352,32 @@ const ShipCard = ({
           </span>
         ))}
       </div>
+      {truncated && (
+        <div className="flex items-center justify-center gap-1.5 pb-2">
+          <span
+            style={{
+              width: 9,
+              height: 9,
+              borderRadius: "50%",
+              background: `radial-gradient(circle at 30% 30%, ${accent} 0%, ${accent}cc 60%, ${accent}55 100%)`,
+              boxShadow: `0 0 7px ${accent}cc, inset 0 1px 0 rgba(255,255,255,0.5)`,
+              border: "1px solid rgba(0,0,0,0.5)",
+            }}
+          />
+          <span
+            style={{
+              fontSize: 18,
+              fontWeight: 700,
+              color: accent,
+              textShadow: `0 0 10px ${accent}66`,
+              lineHeight: 1,
+              fontFamily: "ui-monospace, SFMono-Regular, monospace",
+            }}
+          >
+            ×{charges}
+          </span>
+        </div>
+      )}
     </button>
   );
 };
