@@ -331,13 +331,14 @@ const ShipCard = ({
       </div>
 
       <div
-        className="flex items-center justify-between mx-2 mt-2 px-2"
+        className="flex items-center justify-between mx-2 mt-1.5 px-2 rounded-sm"
         style={{
           height: 18,
           background:
-            "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
-          borderTop: "1px solid rgba(255,255,255,0.08)",
-          borderBottom: "1px solid rgba(0,0,0,0.55)",
+            "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 100%)",
+          border: "1px solid rgba(255,255,255,0.06)",
+          boxShadow:
+            "inset 0 1px 0 rgba(255,255,255,0.04), inset 0 -1px 0 rgba(0,0,0,0.4)",
           fontSize: 9,
           fontWeight: 700,
           letterSpacing: "0.08em",
