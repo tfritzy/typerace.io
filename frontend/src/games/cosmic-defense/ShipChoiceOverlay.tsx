@@ -224,15 +224,6 @@ const ShipCard = ({
           "0 20px 44px -18px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)";
       }}
     >
-      <div
-        className="absolute inset-x-0 top-0 pointer-events-none"
-        style={{
-          height: 3,
-          background: `linear-gradient(90deg, transparent 0%, ${accent} 50%, transparent 100%)`,
-          opacity: 0.7,
-        }}
-      />
-
       <CornerHotkey hotkey={hotkey} />
 
       <div
@@ -385,13 +376,29 @@ export const ShipChoiceOverlay = ({
           {`Level ${level}`}
         </div>
         <div
-          className="text-[#a6adc8] text-[14px] mt-1 mb-2"
+          className="text-[#a6adc8] text-[14px] mt-1 mb-6"
           style={{ fontFamily: "system-ui, sans-serif" }}
         >
           Choose a ship
         </div>
+        <div className="flex gap-5">
+          {choices.map((entityType, i) => {
+            const existingSlot = existing.get(entityType);
+            return (
+              <ShipCard
+                key={entityType}
+                entityType={entityType}
+                hotkey={i + 1}
+                preview={shipPreviews.get(entityType)}
+                isUpgrade={!!existingSlot}
+                currentLevel={existingSlot?.level ?? 0}
+                onSelect={onSelect}
+              />
+            );
+          })}
+        </div>
         <div
-          className="flex items-center gap-2 mb-6 text-[12px] text-[#7f849c]"
+          className="flex items-center gap-2 mt-6 text-[12px] text-[#7f849c]"
           style={{ fontFamily: "system-ui, sans-serif" }}
         >
           <span>Press</span>
@@ -414,22 +421,6 @@ export const ShipChoiceOverlay = ({
             </span>
           ))}
           <span>or click a card to choose</span>
-        </div>
-        <div className="flex gap-5">
-          {choices.map((entityType, i) => {
-            const existingSlot = existing.get(entityType);
-            return (
-              <ShipCard
-                key={entityType}
-                entityType={entityType}
-                hotkey={i + 1}
-                preview={shipPreviews.get(entityType)}
-                isUpgrade={!!existingSlot}
-                currentLevel={existingSlot?.level ?? 0}
-                onSelect={onSelect}
-              />
-            );
-          })}
         </div>
       </div>
     </>
