@@ -26,7 +26,7 @@ interface PrimaryStat {
 
 const STAT_COLOR: Record<StatKind, string> = {
   damage: "#f38ba8",
-  plasma: "#cc88ff",
+  plasma: "#ff5a3c",
   freeze: "#89dceb",
   chain: "#a6e3a1",
 };
@@ -34,7 +34,7 @@ const STAT_COLOR: Record<StatKind, string> = {
 const ACCENT_COLOR = "#f9e2af";
 
 function damageTypeAccent(t: DamageType): string {
-  if (t === DamageType.Plasma) return "#cc88ff";
+  if (t === DamageType.Plasma) return "#ff5a3c";
   if (t === DamageType.Ice) return "#89dceb";
   return ACCENT_COLOR;
 }
@@ -285,20 +285,30 @@ const ShipCard = ({
       </div>
 
       {stat && (
-        <div className="relative mt-3 mb-4 flex items-center justify-center gap-2">
-          <StatIcon kind={stat.kind} color={stat.color} size={34} />
-          <span
-            className="font-bold leading-none"
+        <div className="relative mt-auto pb-4 px-4">
+          <div
+            className="mb-3 mx-auto"
             style={{
-              color: stat.color,
-              fontFamily: "system-ui, sans-serif",
-              fontSize: 30,
-              letterSpacing: "-0.02em",
-              textShadow: `0 2px 8px ${stat.color}55, 0 1px 2px rgba(0,0,0,0.6)`,
+              height: 1,
+              width: "70%",
+              background: `linear-gradient(90deg, transparent 0%, ${stat.color}55 50%, transparent 100%)`,
             }}
-          >
-            {stat.value}
-          </span>
+          />
+          <div className="flex items-center justify-center gap-2.5">
+            <StatIcon kind={stat.kind} color={stat.color} size={28} />
+            <span
+              className="font-bold leading-none"
+              style={{
+                color: stat.color,
+                fontFamily: "system-ui, sans-serif",
+                fontSize: 32,
+                letterSpacing: "-0.02em",
+                textShadow: `0 0 14px ${stat.color}66, 0 1px 2px rgba(0,0,0,0.6)`,
+              }}
+            >
+              {stat.value}
+            </span>
+          </div>
         </div>
       )}
     </button>
