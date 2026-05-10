@@ -1,4 +1,5 @@
 import { useMemo, useEffect, useCallback } from "react";
+import { Flame, Snowflake, Swords, Link2 } from "lucide-react";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { FRIENDLY_CONFIG_MAP, getScaledConfig, type FriendlyConfig } from "./enemyConfig";
 import { DamageType, type EntityType } from "./types";
@@ -63,53 +64,12 @@ interface StatIconProps {
 }
 
 const StatIcon = ({ kind, color, size }: StatIconProps) => {
-  const common = { width: size, height: size, viewBox: "0 0 24 24", fill: "none" as const };
-  switch (kind) {
-    case "damage":
-      return (
-        <svg {...common}>
-          <g fill={color} stroke={color} strokeWidth="0.6" strokeLinejoin="round">
-            <path d="M11 2h2v14h-2z" fillOpacity="0.85" />
-            <path d="M8 16h8v2H8z" fillOpacity="0.7" />
-            <path d="M11 18h2v3h-2z" fillOpacity="0.7" />
-            <circle cx="12" cy="22" r="1.1" fillOpacity="0.85" />
-          </g>
-        </svg>
-      );
-    case "plasma":
-      return (
-        <svg {...common}>
-          <path
-            d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"
-            fill={color}
-            fillOpacity="0.85"
-          />
-        </svg>
-      );
-    case "freeze":
-      return (
-        <svg {...common}>
-          <g stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none">
-            <line x1="12" y1="2" x2="12" y2="22" />
-            <line x1="3.4" y1="7" x2="20.6" y2="17" />
-            <line x1="3.4" y1="17" x2="20.6" y2="7" />
-            <polyline points="9,4 12,6 15,4" />
-            <polyline points="9,20 12,18 15,20" />
-            <polyline points="4,11 6,12 4,13" />
-            <polyline points="20,11 18,12 20,13" />
-          </g>
-        </svg>
-      );
-    case "chain":
-      return (
-        <svg {...common}>
-          <g stroke={color} strokeWidth="1.6" fill="none" strokeLinecap="round">
-            <rect x="3" y="9" width="9" height="6" rx="3" />
-            <rect x="12" y="9" width="9" height="6" rx="3" />
-          </g>
-        </svg>
-      );
-  }
+  const Icon =
+    kind === "damage" ? Swords :
+    kind === "plasma" ? Flame :
+    kind === "freeze" ? Snowflake :
+    Link2;
+  return <Icon size={size} color={color} strokeWidth={2.25} absoluteStrokeWidth />;
 };
 
 function generateChoices(slots: PlacementSlot[]): EntityType[] {
