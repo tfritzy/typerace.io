@@ -1,5 +1,4 @@
 import { useMemo, useEffect, useCallback } from "react";
-import { Flame, Snowflake, Swords, Link2 } from "lucide-react";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { FRIENDLY_CONFIG_MAP, getScaledConfig, type FriendlyConfig } from "./enemyConfig";
 import { DamageType, type EntityType } from "./types";
@@ -16,61 +15,116 @@ interface ShipChoiceOverlayProps {
   level: number;
 }
 
-type StatKind = "damage" | "plasma" | "freeze" | "chain";
-
-interface PrimaryStat {
-  kind: StatKind;
-  value: string;
-  color: string;
-}
-
-const STAT_COLOR: Record<StatKind, string> = {
-  damage: "#f38ba8",
-  plasma: "#ff5a3c",
+const KEYWORD_COLOR = {
+  plasma: "#c4528a",
   freeze: "#89dceb",
   chain: "#a6e3a1",
-};
+  number: "#f9e2af",
+} as const;
 
 const ACCENT_COLOR = "#f9e2af";
 
 function damageTypeAccent(t: DamageType): string {
-  if (t === DamageType.Plasma) return "#ff5a3c";
-  if (t === DamageType.Ice) return "#89dceb";
+  if (t === DamageType.Plasma) return KEYWORD_COLOR.plasma;
+  if (t === DamageType.Ice) return KEYWORD_COLOR.freeze;
   return ACCENT_COLOR;
 }
 
-function getPrimaryStat(config: FriendlyConfig): PrimaryStat | null {
-  if (config.plasmaStacks > 0) {
-    return { kind: "plasma", value: `${config.plasmaStacks}`, color: STAT_COLOR.plasma };
-  }
-  if (config.freezeStacks > 0) {
-    return { kind: "freeze", value: `${config.freezeStacks}s`, color: STAT_COLOR.freeze };
-  }
-  if (config.chainCount > 0) {
-    return { kind: "chain", value: `${config.chainCount}`, color: STAT_COLOR.chain };
-  }
-  const damageAmount = config.projectileDamage > 0 ? config.projectileDamage : config.laserDamage;
-  if (damageAmount > 0) {
-    const value = config.fireCount > 1 ? `${damageAmount}×${config.fireCount}` : `${damageAmount}`;
-    return { kind: "damage", value, color: STAT_COLOR.damage };
-  }
-  return null;
+interface TextSegment {
+  text: string;
+  color?: string;
+  bold?: boolean;
 }
 
-interface StatIconProps {
-  kind: StatKind;
-  color: string;
-  size: number;
+function num(n: number | string): TextSegment {
+  return { text: `${n}`, color: KEYWORD_COLOR.number, bold: true };
 }
 
-const StatIcon = ({ kind, color, size }: StatIconProps) => {
-  const Icon =
-    kind === "damage" ? Swords :
-    kind === "plasma" ? Flame :
-    kind === "freeze" ? Snowflake :
-    Link2;
-  return <Icon size={size} color={color} strokeWidth={2.25} absoluteStrokeWidth />;
-};
+function keyword(text: string, color: string): TextSegment {
+  return { text, color, bold: true };
+}
+
+function plain(text: string): TextSegment {
+  return { text };
+}
+
+function getCardText(entityType: EntityType, c: FriendlyConfig): TextSegment[] {
+  const dmg = c.projectileDamage > 0 ? c.projectileDamage : c.laserDamage;
+  switch (entityType) {
+    case "Spur":
+      return [plain("Charges a heavy round, dealing "), num(dmg), plain(" damage to a single target.")];
+    case "Ember":
+      return [plain("Fires light projectiles dealing "), num(dmg), plain(" damage.")];
+    case "Corona":
+      return [plain("Sustained laser beam dealing "), num(dmg), plain(" damage per second.")];
+    case "Pip":
+      return [plain("Fires twin projectiles dealing "), num(dmg), plain(" damage each.")];
+    case "Eagle":
+      return [
+        plain("Continuous laser that applies "),
+        num(c.plasmaStacks),
+        plain(" stacks of "),
+        keyword("plasma", KEYWORD_COLOR.plasma),
+        plain("."),
+      ];
+    case "Needle":
+      return [
+        plain("Piercing laser that hits every enemy in line, dealing "),
+        num(dmg),
+        plain(" damage per second."),
+      ];
+    case "Flare":
+      return [
+        plain("Explosive blast dealing "),
+        num(dmg),
+        plain(" damage and applying "),
+        num(c.freezeStacks),
+        plain(" stacks of "),
+        keyword("freeze", KEYWORD_COLOR.freeze),
+        plain(" in an area."),
+      ];
+    case "Dart":
+      return [
+        plain("Plasma blast applying "),
+        num(c.plasmaStacks),
+        plain(" stacks of "),
+        keyword("plasma", KEYWORD_COLOR.plasma),
+        plain(" to all enemies in an area."),
+      ];
+    case "Moth":
+      return [plain("Steady projectile dealing "), num(dmg), plain(" damage.")];
+    case "Prism":
+      return [
+        plain("Piercing ice beam dealing "),
+        num(dmg),
+        plain(" damage and applying "),
+        num(c.freezeStacks),
+        plain(" stacks of "),
+        keyword("freeze", KEYWORD_COLOR.freeze),
+        plain("."),
+      ];
+    case "Hawk":
+      return [plain("Heavy round dealing "), num(dmg), plain(" damage in an area.")];
+    case "Nova":
+      return [
+        plain("Bouncing shot that "),
+        keyword("chains", KEYWORD_COLOR.chain),
+        plain(" to "),
+        num(c.chainCount),
+        plain(" enemies, dealing "),
+        num(dmg),
+        plain(" damage each."),
+      ];
+    case "Lance":
+      return [
+        plain("Massive piercing cannon dealing "),
+        num(dmg),
+        plain(" damage to every enemy in line."),
+      ];
+    default:
+      return [plain("")];
+  }
+}
 
 function generateChoices(slots: PlacementSlot[]): EntityType[] {
   const existing = new Set(
@@ -99,8 +153,8 @@ function generateChoices(slots: PlacementSlot[]): EntityType[] {
   return pool.slice(0, Math.min(3, pool.length));
 }
 
-const CARD_WIDTH = 220;
-const CARD_HEIGHT = 270;
+const CARD_WIDTH = 240;
+const CARD_HEIGHT = 360;
 
 interface CornerHotkeyProps {
   hotkey: number;
@@ -127,35 +181,6 @@ const CornerHotkey = ({ hotkey }: CornerHotkeyProps) => (
   </div>
 );
 
-interface ChargeDotsProps {
-  charges: number;
-  accent: string;
-}
-
-const ChargeDots = ({ charges, accent }: ChargeDotsProps) => {
-  const dots = Array.from({ length: charges }, (_, i) => i);
-  return (
-    <div
-      className="flex flex-wrap gap-1 justify-center px-3"
-      style={{ maxWidth: "100%" }}
-    >
-      {dots.map((i) => (
-        <span
-          key={i}
-          style={{
-            width: 9,
-            height: 9,
-            borderRadius: "50%",
-            background: accent,
-            boxShadow: `0 0 4px ${accent}88, inset 0 1px 0 rgba(255,255,255,0.4)`,
-            border: "1px solid rgba(0,0,0,0.4)",
-          }}
-        />
-      ))}
-    </div>
-  );
-};
-
 interface ShipCardProps {
   entityType: EntityType;
   hotkey: number;
@@ -173,14 +198,13 @@ const ShipCard = ({
   currentLevel,
   onSelect,
 }: ShipCardProps) => {
-  const bp = SHIP_BLUEPRINTS.find((b) => b.entityType === entityType)!;
   const baseConfig = FRIENDLY_CONFIG_MAP.get(entityType)!;
   const displayConfig = isUpgrade
     ? getScaledConfig(baseConfig, currentLevel + 1)
     : baseConfig;
 
-  const stat = getPrimaryStat(displayConfig);
   const accent = damageTypeAccent(displayConfig.damageType);
+  const cardText = getCardText(entityType, displayConfig);
 
   return (
     <button
@@ -207,17 +231,10 @@ const ShipCard = ({
           "0 18px 40px -18px rgba(0,0,0,0.85), 0 2px 0 rgba(255,255,255,0.04) inset";
       }}
     >
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `radial-gradient(ellipse at 50% 30%, ${accent}1c 0%, transparent 60%)`,
-        }}
-      />
-
       <CornerHotkey hotkey={hotkey} />
 
       <div
-        className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider"
+        className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider z-10"
         style={
           isUpgrade
             ? {
@@ -236,81 +253,83 @@ const ShipCard = ({
       </div>
 
       <div
-        className="relative flex items-center justify-center"
-        style={{ marginTop: 26, height: 88 }}
+        className="relative mx-3 mt-10 rounded-md overflow-hidden flex items-center justify-center"
+        style={{
+          height: 140,
+          background: `radial-gradient(ellipse at 50% 45%, ${accent}22 0%, rgba(0,0,0,0.4) 70%)`,
+          border: "1px solid rgba(255,255,255,0.08)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.4)",
+        }}
       >
-        <div
-          className="absolute"
-          style={{
-            width: 130,
-            height: 130,
-            borderRadius: "50%",
-            background: `radial-gradient(circle, ${accent}33 0%, transparent 70%)`,
-          }}
-        />
         {preview && (
           <img
             src={preview}
             alt={entityType}
             style={{
-              maxWidth: 88,
-              maxHeight: 88,
+              maxWidth: 110,
+              maxHeight: 110,
               width: "auto",
               height: "auto",
               objectFit: "contain",
               imageRendering: "pixelated",
-              filter: `drop-shadow(0 4px 6px ${accent}66)`,
+              filter: `drop-shadow(0 4px 8px ${accent}88)`,
             }}
           />
         )}
       </div>
 
-      <div className="relative mt-2">
-        <ChargeDots charges={displayConfig.chargesRequired} accent={accent} />
-      </div>
-
-      <div className="relative flex flex-col items-center px-4 mt-3">
+      <div className="relative flex items-center justify-between px-3 mt-2">
         <span
-          className="text-[#cdd6f4] font-bold tracking-wide"
-          style={{ fontSize: 18, fontFamily: "system-ui, sans-serif", lineHeight: 1.1 }}
+          className="text-[#cdd6f4] font-bold tracking-wide truncate"
+          style={{ fontSize: 17, fontFamily: "system-ui, sans-serif" }}
         >
           {entityType}
         </span>
-        <span
-          className="text-[11.5px] text-[#a6adc8] mt-1 text-center leading-snug"
-          style={{ fontFamily: "system-ui, sans-serif" }}
-        >
-          {bp.description}
-        </span>
+        <div className="flex gap-1 ml-2 shrink-0">
+          {Array.from({ length: displayConfig.chargesRequired }, (_, i) => (
+            <span
+              key={i}
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: "50%",
+                background: accent,
+                boxShadow: `0 0 4px ${accent}88, inset 0 1px 0 rgba(255,255,255,0.4)`,
+                border: "1px solid rgba(0,0,0,0.4)",
+              }}
+            />
+          ))}
+        </div>
       </div>
 
-      {stat && (
-        <div className="relative mt-auto pb-4 px-4">
-          <div
-            className="mb-3 mx-auto"
+      <div
+        className="mx-3 mt-2"
+        style={{
+          height: 1,
+          background: `linear-gradient(90deg, transparent 0%, ${accent}55 50%, transparent 100%)`,
+        }}
+      />
+
+      <div
+        className="relative px-3 pt-2.5 pb-3 text-[#cdd6f4] leading-snug"
+        style={{
+          fontFamily: "system-ui, sans-serif",
+          fontSize: 13,
+        }}
+      >
+        {cardText.map((seg, i) => (
+          <span
+            key={i}
             style={{
-              height: 1,
-              width: "70%",
-              background: `linear-gradient(90deg, transparent 0%, ${stat.color}55 50%, transparent 100%)`,
+              color: seg.color ?? "#cdd6f4",
+              fontWeight: seg.bold ? 700 : 400,
+              textShadow: seg.color && seg.bold ? `0 0 8px ${seg.color}55` : undefined,
             }}
-          />
-          <div className="flex items-center justify-center gap-2.5">
-            <StatIcon kind={stat.kind} color={stat.color} size={28} />
-            <span
-              className="font-bold leading-none"
-              style={{
-                color: stat.color,
-                fontFamily: "system-ui, sans-serif",
-                fontSize: 32,
-                letterSpacing: "-0.02em",
-                textShadow: `0 0 14px ${stat.color}66, 0 1px 2px rgba(0,0,0,0.6)`,
-              }}
-            >
-              {stat.value}
-            </span>
-          </div>
-        </div>
-      )}
+          >
+            {seg.text}
+          </span>
+        ))}
+      </div>
     </button>
   );
 };
