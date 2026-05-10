@@ -250,10 +250,9 @@ const ShipCard = ({
       }}
     >
       <div
-        className="relative flex items-center justify-between px-2 mt-2 py-1 mx-2 rounded"
+        className="relative flex items-center justify-between px-3 pt-2.5 pb-2"
         style={{
-          background: "linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.25) 100%)",
-          border: "1px solid rgba(255,255,255,0.06)",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
         }}
       >
         <span
