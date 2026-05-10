@@ -16,13 +16,13 @@ interface ShipChoiceOverlayProps {
 }
 
 const KEYWORD_COLOR = {
-  plasma: "#c4528a",
-  freeze: "#89dceb",
-  chain: "#a6e3a1",
-  number: "#f9e2af",
+  plasma: "#d65c9f",
+  freeze: "#7dd3fc",
+  chain: "#86efac",
+  number: "#fbbf24",
 } as const;
 
-const ACCENT_COLOR = "#f9e2af";
+const ACCENT_COLOR = "#fbbf24";
 
 function damageTypeAccent(t: DamageType): string {
   if (t === DamageType.Plasma) return KEYWORD_COLOR.plasma;
@@ -162,18 +162,18 @@ interface CornerHotkeyProps {
 
 const CornerHotkey = ({ hotkey }: CornerHotkeyProps) => (
   <div
-    className="absolute flex items-center justify-center select-none pointer-events-none rounded-md"
+    className="absolute flex items-center justify-center select-none pointer-events-none rounded-md z-10"
     style={{
       top: 10,
       left: 10,
-      width: 28,
-      height: 28,
-      background: "rgba(255,255,255,0.06)",
-      border: "1px solid rgba(255,255,255,0.18)",
-      boxShadow: "0 1px 0 rgba(0,0,0,0.4), 0 0 0 2px rgba(0,0,0,0.25)",
-      color: "#cdd6f4",
-      fontFamily: "system-ui, sans-serif",
-      fontSize: 14,
+      width: 26,
+      height: 26,
+      background: "linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 100%)",
+      border: "1px solid rgba(255,255,255,0.22)",
+      boxShadow: "0 1px 2px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)",
+      color: "#e2e8f0",
+      fontFamily: "ui-monospace, SFMono-Regular, monospace",
+      fontSize: 13,
       fontWeight: 700,
     }}
   >
@@ -214,23 +214,32 @@ const ShipCard = ({
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
         background:
-          "linear-gradient(165deg, #1e1f3a 0%, #14152a 55%, #0c0e1c 100%)",
-        border: "1px solid rgba(255,255,255,0.10)",
+          "linear-gradient(160deg, #20223f 0%, #161731 50%, #0a0c1c 100%)",
+        border: "1px solid rgba(255,255,255,0.08)",
         boxShadow:
-          "0 18px 40px -18px rgba(0,0,0,0.85), 0 2px 0 rgba(255,255,255,0.04) inset",
+          "0 20px 44px -18px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = accent;
-        e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.boxShadow = `0 24px 48px -16px rgba(0,0,0,0.9), 0 0 0 1px ${accent}55, 0 0 24px -4px ${accent}55, 0 2px 0 rgba(255,255,255,0.04) inset`;
+        e.currentTarget.style.borderColor = `${accent}cc`;
+        e.currentTarget.style.transform = "translateY(-5px)";
+        e.currentTarget.style.boxShadow = `0 28px 52px -16px rgba(0,0,0,0.95), 0 0 0 1px ${accent}aa, 0 0 32px -4px ${accent}77, inset 0 1px 0 rgba(255,255,255,0.08)`;
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)";
+        e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
         e.currentTarget.style.transform = "translateY(0)";
         e.currentTarget.style.boxShadow =
-          "0 18px 40px -18px rgba(0,0,0,0.85), 0 2px 0 rgba(255,255,255,0.04) inset";
+          "0 20px 44px -18px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)";
       }}
     >
+      <div
+        className="absolute inset-x-0 top-0 pointer-events-none"
+        style={{
+          height: 3,
+          background: `linear-gradient(90deg, transparent 0%, ${accent} 50%, transparent 100%)`,
+          opacity: 0.7,
+        }}
+      />
+
       <CornerHotkey hotkey={hotkey} />
 
       <div
@@ -238,14 +247,16 @@ const ShipCard = ({
         style={
           isUpgrade
             ? {
-                background: "rgba(249,226,175,0.15)",
-                color: "#f9e2af",
-                border: "1px solid rgba(249,226,175,0.35)",
+                background: "linear-gradient(180deg, rgba(251,191,36,0.22) 0%, rgba(251,191,36,0.10) 100%)",
+                color: "#fbbf24",
+                border: "1px solid rgba(251,191,36,0.45)",
+                boxShadow: "0 0 10px rgba(251,191,36,0.25)",
               }
             : {
-                background: "rgba(166,227,161,0.15)",
-                color: "#a6e3a1",
-                border: "1px solid rgba(166,227,161,0.35)",
+                background: "linear-gradient(180deg, rgba(134,239,172,0.22) 0%, rgba(134,239,172,0.10) 100%)",
+                color: "#86efac",
+                border: "1px solid rgba(134,239,172,0.45)",
+                boxShadow: "0 0 10px rgba(134,239,172,0.25)",
               }
         }
       >
@@ -256,9 +267,10 @@ const ShipCard = ({
         className="relative mx-3 mt-10 rounded-md overflow-hidden flex items-center justify-center"
         style={{
           height: 140,
-          background: `radial-gradient(ellipse at 50% 45%, ${accent}22 0%, rgba(0,0,0,0.4) 70%)`,
-          border: "1px solid rgba(255,255,255,0.08)",
-          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.4)",
+          background: `radial-gradient(ellipse at 50% 50%, ${accent}33 0%, ${accent}10 35%, rgba(0,0,0,0.55) 80%)`,
+          border: "1px solid rgba(255,255,255,0.06)",
+          boxShadow:
+            `inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 18px -8px ${accent}66`,
         }}
       >
         {preview && (
@@ -266,22 +278,31 @@ const ShipCard = ({
             src={preview}
             alt={entityType}
             style={{
-              maxWidth: 110,
-              maxHeight: 110,
-              width: "auto",
-              height: "auto",
+              width: 110,
+              height: 110,
               objectFit: "contain",
               imageRendering: "pixelated",
-              filter: `drop-shadow(0 4px 8px ${accent}88)`,
+              filter: `drop-shadow(0 4px 10px ${accent}aa) drop-shadow(0 0 4px ${accent}66)`,
             }}
           />
         )}
       </div>
 
-      <div className="relative flex items-center justify-between px-3 mt-2">
+      <div
+        className="relative flex items-center justify-between px-3 mt-2.5 py-1.5 mx-3 rounded"
+        style={{
+          background: "linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.25) 100%)",
+          border: "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
         <span
-          className="text-[#cdd6f4] font-bold tracking-wide truncate"
-          style={{ fontSize: 17, fontFamily: "system-ui, sans-serif" }}
+          className="font-bold tracking-wide truncate"
+          style={{
+            fontSize: 16,
+            fontFamily: "system-ui, sans-serif",
+            color: "#f1f5f9",
+            textShadow: `0 0 10px ${accent}55`,
+          }}
         >
           {entityType}
         </span>
@@ -293,9 +314,9 @@ const ShipCard = ({
                 width: 7,
                 height: 7,
                 borderRadius: "50%",
-                background: accent,
-                boxShadow: `0 0 4px ${accent}88, inset 0 1px 0 rgba(255,255,255,0.4)`,
-                border: "1px solid rgba(0,0,0,0.4)",
+                background: `radial-gradient(circle at 30% 30%, ${accent} 0%, ${accent}cc 60%, ${accent}55 100%)`,
+                boxShadow: `0 0 5px ${accent}cc, inset 0 1px 0 rgba(255,255,255,0.5)`,
+                border: "1px solid rgba(0,0,0,0.5)",
               }}
             />
           ))}
@@ -303,27 +324,20 @@ const ShipCard = ({
       </div>
 
       <div
-        className="mx-3 mt-2"
-        style={{
-          height: 1,
-          background: `linear-gradient(90deg, transparent 0%, ${accent}55 50%, transparent 100%)`,
-        }}
-      />
-
-      <div
-        className="relative px-3 pt-2.5 pb-3 text-[#cdd6f4] leading-snug"
+        className="relative px-4 pt-3 pb-3 leading-snug flex-1"
         style={{
           fontFamily: "system-ui, sans-serif",
           fontSize: 13,
+          color: "#cbd5e1",
         }}
       >
         {cardText.map((seg, i) => (
           <span
             key={i}
             style={{
-              color: seg.color ?? "#cdd6f4",
+              color: seg.color ?? "#cbd5e1",
               fontWeight: seg.bold ? 700 : 400,
-              textShadow: seg.color && seg.bold ? `0 0 8px ${seg.color}55` : undefined,
+              textShadow: seg.color && seg.bold ? `0 0 10px ${seg.color}66` : undefined,
             }}
           >
             {seg.text}
