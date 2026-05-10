@@ -1,7 +1,7 @@
 import { useMemo, useEffect, useCallback } from "react";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { FRIENDLY_CONFIG_MAP, getScaledConfig, type FriendlyConfig } from "./enemyConfig";
-import { DamageType, type EntityType } from "./types";
+import { type EntityType } from "./types";
 import type { PlacementSlot } from "./PlacementPoints";
 
 const CONSISTENT_DAMAGE_ROLES = new Set([
@@ -23,12 +23,6 @@ const KEYWORD_COLOR = {
 } as const;
 
 const ACCENT_COLOR = "#fbbf24";
-
-function damageTypeAccent(t: DamageType): string {
-  if (t === DamageType.Plasma) return KEYWORD_COLOR.plasma;
-  if (t === DamageType.Ice) return KEYWORD_COLOR.freeze;
-  return ACCENT_COLOR;
-}
 
 interface TextSegment {
   text: string;
@@ -56,12 +50,12 @@ function getCardText(entityType: EntityType, c: FriendlyConfig): TextSegment[] {
     case "Ember":
       return [plain("Fires light projectiles dealing "), num(dmg), plain(" damage.")];
     case "Corona":
-      return [plain("Sustained laser beam dealing "), num(dmg), plain(" damage per second.")];
+      return [plain("Laser beam dealing "), num(dmg), plain(" damage.")];
     case "Pip":
       return [plain("Fires twin projectiles dealing "), num(dmg), plain(" damage each.")];
     case "Eagle":
       return [
-        plain("Continuous laser that applies "),
+        plain("Laser that applies "),
         num(c.plasmaStacks),
         plain(" stacks of "),
         keyword("plasma", KEYWORD_COLOR.plasma),
@@ -69,9 +63,9 @@ function getCardText(entityType: EntityType, c: FriendlyConfig): TextSegment[] {
       ];
     case "Needle":
       return [
-        plain("Piercing laser that hits every enemy in line, dealing "),
+        plain("Piercing laser hitting every enemy in line, dealing "),
         num(dmg),
-        plain(" damage per second."),
+        plain(" damage."),
       ];
     case "Flare":
       return [
@@ -203,7 +197,7 @@ const ShipCard = ({
     ? getScaledConfig(baseConfig, currentLevel + 1)
     : baseConfig;
 
-  const accent = damageTypeAccent(displayConfig.damageType);
+  const accent = ACCENT_COLOR;
   const cardText = getCardText(entityType, displayConfig);
 
   return (
@@ -220,12 +214,11 @@ const ShipCard = ({
           "0 20px 44px -18px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = `${accent}cc`;
         e.currentTarget.style.transform = "translateY(-5px)";
-        e.currentTarget.style.boxShadow = `0 28px 52px -16px rgba(0,0,0,0.95), 0 0 0 1px ${accent}aa, 0 0 32px -4px ${accent}77, inset 0 1px 0 rgba(255,255,255,0.08)`;
+        e.currentTarget.style.boxShadow =
+          "0 28px 52px -16px rgba(0,0,0,0.95), 0 0 0 1px rgba(255,255,255,0.18), inset 0 1px 0 rgba(255,255,255,0.08)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
         e.currentTarget.style.transform = "translateY(0)";
         e.currentTarget.style.boxShadow =
           "0 20px 44px -18px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)";
@@ -278,8 +271,8 @@ const ShipCard = ({
             src={preview}
             alt={entityType}
             style={{
-              width: 110,
-              height: 110,
+              width: 88,
+              height: 88,
               objectFit: "contain",
               imageRendering: "pixelated",
               filter: `drop-shadow(0 4px 10px ${accent}aa) drop-shadow(0 0 4px ${accent}66)`,
