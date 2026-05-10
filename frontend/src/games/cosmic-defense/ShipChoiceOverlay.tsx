@@ -68,21 +68,22 @@ const StatIcon = ({ kind, color, size }: StatIconProps) => {
     case "damage":
       return (
         <svg {...common}>
-          <path
-            d="M14.5 3l6.5 6.5-2.2 2.2-1.4-1.4-7 7 1.4 1.4-2.2 2.2L3 14.5l2.2-2.2 1.4 1.4 7-7-1.4-1.4L14.5 3z"
-            fill={color}
-            fillOpacity="0.18"
-            stroke={color}
-            strokeWidth="1.2"
-            strokeLinejoin="round"
-          />
+          <g fill={color} stroke={color} strokeWidth="0.6" strokeLinejoin="round">
+            <path d="M11 2h2v14h-2z" fillOpacity="0.85" />
+            <path d="M8 16h8v2H8z" fillOpacity="0.7" />
+            <path d="M11 18h2v3h-2z" fillOpacity="0.7" />
+            <circle cx="12" cy="22" r="1.1" fillOpacity="0.85" />
+          </g>
         </svg>
       );
     case "plasma":
       return (
         <svg {...common}>
-          <circle cx="12" cy="12" r="9" fill={color} fillOpacity="0.18" stroke={color} strokeWidth="1.2" />
-          <circle cx="12" cy="12" r="5" fill={color} fillOpacity="0.35" stroke={color} strokeWidth="1" />
+          <path
+            d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"
+            fill={color}
+            fillOpacity="0.85"
+          />
         </svg>
       );
     case "freeze":
@@ -139,7 +140,7 @@ function generateChoices(slots: PlacementSlot[]): EntityType[] {
 }
 
 const CARD_WIDTH = 220;
-const CARD_HEIGHT = 320;
+const CARD_HEIGHT = 270;
 
 interface CornerHotkeyProps {
   hotkey: number;
@@ -276,7 +277,7 @@ const ShipCard = ({
 
       <div
         className="relative flex items-center justify-center"
-        style={{ marginTop: 38, height: 92 }}
+        style={{ marginTop: 26, height: 88 }}
       >
         <div
           className="absolute"
@@ -324,24 +325,16 @@ const ShipCard = ({
       </div>
 
       {stat && (
-        <div
-          className="relative mt-auto mx-3 mb-3 flex items-center justify-center gap-2.5 rounded-lg"
-          style={{
-            padding: "10px 14px",
-            background: `linear-gradient(180deg, ${stat.color}1f 0%, ${stat.color}10 100%)`,
-            border: `1px solid ${stat.color}3a`,
-            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.06), 0 0 14px -6px ${stat.color}66`,
-          }}
-        >
-          <StatIcon kind={stat.kind} color={stat.color} size={28} />
+        <div className="relative mt-3 mb-4 flex items-center justify-center gap-2">
+          <StatIcon kind={stat.kind} color={stat.color} size={34} />
           <span
             className="font-bold leading-none"
             style={{
               color: stat.color,
               fontFamily: "system-ui, sans-serif",
-              fontSize: 26,
-              letterSpacing: "-0.01em",
-              textShadow: `0 1px 2px rgba(0,0,0,0.6)`,
+              fontSize: 30,
+              letterSpacing: "-0.02em",
+              textShadow: `0 2px 8px ${stat.color}55, 0 1px 2px rgba(0,0,0,0.6)`,
             }}
           >
             {stat.value}
