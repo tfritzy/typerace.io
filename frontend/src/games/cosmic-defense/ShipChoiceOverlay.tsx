@@ -147,8 +147,8 @@ function generateChoices(slots: PlacementSlot[]): EntityType[] {
   return pool.slice(0, Math.min(3, pool.length));
 }
 
-const CARD_WIDTH = 240;
-const CARD_HEIGHT = 360;
+const CARD_WIDTH = 180;
+const CARD_HEIGHT = 270;
 
 interface CornerHotkeyProps {
   hotkey: number;
@@ -158,16 +158,16 @@ const CornerHotkey = ({ hotkey }: CornerHotkeyProps) => (
   <div
     className="absolute flex items-center justify-center select-none pointer-events-none rounded-md z-10"
     style={{
-      top: 10,
-      left: 10,
-      width: 26,
-      height: 26,
+      top: 8,
+      left: 8,
+      width: 22,
+      height: 22,
       background: "linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 100%)",
       border: "1px solid rgba(255,255,255,0.22)",
       boxShadow: "0 1px 2px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)",
       color: "#e2e8f0",
       fontFamily: "ui-monospace, SFMono-Regular, monospace",
-      fontSize: 13,
+      fontSize: 11,
       fontWeight: 700,
     }}
   >
@@ -227,7 +227,7 @@ const ShipCard = ({
       <CornerHotkey hotkey={hotkey} />
 
       <div
-        className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider z-10"
+        className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider z-10"
         style={
           isUpgrade
             ? {
@@ -248,9 +248,9 @@ const ShipCard = ({
       </div>
 
       <div
-        className="relative mx-3 mt-10 rounded-md overflow-hidden flex items-center justify-center"
+        className="relative mx-2 mt-8 rounded-md overflow-hidden flex items-center justify-center"
         style={{
-          height: 140,
+          height: 100,
           background: `radial-gradient(ellipse at 50% 50%, ${accent}33 0%, ${accent}10 35%, rgba(0,0,0,0.55) 80%)`,
           border: "1px solid rgba(255,255,255,0.06)",
           boxShadow:
@@ -262,8 +262,8 @@ const ShipCard = ({
             src={preview}
             alt={entityType}
             style={{
-              width: 88,
-              height: 88,
+              width: 64,
+              height: 64,
               objectFit: "contain",
               imageRendering: "pixelated",
               filter: `drop-shadow(0 4px 10px ${accent}aa) drop-shadow(0 0 4px ${accent}66)`,
@@ -273,7 +273,7 @@ const ShipCard = ({
       </div>
 
       <div
-        className="relative flex items-center justify-between px-3 mt-2.5 py-1.5 mx-3 rounded"
+        className="relative flex items-center justify-between px-2 mt-2 py-1 mx-2 rounded"
         style={{
           background: "linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.25) 100%)",
           border: "1px solid rgba(255,255,255,0.06)",
@@ -282,7 +282,7 @@ const ShipCard = ({
         <span
           className="font-bold tracking-wide truncate"
           style={{
-            fontSize: 16,
+            fontSize: 13,
             fontFamily: "system-ui, sans-serif",
             color: "#f1f5f9",
             textShadow: `0 0 10px ${accent}55`,
@@ -295,8 +295,8 @@ const ShipCard = ({
             <span
               key={i}
               style={{
-                width: 7,
-                height: 7,
+                width: 6,
+                height: 6,
                 borderRadius: "50%",
                 background: `radial-gradient(circle at 30% 30%, ${accent} 0%, ${accent}cc 60%, ${accent}55 100%)`,
                 boxShadow: `0 0 5px ${accent}cc, inset 0 1px 0 rgba(255,255,255,0.5)`,
@@ -308,10 +308,10 @@ const ShipCard = ({
       </div>
 
       <div
-        className="relative px-4 pt-3 pb-3 leading-snug flex-1"
+        className="relative px-3 pt-2 pb-2 leading-snug flex-1"
         style={{
           fontFamily: "system-ui, sans-serif",
-          fontSize: 13,
+          fontSize: 11,
           color: "#cbd5e1",
         }}
       >
@@ -381,7 +381,7 @@ export const ShipChoiceOverlay = ({
         >
           Choose a ship
         </div>
-        <div className="flex gap-5">
+        <div className="flex gap-3">
           {choices.map((entityType, i) => {
             const existingSlot = existing.get(entityType);
             return (
