@@ -249,12 +249,7 @@ const ShipCard = ({
           "0 20px 44px -18px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)";
       }}
     >
-      <div
-        className="relative flex items-center justify-between px-3 pt-2.5 pb-2"
-        style={{
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-        }}
-      >
+      <div className="relative flex items-center justify-between px-3 pt-2.5 pb-1.5">
         <span
           className="font-bold tracking-wide truncate"
           style={{
@@ -311,7 +306,7 @@ const ShipCard = ({
       </div>
 
       <div
-        className="relative mx-2 mt-2 rounded-md overflow-hidden flex items-center justify-center"
+        className="relative mx-2 mt-1 rounded-md overflow-hidden flex items-center justify-center"
         style={{
           height: 100,
           background: `radial-gradient(ellipse at 50% 50%, ${accent}1a 0%, ${accent}08 40%, rgba(0,0,0,0.55) 85%)`,
@@ -356,7 +351,7 @@ const ShipCard = ({
       </div>
 
       <div
-        className="relative px-3 pt-2 pb-2 leading-snug flex-1"
+        className="relative px-3 pt-3 pb-2 leading-snug flex-1"
         style={{
           fontFamily: "system-ui, sans-serif",
           fontSize: 11,
