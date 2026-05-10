@@ -138,8 +138,8 @@ function generateChoices(slots: PlacementSlot[]): EntityType[] {
   return pool.slice(0, Math.min(3, pool.length));
 }
 
-const CARD_WIDTH = 240;
-const CARD_HEIGHT = 410;
+const CARD_WIDTH = 220;
+const CARD_HEIGHT = 320;
 
 interface CornerHotkeyProps {
   hotkey: number;
@@ -249,7 +249,7 @@ const ShipCard = ({
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(circle at 50% 24%, ${accent}1f 0%, transparent 55%)`,
+          background: `radial-gradient(ellipse at 50% 30%, ${accent}1c 0%, transparent 60%)`,
         }}
       />
 
@@ -275,14 +275,14 @@ const ShipCard = ({
       </div>
 
       <div
-        className="relative flex items-center justify-center mt-12"
-        style={{ height: 110 }}
+        className="relative flex items-center justify-center"
+        style={{ marginTop: 38, height: 92 }}
       >
         <div
           className="absolute"
           style={{
-            width: 140,
-            height: 140,
+            width: 130,
+            height: 130,
             borderRadius: "50%",
             background: `radial-gradient(circle, ${accent}33 0%, transparent 70%)`,
           }}
@@ -292,8 +292,8 @@ const ShipCard = ({
             src={preview}
             alt={entityType}
             style={{
-              maxWidth: 104,
-              maxHeight: 104,
+              maxWidth: 88,
+              maxHeight: 88,
               width: "auto",
               height: "auto",
               objectFit: "contain",
@@ -304,61 +304,50 @@ const ShipCard = ({
         )}
       </div>
 
-      <div className="relative mt-3">
+      <div className="relative mt-2">
         <ChargeDots charges={displayConfig.chargesRequired} accent={accent} />
       </div>
 
-      <div className="relative flex flex-col items-center px-5 mt-4">
+      <div className="relative flex flex-col items-center px-4 mt-3">
         <span
           className="text-[#cdd6f4] font-bold tracking-wide"
-          style={{ fontSize: 20, fontFamily: "system-ui, sans-serif" }}
+          style={{ fontSize: 18, fontFamily: "system-ui, sans-serif", lineHeight: 1.1 }}
         >
           {entityType}
         </span>
         <span
-          className="text-[12px] text-[#a6adc8] mt-1.5 text-center leading-snug"
+          className="text-[11.5px] text-[#a6adc8] mt-1 text-center leading-snug"
           style={{ fontFamily: "system-ui, sans-serif" }}
         >
           {bp.description}
         </span>
       </div>
 
-      <div
-        className="mx-5 my-4"
-        style={{
-          height: 1,
-          background:
-            "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)",
-        }}
-      />
-
-      <div className="relative flex items-center justify-center mt-auto pb-5">
-        {stat && (
-          <div className="relative" style={{ width: 96, height: 96 }}>
-            <div
-              className="absolute inset-0"
-              style={{
-                background: `radial-gradient(circle, ${stat.color}1f 0%, transparent 70%)`,
-              }}
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <StatIcon kind={stat.kind} color={stat.color} size={96} />
-            </div>
-            <div
-              className="absolute inset-0 flex items-center justify-center font-bold"
-              style={{
-                color: stat.color,
-                fontFamily: "system-ui, sans-serif",
-                fontSize: stat.value.length > 3 ? 22 : 28,
-                textShadow: "0 2px 6px rgba(0,0,0,0.7)",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              {stat.value}
-            </div>
-          </div>
-        )}
-      </div>
+      {stat && (
+        <div
+          className="relative mt-auto mx-3 mb-3 flex items-center justify-center gap-2.5 rounded-lg"
+          style={{
+            padding: "10px 14px",
+            background: `linear-gradient(180deg, ${stat.color}1f 0%, ${stat.color}10 100%)`,
+            border: `1px solid ${stat.color}3a`,
+            boxShadow: `inset 0 1px 0 rgba(255,255,255,0.06), 0 0 14px -6px ${stat.color}66`,
+          }}
+        >
+          <StatIcon kind={stat.kind} color={stat.color} size={28} />
+          <span
+            className="font-bold leading-none"
+            style={{
+              color: stat.color,
+              fontFamily: "system-ui, sans-serif",
+              fontSize: 26,
+              letterSpacing: "-0.01em",
+              textShadow: `0 1px 2px rgba(0,0,0,0.6)`,
+            }}
+          >
+            {stat.value}
+          </span>
+        </div>
+      )}
     </button>
   );
 };
