@@ -328,30 +328,58 @@ const ShipCard = ({
             }}
           />
         )}
-        <div
-          className="absolute top-1 right-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider"
-          style={
-            isUpgrade
-              ? {
-                  background: "linear-gradient(180deg, rgba(251,191,36,0.22) 0%, rgba(251,191,36,0.10) 100%)",
-                  color: "#fbbf24",
-                  border: "1px solid rgba(251,191,36,0.45)",
-                  boxShadow: "0 0 10px rgba(251,191,36,0.25)",
-                }
-              : {
-                  background: "linear-gradient(180deg, rgba(134,239,172,0.22) 0%, rgba(134,239,172,0.10) 100%)",
-                  color: "#86efac",
-                  border: "1px solid rgba(134,239,172,0.45)",
-                  boxShadow: "0 0 10px rgba(134,239,172,0.25)",
-                }
-          }
-        >
-          {isUpgrade ? `LV ${currentLevel} → ${currentLevel + 1}` : "NEW"}
-        </div>
       </div>
 
       <div
-        className="relative px-3 pt-3 pb-2 leading-snug flex-1"
+        className="flex items-center justify-between mx-2 mt-2 px-2"
+        style={{
+          height: 18,
+          background:
+            "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+          borderTop: "1px solid rgba(255,255,255,0.08)",
+          borderBottom: "1px solid rgba(0,0,0,0.55)",
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          fontFamily: "system-ui, sans-serif",
+        }}
+      >
+        <span
+          style={{
+            color: isUpgrade ? "#fbbf24" : "#86efac",
+            textShadow: `0 0 6px ${isUpgrade ? "#fbbf24" : "#86efac"}55`,
+          }}
+        >
+          {isUpgrade ? "Upgrade" : "New Ship"}
+        </span>
+        <span
+          style={{
+            color: "#cbd5e1",
+            fontFamily: "ui-monospace, SFMono-Regular, monospace",
+            letterSpacing: 0,
+            display: "inline-flex",
+            alignItems: "center",
+          }}
+        >
+          {isUpgrade ? (
+            <>
+              Lv {currentLevel}
+              <ChevronRight
+                size={9}
+                strokeWidth={2.5}
+                style={{ color: "#94a3b8", margin: "0 1px" }}
+              />
+              {currentLevel + 1}
+            </>
+          ) : (
+            "Lv 1"
+          )}
+        </span>
+      </div>
+
+      <div
+        className="relative px-3 pt-2 pb-2 leading-snug flex-1"
         style={{
           fontFamily: "system-ui, sans-serif",
           fontSize: 11,
