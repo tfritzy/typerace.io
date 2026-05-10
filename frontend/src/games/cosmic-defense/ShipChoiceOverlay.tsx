@@ -194,31 +194,6 @@ function generateChoices(slots: PlacementSlot[]): EntityType[] {
 const CARD_WIDTH = 180;
 const CARD_HEIGHT = 270;
 
-interface CornerHotkeyProps {
-  hotkey: number;
-}
-
-const CornerHotkey = ({ hotkey }: CornerHotkeyProps) => (
-  <div
-    className="absolute flex items-center justify-center select-none pointer-events-none rounded-md z-10"
-    style={{
-      top: 8,
-      left: 8,
-      width: 22,
-      height: 22,
-      background: "linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 100%)",
-      border: "1px solid rgba(255,255,255,0.22)",
-      boxShadow: "0 1px 2px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)",
-      color: "#e2e8f0",
-      fontFamily: "ui-monospace, SFMono-Regular, monospace",
-      fontSize: 11,
-      fontWeight: 700,
-    }}
-  >
-    {hotkey}
-  </div>
-);
-
 interface ShipCardProps {
   entityType: EntityType;
   hotkey: number;
@@ -250,7 +225,6 @@ const ShipCard = ({
     : getCardText(entityType, displayConfig);
   const charges = displayConfig.chargesRequired;
   const truncated = charges > 10;
-
   return (
     <button
       onClick={() => onSelect(entityType)}
@@ -275,8 +249,6 @@ const ShipCard = ({
           "0 20px 44px -18px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)";
       }}
     >
-      <CornerHotkey hotkey={hotkey} />
-
       <div
         className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider z-10"
         style={
@@ -342,7 +314,32 @@ const ShipCard = ({
           {entityType}
         </span>
         <div className="flex gap-1 ml-2 shrink-0 items-center">
-          {!truncated &&
+          {truncated ? (
+            <>
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: `radial-gradient(circle at 30% 30%, ${accent} 0%, ${accent}cc 60%, ${accent}55 100%)`,
+                  boxShadow: `0 0 5px ${accent}cc, inset 0 1px 0 rgba(255,255,255,0.5)`,
+                  border: "1px solid rgba(0,0,0,0.5)",
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: accent,
+                  textShadow: `0 0 8px ${accent}66`,
+                  lineHeight: 1,
+                  fontFamily: "ui-monospace, SFMono-Regular, monospace",
+                }}
+              >
+                ×{charges}
+              </span>
+            </>
+          ) : (
             Array.from({ length: charges }, (_, i) => (
               <span
                 key={i}
@@ -355,7 +352,8 @@ const ShipCard = ({
                   border: "1px solid rgba(0,0,0,0.5)",
                 }}
               />
-            ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -380,32 +378,18 @@ const ShipCard = ({
           </span>
         ))}
       </div>
-      {truncated && (
-        <div className="flex items-center justify-center gap-1.5 pb-2">
-          <span
-            style={{
-              width: 9,
-              height: 9,
-              borderRadius: "50%",
-              background: `radial-gradient(circle at 30% 30%, ${accent} 0%, ${accent}cc 60%, ${accent}55 100%)`,
-              boxShadow: `0 0 7px ${accent}cc, inset 0 1px 0 rgba(255,255,255,0.5)`,
-              border: "1px solid rgba(0,0,0,0.5)",
-            }}
-          />
-          <span
-            style={{
-              fontSize: 18,
-              fontWeight: 700,
-              color: accent,
-              textShadow: `0 0 10px ${accent}66`,
-              lineHeight: 1,
-              fontFamily: "ui-monospace, SFMono-Regular, monospace",
-            }}
-          >
-            ×{charges}
-          </span>
-        </div>
-      )}
+      <div
+        className="flex items-center justify-center pb-2 pt-1 select-none"
+        style={{
+          color: "#94a3b8",
+          fontFamily: "ui-monospace, SFMono-Regular, monospace",
+          fontSize: 13,
+          fontWeight: 700,
+          letterSpacing: "0.04em",
+        }}
+      >
+        {hotkey}
+      </div>
     </button>
   );
 };
