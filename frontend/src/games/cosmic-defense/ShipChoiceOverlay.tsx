@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useCallback, type ReactNode } from "react";
-import { ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { FRIENDLY_CONFIG_MAP, getScaledConfig, type FriendlyConfig } from "./enemyConfig";
 import { type EntityType } from "./types";
@@ -49,10 +49,10 @@ function num(current: number, next?: number): TextSegment[] {
           >
             {current}
           </span>
-          <ArrowRight
+          <ChevronRight
             size={10}
             strokeWidth={2.5}
-            style={{ color: "#94a3b8", margin: "0 2px", flexShrink: 0 }}
+            style={{ color: "#94a3b8", margin: "0 1px", flexShrink: 0 }}
           />
           <span
             style={{
