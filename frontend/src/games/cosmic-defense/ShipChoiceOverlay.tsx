@@ -15,13 +15,20 @@ interface ShipChoiceOverlayProps {
   level: number;
 }
 
-type StatKind = "damage" | "plasma" | "freeze" | "chain" | "splash";
+type StatKind = "damage" | "plasma" | "freeze" | "chain";
 
-interface StatRow {
+interface PrimaryStat {
   kind: StatKind;
   value: string;
   color: string;
 }
+
+const STAT_COLOR: Record<StatKind, string> = {
+  damage: "#f38ba8",
+  plasma: "#cc88ff",
+  freeze: "#89dceb",
+  chain: "#a6e3a1",
+};
 
 const ACCENT_COLOR = "#f9e2af";
 
@@ -31,41 +38,32 @@ function damageTypeAccent(t: DamageType): string {
   return ACCENT_COLOR;
 }
 
-function getShipStats(config: FriendlyConfig): StatRow[] {
-  const rows: StatRow[] = [];
-
+function getPrimaryStat(config: FriendlyConfig): PrimaryStat | null {
+  if (config.plasmaStacks > 0) {
+    return { kind: "plasma", value: `${config.plasmaStacks}`, color: STAT_COLOR.plasma };
+  }
+  if (config.freezeStacks > 0) {
+    return { kind: "freeze", value: `${config.freezeStacks}s`, color: STAT_COLOR.freeze };
+  }
+  if (config.chainCount > 0) {
+    return { kind: "chain", value: `${config.chainCount}`, color: STAT_COLOR.chain };
+  }
   const damageAmount = config.projectileDamage > 0 ? config.projectileDamage : config.laserDamage;
   if (damageAmount > 0) {
-    const numberPart = config.fireCount > 1 ? `${damageAmount} × ${config.fireCount}` : `${damageAmount}`;
-    rows.push({ kind: "damage", value: numberPart, color: "#f38ba8" });
+    const value = config.fireCount > 1 ? `${damageAmount}×${config.fireCount}` : `${damageAmount}`;
+    return { kind: "damage", value, color: STAT_COLOR.damage };
   }
-
-  if (config.plasmaStacks > 0) {
-    rows.push({ kind: "plasma", value: `${config.plasmaStacks}`, color: "#cc88ff" });
-  }
-
-  if (config.freezeStacks > 0) {
-    rows.push({ kind: "freeze", value: `${config.freezeStacks}s`, color: "#89dceb" });
-  }
-
-  if (config.chainCount > 0) {
-    rows.push({ kind: "chain", value: `${config.chainCount}`, color: "#a6e3a1" });
-  }
-
-  if (config.explosionRadius > 0) {
-    rows.push({ kind: "splash", value: `${config.explosionRadius}`, color: "#fab387" });
-  }
-
-  return rows;
+  return null;
 }
 
 interface StatIconProps {
   kind: StatKind;
   color: string;
+  size: number;
 }
 
-const StatIcon = ({ kind, color }: StatIconProps) => {
-  const common = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none" as const };
+const StatIcon = ({ kind, color, size }: StatIconProps) => {
+  const common = { width: size, height: size, viewBox: "0 0 24 24", fill: "none" as const };
   switch (kind) {
     case "damage":
       return (
@@ -73,8 +71,9 @@ const StatIcon = ({ kind, color }: StatIconProps) => {
           <path
             d="M14.5 3l6.5 6.5-2.2 2.2-1.4-1.4-7 7 1.4 1.4-2.2 2.2L3 14.5l2.2-2.2 1.4 1.4 7-7-1.4-1.4L14.5 3z"
             fill={color}
+            fillOpacity="0.18"
             stroke={color}
-            strokeWidth="0.5"
+            strokeWidth="1.2"
             strokeLinejoin="round"
           />
         </svg>
@@ -82,45 +81,30 @@ const StatIcon = ({ kind, color }: StatIconProps) => {
     case "plasma":
       return (
         <svg {...common}>
-          <circle cx="12" cy="12" r="6" fill={color} opacity="0.35" />
-          <circle cx="12" cy="12" r="3.5" fill={color} />
-          <circle cx="10" cy="10" r="1" fill="#ffffff" opacity="0.7" />
+          <circle cx="12" cy="12" r="9" fill={color} fillOpacity="0.18" stroke={color} strokeWidth="1.2" />
+          <circle cx="12" cy="12" r="5" fill={color} fillOpacity="0.35" stroke={color} strokeWidth="1" />
         </svg>
       );
     case "freeze":
       return (
         <svg {...common}>
-          <g stroke={color} strokeWidth="1.6" strokeLinecap="round">
-            <line x1="12" y1="3" x2="12" y2="21" />
-            <line x1="4.2" y1="7.5" x2="19.8" y2="16.5" />
-            <line x1="4.2" y1="16.5" x2="19.8" y2="7.5" />
-            <polyline points="9,5 12,7 15,5" fill="none" />
-            <polyline points="9,19 12,17 15,19" fill="none" />
+          <g stroke={color} strokeWidth="1.4" strokeLinecap="round" fill="none">
+            <line x1="12" y1="2" x2="12" y2="22" />
+            <line x1="3.4" y1="7" x2="20.6" y2="17" />
+            <line x1="3.4" y1="17" x2="20.6" y2="7" />
+            <polyline points="9,4 12,6 15,4" />
+            <polyline points="9,20 12,18 15,20" />
+            <polyline points="4,11 6,12 4,13" />
+            <polyline points="20,11 18,12 20,13" />
           </g>
         </svg>
       );
     case "chain":
       return (
         <svg {...common}>
-          <g stroke={color} strokeWidth="2" fill="none" strokeLinecap="round">
-            <path d="M9 13a3.5 3.5 0 0 1 0-5l2-2a3.5 3.5 0 0 1 5 5l-1 1" />
-            <path d="M15 11a3.5 3.5 0 0 1 0 5l-2 2a3.5 3.5 0 0 1-5-5l1-1" />
-          </g>
-        </svg>
-      );
-    case "splash":
-      return (
-        <svg {...common}>
-          <circle cx="12" cy="12" r="4" fill={color} />
-          <g stroke={color} strokeWidth="1.6" strokeLinecap="round">
-            <line x1="12" y1="2.5" x2="12" y2="6" />
-            <line x1="12" y1="18" x2="12" y2="21.5" />
-            <line x1="2.5" y1="12" x2="6" y2="12" />
-            <line x1="18" y1="12" x2="21.5" y2="12" />
-            <line x1="5" y1="5" x2="7.5" y2="7.5" />
-            <line x1="16.5" y1="16.5" x2="19" y2="19" />
-            <line x1="5" y1="19" x2="7.5" y2="16.5" />
-            <line x1="16.5" y1="7.5" x2="19" y2="5" />
+          <g stroke={color} strokeWidth="1.6" fill="none" strokeLinecap="round">
+            <rect x="3" y="9" width="9" height="6" rx="3" />
+            <rect x="12" y="9" width="9" height="6" rx="3" />
           </g>
         </svg>
       );
@@ -234,7 +218,7 @@ const ShipCard = ({
     ? getScaledConfig(baseConfig, currentLevel + 1)
     : baseConfig;
 
-  const stats = getShipStats(displayConfig);
+  const stat = getPrimaryStat(displayConfig);
   const accent = damageTypeAccent(displayConfig.damageType);
 
   return (
@@ -348,24 +332,32 @@ const ShipCard = ({
         }}
       />
 
-      <div className="relative flex flex-wrap justify-center gap-x-3 gap-y-2 px-5 mt-auto pb-6">
-        {stats.map((s) => (
-          <div
-            key={s.kind}
-            className="flex items-center gap-1.5 rounded-md"
-            style={{
-              fontFamily: "system-ui, sans-serif",
-              padding: "4px 9px",
-              background: `${s.color}14`,
-              border: `1px solid ${s.color}33`,
-            }}
-          >
-            <StatIcon kind={s.kind} color={s.color} />
-            <span className="font-semibold text-[13px]" style={{ color: s.color }}>
-              {s.value}
-            </span>
+      <div className="relative flex items-center justify-center mt-auto pb-5">
+        {stat && (
+          <div className="relative" style={{ width: 96, height: 96 }}>
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `radial-gradient(circle, ${stat.color}1f 0%, transparent 70%)`,
+              }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <StatIcon kind={stat.kind} color={stat.color} size={96} />
+            </div>
+            <div
+              className="absolute inset-0 flex items-center justify-center font-bold"
+              style={{
+                color: stat.color,
+                fontFamily: "system-ui, sans-serif",
+                fontSize: stat.value.length > 3 ? 22 : 28,
+                textShadow: "0 2px 6px rgba(0,0,0,0.7)",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {stat.value}
+            </div>
           </div>
-        ))}
+        )}
       </div>
     </button>
   );
