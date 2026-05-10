@@ -30,8 +30,15 @@ interface TextSegment {
   bold?: boolean;
 }
 
-function num(n: number | string): TextSegment {
-  return { text: `${n}`, color: KEYWORD_COLOR.number, bold: true };
+function num(current: number, next?: number): TextSegment[] {
+  if (next === undefined || next === current) {
+    return [{ text: `${current}`, color: KEYWORD_COLOR.number, bold: true }];
+  }
+  return [
+    { text: `${current}`, color: KEYWORD_COLOR.number, bold: true },
+    { text: " → ", color: "#94a3b8", bold: true },
+    { text: `${next}`, color: KEYWORD_COLOR.number, bold: true },
+  ];
 }
 
 function keyword(text: string, color: string): TextSegment {
@@ -42,21 +49,30 @@ function plain(text: string): TextSegment {
   return { text };
 }
 
-function getCardText(entityType: EntityType, c: FriendlyConfig): TextSegment[] {
-  const dmg = c.projectileDamage > 0 ? c.projectileDamage : c.laserDamage;
+function getDmg(c: FriendlyConfig): number {
+  return c.projectileDamage > 0 ? c.projectileDamage : c.laserDamage;
+}
+
+function getCardText(
+  entityType: EntityType,
+  c: FriendlyConfig,
+  next?: FriendlyConfig
+): TextSegment[] {
+  const dmg = getDmg(c);
+  const nDmg = next ? getDmg(next) : undefined;
   switch (entityType) {
     case "Spur":
-      return [plain("Fires a heavy round, dealing "), num(dmg), plain(" damage to a single target.")];
+      return [plain("Fires a heavy round, dealing "), ...num(dmg, nDmg), plain(" damage to a single target.")];
     case "Ember":
-      return [plain("Fires a light projectile, dealing "), num(dmg), plain(" damage.")];
+      return [plain("Fires a light projectile, dealing "), ...num(dmg, nDmg), plain(" damage.")];
     case "Corona":
-      return [plain("Fires a focused laser, dealing "), num(dmg), plain(" damage.")];
+      return [plain("Fires a focused laser, dealing "), ...num(dmg, nDmg), plain(" damage.")];
     case "Pip":
-      return [plain("Fires twin projectiles, dealing "), num(dmg), plain(" damage each.")];
+      return [plain("Fires twin projectiles, dealing "), ...num(dmg, nDmg), plain(" damage each.")];
     case "Eagle":
       return [
         plain("Fires a laser, applying "),
-        num(c.plasmaStacks),
+        ...num(c.plasmaStacks, next?.plasmaStacks),
         plain(" stacks of "),
         keyword("plasma", KEYWORD_COLOR.plasma),
         plain("."),
@@ -64,15 +80,15 @@ function getCardText(entityType: EntityType, c: FriendlyConfig): TextSegment[] {
     case "Needle":
       return [
         plain("Fires a piercing laser, dealing "),
-        num(dmg),
+        ...num(dmg, nDmg),
         plain(" damage to every enemy in line."),
       ];
     case "Flare":
       return [
         plain("Fires an explosive blast, dealing "),
-        num(dmg),
+        ...num(dmg, nDmg),
         plain(" damage and applying "),
-        num(c.freezeStacks),
+        ...num(c.freezeStacks, next?.freezeStacks),
         plain(" stacks of "),
         keyword("freeze", KEYWORD_COLOR.freeze),
         plain(" in an area."),
@@ -80,39 +96,39 @@ function getCardText(entityType: EntityType, c: FriendlyConfig): TextSegment[] {
     case "Dart":
       return [
         plain("Fires a plasma blast, applying "),
-        num(c.plasmaStacks),
+        ...num(c.plasmaStacks, next?.plasmaStacks),
         plain(" stacks of "),
         keyword("plasma", KEYWORD_COLOR.plasma),
         plain(" to all enemies in an area."),
       ];
     case "Moth":
-      return [plain("Fires a steady projectile, dealing "), num(dmg), plain(" damage.")];
+      return [plain("Fires a steady projectile, dealing "), ...num(dmg, nDmg), plain(" damage.")];
     case "Prism":
       return [
         plain("Fires a piercing ice beam, dealing "),
-        num(dmg),
+        ...num(dmg, nDmg),
         plain(" damage and applying "),
-        num(c.freezeStacks),
+        ...num(c.freezeStacks, next?.freezeStacks),
         plain(" stacks of "),
         keyword("freeze", KEYWORD_COLOR.freeze),
         plain("."),
       ];
     case "Hawk":
-      return [plain("Fires a heavy round, dealing "), num(dmg), plain(" damage in an area.")];
+      return [plain("Fires a heavy round, dealing "), ...num(dmg, nDmg), plain(" damage in an area.")];
     case "Nova":
       return [
         plain("Fires a bouncing shot that "),
         keyword("chains", KEYWORD_COLOR.chain),
         plain(" to "),
-        num(c.chainCount),
+        ...num(c.chainCount, next?.chainCount),
         plain(" enemies, dealing "),
-        num(dmg),
+        ...num(dmg, nDmg),
         plain(" damage each."),
       ];
     case "Lance":
       return [
         plain("Fires a massive piercing cannon, dealing "),
-        num(dmg),
+        ...num(dmg, nDmg),
         plain(" damage to every enemy in line."),
       ];
     default:
@@ -193,12 +209,19 @@ const ShipCard = ({
   onSelect,
 }: ShipCardProps) => {
   const baseConfig = FRIENDLY_CONFIG_MAP.get(entityType)!;
+  const currentConfig = isUpgrade
+    ? getScaledConfig(baseConfig, currentLevel)
+    : baseConfig;
   const displayConfig = isUpgrade
     ? getScaledConfig(baseConfig, currentLevel + 1)
     : baseConfig;
 
   const accent = ACCENT_COLOR;
-  const cardText = getCardText(entityType, displayConfig);
+  const cardText = isUpgrade
+    ? getCardText(entityType, currentConfig, displayConfig)
+    : getCardText(entityType, displayConfig);
+  const charges = displayConfig.chargesRequired;
+  const truncated = charges > 5;
 
   return (
     <button
@@ -251,10 +274,10 @@ const ShipCard = ({
         className="relative mx-2 mt-8 rounded-md overflow-hidden flex items-center justify-center"
         style={{
           height: 100,
-          background: `radial-gradient(ellipse at 50% 50%, ${accent}33 0%, ${accent}10 35%, rgba(0,0,0,0.55) 80%)`,
+          background: `radial-gradient(ellipse at 50% 50%, ${accent}1a 0%, ${accent}08 40%, rgba(0,0,0,0.55) 85%)`,
           border: "1px solid rgba(255,255,255,0.06)",
           boxShadow:
-            `inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 18px -8px ${accent}66`,
+            `inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 12px -10px ${accent}33`,
         }}
       >
         {preview && (
@@ -266,7 +289,7 @@ const ShipCard = ({
               height: 64,
               objectFit: "contain",
               imageRendering: "pixelated",
-              filter: `drop-shadow(0 4px 10px ${accent}aa) drop-shadow(0 0 4px ${accent}66)`,
+              filter: `drop-shadow(0 3px 6px rgba(0,0,0,0.55)) drop-shadow(0 0 3px ${accent}55)`,
             }}
           />
         )}
@@ -290,20 +313,47 @@ const ShipCard = ({
         >
           {entityType}
         </span>
-        <div className="flex gap-1 ml-2 shrink-0">
-          {Array.from({ length: displayConfig.chargesRequired }, (_, i) => (
-            <span
-              key={i}
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                background: `radial-gradient(circle at 30% 30%, ${accent} 0%, ${accent}cc 60%, ${accent}55 100%)`,
-                boxShadow: `0 0 5px ${accent}cc, inset 0 1px 0 rgba(255,255,255,0.5)`,
-                border: "1px solid rgba(0,0,0,0.5)",
-              }}
-            />
-          ))}
+        <div className="flex gap-1 ml-2 shrink-0 items-center">
+          {truncated ? (
+            <>
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: `radial-gradient(circle at 30% 30%, ${accent} 0%, ${accent}cc 60%, ${accent}55 100%)`,
+                  boxShadow: `0 0 5px ${accent}cc, inset 0 1px 0 rgba(255,255,255,0.5)`,
+                  border: "1px solid rgba(0,0,0,0.5)",
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: accent,
+                  textShadow: `0 0 8px ${accent}66`,
+                  lineHeight: 1,
+                  fontFamily: "ui-monospace, SFMono-Regular, monospace",
+                }}
+              >
+                ×{charges}
+              </span>
+            </>
+          ) : (
+            Array.from({ length: charges }, (_, i) => (
+              <span
+                key={i}
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: `radial-gradient(circle at 30% 30%, ${accent} 0%, ${accent}cc 60%, ${accent}55 100%)`,
+                  boxShadow: `0 0 5px ${accent}cc, inset 0 1px 0 rgba(255,255,255,0.5)`,
+                  border: "1px solid rgba(0,0,0,0.5)",
+                }}
+              />
+            ))
+          )}
         </div>
       </div>
 
