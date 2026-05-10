@@ -46,16 +46,16 @@ function getCardText(entityType: EntityType, c: FriendlyConfig): TextSegment[] {
   const dmg = c.projectileDamage > 0 ? c.projectileDamage : c.laserDamage;
   switch (entityType) {
     case "Spur":
-      return [plain("Charges a heavy round, dealing "), num(dmg), plain(" damage to a single target.")];
+      return [plain("Fires a heavy round, dealing "), num(dmg), plain(" damage to a single target.")];
     case "Ember":
-      return [plain("Fires light projectiles dealing "), num(dmg), plain(" damage.")];
+      return [plain("Fires a light projectile, dealing "), num(dmg), plain(" damage.")];
     case "Corona":
-      return [plain("Laser beam dealing "), num(dmg), plain(" damage.")];
+      return [plain("Fires a focused laser, dealing "), num(dmg), plain(" damage.")];
     case "Pip":
-      return [plain("Fires twin projectiles dealing "), num(dmg), plain(" damage each.")];
+      return [plain("Fires twin projectiles, dealing "), num(dmg), plain(" damage each.")];
     case "Eagle":
       return [
-        plain("Laser that applies "),
+        plain("Fires a laser, applying "),
         num(c.plasmaStacks),
         plain(" stacks of "),
         keyword("plasma", KEYWORD_COLOR.plasma),
@@ -63,13 +63,13 @@ function getCardText(entityType: EntityType, c: FriendlyConfig): TextSegment[] {
       ];
     case "Needle":
       return [
-        plain("Piercing laser hitting every enemy in line, dealing "),
+        plain("Fires a piercing laser, dealing "),
         num(dmg),
-        plain(" damage."),
+        plain(" damage to every enemy in line."),
       ];
     case "Flare":
       return [
-        plain("Explosive blast dealing "),
+        plain("Fires an explosive blast, dealing "),
         num(dmg),
         plain(" damage and applying "),
         num(c.freezeStacks),
@@ -79,17 +79,17 @@ function getCardText(entityType: EntityType, c: FriendlyConfig): TextSegment[] {
       ];
     case "Dart":
       return [
-        plain("Plasma blast applying "),
+        plain("Fires a plasma blast, applying "),
         num(c.plasmaStacks),
         plain(" stacks of "),
         keyword("plasma", KEYWORD_COLOR.plasma),
         plain(" to all enemies in an area."),
       ];
     case "Moth":
-      return [plain("Steady projectile dealing "), num(dmg), plain(" damage.")];
+      return [plain("Fires a steady projectile, dealing "), num(dmg), plain(" damage.")];
     case "Prism":
       return [
-        plain("Piercing ice beam dealing "),
+        plain("Fires a piercing ice beam, dealing "),
         num(dmg),
         plain(" damage and applying "),
         num(c.freezeStacks),
@@ -98,10 +98,10 @@ function getCardText(entityType: EntityType, c: FriendlyConfig): TextSegment[] {
         plain("."),
       ];
     case "Hawk":
-      return [plain("Heavy round dealing "), num(dmg), plain(" damage in an area.")];
+      return [plain("Fires a heavy round, dealing "), num(dmg), plain(" damage in an area.")];
     case "Nova":
       return [
-        plain("Bouncing shot that "),
+        plain("Fires a bouncing shot that "),
         keyword("chains", KEYWORD_COLOR.chain),
         plain(" to "),
         num(c.chainCount),
@@ -111,7 +111,7 @@ function getCardText(entityType: EntityType, c: FriendlyConfig): TextSegment[] {
       ];
     case "Lance":
       return [
-        plain("Massive piercing cannon dealing "),
+        plain("Fires a massive piercing cannon, dealing "),
         num(dmg),
         plain(" damage to every enemy in line."),
       ];
