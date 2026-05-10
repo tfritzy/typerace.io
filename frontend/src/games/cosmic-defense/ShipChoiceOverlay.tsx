@@ -331,14 +331,8 @@ const ShipCard = ({
       </div>
 
       <div
-        className="flex items-center justify-between mx-2 mt-1.5 px-2 rounded-sm"
+        className="flex items-center justify-between px-3 pt-2"
         style={{
-          height: 18,
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 100%)",
-          border: "1px solid rgba(255,255,255,0.06)",
-          boxShadow:
-            "inset 0 1px 0 rgba(255,255,255,0.04), inset 0 -1px 0 rgba(0,0,0,0.4)",
           fontSize: 9,
           fontWeight: 700,
           letterSpacing: "0.08em",
@@ -349,14 +343,13 @@ const ShipCard = ({
         <span
           style={{
             color: isUpgrade ? "#fbbf24" : "#86efac",
-            textShadow: `0 0 6px ${isUpgrade ? "#fbbf24" : "#86efac"}55`,
           }}
         >
           {isUpgrade ? "Upgrade" : "New Ship"}
         </span>
         <span
           style={{
-            color: "#cbd5e1",
+            color: "#94a3b8",
             fontFamily: "ui-monospace, SFMono-Regular, monospace",
             letterSpacing: 0,
             display: "inline-flex",
@@ -369,7 +362,7 @@ const ShipCard = ({
               <ChevronRight
                 size={9}
                 strokeWidth={2.5}
-                style={{ color: "#94a3b8", margin: "0 1px" }}
+                style={{ color: "#64748b", margin: "0 1px" }}
               />
               {currentLevel + 1}
             </>
@@ -380,7 +373,7 @@ const ShipCard = ({
       </div>
 
       <div
-        className="relative px-3 pt-2 pb-2 leading-snug flex-1"
+        className="relative px-3 pt-1 pb-2 leading-snug flex-1"
         style={{
           fontFamily: "system-ui, sans-serif",
           fontSize: 11,
