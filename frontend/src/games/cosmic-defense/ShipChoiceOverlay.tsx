@@ -250,52 +250,6 @@ const ShipCard = ({
       }}
     >
       <div
-        className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider z-10"
-        style={
-          isUpgrade
-            ? {
-                background: "linear-gradient(180deg, rgba(251,191,36,0.22) 0%, rgba(251,191,36,0.10) 100%)",
-                color: "#fbbf24",
-                border: "1px solid rgba(251,191,36,0.45)",
-                boxShadow: "0 0 10px rgba(251,191,36,0.25)",
-              }
-            : {
-                background: "linear-gradient(180deg, rgba(134,239,172,0.22) 0%, rgba(134,239,172,0.10) 100%)",
-                color: "#86efac",
-                border: "1px solid rgba(134,239,172,0.45)",
-                boxShadow: "0 0 10px rgba(134,239,172,0.25)",
-              }
-        }
-      >
-        {isUpgrade ? `LV ${currentLevel} → ${currentLevel + 1}` : "NEW"}
-      </div>
-
-      <div
-        className="relative mx-2 mt-8 rounded-md overflow-hidden flex items-center justify-center"
-        style={{
-          height: 100,
-          background: `radial-gradient(ellipse at 50% 50%, ${accent}1a 0%, ${accent}08 40%, rgba(0,0,0,0.55) 85%)`,
-          border: "1px solid rgba(255,255,255,0.06)",
-          boxShadow:
-            `inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 12px -10px ${accent}33`,
-        }}
-      >
-        {preview && (
-          <img
-            src={preview}
-            alt={entityType}
-            style={{
-              width: 64,
-              height: 64,
-              objectFit: "contain",
-              imageRendering: "pixelated",
-              filter: `drop-shadow(0 3px 6px rgba(0,0,0,0.55)) drop-shadow(0 0 3px ${accent}55)`,
-            }}
-          />
-        )}
-      </div>
-
-      <div
         className="relative flex items-center justify-between px-2 mt-2 py-1 mx-2 rounded"
         style={{
           background: "linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.25) 100%)",
@@ -354,6 +308,51 @@ const ShipCard = ({
               />
             ))
           )}
+        </div>
+      </div>
+
+      <div
+        className="relative mx-2 mt-2 rounded-md overflow-hidden flex items-center justify-center"
+        style={{
+          height: 100,
+          background: `radial-gradient(ellipse at 50% 50%, ${accent}1a 0%, ${accent}08 40%, rgba(0,0,0,0.55) 85%)`,
+          border: "1px solid rgba(255,255,255,0.06)",
+          boxShadow:
+            `inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 12px -10px ${accent}33`,
+        }}
+      >
+        {preview && (
+          <img
+            src={preview}
+            alt={entityType}
+            style={{
+              width: 64,
+              height: 64,
+              objectFit: "contain",
+              imageRendering: "pixelated",
+              filter: `drop-shadow(0 3px 6px rgba(0,0,0,0.55)) drop-shadow(0 0 3px ${accent}55)`,
+            }}
+          />
+        )}
+        <div
+          className="absolute top-1 right-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider"
+          style={
+            isUpgrade
+              ? {
+                  background: "linear-gradient(180deg, rgba(251,191,36,0.22) 0%, rgba(251,191,36,0.10) 100%)",
+                  color: "#fbbf24",
+                  border: "1px solid rgba(251,191,36,0.45)",
+                  boxShadow: "0 0 10px rgba(251,191,36,0.25)",
+                }
+              : {
+                  background: "linear-gradient(180deg, rgba(134,239,172,0.22) 0%, rgba(134,239,172,0.10) 100%)",
+                  color: "#86efac",
+                  border: "1px solid rgba(134,239,172,0.45)",
+                  boxShadow: "0 0 10px rgba(134,239,172,0.25)",
+                }
+          }
+        >
+          {isUpgrade ? `LV ${currentLevel} → ${currentLevel + 1}` : "NEW"}
         </div>
       </div>
 
