@@ -1,4 +1,5 @@
-import { useMemo, useEffect, useCallback } from "react";
+import { useMemo, useEffect, useCallback, type ReactNode } from "react";
+import { ArrowRight } from "lucide-react";
 import { SHIP_BLUEPRINTS } from "./shipCatalog";
 import { FRIENDLY_CONFIG_MAP, getScaledConfig, type FriendlyConfig } from "./enemyConfig";
 import { type EntityType } from "./types";
@@ -25,9 +26,10 @@ const KEYWORD_COLOR = {
 const ACCENT_COLOR = "#fbbf24";
 
 interface TextSegment {
-  text: string;
+  text?: string;
   color?: string;
   bold?: boolean;
+  node?: ReactNode;
 }
 
 function num(current: number, next?: number): TextSegment[] {
@@ -35,9 +37,35 @@ function num(current: number, next?: number): TextSegment[] {
     return [{ text: `${current}`, color: KEYWORD_COLOR.number, bold: true }];
   }
   return [
-    { text: `${current}`, color: KEYWORD_COLOR.number, bold: true },
-    { text: " → ", color: "#94a3b8", bold: true },
-    { text: `${next}`, color: KEYWORD_COLOR.number, bold: true },
+    {
+      node: (
+        <span style={{ whiteSpace: "nowrap", display: "inline-flex", alignItems: "center" }}>
+          <span
+            style={{
+              color: KEYWORD_COLOR.number,
+              fontWeight: 700,
+              textShadow: `0 0 10px ${KEYWORD_COLOR.number}66`,
+            }}
+          >
+            {current}
+          </span>
+          <ArrowRight
+            size={10}
+            strokeWidth={2.5}
+            style={{ color: "#94a3b8", margin: "0 2px", flexShrink: 0 }}
+          />
+          <span
+            style={{
+              color: KEYWORD_COLOR.number,
+              fontWeight: 700,
+              textShadow: `0 0 10px ${KEYWORD_COLOR.number}66`,
+            }}
+          >
+            {next}
+          </span>
+        </span>
+      ),
+    },
   ];
 }
 
@@ -348,7 +376,7 @@ const ShipCard = ({
               textShadow: seg.color && seg.bold ? `0 0 10px ${seg.color}66` : undefined,
             }}
           >
-            {seg.text}
+            {seg.node ?? seg.text}
           </span>
         ))}
       </div>
