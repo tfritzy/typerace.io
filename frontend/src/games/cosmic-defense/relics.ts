@@ -332,7 +332,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     id: "superheated",
     name: "Superheated",
     description: "Enemies with plasma stacks move 30% slower.",
-    sprite: "/futuristic_pixel_icons/Red Starcrystal.png",
+    sprite: "/futuristic_pixel_icons/Pink Starcrystal.png",
     effects: { plasmaSlow: 0.3 },
   },
   {
@@ -367,7 +367,7 @@ export const RELIC_CATALOG: RelicDefinition[] = [
     id: "pyroclasm",
     name: "Pyroclasm",
     description: "When an enemy with plasma stacks dies, its plasma stacks are transferred to the nearest enemy.",
-    sprite: "/futuristic_pixel_icons/Red Starcrystal.png",
+    sprite: "/futuristic_pixel_icons/Pink Starcrystal.png",
     effects: { plasmaDeathTransfer: 1 },
   },
   {
