@@ -687,7 +687,9 @@ function dealDamageToEntity(
 }
 
 function spawnExplosion(state: GameState, entityType: EntityType, x: number, y: number, explosionRadius = 0): void {
-  state.explosions.push({ id: state.nextId++, x, y, explosionType: getExplosionType(entityType), explosionRadius });
+  const explosionType = getExplosionType(entityType);
+  if (explosionType === undefined) return;
+  state.explosions.push({ id: state.nextId++, x, y, explosionType, explosionRadius });
 }
 
 function performInstantHit(

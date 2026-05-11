@@ -34,7 +34,6 @@ export const ENTITY_EXPLOSION_TYPES: Partial<Record<EntityType, ExplosionType>> 
   Dart: ExplosionType.PlasmaExplosive,
   Flare: ExplosionType.IceExplosive,
   Hawk: ExplosionType.Explosive,
-  Moth: ExplosionType.MothHit,
   Nova: ExplosionType.ChainHit,
 };
 

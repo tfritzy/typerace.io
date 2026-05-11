@@ -75,3 +75,21 @@ describe("laser timing behavior", () => {
     expect(firstEnemy.health).toBe(10);
   });
 });
+
+describe("projectile impact explosions", () => {
+  it("does not render impact explosion for Moth projectiles", () => {
+    const state = createGameState();
+    const target = makeEnemy(state, { health: 20, x: PLANET_X + 120, y: PLANET_Y });
+    const mothConfig = FRIENDLY_CATALOG.find((config) => config.entityType === "Moth")!;
+    const mothId = spawnAlliedEntity(state, mothConfig, ColorPreset.Preset1, PLANET_X, PLANET_Y, 1);
+    const moth = state.entityById.get(mothId)!;
+    moth.chargesRequired = 1;
+
+    onCorrectKeystroke(state);
+    unpauseGame(state);
+    updateState(state, 0.1);
+
+    expect(target.health).toBeLessThan(20);
+    expect(state.explosions).toHaveLength(0);
+  });
+});
