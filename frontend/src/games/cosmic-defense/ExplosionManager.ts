@@ -5,23 +5,75 @@ import type { AssetManager } from "./assetManager";
 import type { GameState, ExplosionState } from "./state";
 import { ExplosionType } from "./types";
 
-type ExplosionRenderMode = "sprite" | "particle";
-const DEFAULT_PIP_PARTICLE_LIFETIME = 0.12;
+type TextureSetKey = "plasma" | "ice" | "hawk" | "moth" | "chain";
 
-interface ExplosionConfig {
-  renderMode: ExplosionRenderMode;
-  spriteScale?: number;
-  spriteSpeed?: number;
-  particleLifetime?: number;
+interface SpriteExplosionVisualConfig {
+  kind: "sprite";
+  textureSet: TextureSetKey;
+  scale: number;
+  speed: number;
 }
 
-const EXPLOSION_TYPE_CONFIGS: Record<ExplosionType, ExplosionConfig> = {
-  [ExplosionType.PlasmaExplosive]: { renderMode: "sprite", spriteScale: 3, spriteSpeed: 0.30 },
-  [ExplosionType.IceExplosive]:    { renderMode: "sprite", spriteScale: 3, spriteSpeed: 0.30 },
-  [ExplosionType.Explosive]:       { renderMode: "sprite", spriteScale: 3, spriteSpeed: 0.30 },
-  [ExplosionType.MothHit]:         { renderMode: "sprite", spriteScale: 3, spriteSpeed: 0.30 },
-  [ExplosionType.ChainHit]:        { renderMode: "sprite", spriteScale: 1.5, spriteSpeed: 0.60 },
-  [ExplosionType.PipImpact]:       { renderMode: "particle", particleLifetime: DEFAULT_PIP_PARTICLE_LIFETIME },
+interface ParticleExplosionVisualConfig {
+  kind: "particle";
+  textureSet: TextureSetKey;
+  emitterLifetime: number;
+  particleLifetimeMin: number;
+  particleLifetimeMax: number;
+  frequency: number;
+  maxParticles: number;
+  spawnWidth: number;
+  spawnHeight: number;
+  colorStart: string;
+  colorEnd: string;
+  alphaPeak: number;
+  alphaPeakTime: number;
+  alphaMid: number;
+  alphaMidTime: number;
+  scaleStart: number;
+  scaleEnd: number;
+  scaleMinMult: number;
+  speedMin: number;
+  speedMax: number;
+}
+
+type ExplosionVisualConfig = SpriteExplosionVisualConfig | ParticleExplosionVisualConfig;
+
+const DEFAULT_EXPLOSION_VISUAL_CONFIG: SpriteExplosionVisualConfig = {
+  kind: "sprite",
+  textureSet: "moth",
+  scale: 3,
+  speed: 0.30,
+};
+
+const EXPLOSION_VISUAL_CONFIGS: Record<ExplosionType, ExplosionVisualConfig> = {
+  [ExplosionType.PlasmaExplosive]: { kind: "sprite", textureSet: "plasma", scale: 3, speed: 0.30 },
+  [ExplosionType.IceExplosive]:    { kind: "sprite", textureSet: "ice", scale: 3, speed: 0.30 },
+  [ExplosionType.Explosive]:       { kind: "sprite", textureSet: "hawk", scale: 3, speed: 0.30 },
+  [ExplosionType.MothHit]:         { kind: "sprite", textureSet: "moth", scale: 3, speed: 0.30 },
+  [ExplosionType.ChainHit]:        { kind: "sprite", textureSet: "chain", scale: 1.5, speed: 0.60 },
+  [ExplosionType.LightImpact]: {
+    kind: "particle",
+    textureSet: "chain",
+    emitterLifetime: 0.12,
+    particleLifetimeMin: 0.10,
+    particleLifetimeMax: 0.20,
+    frequency: 0.006,
+    maxParticles: 8,
+    spawnWidth: 6,
+    spawnHeight: 6,
+    colorStart: "#cfe8ff",
+    colorEnd: "#88bbff",
+    alphaPeak: 0.8,
+    alphaPeakTime: 0.15,
+    alphaMid: 0.3,
+    alphaMidTime: 0.7,
+    scaleStart: 0.35,
+    scaleEnd: 0.65,
+    scaleMinMult: 0.6,
+    speedMin: 10,
+    speedMax: 20,
+  },
 };
 
 export class ExplosionManager {
@@ -81,24 +133,22 @@ export class ExplosionManager {
     }
   }
 
-  private getExplosionTextures(explosionType: ExplosionType | undefined): Texture[] {
-    switch (explosionType) {
-      case ExplosionType.PlasmaExplosive: return this.assets.getPlasmaExplosionTextures();
-      case ExplosionType.IceExplosive:    return this.assets.getIceExplosionTextures();
-      case ExplosionType.Explosive:       return this.assets.getHawkExplosionTextures();
-      case ExplosionType.MothHit:         return this.assets.getMothExplosionTextures();
-      case ExplosionType.ChainHit:        return this.assets.getChainHitTextures();
-      case ExplosionType.PipImpact:       return this.assets.getChainHitTextures();
-      default:                            return this.assets.getMothExplosionTextures();
+  private getTextures(textureSet: TextureSetKey): Texture[] {
+    switch (textureSet) {
+      case "plasma": return this.assets.getPlasmaExplosionTextures();
+      case "ice": return this.assets.getIceExplosionTextures();
+      case "hawk": return this.assets.getHawkExplosionTextures();
+      case "chain": return this.assets.getChainHitTextures();
+      case "moth": return this.assets.getMothExplosionTextures();
     }
   }
 
-  private createPipParticleConfig(texture: Texture, emitterLifetime: number): EmitterConfigV3 {
+  private createParticleConfig(texture: Texture, config: ParticleExplosionVisualConfig): EmitterConfigV3 {
     return {
-      lifetime: { min: 0.10, max: 0.20 },
-      frequency: 0.006,
-      emitterLifetime,
-      maxParticles: 8,
+      lifetime: { min: config.particleLifetimeMin, max: config.particleLifetimeMax },
+      frequency: config.frequency,
+      emitterLifetime: config.emitterLifetime,
+      maxParticles: config.maxParticles,
       addAtBack: false,
       pos: { x: 0, y: 0 },
       behaviors: [
@@ -106,7 +156,12 @@ export class ExplosionManager {
           type: "spawnShape",
           config: {
             type: "rect",
-            data: { x: -3, y: -3, w: 6, h: 6 },
+            data: {
+              x: -config.spawnWidth / 2,
+              y: -config.spawnHeight / 2,
+              w: config.spawnWidth,
+              h: config.spawnHeight,
+            },
           },
         },
         {
@@ -118,8 +173,8 @@ export class ExplosionManager {
           config: {
             color: {
               list: [
-                { value: "#cfe8ff", time: 0 },
-                { value: "#88bbff", time: 1 },
+                { value: config.colorStart, time: 0 },
+                { value: config.colorEnd, time: 1 },
               ],
             },
           },
@@ -130,8 +185,8 @@ export class ExplosionManager {
             alpha: {
               list: [
                 { value: 0, time: 0 },
-                { value: 0.8, time: 0.15 },
-                { value: 0.3, time: 0.7 },
+                { value: config.alphaPeak, time: config.alphaPeakTime },
+                { value: config.alphaMid, time: config.alphaMidTime },
                 { value: 0, time: 1 },
               ],
             },
@@ -142,16 +197,16 @@ export class ExplosionManager {
           config: {
             scale: {
               list: [
-                { value: 0.35, time: 0 },
-                { value: 0.65, time: 1 },
+                { value: config.scaleStart, time: 0 },
+                { value: config.scaleEnd, time: 1 },
               ],
             },
-            minMult: 0.6,
+            minMult: config.scaleMinMult,
           },
         },
         {
           type: "moveSpeed",
-          config: { min: 10, max: 20 },
+          config: { min: config.speedMin, max: config.speedMax },
         },
         {
           type: "rotation",
@@ -161,39 +216,42 @@ export class ExplosionManager {
     };
   }
 
-  private getPipImpactTexture(): Texture {
-    return this.assets.getChainHitTextures()[0];
+  private getVisualConfig(explosionType: ExplosionType | undefined): ExplosionVisualConfig {
+    if (explosionType === undefined) {
+      return DEFAULT_EXPLOSION_VISUAL_CONFIG;
+    }
+    return EXPLOSION_VISUAL_CONFIGS[explosionType];
   }
 
-  private createDisplayObject(exp: ExplosionState): Container {
-    const config = exp.explosionType !== undefined ? EXPLOSION_TYPE_CONFIGS[exp.explosionType] : undefined;
-    const renderMode = config?.renderMode ?? "sprite";
+  private createParticleDisplayObject(exp: ExplosionState, config: ParticleExplosionVisualConfig): Container {
+    const texture = this.getTextures(config.textureSet)[0];
+    const container = new Container();
+    const emitter = new Emitter(container, this.createParticleConfig(texture, config));
+    emitter.emit = true;
+    this.particleEmitters.set(exp.id, emitter);
+    return container;
+  }
 
-    if (renderMode === "particle") {
-      const container = new Container();
-      const emitter = new Emitter(
-        container,
-        this.createPipParticleConfig(
-          this.getPipImpactTexture(),
-          config?.particleLifetime ?? DEFAULT_PIP_PARTICLE_LIFETIME
-        )
-      );
-      emitter.emit = true;
-      this.particleEmitters.set(exp.id, emitter);
-      return container;
-    }
-
-    const textures = this.getExplosionTextures(exp.explosionType);
+  private createSpriteDisplayObject(exp: ExplosionState, config: SpriteExplosionVisualConfig): AnimatedSprite {
+    const textures = this.getTextures(config.textureSet);
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
-    sprite.scale.set(config?.spriteScale ?? 3);
-    sprite.animationSpeed = config?.spriteSpeed ?? 0.30;
+    sprite.scale.set(config.scale);
+    sprite.animationSpeed = config.speed;
     sprite.loop = false;
     sprite.onComplete = () => {
       this.completedIds.add(exp.id);
     };
     sprite.play();
     return sprite;
+  }
+
+  private createDisplayObject(exp: ExplosionState): Container {
+    const config = this.getVisualConfig(exp.explosionType);
+    if (config.kind === "particle") {
+      return this.createParticleDisplayObject(exp, config);
+    }
+    return this.createSpriteDisplayObject(exp, config);
   }
 
   destroy(): void {

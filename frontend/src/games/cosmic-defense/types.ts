@@ -28,7 +28,7 @@ export enum ExplosionType {
   Explosive = 3,
   MothHit = 4,
   ChainHit = 5,
-  PipImpact = 6,
+  LightImpact = 6,
 }
 
 export const ENTITY_EXPLOSION_TYPES: Partial<Record<EntityType, ExplosionType>> = {
@@ -37,7 +37,7 @@ export const ENTITY_EXPLOSION_TYPES: Partial<Record<EntityType, ExplosionType>> 
   Hawk: ExplosionType.Explosive,
   Moth: ExplosionType.MothHit,
   Nova: ExplosionType.ChainHit,
-  Pip: ExplosionType.PipImpact,
+  Pip: ExplosionType.LightImpact,
 };
 
 export function getExplosionType(entityType: EntityType): ExplosionType | undefined {
