@@ -120,7 +120,7 @@ export class CosmicDefenseGame {
 
   private update(dt: number): void {
     try {
-      this.explosionManager.update(this.state);
+      this.explosionManager.update(this.state, dt);
       this.damageNumberManager.update(dt);
       this.relicPickupManager.update(dt);
     } catch (e) {

@@ -6,6 +6,7 @@ import type { GameState, ExplosionState } from "./state";
 import { ExplosionType } from "./types";
 
 type ExplosionRenderMode = "sprite" | "particle";
+const DEFAULT_PIP_PARTICLE_LIFETIME = 0.12;
 
 interface ExplosionConfig {
   renderMode: ExplosionRenderMode;
@@ -20,7 +21,7 @@ const EXPLOSION_TYPE_CONFIGS: Record<ExplosionType, ExplosionConfig> = {
   [ExplosionType.Explosive]:       { renderMode: "sprite", spriteScale: 3, spriteSpeed: 0.30 },
   [ExplosionType.MothHit]:         { renderMode: "sprite", spriteScale: 3, spriteSpeed: 0.30 },
   [ExplosionType.ChainHit]:        { renderMode: "sprite", spriteScale: 1.5, spriteSpeed: 0.60 },
-  [ExplosionType.PipImpact]:       { renderMode: "particle", particleLifetime: 0.12 },
+  [ExplosionType.PipImpact]:       { renderMode: "particle", particleLifetime: DEFAULT_PIP_PARTICLE_LIFETIME },
 };
 
 export class ExplosionManager {
@@ -37,7 +38,7 @@ export class ExplosionManager {
     this.layer = new Container();
   }
 
-  update(state: GameState): void {
+  update(state: GameState, dt: number): void {
     this.activeIds.clear();
 
     for (let i = state.explosions.length - 1; i >= 0; i--) {
@@ -61,7 +62,7 @@ export class ExplosionManager {
     }
 
     for (const [id, emitter] of this.particleEmitters) {
-      emitter.update(1 / 60);
+      emitter.update(dt);
       if (!emitter.emit && emitter.particleCount === 0) {
         this.completedIds.add(id);
       }
@@ -160,16 +161,22 @@ export class ExplosionManager {
     };
   }
 
+  private getPipImpactTexture(): Texture {
+    return this.assets.getChainHitTextures()[0];
+  }
+
   private createDisplayObject(exp: ExplosionState): Container {
     const config = exp.explosionType !== undefined ? EXPLOSION_TYPE_CONFIGS[exp.explosionType] : undefined;
     const renderMode = config?.renderMode ?? "sprite";
 
     if (renderMode === "particle") {
-      const textures = this.getExplosionTextures(exp.explosionType);
       const container = new Container();
       const emitter = new Emitter(
         container,
-        this.createPipParticleConfig(textures[0], config?.particleLifetime ?? 0.12)
+        this.createPipParticleConfig(
+          this.getPipImpactTexture(),
+          config?.particleLifetime ?? DEFAULT_PIP_PARTICLE_LIFETIME
+        )
       );
       emitter.emit = true;
       this.particleEmitters.set(exp.id, emitter);
