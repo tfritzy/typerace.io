@@ -375,8 +375,10 @@ function spawnInRightSixteenth(): { x: number; y: number } {
   const topBandHeight = Math.max(0, exclusionTop - minY);
   const bottomBandHeight = Math.max(0, maxY - exclusionBottom);
   const spawnBandTotalHeight = topBandHeight + bottomBandHeight;
-  let y = minY + Math.random() * (maxY - minY);
-  if (spawnBandTotalHeight > 0) {
+  let y: number;
+  if (spawnBandTotalHeight <= 0) {
+    y = Math.random() < 0.5 ? minY : maxY;
+  } else {
     const roll = Math.random() * spawnBandTotalHeight;
     if (roll < topBandHeight) {
       y = minY + Math.random() * topBandHeight;
