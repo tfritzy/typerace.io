@@ -6,6 +6,7 @@ import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } f
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
+export const ENEMY_SPAWN_CENTER_EXCLUSION_HALF_HEIGHT = 120;
 const PLASMA_DAMAGE_PER_TICK = 1;
 const LASER_RANGE = 2200;
 const SCORE_PER_XP = 10;
@@ -367,9 +368,25 @@ function makeBaseEntity(
 function spawnInRightSixteenth(): { x: number; y: number } {
   const pad = 60;
   const xStart = (CANVAS_WIDTH * 15) / 16;
+  const minY = pad;
+  const maxY = CANVAS_HEIGHT - pad;
+  const exclusionTop = Math.max(minY, PLANET_Y - ENEMY_SPAWN_CENTER_EXCLUSION_HALF_HEIGHT);
+  const exclusionBottom = Math.min(maxY, PLANET_Y + ENEMY_SPAWN_CENTER_EXCLUSION_HALF_HEIGHT);
+  const topBandHeight = Math.max(0, exclusionTop - minY);
+  const bottomBandHeight = Math.max(0, maxY - exclusionBottom);
+  const spawnBandTotalHeight = topBandHeight + bottomBandHeight;
+  let y = minY + Math.random() * (maxY - minY);
+  if (spawnBandTotalHeight > 0) {
+    const roll = Math.random() * spawnBandTotalHeight;
+    if (roll < topBandHeight) {
+      y = minY + Math.random() * topBandHeight;
+    } else {
+      y = exclusionBottom + Math.random() * bottomBandHeight;
+    }
+  }
   return {
     x: xStart + Math.random() * (CANVAS_WIDTH - xStart - pad),
-    y: pad + Math.random() * (CANVAS_HEIGHT - pad * 2),
+    y,
   };
 }
 

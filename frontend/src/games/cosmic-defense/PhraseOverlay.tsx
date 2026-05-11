@@ -199,13 +199,13 @@ export const PhraseOverlay = ({
             </span>,
           );
         }
-      } else {
-        c.push(
-          <span key={i} style={{ color: "rgba(255,255,255,0.5)" }}>
-            {phrase[i]}
-          </span>,
-        );
-      }
+        } else {
+          c.push(
+            <span key={i} style={{ color: "rgba(255,255,255,0.62)" }}>
+              {phrase[i]}
+            </span>,
+          );
+        }
     }
 
     return c;
@@ -233,10 +233,21 @@ export const PhraseOverlay = ({
         }}
       />
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 relative"
         style={{ pointerEvents: "auto", cursor: "text", visibility: isPaused ? "hidden" : "visible" }}
         onClick={() => inputRef.current?.focus()}
       >
+        <div
+          className="absolute left-1/2 top-full -translate-x-1/2"
+          style={{
+            width: `${CHAR_COUNT * 2}ch`,
+            height: "3.5rem",
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.46), rgba(0,0,0,0))",
+            filter: "blur(6px)",
+            opacity: 0.75,
+            pointerEvents: "none",
+          }}
+        />
         <div
           className="text-3xl font-mono whitespace-pre relative"
           style={{
