@@ -40,15 +40,15 @@ function makeAlly(state: GameState, overrides: Partial<EntityState> = {}): Entit
 describe("projectile bounce behavior", () => {
   it("bounces projectiles after impact", () => {
     const state = createGameState();
-    const firstEnemy = makeEnemy(state, { health: 10, x: PLANET_X + 100, y: PLANET_Y });
-    const secondEnemy = makeEnemy(state, { health: 20, x: PLANET_X + 180, y: PLANET_Y });
+    const firstEnemy = makeEnemy(state, { health: 20, x: PLANET_X + 100, y: PLANET_Y });
+    const secondEnemy = makeEnemy(state, { health: 20, x: PLANET_X + 260, y: PLANET_Y });
     makeAlly(state, { projectileDamage: 10, chargesRequired: 1, bounceCount: 1 });
 
     onCorrectKeystroke(state);
     unpauseGame(state);
     updateState(state, 0.1);
 
-    expect(state.entityById.has(firstEnemy.id)).toBe(false);
+    expect(firstEnemy.health).toBe(10);
     expect(state.projectiles).toHaveLength(1);
 
     updateState(state, 0.1);

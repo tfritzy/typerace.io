@@ -1011,6 +1011,10 @@ function fireShot(state: GameState, e: EntityState): void {
 function fireLaser(state: GameState, e: EntityState): void {
   const target = findNearestTarget(state, e);
   if (!target) return;
+  if (e.hitDelay <= 0) {
+    executeLaserShot(state, e, target.x, target.y, target.entity?.id ?? null);
+    return;
+  }
   state.pendingShots.push({
     fireAt: state.time.time + e.hitDelay,
     shooterId: e.id,
