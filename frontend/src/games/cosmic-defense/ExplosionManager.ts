@@ -9,11 +9,11 @@ interface ExplosionConfig {
 }
 
 const EXPLOSION_TYPE_CONFIGS: Record<ExplosionType, ExplosionConfig> = {
-  [ExplosionType.PlasmaExplosive]: { scale: 3,   speed: 0.30 },
-  [ExplosionType.IceExplosive]:    { scale: 3,   speed: 0.30 },
-  [ExplosionType.Explosive]:       { scale: 3,   speed: 0.30 },
-  [ExplosionType.MothHit]:         { scale: 3,   speed: 0.30 },
-  [ExplosionType.ChainHit]:        { scale: 1.5, speed: 0.60 },
+  [ExplosionType.PlasmaExplosive]: { scale: 3,    speed: 0.30 },
+  [ExplosionType.IceExplosive]:    { scale: 3,    speed: 0.30 },
+  [ExplosionType.Explosive]:       { scale: 3,    speed: 0.30 },
+  [ExplosionType.MothHit]:         { scale: 0.75, speed: 0.30 },
+  [ExplosionType.ChainHit]:        { scale: 1.5,  speed: 0.60 },
 };
 
 export class ExplosionManager {
@@ -76,7 +76,7 @@ export class ExplosionManager {
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
     const config = exp.explosionType !== undefined ? EXPLOSION_TYPE_CONFIGS[exp.explosionType] : undefined;
-    sprite.scale.set(config?.scale ?? 3);
+    sprite.scale.set(config?.scale ?? 0.75);
     sprite.animationSpeed = config?.speed ?? 0.30;
     sprite.loop = false;
     sprite.onComplete = () => {
