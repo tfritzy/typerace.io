@@ -27,7 +27,7 @@ export function drawHealthBar(
   drawStandardHealthBar(g, ratio, style);
 }
 
-function drawStandardHealthBar(g: Graphics, ratio: number, style: HealthBarStyle): void {
+function drawStandardHealthBar(g: Graphics, ratio: number, style: HealthBarStyle = {}): void {
   const width = style.width ?? HEALTH_BAR_WIDTH;
   const height = style.height ?? HEALTH_BAR_HEIGHT;
   const offset = style.offset ?? HEALTH_BAR_OFFSET;
