@@ -30,18 +30,6 @@ export enum ExplosionType {
   ChainHit = 5,
 }
 
-export const ENTITY_EXPLOSION_TYPES: Partial<Record<EntityType, ExplosionType>> = {
-  Dart: ExplosionType.PlasmaExplosive,
-  Flare: ExplosionType.IceExplosive,
-  Hawk: ExplosionType.Explosive,
-  Moth: ExplosionType.MothHit,
-  Nova: ExplosionType.ChainHit,
-};
-
-export function getExplosionType(entityType: EntityType): ExplosionType | undefined {
-  return ENTITY_EXPLOSION_TYPES[entityType];
-}
-
 export const SHIP_ENTITY_TYPES = [
   "Vanguard", "Sentinel", "Corsair", "Dynamo", "Scout", "Dart", "Wasp",
   "Inferno", "Hawk", "Sparrow", "Gnat", "Stinger", "Needle", "Pulse",

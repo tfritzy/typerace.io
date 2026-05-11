@@ -1,4 +1,4 @@
-import { type EntityType, DamageType, FireMode } from "./types";
+import { type EntityType, DamageType, ExplosionType, FireMode } from "./types";
 
 export interface ShipHitbox {
   hitWidth: number;
@@ -82,6 +82,7 @@ export interface EnemyConfig {
   speed: number;
   isBoss: boolean;
   projectileColor: number;
+  impactExplosionType?: ExplosionType;
 }
 
 const BASE_HEALTH = 30;
@@ -111,6 +112,7 @@ function calculateEnemyXpReward(power: number): number {
 interface EnemyShipBaseConfig {
   entityType: EntityType;
   projectileColor: number;
+  impactExplosionType?: ExplosionType;
 }
 
 export const ENEMY_SHIP_CATALOG: EnemyShipBaseConfig[] = [
@@ -124,9 +126,9 @@ export const ENEMY_SHIP_CATALOG: EnemyShipBaseConfig[] = [
   { entityType: "Robin",       projectileColor: 0xff9933 },
   { entityType: "Sparrow",     projectileColor: 0xffcc44 },
   { entityType: "Hornet",      projectileColor: 0xff8800 },
-  { entityType: "Dart",        projectileColor: 0xcc44ff },
+  { entityType: "Dart",        projectileColor: 0xcc44ff, impactExplosionType: ExplosionType.PlasmaExplosive },
   { entityType: "Scout",       projectileColor: 0x4488ff },
-  { entityType: "Hawk",        projectileColor: 0xff5500 },
+  { entityType: "Hawk",        projectileColor: 0xff5500, impactExplosionType: ExplosionType.Explosive },
   { entityType: "Dynamo",      projectileColor: 0x0088ff },
   { entityType: "Harrier",     projectileColor: 0xff4400 },
   { entityType: "Raptor",      projectileColor: 0xffaa00 },
@@ -162,6 +164,7 @@ export function createEnemyConfigForVirtualTier(virtualTier: number): EnemyConfi
     speed: ENEMY_SPEED,
     isBoss: false,
     projectileColor: ship.projectileColor,
+    impactExplosionType: ship.impactExplosionType,
   };
 }
 
@@ -217,6 +220,7 @@ export interface FriendlyConfig {
   damageType: DamageType;
   fireMode: FireMode;
   projectileColor: number;
+  impactExplosionType?: ExplosionType;
 }
 
 export const ENEMY_CATALOG: EnemyConfig[] = ENEMY_SHIP_TYPES.map((_, i) => createEnemyConfigForVirtualTier(i));
@@ -228,12 +232,12 @@ export const FRIENDLY_CATALOG: FriendlyConfig[] = [
   { entityType: "Pip",    health: 150, projectileDamage: 8,  chargesRequired: 2,  plasmaStacks: 0,  laserDamage: 0,  freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 2, projectileSize: 3, explosionRadius: 0,   hitDelay: 0,    damageType: DamageType.Physical, fireMode: FireMode.Projectile, projectileColor: 0x88bbff },
   { entityType: "Eagle",  health: 200, projectileDamage: 0,  chargesRequired: 6,  plasmaStacks: 10, laserDamage: 0,  freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, projectileSize: 2, explosionRadius: 0,   hitDelay: 0,    damageType: DamageType.Plasma,   fireMode: FireMode.Laser,      projectileColor: 0xff4422 },
   { entityType: "Needle", health: 200, projectileDamage: 0,  chargesRequired: 4,  plasmaStacks: 0,  laserDamage: 3,  freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, projectileSize: 2, explosionRadius: 0,   hitDelay: 0,    damageType: DamageType.Laser,    fireMode: FireMode.Laser,      projectileColor: 0x50e878 },
-  { entityType: "Flare",  health: 300, projectileDamage: 8,  chargesRequired: 8,  plasmaStacks: 0,  laserDamage: 0,  freezeStacks: 3, chainCount: 0, buffMultiplier: 0, fireCount: 1, projectileSize: 6, explosionRadius: 120, hitDelay: 0,    damageType: DamageType.Ice,      fireMode: FireMode.Projectile, projectileColor: 0x88eeff },
-  { entityType: "Dart",   health: 200, projectileDamage: 0,  chargesRequired: 6,  plasmaStacks: 15, laserDamage: 0,  freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, projectileSize: 5, explosionRadius: 120, hitDelay: 0.33, damageType: DamageType.Plasma,   fireMode: FireMode.Projectile, projectileColor: 0xcc44ff },
+  { entityType: "Flare",  health: 300, projectileDamage: 8,  chargesRequired: 8,  plasmaStacks: 0,  laserDamage: 0,  freezeStacks: 3, chainCount: 0, buffMultiplier: 0, fireCount: 1, projectileSize: 6, explosionRadius: 120, hitDelay: 0,    damageType: DamageType.Ice,      fireMode: FireMode.Projectile, projectileColor: 0x88eeff, impactExplosionType: ExplosionType.IceExplosive },
+  { entityType: "Dart",   health: 200, projectileDamage: 0,  chargesRequired: 6,  plasmaStacks: 15, laserDamage: 0,  freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, projectileSize: 5, explosionRadius: 120, hitDelay: 0.33, damageType: DamageType.Plasma,   fireMode: FireMode.Projectile, projectileColor: 0xcc44ff, impactExplosionType: ExplosionType.PlasmaExplosive },
   { entityType: "Moth",   health: 200, projectileDamage: 20, chargesRequired: 4,  plasmaStacks: 0,  laserDamage: 0,  freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, projectileSize: 7, explosionRadius: 0,   hitDelay: 0,    damageType: DamageType.Physical, fireMode: FireMode.Projectile, projectileColor: 0x44ff99 },
   { entityType: "Prism",  health: 150, projectileDamage: 0,  chargesRequired: 2,  plasmaStacks: 0,  laserDamage: 4,  freezeStacks: 2, chainCount: 0, buffMultiplier: 0, fireCount: 1, projectileSize: 2, explosionRadius: 0,   hitDelay: 0,    damageType: DamageType.Ice,      fireMode: FireMode.Laser,      projectileColor: 0x89b4fa },
-  { entityType: "Hawk",   health: 200, projectileDamage: 10, chargesRequired: 6,  plasmaStacks: 0,  laserDamage: 0,  freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, projectileSize: 6, explosionRadius: 120, hitDelay: 0,    damageType: DamageType.Physical, fireMode: FireMode.Projectile, projectileColor: 0xff5500 },
-  { entityType: "Nova",   health: 180, projectileDamage: 5,  chargesRequired: 5,  plasmaStacks: 0,  laserDamage: 0,  freezeStacks: 0, chainCount: 3, buffMultiplier: 0, fireCount: 1, projectileSize: 4, explosionRadius: 0,   hitDelay: 0,    damageType: DamageType.Physical, fireMode: FireMode.Projectile, projectileColor: 0x99ff44 },
+  { entityType: "Hawk",   health: 200, projectileDamage: 10, chargesRequired: 6,  plasmaStacks: 0,  laserDamage: 0,  freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, projectileSize: 6, explosionRadius: 120, hitDelay: 0,    damageType: DamageType.Physical, fireMode: FireMode.Projectile, projectileColor: 0xff5500, impactExplosionType: ExplosionType.Explosive },
+  { entityType: "Nova",   health: 180, projectileDamage: 5,  chargesRequired: 5,  plasmaStacks: 0,  laserDamage: 0,  freezeStacks: 0, chainCount: 3, buffMultiplier: 0, fireCount: 1, projectileSize: 4, explosionRadius: 0,   hitDelay: 0,    damageType: DamageType.Physical, fireMode: FireMode.Projectile, projectileColor: 0x99ff44, impactExplosionType: ExplosionType.ChainHit },
   { entityType: "Lance",  health: 400, projectileDamage: 0,  chargesRequired: 14, plasmaStacks: 0,  laserDamage: 30, freezeStacks: 0, chainCount: 0, buffMultiplier: 0, fireCount: 1, projectileSize: 6, explosionRadius: 0,   hitDelay: 0,    damageType: DamageType.Laser,    fireMode: FireMode.Laser,      projectileColor: 0xb060e0 },
 ];
 

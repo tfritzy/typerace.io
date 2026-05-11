@@ -11,7 +11,7 @@ import {
   type EntityState,
   type GameState,
 } from "./state";
-import { ColorPreset, FireMode, Team } from "./types";
+import { type EntityType, ColorPreset, ExplosionType, FireMode, Team } from "./types";
 import { ENEMY_CATALOG, FRIENDLY_CATALOG } from "./enemyConfig";
 
 function makeEnemy(state: GameState, overrides: Partial<EntityState> = {}): EntityState {
@@ -35,6 +35,10 @@ function makeAlly(state: GameState, overrides: Partial<EntityState> = {}): Entit
   const entity = state.entityById.get(id)!;
   Object.assign(entity, overrides);
   return entity;
+}
+
+function getFriendlyConfig(entityType: EntityType) {
+  return FRIENDLY_CATALOG.find((config) => config.entityType === entityType)!;
 }
 
 describe("projectile bounce behavior", () => {
@@ -73,5 +77,38 @@ describe("laser timing behavior", () => {
     updateState(state, 0.1);
 
     expect(firstEnemy.health).toBe(10);
+  });
+});
+
+describe("projectile impact explosions", () => {
+  it("does not render impact explosions for Moth", () => {
+    const state = createGameState();
+    const target = makeEnemy(state, { health: 20, x: PLANET_X + 120, y: PLANET_Y });
+    const mothId = spawnAlliedEntity(state, getFriendlyConfig("Moth"), ColorPreset.Preset1, PLANET_X, PLANET_Y, 1);
+    const moth = state.entityById.get(mothId)!;
+    moth.chargesRequired = 1;
+
+    onCorrectKeystroke(state);
+    unpauseGame(state);
+    updateState(state, 0.1);
+
+    expect(target.health).toBeLessThan(20);
+    expect(state.explosions).toHaveLength(0);
+  });
+
+  it("renders impacts when a ship is explicitly configured for them", () => {
+    const state = createGameState();
+    makeEnemy(state, { health: 20, x: PLANET_X + 120, y: PLANET_Y });
+    makeAlly(state, {
+      projectileDamage: 10,
+      chargesRequired: 1,
+      impactExplosionType: ExplosionType.ChainHit,
+    });
+
+    onCorrectKeystroke(state);
+    unpauseGame(state);
+    updateState(state, 0.1);
+
+    expect(state.explosions).toHaveLength(1);
   });
 });
