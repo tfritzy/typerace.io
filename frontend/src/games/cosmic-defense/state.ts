@@ -144,6 +144,7 @@ export interface EntityDeathData {
   team: Team;
   entityType: EntityType;
   xpAmount: number;
+  sizeScale: number;
 }
 
 export interface XPData {
@@ -666,6 +667,7 @@ function dealDamageToEntity(
         team: target.team,
         entityType: target.entityType,
         xpAmount,
+        sizeScale: target.sizeScale,
       });
       if (target.isBoss) {
         state.onBossDefeated.emit({ id: target.id });

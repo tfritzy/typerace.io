@@ -8,13 +8,13 @@ import { SHIP_TURN_SPEED } from "./constants";
 import { approachAngle } from "./utils";
 import { drawHealthBar } from "./healthBar";
 
-const SHIP_DEATH_ANIMATION_SPEED = 0.6;
+const SHIP_DEATH_ANIMATION_SPEED = 0.3;
 const ENEMY_CONTAINER_SCALE = 2.25;
 const WARP_IN_ANIMATION_SPEED = 0.25;
 const WARP_FRAME_SIZE = 64;
 const WARP_SIZE_MULTIPLIER = 1.5;
 const DEATH_EXPLOSION_FRAME_SIZE = 64;
-const DEATH_EXPLOSION_SIZE_MULTIPLIER = 5;
+const DEATH_EXPLOSION_SIZE_MULTIPLIER = 2.5;
 
 export class EnemyManager {
   readonly layer: Container;
@@ -34,7 +34,7 @@ export class EnemyManager {
 
   subscribe(state: GameState): void {
     this.unsubDeath = state.onEnemyEntityDeath.subscribe((data: EntityDeathData) => {
-      this.spawnDeathExplosion(data.x, data.y, data.entityType);
+      this.spawnDeathExplosion(data.x, data.y, data.entityType, data.sizeScale);
     });
   }
 
@@ -79,13 +79,13 @@ export class EnemyManager {
     }
   }
 
-  private spawnDeathExplosion(x: number, y: number, entityType: EntityType): void {
+  private spawnDeathExplosion(x: number, y: number, entityType: EntityType, sizeScale: number): void {
     const textures = this.assets.getShipDeathExplosionTextures();
     const sprite = new AnimatedSprite(textures);
     sprite.anchor.set(0.5);
     const { width, height } = this.assets.getShipTextureSize(entityType);
     const maxDim = Math.max(width, height);
-    sprite.scale.set((maxDim * ENEMY_CONTAINER_SCALE * DEATH_EXPLOSION_SIZE_MULTIPLIER) / DEATH_EXPLOSION_FRAME_SIZE);
+    sprite.scale.set((maxDim * ENEMY_CONTAINER_SCALE * sizeScale * DEATH_EXPLOSION_SIZE_MULTIPLIER) / DEATH_EXPLOSION_FRAME_SIZE);
     sprite.animationSpeed = SHIP_DEATH_ANIMATION_SPEED;
     sprite.loop = false;
     sprite.x = x;
