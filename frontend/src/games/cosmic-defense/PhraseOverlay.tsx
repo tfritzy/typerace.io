@@ -17,7 +17,8 @@ function generatePhrase(wordCount: number): string {
   return words.join(" ");
 }
 
-const CHAR_COUNT = 22;
+const CHAR_COUNT = 17;
+const PHRASE_X_OFFSET_PX = 28;
 const HOTKEYS = new Set(["1", "2", "3"]);
 
 export const PhraseOverlay = ({
@@ -233,8 +234,13 @@ export const PhraseOverlay = ({
         }}
       />
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{ pointerEvents: "auto", cursor: "text", visibility: isPaused ? "hidden" : "visible" }}
+        className="absolute top-1/2 left-1/2"
+        style={{
+          transform: `translate(calc(-50% + ${PHRASE_X_OFFSET_PX}px), -50%)`,
+          pointerEvents: "auto",
+          cursor: "text",
+          visibility: isPaused ? "hidden" : "visible",
+        }}
         onClick={() => inputRef.current?.focus()}
       >
         <div className="relative">

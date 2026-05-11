@@ -365,13 +365,15 @@ function makeBaseEntity(
   };
 }
 
-function spawnInRightSixteenth(): { x: number; y: number } {
+function spawnInRightSixteenth(config: EnemyConfig): { x: number; y: number } {
   const pad = 60;
   const xStart = (CANVAS_WIDTH * 15) / 16;
   const minY = pad;
   const maxY = CANVAS_HEIGHT - pad;
-  const exclusionTop = Math.max(minY, PLANET_Y - ENEMY_SPAWN_CENTER_EXCLUSION_HALF_HEIGHT);
-  const exclusionBottom = Math.min(maxY, PLANET_Y + ENEMY_SPAWN_CENTER_EXCLUSION_HALF_HEIGHT);
+  const hitHalfH = (SHIP_HITBOX_MAP[config.entityType].hitHeight * config.sizeScale) / 2;
+  const spawnExclusionHalfHeight = ENEMY_SPAWN_CENTER_EXCLUSION_HALF_HEIGHT + hitHalfH;
+  const exclusionTop = Math.max(minY, PLANET_Y - spawnExclusionHalfHeight);
+  const exclusionBottom = Math.min(maxY, PLANET_Y + spawnExclusionHalfHeight);
   const topBandHeight = Math.max(0, exclusionTop - minY);
   const bottomBandHeight = Math.max(0, maxY - exclusionBottom);
   const spawnBandTotalHeight = topBandHeight + bottomBandHeight;
@@ -393,7 +395,7 @@ function spawnInRightSixteenth(): { x: number; y: number } {
 }
 
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
-  const { x, y } = spawnInRightSixteenth();
+  const { x, y } = spawnInRightSixteenth(config);
   const baseEntity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
   const entity: EntityState = {
     ...baseEntity,
