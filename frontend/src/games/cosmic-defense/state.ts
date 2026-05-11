@@ -556,6 +556,24 @@ function findNearestEnemy(state: GameState, origin: EntityState, predicate?: (e:
   return nearest;
 }
 
+function findNearestChainTarget(state: GameState, x: number, y: number, excludedIds: Set<number>): EntityState | null {
+  let nearest: EntityState | null = null;
+  let nearestDistSq = Infinity;
+  const maxJumpDistSq = MAX_CHAIN_JUMP_DISTANCE * MAX_CHAIN_JUMP_DISTANCE;
+  for (const other of state.entities) {
+    if (other.team !== Team.Enemy || excludedIds.has(other.id)) continue;
+    const dx = other.x - x;
+    const dy = other.y - y;
+    const distSq = dx * dx + dy * dy;
+    if (distSq > maxJumpDistSq) continue;
+    if (distSq < nearestDistSq) {
+      nearestDistSq = distSq;
+      nearest = other;
+    }
+  }
+  return nearest;
+}
+
 function applyFreezeStacks(state: GameState, target: EntityState, stacks: number): void {
   if (stacks <= 0) return;
   target.freezeStacks += stacks;
@@ -850,6 +868,24 @@ function applyHitEffects(state: GameState, shooter: EntityState, target: EntityS
   dealDamageToEntity(state, shooter, target, dmg);
 }
 
+function applyProjectileChains(state: GameState, shooter: EntityState, lastHitTarget: EntityState): void {
+  if (shooter.chainCount <= 0) return;
+  const dmg = getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter));
+  const hitIds = new Set<number>([lastHitTarget.id]);
+  let currentTarget: EntityState | null = lastHitTarget;
+  let chainsRemaining = shooter.chainCount;
+
+  while (currentTarget && chainsRemaining > 0) {
+    const nextTarget = findNearestChainTarget(state, currentTarget.x, currentTarget.y, hitIds);
+    if (!nextTarget) break;
+    hitIds.add(nextTarget.id);
+    spawnExplosion(state, shooter.entityType, nextTarget.x, nextTarget.y);
+    dealDamageToEntity(state, shooter, nextTarget, dmg);
+    currentTarget = nextTarget;
+    chainsRemaining--;
+  }
+}
+
 function applyProjectileHit(state: GameState, proj: ProjectileState, hitEntity: EntityState): void {
   const shooter = state.entityById.get(proj.shooterId);
   if (!shooter) return;
@@ -874,6 +910,7 @@ function applyProjectileHit(state: GameState, proj: ProjectileState, hitEntity: 
     spawnExplosion(state, shooter.entityType, hitEntity.x, hitEntity.y);
     applyHitEffects(state, shooter, hitEntity, dmg);
   }
+  applyProjectileChains(state, shooter, hitEntity);
 }
 
 function tickProjectiles(state: GameState, dt: number): void {
@@ -1023,43 +1060,6 @@ function executeLaserShot(state: GameState, e: EntityState, targetX: number, tar
   });
 }
 
-function fireChainProjectile(state: GameState, e: EntityState): void {
-  const target = findNearestTarget(state, e);
-  if (!target || !target.entity) return;
-
-  const dmg = getBuffedDamage(e, getEffectiveProjectileDamage(state, e));
-
-  const hitIds = new Set<number>();
-  let currentTarget: EntityState | null = target.entity;
-  let chainsRemaining = e.chainCount;
-  const maxJumpDistSq = MAX_CHAIN_JUMP_DISTANCE * MAX_CHAIN_JUMP_DISTANCE;
-
-  while (currentTarget && chainsRemaining >= 0) {
-    hitIds.add(currentTarget.id);
-    spawnExplosion(state, e.entityType, currentTarget.x, currentTarget.y);
-    dealDamageToEntity(state, e, currentTarget, dmg);
-
-    chainsRemaining--;
-    if (chainsRemaining < 0) break;
-
-    let nearest: EntityState | null = null;
-    let nearestDist = Infinity;
-    for (const other of state.entities) {
-      if (other.team !== Team.Enemy || hitIds.has(other.id)) continue;
-      const cx = other.x - currentTarget.x;
-      const cy = other.y - currentTarget.y;
-      const d = cx * cx + cy * cy;
-      if (d < nearestDist && d <= maxJumpDistSq) {
-        nearestDist = d;
-        nearest = other;
-      }
-    }
-    if (!nearest) break;
-
-    currentTarget = nearest;
-  }
-}
-
 function activateBuffer(state: GameState, e: EntityState): void {
   for (const ally of state.entities) {
     if (ally.id === e.id || ally.team !== Team.Allied) continue;
@@ -1082,11 +1082,6 @@ function activateAbility(state: GameState, e: EntityState): void {
 
     if (e.buffMultiplier > 0) {
       activateBuffer(state, e);
-      continue;
-    }
-
-    if (e.chainCount > 0) {
-      fireChainProjectile(state, e);
       continue;
     }
 
