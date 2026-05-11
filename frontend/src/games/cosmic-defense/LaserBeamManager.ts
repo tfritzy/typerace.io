@@ -62,7 +62,7 @@ export class LaserBeamManager {
       core.stroke({ width: width * 2.5, color: beam.color, alpha });
       core.moveTo(beam.x1, beam.y1);
       core.lineTo(beam.x2, beam.y2);
-      core.stroke({ width: Math.max(0.5, width * 0.8), color: 0xffffff, alpha });
+      core.stroke({ width: Math.max(LASER_WIDTH_SCALE, width * 0.8), color: 0xffffff, alpha });
     }
 
     for (const [id, g] of this.glowObjects) {
