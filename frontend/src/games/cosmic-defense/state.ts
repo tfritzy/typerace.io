@@ -1,5 +1,5 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT, MAX_VITAL_MATRIX_BONUS } from "./constants";
-import { type EntityType, ColorPreset, ExplosionType, Team, DamageType, FireMode } from "./types";
+import { type EntityType, ColorPreset, ExplosionType, Team, getExplosionType, DamageType, FireMode } from "./types";
 import { SHIP_HITBOX_MAP, type EnemyConfig, type FriendlyConfig, getScaledConfig, createEnemyConfigForWave, createBossConfigForWave, ENEMY_SHIP_TYPES, getWaveHealthMultiplier } from "./enemyConfig";
 import { getShipRole, type ShipRole } from "./shipCatalog";
 import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } from "./relics";
@@ -66,7 +66,6 @@ export interface EntityState {
   damageType: DamageType;
   fireMode: FireMode;
   projectileColor: number;
-  impactExplosionType?: ExplosionType;
 }
 
 export interface ProjectileState {
@@ -362,7 +361,6 @@ function makeBaseEntity(
     damageType: DamageType.Physical,
     fireMode: FireMode.Projectile,
     projectileColor: 0xffd700,
-    impactExplosionType: undefined,
   };
 }
 
@@ -423,7 +421,6 @@ export function spawnAlliedEntity(
   entity.damageType = config.damageType;
   entity.fireMode = config.fireMode;
   entity.projectileColor = config.projectileColor;
-  entity.impactExplosionType = config.impactExplosionType;
   addEntity(state, entity);
   return entity.id;
 }
@@ -689,7 +686,8 @@ function dealDamageToEntity(
   return killed;
 }
 
-function spawnExplosion(state: GameState, explosionType: ExplosionType | undefined, x: number, y: number, explosionRadius = 0): void {
+function spawnExplosion(state: GameState, entityType: EntityType, x: number, y: number, explosionRadius = 0): void {
+  const explosionType = getExplosionType(entityType);
   if (explosionType === undefined) return;
   state.explosions.push({ id: state.nextId++, x, y, explosionType, explosionRadius });
 }
@@ -700,7 +698,7 @@ function performInstantHit(
   target: { x: number; y: number; entity: EntityState | null },
   damage: number
 ): void {
-  spawnExplosion(state, shooter.impactExplosionType, target.x, target.y, shooter.explosionRadius);
+  spawnExplosion(state, shooter.entityType, target.x, target.y, shooter.explosionRadius);
 
   if (target.entity) {
     dealDamageToEntity(state, shooter, target.entity, damage);
@@ -883,7 +881,7 @@ function applyProjectileChains(state: GameState, shooter: EntityState, lastHitTa
     const nextTarget = findNearestChainTarget(state, currentTarget.x, currentTarget.y, hitIds);
     if (!nextTarget) break;
     hitIds.add(nextTarget.id);
-    spawnExplosion(state, shooter.impactExplosionType, nextTarget.x, nextTarget.y);
+    spawnExplosion(state, shooter.entityType, nextTarget.x, nextTarget.y);
     dealDamageToEntity(state, shooter, nextTarget, dmg);
     currentTarget = nextTarget;
     chainsRemaining--;
@@ -900,7 +898,7 @@ function applyProjectileHit(state: GameState, proj: ProjectileState, hitEntity: 
     : 0;
 
   if (explosionRadius > 0) {
-    spawnExplosion(state, shooter.impactExplosionType, proj.x, proj.y, explosionRadius);
+    spawnExplosion(state, shooter.entityType, proj.x, proj.y, explosionRadius);
     const r2 = explosionRadius * explosionRadius;
     for (let k = state.entities.length - 1; k >= 0; k--) {
       const splash = state.entities[k];
@@ -911,7 +909,7 @@ function applyProjectileHit(state: GameState, proj: ProjectileState, hitEntity: 
       applyHitEffects(state, shooter, splash, dmg);
     }
   } else {
-    spawnExplosion(state, shooter.impactExplosionType, hitEntity.x, hitEntity.y);
+    spawnExplosion(state, shooter.entityType, hitEntity.x, hitEntity.y);
     applyHitEffects(state, shooter, hitEntity, dmg);
   }
   applyProjectileChains(state, shooter, hitEntity);
