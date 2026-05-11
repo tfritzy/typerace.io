@@ -868,11 +868,11 @@ function applyHitEffects(state: GameState, shooter: EntityState, target: EntityS
   dealDamageToEntity(state, shooter, target, dmg);
 }
 
-function applyProjectileChains(state: GameState, shooter: EntityState, initialTarget: EntityState): void {
+function applyProjectileChains(state: GameState, shooter: EntityState, lastHitTarget: EntityState): void {
   if (shooter.chainCount <= 0) return;
   const dmg = getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter));
-  const hitIds = new Set<number>([initialTarget.id]);
-  let currentTarget: EntityState | null = initialTarget;
+  const hitIds = new Set<number>([lastHitTarget.id]);
+  let currentTarget: EntityState | null = lastHitTarget;
   let chainsRemaining = shooter.chainCount;
 
   while (currentTarget && chainsRemaining > 0) {
