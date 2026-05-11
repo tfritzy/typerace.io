@@ -77,7 +77,7 @@ describe("laser timing behavior", () => {
 });
 
 describe("projectile impact explosions", () => {
-  it("does not render one for Moth", () => {
+  it("does not render impact explosion for Moth projectiles", () => {
     const state = createGameState();
     const target = makeEnemy(state, { health: 20, x: PLANET_X + 120, y: PLANET_Y });
     const mothConfig = FRIENDLY_CATALOG.find((config) => config.entityType === "Moth")!;
