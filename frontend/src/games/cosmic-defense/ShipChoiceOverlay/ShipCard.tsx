@@ -190,7 +190,7 @@ export const ShipCard = ({
       </div>
 
       <div
-        className="relative px-3 pt-2.5 pb-3 leading-snug flex-1"
+        className="relative px-3 pt-4 pb-3 leading-snug flex-1"
         style={{
           fontFamily: "system-ui, sans-serif",
           fontSize: 11,
