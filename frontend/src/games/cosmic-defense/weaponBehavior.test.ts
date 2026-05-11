@@ -60,12 +60,17 @@ describe("projectile bounce behavior", () => {
 });
 
 describe("laser timing behavior", () => {
-  it("still resolves zero-delay lasers immediately", () => {
+  it("queues zero-delay lasers through pending shots", () => {
     const state = createGameState();
     const firstEnemy = makeEnemy(state, { health: 20, x: PLANET_X + 100, y: PLANET_Y });
     makeAlly(state, { projectileDamage: 0, laserDamage: 10, fireMode: FireMode.Laser, chargesRequired: 1, role: "laser" });
 
     onCorrectKeystroke(state);
+    expect(state.pendingShots).toHaveLength(1);
+    expect(firstEnemy.health).toBe(20);
+
+    unpauseGame(state);
+    updateState(state, 0.1);
 
     expect(firstEnemy.health).toBe(10);
   });
