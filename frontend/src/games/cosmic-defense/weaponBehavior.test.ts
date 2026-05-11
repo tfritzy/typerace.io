@@ -38,37 +38,35 @@ function makeAlly(state: GameState, overrides: Partial<EntityState> = {}): Entit
 }
 
 describe("projectile bounce behavior", () => {
-  it("bounces projectiles after impact", () => {
+  it("waits for projectile impact before chaining", () => {
     const state = createGameState();
-    const firstEnemy = makeEnemy(state, { health: 20, x: PLANET_X + 100, y: PLANET_Y });
-    const secondEnemy = makeEnemy(state, { health: 20, x: PLANET_X + 260, y: PLANET_Y });
-    makeAlly(state, { projectileDamage: 10, chargesRequired: 1, bounceCount: 1 });
+    const firstEnemy = makeEnemy(state, { health: 20, x: PLANET_X + 220, y: PLANET_Y });
+    const secondEnemy = makeEnemy(state, { health: 20, x: PLANET_X + 300, y: PLANET_Y });
+    makeAlly(state, { projectileDamage: 10, chargesRequired: 1, chainCount: 1 });
 
     onCorrectKeystroke(state);
     unpauseGame(state);
-    updateState(state, 0.1);
+    updateState(state, 0.05);
 
-    expect(firstEnemy.health).toBe(10);
+    expect(firstEnemy.health).toBe(20);
+    expect(secondEnemy.health).toBe(20);
     expect(state.projectiles).toHaveLength(1);
 
     updateState(state, 0.1);
 
+    expect(firstEnemy.health).toBe(10);
     expect(secondEnemy.health).toBe(10);
   });
 });
 
-describe("laser bounce behavior", () => {
-  it("allows lasers to bounce when configured", () => {
+describe("laser timing behavior", () => {
+  it("still resolves zero-delay lasers immediately", () => {
     const state = createGameState();
     const firstEnemy = makeEnemy(state, { health: 20, x: PLANET_X + 100, y: PLANET_Y });
-    const secondEnemy = makeEnemy(state, { health: 20, x: PLANET_X + 180, y: PLANET_Y + 40 });
-    makeAlly(state, { projectileDamage: 0, laserDamage: 10, fireMode: FireMode.Laser, chargesRequired: 1, bounceCount: 1, role: "laser" });
+    makeAlly(state, { projectileDamage: 0, laserDamage: 10, fireMode: FireMode.Laser, chargesRequired: 1, role: "laser" });
 
     onCorrectKeystroke(state);
-    unpauseGame(state);
-    updateState(state, 0.1);
 
     expect(firstEnemy.health).toBe(10);
-    expect(secondEnemy.health).toBe(10);
   });
 });

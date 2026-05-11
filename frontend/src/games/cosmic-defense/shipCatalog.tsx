@@ -21,7 +21,7 @@ export type ShipRole =
   | "shooter"
   | "ice_beam"
   | "plasma_single"
-  | "bounce"
+  | "chain"
   | "mac_cannon";
 
 export const ROLE_META: Record<ShipRole, { icon: LucideIcon; label: string; color: string }> = {
@@ -35,7 +35,7 @@ export const ROLE_META: Record<ShipRole, { icon: LucideIcon; label: string; colo
   shooter: { icon: Crosshair, label: "Shooter", color: "#94e2d5" },
   ice_beam: { icon: Waves, label: "Ice Beam", color: "#74c7ec" },
   plasma_single: { icon: Bomb, label: "Plasma", color: "#eba0ac" },
-  bounce: { icon: Link, label: "Bounce", color: "#a6e3a1" },
+  chain: { icon: Link, label: "Chain", color: "#a6e3a1" },
   mac_cannon: { icon: Shield, label: "MAC Cannon", color: "#cdd6f4" },
 };
 
@@ -184,14 +184,14 @@ export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   {
     entityType: "Nova",
     colorPreset: ColorPreset.Preset1,
-    role: "bounce",
-    description: "Bouncing shots",
+    role: "chain",
+    description: "Bouncing chain shots",
     descriptionFn: (c, next) => [
-      plain("Fires a shot that "),
-      keyword("bounces", KEYWORD_COLOR.chain),
+      plain("Fires a bouncing shot that "),
+      keyword("chains", KEYWORD_COLOR.chain),
       plain(" to "),
-      ...num(c.bounceCount, next?.bounceCount),
-      plain(" more enemies, dealing "),
+      ...num(c.chainCount, next?.chainCount),
+      plain(" enemies, dealing "),
       ...num(getDmg(c), next ? getDmg(next) : undefined),
       plain(" damage each."),
     ],
