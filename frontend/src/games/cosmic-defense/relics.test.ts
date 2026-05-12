@@ -193,6 +193,7 @@ describe('cryo_surge', () => {
     const state = makeState(['cryo_surge']);
     const enemy = makeEnemy(state, { speed: 100, x: PLANET_X + 1000, y: PLANET_Y, range: 700 });
     onPerfectWord(state);
+    expect(enemy.chillDurationSeconds).toBeGreaterThan(0);
     unpauseGame(state);
     updateState(state, 0.1);
     expect(Math.abs(enemy.vx)).toBeCloseTo(50, 1);
