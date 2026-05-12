@@ -134,13 +134,13 @@ export const ShipCard = ({
       </div>
 
       <div
-        className="relative flex items-center justify-between mx-2 mt-2 px-2.5 py-1.5 rounded-md"
+        className="relative z-10 flex items-center justify-between mx-1.5 -mt-2 px-2.5 py-1.5 rounded-md"
         style={{
           border: "1px solid rgba(255,255,255,0.12)",
           background:
             "linear-gradient(160deg, rgba(22,23,49,0.9) 0%, rgba(10,12,28,0.9) 100%)",
           boxShadow:
-            "inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.35)",
+            "inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.35), 0 6px 12px -8px rgba(0,0,0,0.8)",
         }}
       >
         <span
