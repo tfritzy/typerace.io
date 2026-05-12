@@ -134,8 +134,10 @@ export const ShipCard = ({
       </div>
 
       <div
-        className="relative z-10 flex items-center justify-between mx-1 -mt-2 px-2 py-1.5 rounded-md"
+        className="relative z-10 flex items-center justify-between -mt-2 px-2 py-1.5 rounded-md"
         style={{
+          marginLeft: 3,
+          marginRight: 3,
           border: "1px solid rgba(255,255,255,0.12)",
           background:
             "linear-gradient(160deg, rgba(22,23,49,0.9) 0%, rgba(10,12,28,0.9) 100%)",
