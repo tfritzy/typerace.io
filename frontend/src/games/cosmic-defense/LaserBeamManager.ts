@@ -4,7 +4,6 @@ import type { GameState } from "./state";
 const BEAM_DURATION = 0.35;
 const GLOW_BLUR_STRENGTH = 4;
 const GLOW_BLUR_QUALITY = 4;
-const LASER_WIDTH_SCALE = 0.5;
 
 export class LaserBeamManager {
   readonly layer: Container;
@@ -46,23 +45,22 @@ export class LaserBeamManager {
 
       const age = state.time.time - beam.time;
       const alpha = Math.max(0, 1 - age / BEAM_DURATION);
-      const width = beam.width * LASER_WIDTH_SCALE;
 
       glow.clear();
       glow.moveTo(beam.x1, beam.y1);
       glow.lineTo(beam.x2, beam.y2);
-      glow.stroke({ width: width * 6, color: beam.color, alpha: alpha * 0.4 });
+      glow.stroke({ width: beam.width * 3, color: beam.color, alpha: alpha * 0.4 });
       glow.moveTo(beam.x1, beam.y1);
       glow.lineTo(beam.x2, beam.y2);
-      glow.stroke({ width: width * 3, color: beam.color, alpha: alpha * 0.6 });
+      glow.stroke({ width: beam.width * 1.5, color: beam.color, alpha: alpha * 0.6 });
 
       core.clear();
       core.moveTo(beam.x1, beam.y1);
       core.lineTo(beam.x2, beam.y2);
-      core.stroke({ width: width * 2.5, color: beam.color, alpha });
+      core.stroke({ width: beam.width * 1.25, color: beam.color, alpha });
       core.moveTo(beam.x1, beam.y1);
       core.lineTo(beam.x2, beam.y2);
-      core.stroke({ width: Math.max(LASER_WIDTH_SCALE, width * 0.8), color: 0xffffff, alpha });
+      core.stroke({ width: Math.max(0.5, beam.width * 0.4), color: 0xffffff, alpha });
     }
 
     for (const [id, g] of this.glowObjects) {
