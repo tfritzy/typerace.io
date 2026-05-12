@@ -366,6 +366,16 @@ function makeBaseEntity(
   };
 }
 
+const _damageData: DamageData = { amount: 0, x: 0, y: 0, isPlasma: false };
+const _scoreData: ScoreData = { score: 0 };
+const _xpData: XPData = { xp: 0, level: 0, xpNeeded: 0 };
+const _deathData: EntityDeathData = { x: 0, y: 0, team: Team.Enemy, entityType: "Pulse", xpAmount: 0, sizeScale: 1 };
+const _bossSpawnedData: BossSpawnedData = { id: 0, entityType: "Pulse", maxHealth: 0 };
+const _bossDefeatedData: BossDefeatedData = { id: 0 };
+const _relicDropData: RelicDropData = { relicId: "" as RelicId, x: 0, y: 0 };
+const _chainHitIds = new Set<number>();
+const _spawnPosition = { x: 0, y: 0 };
+
 function spawnInRightSixteenth(config: EnemyConfig): { x: number; y: number } {
   const pad = 60;
   const xStart = (CANVAS_WIDTH * 15) / 16;
@@ -389,10 +399,9 @@ function spawnInRightSixteenth(config: EnemyConfig): { x: number; y: number } {
       y = exclusionBottom + Math.random() * bottomBandHeight;
     }
   }
-  return {
-    x: xStart + Math.random() * (CANVAS_WIDTH - xStart - pad),
-    y,
-  };
+  _spawnPosition.x = xStart + Math.random() * (CANVAS_WIDTH - xStart - pad);
+  _spawnPosition.y = y;
+  return _spawnPosition;
 }
 
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
@@ -411,7 +420,10 @@ export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): 
   };
   addEntity(state, entity);
   if (entity.isBoss) {
-    state.onBossSpawned.emit({ id: entity.id, entityType: entity.entityType, maxHealth: entity.maxHealth });
+    _bossSpawnedData.id = entity.id;
+    _bossSpawnedData.entityType = entity.entityType;
+    _bossSpawnedData.maxHealth = entity.maxHealth;
+    state.onBossSpawned.emit(_bossSpawnedData);
   }
 }
 
@@ -455,6 +467,12 @@ function isInBounds(x: number, y: number): boolean {
     y >= -pad &&
     y <= CANVAS_HEIGHT + pad
   );
+}
+
+function swapPop<T>(arr: T[], i: number): void {
+  const last = arr.length - 1;
+  if (i !== last) arr[i] = arr[last];
+  arr.pop();
 }
 
 function checkCollisions(state: GameState): void {
@@ -681,22 +699,25 @@ function dealDamageToEntity(
       }
       const xpAmount = target.xpReward;
       state.score += xpAmount * SCORE_PER_XP;
-      state.onScoreChanged.emit({ score: state.score });
-      state.onEnemyEntityDeath.emit({
-        x: target.x,
-        y: target.y,
-        team: target.team,
-        entityType: target.entityType,
-        xpAmount,
-        sizeScale: target.sizeScale,
-      });
+      _scoreData.score = state.score;
+      state.onScoreChanged.emit(_scoreData);
+      _deathData.x = target.x;
+      _deathData.y = target.y;
+      _deathData.team = target.team;
+      _deathData.entityType = target.entityType;
+      _deathData.xpAmount = xpAmount;
+      _deathData.sizeScale = target.sizeScale;
+      state.onEnemyEntityDeath.emit(_deathData);
       if (target.isBoss) {
-        state.onBossDefeated.emit({ id: target.id });
+        _bossDefeatedData.id = target.id;
+        state.onBossDefeated.emit(_bossDefeatedData);
         const unowned = RELIC_CATALOG.filter((r) => !state.relics.includes(r.id));
         if (unowned.length > 0) {
           const relicIndex = (state.spawner.currentWave - 1) % unowned.length;
-          const relicId = unowned[relicIndex].id;
-          state.onRelicDropped.emit({ relicId, x: target.x, y: target.y });
+          _relicDropData.relicId = unowned[relicIndex].id;
+          _relicDropData.x = target.x;
+          _relicDropData.y = target.y;
+          state.onRelicDropped.emit(_relicDropData);
         }
       }
     }
@@ -704,7 +725,11 @@ function dealDamageToEntity(
     if (idx >= 0) removeEntityAt(state, idx);
   }
 
-  state.onDamageDealt.emit({ amount: damage, x: target.x, y: target.y, isPlasma });
+  _damageData.amount = damage;
+  _damageData.x = target.x;
+  _damageData.y = target.y;
+  _damageData.isPlasma = isPlasma;
+  state.onDamageDealt.emit(_damageData);
 
   return killed;
 }
@@ -831,7 +856,7 @@ function tickLaserBeams(state: GameState): void {
   const LASER_BEAM_DURATION = 0.35;
   for (let i = state.laserBeams.length - 1; i >= 0; i--) {
     if (state.time.time - state.laserBeams[i].time > LASER_BEAM_DURATION) {
-      state.laserBeams.splice(i, 1);
+      swapPop(state.laserBeams, i);
     }
   }
 }
@@ -840,7 +865,7 @@ function tickPendingShots(state: GameState): void {
   for (let i = state.pendingShots.length - 1; i >= 0; i--) {
     const shot = state.pendingShots[i];
     if (state.time.time < shot.fireAt) continue;
-    state.pendingShots.splice(i, 1);
+    swapPop(state.pendingShots, i);
 
     const shooter = state.entityById.get(shot.shooterId);
     if (!shooter) continue;
@@ -896,14 +921,15 @@ function applyHitEffects(state: GameState, shooter: EntityState, target: EntityS
 function applyProjectileChains(state: GameState, shooter: EntityState, lastHitTarget: EntityState): void {
   if (shooter.chainCount <= 0) return;
   const dmg = getBuffedDamage(shooter, getEffectiveProjectileDamage(state, shooter));
-  const hitIds = new Set<number>([lastHitTarget.id]);
+  _chainHitIds.clear();
+  _chainHitIds.add(lastHitTarget.id);
   let currentTarget: EntityState | null = lastHitTarget;
   let chainsRemaining = shooter.chainCount;
 
   while (currentTarget && chainsRemaining > 0) {
-    const nextTarget = findNearestChainTarget(state, currentTarget.x, currentTarget.y, hitIds);
+    const nextTarget = findNearestChainTarget(state, currentTarget.x, currentTarget.y, _chainHitIds);
     if (!nextTarget) break;
-    hitIds.add(nextTarget.id);
+    _chainHitIds.add(nextTarget.id);
     spawnExplosion(state, shooter.entityType, nextTarget.x, nextTarget.y);
     dealDamageToEntity(state, shooter, nextTarget, dmg);
     currentTarget = nextTarget;
@@ -947,7 +973,7 @@ function tickProjectiles(state: GameState, dt: number): void {
     proj.y += proj.vy * dt;
 
     if (!isInBounds(proj.x, proj.y)) {
-      state.projectiles.splice(i, 1);
+      swapPop(state.projectiles, i);
       continue;
     }
 
@@ -962,7 +988,7 @@ function tickProjectiles(state: GameState, dt: number): void {
       break;
     }
     if (collided) {
-      state.projectiles.splice(i, 1);
+      swapPop(state.projectiles, i);
     }
   }
 }
@@ -1152,10 +1178,20 @@ export function onPerfectWord(state: GameState): void {
     }
   }
   if (state.relicEffects.perfectWordSplashDamage > 0) {
-    const enemies = state.entities.filter(e => e.team === Team.Enemy);
-    if (enemies.length > 0) {
-      const target = enemies[Math.floor(Math.random() * enemies.length)];
-      dealDamageToEntity(state, null, target, state.relicEffects.perfectWordSplashDamage);
+    let enemyCount = 0;
+    for (const e of state.entities) {
+      if (e.team === Team.Enemy) enemyCount++;
+    }
+    if (enemyCount > 0) {
+      let pick = Math.floor(Math.random() * enemyCount);
+      for (const e of state.entities) {
+        if (e.team !== Team.Enemy) continue;
+        if (pick === 0) {
+          dealDamageToEntity(state, null, e, state.relicEffects.perfectWordSplashDamage);
+          break;
+        }
+        pick--;
+      }
     }
   }
   if (state.relicEffects.streakMilestoneDamage > 0 && state.perfectWordStreak % STREAK_MILESTONE_INTERVAL === 0) {
@@ -1288,7 +1324,10 @@ export function awardXP(state: GameState, amount: number): void {
     pauseGame(state);
     state.onLevelUp.emit();
   }
-  state.onXPChanged.emit({ xp: state.xp, level: state.level, xpNeeded: xpForNextLevel(state.level) });
+  _xpData.xp = state.xp;
+  _xpData.level = state.level;
+  _xpData.xpNeeded = xpForNextLevel(state.level);
+  state.onXPChanged.emit(_xpData);
 }
 
 export function levelUpEntity(state: GameState, entityId: number, config: FriendlyConfig, newLevel: number): void {

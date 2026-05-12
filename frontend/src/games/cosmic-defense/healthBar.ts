@@ -4,6 +4,10 @@ import type { EntityState } from "./state";
 const HEALTH_BAR_WIDTH = 48;
 const HEALTH_BAR_HEIGHT = 6;
 const HEALTH_BAR_OFFSET = -34;
+const HEALTH_BAR_HALF_WIDTH = HEALTH_BAR_WIDTH / 2;
+
+const BG_FILL_STYLE = { color: 0x000000, alpha: 0.5 };
+const BAR_FILL_STYLE = { color: 0x4ade80 };
 
 function getHealthBarColor(ratio: number): number {
   return ratio > 0.6 ? 0x4ade80 : ratio > 0.3 ? 0xfbbf24 : 0xef4444;
@@ -12,29 +16,17 @@ function getHealthBarColor(ratio: number): number {
 export function drawHealthBar(g: Graphics, entity: EntityState): void {
   g.clear();
   g.x = entity.x;
-  g.y = entity.y;
+  g.y = entity.y + HEALTH_BAR_OFFSET;
 
   const ratio = Math.max(0, entity.health / entity.maxHealth);
-  drawStandardHealthBar(g, ratio, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT, HEALTH_BAR_OFFSET);
-}
-
-function drawStandardHealthBar(
-  g: Graphics,
-  ratio: number,
-  width: number,
-  height: number,
-  offset: number
-): void {
-  g.y += offset;
   if (ratio >= 1) return;
 
-  const barColor = getHealthBarColor(ratio);
-
-  g.rect(-width / 2, 0, width, height);
-  g.fill({ color: 0x000000, alpha: 0.5 });
+  g.rect(-HEALTH_BAR_HALF_WIDTH, 0, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
+  g.fill(BG_FILL_STYLE);
 
   if (ratio > 0) {
-    g.rect(-width / 2, 0, width * ratio, height);
-    g.fill({ color: barColor });
+    BAR_FILL_STYLE.color = getHealthBarColor(ratio);
+    g.rect(-HEALTH_BAR_HALF_WIDTH, 0, HEALTH_BAR_WIDTH * ratio, HEALTH_BAR_HEIGHT);
+    g.fill(BAR_FILL_STYLE);
   }
 }
