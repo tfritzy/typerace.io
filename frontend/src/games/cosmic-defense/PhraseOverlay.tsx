@@ -17,8 +17,10 @@ function generatePhrase(wordCount: number): string {
   return words.join(" ");
 }
 
-const CHAR_COUNT = 17;
-const PHRASE_X_OFFSET_PX = 60;
+const LEFT_VISIBLE_CH = 6;
+const RIGHT_VISIBLE_CH = 16;
+const VISIBLE_CHAR_COUNT = LEFT_VISIBLE_CH + RIGHT_VISIBLE_CH;
+const PHRASE_RIGHT_MARGIN_PX = 40;
 const HOTKEYS = new Set(["1", "2", "3"]);
 
 export const PhraseOverlay = ({
@@ -79,11 +81,11 @@ export const PhraseOverlay = ({
         }
       }
 
-      while (currentPhrase.length - currentTyped.length < CHAR_COUNT) {
+      while (currentPhrase.length - currentTyped.length < RIGHT_VISIBLE_CH) {
         currentPhrase += " " + getRandomWord(getLangCode());
       }
 
-      while (currentTyped.length > CHAR_COUNT * 2) {
+      while (currentTyped.length > VISIBLE_CHAR_COUNT * 2) {
         const spaceI = currentPhrase.indexOf(" ") + 1;
         currentPhrase = currentPhrase.substring(spaceI);
         currentTyped = currentTyped.substring(spaceI);
@@ -212,8 +214,8 @@ export const PhraseOverlay = ({
     return c;
   }, [phrase, typed, checkpoint]);
 
-  const offset = CHAR_COUNT - typed.length;
-  const phraseWidth = `${CHAR_COUNT * 2}ch`;
+  const offset = LEFT_VISIBLE_CH - typed.length;
+  const phraseWidth = `${VISIBLE_CHAR_COUNT}ch`;
 
   return (
     <div className="w-full h-full relative" style={{ pointerEvents: "none" }}>
@@ -235,9 +237,10 @@ export const PhraseOverlay = ({
         }}
       />
       <div
-        className="absolute top-1/2 left-1/2"
+        className="absolute top-1/2 right-0"
         style={{
-          transform: `translate(calc(-50% + ${PHRASE_X_OFFSET_PX}px), -50%)`,
+          right: `${PHRASE_RIGHT_MARGIN_PX}px`,
+          transform: "translateY(-50%)",
           pointerEvents: "auto",
           cursor: "text",
           visibility: isPaused ? "hidden" : "visible",
@@ -256,7 +259,7 @@ export const PhraseOverlay = ({
           }}
         >
           <div
-            className="absolute left-1/2 top-full -translate-x-1/2"
+            className="absolute top-full left-0"
             style={{
               width: phraseWidth,
               height: "3.5rem",
@@ -280,8 +283,9 @@ export const PhraseOverlay = ({
             {chars}
           </div>
           <div
-            className="absolute left-1/2 top-0 h-[2.25rem] -translate-x-px"
+            className="absolute top-0 h-[2.25rem]"
             style={{
+              left: `calc(${LEFT_VISIBLE_CH}ch - 1px)`,
               borderLeft: "1px solid rgba(255,255,255,0.7)",
               filter: "drop-shadow(0 0 2px rgba(0,0,0,0.8))",
             }}
