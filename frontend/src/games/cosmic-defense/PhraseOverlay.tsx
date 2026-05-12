@@ -17,7 +17,8 @@ function generatePhrase(wordCount: number): string {
   return words.join(" ");
 }
 
-const CHAR_COUNT = 22;
+const CHAR_COUNT = 17;
+const PHRASE_X_OFFSET_PX = 60;
 const HOTKEYS = new Set(["1", "2", "3"]);
 
 export const PhraseOverlay = ({
@@ -199,19 +200,20 @@ export const PhraseOverlay = ({
             </span>,
           );
         }
-      } else {
-        c.push(
-          <span key={i} style={{ color: "rgba(255,255,255,0.5)" }}>
-            {phrase[i]}
-          </span>,
-        );
-      }
+        } else {
+          c.push(
+            <span key={i} style={{ color: "rgba(255,255,255,0.62)" }}>
+              {phrase[i]}
+            </span>,
+          );
+        }
     }
 
     return c;
   }, [phrase, typed, checkpoint]);
 
   const offset = CHAR_COUNT - typed.length;
+  const phraseWidth = `${CHAR_COUNT * 2}ch`;
 
   return (
     <div className="w-full h-full relative" style={{ pointerEvents: "none" }}>
@@ -233,14 +235,19 @@ export const PhraseOverlay = ({
         }}
       />
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{ pointerEvents: "auto", cursor: "text", visibility: isPaused ? "hidden" : "visible" }}
+        className="absolute top-1/2 left-1/2"
+        style={{
+          transform: `translate(calc(-50% + ${PHRASE_X_OFFSET_PX}px), -50%)`,
+          pointerEvents: "auto",
+          cursor: "text",
+          visibility: isPaused ? "hidden" : "visible",
+        }}
         onClick={() => inputRef.current?.focus()}
       >
         <div
           className="text-3xl font-mono whitespace-pre relative"
           style={{
-            width: `${CHAR_COUNT * 2}ch`,
+            width: phraseWidth,
             overflowX: "hidden",
             maskImage:
               "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
@@ -248,6 +255,17 @@ export const PhraseOverlay = ({
               "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
           }}
         >
+          <div
+            className="absolute left-1/2 top-full -translate-x-1/2"
+            style={{
+              width: phraseWidth,
+              height: "3.5rem",
+              background: "linear-gradient(to bottom, rgba(0,0,0,0.46), rgba(0,0,0,0))",
+              filter: "blur(6px)",
+              opacity: 0.75,
+              pointerEvents: "none",
+            }}
+          />
           <div
             style={{
               transform: `translateX(${offset}ch)`,

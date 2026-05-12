@@ -6,6 +6,7 @@ import { RELIC_CATALOG, computeRelicEffects, type RelicId, type RelicEffects } f
 
 export const PLANET_X = 200;
 export const PLANET_Y = CANVAS_HEIGHT / 2;
+export const ENEMY_SPAWN_CENTER_EXCLUSION_HALF_HEIGHT = 120;
 const PLASMA_DAMAGE_PER_TICK = 1;
 const LASER_RANGE = 2200;
 const SCORE_PER_XP = 10;
@@ -365,17 +366,37 @@ function makeBaseEntity(
   };
 }
 
-function spawnInRightSixteenth(): { x: number; y: number } {
+function spawnInRightSixteenth(config: EnemyConfig): { x: number; y: number } {
   const pad = 60;
   const xStart = (CANVAS_WIDTH * 15) / 16;
+  const minY = pad;
+  const maxY = CANVAS_HEIGHT - pad;
+  const hitHalfH = (SHIP_HITBOX_MAP[config.entityType].hitHeight * config.sizeScale) / 2;
+  const spawnExclusionHalfHeight = ENEMY_SPAWN_CENTER_EXCLUSION_HALF_HEIGHT + hitHalfH;
+  const exclusionTop = Math.max(minY, PLANET_Y - spawnExclusionHalfHeight);
+  const exclusionBottom = Math.min(maxY, PLANET_Y + spawnExclusionHalfHeight);
+  const topBandHeight = Math.max(0, exclusionTop - minY);
+  const bottomBandHeight = Math.max(0, maxY - exclusionBottom);
+  const spawnBandTotalHeight = topBandHeight + bottomBandHeight;
+  let y: number;
+  if (spawnBandTotalHeight <= 0) {
+    y = Math.random() < 0.5 ? minY : maxY;
+  } else {
+    const roll = Math.random() * spawnBandTotalHeight;
+    if (roll < topBandHeight) {
+      y = minY + Math.random() * topBandHeight;
+    } else {
+      y = exclusionBottom + Math.random() * bottomBandHeight;
+    }
+  }
   return {
     x: xStart + Math.random() * (CANVAS_WIDTH - xStart - pad),
-    y: pad + Math.random() * (CANVAS_HEIGHT - pad * 2),
+    y,
   };
 }
 
 export function spawnEntity(state: GameState, config: EnemyConfig, team: Team): void {
-  const { x, y } = spawnInRightSixteenth();
+  const { x, y } = spawnInRightSixteenth(config);
   const baseEntity = makeBaseEntity(state, config.entityType, x, y, team, ColorPreset.Preset4);
   const entity: EntityState = {
     ...baseEntity,
