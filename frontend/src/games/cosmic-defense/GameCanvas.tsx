@@ -83,6 +83,25 @@ const GameCanvasInner = ({ onPlayAgain }: { onPlayAgain: () => void }) => {
   }, []);
 
   useEffect(() => {
+    const handlePreventSpaceScroll = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) return;
+      if (event.code !== "Space" && event.key !== "Spacebar") return;
+      const target = event.target as EventTarget | null;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        (target instanceof HTMLElement && target.isContentEditable)
+      ) {
+        return;
+      }
+      event.preventDefault();
+    };
+    window.addEventListener("keydown", handlePreventSpaceScroll);
+    return () => window.removeEventListener("keydown", handlePreventSpaceScroll);
+  }, []);
+
+  useEffect(() => {
     const div = containerRef.current;
     if (!div || !gameId || !language) return;
 
