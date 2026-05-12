@@ -6,7 +6,7 @@ import { Team } from "./types";
 import type { EntityType } from "./types";
 import { SHIP_TURN_SPEED } from "./constants";
 import { approachAngle } from "./utils";
-import { drawEnemyHealthBar } from "./healthBar";
+import { drawHealthBar } from "./healthBar";
 
 const SHIP_DEATH_ANIMATION_SPEED = 0.6;
 const ENEMY_CONTAINER_SCALE = 2.25;
@@ -66,7 +66,7 @@ export class EnemyManager {
       this.layer.addChild(g);
       this.healthBarGraphics.set(entity.id, g);
     }
-    drawEnemyHealthBar(g, entity);
+    drawHealthBar(g, entity);
   }
 
   private tickDeathAnimations(): void {
