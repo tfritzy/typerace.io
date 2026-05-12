@@ -235,7 +235,7 @@ export const PhraseOverlay = ({
         }}
       />
       <div
-        className="absolute top-1/2 left-1/2 relative"
+        className="absolute top-1/2 left-1/2"
         style={{
           transform: `translate(calc(-50% + ${PHRASE_X_OFFSET_PX}px), -50%)`,
           pointerEvents: "auto",
@@ -244,17 +244,6 @@ export const PhraseOverlay = ({
         }}
         onClick={() => inputRef.current?.focus()}
       >
-        <div
-          className="absolute left-1/2 top-full -translate-x-1/2"
-          style={{
-            width: phraseWidth,
-            height: "3.5rem",
-            background: "linear-gradient(to bottom, rgba(0,0,0,0.46), rgba(0,0,0,0))",
-            filter: "blur(6px)",
-            opacity: 0.75,
-            pointerEvents: "none",
-          }}
-        />
         <div
           className="text-3xl font-mono whitespace-pre relative"
           style={{
@@ -266,6 +255,17 @@ export const PhraseOverlay = ({
               "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
           }}
         >
+          <div
+            className="absolute left-1/2 top-full -translate-x-1/2"
+            style={{
+              width: phraseWidth,
+              height: "3.5rem",
+              background: "linear-gradient(to bottom, rgba(0,0,0,0.46), rgba(0,0,0,0))",
+              filter: "blur(6px)",
+              opacity: 0.75,
+              pointerEvents: "none",
+            }}
+          />
           <div
             style={{
               transform: `translateX(${offset}ch)`,
