@@ -4,11 +4,9 @@ import type { EntityState } from "./state";
 const HEALTH_BAR_WIDTH = 28;
 const HEALTH_BAR_HEIGHT = 3;
 const HEALTH_BAR_OFFSET = -18;
-type HealthBarStyle = {
-  width?: number;
-  height?: number;
-  offset?: number;
-};
+const ENEMY_HEALTH_BAR_WIDTH = 48;
+const ENEMY_HEALTH_BAR_HEIGHT = 6;
+const ENEMY_HEALTH_BAR_OFFSET = -34;
 
 function getHealthBarColor(ratio: number): number {
   return ratio > 0.6 ? 0x4ade80 : ratio > 0.3 ? 0xfbbf24 : 0xef4444;
@@ -16,21 +14,32 @@ function getHealthBarColor(ratio: number): number {
 
 export function drawHealthBar(
   g: Graphics,
-  entity: EntityState,
-  style: HealthBarStyle = {}
+  entity: EntityState
 ): void {
   g.clear();
   g.x = entity.x;
   g.y = entity.y;
 
   const ratio = Math.max(0, entity.health / entity.maxHealth);
-  drawStandardHealthBar(g, ratio, style);
+  drawStandardHealthBar(g, ratio, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT, HEALTH_BAR_OFFSET);
 }
 
-function drawStandardHealthBar(g: Graphics, ratio: number, style: HealthBarStyle = {}): void {
-  const width = style.width ?? HEALTH_BAR_WIDTH;
-  const height = style.height ?? HEALTH_BAR_HEIGHT;
-  const offset = style.offset ?? HEALTH_BAR_OFFSET;
+export function drawEnemyHealthBar(g: Graphics, entity: EntityState): void {
+  g.clear();
+  g.x = entity.x;
+  g.y = entity.y;
+
+  const ratio = Math.max(0, entity.health / entity.maxHealth);
+  drawStandardHealthBar(g, ratio, ENEMY_HEALTH_BAR_WIDTH, ENEMY_HEALTH_BAR_HEIGHT, ENEMY_HEALTH_BAR_OFFSET);
+}
+
+function drawStandardHealthBar(
+  g: Graphics,
+  ratio: number,
+  width: number,
+  height: number,
+  offset: number
+): void {
   g.y += offset;
   if (ratio >= 1) return;
 

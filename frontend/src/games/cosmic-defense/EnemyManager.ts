@@ -6,7 +6,7 @@ import { Team } from "./types";
 import type { EntityType } from "./types";
 import { SHIP_TURN_SPEED } from "./constants";
 import { approachAngle } from "./utils";
-import { drawHealthBar } from "./healthBar";
+import { drawEnemyHealthBar } from "./healthBar";
 
 const SHIP_DEATH_ANIMATION_SPEED = 0.6;
 const ENEMY_CONTAINER_SCALE = 2.25;
@@ -15,9 +15,6 @@ const WARP_FRAME_SIZE = 64;
 const WARP_SIZE_MULTIPLIER = 1.5;
 const DEATH_EXPLOSION_FRAME_SIZE = 64;
 const DEATH_EXPLOSION_SIZE_MULTIPLIER = 5;
-const ENEMY_HEALTH_BAR_WIDTH = 48;
-const ENEMY_HEALTH_BAR_HEIGHT = 6;
-const ENEMY_HEALTH_BAR_OFFSET = -34;
 
 export class EnemyManager {
   readonly layer: Container;
@@ -69,11 +66,7 @@ export class EnemyManager {
       this.layer.addChild(g);
       this.healthBarGraphics.set(entity.id, g);
     }
-    drawHealthBar(g, entity, {
-      width: ENEMY_HEALTH_BAR_WIDTH,
-      height: ENEMY_HEALTH_BAR_HEIGHT,
-      offset: ENEMY_HEALTH_BAR_OFFSET
-    });
+    drawEnemyHealthBar(g, entity);
   }
 
   private tickDeathAnimations(): void {
