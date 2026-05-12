@@ -16,21 +16,26 @@ export function drawHealthBar(
   g: Graphics,
   entity: EntityState
 ): void {
-  g.clear();
-  g.x = entity.x;
-  g.y = entity.y;
-
-  const ratio = Math.max(0, entity.health / entity.maxHealth);
-  drawStandardHealthBar(g, ratio, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT, HEALTH_BAR_OFFSET);
+  drawHealthBarWithStyle(g, entity, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT, HEALTH_BAR_OFFSET);
 }
 
 export function drawEnemyHealthBar(g: Graphics, entity: EntityState): void {
+  drawHealthBarWithStyle(g, entity, ENEMY_HEALTH_BAR_WIDTH, ENEMY_HEALTH_BAR_HEIGHT, ENEMY_HEALTH_BAR_OFFSET);
+}
+
+function drawHealthBarWithStyle(
+  g: Graphics,
+  entity: EntityState,
+  width: number,
+  height: number,
+  offset: number
+): void {
   g.clear();
   g.x = entity.x;
   g.y = entity.y;
 
   const ratio = Math.max(0, entity.health / entity.maxHealth);
-  drawStandardHealthBar(g, ratio, ENEMY_HEALTH_BAR_WIDTH, ENEMY_HEALTH_BAR_HEIGHT, ENEMY_HEALTH_BAR_OFFSET);
+  drawStandardHealthBar(g, ratio, width, height, offset);
 }
 
 function drawStandardHealthBar(
