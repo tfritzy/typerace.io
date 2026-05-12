@@ -5,10 +5,10 @@ const BEAM_DURATION = 0.35;
 const GLOW_BLUR_STRENGTH = 4;
 const GLOW_BLUR_QUALITY = 4;
 
-const GLOW_STROKE_OUTER = { width: 0, color: 0, alpha: 0 };
-const GLOW_STROKE_INNER = { width: 0, color: 0, alpha: 0 };
-const CORE_STROKE_MAIN = { width: 0, color: 0, alpha: 0 };
-const CORE_STROKE_HIGHLIGHT = { width: 0, color: 0xffffff, alpha: 0 };
+const _glowStrokeOuter = { width: 0, color: 0, alpha: 0 };
+const _glowStrokeInner = { width: 0, color: 0, alpha: 0 };
+const _coreStrokeMain = { width: 0, color: 0, alpha: 0 };
+const _coreStrokeHighlight = { width: 0, color: 0xffffff, alpha: 0 };
 
 export class LaserBeamManager {
   readonly layer: Container;
@@ -51,33 +51,33 @@ export class LaserBeamManager {
       const age = state.time.time - beam.time;
       const alpha = Math.max(0, 1 - age / BEAM_DURATION);
 
-      GLOW_STROKE_OUTER.width = beam.width * 3;
-      GLOW_STROKE_OUTER.color = beam.color;
-      GLOW_STROKE_OUTER.alpha = alpha * 0.4;
-      GLOW_STROKE_INNER.width = beam.width * 1.5;
-      GLOW_STROKE_INNER.color = beam.color;
-      GLOW_STROKE_INNER.alpha = alpha * 0.6;
-      CORE_STROKE_MAIN.width = beam.width * 1.25;
-      CORE_STROKE_MAIN.color = beam.color;
-      CORE_STROKE_MAIN.alpha = alpha;
-      CORE_STROKE_HIGHLIGHT.width = Math.max(0.5, beam.width * 0.4);
-      CORE_STROKE_HIGHLIGHT.alpha = alpha;
+      _glowStrokeOuter.width = beam.width * 3;
+      _glowStrokeOuter.color = beam.color;
+      _glowStrokeOuter.alpha = alpha * 0.4;
+      _glowStrokeInner.width = beam.width * 1.5;
+      _glowStrokeInner.color = beam.color;
+      _glowStrokeInner.alpha = alpha * 0.6;
+      _coreStrokeMain.width = beam.width * 1.25;
+      _coreStrokeMain.color = beam.color;
+      _coreStrokeMain.alpha = alpha;
+      _coreStrokeHighlight.width = Math.max(0.5, beam.width * 0.4);
+      _coreStrokeHighlight.alpha = alpha;
 
       glow.clear();
       glow.moveTo(beam.x1, beam.y1);
       glow.lineTo(beam.x2, beam.y2);
-      glow.stroke(GLOW_STROKE_OUTER);
+      glow.stroke(_glowStrokeOuter);
       glow.moveTo(beam.x1, beam.y1);
       glow.lineTo(beam.x2, beam.y2);
-      glow.stroke(GLOW_STROKE_INNER);
+      glow.stroke(_glowStrokeInner);
 
       core.clear();
       core.moveTo(beam.x1, beam.y1);
       core.lineTo(beam.x2, beam.y2);
-      core.stroke(CORE_STROKE_MAIN);
+      core.stroke(_coreStrokeMain);
       core.moveTo(beam.x1, beam.y1);
       core.lineTo(beam.x2, beam.y2);
-      core.stroke(CORE_STROKE_HIGHLIGHT);
+      core.stroke(_coreStrokeHighlight);
     }
 
     for (const [id, g] of this.glowObjects) {
