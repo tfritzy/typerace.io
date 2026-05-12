@@ -18,7 +18,7 @@ function generatePhrase(wordCount: number): string {
 }
 
 const CHAR_COUNT = 17;
-const PHRASE_X_OFFSET_PX = 44;
+const PHRASE_X_OFFSET_PX = 60;
 const HOTKEYS = new Set(["1", "2", "3"]);
 
 export const PhraseOverlay = ({
