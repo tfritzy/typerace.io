@@ -33,6 +33,7 @@ export class DamageNumberManager {
   }
 
   private spawn(data: DamageData): void {
+    if (Math.round(data.amount) === 0) return;
     const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI;
     const dx = Math.cos(angle) * FLY_DISTANCE;
     const dy = Math.sin(angle) * FLY_DISTANCE;
