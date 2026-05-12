@@ -213,6 +213,7 @@ export const PhraseOverlay = ({
   }, [phrase, typed, checkpoint]);
 
   const offset = CHAR_COUNT - typed.length;
+  const phraseWidth = `${CHAR_COUNT * 2}ch`;
 
   return (
     <div className="w-full h-full relative" style={{ pointerEvents: "none" }}>
@@ -234,7 +235,7 @@ export const PhraseOverlay = ({
         }}
       />
       <div
-        className="absolute top-1/2 left-1/2"
+        className="absolute top-1/2 left-1/2 relative"
         style={{
           transform: `translate(calc(-50% + ${PHRASE_X_OFFSET_PX}px), -50%)`,
           pointerEvents: "auto",
@@ -243,50 +244,48 @@ export const PhraseOverlay = ({
         }}
         onClick={() => inputRef.current?.focus()}
       >
-        <div className="relative">
+        <div
+          className="absolute left-1/2 top-full -translate-x-1/2"
+          style={{
+            width: phraseWidth,
+            height: "3.5rem",
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.46), rgba(0,0,0,0))",
+            filter: "blur(6px)",
+            opacity: 0.75,
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          className="text-3xl font-mono whitespace-pre relative"
+          style={{
+            width: phraseWidth,
+            overflowX: "hidden",
+            maskImage:
+              "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
+          }}
+        >
           <div
-            className="absolute left-1/2 top-full -translate-x-1/2"
             style={{
-              width: `${CHAR_COUNT * 2}ch`,
-              height: "3.5rem",
-              background: "linear-gradient(to bottom, rgba(0,0,0,0.46), rgba(0,0,0,0))",
-              filter: "blur(6px)",
-              opacity: 0.75,
-              pointerEvents: "none",
-            }}
-          />
-          <div
-            className="text-3xl font-mono whitespace-pre relative"
-            style={{
-              width: `${CHAR_COUNT * 2}ch`,
-              overflowX: "hidden",
-              maskImage:
-                "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
-              WebkitMaskImage:
-                "linear-gradient(to right, transparent, black 15%, black 85%, transparent)",
+              transform: `translateX(${offset}ch)`,
+              transition: skipTransition.current
+                ? "none"
+                : "transform 80ms ease-out",
+              whiteSpace: "pre",
+              textShadow:
+                "0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)",
             }}
           >
-            <div
-              style={{
-                transform: `translateX(${offset}ch)`,
-                transition: skipTransition.current
-                  ? "none"
-                  : "transform 80ms ease-out",
-                whiteSpace: "pre",
-                textShadow:
-                  "0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)",
-              }}
-            >
-              {chars}
-            </div>
-            <div
-              className="absolute left-1/2 top-0 h-[2.25rem] -translate-x-px"
-              style={{
-                borderLeft: "1px solid rgba(255,255,255,0.7)",
-                filter: "drop-shadow(0 0 2px rgba(0,0,0,0.8))",
-              }}
-            />
+            {chars}
           </div>
+          <div
+            className="absolute left-1/2 top-0 h-[2.25rem] -translate-x-px"
+            style={{
+              borderLeft: "1px solid rgba(255,255,255,0.7)",
+              filter: "drop-shadow(0 0 2px rgba(0,0,0,0.8))",
+            }}
+          />
         </div>
       </div>
       <div
