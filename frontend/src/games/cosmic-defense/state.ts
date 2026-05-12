@@ -298,6 +298,15 @@ export function createGameState(): GameState {
   return state;
 }
 
+export function pickRandomUnownedRelic(
+  unownedRelics: Array<{ id: RelicId }>,
+  randomFn: () => number = Math.random
+): RelicId | null {
+  if (unownedRelics.length === 0) return null;
+  const relicIndex = Math.floor(randomFn() * unownedRelics.length);
+  return unownedRelics[relicIndex].id;
+}
+
 function addEntity(state: GameState, entity: EntityState): void {
   state.entities.push(entity);
   state.entityById.set(entity.id, entity);
@@ -693,9 +702,8 @@ function dealDamageToEntity(
       if (target.isBoss) {
         state.onBossDefeated.emit({ id: target.id });
         const unowned = RELIC_CATALOG.filter((r) => !state.relics.includes(r.id));
-        if (unowned.length > 0) {
-          const relicIndex = (state.spawner.currentWave - 1) % unowned.length;
-          const relicId = unowned[relicIndex].id;
+        const relicId = pickRandomUnownedRelic(unowned);
+        if (relicId) {
           state.onRelicDropped.emit({ relicId, x: target.x, y: target.y });
         }
       }

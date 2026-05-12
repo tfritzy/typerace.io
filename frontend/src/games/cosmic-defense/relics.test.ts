@@ -10,10 +10,11 @@ import {
   spawnAlliedEntity,
   PLANET_X,
   PLANET_Y,
+  pickRandomUnownedRelic,
   type GameState,
   type EntityState,
 } from './state';
-import { computeRelicEffects, type RelicId } from './relics';
+import { computeRelicEffects, RELIC_CATALOG, type RelicId } from './relics';
 import { Team, ColorPreset, FireMode } from './types';
 import { ENEMY_CATALOG, FRIENDLY_CATALOG } from './enemyConfig';
 
@@ -435,5 +436,16 @@ describe('plasma_feedback', () => {
     unpauseGame(state);
     updateState(state, 0.1);
     expect(200 - burning.health).toBe(13);
+  });
+});
+
+describe('pickRandomUnownedRelic', () => {
+  it('returns null when no relics are available', () => {
+    expect(pickRandomUnownedRelic([])).toBeNull();
+  });
+
+  it('selects a random relic based on Math.random', () => {
+    const unowned = RELIC_CATALOG.slice(0, 3);
+    expect(pickRandomUnownedRelic(unowned, () => 0.95)).toBe(unowned[2].id);
   });
 });
