@@ -66,7 +66,83 @@ export const ShipCard = ({
           "0 20px 44px -18px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)";
       }}
     >
-      <div className="relative flex items-center justify-between px-3 pt-2.5 pb-1.5">
+      <div
+        className="flex items-center justify-between px-3 pt-2.5"
+        style={{
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          fontFamily: "system-ui, sans-serif",
+        }}
+      >
+        <span
+          style={{
+            color: isUpgrade ? "#fbbf24" : "#86efac",
+          }}
+        >
+          {isUpgrade ? "Upgrade" : "New Ship"}
+        </span>
+        <span
+          style={{
+            color: "#94a3b8",
+            fontFamily: "ui-monospace, SFMono-Regular, monospace",
+            letterSpacing: 0,
+            display: "inline-flex",
+            alignItems: "center",
+          }}
+        >
+          {isUpgrade ? (
+            <>
+              Lv {currentLevel}
+              <ChevronRight
+                size={9}
+                strokeWidth={2.5}
+                style={{ color: "#64748b", margin: "0 1px" }}
+              />
+              {currentLevel + 1}
+            </>
+          ) : (
+            "Lv 1"
+          )}
+        </span>
+      </div>
+
+      <div
+        className="relative mx-2 mt-2 rounded-md overflow-hidden flex items-center justify-center"
+        style={{
+          height: 100,
+          background: `radial-gradient(ellipse at 50% 50%, ${accent}1a 0%, ${accent}08 40%, rgba(0,0,0,0.55) 85%)`,
+          border: "1px solid rgba(255,255,255,0.06)",
+          boxShadow:
+            `inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 12px -10px ${accent}33`,
+        }}
+      >
+        {preview && (
+          <img
+            src={preview}
+            alt={entityType}
+            style={{
+              width: 64,
+              height: 64,
+              objectFit: "contain",
+              imageRendering: "pixelated",
+              filter: `drop-shadow(0 3px 6px rgba(0,0,0,0.55)) drop-shadow(0 0 3px ${accent}55)`,
+            }}
+          />
+        )}
+      </div>
+
+      <div
+        className="relative z-10 flex items-center justify-between mx-[3px] -mt-1 px-2 py-1.5 rounded-md"
+        style={{
+          border: "1px solid rgba(255,255,255,0.12)",
+          background:
+            "linear-gradient(160deg, rgba(22,23,49,0.9) 0%, rgba(10,12,28,0.9) 100%)",
+          boxShadow:
+            "inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.35), 0 6px 12px -8px rgba(0,0,0,0.8)",
+        }}
+      >
         <span
           className="font-bold tracking-wide truncate"
           style={{
@@ -120,73 +196,6 @@ export const ShipCard = ({
             ))
           )}
         </div>
-      </div>
-
-      <div
-        className="relative mx-2 mt-1 rounded-md overflow-hidden flex items-center justify-center"
-        style={{
-          height: 100,
-          background: `radial-gradient(ellipse at 50% 50%, ${accent}1a 0%, ${accent}08 40%, rgba(0,0,0,0.55) 85%)`,
-          border: "1px solid rgba(255,255,255,0.06)",
-          boxShadow:
-            `inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 12px -10px ${accent}33`,
-        }}
-      >
-        {preview && (
-          <img
-            src={preview}
-            alt={entityType}
-            style={{
-              width: 64,
-              height: 64,
-              objectFit: "contain",
-              imageRendering: "pixelated",
-              filter: `drop-shadow(0 3px 6px rgba(0,0,0,0.55)) drop-shadow(0 0 3px ${accent}55)`,
-            }}
-          />
-        )}
-      </div>
-
-      <div
-        className="flex items-center justify-between px-3 pt-2.5"
-        style={{
-          fontSize: 9,
-          fontWeight: 700,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          fontFamily: "system-ui, sans-serif",
-        }}
-      >
-        <span
-          style={{
-            color: isUpgrade ? "#fbbf24" : "#86efac",
-          }}
-        >
-          {isUpgrade ? "Upgrade" : "New Ship"}
-        </span>
-        <span
-          style={{
-            color: "#94a3b8",
-            fontFamily: "ui-monospace, SFMono-Regular, monospace",
-            letterSpacing: 0,
-            display: "inline-flex",
-            alignItems: "center",
-          }}
-        >
-          {isUpgrade ? (
-            <>
-              Lv {currentLevel}
-              <ChevronRight
-                size={9}
-                strokeWidth={2.5}
-                style={{ color: "#64748b", margin: "0 1px" }}
-              />
-              {currentLevel + 1}
-            </>
-          ) : (
-            "Lv 1"
-          )}
-        </span>
       </div>
 
       <div
