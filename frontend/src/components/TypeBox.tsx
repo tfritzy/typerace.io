@@ -149,7 +149,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
 
         const reachedLimit =
-          firstErrorPos !== null && newValue.length - firstErrorPos - 1 >= 10;
+          firstErrorPos !== null && newValue.length - firstErrorPos - 1 >= 14;
         setHasReachedErrorLimit(reachedLimit);
         setInput(newValue);
 
@@ -315,7 +315,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       >
         {hasReachedErrorLimit && (
           <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-destructive">
-            Too many errors — backspace to fix
+            You must fix all errors to finish
           </div>
         )}
         <div className="relative select-none flex-1">
