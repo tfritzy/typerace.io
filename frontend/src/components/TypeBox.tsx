@@ -6,6 +6,7 @@ import React, {
   forwardRef,
 } from "react";
 import { Cursor } from "./Cursor";
+import { getTranslations } from "../utils/translations";
 
 type TypeBoxProps = {
   phrase: string;
@@ -315,7 +316,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       >
         {hasReachedErrorLimit && (
           <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-destructive">
-            Too many errors — backspace to fix
+            {getTranslations().tooManyErrors}
           </div>
         )}
         <div className="relative select-none flex-1">
