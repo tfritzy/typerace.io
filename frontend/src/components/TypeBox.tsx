@@ -315,7 +315,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       >
         {hasReachedErrorLimit && (
           <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-destructive">
-            You must fix all errors to finish
+            Too many errors — backspace to fix
           </div>
         )}
         <div className="relative select-none flex-1">
