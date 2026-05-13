@@ -13,7 +13,7 @@ type TypeBoxProps = {
   onComplete?: () => void;
   onProgress?: (
     correctCharCount: number,
-    eventType: "Correct" | "Incorrect" | "Backspace"
+    eventType: "Correct" | "Incorrect" | "Backspace",
   ) => void;
   onWordComplete?: (wordXp: number, position: { x: number; y: number }) => void;
   className?: string;
@@ -43,7 +43,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       initialProgress = 0,
       hideCursor = false,
     },
-    ref
+    ref,
   ) => {
     const [focused, setFocused] = useState(true);
     const [input, setInput] = useState(phrase.substring(0, initialProgress));
@@ -223,7 +223,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         input,
         resetOnComplete,
         disabled,
-      ]
+      ],
     );
 
     const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -262,13 +262,13 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         const isInCurrentWord =
           i >= lastCompletedWordEnd && i < input.length && isCorrect;
 
-        let colorClass = 'text-text-untyped';
+        let colorClass = "text-text-untyped";
         if (isTyped && !isCorrect) {
-          colorClass = 'text-destructive';
+          colorClass = "text-destructive";
         } else if (isInCompletedWord) {
-          colorClass = 'text-text-completed';
+          colorClass = "text-text-completed";
         } else if (isInCurrentWord) {
-          colorClass = 'text-foreground';
+          colorClass = "text-foreground";
         }
 
         const isError = isTyped && !isCorrect;
@@ -300,7 +300,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         <div className="relative select-none flex-1">
           <div className="type-box">
             <div
-              className="whitespace-pre-wrap text-start text-[32px] font-light tracking-wide leading-14"
+              className="whitespace-pre-wrap text-start text-[26px] font-mono"
               ref={phraseRef}
             >
               {renderText()}
@@ -337,5 +337,5 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         </div>
       </div>
     );
-  }
+  },
 );
