@@ -54,7 +54,7 @@ export interface EntityState {
   damageDealt: number;
   targetingMode: TargetingMode;
   level: number;
-  freezeStacks: number;
+  chillDurationSeconds: number;
   chainCount: number;
   buffMultiplier: number;
   buffedNextAttack: boolean;
@@ -298,6 +298,15 @@ export function createGameState(): GameState {
   return state;
 }
 
+export function pickRandomUnownedRelic(
+  unownedRelics: Array<{ id: RelicId }>,
+  randomFn: () => number = Math.random
+): RelicId | null {
+  if (unownedRelics.length === 0) return null;
+  const relicIndex = Math.floor(randomFn() * unownedRelics.length);
+  return unownedRelics[relicIndex].id;
+}
+
 function addEntity(state: GameState, entity: EntityState): void {
   state.entities.push(entity);
   state.entityById.set(entity.id, entity);
@@ -350,7 +359,7 @@ function makeBaseEntity(
     damageDealt: 0,
     targetingMode: TargetingMode.NearestToPlanet,
     level: 0,
-    freezeStacks: 0,
+    chillDurationSeconds: 0,
     chainCount: 0,
     buffMultiplier: 0,
     buffedNextAttack: false,
@@ -433,7 +442,7 @@ export function spawnAlliedEntity(
   entity.plasmaStacksApplied = scaled.plasmaStacks;
   entity.laserDamage = scaled.laserDamage;
   entity.level = level;
-  entity.freezeStacks = scaled.freezeStacks;
+  entity.chillDurationSeconds = scaled.chillDurationSeconds;
   entity.chainCount = scaled.chainCount;
   entity.buffMultiplier = scaled.buffMultiplier;
   entity.fireCount = config.fireCount;
@@ -596,14 +605,14 @@ function findNearestChainTarget(state: GameState, x: number, y: number, excluded
   return nearest;
 }
 
-function applyFreezeStacks(state: GameState, target: EntityState, stacks: number): void {
-  if (stacks <= 0) return;
-  target.freezeStacks += stacks;
+function applyChillDuration(state: GameState, target: EntityState, durationSeconds: number): void {
+  if (durationSeconds <= 0) return;
+  target.chillDurationSeconds += durationSeconds;
   if (state.relicEffects.frostNovaDamage > 0) {
     dealDamageToEntity(state, null, target, state.relicEffects.frostNovaDamage);
   }
-  if (state.relicEffects.plasmaOnFreezeApply > 0) {
-    target.plasmaStacks += state.relicEffects.plasmaOnFreezeApply;
+  if (state.relicEffects.plasmaOnChillApply > 0) {
+    target.plasmaStacks += state.relicEffects.plasmaOnChillApply;
   }
 }
 
@@ -618,8 +627,8 @@ function dealDamageToEntity(
   if (attacker?.team === Team.Allied && target.team === Team.Enemy) {
     const streakMultiplier = Math.min(1.25, 1 + state.perfectWordStreak * state.relicEffects.streakDamageBonus);
     effectiveDamage = Math.round(effectiveDamage * state.relicEffects.damageMultiplier * streakMultiplier);
-    if (state.relicEffects.frozenDamageMultiplier > 1 && target.freezeStacks > 0) {
-      effectiveDamage = Math.round(effectiveDamage * state.relicEffects.frozenDamageMultiplier);
+    if (state.relicEffects.chilledDamageMultiplier > 1 && target.chillDurationSeconds > 0) {
+      effectiveDamage = Math.round(effectiveDamage * state.relicEffects.chilledDamageMultiplier);
     }
     if (state.relicEffects.firstStrikeDamageBonus > 0 && target.health === target.maxHealth) {
       effectiveDamage = Math.round(effectiveDamage * (1 + state.relicEffects.firstStrikeDamageBonus));
@@ -627,7 +636,7 @@ function dealDamageToEntity(
     if (state.relicEffects.plasmaDamageBonusPerStack > 0 && target.plasmaStacks > 0) {
       effectiveDamage = Math.round(effectiveDamage * (1 + target.plasmaStacks * state.relicEffects.plasmaDamageBonusPerStack));
     }
-    if (state.relicEffects.freezeStacksBonus > 0 && attacker.freezeStacks > 0) applyFreezeStacks(state, target, state.relicEffects.freezeStacksBonus);
+    if (state.relicEffects.chillDurationBonusSeconds > 0 && attacker.chillDurationSeconds > 0) applyChillDuration(state, target, state.relicEffects.chillDurationBonusSeconds);
     if (state.relicEffects.plasmaStacksBonus > 0 && attacker.plasmaStacksApplied > 0) target.plasmaStacks += state.relicEffects.plasmaStacksBonus;
     if (state.relicEffects.physicalAgainstPlasmaStacks > 0 && attacker.damageType === DamageType.Physical && target.plasmaStacks > 0) {
       target.plasmaStacks += state.relicEffects.physicalAgainstPlasmaStacks;
@@ -657,16 +666,16 @@ function dealDamageToEntity(
       if (attacker && attacker.team === Team.Allied && state.relicEffects.chargesPerKill > 0) {
         grantCharge(state, attacker, state.relicEffects.chargesPerKill);
       }
-      if (state.relicEffects.chargesOnFrozenKill > 0 && target.freezeStacks > 0) {
+      if (state.relicEffects.chargesOnChilledKill > 0 && target.chillDurationSeconds > 0) {
         for (const e of state.entities) {
-          if (e.team === Team.Allied) grantCharge(state, e, state.relicEffects.chargesOnFrozenKill);
+          if (e.team === Team.Allied) grantCharge(state, e, state.relicEffects.chargesOnChilledKill);
         }
       }
       if (state.relicEffects.deathNovaPlasmaStacks > 0) {
         applyDeathExplosion(state, target, (other) => { other.plasmaStacks += state.relicEffects.deathNovaPlasmaStacks; });
       }
-      if (state.relicEffects.frostChainFreezeStacks > 0 && target.freezeStacks > 0) {
-        applyDeathExplosion(state, target, (other) => { other.freezeStacks += state.relicEffects.frostChainFreezeStacks; });
+      if (state.relicEffects.frostChainChillDurationSeconds > 0 && target.chillDurationSeconds > 0) {
+        applyDeathExplosion(state, target, (other) => { other.chillDurationSeconds += state.relicEffects.frostChainChillDurationSeconds; });
       }
       if (state.relicEffects.plasmaDeathSpread > 0 && target.plasmaStacks > 0) {
         applyDeathExplosion(state, target, (other) => { other.plasmaStacks += state.relicEffects.plasmaDeathSpread; });
@@ -675,9 +684,9 @@ function dealDamageToEntity(
         const nearest = findNearestEnemy(state, target);
         if (nearest) nearest.plasmaStacks += target.plasmaStacks;
       }
-      if (state.relicEffects.freezeKillSpread > 0 && target.freezeStacks > 0) {
-        const nearest = findNearestEnemy(state, target, (e) => e.freezeStacks === 0);
-        if (nearest) nearest.freezeStacks += state.relicEffects.freezeKillSpread;
+      if (state.relicEffects.chillKillSpreadDurationSeconds > 0 && target.chillDurationSeconds > 0) {
+        const nearest = findNearestEnemy(state, target, (e) => e.chillDurationSeconds === 0);
+        if (nearest) nearest.chillDurationSeconds += state.relicEffects.chillKillSpreadDurationSeconds;
       }
       const xpAmount = target.xpReward;
       state.score += xpAmount * SCORE_PER_XP;
@@ -693,9 +702,8 @@ function dealDamageToEntity(
       if (target.isBoss) {
         state.onBossDefeated.emit({ id: target.id });
         const unowned = RELIC_CATALOG.filter((r) => !state.relics.includes(r.id));
-        if (unowned.length > 0) {
-          const relicIndex = (state.spawner.currentWave - 1) % unowned.length;
-          const relicId = unowned[relicIndex].id;
+        const relicId = pickRandomUnownedRelic(unowned);
+        if (relicId) {
           state.onRelicDropped.emit({ relicId, x: target.x, y: target.y });
         }
       }
@@ -740,8 +748,8 @@ function performInstantHit(
           grantCharge(state, e, state.relicEffects.chargesOnPlanetDamage);
         }
       }
-      if (state.relicEffects.planetFreezeOnHit > 0) {
-        applyFreezeStacks(state, shooter, state.relicEffects.planetFreezeOnHit);
+      if (state.relicEffects.planetChillOnHitSeconds > 0) {
+        applyChillDuration(state, shooter, state.relicEffects.planetChillOnHitSeconds);
       }
     }
     state.onPlanetDamaged.emit();
@@ -781,8 +789,8 @@ function tickPerSecond(state: GameState, dt: number): void {
     const e = state.entities[i];
     if (e.team !== Team.Enemy) continue;
 
-    if (e.freezeStacks > 0) {
-      e.freezeStacks = Math.max(0, e.freezeStacks - 1);
+    if (e.chillDurationSeconds > 0) {
+      e.chillDurationSeconds = Math.max(0, e.chillDurationSeconds - 1);
     }
   }
 }
@@ -791,7 +799,7 @@ function tickEntities(state: GameState, dt: number): void {
   const enemySpeedMultiplier = state.relicEffects.enemySpeedMultiplier;
 
   for (const e of state.entities) {
-    const isFrozen = e.team === Team.Enemy && e.freezeStacks > 0;
+    const isChilled = e.team === Team.Enemy && e.chillDurationSeconds > 0;
     const target = findNearestTarget(state, e);
     let inRange = false;
 
@@ -805,7 +813,7 @@ function tickEntities(state: GameState, dt: number): void {
         if (e.speed > 0) { e.vx = 0; e.vy = 0; }
         e.rotation = Math.atan2(dy, dx);
 
-        if (e.chargesRequired <= 0 && !isFrozen) {
+        if (e.chargesRequired <= 0) {
           e.fireTimer -= dt / state.relicEffects.enemyFireSlowMultiplier;
           if (e.fireTimer <= 0) {
             e.fireTimer += e.fireRate;
@@ -815,9 +823,10 @@ function tickEntities(state: GameState, dt: number): void {
       }
     }
 
-    if (!inRange && e.speed > 0 && !isFrozen) {
+    if (!inRange && e.speed > 0) {
       const plasmaPenalty = state.relicEffects.plasmaSlow > 0 && e.plasmaStacks > 0 ? (1 - state.relicEffects.plasmaSlow) : 1;
-      const effectiveSpeed = e.team === Team.Enemy ? e.speed * enemySpeedMultiplier * plasmaPenalty : e.speed;
+      const chillPenalty = isChilled ? 0.5 : 1;
+      const effectiveSpeed = e.team === Team.Enemy ? e.speed * enemySpeedMultiplier * plasmaPenalty * chillPenalty : e.speed;
       e.vx = -effectiveSpeed;
       e.vy = 0;
       e.x += e.vx * dt;
@@ -889,7 +898,7 @@ function executeProjectileShot(state: GameState, shooter: EntityState, targetX: 
 
 function applyHitEffects(state: GameState, shooter: EntityState, target: EntityState, dmg: number): void {
   if (shooter.plasmaStacksApplied > 0) target.plasmaStacks += shooter.plasmaStacksApplied;
-  if (shooter.freezeStacks > 0) applyFreezeStacks(state, target, shooter.freezeStacks);
+  if (shooter.chillDurationSeconds > 0) applyChillDuration(state, target, shooter.chillDurationSeconds);
   dealDamageToEntity(state, shooter, target, dmg);
 }
 
@@ -1165,13 +1174,13 @@ export function onPerfectWord(state: GameState): void {
       }
     }
   }
-  if (state.relicEffects.blizzardFreezeInterval > 0 && state.relicEffects.blizzardFreezeStacks > 0 &&
-      state.perfectWordStreak % state.relicEffects.blizzardFreezeInterval === 0) {
+  if (state.relicEffects.blizzardChillInterval > 0 && state.relicEffects.blizzardChillDurationSeconds > 0 &&
+      state.perfectWordStreak % state.relicEffects.blizzardChillInterval === 0) {
     for (const e of state.entities) {
-      if (e.team === Team.Enemy) e.freezeStacks += state.relicEffects.blizzardFreezeStacks;
+      if (e.team === Team.Enemy) e.chillDurationSeconds += state.relicEffects.blizzardChillDurationSeconds;
     }
   }
-  if (state.relicEffects.freezeOnPerfectWord > 0) {
+  if (state.relicEffects.chillOnPerfectWordSeconds > 0) {
     let nearest: EntityState | null = null;
     let nearestDistSq = Infinity;
     for (const e of state.entities) {
@@ -1179,7 +1188,7 @@ export function onPerfectWord(state: GameState): void {
       const distSq = e.x * e.x + e.y * e.y;
       if (distSq < nearestDistSq) { nearestDistSq = distSq; nearest = e; }
     }
-    if (nearest) applyFreezeStacks(state, nearest, state.relicEffects.freezeOnPerfectWord);
+    if (nearest) applyChillDuration(state, nearest, state.relicEffects.chillOnPerfectWordSeconds);
   }
 }
 
@@ -1301,7 +1310,7 @@ export function levelUpEntity(state: GameState, entityId: number, config: Friend
   entity.projectileDamage = scaled.projectileDamage;
   entity.laserDamage = scaled.laserDamage;
   entity.chainCount = scaled.chainCount;
-  entity.freezeStacks = scaled.freezeStacks;
+  entity.chillDurationSeconds = scaled.chillDurationSeconds;
   entity.buffMultiplier = scaled.buffMultiplier;
   entity.explosionRadius = scaled.explosionRadius;
 }

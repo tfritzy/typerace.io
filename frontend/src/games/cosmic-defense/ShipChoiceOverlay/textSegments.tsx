@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react";
 
 export const KEYWORD_COLOR = {
   plasma: "#d65c9f",
-  freeze: "#7dd3fc",
+  chill: "#7dd3fc",
   chain: "#86efac",
   number: "#fbbf24",
 } as const;

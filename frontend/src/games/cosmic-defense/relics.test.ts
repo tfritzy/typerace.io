@@ -10,10 +10,11 @@ import {
   spawnAlliedEntity,
   PLANET_X,
   PLANET_Y,
+  pickRandomUnownedRelic,
   type GameState,
   type EntityState,
 } from './state';
-import { computeRelicEffects, type RelicId } from './relics';
+import { computeRelicEffects, RELIC_CATALOG, type RelicId } from './relics';
 import { Team, ColorPreset, FireMode } from './types';
 import { ENEMY_CATALOG, FRIENDLY_CATALOG } from './enemyConfig';
 
@@ -66,14 +67,14 @@ describe('stellar_core', () => {
 });
 
 describe('glacial_emitter', () => {
-  it('applies an extra freeze stack when an ice ship attacks', () => {
+  it('applies an extra second of chill duration when an ice ship attacks', () => {
     const state = makeState(['glacial_emitter']);
-    makeAlly(state, { laserDamage: 5, freezeStacks: 2, chargesRequired: 1, projectileDamage: 0, fireMode: FireMode.Laser });
+    makeAlly(state, { laserDamage: 5, chillDurationSeconds: 2, chargesRequired: 1, projectileDamage: 0, fireMode: FireMode.Laser });
     const enemy = makeEnemy(state, { health: 100 });
     onCorrectKeystroke(state);
     unpauseGame(state);
     updateState(state, 0.1);
-    expect(enemy.freezeStacks).toBe(3);
+    expect(enemy.chillDurationSeconds).toBe(3);
   });
 });
 
@@ -181,17 +182,27 @@ describe('surge_protocol', () => {
 });
 
 describe('cryo_surge', () => {
-  it('freezes nearest enemy on perfect word', () => {
+  it('chills nearest enemy on perfect word', () => {
     const state = makeState(['cryo_surge']);
     const enemy = makeEnemy(state);
-    expect(enemy.freezeStacks).toBe(0);
+    expect(enemy.chillDurationSeconds).toBe(0);
     onPerfectWord(state);
-    expect(enemy.freezeStacks).toBe(2);
+    expect(enemy.chillDurationSeconds).toBe(2);
+  });
+
+  it('reduces chilled enemy movement speed by half', () => {
+    const state = makeState(['cryo_surge']);
+    const enemy = makeEnemy(state, { speed: 100, x: PLANET_X + 1000, y: PLANET_Y, range: 700 });
+    onPerfectWord(state);
+    expect(enemy.chillDurationSeconds).toBeGreaterThan(0);
+    unpauseGame(state);
+    updateState(state, 0.1);
+    expect(Math.abs(enemy.vx)).toBeCloseTo(50, 1);
   });
 });
 
 describe('frost_nova', () => {
-  it('deals damage each time freeze is applied, even if already frozen', () => {
+  it('deals damage each time chill is applied, even if already chilled', () => {
     const state = makeState(['cryo_surge', 'frost_nova']);
     const enemy = makeEnemy(state, { health: 200 });
     onPerfectWord(state);
@@ -202,11 +213,11 @@ describe('frost_nova', () => {
 });
 
 describe('static_discharge', () => {
-  it('applies plasma stacks when enemy is frozen via cryo_surge', () => {
+  it('applies plasma stacks when enemy is chilled via cryo_surge', () => {
     const state = makeState(['cryo_surge', 'static_discharge']);
     const enemy = makeEnemy(state, { plasmaStacks: 0 });
     onPerfectWord(state);
-    expect(enemy.freezeStacks).toBeGreaterThan(0);
+    expect(enemy.chillDurationSeconds).toBeGreaterThan(0);
     expect(enemy.plasmaStacks).toBe(2);
   });
 });
@@ -252,33 +263,33 @@ describe('death_nova', () => {
 });
 
 describe('frost_chain', () => {
-  it('freezes nearby enemies when a frozen enemy is killed by plasma', () => {
+  it('chills nearby enemies when a chilled enemy is killed by plasma', () => {
     const state = makeState(['frost_chain']);
-    const frozen = makeEnemy(state, { health: 1, plasmaStacks: 2, freezeStacks: 3, x: PLANET_X + 100, y: PLANET_Y });
-    const nearby = makeEnemy(state, { health: 200, freezeStacks: 0, x: PLANET_X + 150, y: PLANET_Y });
+    const chilled = makeEnemy(state, { health: 1, plasmaStacks: 2, chillDurationSeconds: 3, x: PLANET_X + 100, y: PLANET_Y });
+    const nearby = makeEnemy(state, { health: 200, chillDurationSeconds: 0, x: PLANET_X + 150, y: PLANET_Y });
     tickSecond(state);
-    expect(nearby.freezeStacks).toBeGreaterThan(0);
-    expect(frozen).toBeTruthy();
+    expect(nearby.chillDurationSeconds).toBeGreaterThan(0);
+    expect(chilled).toBeTruthy();
   });
 });
 
 describe('cryo_recharge', () => {
-  it('grants charges to all allies when a frozen enemy is killed', () => {
+  it('grants charges to all allies when a chilled enemy is killed', () => {
     const state = makeState(['cryo_recharge']);
     const ally = makeAlly(state, { chargesRequired: 5, charge: 0 });
-    makeEnemy(state, { health: 1, plasmaStacks: 2, freezeStacks: 3 });
+    makeEnemy(state, { health: 1, plasmaStacks: 2, chillDurationSeconds: 3 });
     tickSecond(state);
     expect(ally.charge).toBeGreaterThan(0);
   });
 });
 
 describe('permafrost', () => {
-  it('freezes nearest unfrozen enemy when a frozen enemy is killed', () => {
+  it('chills nearest unchilled enemy when a chilled enemy is killed', () => {
     const state = makeState(['permafrost']);
-    makeEnemy(state, { health: 1, plasmaStacks: 2, freezeStacks: 3, x: PLANET_X + 100, y: PLANET_Y });
-    const unfrozen = makeEnemy(state, { health: 200, freezeStacks: 0, x: PLANET_X + 200, y: PLANET_Y });
+    makeEnemy(state, { health: 1, plasmaStacks: 2, chillDurationSeconds: 3, x: PLANET_X + 100, y: PLANET_Y });
+    const unchilled = makeEnemy(state, { health: 200, chillDurationSeconds: 0, x: PLANET_X + 200, y: PLANET_Y });
     tickSecond(state);
-    expect(unfrozen.freezeStacks).toBeGreaterThan(0);
+    expect(unchilled.chillDurationSeconds).toBeGreaterThan(0);
   });
 });
 
@@ -303,14 +314,14 @@ describe('vital_matrix', () => {
 });
 
 describe('cryo_shatter', () => {
-  it('doubles damage to frozen enemies', () => {
+  it('doubles damage to chilled enemies', () => {
     const state = makeState(['cryo_shatter']);
     const ally = makeAlly(state, { projectileDamage: 10, chargesRequired: 1 });
-    const frozenEnemy = makeEnemy(state, { health: 200, freezeStacks: 3 });
+    const chilledEnemy = makeEnemy(state, { health: 200, chillDurationSeconds: 3 });
     onCorrectKeystroke(state);
     unpauseGame(state);
     updateState(state, 0.1);
-    const damageDone = 200 - frozenEnemy.health;
+    const damageDone = 200 - chilledEnemy.health;
     expect(damageDone).toBe(20);
     expect(ally).toBeTruthy();
   });
@@ -355,13 +366,13 @@ describe('chrono_burst', () => {
 });
 
 describe('blizzard', () => {
-  it('freezes all enemies every 10 consecutive perfect words', () => {
+  it('chills all enemies every 10 consecutive perfect words', () => {
     const state = makeState(['blizzard']);
-    const e1 = makeEnemy(state, { freezeStacks: 0 });
-    const e2 = makeEnemy(state, { freezeStacks: 0 });
+    const e1 = makeEnemy(state, { chillDurationSeconds: 0 });
+    const e2 = makeEnemy(state, { chillDurationSeconds: 0 });
     for (let i = 0; i < 10; i++) onPerfectWord(state);
-    expect(e1.freezeStacks).toBe(3);
-    expect(e2.freezeStacks).toBe(3);
+    expect(e1.chillDurationSeconds).toBe(3);
+    expect(e2.chillDurationSeconds).toBe(3);
   });
 });
 
@@ -410,7 +421,7 @@ describe('superheated', () => {
 });
 
 describe('ice_armor', () => {
-  it('freezes attacking enemy when planet takes damage', () => {
+  it('chills attacking enemy when planet takes damage', () => {
     const state = makeState(['ice_armor']);
     const attacker = makeEnemy(state, {
       projectileDamage: 20,
@@ -422,7 +433,7 @@ describe('ice_armor', () => {
     });
     unpauseGame(state);
     updateState(state, 0.1);
-    expect(attacker.freezeStacks).toBeGreaterThan(0);
+    expect(attacker.chillDurationSeconds).toBeGreaterThan(0);
   });
 });
 
@@ -435,5 +446,16 @@ describe('plasma_feedback', () => {
     unpauseGame(state);
     updateState(state, 0.1);
     expect(200 - burning.health).toBe(13);
+  });
+});
+
+describe('pickRandomUnownedRelic', () => {
+  it('returns null when no relics are available', () => {
+    expect(pickRandomUnownedRelic([])).toBeNull();
+  });
+
+  it('selects a random relic based on Math.random', () => {
+    const unowned = RELIC_CATALOG.slice(0, 3);
+    expect(pickRandomUnownedRelic(unowned, () => 0.95)).toBe(unowned[2].id);
   });
 });

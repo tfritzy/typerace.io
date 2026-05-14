@@ -19,4 +19,9 @@ export default defineConfig({
       '@pixi/ticker': path.resolve(__dirname, './src/pixi-compat/ticker.ts'),
     },
   },
+  server: {
+    watch: {
+      ignored: ['**/public/**'],
+    },
+  },
 })

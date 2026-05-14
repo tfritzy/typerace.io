@@ -6,6 +6,7 @@ import React, {
   forwardRef,
 } from "react";
 import { Cursor } from "./Cursor";
+import { getTranslations } from "../utils/translations";
 
 type TypeBoxProps = {
   phrase: string;
@@ -13,7 +14,7 @@ type TypeBoxProps = {
   onComplete?: () => void;
   onProgress?: (
     correctCharCount: number,
-    eventType: "Correct" | "Incorrect" | "Backspace"
+    eventType: "Correct" | "Incorrect" | "Backspace",
   ) => void;
   onWordComplete?: (wordXp: number, position: { x: number; y: number }) => void;
   className?: string;
@@ -43,7 +44,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       initialProgress = 0,
       hideCursor = false,
     },
-    ref
+    ref,
   ) => {
     const [focused, setFocused] = useState(true);
     const [input, setInput] = useState(phrase.substring(0, initialProgress));
@@ -53,6 +54,13 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const targetRef = useRef<HTMLElement>(null);
     const phraseRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
+    const lastProcessedValueRef = useRef<string>(
+      phrase.substring(0, initialProgress),
+    );
+
+    React.useEffect(() => {
+      lastProcessedValueRef.current = phrase.substring(0, initialProgress);
+    }, [phrase, initialProgress]);
 
     React.useEffect(() => {
       if (targetRef.current && focused && !isComplete) {
@@ -90,19 +98,22 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       event.preventDefault();
     }, []);
 
-    const handleChange = useCallback(
-      (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const processValue = useCallback(
+      (newValue: string) => {
         if (disabled) {
           return;
         }
-
-        const newValue = event.target.value;
 
         if (newValue.length > phrase.length) {
           return;
         }
 
-        const oldValue = input;
+        if (lastProcessedValueRef.current === newValue) {
+          return;
+        }
+
+        const oldValue = lastProcessedValueRef.current;
+        lastProcessedValueRef.current = newValue;
 
         if (newValue.length < oldValue.length) {
           let lastCompletedWordEnd = 0;
@@ -117,7 +128,9 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
           if (newValue.length < lastCompletedWordEnd) {
             const correctPrefix = phrase.substring(0, lastCompletedWordEnd);
+            lastProcessedValueRef.current = correctPrefix;
             setInput(correctPrefix);
+            setHasReachedErrorLimit(false);
             return;
           }
         }
@@ -136,17 +149,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           }
         }
 
-        const isAddingChar = newValue.length > oldValue.length;
-        if (isAddingChar && firstErrorPos !== null) {
-          const charsAfterError = newValue.length - firstErrorPos - 1;
-          if (charsAfterError >= 10) {
-            setHasReachedErrorLimit(true);
-            return;
-          }
-        }
-
         const reachedLimit =
-          firstErrorPos !== null && newValue.length - firstErrorPos - 1 >= 10;
+          firstErrorPos !== null && newValue.length - firstErrorPos - 1 >= 14;
         setHasReachedErrorLimit(reachedLimit);
         setInput(newValue);
 
@@ -208,6 +212,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           onComplete();
           if (resetOnComplete) {
             setTimeout(() => {
+              lastProcessedValueRef.current = "";
               setInput("");
               setIsComplete(false);
               setHasReachedErrorLimit(false);
@@ -220,10 +225,27 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         onComplete,
         onProgress,
         onWordComplete,
-        input,
         resetOnComplete,
         disabled,
-      ]
+      ],
+    );
+
+    const handleChange = useCallback(
+      (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const nativeEvent = event.nativeEvent as InputEvent;
+        if (nativeEvent && nativeEvent.isComposing) {
+          return;
+        }
+        processValue(event.target.value);
+      },
+      [processValue],
+    );
+
+    const handleCompositionEnd = useCallback(
+      (event: React.CompositionEvent<HTMLTextAreaElement>) => {
+        processValue(event.currentTarget.value);
+      },
+      [processValue],
     );
 
     const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -262,13 +284,13 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         const isInCurrentWord =
           i >= lastCompletedWordEnd && i < input.length && isCorrect;
 
-        let colorClass = 'text-text-untyped';
+        let colorClass = "text-text-untyped";
         if (isTyped && !isCorrect) {
-          colorClass = 'text-destructive';
+          colorClass = "text-destructive";
         } else if (isInCompletedWord) {
-          colorClass = 'text-text-completed';
+          colorClass = "text-text-completed";
         } else if (isInCurrentWord) {
-          colorClass = 'text-foreground';
+          colorClass = "text-foreground";
         }
 
         const isError = isTyped && !isCorrect;
@@ -294,13 +316,13 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       >
         {hasReachedErrorLimit && (
           <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-destructive">
-            You must fix all errors
+            {getTranslations().tooManyErrors}
           </div>
         )}
         <div className="relative select-none flex-1">
           <div className="type-box">
             <div
-              className="whitespace-pre-wrap text-start text-[32px] font-light tracking-wide leading-14"
+              className="whitespace-pre-wrap text-start text-[26px] font-mono"
               ref={phraseRef}
             >
               {renderText()}
@@ -319,6 +341,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               onChange={handleChange}
               onKeyDown={handleKeyDown}
               onPaste={handlePaste}
+              onCompositionEnd={handleCompositionEnd}
               onFocus={handleFocus}
               onBlur={handleBlur}
               id="type-box"
@@ -337,5 +360,5 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         </div>
       </div>
     );
-  }
+  },
 );
