@@ -17,6 +17,10 @@ const CHARGE_DOT_RADIUS = 2;
 const CHARGE_DOT_SPACING = 7;
 const CHARGE_DOT_OFFSET = 28;
 
+const CHARGE_FILL_ACTIVE = { color: 0x4ade80 };
+const CHARGE_FILL_EMPTY = { color: 0x333333 };
+const CHARGE_STROKE_EMPTY = { color: 0x555555, width: 1 };
+
 export class ShipManager {
   readonly layer: Container;
   private assets: AssetManager;
@@ -76,11 +80,11 @@ export class ShipManager {
 
       if (d < entity.charge) {
         g.circle(offsetX, 0, CHARGE_DOT_RADIUS);
-        g.fill({ color: 0x4ade80 });
+        g.fill(CHARGE_FILL_ACTIVE);
       } else {
         g.circle(offsetX, 0, CHARGE_DOT_RADIUS);
-        g.fill({ color: 0x333333 });
-        g.stroke({ color: 0x555555, width: 1 });
+        g.fill(CHARGE_FILL_EMPTY);
+        g.stroke(CHARGE_STROKE_EMPTY);
       }
     }
   }
