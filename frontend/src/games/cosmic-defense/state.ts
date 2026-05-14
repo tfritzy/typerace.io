@@ -1187,20 +1187,10 @@ export function onPerfectWord(state: GameState): void {
     }
   }
   if (state.relicEffects.perfectWordSplashDamage > 0) {
-    let enemyCount = 0;
-    for (const e of state.entities) {
-      if (e.team === Team.Enemy) enemyCount++;
-    }
-    if (enemyCount > 0) {
-      let pick = Math.floor(Math.random() * enemyCount);
-      for (const e of state.entities) {
-        if (e.team !== Team.Enemy) continue;
-        if (pick === 0) {
-          dealDamageToEntity(state, null, e, state.relicEffects.perfectWordSplashDamage);
-          break;
-        }
-        pick--;
-      }
+    const enemies = state.entities.filter((e) => e.team === Team.Enemy);
+    if (enemies.length > 0) {
+      const target = enemies[Math.floor(Math.random() * enemies.length)];
+      dealDamageToEntity(state, null, target, state.relicEffects.perfectWordSplashDamage);
     }
   }
   if (state.relicEffects.streakMilestoneDamage > 0 && state.perfectWordStreak % STREAK_MILESTONE_INTERVAL === 0) {
