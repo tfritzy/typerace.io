@@ -17,8 +17,8 @@ function generatePhrase(wordCount: number): string {
   return words.join(" ");
 }
 
-const LEFT_VISIBLE_CH = 6;
-const RIGHT_VISIBLE_CH = 16;
+const LEFT_VISIBLE_CH = 10;
+const RIGHT_VISIBLE_CH = 10;
 const VISIBLE_CHAR_COUNT = LEFT_VISIBLE_CH + RIGHT_VISIBLE_CH;
 const PHRASE_RIGHT_MARGIN_PX = 40;
 const HOTKEYS = new Set(["1", "2", "3"]);
