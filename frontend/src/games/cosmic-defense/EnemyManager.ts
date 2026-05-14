@@ -74,7 +74,9 @@ export class EnemyManager {
       const anim = this.deathAnimations[i];
       if (!anim.playing) {
         anim.destroy();
-        this.deathAnimations.splice(i, 1);
+        const last = this.deathAnimations.length - 1;
+        if (i !== last) this.deathAnimations[i] = this.deathAnimations[last];
+        this.deathAnimations.pop();
       }
     }
   }
@@ -118,7 +120,9 @@ export class EnemyManager {
       const anim = this.warpInAnimations[i];
       if (!anim.playing) {
         anim.destroy();
-        this.warpInAnimations.splice(i, 1);
+        const last = this.warpInAnimations.length - 1;
+        if (i !== last) this.warpInAnimations[i] = this.warpInAnimations[last];
+        this.warpInAnimations.pop();
       }
     }
   }

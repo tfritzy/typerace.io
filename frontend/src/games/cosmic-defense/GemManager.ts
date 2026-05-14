@@ -131,7 +131,9 @@ export class GemManager {
       if (gem.elapsed >= GEM_MAX_LIFE) {
         gem.glow.destroy();
         gem.core.destroy();
-        this.active.splice(i, 1);
+        const last = this.active.length - 1;
+        if (i !== last) this.active[i] = this.active[last];
+        this.active.pop();
         continue;
       }
 
@@ -143,7 +145,9 @@ export class GemManager {
         awardXP(state, gem.xpAmount);
         gem.glow.destroy();
         gem.core.destroy();
-        this.active.splice(i, 1);
+        const last = this.active.length - 1;
+        if (i !== last) this.active[i] = this.active[last];
+        this.active.pop();
         continue;
       }
 

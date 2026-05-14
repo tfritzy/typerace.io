@@ -36,7 +36,9 @@ export class ExplosionManager {
       const exp = state.explosions[i];
 
       if (this.completedIds.has(exp.id)) {
-        state.explosions.splice(i, 1);
+        const last = state.explosions.length - 1;
+        if (i !== last) state.explosions[i] = state.explosions[last];
+        state.explosions.pop();
         this.completedIds.delete(exp.id);
         continue;
       }

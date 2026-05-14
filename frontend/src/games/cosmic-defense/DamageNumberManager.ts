@@ -69,7 +69,9 @@ export class DamageNumberManager {
 
       if (t >= 1) {
         n.text.destroy();
-        this.active.splice(i, 1);
+        const last = this.active.length - 1;
+        if (i !== last) this.active[i] = this.active[last];
+        this.active.pop();
         continue;
       }
 
