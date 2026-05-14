@@ -52,7 +52,7 @@ export interface RelicEffects {
   explosionRadiusMultiplier: number;
   planetHealPerSecond: number;
   planetDamageReduction: number;
-  freezeStacksBonus: number;
+  chillDurationBonusSeconds: number;
   plasmaStacksBonus: number;
   enemyFireSlowMultiplier: number;
   planetRegenPerPerfectWord: number;
@@ -70,22 +70,22 @@ export interface RelicEffects {
   streakMilestoneDamage: number;
   plasmaDamageMultiplier: number;
   deathNovaPlasmaStacks: number;
-  frozenDamageMultiplier: number;
-  frostChainFreezeStacks: number;
+  chilledDamageMultiplier: number;
+  frostChainChillDurationSeconds: number;
   firstStrikeDamageBonus: number;
   plasmaDamageBonusPerStack: number;
   physicalAgainstPlasmaStacks: number;
-  freezeKillSpread: number;
-  blizzardFreezeInterval: number;
-  blizzardFreezeStacks: number;
+  chillKillSpreadDurationSeconds: number;
+  blizzardChillInterval: number;
+  blizzardChillDurationSeconds: number;
   plasmaSlow: number;
-  chargesOnFrozenKill: number;
-  planetFreezeOnHit: number;
+  chargesOnChilledKill: number;
+  planetChillOnHitSeconds: number;
   frostNovaDamage: number;
-  freezeOnPerfectWord: number;
+  chillOnPerfectWordSeconds: number;
   plasmaDeathTransfer: number;
   plasmaExpiredDamage: number;
-  plasmaOnFreezeApply: number;
+  plasmaOnChillApply: number;
 }
 
 export interface RelicDefinition {
@@ -156,9 +156,9 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "glacial_emitter",
     name: "Glacial Emitter",
-    description: "Freezing attacks apply 1 additional freeze stack to enemies hit.",
+    description: "Chilling attacks apply 1 additional second of chill.",
     sprite: "/futuristic_pixel_icons/Turqoise Crystal.png",
-    effects: { freezeStacksBonus: 1 },
+    effects: { chillDurationBonusSeconds: 1 },
   },
   {
     id: "plasma_weave",
@@ -282,16 +282,16 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "cryo_shatter",
     name: "Cryo Shatter",
-    description: "Frozen enemies take 2x damage.",
+    description: "Chilled enemies take 2x damage.",
     sprite: "/futuristic_pixel_icons/Ice Pack.png",
-    effects: { frozenDamageMultiplier: 2 },
+    effects: { chilledDamageMultiplier: 2 },
   },
   {
     id: "frost_chain",
     name: "Frost Chain",
-    description: "When a frozen enemy dies, it explodes freezing nearby enemies for 1 second.",
+    description: "When a chilled enemy dies, it explodes and chills nearby enemies for 1 second.",
     sprite: "/futuristic_pixel_icons/Turqoise Ring.png",
-    effects: { frostChainFreezeStacks: 1 },
+    effects: { frostChainChillDurationSeconds: 1 },
   },
   {
     id: "first_strike",
@@ -317,16 +317,16 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "permafrost",
     name: "Permafrost",
-    description: "When a frozen enemy is killed, the nearest unfrozen enemy is frozen for 2 seconds.",
+    description: "When a chilled enemy is killed, the nearest unchilled enemy is chilled for 2 seconds.",
     sprite: "/futuristic_pixel_icons/Light Crystal.png",
-    effects: { freezeKillSpread: 2 },
+    effects: { chillKillSpreadDurationSeconds: 2 },
   },
   {
     id: "blizzard",
     name: "Blizzard",
-    description: "Every 10 consecutive words with no errors, freeze all enemies for 3 seconds.",
+    description: "Every 10 consecutive words with no errors, chill all enemies for 3 seconds.",
     sprite: "/futuristic_pixel_icons/Crystal.png",
-    effects: { blizzardFreezeInterval: 10, blizzardFreezeStacks: 3 },
+    effects: { blizzardChillInterval: 10, blizzardChillDurationSeconds: 3 },
   },
   {
     id: "superheated",
@@ -338,28 +338,28 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "cryo_surge",
     name: "Cryo Surge",
-    description: "Completing a word with no errors freezes the nearest enemy for 2 seconds.",
+    description: "Completing a word with no errors chills the nearest enemy for 2 seconds.",
     sprite: "/futuristic_pixel_icons/Blue Star Crystal.png",
-    effects: { freezeOnPerfectWord: 2 },
+    effects: { chillOnPerfectWordSeconds: 2 },
   },
   {
     id: "cryo_recharge",
     name: "Cryo Recharge",
-    description: "Killing a frozen enemy grants all ships 1 charge.",
+    description: "Killing a chilled enemy grants all ships 1 charge.",
     sprite: "/futuristic_pixel_icons/Turqoise Ring.png",
-    effects: { chargesOnFrozenKill: 1 },
+    effects: { chargesOnChilledKill: 1 },
   },
   {
     id: "ice_armor",
     name: "Ice Armor",
-    description: "When the planet takes damage, freeze the attacker for 2 seconds.",
+    description: "When the planet takes damage, chill the attacker for 2 seconds.",
     sprite: "/futuristic_pixel_icons/Orange Star Shards.png",
-    effects: { planetFreezeOnHit: 2 },
+    effects: { planetChillOnHitSeconds: 2 },
   },
   {
     id: "frost_nova",
     name: "Frost Nova",
-    description: "When an enemy is frozen, it takes 15 instant damage.",
+    description: "When an enemy is chilled, it takes 15 instant damage.",
     sprite: "/futuristic_pixel_icons/Light Crystal.png",
     effects: { frostNovaDamage: 15 },
   },
@@ -380,9 +380,9 @@ export const RELIC_CATALOG: RelicDefinition[] = [
   {
     id: "static_discharge",
     name: "Static Discharge",
-    description: "Applying freeze to an enemy also applies 2 plasma stacks.",
+    description: "Applying chill to an enemy also applies 2 plasma stacks.",
     sprite: "/futuristic_pixel_icons/Turqoise Ring.png",
-    effects: { plasmaOnFreezeApply: 2 },
+    effects: { plasmaOnChillApply: 2 },
   },
 ];
 
@@ -400,7 +400,7 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     explosionRadiusMultiplier: 1,
     planetHealPerSecond: 0,
     planetDamageReduction: 1,
-    freezeStacksBonus: 0,
+    chillDurationBonusSeconds: 0,
     plasmaStacksBonus: 0,
     enemyFireSlowMultiplier: 1,
     planetRegenPerPerfectWord: 0,
@@ -418,22 +418,22 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     streakMilestoneDamage: 0,
     plasmaDamageMultiplier: 1,
     deathNovaPlasmaStacks: 0,
-    frozenDamageMultiplier: 1,
-    frostChainFreezeStacks: 0,
+    chilledDamageMultiplier: 1,
+    frostChainChillDurationSeconds: 0,
     firstStrikeDamageBonus: 0,
     plasmaDamageBonusPerStack: 0,
     physicalAgainstPlasmaStacks: 0,
-    freezeKillSpread: 0,
-    blizzardFreezeInterval: 0,
-    blizzardFreezeStacks: 0,
+    chillKillSpreadDurationSeconds: 0,
+    blizzardChillInterval: 0,
+    blizzardChillDurationSeconds: 0,
     plasmaSlow: 0,
-    chargesOnFrozenKill: 0,
-    planetFreezeOnHit: 0,
+    chargesOnChilledKill: 0,
+    planetChillOnHitSeconds: 0,
     frostNovaDamage: 0,
-    freezeOnPerfectWord: 0,
+    chillOnPerfectWordSeconds: 0,
     plasmaDeathTransfer: 0,
     plasmaExpiredDamage: 0,
-    plasmaOnFreezeApply: 0,
+    plasmaOnChillApply: 0,
   };
   for (const relicId of relics) {
     const def = RELIC_MAP.get(relicId);
@@ -446,7 +446,7 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     if (def.effects.explosionRadiusMultiplier !== undefined) result.explosionRadiusMultiplier *= def.effects.explosionRadiusMultiplier;
     if (def.effects.planetHealPerSecond !== undefined) result.planetHealPerSecond += def.effects.planetHealPerSecond;
     if (def.effects.planetDamageReduction !== undefined) result.planetDamageReduction *= def.effects.planetDamageReduction;
-    if (def.effects.freezeStacksBonus !== undefined) result.freezeStacksBonus += def.effects.freezeStacksBonus;
+    if (def.effects.chillDurationBonusSeconds !== undefined) result.chillDurationBonusSeconds += def.effects.chillDurationBonusSeconds;
     if (def.effects.plasmaStacksBonus !== undefined) result.plasmaStacksBonus += def.effects.plasmaStacksBonus;
     if (def.effects.enemyFireSlowMultiplier !== undefined) result.enemyFireSlowMultiplier *= def.effects.enemyFireSlowMultiplier;
     if (def.effects.planetRegenPerPerfectWord !== undefined) result.planetRegenPerPerfectWord += def.effects.planetRegenPerPerfectWord;
@@ -464,22 +464,22 @@ export function computeRelicEffects(relics: RelicId[]): RelicEffects {
     if (def.effects.streakMilestoneDamage !== undefined) result.streakMilestoneDamage += def.effects.streakMilestoneDamage;
     if (def.effects.plasmaDamageMultiplier !== undefined) result.plasmaDamageMultiplier *= def.effects.plasmaDamageMultiplier;
     if (def.effects.deathNovaPlasmaStacks !== undefined) result.deathNovaPlasmaStacks += def.effects.deathNovaPlasmaStacks;
-    if (def.effects.frozenDamageMultiplier !== undefined) result.frozenDamageMultiplier *= def.effects.frozenDamageMultiplier;
-    if (def.effects.frostChainFreezeStacks !== undefined) result.frostChainFreezeStacks += def.effects.frostChainFreezeStacks;
+    if (def.effects.chilledDamageMultiplier !== undefined) result.chilledDamageMultiplier *= def.effects.chilledDamageMultiplier;
+    if (def.effects.frostChainChillDurationSeconds !== undefined) result.frostChainChillDurationSeconds += def.effects.frostChainChillDurationSeconds;
     if (def.effects.firstStrikeDamageBonus !== undefined) result.firstStrikeDamageBonus += def.effects.firstStrikeDamageBonus;
     if (def.effects.plasmaDamageBonusPerStack !== undefined) result.plasmaDamageBonusPerStack += def.effects.plasmaDamageBonusPerStack;
     if (def.effects.physicalAgainstPlasmaStacks !== undefined) result.physicalAgainstPlasmaStacks += def.effects.physicalAgainstPlasmaStacks;
-    if (def.effects.freezeKillSpread !== undefined) result.freezeKillSpread += def.effects.freezeKillSpread;
-    if (def.effects.blizzardFreezeInterval !== undefined) result.blizzardFreezeInterval += def.effects.blizzardFreezeInterval;
-    if (def.effects.blizzardFreezeStacks !== undefined) result.blizzardFreezeStacks += def.effects.blizzardFreezeStacks;
+    if (def.effects.chillKillSpreadDurationSeconds !== undefined) result.chillKillSpreadDurationSeconds += def.effects.chillKillSpreadDurationSeconds;
+    if (def.effects.blizzardChillInterval !== undefined) result.blizzardChillInterval += def.effects.blizzardChillInterval;
+    if (def.effects.blizzardChillDurationSeconds !== undefined) result.blizzardChillDurationSeconds += def.effects.blizzardChillDurationSeconds;
     if (def.effects.plasmaSlow !== undefined) result.plasmaSlow += def.effects.plasmaSlow;
-    if (def.effects.chargesOnFrozenKill !== undefined) result.chargesOnFrozenKill += def.effects.chargesOnFrozenKill;
-    if (def.effects.planetFreezeOnHit !== undefined) result.planetFreezeOnHit += def.effects.planetFreezeOnHit;
+    if (def.effects.chargesOnChilledKill !== undefined) result.chargesOnChilledKill += def.effects.chargesOnChilledKill;
+    if (def.effects.planetChillOnHitSeconds !== undefined) result.planetChillOnHitSeconds += def.effects.planetChillOnHitSeconds;
     if (def.effects.frostNovaDamage !== undefined) result.frostNovaDamage += def.effects.frostNovaDamage;
-    if (def.effects.freezeOnPerfectWord !== undefined) result.freezeOnPerfectWord += def.effects.freezeOnPerfectWord;
+    if (def.effects.chillOnPerfectWordSeconds !== undefined) result.chillOnPerfectWordSeconds += def.effects.chillOnPerfectWordSeconds;
     if (def.effects.plasmaDeathTransfer !== undefined) result.plasmaDeathTransfer += def.effects.plasmaDeathTransfer;
     if (def.effects.plasmaExpiredDamage !== undefined) result.plasmaExpiredDamage += def.effects.plasmaExpiredDamage;
-    if (def.effects.plasmaOnFreezeApply !== undefined) result.plasmaOnFreezeApply += def.effects.plasmaOnFreezeApply;
+    if (def.effects.plasmaOnChillApply !== undefined) result.plasmaOnChillApply += def.effects.plasmaOnChillApply;
   }
   return result;
 }

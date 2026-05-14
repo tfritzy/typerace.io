@@ -16,7 +16,7 @@ export type ShipRole =
   | "dual_shot"
   | "plasma_beam"
   | "pierce_laser"
-  | "freeze"
+  | "chill"
   | "plasma"
   | "shooter"
   | "ice_beam"
@@ -30,7 +30,7 @@ export const ROLE_META: Record<ShipRole, { icon: LucideIcon; label: string; colo
   dual_shot: { icon: Gauge, label: "Dual Shot", color: "#89b4fa" },
   plasma_beam: { icon: Flame, label: "Plasma Beam", color: "#f38ba8" },
   pierce_laser: { icon: Swords, label: "Pierce Laser", color: "#b4befe" },
-  freeze: { icon: Snowflake, label: "Freeze", color: "#89dceb" },
+  chill: { icon: Snowflake, label: "Chill", color: "#89dceb" },
   plasma: { icon: Flame, label: "Plasma", color: "#fab387" },
   shooter: { icon: Crosshair, label: "Shooter", color: "#94e2d5" },
   ice_beam: { icon: Waves, label: "Ice Beam", color: "#74c7ec" },
@@ -119,15 +119,15 @@ export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
   {
     entityType: "Flare",
     colorPreset: ColorPreset.Preset1,
-    role: "freeze",
-    description: "Freezing explosive blast",
+    role: "chill",
+    description: "Chilling explosive blast",
     descriptionFn: (c, next) => [
       plain("Fires an explosive blast, dealing "),
       ...num(getDmg(c), next ? getDmg(next) : undefined),
       plain(" damage and applying "),
-      ...num(c.freezeStacks, next?.freezeStacks),
-      plain(" stacks of "),
-      keyword("freeze", KEYWORD_COLOR.freeze),
+      ...num(c.chillDurationSeconds, next?.chillDurationSeconds),
+      plain(" seconds of "),
+      keyword("chill", KEYWORD_COLOR.chill),
       plain(" in an area."),
     ],
   },
@@ -159,14 +159,14 @@ export const SHIP_BLUEPRINTS: ShipBlueprint[] = [
     entityType: "Prism",
     colorPreset: ColorPreset.Preset1,
     role: "ice_beam",
-    description: "Freezing piercing beam",
+    description: "Chilling piercing beam",
     descriptionFn: (c, next) => [
       plain("Fires a piercing ice beam, dealing "),
       ...num(getDmg(c), next ? getDmg(next) : undefined),
       plain(" damage and applying "),
-      ...num(c.freezeStacks, next?.freezeStacks),
-      plain(" stacks of "),
-      keyword("freeze", KEYWORD_COLOR.freeze),
+      ...num(c.chillDurationSeconds, next?.chillDurationSeconds),
+      plain(" seconds of "),
+      keyword("chill", KEYWORD_COLOR.chill),
       plain("."),
     ],
   },
