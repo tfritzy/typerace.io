@@ -213,11 +213,87 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+@property --type-box-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
 .box-with-focus {
+  position: relative;
   background-color: var(--color-box-bg);
   border: var(--border-width, 1px) solid var(--color-box-border);
   border-radius: calc(var(--radius, 8px) * 2);
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  --type-box-border-color: transparent;
+  --type-box-border-opacity: 0;
+  --type-box-border-duration: 3s;
+}
+
+.box-with-focus::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--type-box-angle),
+    transparent 0deg,
+    var(--type-box-border-color) 90deg,
+    transparent 180deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  opacity: var(--type-box-border-opacity);
+  transition: opacity 0.3s ease;
+  animation: type-box-rotate var(--type-box-border-duration) linear infinite;
+}
+
+.box-with-focus[data-border-state="selected"] {
+  --type-box-border-color: var(--accent-primary);
+  --type-box-border-opacity: 1;
+}
+
+.box-with-focus[data-border-state="error"] {
+  --type-box-border-color: var(--destructive);
+  --type-box-border-opacity: 1;
+  --type-box-border-duration: 1.2s;
+}
+
+.box-with-focus.is-complete {
+  --type-box-border-color: var(--accent-primary);
+  --type-box-border-opacity: 1;
+}
+
+.box-with-focus.is-complete::before {
+  background: conic-gradient(
+    from var(--type-box-angle),
+    var(--accent-primary) 0deg,
+    var(--accent-primary) 360deg
+  );
+  animation:
+    type-box-rotate var(--type-box-border-duration) linear infinite,
+    type-box-complete-flash 0.7s ease-out;
+}
+
+@keyframes type-box-rotate {
+  to {
+    --type-box-angle: 360deg;
+  }
+}
+
+@keyframes type-box-complete-flash {
+  0% {
+    filter: brightness(1.8) saturate(1.4);
+  }
+  100% {
+    filter: brightness(1) saturate(1);
+  }
 }
 
 .box-with-focus:focus-within {

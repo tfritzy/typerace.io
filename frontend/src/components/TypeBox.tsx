@@ -50,6 +50,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const [input, setInput] = useState(phrase.substring(0, initialProgress));
     const [isComplete, setIsComplete] = useState(false);
     const [hasReachedErrorLimit, setHasReachedErrorLimit] = useState(false);
+    const [hasError, setHasError] = useState(false);
+    const [justCompleted, setJustCompleted] = useState(false);
 
     const targetRef = useRef<HTMLElement>(null);
     const phraseRef = useRef<HTMLDivElement>(null);
@@ -61,6 +63,12 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     React.useEffect(() => {
       lastProcessedValueRef.current = phrase.substring(0, initialProgress);
     }, [phrase, initialProgress]);
+
+    React.useEffect(() => {
+      if (!justCompleted) return;
+      const timer = setTimeout(() => setJustCompleted(false), 700);
+      return () => clearTimeout(timer);
+    }, [justCompleted]);
 
     React.useEffect(() => {
       if (targetRef.current && focused && !isComplete) {
@@ -131,6 +139,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             lastProcessedValueRef.current = correctPrefix;
             setInput(correctPrefix);
             setHasReachedErrorLimit(false);
+            setHasError(false);
             return;
           }
         }
@@ -152,6 +161,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         const reachedLimit =
           firstErrorPos !== null && newValue.length - firstErrorPos - 1 >= 14;
         setHasReachedErrorLimit(reachedLimit);
+        setHasError(firstErrorPos !== null);
         setInput(newValue);
 
         if (onWordComplete && newValue.length > oldValue.length) {
@@ -209,6 +219,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
         if (newValue === phrase && onComplete) {
           setIsComplete(true);
+          setJustCompleted(true);
+          setHasError(false);
           onComplete();
           if (resetOnComplete) {
             setTimeout(() => {
@@ -216,6 +228,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               setInput("");
               setIsComplete(false);
               setHasReachedErrorLimit(false);
+              setHasError(false);
             }, 0);
           }
         }
@@ -308,10 +321,18 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       });
     };
 
+    const borderState: "deselected" | "selected" | "error" =
+      hasError || hasReachedErrorLimit
+        ? "error"
+        : focused && !disabled
+          ? "selected"
+          : "deselected";
+
     return (
       <div
-        className={`relative box-with-focus w-full px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
+        className={`relative box-with-focus w-full px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${justCompleted ? "is-complete" : ""} ${className || ""}`}
         style={height ? { minHeight: height } : undefined}
+        data-border-state={borderState}
         onClick={() => inputRef.current?.focus()}
       >
         {hasReachedErrorLimit && (
