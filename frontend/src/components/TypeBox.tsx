@@ -349,7 +349,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             height="100%"
             rx="16"
             ry="16"
-            pathLength="1"
           />
           <rect
             className="type-box-border-highlight"
@@ -359,7 +358,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             height="100%"
             rx="16"
             ry="16"
-            pathLength="1"
           />
         </svg>
         {hasReachedErrorLimit && (

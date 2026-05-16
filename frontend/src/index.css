@@ -219,12 +219,6 @@ body {
   border: var(--border-width, 1px) solid var(--color-box-border);
   border-radius: calc(var(--radius, 8px) * 2);
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-  --type-box-border-color: var(--accent-primary);
-  --type-box-border-color-bright: var(--accent-light);
-  --type-box-border-opacity: 0;
-  --type-box-border-duration: 6s;
-  --type-box-border-base-opacity: 0.35;
-  --type-box-border-highlight-opacity: 0.7;
 }
 
 .type-box-border-ring {
@@ -233,59 +227,92 @@ body {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  opacity: var(--type-box-border-opacity);
+  opacity: 0;
   transition: opacity 0.5s ease;
 }
 
 .type-box-border-base {
   fill: none;
-  stroke: var(--type-box-border-color);
+  stroke: var(--border-hover);
   stroke-width: 1;
-  opacity: var(--type-box-border-base-opacity);
   vector-effect: non-scaling-stroke;
 }
 
 .type-box-border-highlight {
   fill: none;
-  stroke: var(--type-box-border-color-bright);
-  stroke-width: 1;
-  opacity: var(--type-box-border-highlight-opacity);
+  stroke: var(--secondary-foreground);
+  stroke-width: 2;
   vector-effect: non-scaling-stroke;
   stroke-linecap: round;
-  stroke-dasharray: 0.12 0.38 0.12 0.38;
-  animation: type-box-ring-trace var(--type-box-border-duration) linear infinite;
-  filter: blur(1.5px);
+  stroke-dasharray: 40 360;
+  stroke-dashoffset: 0;
+  filter: blur(5px);
+  opacity: 0;
 }
 
 .box-with-focus[data-border-state="selected"] {
-  --type-box-border-color: var(--accent-primary);
-  --type-box-border-color-bright: var(--accent-light);
-  --type-box-border-opacity: 1;
+  border-color: var(--border-hover);
 }
 
-.box-with-focus[data-border-state="error"] {
-  --type-box-border-color: var(--destructive);
-  --type-box-border-color-bright: var(--destructive);
-  --type-box-border-opacity: 1;
-  --type-box-border-duration: 3s;
-  --type-box-border-base-opacity: 0.4;
-  --type-box-border-highlight-opacity: 0.9;
+.box-with-focus[data-border-state="selected"] .type-box-border-ring {
+  opacity: 1;
 }
 
-.box-with-focus.is-complete {
-  --type-box-border-color: var(--accent-primary);
-  --type-box-border-color-bright: var(--accent-light);
-  --type-box-border-opacity: 1;
-  --type-box-border-base-opacity: 1;
+.box-with-focus[data-border-state="selected"] .type-box-border-highlight {
+  animation:
+    type-box-ring-trace 6s linear infinite,
+    type-box-highlight-fade 3.5s ease-out forwards;
+}
+
+.box-with-focus[data-border-state="error"] .type-box-border-ring {
+  opacity: 1;
+}
+
+.box-with-focus[data-border-state="error"] .type-box-border-base {
+  stroke: var(--destructive);
+  opacity: 0.45;
+}
+
+.box-with-focus[data-border-state="error"] .type-box-border-highlight {
+  stroke: var(--destructive);
+  opacity: 0.9;
+  animation: type-box-ring-trace 5s linear infinite;
 }
 
 .box-with-focus.is-complete .type-box-border-ring {
+  opacity: 1;
   animation: type-box-complete-flash 0.7s ease-out;
+}
+
+.box-with-focus.is-complete .type-box-border-base {
+  stroke: var(--accent-primary);
+  opacity: 1;
+}
+
+.box-with-focus.is-complete .type-box-border-highlight {
+  stroke: var(--accent-light);
+  opacity: 0;
+  animation: none;
 }
 
 @keyframes type-box-ring-trace {
   to {
-    stroke-dashoffset: -1;
+    stroke-dashoffset: -400;
+  }
+}
+
+@keyframes type-box-highlight-fade {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }
 
