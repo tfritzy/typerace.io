@@ -335,6 +335,33 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         data-border-state={borderState}
         onClick={() => inputRef.current?.focus()}
       >
+        <svg
+          className="type-box-border-ring"
+          aria-hidden="true"
+          preserveAspectRatio="none"
+          overflow="visible"
+        >
+          <rect
+            className="type-box-border-base"
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            rx="16"
+            ry="16"
+            pathLength="1"
+          />
+          <rect
+            className="type-box-border-highlight"
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            rx="16"
+            ry="16"
+            pathLength="1"
+          />
+        </svg>
         {hasReachedErrorLimit && (
           <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-destructive">
             {getTranslations().tooManyErrors}

@@ -213,78 +213,79 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-@property --type-box-angle {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
-
 .box-with-focus {
   position: relative;
   background-color: var(--color-box-bg);
   border: var(--border-width, 1px) solid var(--color-box-border);
   border-radius: calc(var(--radius, 8px) * 2);
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-  --type-box-border-color: transparent;
+  --type-box-border-color: var(--accent-primary);
+  --type-box-border-color-bright: var(--accent-light);
   --type-box-border-opacity: 0;
-  --type-box-border-duration: 3s;
+  --type-box-border-duration: 6s;
+  --type-box-border-base-opacity: 0.35;
+  --type-box-border-highlight-opacity: 0.7;
 }
 
-.box-with-focus::before {
-  content: "";
+.type-box-border-ring {
   position: absolute;
   inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: conic-gradient(
-    from var(--type-box-angle),
-    color-mix(in srgb, var(--type-box-border-color) 35%, transparent) 0deg,
-    var(--type-box-border-color) 90deg,
-    color-mix(in srgb, var(--type-box-border-color) 35%, transparent) 180deg,
-    var(--type-box-border-color) 270deg,
-    color-mix(in srgb, var(--type-box-border-color) 35%, transparent) 360deg
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   opacity: var(--type-box-border-opacity);
   transition: opacity 0.5s ease;
-  animation: type-box-rotate var(--type-box-border-duration) linear infinite;
+}
+
+.type-box-border-base {
+  fill: none;
+  stroke: var(--type-box-border-color);
+  stroke-width: 1;
+  opacity: var(--type-box-border-base-opacity);
+  vector-effect: non-scaling-stroke;
+}
+
+.type-box-border-highlight {
+  fill: none;
+  stroke: var(--type-box-border-color-bright);
+  stroke-width: 1;
+  opacity: var(--type-box-border-highlight-opacity);
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-dasharray: 0.12 0.38 0.12 0.38;
+  animation: type-box-ring-trace var(--type-box-border-duration) linear infinite;
+  filter: blur(1.5px);
 }
 
 .box-with-focus[data-border-state="selected"] {
   --type-box-border-color: var(--accent-primary);
+  --type-box-border-color-bright: var(--accent-light);
   --type-box-border-opacity: 1;
 }
 
 .box-with-focus[data-border-state="error"] {
   --type-box-border-color: var(--destructive);
+  --type-box-border-color-bright: var(--destructive);
   --type-box-border-opacity: 1;
-  --type-box-border-duration: 1.2s;
+  --type-box-border-duration: 3s;
+  --type-box-border-base-opacity: 0.4;
+  --type-box-border-highlight-opacity: 0.9;
 }
 
 .box-with-focus.is-complete {
   --type-box-border-color: var(--accent-primary);
+  --type-box-border-color-bright: var(--accent-light);
   --type-box-border-opacity: 1;
+  --type-box-border-base-opacity: 1;
 }
 
-.box-with-focus.is-complete::before {
-  background: conic-gradient(
-    from var(--type-box-angle),
-    var(--accent-primary) 0deg,
-    var(--accent-primary) 360deg
-  );
-  animation:
-    type-box-rotate var(--type-box-border-duration) linear infinite,
-    type-box-complete-flash 0.7s ease-out;
+.box-with-focus.is-complete .type-box-border-ring {
+  animation: type-box-complete-flash 0.7s ease-out;
 }
 
-@keyframes type-box-rotate {
+@keyframes type-box-ring-trace {
   to {
-    --type-box-angle: 360deg;
+    stroke-dashoffset: -1;
   }
 }
 
