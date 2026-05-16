@@ -233,15 +233,16 @@ body {
 .box-with-focus::before {
   content: "";
   position: absolute;
-  inset: -1px;
+  inset: 0;
   border-radius: inherit;
-  padding: 2px;
+  padding: 1px;
   background: conic-gradient(
     from var(--type-box-angle),
-    transparent 0deg,
+    color-mix(in srgb, var(--type-box-border-color) 35%, transparent) 0deg,
     var(--type-box-border-color) 90deg,
-    transparent 180deg,
-    transparent 360deg
+    color-mix(in srgb, var(--type-box-border-color) 35%, transparent) 180deg,
+    var(--type-box-border-color) 270deg,
+    color-mix(in srgb, var(--type-box-border-color) 35%, transparent) 360deg
   );
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -250,7 +251,7 @@ body {
           mask-composite: exclude;
   pointer-events: none;
   opacity: var(--type-box-border-opacity);
-  transition: opacity 0.3s ease;
+  transition: opacity 0.5s ease;
   animation: type-box-rotate var(--type-box-border-duration) linear infinite;
 }
 
