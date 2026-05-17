@@ -232,16 +232,19 @@ body {
 
 @keyframes typeBoxBorderPulse {
   0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-primary) 55%, transparent);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 45%, transparent),
+      0 0 20px 2px color-mix(in srgb, var(--accent-primary) 55%, transparent);
   }
   100% {
-    box-shadow: 0 0 0 18px color-mix(in srgb, var(--accent-primary) 0%, transparent);
+    border-color: var(--color-box-border);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-primary) 0%, transparent),
+      0 0 0 0 color-mix(in srgb, var(--accent-primary) 0%, transparent);
   }
 }
 
 .box-with-focus.type-box-pulse,
 .box-with-focus.type-box-pulse:focus-within {
-  border-color: var(--accent-primary);
   animation: typeBoxBorderPulse 1s ease-out infinite;
 }
 
