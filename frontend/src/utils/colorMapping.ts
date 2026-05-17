@@ -361,12 +361,25 @@ export function getDisplayColorHex(playerColorTag: string | undefined, isCurrent
 
 export function getPlayerAvatarColors(playerColorTag: string): string[] {
     const hex = getPlayerColorHex(playerColorTag);
-    const [h] = hexToHsl(hex);
+    return buildAvatarPalette(hex);
+}
+
+export function buildAvatarPalette(hex: string): string[] {
+    const [h, sRaw] = hexToHsl(hex);
+    const s = Math.max(0.55, sRaw);
     return [
         hex,
-        hslToHex(h, 0.15, 0.22),
-        hslToHex(h, 0.08, 0.15),
+        hslToHex(h - 25, s * 0.85, 0.72),
+        hslToHex(h + 25, s * 0.85, 0.62),
+        hslToHex(h, s * 0.9, 0.85),
+        hslToHex(h, Math.min(1, s * 0.95), 0.32),
     ];
+}
+
+export function getAvatarBorderColor(hex: string): string {
+    const [h, sRaw, l] = hexToHsl(hex);
+    const s = Math.max(0.4, sRaw);
+    return hslToHex(h, s * 0.6, Math.min(0.4, l * 0.55));
 }
 
 export function getPlayerProgressGradient(playerColorTag: string): string {

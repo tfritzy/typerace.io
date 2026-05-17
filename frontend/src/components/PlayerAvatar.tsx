@@ -1,7 +1,7 @@
 import Avatar from "boring-avatars";
 import { Crown } from 'lucide-react';
 import { memo, useState, useEffect, useCallback, useMemo } from "react";
-import { getPlayerAvatarColors } from "../utils/colorMapping";
+import { buildAvatarPalette, getAvatarBorderColor, getPlayerAvatarColors, getPlayerColorHex } from "../utils/colorMapping";
 
 type PlayerAvatarProps = {
     size: number;
@@ -12,13 +12,9 @@ type PlayerAvatarProps = {
     playerColorTag?: string;
 };
 
-function getAvatarColorsFromCSS(): string[] {
+function getPrimaryAvatarColorFromCSS(): string {
     const style = getComputedStyle(document.documentElement);
-    return [
-        style.getPropertyValue('--avatar-color-1').trim(),
-        style.getPropertyValue('--avatar-color-2').trim(),
-        style.getPropertyValue('--avatar-color-3').trim(),
-    ];
+    return style.getPropertyValue('--avatar-color-1').trim() || '#fabd2f';
 }
 
 export const PlayerAvatar = memo(({
@@ -28,10 +24,10 @@ export const PlayerAvatar = memo(({
     placement,
     playerColorTag
 }: PlayerAvatarProps) => {
-    const [fallbackColors, setFallbackColors] = useState(getAvatarColorsFromCSS);
+    const [primaryHex, setPrimaryHex] = useState(getPrimaryAvatarColorFromCSS);
 
     const onThemeChange = useCallback(() => {
-        setFallbackColors(getAvatarColorsFromCSS());
+        setPrimaryHex(getPrimaryAvatarColorFromCSS());
     }, []);
 
     useEffect(() => {
@@ -40,8 +36,13 @@ export const PlayerAvatar = memo(({
     }, [onThemeChange]);
 
     const avatarColors = useMemo(
-        () => playerColorTag ? getPlayerAvatarColors(playerColorTag) : fallbackColors,
-        [playerColorTag, fallbackColors]
+        () => playerColorTag ? getPlayerAvatarColors(playerColorTag) : buildAvatarPalette(primaryHex),
+        [playerColorTag, primaryHex]
+    );
+
+    const avatarBorderColor = useMemo(
+        () => getAvatarBorderColor(playerColorTag ? getPlayerColorHex(playerColorTag) : primaryHex),
+        [playerColorTag, primaryHex]
     );
 
     const getCrownColor = (place: number) => {
@@ -71,7 +72,7 @@ export const PlayerAvatar = memo(({
     return (
         <div
             className={`relative shrink-0 border-2 rounded-full ${isLoading ? 'border-dashed' : ''}`}
-            style={{ borderColor: borderColor || avatarColors[1] }}
+            style={{ borderColor: borderColor || avatarBorderColor }}
         >
             {crownColor && (
                 <div
@@ -112,7 +113,7 @@ export const PlayerAvatar = memo(({
                 <Avatar
                     size={size}
                     name={identity}
-                    variant="marble"
+                    variant="beam"
                     colors={avatarColors}
                 />
             )}
