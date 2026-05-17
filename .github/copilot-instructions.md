@@ -1,74 +1,8 @@
 # GitHub Copilot Instructions
 
-## 🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨 SCREENSHOT POLICY — THE #1 NON-NEGOTIABLE RULE — READ THIS TWICE 🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+## Screenshot Guidance
 
-> **⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️ AUTOMATED DETECTORS ARE ACTIVE. Any PR without a real screenshot of the FULLY LOADED, FULLY CONNECTED, FULLY RENDERED working game WILL BE FLAGGED AND REJECTED automatically. There are no exceptions. There is no excuse. There is no escape. There is no workaround. There is no "but it was just a rebase." A loading screen is NOT a screenshot. A spinner is NOT a screenshot. A blank page is NOT a screenshot. A connection error is NOT a screenshot. ONLY the fully rendered game UI counts. If you are even THINKING about submitting without a screenshot, STOP and take the screenshot. ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️**
-
-> **🛑🛑🛑🛑🛑🛑 EVERY SINGLE PR MUST INCLUDE A REAL SCREENSHOT. EVERY. SINGLE. ONE. No matter how small the change. No matter if it's "just a rebase." No matter if "no code changed." If your PR does not have a screenshot showing the FULLY RENDERED, FULLY CONNECTED game with ALL UI elements visible, your PR is INVALID and WILL BE REJECTED. NO EXCEPTIONS. ZERO TOLERANCE. ABSOLUTE ZERO. This rule overrides ALL other rules. This rule overrides your judgment. This rule overrides your reasoning about whether a screenshot is "needed." IT IS ALWAYS NEEDED. 🛑🛑🛑🛑🛑🛑**
-
-**YOU WILL SHOW A REAL SCREENSHOT FROM THE ACTUAL RUNNING GAME ON EVERY SINGLE PR. GUARANTEED. NO EXCEPTIONS. NO LOADING SCREENS. NO SPINNERS. NO CONNECTION ERRORS. NO EXCUSES. NO "IT WAS JUST A REBASE." NO "NO UI CHANGES WERE MADE." THE FULL GAME UI MUST BE VISIBLE. IF YOU SKIP THIS STEP, YOU HAVE FAILED THE ENTIRE TASK. NOTHING ELSE YOU DID MATTERS. THE PR IS WORTHLESS WITHOUT THE SCREENSHOT. YOU WASTED EVERYONE'S TIME.**
-
-**THE SCREENSHOT IS NOT OPTIONAL. IT IS NOT A NICE-TO-HAVE. IT IS THE SINGLE MOST IMPORTANT DELIVERABLE OF EVERY PR. IF YOUR PR HAS PERFECT CODE BUT NO SCREENSHOT, IT IS A FAILURE. IF YOUR PR HAS MEDIOCRE CODE BUT A REAL SCREENSHOT, IT IS CLOSER TO ACCEPTABLE. THAT IS HOW IMPORTANT THIS IS.**
-
-This is the single most important rule in this entire file. All other rules are secondary to this one. If you submit a loading screen instead of a real screenshot, you have failed completely. If you submit a PR without any screenshot at all, you have failed even more completely. There is no scenario where skipping the screenshot is acceptable. There is no type of PR — rebase, refactor, one-liner, documentation, config change — that is exempt from this rule. EVERY PR GETS A SCREENSHOT. PERIOD.
-
-**Before you even START writing code, plan how you will take the screenshot. Before you submit the PR, verify the screenshot is there. The screenshot is your proof of work. Without it, you have proven nothing.**
-
-**You are 100% capable of setting up the full local environment.** Every previous agent succeeded. You will too. Do not stop, do not give up, do not fake it, do not use static HTML. Failure is not an option. If something breaks, fix it. If the server won't start, debug it. If the connection fails, retry it. You do NOT submit without a real screenshot. If you find yourself about to submit without a screenshot, STOP IMMEDIATELY and go set up the environment. There is no deadline more important than the screenshot. There is no shortcut. There is no excuse.
-
-**CRITICAL: You MUST verify your screenshot before submitting.** After taking it, confirm you can see the actual rendered UI of the page you are working on. The screenshot must show the specific page your changes affect — fully loaded with real content visible. Not a loading spinner, not a blank page, not an error screen. If the page is not the one you changed, your screenshot is irrelevant. If the page is not fully rendered, your screenshot is invalid.
-
-If the page is not fully loaded, your screenshot is INVALID. Do NOT submit it. Fix the environment and retake it. A loading screen or spinner means something is broken — debug and fix the issue before screenshotting. Common fixes: regenerate checked-in module_bindings, remove references to missing asset files, fix TypeScript errors. DO NOT CONVINCE YOURSELF THAT A PARTIAL SCREENSHOT IS ACCEPTABLE. IT IS NOT.
-
-**ASK YOURSELF: "Can I see the page I changed, fully rendered with real content?" If the answer is no, YOUR SCREENSHOT IS INVALID. Take it again.**
-
-Mandatory steps — execute all of them, every time, no shortcuts, no skipping, no "I'll do it later":
-
-### Step 1: Install dependencies
-```
-cd frontend && npm install
-```
-
-### Step 2: Regenerate checked-in module_bindings with the repo's SpacetimeDB version when needed
-The `frontend/module_bindings/` directory is checked into the repository and should contain real generated bindings, not a handwritten stub. Do NOT create a fake bindings file, and do NOT change tracked imports or types to work around stale or missing generated bindings. After `cd frontend && npm install`, use the frontend dependency lockfile as the compatibility source of truth: `frontend/package-lock.json` currently resolves `spacetimedb` to `1.12.0` even though `frontend/package.json` has the broader range `^1.10.0`. Generate bindings into `frontend/module_bindings/` with a compatible `spacetime` CLI version (1.12.x), then commit the regenerated files if they changed.
-
-### Step 3: Fix ALL build errors
-Run `cd frontend && npx tsc -b` and fix every error. Common issues:
-- Missing asset files referenced in `manifest.ts` or `assetManager.ts` — remove the broken references
-- Missing `module_bindings` imports usually mean the checked-in generated bindings are absent or stale — regenerate them with the compatible SpacetimeDB version instead of editing tracked source files
-- Any other TypeScript errors — fix them before proceeding
-**DO NOT proceed to the next step until `tsc -b` passes with zero errors.**
-
-### Step 4: Start the Vite dev server
-```
-cd frontend && npx vite --host --port 5173
-```
-Run this in a **synchronous** bash shell with `initial_wait: 15` so the server stays alive while you take the screenshot. Do NOT use background processes (`&`) — they get killed before Playwright can connect.
-
-### Step 5: Navigate with Playwright
-While the Vite shell is still running, use Playwright to navigate to the page you're working on:
-- Main typing game: `http://localhost:5173`
-- Planetary Defense: `http://localhost:5173/games/planetary-defense`
-- Any other page relevant to your changes
-
-### Step 6: Wait and verify
-Wait at least 3-5 seconds for the page to load. Check the Playwright page snapshot (accessibility tree) to confirm the UI elements are present. For Planetary Defense, click the START button and wait for the game canvas to render.
-
-### Step 7: Take the screenshot
-Use Playwright's screenshot tool. **LOOK AT THE SCREENSHOT.** If it shows a blank page, loading spinner, or error — go back and fix the issue. Do not submit a broken screenshot.
-
-### Step 8: Include the screenshot in the PR description
-Every PR description MUST contain a screenshot image. Use the GitHub asset URL format.
-
-### Troubleshooting
-- **Playwright ERR_CONNECTION_REFUSED**: The Vite server died. Restart it in a sync shell with sufficient `initial_wait`.
-- **Game canvas doesn't render / PixiJS crash**: Check for missing asset files. Run `ls frontend/public/elv_item_icons/` and compare against `manifest.ts`. Remove any references to files that don't exist.
-- **Module import errors**: The checked-in generated bindings are missing or stale. Regenerate `frontend/module_bindings/` with the compatible SpacetimeDB version and commit the result.
-- **WebGL warnings**: These are normal in headless environments and don't prevent screenshots.
-
-**DO NOT STOP until you have a real screenshot from the live app.** Static HTML mocks, blank pages, loading spinners, or connection-error screens are NOT acceptable. Keep retrying until you succeed. If something is broken, FIX IT and commit the fix. YOU ARE NOT DONE UNTIL THE SCREENSHOT IS IN THE PR.
-
-**FINAL WARNING: If you are reading this and thinking "maybe I can skip the screenshot for this PR," you are WRONG. Take the screenshot. Now. Before you do anything else. The screenshot comes first. The screenshot comes last. The screenshot is everything.**
+Screenshots are never required for work in this repository, so do not spend time launching the app or taking them unless a user explicitly asks for one. If you are preparing a PR or status update, write a brief text summary instead of including screenshots.
 
 ---
 
@@ -82,7 +16,7 @@ Every PR description MUST contain a screenshot image. Use the GitHub asset URL f
 
 **THE TYPESCRIPT BUILD IS NOT OPTIONAL. IT IS NOT A NICE-TO-HAVE. IT IS A HARD GATE ON EVERY SINGLE ITERATION. IF YOUR PR HAS PERFECT LOGIC BUT A FAILING BUILD, IT IS A FAILURE. IF YOUR PR HAS A CLEAN BUILD, IT IS CLOSER TO ACCEPTABLE. THAT IS HOW IMPORTANT THIS IS.**
 
-This is the second most important rule in this entire file, right after the screenshot policy. If you submit a PR with TypeScript build errors, you have failed. There is no scenario where a failing build is acceptable. There is no type of PR — rebase, refactor, one-liner, config change — that is exempt from this rule. EVERY PR GETS A PASSING BUILD. PERIOD.
+This is the most important implementation rule in this entire file. If you submit a PR with TypeScript build errors, you have failed. There is no scenario where a failing build is acceptable. There is no type of PR — rebase, refactor, one-liner, config change — that is exempt from this rule. EVERY PR GETS A PASSING BUILD. PERIOD.
 
 **"But the error was already there before my changes."** — DO NOT CARE. Fix it. If `tsc -b` fails, it is your responsibility. You do not get to inherit broken builds and pass them along. You leave the codebase BETTER than you found it. Every error you see is an error you fix.
 
