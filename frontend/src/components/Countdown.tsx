@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import { useParams } from "react-router-dom";
 import type { Game } from "../types/stdb";
 import { useDatabase } from "../contexts/SpacetimeContext";
-import { TYPE_BOX_FRAME_ID } from "./TypeBox";
 
 export const Countdown = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -94,7 +93,7 @@ export const Countdown = () => {
       setTypeBoxFrame(null);
       return;
     }
-    const find = () => setTypeBoxFrame(document.getElementById(TYPE_BOX_FRAME_ID));
+    const find = () => setTypeBoxFrame(document.getElementById("type-box-frame"));
     find();
     const raf = requestAnimationFrame(find);
     return () => cancelAnimationFrame(raf);

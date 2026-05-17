@@ -8,8 +8,6 @@ import React, {
 import { Cursor } from "./Cursor";
 import { getTranslations } from "../utils/translations";
 
-export const TYPE_BOX_FRAME_ID = "type-box-frame";
-
 type TypeBoxProps = {
   phrase: string;
   attribution?: string;
@@ -316,7 +314,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     return (
       <div
-        id={TYPE_BOX_FRAME_ID}
+        id="type-box-frame"
         className={`relative box-with-focus w-full px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
         style={containerStyle}
         onClick={() => inputRef.current?.focus()}
