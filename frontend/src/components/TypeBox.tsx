@@ -46,6 +46,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     },
     ref,
   ) => {
+    const MISTYPE_INDICATOR_FONT_SIZE_EM = 0.55;
+    const PHRASE_LINE_HEIGHT_WITH_INDICATORS = 1.35;
     const [focused, setFocused] = useState(true);
     const [input, setInput] = useState(phrase.substring(0, initialProgress));
     const [isComplete, setIsComplete] = useState(false);
@@ -233,6 +235,14 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       }
     }, []);
 
+    const getMistypeIndicatorChar = (
+      isError: boolean,
+      typedChar: string | undefined,
+    ) => {
+      if (!isError || typedChar === undefined) return "\u00A0";
+      return typedChar === " " ? "␣" : typedChar;
+    };
+
     const renderText = () => {
       const chars = phrase.split("");
 
@@ -269,12 +279,13 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           <span
             key={i}
             data-char-index={i}
-            className="inline-flex flex-col items-center justify-start align-top min-w-[1ch]"
+            className="inline-flex flex-col items-center justify-start align-top"
           >
             <span
-              className={`text-[0.55em] leading-none h-[1em] ${isError ? "text-destructive" : "opacity-0"}`}
+              className={`leading-none h-[1em] ${isError ? "text-destructive" : "opacity-0"}`}
+              style={{ fontSize: `${MISTYPE_INDICATOR_FONT_SIZE_EM}em` }}
             >
-              {isError ? (input[i] === " " ? "␣" : input[i]) : "·"}
+              {getMistypeIndicatorChar(isError, input[i])}
             </span>
             <span
               className={`transition-all duration-150 leading-none ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
@@ -305,7 +316,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         <div className="relative select-none flex-1">
           <div className="type-box">
             <div
-              className="whitespace-pre-wrap text-start text-[26px] font-mono leading-[1.35]"
+              className="whitespace-pre-wrap text-start text-[26px] font-mono"
+              style={{ lineHeight: PHRASE_LINE_HEIGHT_WITH_INDICATORS }}
               ref={phraseRef}
             >
               {renderText()}
