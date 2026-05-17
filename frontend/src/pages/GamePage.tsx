@@ -378,6 +378,13 @@ export const GamePage = () => {
               initialProgress={initialProgress}
               isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
               hideCursor={!isMemberOfRace}
+              borderState={
+                isCountdown
+                  ? "countdown"
+                  : game.state?.tag === "Racing"
+                    ? "active"
+                    : undefined
+              }
             />
           )}
         </div>
