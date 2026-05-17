@@ -112,7 +112,7 @@ export const PlayerAvatar = memo(({
                 <Avatar
                     size={size}
                     name={identity}
-                    variant="beam"
+                    variant="marble"
                     colors={avatarColors}
                 />
             )}
