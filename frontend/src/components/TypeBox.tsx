@@ -276,12 +276,16 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
         const isError = isTyped && !isCorrect;
 
-        if (char === " " && !isError) {
+        if (!isError) {
           return (
-            <React.Fragment key={i}>
+            <span
+              key={i}
+              data-char-index={i}
+              className={`transition-all duration-150 leading-none ${colorClass}`}
+            >
               {isCursor && <span id="target" ref={targetRef} />}
-              {" "}
-            </React.Fragment>
+              {char}
+            </span>
           );
         }
 
