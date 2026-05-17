@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { Game } from "../types/stdb";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { TypeBoxBorderPulse } from "./TypeBoxBorderPulse";
 
 export const Countdown = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -83,11 +84,12 @@ export const Countdown = () => {
   }, [count, isVisible]);
 
   if (!isVisible) {
-    return null;
+    return <TypeBoxBorderPulse />;
   }
 
   return (
     <>
+      <TypeBoxBorderPulse />
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
         <div
           key={count}

@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import { TypeBox, type TypeBoxRef } from "./TypeBox";
 import type { DbConnection } from "../../module_bindings";
 import { WordXpIndicator } from "./WordXpIndicator";
@@ -19,7 +19,6 @@ type GamePageTypeBoxProps = {
   initialProgress?: number;
   isAnonymous?: boolean;
   hideCursor?: boolean;
-  borderState?: "off" | "countdown" | "active";
 };
 
 export const GamePageTypeBox = memo(
@@ -33,43 +32,10 @@ export const GamePageTypeBox = memo(
     initialProgress = 0,
     isAnonymous = true,
     hideCursor = false,
-    borderState = "off",
   }: GamePageTypeBoxProps) => {
     const typeBoxRef = useRef<TypeBoxRef>(null);
     const [xpIndicators, setXpIndicators] = useState<XpIndicatorInstance[]>([]);
     const xpIndicatorIdCounter = useRef(0);
-
-    const [countdownBright, setCountdownBright] = useState(false);
-
-    useEffect(() => {
-      if (borderState !== "countdown") {
-        setCountdownBright(false);
-        return;
-      }
-
-      const PERIOD_MS = 1000;
-      let rafId: number | null = null;
-
-      const tick = () => {
-        setCountdownBright(true);
-        rafId = requestAnimationFrame(() => {
-          rafId = requestAnimationFrame(() => setCountdownBright(false));
-        });
-      };
-
-      tick();
-      const interval = setInterval(tick, PERIOD_MS);
-
-      return () => {
-        clearInterval(interval);
-        if (rafId !== null) cancelAnimationFrame(rafId);
-        setCountdownBright(false);
-      };
-    }, [borderState]);
-
-    const borderHighlight =
-      borderState === "active" ||
-      (borderState === "countdown" && countdownBright);
 
     const handleProgress = useCallback(
       (
@@ -133,7 +99,6 @@ export const GamePageTypeBox = memo(
           height="430px"
           initialProgress={initialProgress}
           hideCursor={hideCursor}
-          borderHighlight={borderHighlight}
         />
       </div>
     );

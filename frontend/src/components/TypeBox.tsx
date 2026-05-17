@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { Cursor } from "./Cursor";
 import { getTranslations } from "../utils/translations";
+import { TYPE_BOX_FRAME_ID } from "./TypeBoxBorderPulse";
 
 type TypeBoxProps = {
   phrase: string;
@@ -23,7 +24,6 @@ type TypeBoxProps = {
   disabled?: boolean;
   initialProgress?: number;
   hideCursor?: boolean;
-  borderHighlight?: boolean;
 };
 
 export type TypeBoxRef = {
@@ -44,7 +44,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       disabled = false,
       initialProgress = 0,
       hideCursor = false,
-      borderHighlight = false,
     },
     ref,
   ) => {
@@ -312,18 +311,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     const containerStyle: React.CSSProperties = {
       ...(height ? { minHeight: height } : null),
-      transition: "border-color 300ms ease-in-out, box-shadow 300ms ease-in-out",
-      ...(borderHighlight
-        ? {
-            borderColor: "var(--accent-primary)",
-            boxShadow:
-              "0 0 0 3px color-mix(in srgb, var(--accent-primary) 45%, transparent), 0 0 20px 2px color-mix(in srgb, var(--accent-primary) 55%, transparent)",
-          }
-        : null),
     };
 
     return (
       <div
+        id={TYPE_BOX_FRAME_ID}
         className={`relative box-with-focus w-full px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
         style={containerStyle}
         onClick={() => inputRef.current?.focus()}

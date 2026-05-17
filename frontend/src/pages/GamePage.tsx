@@ -237,7 +237,6 @@ export const GamePage = () => {
     currentPlayerId &&
     game.owner?.isEqual(currentPlayerId);
   const isCountdown = game.state?.tag === "Countdown";
-  const isRacing = game.state?.tag === "Racing";
   const t = getTranslations();
 
   const currentPlayerProgress = gamePlayerProgress.find(
@@ -379,9 +378,6 @@ export const GamePage = () => {
               initialProgress={initialProgress}
               isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
               hideCursor={!isMemberOfRace}
-              borderState={
-                isCountdown ? "countdown" : isRacing ? "active" : "off"
-              }
             />
           )}
         </div>
