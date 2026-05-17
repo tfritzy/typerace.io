@@ -46,6 +46,9 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     },
     ref,
   ) => {
+    const mistypeIndicatorFontSizeEm = 0.55;
+    const nonBreakingSpace = "\u00A0";
+    const spaceIndicatorChar = "␣";
     const [focused, setFocused] = useState(true);
     const [input, setInput] = useState(phrase.substring(0, initialProgress));
     const [isComplete, setIsComplete] = useState(false);
@@ -233,6 +236,14 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       }
     }, []);
 
+    const getMistypeIndicatorChar = (
+      isError: boolean,
+      typedChar: string | undefined,
+    ) => {
+      if (!isError || typedChar === undefined) return nonBreakingSpace;
+      return typedChar === " " ? spaceIndicatorChar : typedChar;
+    };
+
     const renderText = () => {
       const chars = phrase.split("");
 
@@ -269,10 +280,20 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           <span
             key={i}
             data-char-index={i}
-            className={`transition-all duration-150 ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
+            className="relative inline-block align-top"
           >
-            {isCursor && <span id="target" ref={targetRef} />}
-            {char}
+            <span
+              className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[0.85em] leading-none ${isError ? "text-destructive" : "opacity-0"}`}
+              style={{ fontSize: `${mistypeIndicatorFontSizeEm}em` }}
+            >
+              {getMistypeIndicatorChar(isError, input[i])}
+            </span>
+            <span
+              className={`transition-all duration-150 leading-none ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
+            >
+              {isCursor && <span id="target" ref={targetRef} />}
+              {char}
+            </span>
           </span>
         );
       });
