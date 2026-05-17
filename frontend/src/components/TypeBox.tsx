@@ -276,6 +276,15 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
         const isError = isTyped && !isCorrect;
 
+        if (char === " " && !isError) {
+          return (
+            <React.Fragment key={i}>
+              {isCursor && <span id="target" ref={targetRef} />}
+              {" "}
+            </React.Fragment>
+          );
+        }
+
         return (
           <span
             key={i}
