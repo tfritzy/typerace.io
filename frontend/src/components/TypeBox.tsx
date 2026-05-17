@@ -6,6 +6,7 @@ import React, {
   forwardRef,
 } from "react";
 import { Cursor } from "./Cursor";
+import { getTranslations } from "../utils/translations";
 
 type TypeBoxProps = {
   phrase: string;
@@ -133,15 +134,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             if (firstErrorPos === null) {
               firstErrorPos = i;
             }
-          }
-        }
-
-        const isAddingChar = newValue.length > oldValue.length;
-        if (isAddingChar && firstErrorPos !== null) {
-          const charsAfterError = newValue.length - firstErrorPos - 1;
-          if (charsAfterError >= 10) {
-            setHasReachedErrorLimit(true);
-            return;
           }
         }
 
@@ -294,7 +286,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       >
         {hasReachedErrorLimit && (
           <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-destructive">
-            You must fix all errors
+            {getTranslations().tooManyErrors}
           </div>
         )}
         <div className="relative select-none flex-1">
