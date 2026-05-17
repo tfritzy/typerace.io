@@ -280,10 +280,10 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           <span
             key={i}
             data-char-index={i}
-            className="inline-flex flex-col items-center justify-start align-top"
+            className="relative inline-block align-top"
           >
             <span
-              className={`leading-none h-[1em] ${isError ? "text-destructive" : "opacity-0"}`}
+              className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[0.85em] leading-none ${isError ? "text-destructive" : "opacity-0"}`}
               style={{ fontSize: `${mistypeIndicatorFontSizeEm}em` }}
             >
               {getMistypeIndicatorChar(isError, input[i])}
