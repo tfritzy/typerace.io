@@ -47,7 +47,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     ref,
   ) => {
     const mistypeIndicatorFontSizeEm = 0.55;
-    const phraseLineHeightWithIndicators = 1.35;
     const nonBreakingSpace = "\u00A0";
     const spaceIndicatorChar = "␣";
     const [focused, setFocused] = useState(true);
@@ -319,7 +318,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           <div className="type-box">
             <div
               className="whitespace-pre-wrap text-start text-[26px] font-mono"
-              style={{ lineHeight: phraseLineHeightWithIndicators }}
               ref={phraseRef}
             >
               {renderText()}
