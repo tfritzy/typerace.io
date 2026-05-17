@@ -54,13 +54,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const targetRef = useRef<HTMLElement>(null);
     const phraseRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
-    const lastProcessedValueRef = useRef<string>(
-      phrase.substring(0, initialProgress),
-    );
-
-    React.useEffect(() => {
-      lastProcessedValueRef.current = phrase.substring(0, initialProgress);
-    }, [phrase, initialProgress]);
 
     React.useEffect(() => {
       if (targetRef.current && focused && !isComplete) {
@@ -98,22 +91,19 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       event.preventDefault();
     }, []);
 
-    const processValue = useCallback(
-      (newValue: string) => {
+    const handleChange = useCallback(
+      (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         if (disabled) {
           return;
         }
+
+        const newValue = event.target.value;
 
         if (newValue.length > phrase.length) {
           return;
         }
 
-        if (lastProcessedValueRef.current === newValue) {
-          return;
-        }
-
-        const oldValue = lastProcessedValueRef.current;
-        lastProcessedValueRef.current = newValue;
+        const oldValue = input;
 
         if (newValue.length < oldValue.length) {
           let lastCompletedWordEnd = 0;
@@ -128,9 +118,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
           if (newValue.length < lastCompletedWordEnd) {
             const correctPrefix = phrase.substring(0, lastCompletedWordEnd);
-            lastProcessedValueRef.current = correctPrefix;
             setInput(correctPrefix);
-            setHasReachedErrorLimit(false);
             return;
           }
         }
@@ -150,7 +138,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
 
         const reachedLimit =
-          firstErrorPos !== null && newValue.length - firstErrorPos - 1 >= 14;
+          firstErrorPos !== null && newValue.length - firstErrorPos - 1 >= 10;
         setHasReachedErrorLimit(reachedLimit);
         setInput(newValue);
 
@@ -212,7 +200,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           onComplete();
           if (resetOnComplete) {
             setTimeout(() => {
-              lastProcessedValueRef.current = "";
               setInput("");
               setIsComplete(false);
               setHasReachedErrorLimit(false);
@@ -225,27 +212,10 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         onComplete,
         onProgress,
         onWordComplete,
+        input,
         resetOnComplete,
         disabled,
       ],
-    );
-
-    const handleChange = useCallback(
-      (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const nativeEvent = event.nativeEvent as InputEvent;
-        if (nativeEvent && nativeEvent.isComposing) {
-          return;
-        }
-        processValue(event.target.value);
-      },
-      [processValue],
-    );
-
-    const handleCompositionEnd = useCallback(
-      (event: React.CompositionEvent<HTMLTextAreaElement>) => {
-        processValue(event.currentTarget.value);
-      },
-      [processValue],
     );
 
     const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -341,7 +311,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               onChange={handleChange}
               onKeyDown={handleKeyDown}
               onPaste={handlePaste}
-              onCompositionEnd={handleCompositionEnd}
               onFocus={handleFocus}
               onBlur={handleBlur}
               id="type-box"
