@@ -14,13 +14,9 @@ type PlayerAvatarProps = {
 
 function getAvatarColorsFromCSS(): string[] {
     const style = getComputedStyle(document.documentElement);
-    return [
-        style.getPropertyValue('--accent-light').trim(),
-        style.getPropertyValue('--avatar-color-1').trim(),
-        style.getPropertyValue('--accent-dark').trim(),
-        style.getPropertyValue('--avatar-color-2').trim(),
-        style.getPropertyValue('--avatar-color-3').trim(),
-    ];
+    return Array.from({ length: 5 }, (_, index) =>
+        style.getPropertyValue(`--avatar-color-${index + 1}`).trim()
+    );
 }
 
 export const PlayerAvatar = memo(({

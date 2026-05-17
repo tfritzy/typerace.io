@@ -45,6 +45,22 @@ const PLAYER_COLOR_HEX: Record<string, string> = {
     Sky: '#0EA5E9',
 };
 
+const AVATAR_HUE_LIGHT_SHIFT = 10;
+const AVATAR_HUE_SHADOW_SHIFT = -12;
+const AVATAR_HUE_ACCENT_SHIFT = 28;
+const AVATAR_MIN_SATURATION = 0.45;
+const AVATAR_LIGHT_SATURATION_SCALE = 0.95;
+const AVATAR_SHADOW_SATURATION_SCALE = 0.8;
+const AVATAR_ACCENT_SATURATION_SCALE = 0.7;
+const AVATAR_LIGHT_MIN_LIGHTNESS = 0.42;
+const AVATAR_SHADOW_MIN_LIGHTNESS = 0.28;
+const AVATAR_ACCENT_MIN_LIGHTNESS = 0.34;
+const AVATAR_DARK_SATURATION = 0.18;
+const AVATAR_DARK_LIGHTNESS = 0.14;
+const AVATAR_LIGHTNESS_BOOST = 0.16;
+const AVATAR_SHADOW_LIGHTNESS_DROP = 0.12;
+const AVATAR_ACCENT_LIGHTNESS_DROP = 0.04;
+
 const THEME_PLAYER_COLORS: Record<ThemeTag, Record<string, string>> = {
     OneDark: { ...PLAYER_COLOR_HEX },
     Dracula: {
@@ -366,13 +382,13 @@ export function getDisplayColorHex(playerColorTag: string | undefined, isCurrent
 export function getPlayerAvatarColors(playerColorTag: string): string[] {
     const hex = getPlayerColorHex(playerColorTag);
     const [h, s, l] = hexToHsl(hex);
-    const richSaturation = clamp01(Math.max(0.45, s * 0.95));
+    const richSaturation = clamp01(Math.max(AVATAR_MIN_SATURATION, s * AVATAR_LIGHT_SATURATION_SCALE));
     return [
-        hslToHex(h + 10, richSaturation, clamp01(Math.max(0.42, l + 0.16))),
+        hslToHex(h + AVATAR_HUE_LIGHT_SHIFT, richSaturation, clamp01(Math.max(AVATAR_LIGHT_MIN_LIGHTNESS, l + AVATAR_LIGHTNESS_BOOST))),
         hex,
-        hslToHex(h - 12, clamp01(richSaturation * 0.8), clamp01(Math.max(0.28, l - 0.12))),
-        hslToHex(h + 28, clamp01(richSaturation * 0.7), clamp01(Math.max(0.34, l - 0.04))),
-        hslToHex(h, 0.18, 0.14),
+        hslToHex(h + AVATAR_HUE_SHADOW_SHIFT, clamp01(richSaturation * AVATAR_SHADOW_SATURATION_SCALE), clamp01(Math.max(AVATAR_SHADOW_MIN_LIGHTNESS, l - AVATAR_SHADOW_LIGHTNESS_DROP))),
+        hslToHex(h + AVATAR_HUE_ACCENT_SHIFT, clamp01(richSaturation * AVATAR_ACCENT_SATURATION_SCALE), clamp01(Math.max(AVATAR_ACCENT_MIN_LIGHTNESS, l - AVATAR_ACCENT_LIGHTNESS_DROP))),
+        hslToHex(h, AVATAR_DARK_SATURATION, AVATAR_DARK_LIGHTNESS),
     ];
 }
 

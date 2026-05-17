@@ -136,7 +136,7 @@ export function resolveTheme(settings: ThemeSettings, name: string, previewColor
             textUntyped: isDark ? `rgba(${fgRgba}, 0.35)` : `rgba(${fgRgba}, 0.4)`,
             borderHover: isDark ? `rgba(${fgRgba}, 0.25)` : `rgba(${fgRgba}, 0.25)`,
         },
-        avatarColors: [settings.accentColor, accentDark, isDark ? popover : card],
+        avatarColors: [accentLight, settings.accentColor, accentDark, isDark ? popover : card, background],
         previewColors,
         gradient: `linear-gradient(to right, ${accentDark}, ${settings.accentColor})`,
     };
@@ -363,6 +363,8 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
     root.style.setProperty('--avatar-color-1', theme.avatarColors[0]);
     root.style.setProperty('--avatar-color-2', theme.avatarColors[1]);
     root.style.setProperty('--avatar-color-3', theme.avatarColors[2]);
+    root.style.setProperty('--avatar-color-4', theme.avatarColors[3]);
+    root.style.setProperty('--avatar-color-5', theme.avatarColors[4]);
 
     root.style.setProperty('--border-width', '1px');
     root.style.setProperty('--radius', '8px');
