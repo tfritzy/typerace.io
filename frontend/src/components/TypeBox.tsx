@@ -258,13 +258,15 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
       }
 
-      const renderChar = (char: string, i: number) => {
-        const isTyped = i < input.length;
-        const isCorrect = input[i] === char;
-        const isCursor = i === input.length;
-        const isInCompletedWord = i < lastCompletedWordEnd;
+      const renderChar = (char: string, charIndex: number) => {
+        const isTyped = charIndex < input.length;
+        const isCorrect = input[charIndex] === char;
+        const isCursor = charIndex === input.length;
+        const isInCompletedWord = charIndex < lastCompletedWordEnd;
         const isInCurrentWord =
-          i >= lastCompletedWordEnd && i < input.length && isCorrect;
+          charIndex >= lastCompletedWordEnd &&
+          charIndex < input.length &&
+          isCorrect;
 
         let colorClass = "text-text-untyped";
         if (isTyped && !isCorrect) {
@@ -280,8 +282,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         if (!isError) {
           return (
             <span
-              key={i}
-              data-char-index={i}
+              data-char-index={charIndex}
               className={`transition-all duration-150 leading-none ${colorClass}`}
             >
               {isCursor && <span id="target" ref={targetRef} />}
@@ -292,15 +293,14 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
         return (
           <span
-            key={i}
-            data-char-index={i}
-            className="relative inline-block align-top"
-          >
+              data-char-index={charIndex}
+              className="relative inline-block align-top"
+            >
             <span
               className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[0.85em] leading-none ${isError ? "text-destructive" : "opacity-0"}`}
               style={{ fontSize: `${mistypeIndicatorFontSizeEm}em` }}
             >
-              {getMistypeIndicatorChar(isError, input[i])}
+              {getMistypeIndicatorChar(isError, input[charIndex])}
             </span>
             <span
               className={`transition-all duration-150 leading-none ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
@@ -313,28 +313,41 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       };
 
       const tokens = phrase.match(/\S+|\s+/g) ?? [];
+      const elements: React.ReactNode[] = [];
       let charIndex = 0;
 
-      return tokens.map((token, tokenIndex) => {
+      for (let tokenIndex = 0; tokenIndex < tokens.length; tokenIndex++) {
+        const token = tokens[tokenIndex];
         const startIndex = charIndex;
-        const chars = token.split("");
-        charIndex += chars.length;
+        const tokenChars = token.split("");
+        charIndex += tokenChars.length;
         const isWhitespace = /^\s+$/.test(token);
 
         if (isWhitespace) {
-          return (
-            <React.Fragment key={`space-${tokenIndex}-${startIndex}`}>
-              {chars.map((char, offset) => renderChar(char, startIndex + offset))}
+          elements.push(
+            <React.Fragment key={`space-${startIndex}`}>
+              {tokenChars.map((char, offset) => (
+                <React.Fragment key={startIndex + offset}>
+                  {renderChar(char, startIndex + offset)}
+                </React.Fragment>
+              ))}
             </React.Fragment>
           );
+          continue;
         }
 
-        return (
-          <span key={`word-${tokenIndex}-${startIndex}`} className="inline">
-            {chars.map((char, offset) => renderChar(char, startIndex + offset))}
+        elements.push(
+          <span key={`word-${startIndex}`}>
+            {tokenChars.map((char, offset) => (
+              <React.Fragment key={startIndex + offset}>
+                {renderChar(char, startIndex + offset)}
+              </React.Fragment>
+            ))}
           </span>
         );
-      });
+      }
+
+      return elements;
     };
 
     const containerStyle: React.CSSProperties = {
