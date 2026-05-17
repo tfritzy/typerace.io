@@ -220,42 +220,6 @@ body {
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-.type-box-border-pulse {
-  position: absolute;
-  inset: 0;
-  border-radius: calc(var(--radius, 8px) * 2);
-  pointer-events: none;
-}
-
-.type-box-border-pulse--tick {
-  border: 1px solid var(--accent-primary);
-  animation: typeBoxBorderPulseTick 1000ms ease-out forwards;
-}
-
-.type-box-border-pulse--active {
-  border: 1px solid color-mix(in srgb, var(--accent-primary) 75%, transparent);
-  box-shadow: 0 0 8px 0 color-mix(in srgb, var(--accent-primary) 30%, transparent);
-}
-
-@keyframes typeBoxBorderPulseTick {
-  0% {
-    opacity: 0;
-    box-shadow: 0 0 0 0 transparent;
-  }
-  15% {
-    opacity: 1;
-    box-shadow: 0 0 28px 4px color-mix(in srgb, var(--accent-primary) 75%, transparent);
-  }
-  55% {
-    opacity: 1;
-    box-shadow: 0 0 20px 2px color-mix(in srgb, var(--accent-primary) 55%, transparent);
-  }
-  100% {
-    opacity: 0;
-    box-shadow: 0 0 0 0 transparent;
-  }
-}
-
 .box-with-focus:focus-within {
   background-color: var(--color-box-bg);
   border-color: var(--border-hover);

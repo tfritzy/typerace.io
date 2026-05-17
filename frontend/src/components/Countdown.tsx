@@ -3,37 +3,34 @@ import { useParams } from "react-router-dom";
 import type { Game } from "../types/stdb";
 import { useDatabase } from "../contexts/SpacetimeContext";
 
+const PULSE_PERIOD_MS = 1000;
+const PULSE_BRIGHT_MS = 250;
+const PULSE_FADE_MS = 400;
+
 export const Countdown = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const conn = useDatabase();
-  const [count, setCount] = useState(3);
-  const [isVisible, setIsVisible] = useState(false);
-  const [showImage, setShowImage] = useState(false);
-  const [previousGameState, setPreviousGameState] = useState<string | null>(null);
   const [game, setGame] = useState<Game | null>(null);
+  const [count, setCount] = useState(3);
+  const [showCount, setShowCount] = useState(false);
+  const [showImage, setShowImage] = useState(false);
+  const [pulseOn, setPulseOn] = useState(false);
 
   useEffect(() => {
     if (!conn || !gameId) return;
 
-    const handleGameInsert = (_ctx: any, g: Game) => {
-      if (g.id.toString() === gameId) {
-        setGame(g);
-      }
+    const handleGameInsert = (_ctx: unknown, g: Game) => {
+      if (g.id.toString() === gameId) setGame(g);
     };
-
-    const handleGameUpdate = (_ctx: any, _oldGame: Game, newGame: Game) => {
-      if (newGame.id.toString() === gameId) {
-        setGame(newGame);
-      }
+    const handleGameUpdate = (_ctx: unknown, _o: Game, g: Game) => {
+      if (g.id.toString() === gameId) setGame(g);
     };
 
     conn.db.game.onInsert(handleGameInsert);
     conn.db.game.onUpdate(handleGameUpdate);
 
     const currentGame = conn.db.game.id.find(gameId);
-    if (currentGame) {
-      setGame(currentGame);
-    }
+    if (currentGame) setGame(currentGame);
 
     return () => {
       conn.db.game.removeOnInsert(handleGameInsert);
@@ -41,67 +38,80 @@ export const Countdown = () => {
     };
   }, [conn, gameId]);
 
+  const tag = game?.state?.tag;
+  const isCountdown = tag === "Countdown";
+  const isRacing = tag === "Racing";
+
   useEffect(() => {
-    if (!game) return;
-
-    const currentState = game.state.tag;
-
-    if (previousGameState !== "Countdown" && currentState === "Countdown") {
-      const countdownDurationMs = Number(game.countdownDurationMs);
-      const initialCount = Math.ceil(countdownDurationMs / 1000);
-      setIsVisible(true);
-      setCount(initialCount);
+    if (!isCountdown || !game) {
+      setShowCount(false);
+      setShowImage(false);
+      return;
     }
-
-    setPreviousGameState(currentState);
-  }, [game, previousGameState]);
-
-  useEffect(() => {
-    setIsVisible(false);
+    const ms = Number(game.countdownDurationMs);
+    const initial = Math.max(1, Math.ceil(ms / 1000));
+    setCount(initial);
+    setShowCount(true);
     setShowImage(false);
-    setCount(3);
-    setPreviousGameState(null);
-  }, [game?.id]);
+  }, [isCountdown, game?.id]);
 
   useEffect(() => {
-    if (game?.state?.tag !== "Countdown") return;
-
-    if (count === 0) {
+    if (!isCountdown) return;
+    if (count <= 0) {
       setShowImage(true);
       const t = setTimeout(() => {
-        setIsVisible(false);
+        setShowCount(false);
         setShowImage(false);
       }, 2000);
       return () => clearTimeout(t);
     }
+    const t = setTimeout(() => setCount((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [isCountdown, count]);
 
-    const timer = setTimeout(() => {
-      setCount((c) => c - 1);
-    }, 1000);
+  useEffect(() => {
+    if (!isCountdown) {
+      setPulseOn(false);
+      return;
+    }
+    let offTimer: ReturnType<typeof setTimeout> | null = null;
+    const fire = () => {
+      setPulseOn(true);
+      offTimer = setTimeout(() => setPulseOn(false), PULSE_BRIGHT_MS);
+    };
+    fire();
+    const interval = setInterval(fire, PULSE_PERIOD_MS);
+    return () => {
+      clearInterval(interval);
+      if (offTimer) clearTimeout(offTimer);
+      setPulseOn(false);
+    };
+  }, [isCountdown]);
 
-    return () => clearTimeout(timer);
-  }, [count, game?.state?.tag]);
-
-  const tag = game?.state?.tag;
-  const isCountdownState = tag === "Countdown";
-  const isRacing = tag === "Racing";
+  const showBorder = isCountdown || isRacing;
+  const bright = isRacing || pulseOn;
+  const accent = "var(--accent-primary)";
 
   return (
     <>
-      {isCountdownState && (
-        <div
-          key={count}
-          aria-hidden="true"
-          className="type-box-border-pulse type-box-border-pulse--tick"
-        />
-      )}
-      {isRacing && (
+      {showBorder && (
         <div
           aria-hidden="true"
-          className="type-box-border-pulse type-box-border-pulse--active"
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            borderRadius: "calc(var(--radius, 8px) * 2)",
+            border: `1px solid ${accent}`,
+            opacity: bright ? 1 : 0,
+            boxShadow: bright
+              ? `0 0 24px 2px color-mix(in srgb, ${accent} 55%, transparent)`
+              : "0 0 0 0 transparent",
+            transition: `opacity ${PULSE_FADE_MS}ms ease-out, box-shadow ${PULSE_FADE_MS}ms ease-out`,
+          }}
         />
       )}
-      {isVisible && (
+      {showCount && (
         <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
           <div
             key={count}
@@ -128,7 +138,7 @@ export const Countdown = () => {
       `}</style>
         </div>
       )}
-      {isVisible && showImage && (
+      {showCount && showImage && (
         <div
           className="fixed top-[52%] -translate-y-1/2 pointer-events-none z-50"
           style={{
