@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useParams } from "react-router-dom";
 import type { Game } from "../types/stdb";
 import { useDatabase } from "../contexts/SpacetimeContext";
-import { TypeBoxBorderPulse } from "./TypeBoxBorderPulse";
+import { TYPE_BOX_FRAME_ID } from "./TypeBox";
 
 export const Countdown = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -12,6 +13,7 @@ export const Countdown = () => {
   const [showImage, setShowImage] = useState(false);
   const [previousGameState, setPreviousGameState] = useState<string | null>(null);
   const [game, setGame] = useState<Game | null>(null);
+  const [typeBoxFrame, setTypeBoxFrame] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -83,13 +85,46 @@ export const Countdown = () => {
     return () => clearTimeout(timer);
   }, [count, isVisible]);
 
+  const tag = game?.state?.tag;
+  const isCountdownState = tag === "Countdown";
+  const isRacing = tag === "Racing";
+
+  useEffect(() => {
+    if (!isCountdownState && !isRacing) {
+      setTypeBoxFrame(null);
+      return;
+    }
+    const find = () => setTypeBoxFrame(document.getElementById(TYPE_BOX_FRAME_ID));
+    find();
+    const raf = requestAnimationFrame(find);
+    return () => cancelAnimationFrame(raf);
+  }, [isCountdownState, isRacing]);
+
+  const borderPulse =
+    typeBoxFrame &&
+    createPortal(
+      isCountdownState ? (
+        <div
+          key={count}
+          aria-hidden="true"
+          className="type-box-border-pulse type-box-border-pulse--tick"
+        />
+      ) : isRacing ? (
+        <div
+          aria-hidden="true"
+          className="type-box-border-pulse type-box-border-pulse--active"
+        />
+      ) : null,
+      typeBoxFrame
+    );
+
   if (!isVisible) {
-    return <TypeBoxBorderPulse />;
+    return borderPulse;
   }
 
   return (
     <>
-      <TypeBoxBorderPulse />
+      {borderPulse}
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
         <div
           key={count}

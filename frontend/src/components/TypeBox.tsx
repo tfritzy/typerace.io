@@ -7,7 +7,8 @@ import React, {
 } from "react";
 import { Cursor } from "./Cursor";
 import { getTranslations } from "../utils/translations";
-import { TYPE_BOX_FRAME_ID } from "./TypeBoxBorderPulse";
+
+export const TYPE_BOX_FRAME_ID = "type-box-frame";
 
 type TypeBoxProps = {
   phrase: string;
