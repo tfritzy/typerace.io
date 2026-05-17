@@ -15,7 +15,9 @@ type PlayerAvatarProps = {
 function getAvatarColorsFromCSS(): string[] {
     const style = getComputedStyle(document.documentElement);
     return [
+        style.getPropertyValue('--accent-light').trim(),
         style.getPropertyValue('--avatar-color-1').trim(),
+        style.getPropertyValue('--accent-dark').trim(),
         style.getPropertyValue('--avatar-color-2').trim(),
         style.getPropertyValue('--avatar-color-3').trim(),
     ];
@@ -24,6 +26,7 @@ function getAvatarColorsFromCSS(): string[] {
 export const PlayerAvatar = memo(({
     size,
     identity,
+    isHighlighted = false,
     isLoading = false,
     placement,
     playerColorTag
@@ -70,8 +73,14 @@ export const PlayerAvatar = memo(({
 
     return (
         <div
-            className={`relative shrink-0 border-2 rounded-full ${isLoading ? 'border-dashed' : ''}`}
-            style={{ borderColor: borderColor || avatarColors[1] }}
+            className={`relative shrink-0 rounded-full border-2 p-0.5 transition-all duration-200 ${isLoading ? 'border-dashed' : ''}`}
+            style={{
+                borderColor: borderColor || avatarColors[1],
+                background: `linear-gradient(135deg, ${avatarColors[0]}, ${avatarColors[2]})`,
+                boxShadow: isHighlighted
+                    ? `0 0 0 2px var(--background), 0 0 ${Math.max(10, size * 0.4)}px ${avatarColors[0]}55`
+                    : `0 2px ${Math.max(8, size * 0.25)}px rgba(0, 0, 0, 0.18)`,
+            }}
         >
             {crownColor && (
                 <div
@@ -109,12 +118,14 @@ export const PlayerAvatar = memo(({
                     style={{ width: size, height: size }}
                 />
             ) : (
-                <Avatar
-                    size={size}
-                    name={identity}
-                    variant="beam"
-                    colors={avatarColors}
-                />
+                <div className="rounded-full overflow-hidden bg-card">
+                    <Avatar
+                        size={size}
+                        name={identity}
+                        variant="marble"
+                        colors={avatarColors}
+                    />
+                </div>
             )}
         </div>
     );

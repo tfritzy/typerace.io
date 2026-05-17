@@ -352,6 +352,10 @@ function hslToHex(h: number, s: number, l: number): string {
     return `#${f(0)}${f(8)}${f(4)}`;
 }
 
+function clamp01(value: number): number {
+    return Math.max(0, Math.min(1, value));
+}
+
 export function getDisplayColorHex(playerColorTag: string | undefined, isCurrentPlayer: boolean): string {
     if (isCurrentPlayer) {
         return getComputedStyle(document.documentElement).getPropertyValue('--accent-primary').trim();
@@ -361,11 +365,14 @@ export function getDisplayColorHex(playerColorTag: string | undefined, isCurrent
 
 export function getPlayerAvatarColors(playerColorTag: string): string[] {
     const hex = getPlayerColorHex(playerColorTag);
-    const [h] = hexToHsl(hex);
+    const [h, s, l] = hexToHsl(hex);
+    const richSaturation = clamp01(Math.max(0.45, s * 0.95));
     return [
+        hslToHex(h + 10, richSaturation, clamp01(Math.max(0.42, l + 0.16))),
         hex,
-        hslToHex(h, 0.15, 0.22),
-        hslToHex(h, 0.08, 0.15),
+        hslToHex(h - 12, clamp01(richSaturation * 0.8), clamp01(Math.max(0.28, l - 0.12))),
+        hslToHex(h + 28, clamp01(richSaturation * 0.7), clamp01(Math.max(0.34, l - 0.04))),
+        hslToHex(h, 0.18, 0.14),
     ];
 }
 
