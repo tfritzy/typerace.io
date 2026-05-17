@@ -279,33 +279,22 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
         const isError = isTyped && !isCorrect;
 
-        if (!isError) {
-          return (
-            <span
-              key={i}
-              data-char-index={i}
-              className={`transition-all duration-150 leading-none ${colorClass}`}
-            >
-              {isCursor && <span id="target" ref={targetRef} />}
-              {char}
-            </span>
-          );
-        }
-
         return (
           <span
             key={i}
             data-char-index={i}
-            className="relative inline-block align-top"
+            className={isError ? "relative inline-block align-top" : undefined}
           >
+            {isError && (
+              <span
+                className="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[0.85em] leading-none text-destructive"
+                style={{ fontSize: `${mistypeIndicatorFontSizeEm}em` }}
+              >
+                {getMistypeIndicatorChar(true, input[i])}
+              </span>
+            )}
             <span
-              className="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[0.85em] leading-none text-destructive"
-              style={{ fontSize: `${mistypeIndicatorFontSizeEm}em` }}
-            >
-              {getMistypeIndicatorChar(true, input[i])}
-            </span>
-            <span
-              className={`transition-all duration-150 leading-none ${colorClass} underline decoration-2 decoration-destructive`}
+              className={`transition-all duration-150 leading-none ${colorClass} ${isError ? "underline decoration-2 decoration-destructive whitespace-pre" : ""}`}
             >
               {isCursor && <span id="target" ref={targetRef} />}
               {char}
