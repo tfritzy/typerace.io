@@ -16,7 +16,7 @@ Screenshots are never required for work in this repository, so do not spend time
 
 **THE TYPESCRIPT BUILD IS NOT OPTIONAL. IT IS NOT A NICE-TO-HAVE. IT IS A HARD GATE ON EVERY SINGLE ITERATION. IF YOUR PR HAS PERFECT LOGIC BUT A FAILING BUILD, IT IS A FAILURE. IF YOUR PR HAS A CLEAN BUILD, IT IS CLOSER TO ACCEPTABLE. THAT IS HOW IMPORTANT THIS IS.**
 
-This is the second most important rule in this entire file, right after the screenshot policy. If you submit a PR with TypeScript build errors, you have failed. There is no scenario where a failing build is acceptable. There is no type of PR — rebase, refactor, one-liner, config change — that is exempt from this rule. EVERY PR GETS A PASSING BUILD. PERIOD.
+This is the most important implementation rule in this entire file. If you submit a PR with TypeScript build errors, you have failed. There is no scenario where a failing build is acceptable. There is no type of PR — rebase, refactor, one-liner, config change — that is exempt from this rule. EVERY PR GETS A PASSING BUILD. PERIOD.
 
 **"But the error was already there before my changes."** — DO NOT CARE. Fix it. If `tsc -b` fails, it is your responsibility. You do not get to inherit broken builds and pass them along. You leave the codebase BETTER than you found it. Every error you see is an error you fix.
 
