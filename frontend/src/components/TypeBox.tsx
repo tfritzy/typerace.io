@@ -46,8 +46,10 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     },
     ref,
   ) => {
-    const MISTYPE_INDICATOR_FONT_SIZE_EM = 0.55;
-    const PHRASE_LINE_HEIGHT_WITH_INDICATORS = 1.35;
+    const mistypeIndicatorFontSizeEm = 0.55;
+    const phraseLineHeightWithIndicators = 1.35;
+    const nonBreakingSpace = "\u00A0";
+    const spaceIndicatorChar = "␣";
     const [focused, setFocused] = useState(true);
     const [input, setInput] = useState(phrase.substring(0, initialProgress));
     const [isComplete, setIsComplete] = useState(false);
@@ -239,8 +241,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       isError: boolean,
       typedChar: string | undefined,
     ) => {
-      if (!isError || typedChar === undefined) return "\u00A0";
-      return typedChar === " " ? "␣" : typedChar;
+      if (!isError || typedChar === undefined) return nonBreakingSpace;
+      return typedChar === " " ? spaceIndicatorChar : typedChar;
     };
 
     const renderText = () => {
@@ -283,7 +285,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           >
             <span
               className={`leading-none h-[1em] ${isError ? "text-destructive" : "opacity-0"}`}
-              style={{ fontSize: `${MISTYPE_INDICATOR_FONT_SIZE_EM}em` }}
+              style={{ fontSize: `${mistypeIndicatorFontSizeEm}em` }}
             >
               {getMistypeIndicatorChar(isError, input[i])}
             </span>
@@ -317,7 +319,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           <div className="type-box">
             <div
               className="whitespace-pre-wrap text-start text-[26px] font-mono"
-              style={{ lineHeight: PHRASE_LINE_HEIGHT_WITH_INDICATORS }}
+              style={{ lineHeight: phraseLineHeightWithIndicators }}
               ref={phraseRef}
             >
               {renderText()}
