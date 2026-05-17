@@ -117,25 +117,90 @@ export const Countdown = () => {
         <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
           <div
             key={count}
-            className="countdown-number text-foreground"
             style={{
-              fontSize: "20rem",
-              fontWeight: "bold",
-              animation: "countdownPop 1s ease-out forwards",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              animation: "countdownWrapper 1s cubic-bezier(0.22, 1, 0.36, 1) forwards",
             }}
           >
-            {count}
+            <svg
+              viewBox="0 0 100 100"
+              style={{
+                position: "absolute",
+                width: "18rem",
+                height: "18rem",
+                transform: "rotate(-90deg)",
+                animation: "countdownRingFade 1s ease-out forwards",
+              }}
+            >
+              <circle
+                cx="50"
+                cy="50"
+                r="44"
+                fill="none"
+                stroke="var(--accent-primary)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeDasharray="276.5"
+                strokeDashoffset="0"
+                style={{
+                  animation: "countdownRingDrain 1s linear forwards",
+                  opacity: 0.45,
+                }}
+              />
+            </svg>
+            <div
+              style={{
+                position: "absolute",
+                width: "16rem",
+                height: "16rem",
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle, color-mix(in srgb, var(--accent-primary) 18%, transparent) 0%, transparent 70%)",
+                animation: "countdownGlow 1s ease-out forwards",
+              }}
+            />
+            <div
+              style={{
+                fontSize: "13rem",
+                fontWeight: "900",
+                lineHeight: 1,
+                color: "var(--accent-primary)",
+                textShadow:
+                  "0 0 30px color-mix(in srgb, var(--accent-primary) 90%, transparent), 0 0 70px color-mix(in srgb, var(--accent-primary) 45%, transparent)",
+                position: "relative",
+                letterSpacing: "-0.05em",
+              }}
+            >
+              {count}
+            </div>
           </div>
           <style>{`
-        @keyframes countdownPop {
-          0% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          100% {
-            opacity: 0;
-            transform: scale(0.8);
-          }
+        @keyframes countdownWrapper {
+          0%   { opacity: 0; transform: scale(1.7); filter: blur(14px); }
+          18%  { opacity: 1; transform: scale(0.94); filter: blur(0px); }
+          30%  { transform: scale(1.03); }
+          42%  { transform: scale(1); }
+          72%  { opacity: 1; transform: scale(1); filter: blur(0px); }
+          100% { opacity: 0; transform: scale(0.65); filter: blur(8px); }
+        }
+        @keyframes countdownGlow {
+          0%   { opacity: 0; transform: scale(2.2); }
+          25%  { opacity: 1; transform: scale(1); }
+          75%  { opacity: 0.7; }
+          100% { opacity: 0; transform: scale(1.3); }
+        }
+        @keyframes countdownRingDrain {
+          0%   { stroke-dashoffset: 0; }
+          100% { stroke-dashoffset: 276.5; }
+        }
+        @keyframes countdownRingFade {
+          0%   { opacity: 0; }
+          15%  { opacity: 1; }
+          80%  { opacity: 0.8; }
+          100% { opacity: 0; }
         }
       `}</style>
         </div>
