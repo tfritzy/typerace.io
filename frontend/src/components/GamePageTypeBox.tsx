@@ -19,7 +19,8 @@ type GamePageTypeBoxProps = {
   initialProgress?: number;
   isAnonymous?: boolean;
   hideCursor?: boolean;
-  borderState?: "countdown" | "active";
+  borderBright?: boolean;
+  borderActive?: boolean;
 };
 
 export const GamePageTypeBox = memo(
@@ -33,7 +34,8 @@ export const GamePageTypeBox = memo(
     initialProgress = 0,
     isAnonymous = true,
     hideCursor = false,
-    borderState,
+    borderBright = false,
+    borderActive = false,
   }: GamePageTypeBoxProps) => {
     const typeBoxRef = useRef<TypeBoxRef>(null);
     const [xpIndicators, setXpIndicators] = useState<XpIndicatorInstance[]>([]);
@@ -101,7 +103,8 @@ export const GamePageTypeBox = memo(
           height="430px"
           initialProgress={initialProgress}
           hideCursor={hideCursor}
-          borderState={borderState}
+          borderBright={borderBright}
+          borderActive={borderActive}
         />
       </div>
     );

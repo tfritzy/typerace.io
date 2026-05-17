@@ -230,22 +230,12 @@ body {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes typeBoxBorderPulse {
-  0% {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 45%, transparent),
-      0 0 20px 2px color-mix(in srgb, var(--accent-primary) 55%, transparent);
-  }
-  100% {
-    border-color: var(--color-box-border);
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-primary) 0%, transparent),
-      0 0 0 0 color-mix(in srgb, var(--accent-primary) 0%, transparent);
-  }
-}
-
-.box-with-focus.type-box-pulse,
-.box-with-focus.type-box-pulse:focus-within {
-  animation: typeBoxBorderPulse 1s ease-out infinite;
+.box-with-focus.type-box-bright,
+.box-with-focus.type-box-bright:focus-within {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 45%, transparent),
+    0 0 20px 2px color-mix(in srgb, var(--accent-primary) 55%, transparent);
+  transition: border-color 80ms ease-out, box-shadow 80ms ease-out;
 }
 
 .box-with-focus.type-box-active,
