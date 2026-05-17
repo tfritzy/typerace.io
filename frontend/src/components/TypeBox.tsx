@@ -269,10 +269,19 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           <span
             key={i}
             data-char-index={i}
-            className={`transition-all duration-150 ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
+            className="inline-flex flex-col items-center justify-start align-top min-w-[1ch]"
           >
-            {isCursor && <span id="target" ref={targetRef} />}
-            {char}
+            <span
+              className={`text-[0.55em] leading-none h-[1em] ${isError ? "text-destructive" : "opacity-0"}`}
+            >
+              {isError ? (input[i] === " " ? "␣" : input[i]) : "·"}
+            </span>
+            <span
+              className={`transition-all duration-150 leading-none ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
+            >
+              {isCursor && <span id="target" ref={targetRef} />}
+              {char}
+            </span>
           </span>
         );
       });
@@ -296,7 +305,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         <div className="relative select-none flex-1">
           <div className="type-box">
             <div
-              className="whitespace-pre-wrap text-start text-[26px] font-mono"
+              className="whitespace-pre-wrap text-start text-[26px] font-mono leading-[1.35]"
               ref={phraseRef}
             >
               {renderText()}
