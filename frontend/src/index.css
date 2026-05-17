@@ -230,20 +230,6 @@ body {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.box-with-focus.type-box-bright,
-.box-with-focus.type-box-bright:focus-within {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 45%, transparent),
-    0 0 20px 2px color-mix(in srgb, var(--accent-primary) 55%, transparent);
-  transition: border-color 80ms ease-out, box-shadow 80ms ease-out;
-}
-
-.box-with-focus.type-box-active,
-.box-with-focus.type-box-active:focus-within {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 18%, transparent);
-}
-
 @keyframes modalFadeIn {
   from {
     opacity: 0;

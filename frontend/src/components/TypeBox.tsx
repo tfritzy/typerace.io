@@ -312,10 +312,29 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       });
     };
 
+    const containerStyle: React.CSSProperties = {
+      ...(height ? { minHeight: height } : null),
+      ...(borderBright
+        ? {
+            borderColor: "var(--accent-primary)",
+            boxShadow:
+              "0 0 0 3px color-mix(in srgb, var(--accent-primary) 45%, transparent), 0 0 20px 2px color-mix(in srgb, var(--accent-primary) 55%, transparent)",
+            transition: "none",
+          }
+        : borderActive
+          ? {
+              borderColor: "var(--accent-primary)",
+              boxShadow:
+                "0 0 0 3px color-mix(in srgb, var(--accent-primary) 18%, transparent)",
+              transition: "none",
+            }
+          : { transition: "none" }),
+    };
+
     return (
       <div
-        className={`relative box-with-focus w-full px-8 py-6 cursor-text flex items-start ${borderBright ? "type-box-bright" : ""} ${borderActive ? "type-box-active" : ""} ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
-        style={height ? { minHeight: height } : undefined}
+        className={`relative box-with-focus w-full px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
+        style={containerStyle}
         onClick={() => inputRef.current?.focus()}
       >
         {hasReachedErrorLimit && (
