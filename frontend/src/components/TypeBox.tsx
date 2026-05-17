@@ -166,7 +166,10 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             const wordLength = wordEndIndex - wordStartIndex + 1;
 
             if (phraseRef.current && wordLength > 0) {
-              const spans = phraseRef.current.querySelectorAll("span");
+                const spans =
+                  phraseRef.current.querySelectorAll<HTMLElement>(
+                    "[data-char-index]",
+                  );
               const startSpan = spans[wordStartIndex];
               const endSpan = spans[wordEndIndex];
               if (startSpan && endSpan) {
@@ -245,8 +248,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     };
 
     const renderText = () => {
-      const chars = phrase.split("");
-
       let lastCompletedWordEnd = 0;
       for (let i = 0; i < input.length && i < phrase.length; i++) {
         if (input[i] !== phrase[i]) {
@@ -257,7 +258,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
       }
 
-      return chars.map((char, i) => {
+      const renderChar = (char: string, i: number) => {
         const isTyped = i < input.length;
         const isCorrect = input[i] === char;
         const isCursor = i === input.length;
@@ -307,6 +308,30 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               {isCursor && <span id="target" ref={targetRef} />}
               {char}
             </span>
+          </span>
+        );
+      };
+
+      const tokens = phrase.match(/\S+|\s+/g) ?? [];
+      let charIndex = 0;
+
+      return tokens.map((token, tokenIndex) => {
+        const startIndex = charIndex;
+        const chars = token.split("");
+        charIndex += chars.length;
+        const isWhitespace = /^\s+$/.test(token);
+
+        if (isWhitespace) {
+          return (
+            <React.Fragment key={`space-${tokenIndex}-${startIndex}`}>
+              {chars.map((char, offset) => renderChar(char, startIndex + offset))}
+            </React.Fragment>
+          );
+        }
+
+        return (
+          <span key={`word-${tokenIndex}-${startIndex}`} className="inline">
+            {chars.map((char, offset) => renderChar(char, startIndex + offset))}
           </span>
         );
       });
