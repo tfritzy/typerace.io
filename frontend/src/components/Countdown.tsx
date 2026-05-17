@@ -5,7 +5,7 @@ import { useDatabase } from "../contexts/SpacetimeContext";
 
 const PULSE_PERIOD_MS = 1000;
 const PULSE_BRIGHT_MS = 60;
-const PULSE_FADE_MS = 650;
+const PULSE_FADE_MS = 800;
 
 export const Countdown = () => {
   const { gameId } = useParams<{ gameId: string }>();
