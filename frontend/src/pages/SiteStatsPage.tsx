@@ -17,6 +17,7 @@ import {
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
+import { getDefaultSiteTitle } from "../utils/modes";
 
 ChartJS.register(
     CategoryScale,
@@ -66,7 +67,7 @@ export const SiteStatsPage = () => {
 
     useEffect(() => {
         document.title = "Site Statistics - TypeRace.io";
-        return () => { document.title = "typerace.io - PvP typing"; };
+        return () => { document.title = getDefaultSiteTitle(); };
     }, []);
 
     useEffect(() => {

@@ -3,7 +3,7 @@ import { useMatch } from "react-router-dom";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { ScoreLeaderboards } from "./components/ScoreLeaderboards";
-import { getLanguageFromSlug } from "../utils/modes";
+import { getDefaultSiteTitle, getLanguageFromSlug } from "../utils/modes";
 
 type GameLayoutProps = {
   title: string;
@@ -24,11 +24,12 @@ export const GameLayout = ({
   const language = getLanguageFromSlug(languageGameMatch?.params.lang).slug || "en";
 
   useEffect(() => {
+    const defaultTitle = getDefaultSiteTitle(languageGameMatch?.params.lang);
     document.title = `${title} - TypeRace.io`;
     return () => {
-      document.title = "typerace.io - PvP typing";
+      document.title = defaultTitle;
     };
-  }, [title]);
+  }, [title, languageGameMatch?.params.lang]);
   const maxWidthFromHeight = `calc((100dvh - ${viewportChromeOffsetPx}px) * ${aspectRatio})`;
 
   return (
