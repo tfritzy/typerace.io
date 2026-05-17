@@ -48,12 +48,13 @@ export const GamePageTypeBox = memo(
       }
 
       const PERIOD_MS = 1000;
-      const BRIGHT_MS = 300;
-      let offTimeout: ReturnType<typeof setTimeout> | null = null;
+      let rafId: number | null = null;
 
       const tick = () => {
         setCountdownBright(true);
-        offTimeout = setTimeout(() => setCountdownBright(false), BRIGHT_MS);
+        rafId = requestAnimationFrame(() => {
+          rafId = requestAnimationFrame(() => setCountdownBright(false));
+        });
       };
 
       tick();
@@ -61,7 +62,7 @@ export const GamePageTypeBox = memo(
 
       return () => {
         clearInterval(interval);
-        if (offTimeout) clearTimeout(offTimeout);
+        if (rafId !== null) cancelAnimationFrame(rafId);
         setCountdownBright(false);
       };
     }, [borderState]);
