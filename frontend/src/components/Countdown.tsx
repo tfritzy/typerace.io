@@ -46,7 +46,7 @@ export const Countdown = () => {
 
     const currentState = game.state.tag;
 
-    if (previousGameState === "Lobby" && currentState === "Countdown") {
+    if (previousGameState !== "Countdown" && currentState === "Countdown") {
       const countdownDurationMs = Number(game.countdownDurationMs);
       const initialCount = Math.ceil(countdownDurationMs / 1000);
       setIsVisible(true);
@@ -60,27 +60,27 @@ export const Countdown = () => {
     setIsVisible(false);
     setShowImage(false);
     setCount(3);
-    setPreviousGameState("Lobby");
+    setPreviousGameState(null);
   }, [game?.id]);
 
   useEffect(() => {
-    if (!isVisible) return;
+    if (game?.state?.tag !== "Countdown") return;
 
     if (count === 0) {
       setShowImage(true);
-      setTimeout(() => {
+      const t = setTimeout(() => {
         setIsVisible(false);
         setShowImage(false);
       }, 2000);
-      return;
+      return () => clearTimeout(t);
     }
 
     const timer = setTimeout(() => {
-      setCount(count - 1);
+      setCount((c) => c - 1);
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [count, isVisible]);
+  }, [count, game?.state?.tag]);
 
   const tag = game?.state?.tag;
   const isCountdownState = tag === "Countdown";
