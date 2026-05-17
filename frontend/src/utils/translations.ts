@@ -28,7 +28,6 @@ export interface Translations {
   time: string;
   place: string;
   accuracy: string;
-  tooManyErrors: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -60,7 +59,6 @@ const translations: Record<Language, Translations> = {
     place: "Place",
     accuracy: "Accuracy",
     tagline: "Multiplayer Typing Races",
-    tooManyErrors: "You must fix all errors",
   },
   [Language.Spanish]: {
     publicMatch: "Partida pública",
@@ -90,7 +88,6 @@ const translations: Record<Language, Translations> = {
     place: "Posición",
     accuracy: "Precisión",
     tagline: "Carreras de mecanografía multijugador",
-    tooManyErrors: "Debes corregir todos los errores",
   },
   [Language.French]: {
     publicMatch: "Partie publique",
@@ -120,7 +117,6 @@ const translations: Record<Language, Translations> = {
     place: "Place",
     accuracy: "Précision",
     tagline: "Courses de dactylographie multijoueur",
-    tooManyErrors: "Vous devez corriger toutes les erreurs",
   },
   [Language.German]: {
     publicMatch: "Öffentliches Spiel",
@@ -150,7 +146,6 @@ const translations: Record<Language, Translations> = {
     place: "Platz",
     accuracy: "Genauigkeit",
     tagline: "Multiplayer-Tippwettbewerbe",
-    tooManyErrors: "Du musst alle Fehler korrigieren",
   },
   [Language.Italian]: {
     publicMatch: "Partita pubblica",
@@ -180,7 +175,6 @@ const translations: Record<Language, Translations> = {
     place: "Posizione",
     accuracy: "Precisione",
     tagline: "Gare di digitazione multiplayer",
-    tooManyErrors: "Devi correggere tutti gli errori",
   },
   [Language.Portuguese]: {
     publicMatch: "Partida pública",
@@ -210,7 +204,6 @@ const translations: Record<Language, Translations> = {
     place: "Posição",
     accuracy: "Precisão",
     tagline: "Corridas de digitação multijogador",
-    tooManyErrors: "Você deve corrigir todos os erros",
   },
   [Language.Japanese]: {
     publicMatch: "パブリックマッチ",
@@ -240,7 +233,6 @@ const translations: Record<Language, Translations> = {
     place: "順位",
     accuracy: "精度",
     tagline: "マルチプレイヤータイピングレース",
-    tooManyErrors: "すべてのエラーを修正してください",
   },
   [Language.Korean]: {
     publicMatch: "공개 매치",
@@ -270,7 +262,6 @@ const translations: Record<Language, Translations> = {
     place: "순위",
     accuracy: "정확도",
     tagline: "멀티플레이어 타이핑 레이스",
-    tooManyErrors: "모든 오류를 수정해야 합니다",
   },
   [Language.Chinese]: {
     publicMatch: "公开比赛",
@@ -300,7 +291,6 @@ const translations: Record<Language, Translations> = {
     place: "名次",
     accuracy: "准确率",
     tagline: "多人在线打字竞赛",
-    tooManyErrors: "你必须修正所有错误",
   },
   [Language.Ukrainian]: {
     publicMatch: "Публічний матч",
@@ -330,7 +320,6 @@ const translations: Record<Language, Translations> = {
     place: "Місце",
     accuracy: "Точність",
     tagline: "Багатокористувацькі змагання з друку",
-    tooManyErrors: "Ви маєте виправити всі помилки",
   },
   [Language.Arabic]: {
     publicMatch: "مباراة عامة",
@@ -360,7 +349,6 @@ const translations: Record<Language, Translations> = {
     place: "المركز",
     accuracy: "الدقة",
     tagline: "سباق الكتابة الجماعي",
-    tooManyErrors: "يجب تصحيح جميع الأخطاء",
   },
   [Language.Hindi]: {
     publicMatch: "सार्वजनिक मैच",
@@ -390,7 +378,6 @@ const translations: Record<Language, Translations> = {
     place: "स्थान",
     accuracy: "सटीकता",
     tagline: "मल्टीप्लेयर टाइपिंग रेस",
-    tooManyErrors: "आपको सभी त्रुटियाँ ठीक करनी होंगी",
   },
   [Language.Dutch]: {
     publicMatch: "Openbare wedstrijd",
@@ -420,7 +407,6 @@ const translations: Record<Language, Translations> = {
     place: "Plaats",
     accuracy: "Nauwkeurigheid",
     tagline: "Multiplayer typwedstrijden",
-    tooManyErrors: "Je moet alle fouten corrigeren",
   },
   [Language.Swedish]: {
     publicMatch: "Offentlig match",
@@ -450,7 +436,6 @@ const translations: Record<Language, Translations> = {
     place: "Plats",
     accuracy: "Noggrannhet",
     tagline: "Multiplayer-skrivtävlingar",
-    tooManyErrors: "Du måste rätta alla fel",
   },
   [Language.Turkish]: {
     publicMatch: "Açık Maç",
@@ -480,7 +465,6 @@ const translations: Record<Language, Translations> = {
     place: "Sıralama",
     accuracy: "Doğruluk",
     tagline: "Çok oyunculu yazma yarışları",
-    tooManyErrors: "Tüm hataları düzeltmelisiniz",
   },
 };
 
