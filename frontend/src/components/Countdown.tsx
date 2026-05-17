@@ -82,25 +82,39 @@ export const Countdown = () => {
     return () => clearTimeout(timer);
   }, [count, isVisible]);
 
-  if (!isVisible) {
-    return null;
-  }
+  const tag = game?.state?.tag;
+  const isCountdownState = tag === "Countdown";
+  const isRacing = tag === "Racing";
 
   return (
     <>
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
+      {isCountdownState && (
         <div
           key={count}
-          className="countdown-number text-foreground"
-          style={{
-            fontSize: "20rem",
-            fontWeight: "bold",
-            animation: "countdownPop 1s ease-out forwards",
-          }}
-        >
-          {count}
-        </div>
-        <style>{`
+          aria-hidden="true"
+          className="type-box-border-pulse type-box-border-pulse--tick"
+        />
+      )}
+      {isRacing && (
+        <div
+          aria-hidden="true"
+          className="type-box-border-pulse type-box-border-pulse--active"
+        />
+      )}
+      {isVisible && (
+        <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
+          <div
+            key={count}
+            className="countdown-number text-foreground"
+            style={{
+              fontSize: "20rem",
+              fontWeight: "bold",
+              animation: "countdownPop 1s ease-out forwards",
+            }}
+          >
+            {count}
+          </div>
+          <style>{`
         @keyframes countdownPop {
           0% {
             opacity: 1;
@@ -112,8 +126,9 @@ export const Countdown = () => {
           }
         }
       `}</style>
-      </div>
-      {showImage && (
+        </div>
+      )}
+      {isVisible && showImage && (
         <div
           className="fixed top-[52%] -translate-y-1/2 pointer-events-none z-50"
           style={{

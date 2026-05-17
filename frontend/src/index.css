@@ -223,7 +223,7 @@ body {
 .type-box-border-pulse {
   position: absolute;
   inset: 0;
-  border-radius: inherit;
+  border-radius: calc(var(--radius, 8px) * 2);
   pointer-events: none;
 }
 
