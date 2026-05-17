@@ -231,20 +231,18 @@ body {
 }
 
 @keyframes typeBoxBorderPulse {
-  0%,
-  100% {
-    border-color: var(--color-box-border);
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-primary) 0%, transparent);
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-primary) 55%, transparent);
   }
-  50% {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent-primary) 22%, transparent);
+  100% {
+    box-shadow: 0 0 0 18px color-mix(in srgb, var(--accent-primary) 0%, transparent);
   }
 }
 
 .box-with-focus.type-box-pulse,
 .box-with-focus.type-box-pulse:focus-within {
-  animation: typeBoxBorderPulse 1s ease-in-out infinite;
+  border-color: var(--accent-primary);
+  animation: typeBoxBorderPulse 1s ease-out infinite;
 }
 
 .box-with-focus.type-box-active,
