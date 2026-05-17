@@ -218,34 +218,6 @@ export const GamePage = () => {
     return () => clearTimeout(timeout);
   }, [game, navigate]);
 
-  const [borderBright, setBorderBright] = useState(false);
-  const countdownActive = game?.state?.tag === "Countdown";
-
-  useEffect(() => {
-    if (!countdownActive) {
-      setBorderBright(false);
-      return;
-    }
-
-    const BRIGHT_MS = 300;
-    const PERIOD_MS = 1000;
-    let offTimeout: ReturnType<typeof setTimeout> | null = null;
-
-    const tick = () => {
-      setBorderBright(true);
-      offTimeout = setTimeout(() => setBorderBright(false), BRIGHT_MS);
-    };
-
-    tick();
-    const interval = setInterval(tick, PERIOD_MS);
-
-    return () => {
-      clearInterval(interval);
-      if (offTimeout) clearTimeout(offTimeout);
-      setBorderBright(false);
-    };
-  }, [countdownActive]);
-
   if (!game) {
     return null;
   }
@@ -407,8 +379,9 @@ export const GamePage = () => {
               initialProgress={initialProgress}
               isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
               hideCursor={!isMemberOfRace}
-              borderBright={isCountdown && borderBright}
-              borderActive={isRacing}
+              borderState={
+                isCountdown ? "countdown" : isRacing ? "active" : "off"
+              }
             />
           )}
         </div>

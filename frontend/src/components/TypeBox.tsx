@@ -23,8 +23,7 @@ type TypeBoxProps = {
   disabled?: boolean;
   initialProgress?: number;
   hideCursor?: boolean;
-  borderBright?: boolean;
-  borderActive?: boolean;
+  borderHighlight?: boolean;
 };
 
 export type TypeBoxRef = {
@@ -45,8 +44,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       disabled = false,
       initialProgress = 0,
       hideCursor = false,
-      borderBright = false,
-      borderActive = false,
+      borderHighlight = false,
     },
     ref,
   ) => {
@@ -314,21 +312,14 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     const containerStyle: React.CSSProperties = {
       ...(height ? { minHeight: height } : null),
-      ...(borderBright
+      transition: "border-color 400ms ease-in-out, box-shadow 400ms ease-in-out",
+      ...(borderHighlight
         ? {
             borderColor: "var(--accent-primary)",
             boxShadow:
               "0 0 0 3px color-mix(in srgb, var(--accent-primary) 45%, transparent), 0 0 20px 2px color-mix(in srgb, var(--accent-primary) 55%, transparent)",
-            transition: "none",
           }
-        : borderActive
-          ? {
-              borderColor: "var(--accent-primary)",
-              boxShadow:
-                "0 0 0 3px color-mix(in srgb, var(--accent-primary) 18%, transparent)",
-              transition: "none",
-            }
-          : { transition: "none" }),
+        : null),
     };
 
     return (
