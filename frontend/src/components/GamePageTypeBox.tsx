@@ -1,6 +1,7 @@
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { TypeBox, type TypeBoxRef } from "./TypeBox";
 import type { DbConnection } from "../../module_bindings";
+import type { Game } from "../types/stdb";
 import { WordXpIndicator } from "./WordXpIndicator";
 
 interface XpIndicatorInstance {
@@ -36,6 +37,39 @@ export const GamePageTypeBox = memo(
     const typeBoxRef = useRef<TypeBoxRef>(null);
     const [xpIndicators, setXpIndicators] = useState<XpIndicatorInstance[]>([]);
     const xpIndicatorIdCounter = useRef(0);
+    const [game, setGame] = useState<Game | null>(null);
+    const [countdownTick, setCountdownTick] = useState(0);
+
+    useEffect(() => {
+      if (!conn || !gameId) return;
+      const handleInsert = (_ctx: any, g: Game) => {
+        if (g.id.toString() === gameId) setGame(g);
+      };
+      const handleUpdate = (_ctx: any, _o: Game, g: Game) => {
+        if (g.id.toString() === gameId) setGame(g);
+      };
+      conn.db.game.onInsert(handleInsert);
+      conn.db.game.onUpdate(handleUpdate);
+      const current = conn.db.game.id.find(gameId);
+      if (current) setGame(current);
+      return () => {
+        conn.db.game.removeOnInsert(handleInsert);
+        conn.db.game.removeOnUpdate(handleUpdate);
+      };
+    }, [conn, gameId]);
+
+    const tag = game?.state?.tag;
+    const isCountdownState = tag === "Countdown";
+    const isRacing = tag === "Racing";
+
+    useEffect(() => {
+      if (!isCountdownState) return;
+      setCountdownTick((t) => t + 1);
+      const interval = setInterval(() => {
+        setCountdownTick((t) => t + 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }, [isCountdownState]);
 
     const handleProgress = useCallback(
       (
@@ -88,18 +122,33 @@ export const GamePageTypeBox = memo(
             onComplete={() => handleXpIndicatorComplete(indicator.id)}
           />
         ))}
-        <TypeBox
-          ref={typeBoxRef}
-          phrase={phrase}
-          attribution={attribution}
-          onProgress={handleProgress}
-          onComplete={handleComplete}
-          onWordComplete={handleWordComplete}
-          disabled={disabled}
-          height="430px"
-          initialProgress={initialProgress}
-          hideCursor={hideCursor}
-        />
+        <div className="relative">
+          <TypeBox
+            ref={typeBoxRef}
+            phrase={phrase}
+            attribution={attribution}
+            onProgress={handleProgress}
+            onComplete={handleComplete}
+            onWordComplete={handleWordComplete}
+            disabled={disabled}
+            height="430px"
+            initialProgress={initialProgress}
+            hideCursor={hideCursor}
+          />
+          {isCountdownState && (
+            <div
+              key={countdownTick}
+              aria-hidden="true"
+              className="type-box-border-pulse type-box-border-pulse--tick"
+            />
+          )}
+          {isRacing && (
+            <div
+              aria-hidden="true"
+              className="type-box-border-pulse type-box-border-pulse--active"
+            />
+          )}
+        </div>
       </div>
     );
   }
