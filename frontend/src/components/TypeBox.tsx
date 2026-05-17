@@ -312,7 +312,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     const containerStyle: React.CSSProperties = {
       ...(height ? { minHeight: height } : null),
-      transition: "border-color 400ms ease-in-out, box-shadow 400ms ease-in-out",
+      transition: "border-color 300ms ease-in-out, box-shadow 300ms ease-in-out",
       ...(borderHighlight
         ? {
             borderColor: "var(--accent-primary)",

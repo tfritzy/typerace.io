@@ -48,8 +48,12 @@ export const GamePageTypeBox = memo(
       }
 
       const PERIOD_MS = 1000;
+      const BRIGHT_MS = 300;
+      let offTimeout: ReturnType<typeof setTimeout> | null = null;
+
       const tick = () => {
-        setCountdownBright((prev) => !prev);
+        setCountdownBright(true);
+        offTimeout = setTimeout(() => setCountdownBright(false), BRIGHT_MS);
       };
 
       tick();
@@ -57,6 +61,7 @@ export const GamePageTypeBox = memo(
 
       return () => {
         clearInterval(interval);
+        if (offTimeout) clearTimeout(offTimeout);
         setCountdownBright(false);
       };
     }, [borderState]);
