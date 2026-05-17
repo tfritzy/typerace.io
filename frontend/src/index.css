@@ -229,7 +229,7 @@ body {
 
 .type-box-border-pulse--tick {
   border: 1px solid var(--accent-primary);
-  animation: typeBoxBorderPulseTick 900ms ease-out forwards;
+  animation: typeBoxBorderPulseTick 1000ms ease-out forwards;
 }
 
 .type-box-border-pulse--active {
@@ -242,13 +242,17 @@ body {
     opacity: 0;
     box-shadow: 0 0 0 0 transparent;
   }
-  30% {
+  15% {
     opacity: 1;
-    box-shadow: 0 0 14px 1px color-mix(in srgb, var(--accent-primary) 55%, transparent);
+    box-shadow: 0 0 28px 4px color-mix(in srgb, var(--accent-primary) 75%, transparent);
+  }
+  55% {
+    opacity: 1;
+    box-shadow: 0 0 20px 2px color-mix(in srgb, var(--accent-primary) 55%, transparent);
   }
   100% {
     opacity: 0;
-    box-shadow: 0 0 18px 2px transparent;
+    box-shadow: 0 0 0 0 transparent;
   }
 }
 
