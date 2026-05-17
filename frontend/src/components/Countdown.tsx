@@ -4,8 +4,8 @@ import type { Game } from "../types/stdb";
 import { useDatabase } from "../contexts/SpacetimeContext";
 
 const PULSE_PERIOD_MS = 1000;
-const PULSE_BRIGHT_MS = 250;
-const PULSE_FADE_MS = 400;
+const PULSE_BRIGHT_MS = 60;
+const PULSE_FADE_MS = 650;
 
 export const Countdown = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -105,9 +105,11 @@ export const Countdown = () => {
             border: `1px solid ${accent}`,
             opacity: bright ? 1 : 0,
             boxShadow: bright
-              ? `0 0 24px 2px color-mix(in srgb, ${accent} 55%, transparent)`
+              ? `0 0 12px 0 color-mix(in srgb, ${accent} 35%, transparent)`
               : "0 0 0 0 transparent",
-            transition: `opacity ${PULSE_FADE_MS}ms ease-out, box-shadow ${PULSE_FADE_MS}ms ease-out`,
+            transition: bright
+              ? "none"
+              : `opacity ${PULSE_FADE_MS}ms ease-out, box-shadow ${PULSE_FADE_MS}ms ease-out`,
           }}
         />
       )}
