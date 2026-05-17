@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import { getDefaultSiteTitle } from "../utils/modes";
 
 const GAMES = [
   {
@@ -16,7 +17,7 @@ export const GamesPage = () => {
   useEffect(() => {
     document.title = "Games - TypeRace.io";
     return () => {
-      document.title = "typerace.io - PvP typing";
+      document.title = getDefaultSiteTitle();
     };
   }, []);
 

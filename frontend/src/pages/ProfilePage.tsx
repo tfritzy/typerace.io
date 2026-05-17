@@ -6,7 +6,7 @@ import { PlayerAvatar } from "../components/PlayerAvatar";
 import { useParams, useNavigate } from "react-router-dom";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
 import { EditNameModal } from "../components/EditNameModal";
-import { getLangHome } from "../utils/modes";
+import { getDefaultSiteTitle, getLangHome } from "../utils/modes";
 import { formatNumber, formatTimeSpent } from "../utils/formatters";
 import { useAuth } from "../firebase/AuthContext";
 import { Select } from "../components/Select";
@@ -32,7 +32,7 @@ export const ProfilePage = () => {
         if (viewedPlayer) {
             document.title = `${viewedPlayer.name} - TypeRace.io`;
         }
-        return () => { document.title = "typerace.io - PvP typing"; };
+        return () => { document.title = getDefaultSiteTitle(); };
     }, [viewedPlayer]);
 
     useEffect(() => {

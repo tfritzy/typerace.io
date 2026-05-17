@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useMemo } from "react";
+import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { type GameMode } from "../types/stdb";
 import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
@@ -44,6 +44,10 @@ export const LobbyPage = () => {
   const currentLang = getLanguageFromSlug(lang);
 
   useMemo(() => storeLangSlug(currentLang.slug), [currentLang.slug]);
+
+  useEffect(() => {
+    document.title = currentLang.title;
+  }, [currentLang.title]);
 
   const handleModeSelect = useCallback((mode: GameMode) => {
     setSelectedMode(mode);

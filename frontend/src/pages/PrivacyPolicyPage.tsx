@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { Header } from "../components/Header";
+import { getDefaultSiteTitle } from "../utils/modes";
 
 export const PrivacyPolicyPage = () => {
     useEffect(() => {
         document.title = "Privacy Policy - TypeRace.io";
-        return () => { document.title = "typerace.io - PvP typing"; };
+        return () => { document.title = getDefaultSiteTitle(); };
     }, []);
 
     return (
