@@ -12,6 +12,11 @@ type PlayerAvatarProps = {
     playerColorTag?: string;
 };
 
+const HIGHLIGHT_GLOW_ALPHA_HEX = '55';
+const DEFAULT_SHADOW_MIN_BLUR = 8;
+const DEFAULT_SHADOW_SIZE_RATIO = 0.25;
+const DEFAULT_SHADOW_OPACITY = 0.18;
+
 function getAvatarColorsFromCSS(): string[] {
     const style = getComputedStyle(document.documentElement);
     return Array.from({ length: 5 }, (_, index) =>
@@ -74,8 +79,8 @@ export const PlayerAvatar = memo(({
                 borderColor: borderColor || avatarColors[1],
                 background: `linear-gradient(135deg, ${avatarColors[0]}, ${avatarColors[2]})`,
                 boxShadow: isHighlighted
-                    ? `0 0 0 2px var(--background), 0 0 ${Math.max(10, size * 0.4)}px ${avatarColors[0]}55`
-                    : `0 2px ${Math.max(8, size * 0.25)}px rgba(0, 0, 0, 0.18)`,
+                    ? `0 0 0 2px var(--background), 0 0 ${Math.max(10, size * 0.4)}px ${avatarColors[0]}${HIGHLIGHT_GLOW_ALPHA_HEX}`
+                    : `0 2px ${Math.max(DEFAULT_SHADOW_MIN_BLUR, size * DEFAULT_SHADOW_SIZE_RATIO)}px rgba(0, 0, 0, ${DEFAULT_SHADOW_OPACITY})`,
             }}
         >
             {crownColor && (

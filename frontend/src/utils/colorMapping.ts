@@ -382,12 +382,12 @@ export function getDisplayColorHex(playerColorTag: string | undefined, isCurrent
 export function getPlayerAvatarColors(playerColorTag: string): string[] {
     const hex = getPlayerColorHex(playerColorTag);
     const [h, s, l] = hexToHsl(hex);
-    const richSaturation = clamp01(Math.max(AVATAR_MIN_SATURATION, s * AVATAR_LIGHT_SATURATION_SCALE));
+    const enhancedSaturation = clamp01(Math.max(AVATAR_MIN_SATURATION, s * AVATAR_LIGHT_SATURATION_SCALE));
     return [
-        hslToHex(h + AVATAR_HUE_LIGHT_SHIFT, richSaturation, clamp01(Math.max(AVATAR_LIGHT_MIN_LIGHTNESS, l + AVATAR_LIGHTNESS_BOOST))),
+        hslToHex(h + AVATAR_HUE_LIGHT_SHIFT, enhancedSaturation, clamp01(Math.max(AVATAR_LIGHT_MIN_LIGHTNESS, l + AVATAR_LIGHTNESS_BOOST))),
         hex,
-        hslToHex(h + AVATAR_HUE_SHADOW_SHIFT, clamp01(richSaturation * AVATAR_SHADOW_SATURATION_SCALE), clamp01(Math.max(AVATAR_SHADOW_MIN_LIGHTNESS, l - AVATAR_SHADOW_LIGHTNESS_DROP))),
-        hslToHex(h + AVATAR_HUE_ACCENT_SHIFT, clamp01(richSaturation * AVATAR_ACCENT_SATURATION_SCALE), clamp01(Math.max(AVATAR_ACCENT_MIN_LIGHTNESS, l - AVATAR_ACCENT_LIGHTNESS_DROP))),
+        hslToHex(h + AVATAR_HUE_SHADOW_SHIFT, clamp01(enhancedSaturation * AVATAR_SHADOW_SATURATION_SCALE), clamp01(Math.max(AVATAR_SHADOW_MIN_LIGHTNESS, l - AVATAR_SHADOW_LIGHTNESS_DROP))),
+        hslToHex(h + AVATAR_HUE_ACCENT_SHIFT, clamp01(enhancedSaturation * AVATAR_ACCENT_SATURATION_SCALE), clamp01(Math.max(AVATAR_ACCENT_MIN_LIGHTNESS, l - AVATAR_ACCENT_LIGHTNESS_DROP))),
         hslToHex(h, AVATAR_DARK_SATURATION, AVATAR_DARK_LIGHTNESS),
     ];
 }
