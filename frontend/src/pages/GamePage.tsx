@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useCallback, useState, useMemo } from "react";
+import { useEffect, useCallback, useState, useMemo, useRef } from "react";
 import { type Game, type PlayerProgress } from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
@@ -26,11 +26,15 @@ export const GamePage = () => {
   const [gamePlayerProgress, setGamePlayerProgress] = useState<
     PlayerProgress[]
   >([]);
+  const [currentPlayerEffectDone, setCurrentPlayerEffectDone] = useState(false);
+  const currentPlayerInitialCheckRef = useRef(false);
 
   useEffect(() => {
     setGame(null);
     setGamePlayerProgress([]);
     setHasFinished(false);
+    setCurrentPlayerEffectDone(false);
+    currentPlayerInitialCheckRef.current = false;
   }, [gameId]);
 
   useEffect(() => {
@@ -154,21 +158,50 @@ export const GamePage = () => {
     );
 
     if (currentPlayerProgress && game.phrase) {
-      if (currentPlayerProgress.progressIndex >= game.phrase.length) {
+      const isComplete =
+        currentPlayerProgress.progressIndex >= game.phrase.length;
+
+      if (!currentPlayerInitialCheckRef.current) {
+        currentPlayerInitialCheckRef.current = true;
+        if (isComplete) {
+          setCurrentPlayerEffectDone(true);
+          setHasFinished(true);
+        }
+      } else if (isComplete && currentPlayerEffectDone) {
         setHasFinished(true);
       }
     }
 
-    if (gamePlayerProgress.length > 0 && gamePlayerProgress.every(pp => pp.progressIndex >= game.phrase.length)) {
+    if (
+      gamePlayerProgress.length > 0 &&
+      gamePlayerProgress.every(
+        (pp) => pp.progressIndex >= game.phrase.length,
+      ) &&
+      currentPlayerEffectDone
+    ) {
       setHasFinished(true);
     }
-  }, [conn, game, gamePlayerProgress]);
+  }, [conn, game, gamePlayerProgress, currentPlayerEffectDone]);
 
   useEffect(() => {
-    if (game?.state?.tag === "Archived") {
+    if (game?.state?.tag !== "Archived") return;
+
+    if (!conn || !game.phrase) {
+      setHasFinished(true);
+      return;
+    }
+
+    const currentPlayerId = conn.identity;
+    const currentPP = currentPlayerId
+      ? gamePlayerProgress.find((pp) => pp.playerId.isEqual(currentPlayerId))
+      : undefined;
+    const currentPlayerIsComplete =
+      !!currentPP && currentPP.progressIndex >= game.phrase.length;
+
+    if (!currentPP || !currentPlayerIsComplete || currentPlayerEffectDone) {
       setHasFinished(true);
     }
-  }, [game]);
+  }, [game, conn, gamePlayerProgress, currentPlayerEffectDone]);
 
   useEffect(() => {
     if (!conn || !game || !gameId) return;
@@ -186,6 +219,7 @@ export const GamePage = () => {
   }, [conn, game, gameId, gamePlayerProgress]);
 
   const handleFinish = useCallback(() => {
+    setCurrentPlayerEffectDone(true);
     setHasFinished(true);
   }, []);
 
@@ -244,7 +278,8 @@ export const GamePage = () => {
   );
   const initialProgress = currentPlayerProgress?.progressIndex ?? 0;
   const hasCompletedRace = currentPlayerProgress
-    ? currentPlayerProgress.progressIndex >= game.phrase.length
+    ? currentPlayerProgress.progressIndex >= game.phrase.length &&
+      currentPlayerEffectDone
     : false;
   const isMemberOfRace = !!currentPlayerProgress;
   const isDisabled = isInLobby || isCountdown || !currentPlayerProgress;
