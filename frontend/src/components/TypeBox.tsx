@@ -278,10 +278,14 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       });
     };
 
+    const containerStyle: React.CSSProperties = {
+      ...(height ? { minHeight: height } : null),
+    };
+
     return (
       <div
         className={`relative box-with-focus w-full px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
-        style={height ? { minHeight: height } : undefined}
+        style={containerStyle}
         onClick={() => inputRef.current?.focus()}
       >
         {hasReachedErrorLimit && (

@@ -1,6 +1,7 @@
 import { memo, useCallback, useRef, useState } from "react";
 import { TypeBox, type TypeBoxRef } from "./TypeBox";
 import type { DbConnection } from "../../module_bindings";
+import { Countdown } from "./Countdown";
 import { WordXpIndicator } from "./WordXpIndicator";
 
 interface XpIndicatorInstance {
@@ -88,18 +89,21 @@ export const GamePageTypeBox = memo(
             onComplete={() => handleXpIndicatorComplete(indicator.id)}
           />
         ))}
-        <TypeBox
-          ref={typeBoxRef}
-          phrase={phrase}
-          attribution={attribution}
-          onProgress={handleProgress}
-          onComplete={handleComplete}
-          onWordComplete={handleWordComplete}
-          disabled={disabled}
-          height="430px"
-          initialProgress={initialProgress}
-          hideCursor={hideCursor}
-        />
+        <div className="relative">
+          <TypeBox
+            ref={typeBoxRef}
+            phrase={phrase}
+            attribution={attribution}
+            onProgress={handleProgress}
+            onComplete={handleComplete}
+            onWordComplete={handleWordComplete}
+            disabled={disabled}
+            height="430px"
+            initialProgress={initialProgress}
+            hideCursor={hideCursor}
+          />
+          <Countdown />
+        </div>
       </div>
     );
   }

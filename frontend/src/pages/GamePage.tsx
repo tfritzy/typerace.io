@@ -3,7 +3,6 @@ import { useEffect, useCallback, useState, useMemo } from "react";
 import { type Game, type PlayerProgress } from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
-import { Countdown } from "../components/Countdown";
 import { PlayerStatsRow } from "../components/PlayerStatsRow";
 import { AllPlayersResults } from "../components/AllPlayersResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
@@ -252,8 +251,6 @@ export const GamePage = () => {
   return (
     <div className="relative h-full flex flex-col">
       <Header />
-
-      <Countdown />
 
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4">
         <div className="content-container w-full my-auto">
