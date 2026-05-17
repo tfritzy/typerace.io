@@ -45,21 +45,29 @@ const PLAYER_COLOR_HEX: Record<string, string> = {
     Sky: '#0EA5E9',
 };
 
-const AVATAR_HUE_LIGHT_SHIFT = 10;
-const AVATAR_HUE_SHADOW_SHIFT = -12;
-const AVATAR_HUE_ACCENT_SHIFT = 28;
-const AVATAR_MIN_SATURATION = 0.45;
-const AVATAR_LIGHT_SATURATION_SCALE = 0.95;
-const AVATAR_SHADOW_SATURATION_SCALE = 0.8;
-const AVATAR_ACCENT_SATURATION_SCALE = 0.7;
-const AVATAR_LIGHT_MIN_LIGHTNESS = 0.42;
-const AVATAR_SHADOW_MIN_LIGHTNESS = 0.28;
-const AVATAR_ACCENT_MIN_LIGHTNESS = 0.34;
-const AVATAR_DARK_SATURATION = 0.18;
-const AVATAR_DARK_LIGHTNESS = 0.14;
-const AVATAR_LIGHTNESS_BOOST = 0.16;
-const AVATAR_SHADOW_LIGHTNESS_DROP = 0.12;
-const AVATAR_ACCENT_LIGHTNESS_DROP = 0.04;
+const AVATAR_COLOR_TUNING = {
+    hueDegrees: {
+        lightShift: 10,
+        shadowShift: -12,
+        accentShift: 28,
+    },
+    saturation01: {
+        minimum: 0.45,
+        lightScale: 0.95,
+        shadowScale: 0.8,
+        accentScale: 0.7,
+        darkest: 0.18,
+    },
+    lightness01: {
+        lightMinimum: 0.42,
+        shadowMinimum: 0.28,
+        accentMinimum: 0.34,
+        darkest: 0.14,
+        lightBoost: 0.16,
+        shadowDrop: 0.12,
+        accentDrop: 0.04,
+    },
+} as const;
 
 const THEME_PLAYER_COLORS: Record<ThemeTag, Record<string, string>> = {
     OneDark: { ...PLAYER_COLOR_HEX },
@@ -382,13 +390,13 @@ export function getDisplayColorHex(playerColorTag: string | undefined, isCurrent
 export function getPlayerAvatarColors(playerColorTag: string): string[] {
     const hex = getPlayerColorHex(playerColorTag);
     const [h, s, l] = hexToHsl(hex);
-    const enhancedSaturation = clamp01(Math.max(AVATAR_MIN_SATURATION, s * AVATAR_LIGHT_SATURATION_SCALE));
+    const enhancedSaturation = clamp01(Math.max(AVATAR_COLOR_TUNING.saturation01.minimum, s * AVATAR_COLOR_TUNING.saturation01.lightScale));
     return [
-        hslToHex(h + AVATAR_HUE_LIGHT_SHIFT, enhancedSaturation, clamp01(Math.max(AVATAR_LIGHT_MIN_LIGHTNESS, l + AVATAR_LIGHTNESS_BOOST))),
+        hslToHex(h + AVATAR_COLOR_TUNING.hueDegrees.lightShift, enhancedSaturation, clamp01(Math.max(AVATAR_COLOR_TUNING.lightness01.lightMinimum, l + AVATAR_COLOR_TUNING.lightness01.lightBoost))),
         hex,
-        hslToHex(h + AVATAR_HUE_SHADOW_SHIFT, clamp01(enhancedSaturation * AVATAR_SHADOW_SATURATION_SCALE), clamp01(Math.max(AVATAR_SHADOW_MIN_LIGHTNESS, l - AVATAR_SHADOW_LIGHTNESS_DROP))),
-        hslToHex(h + AVATAR_HUE_ACCENT_SHIFT, clamp01(enhancedSaturation * AVATAR_ACCENT_SATURATION_SCALE), clamp01(Math.max(AVATAR_ACCENT_MIN_LIGHTNESS, l - AVATAR_ACCENT_LIGHTNESS_DROP))),
-        hslToHex(h, AVATAR_DARK_SATURATION, AVATAR_DARK_LIGHTNESS),
+        hslToHex(h + AVATAR_COLOR_TUNING.hueDegrees.shadowShift, clamp01(enhancedSaturation * AVATAR_COLOR_TUNING.saturation01.shadowScale), clamp01(Math.max(AVATAR_COLOR_TUNING.lightness01.shadowMinimum, l - AVATAR_COLOR_TUNING.lightness01.shadowDrop))),
+        hslToHex(h + AVATAR_COLOR_TUNING.hueDegrees.accentShift, clamp01(enhancedSaturation * AVATAR_COLOR_TUNING.saturation01.accentScale), clamp01(Math.max(AVATAR_COLOR_TUNING.lightness01.accentMinimum, l - AVATAR_COLOR_TUNING.lightness01.accentDrop))),
+        hslToHex(h, AVATAR_COLOR_TUNING.saturation01.darkest, AVATAR_COLOR_TUNING.lightness01.darkest),
     ];
 }
 
