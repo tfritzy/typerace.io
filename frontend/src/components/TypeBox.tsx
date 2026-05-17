@@ -8,6 +8,10 @@ import React, {
 import { Cursor } from "./Cursor";
 import { getTranslations } from "../utils/translations";
 
+const COMPLETE_WAVE_SWEEP_MS = 350;
+const COMPLETE_CHAR_ANIM_MS = 500;
+const COMPLETE_EFFECT_TOTAL_MS = COMPLETE_WAVE_SWEEP_MS + COMPLETE_CHAR_ANIM_MS;
+
 type TypeBoxProps = {
   phrase: string;
   attribution?: string;
@@ -49,6 +53,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const [focused, setFocused] = useState(true);
     const [input, setInput] = useState(phrase.substring(0, initialProgress));
     const [isComplete, setIsComplete] = useState(false);
+    const [isPlayingCompleteEffect, setIsPlayingCompleteEffect] =
+      useState(false);
     const [hasReachedErrorLimit, setHasReachedErrorLimit] = useState(false);
 
     const targetRef = useRef<HTMLElement>(null);
@@ -57,10 +63,21 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const lastProcessedValueRef = useRef<string>(
       phrase.substring(0, initialProgress),
     );
+    const completeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+      null,
+    );
 
     React.useEffect(() => {
       lastProcessedValueRef.current = phrase.substring(0, initialProgress);
     }, [phrase, initialProgress]);
+
+    React.useEffect(() => {
+      return () => {
+        if (completeTimeoutRef.current !== null) {
+          clearTimeout(completeTimeoutRef.current);
+        }
+      };
+    }, []);
 
     React.useEffect(() => {
       if (targetRef.current && focused && !isComplete) {
@@ -209,15 +226,23 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
         if (newValue === phrase && onComplete) {
           setIsComplete(true);
-          onComplete();
-          if (resetOnComplete) {
-            setTimeout(() => {
+          setIsPlayingCompleteEffect(true);
+
+          if (completeTimeoutRef.current !== null) {
+            clearTimeout(completeTimeoutRef.current);
+          }
+
+          completeTimeoutRef.current = setTimeout(() => {
+            completeTimeoutRef.current = null;
+            setIsPlayingCompleteEffect(false);
+            onComplete();
+            if (resetOnComplete) {
               lastProcessedValueRef.current = "";
               setInput("");
               setIsComplete(false);
               setHasReachedErrorLimit(false);
-            }, 0);
-          }
+            }
+          }, COMPLETE_EFFECT_TOTAL_MS);
         }
       },
       [
@@ -295,11 +320,24 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
         const isError = isTyped && !isCorrect;
 
+        const charLen = Math.max(chars.length - 1, 1);
+        const waveDelayMs = isPlayingCompleteEffect
+          ? Math.round((i / charLen) * COMPLETE_WAVE_SWEEP_MS)
+          : 0;
+
         return (
           <span
             key={i}
             data-char-index={i}
-            className={`transition-all duration-150 ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
+            className={`transition-all duration-150 ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""} ${isPlayingCompleteEffect ? "complete-wave-char" : ""}`}
+            style={
+              isPlayingCompleteEffect
+                ? {
+                    animationDelay: `${waveDelayMs}ms`,
+                    animationDuration: `${COMPLETE_CHAR_ANIM_MS}ms`,
+                  }
+                : undefined
+            }
           >
             {isCursor && <span id="target" ref={targetRef} />}
             {char}
@@ -310,7 +348,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     return (
       <div
-        className={`relative box-with-focus w-full px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
+        className={`relative box-with-focus w-full px-8 py-6 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${isPlayingCompleteEffect ? "type-box-complete" : ""} ${className || ""}`}
         style={height ? { minHeight: height } : undefined}
         onClick={() => inputRef.current?.focus()}
       >
