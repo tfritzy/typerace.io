@@ -283,18 +283,16 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           <span
             key={i}
             data-char-index={i}
-            className={isError ? "relative inline-block align-top" : undefined}
+            className="relative"
           >
-            {isError && (
-              <span
-                className="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[0.85em] leading-none text-destructive"
-                style={{ fontSize: `${mistypeIndicatorFontSizeEm}em` }}
-              >
-                {getMistypeIndicatorChar(true, input[i])}
-              </span>
-            )}
             <span
-              className={`transition-all duration-150 leading-none ${colorClass} ${isError ? "underline decoration-2 decoration-destructive whitespace-pre" : ""}`}
+              className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[0.85em] leading-none ${isError ? "text-destructive" : "opacity-0"}`}
+              style={{ fontSize: `${mistypeIndicatorFontSizeEm}em` }}
+            >
+              {getMistypeIndicatorChar(isError, input[i])}
+            </span>
+            <span
+              className={`transition-all duration-150 leading-none ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
             >
               {isCursor && <span id="target" ref={targetRef} />}
               {char}
