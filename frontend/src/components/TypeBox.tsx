@@ -166,7 +166,10 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             const wordLength = wordEndIndex - wordStartIndex + 1;
 
             if (phraseRef.current && wordLength > 0) {
-              const spans = phraseRef.current.querySelectorAll("span");
+              const spans =
+                phraseRef.current.querySelectorAll<HTMLElement>(
+                  "[data-char-index]",
+                );
               const startSpan = spans[wordStartIndex];
               const endSpan = spans[wordEndIndex];
               if (startSpan && endSpan) {
@@ -280,7 +283,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           <span
             key={i}
             data-char-index={i}
-            className="relative inline-block align-top"
+            className="relative"
           >
             <span
               className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[0.85em] leading-none ${isError ? "text-destructive" : "opacity-0"}`}
@@ -317,7 +320,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         <div className="relative select-none flex-1">
           <div className="type-box">
             <div
-              className="whitespace-pre-wrap text-start text-[26px] font-mono"
+              className="text-start text-[26px] font-mono"
               ref={phraseRef}
             >
               {renderText()}
