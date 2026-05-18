@@ -9,6 +9,7 @@ const PULSE_FADE_MS = 800;
 const BUFO_GIF_PATH = "/bufo-lets-goo.gif";
 const BUFO_LEFT_OFFSET_PX = 72;
 const BUFO_MAX_SIZE_PX = 56;
+const BUFO_POST_START_MS = 1200;
 
 export const Countdown = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -18,7 +19,9 @@ export const Countdown = () => {
   const [showCount, setShowCount] = useState(false);
   const [pulseOn, setPulseOn] = useState(false);
   const [hasBufoRoom, setHasBufoRoom] = useState(false);
+  const [showBufoAfterStart, setShowBufoAfterStart] = useState(false);
   const preloadedBufoRef = useRef<HTMLImageElement | null>(null);
+  const previousTagRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     const img = new Image();
@@ -71,6 +74,27 @@ export const Countdown = () => {
   const isRacing = tag === "Racing";
 
   useEffect(() => {
+    let hideBufoTimer: ReturnType<typeof setTimeout> | null = null;
+    const previousTag = previousTagRef.current;
+
+    if (tag === "Racing" && previousTag === "Countdown") {
+      setShowBufoAfterStart(true);
+      hideBufoTimer = setTimeout(
+        () => setShowBufoAfterStart(false),
+        BUFO_POST_START_MS
+      );
+    } else if (tag !== "Racing") {
+      setShowBufoAfterStart(false);
+    }
+
+    previousTagRef.current = tag;
+
+    return () => {
+      if (hideBufoTimer) clearTimeout(hideBufoTimer);
+    };
+  }, [tag]);
+
+  useEffect(() => {
     if (!isCountdown || !game) {
       setShowCount(false);
       return;
@@ -113,7 +137,7 @@ export const Countdown = () => {
   const showBorder = isCountdown || isRacing;
   const bright = isRacing || pulseOn;
   const accent = "var(--accent-primary)";
-  const showBufo = showCount && hasBufoRoom;
+  const showBufo = hasBufoRoom && (showCount || showBufoAfterStart);
 
   return (
     <>
