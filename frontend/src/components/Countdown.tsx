@@ -107,7 +107,7 @@ export const Countdown = () => {
   const showBorder = isCountdown || isRacing;
   const bright = isRacing || pulseOn;
   const accent = "var(--accent-primary)";
-  const showBufo = showCount && hasBufoRoom && count > 0;
+  const showBufo = showCount && hasBufoRoom;
 
   return (
     <>
@@ -165,34 +165,14 @@ export const Countdown = () => {
           }}
         >
           <img
-            key={count}
             src={BUFO_GIF_PATH}
             alt=""
             aria-hidden="true"
             className="w-10 h-10 sm:w-14 sm:h-14"
             style={{
-              animation: "fadeInOut 1s ease-out forwards",
+              transform: "scaleX(-1)",
             }}
           />
-          <style>{`
-        @keyframes fadeInOut {
-          0% {
-            transform: scale(0.9) scaleX(-1);
-          }
-          20% {
-            opacity: 1;
-            transform: scale(1) scaleX(-1);
-          }
-          80% {
-            opacity: 1;
-            transform: scale(1) scaleX(-1);
-          }
-          100% {
-            opacity: 0;
-            transform: scale(0.8) scaleX(-1);
-          }
-        }
-      `}</style>
         </div>
       )}
     </>
