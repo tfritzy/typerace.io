@@ -46,7 +46,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     },
     ref,
   ) => {
-    const mistypeIndicatorFontSizeEm = 0.55;
     const nonBreakingSpace = "\u00A0";
     const spaceIndicatorChar = "␣";
     const [focused, setFocused] = useState(true);
@@ -280,14 +279,9 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         const isError = isTyped && !isCorrect;
 
         return (
-          <span
-            key={i}
-            data-char-index={i}
-            className="relative"
-          >
+          <span key={i} data-char-index={i} className="relative">
             <span
-              className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[0.85em] leading-none ${isError ? "text-destructive" : "opacity-0"}`}
-              style={{ fontSize: `${mistypeIndicatorFontSizeEm}em` }}
+              className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[1em] leading-none text-destructive text-xs`}
             >
               {getMistypeIndicatorChar(isError, input[i])}
             </span>
@@ -320,7 +314,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         <div className="relative select-none flex-1">
           <div className="type-box">
             <div
-              className="text-start text-[26px] font-mono"
+              className="text-start text-[26px] font-mono leading-12 height"
               ref={phraseRef}
             >
               {renderText()}
