@@ -107,7 +107,7 @@ export const Countdown = () => {
   const showBorder = isCountdown || isRacing;
   const bright = isRacing || pulseOn;
   const accent = "var(--accent-primary)";
-  const showBufo = showCount && hasBufoRoom;
+  const showBufo = showCount && hasBufoRoom && count > 0;
 
   return (
     <>
@@ -165,6 +165,7 @@ export const Countdown = () => {
           }}
         >
           <img
+            key={count}
             src={BUFO_GIF_PATH}
             alt=""
             aria-hidden="true"
