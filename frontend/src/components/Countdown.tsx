@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { Game } from "../types/stdb";
 import { useDatabase } from "../contexts/SpacetimeContext";
@@ -18,10 +18,16 @@ export const Countdown = () => {
   const [showCount, setShowCount] = useState(false);
   const [pulseOn, setPulseOn] = useState(false);
   const [hasBufoRoom, setHasBufoRoom] = useState(false);
+  const preloadedBufoRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     const img = new Image();
     img.src = BUFO_GIF_PATH;
+    preloadedBufoRef.current = img;
+    return () => {
+      img.src = "";
+      preloadedBufoRef.current = null;
+    };
   }, []);
 
   useEffect(() => {
