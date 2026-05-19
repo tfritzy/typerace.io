@@ -87,9 +87,14 @@ export const PlayerProgressBar = memo(({
     const isCompactEnoughForWpm = compactMode === 'full' || compactMode === 'noBot' || compactMode === 'noLevel';
     const showWpm = !isLoading && isCompactEnoughForWpm && wpm !== undefined && wpm > 0;
     const avatarSize = showAvatarOnly ? 32 : 40;
+    const accessibilityLabel = isLoading ? 'Waiting for player' : `${name}${showWpm ? `, ${Math.round(wpm)} WPM` : ''}`;
 
     return (
-        <div ref={containerRef} className={`box w-full rounded-lg relative ${showAvatarOnly ? 'p-2' : 'p-3 sm:p-4'}`}>
+        <div
+            ref={containerRef}
+            className={`box w-full rounded-lg relative transition-all duration-200 ${showAvatarOnly ? 'p-2' : 'p-3 sm:p-4'}`}
+            aria-label={accessibilityLabel}
+        >
         <div
             className={`w-full flex items-center ${showAvatarOnly ? 'justify-center gap-0' : 'gap-3'} transition-all duration-500 ${isLoading
                 ? 'opacity-20'
