@@ -5,6 +5,12 @@ import { memo, useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { getPlayerProgressGradient } from '../utils/colorMapping';
 import { getInitialTheme } from '../utils/themes';
 
+const AVATAR_ONLY_THRESHOLD = 90;
+const NO_WPM_THRESHOLD = 180;
+const NO_LEVEL_THRESHOLD = 220;
+const NO_BOT_THRESHOLD = 250;
+const NAME_MAX_WIDTH_CLASS = 'max-w-[120px]';
+
 type PlayerProgressBarProps = {
     name: string;
     level: number;
@@ -69,10 +75,10 @@ export const PlayerProgressBar = memo(({
     }, []);
 
     const compactMode = useMemo(() => {
-        if (containerWidth <= 90) return 'avatar';
-        if (containerWidth <= 180) return 'noWpm';
-        if (containerWidth <= 220) return 'noLevel';
-        if (containerWidth <= 250) return 'noBot';
+        if (containerWidth <= AVATAR_ONLY_THRESHOLD) return 'avatar';
+        if (containerWidth <= NO_WPM_THRESHOLD) return 'noWpm';
+        if (containerWidth <= NO_LEVEL_THRESHOLD) return 'noLevel';
+        if (containerWidth <= NO_BOT_THRESHOLD) return 'noBot';
         return 'full';
     }, [containerWidth]);
     const showAvatarOnly = compactMode === 'avatar';
@@ -118,11 +124,11 @@ export const PlayerProgressBar = memo(({
                 <div className="flex items-center gap-2 justify-between">
                     <div className="flex items-center gap-2 min-w-0">
                         {isLoading ? (
-                            <span className="text-sm font-semibold text-muted-foreground truncate max-w-[120px]">Waiting...</span>
+                            <span className={`text-sm font-semibold text-muted-foreground truncate ${NAME_MAX_WIDTH_CLASS}`}>Waiting...</span>
                         ) : (
                             <>
                                 <div className="flex items-center gap-1 min-w-0">
-                                    <span className={`text-sm font-semibold truncate max-w-[120px] ${isCurrentPlayer ? 'text-foreground' : 'text-muted-foreground'}`}>
+                                    <span className={`text-sm font-semibold truncate ${NAME_MAX_WIDTH_CLASS} ${isCurrentPlayer ? 'text-foreground' : 'text-muted-foreground'}`}>
                                         {name}
                                     </span>
                                     {showBotIndicator && (
