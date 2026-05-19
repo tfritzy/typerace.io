@@ -107,6 +107,29 @@ export const Countdown = () => {
 
   return (
     <>
+      <style>{`
+        @keyframes countdownPop {
+          0% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+        }
+
+        @keyframes bufoFadeScaleIn {
+          0% {
+            opacity: 0;
+            transform: scaleX(-1) scale(0.86);
+          }
+          100% {
+            opacity: 1;
+            transform: scaleX(-1) scale(1);
+          }
+        }
+      `}</style>
       {showBorder && (
         <div
           aria-hidden="true"
@@ -139,18 +162,6 @@ export const Countdown = () => {
           >
             {count}
           </div>
-          <style>{`
-        @keyframes countdownPop {
-          0% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          100% {
-            opacity: 0;
-            transform: scale(0.8);
-          }
-        }
-      `}</style>
         </div>
       )}
       {showBufo && (
@@ -170,18 +181,6 @@ export const Countdown = () => {
               animation: "bufoFadeScaleIn 220ms ease-out both",
             }}
           />
-          <style>{`
-        @keyframes bufoFadeScaleIn {
-          0% {
-            opacity: 0;
-            transform: scaleX(-1) scale(0.86);
-          }
-          100% {
-            opacity: 1;
-            transform: scaleX(-1) scale(1);
-          }
-        }
-      `}</style>
         </div>
       )}
     </>
