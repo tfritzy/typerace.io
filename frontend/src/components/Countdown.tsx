@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { Game } from "../types/stdb";
 import { useDatabase } from "../contexts/SpacetimeContext";
@@ -7,8 +7,6 @@ const PULSE_PERIOD_MS = 1000;
 const PULSE_BRIGHT_MS = 150;
 const PULSE_FADE_MS = 800;
 const BUFO_GIF_PATH = "/bufo-lets-goo.gif";
-const BUFO_LEFT_OFFSET_PX = 72;
-const BUFO_MAX_SIZE_PX = 56;
 const BUFO_POST_START_MS = 1200;
 
 export const Countdown = () => {
@@ -18,20 +16,7 @@ export const Countdown = () => {
   const [count, setCount] = useState(3);
   const [showCount, setShowCount] = useState(false);
   const [pulseOn, setPulseOn] = useState(false);
-  const [hasBufoRoom, setHasBufoRoom] = useState(false);
-  const [showBufoAfterStart, setShowBufoAfterStart] = useState(false);
-  const preloadedBufoRef = useRef<HTMLImageElement | null>(null);
-  const previousTagRef = useRef<string | undefined>(undefined);
-
-  useEffect(() => {
-    const img = new Image();
-    img.src = BUFO_GIF_PATH;
-    preloadedBufoRef.current = img;
-    return () => {
-      img.src = "";
-      preloadedBufoRef.current = null;
-    };
-  }, []);
+  const [showBufo, setShowBufo] = useState(false);
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -55,44 +40,26 @@ export const Countdown = () => {
     };
   }, [conn, gameId]);
 
-  useEffect(() => {
-    const updateHasRoom = () => {
-      const maxContentWidthValue = getComputedStyle(
-        document.documentElement
-      ).getPropertyValue("--max-content-width");
-      const maxContentWidth = Number.parseFloat(maxContentWidthValue) || 1000;
-      const sideGutter = Math.max(0, (window.innerWidth - maxContentWidth) / 2);
-      setHasBufoRoom(sideGutter >= BUFO_LEFT_OFFSET_PX + BUFO_MAX_SIZE_PX);
-    };
-    updateHasRoom();
-    window.addEventListener("resize", updateHasRoom);
-    return () => window.removeEventListener("resize", updateHasRoom);
-  }, []);
-
   const tag = game?.state?.tag;
   const isCountdown = tag === "Countdown";
   const isRacing = tag === "Racing";
 
   useEffect(() => {
-    let hideBufoTimer: ReturnType<typeof setTimeout> | null = null;
-    const previousTag = previousTagRef.current;
-
-    if (tag === "Racing" && previousTag === "Countdown") {
-      setShowBufoAfterStart(true);
-      hideBufoTimer = setTimeout(
-        () => setShowBufoAfterStart(false),
-        BUFO_POST_START_MS
-      );
-    } else if (tag !== "Racing") {
-      setShowBufoAfterStart(false);
+    if (isCountdown) {
+      setShowBufo(true);
+      return;
     }
-
-    previousTagRef.current = tag;
+    if (!isRacing) {
+      setShowBufo(false);
+      return;
+    }
+    if (!showBufo) return;
+    const hideBufoTimer = setTimeout(() => setShowBufo(false), BUFO_POST_START_MS);
 
     return () => {
-      if (hideBufoTimer) clearTimeout(hideBufoTimer);
+      clearTimeout(hideBufoTimer);
     };
-  }, [tag]);
+  }, [isCountdown, isRacing, showBufo]);
 
   useEffect(() => {
     if (!isCountdown || !game) {
@@ -137,7 +104,6 @@ export const Countdown = () => {
   const showBorder = isCountdown || isRacing;
   const bright = isRacing || pulseOn;
   const accent = "var(--accent-primary)";
-  const showBufo = hasBufoRoom && (showCount || showBufoAfterStart);
 
   return (
     <>
@@ -189,7 +155,7 @@ export const Countdown = () => {
       )}
       {showBufo && (
         <div
-          className="fixed top-[52%] -translate-y-1/2 pointer-events-none z-50"
+          className="fixed top-[52%] -translate-y-1/2 pointer-events-none z-50 hidden xl:block"
           style={{
             left: "max(1rem, calc((100vw - var(--max-content-width)) / 2 - 4.5rem))",
           }}
