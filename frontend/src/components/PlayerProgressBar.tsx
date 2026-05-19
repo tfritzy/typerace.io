@@ -84,11 +84,12 @@ export const PlayerProgressBar = memo(({
     const showAvatarOnly = compactMode === 'avatar';
     const showBotIndicator = compactMode === 'full' && isBot;
     const showLevel = compactMode === 'full' || compactMode === 'noBot';
-    const showWpm = !isLoading && (compactMode === 'full' || compactMode === 'noBot' || compactMode === 'noLevel') && wpm !== undefined && wpm > 0;
+    const isCompactEnoughForWpm = compactMode === 'full' || compactMode === 'noBot' || compactMode === 'noLevel';
+    const showWpm = !isLoading && isCompactEnoughForWpm && wpm !== undefined && wpm > 0;
     const avatarSize = showAvatarOnly ? 32 : 40;
 
     return (
-        <div ref={containerRef} className={`box w-full rounded-lg relative ${showAvatarOnly ? 'px-2 py-2' : 'px-3 py-3 sm:px-4 sm:py-4'}`}>
+        <div ref={containerRef} className={`box w-full rounded-lg relative ${showAvatarOnly ? 'p-2' : 'p-3 sm:p-4'}`}>
         <div
             className={`w-full flex items-center ${showAvatarOnly ? 'justify-center gap-0' : 'gap-3'} transition-all duration-500 ${isLoading
                 ? 'opacity-20'
