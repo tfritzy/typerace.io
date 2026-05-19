@@ -7,6 +7,7 @@ const PULSE_PERIOD_MS = 1000;
 const PULSE_BRIGHT_MS = 150;
 const PULSE_FADE_MS = 800;
 const BUFO_GIF_PATH = "/bufo-lets-goo.gif";
+const BUFO_FADE_SCALE_IN_MS = 220;
 const BUFO_POST_START_MS = 1200;
 
 export const Countdown = () => {
@@ -154,7 +155,7 @@ export const Countdown = () => {
             aria-hidden="true"
             className="w-10 h-10 sm:w-14 sm:h-14"
             style={{
-              animation: "bufoFadeScaleIn 220ms ease-out both",
+              animation: `bufoFadeScaleIn ${BUFO_FADE_SCALE_IN_MS}ms ease-out both`,
             }}
           />
         </div>
