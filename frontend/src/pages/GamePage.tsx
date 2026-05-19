@@ -265,7 +265,7 @@ export const GamePage = () => {
                   return null;
                 }
                 return (
-                  <div key={`loading-${index}`} className="w-[280px] shrink-0">
+                  <div key={`loading-${index}`} className="w-[180px] sm:w-[220px] md:w-[240px] lg:w-[280px] shrink-0">
                     <PlayerProgressBar
                       name={t.waitingForPlayer}
                       level={1}
@@ -281,7 +281,7 @@ export const GamePage = () => {
               }
 
               return (
-                <div key={pp.id.toString()} className="w-[280px] shrink-0">
+                <div key={pp.id.toString()} className="w-[180px] sm:w-[220px] md:w-[240px] lg:w-[280px] shrink-0">
                   <PlayerProgressBar
                     key={pp.id.toString()}
                     name={pp.playerName}

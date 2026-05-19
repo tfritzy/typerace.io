@@ -1,7 +1,7 @@
 import { PlayerAvatar } from './PlayerAvatar';
 import { Bot, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { memo, useMemo, useState, useEffect, useCallback } from 'react';
+import { memo, useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { getPlayerProgressGradient } from '../utils/colorMapping';
 import { getInitialTheme } from '../utils/themes';
 
@@ -39,6 +39,8 @@ export const PlayerProgressBar = memo(({
     playerColorTag,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const [containerWidth, setContainerWidth] = useState(280);
 
     const [currentTheme, setCurrentTheme] = useState(getInitialTheme);
     const onThemeChange = useCallback(() => setCurrentTheme(getInitialTheme()), []);
@@ -53,11 +55,36 @@ export const PlayerProgressBar = memo(({
             : 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))',
         [playerColorTag, currentTheme]
     );
+    useEffect(() => {
+        if (!containerRef.current) {
+            return;
+        }
+        const observer = new ResizeObserver(([entry]) => {
+            if (entry?.contentRect?.width) {
+                setContainerWidth(entry.contentRect.width);
+            }
+        });
+        observer.observe(containerRef.current);
+        return () => observer.disconnect();
+    }, []);
+
+    const compactMode = useMemo(() => {
+        if (containerWidth <= 90) return 'avatar';
+        if (containerWidth <= 180) return 'noWpm';
+        if (containerWidth <= 220) return 'noLevel';
+        if (containerWidth <= 250) return 'noBot';
+        return 'full';
+    }, [containerWidth]);
+    const showAvatarOnly = compactMode === 'avatar';
+    const showBotIndicator = compactMode === 'full' && isBot;
+    const showLevel = compactMode === 'full' || compactMode === 'noBot';
+    const showWpm = !isLoading && (compactMode === 'full' || compactMode === 'noBot' || compactMode === 'noLevel') && wpm !== undefined && wpm > 0;
+    const avatarSize = showAvatarOnly ? 32 : 40;
 
     return (
-        <div className="box w-full rounded-lg px-4 py-3 sm:px-8 sm:py-6 relative">
+        <div ref={containerRef} className={`box w-full rounded-lg relative ${showAvatarOnly ? 'px-2 py-2' : 'px-3 py-3 sm:px-4 sm:py-4'}`}>
         <div
-            className={`w-full flex items-center gap-5 transition-all duration-500 ${isLoading
+            className={`w-full flex items-center ${showAvatarOnly ? 'justify-center gap-0' : 'gap-3'} transition-all duration-500 ${isLoading
                 ? 'opacity-20'
                 : 'opacity-100 animate-[slideInFromLeft_0.5s_ease-out]'
                 }`}
@@ -65,7 +92,7 @@ export const PlayerProgressBar = memo(({
             {isLoading || isAnonymous ? (
                 <PlayerAvatar
                     key="avatar"
-                    size={40}
+                    size={avatarSize}
                     identity={identityHash}
                     isHighlighted={isCurrentPlayer}
                     isLoading={isLoading}
@@ -76,7 +103,7 @@ export const PlayerProgressBar = memo(({
                 <Link key="avatar-link" to={`/profile/${playerPublicId}`} className="shrink-0">
                     <PlayerAvatar
                         key="avatar"
-                        size={40}
+                        size={avatarSize}
                         identity={identityHash}
                         isHighlighted={isCurrentPlayer}
                         isLoading={isLoading}
@@ -86,18 +113,19 @@ export const PlayerProgressBar = memo(({
                 </Link>
             )}
 
-            <div className="flex-1 flex flex-col gap-2">
+            {!showAvatarOnly && (
+            <div className="flex-1 min-w-0 flex flex-col gap-2">
                 <div className="flex items-center gap-2 justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
                         {isLoading ? (
-                            <span className="text-sm font-semibold text-muted-foreground">Waiting...</span>
+                            <span className="text-sm font-semibold text-muted-foreground truncate max-w-[120px]">Waiting...</span>
                         ) : (
                             <>
-                                <div className="flex items-center gap-1">
-                                    <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-foreground' : 'text-muted-foreground'}`}>
+                                <div className="flex items-center gap-1 min-w-0">
+                                    <span className={`text-sm font-semibold truncate max-w-[120px] ${isCurrentPlayer ? 'text-foreground' : 'text-muted-foreground'}`}>
                                         {name}
                                     </span>
-                                    {isBot && (
+                                    {showBotIndicator && (
                                         <div className="group relative">
                                             <Bot className="w-4 h-4 text-muted-foreground" />
                                             <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-card text-foreground text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-10 shadow-lg w-64">
@@ -107,13 +135,13 @@ export const PlayerProgressBar = memo(({
                                         </div>
                                     )}
                                 </div>
-                                <span className="text-xs font-medium text-muted-foreground">
+                                {showLevel && (<span className="text-xs font-medium text-muted-foreground">
                                     Lvl {level}
-                                </span>
+                                </span>)}
                             </>
                         )}
                     </div>
-                    {!isLoading && wpm !== undefined && wpm > 0 && (
+                    {showWpm && (
                         <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-foreground' : 'text-muted-foreground'}`}>
                             {Math.round(wpm)} WPM
                         </span>
@@ -130,6 +158,7 @@ export const PlayerProgressBar = memo(({
                     />
                 </div>
             </div>
+            )}
             {onKick && (
                 <button
                     onClick={onKick}
