@@ -154,7 +154,6 @@ export const Countdown = () => {
             aria-hidden="true"
             className="w-10 h-10 sm:w-14 sm:h-14"
             style={{
-              transform: "scaleX(-1)",
               animation: "bufoFadeScaleIn 220ms ease-out both",
             }}
           />
