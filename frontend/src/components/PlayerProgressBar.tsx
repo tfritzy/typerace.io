@@ -5,9 +5,9 @@ import { memo, useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { getPlayerProgressGradient } from '../utils/colorMapping';
 import { getInitialTheme } from '../utils/themes';
 
-const COMPACT_MODE_AVATAR_ONLY_THRESHOLD = 90;
-const COMPACT_MODE_NO_WPM_THRESHOLD = 180;
-const COMPACT_MODE_NO_LEVEL_THRESHOLD = 220;
+const COMPACT_MODE_AVATAR_ONLY_THRESHOLD = 130;
+const COMPACT_MODE_NO_WPM_THRESHOLD = 170;
+const COMPACT_MODE_NO_LEVEL_THRESHOLD = 210;
 const COMPACT_MODE_NO_BOT_THRESHOLD = 250;
 const DEFAULT_CONTAINER_WIDTH = 280;
 const NAME_MAX_WIDTH_CLASS = 'max-w-[120px]';
@@ -45,7 +45,7 @@ export const PlayerProgressBar = memo(({
     onKick,
     playerColorTag,
 }: PlayerProgressBarProps) => {
-    const progressPercentage = (progressIndex / phraseLength) * 100;
+    const progressPercentage = phraseLength > 0 ? (progressIndex / phraseLength) * 100 : 0;
     const containerRef = useRef<HTMLDivElement | null>(null);
     const [containerWidth, setContainerWidth] = useState(DEFAULT_CONTAINER_WIDTH);
 
@@ -88,6 +88,10 @@ export const PlayerProgressBar = memo(({
     const isCompactEnoughForWpm = compactMode === 'full' || compactMode === 'noBot' || compactMode === 'noLevel';
     const showWpm = !isLoading && isCompactEnoughForWpm && wpm !== undefined && wpm > 0;
     const avatarSize = showAvatarOnly ? 32 : 40;
+    const clampedProgressPercentage = Math.min(100, Math.max(0, progressPercentage));
+    const radialRadius = 18;
+    const radialCircumference = 2 * Math.PI * radialRadius;
+    const radialStrokeOffset = radialCircumference * (1 - clampedProgressPercentage / 100);
     const accessibilityLabel = isLoading
         ? 'Waiting for player'
         : `${name}, level ${level}${isBot ? ', bot' : ''}${showWpm ? `, ${Math.round(wpm)} WPM` : ''}`;
@@ -104,7 +108,60 @@ export const PlayerProgressBar = memo(({
                 : 'opacity-100 animate-[slideInFromLeft_0.5s_ease-out]'
                 }`}
         >
-            {isLoading || isAnonymous ? (
+            {showAvatarOnly ? (
+                <div className="relative h-10 w-10 shrink-0">
+                    <svg className="absolute inset-0 -rotate-90" viewBox="0 0 44 44" aria-hidden="true">
+                        <circle
+                            cx={22}
+                            cy={22}
+                            r={radialRadius}
+                            fill="none"
+                            stroke="var(--secondary)"
+                            strokeWidth={2}
+                        />
+                        <circle
+                            cx={22}
+                            cy={22}
+                            r={radialRadius}
+                            fill="none"
+                            stroke={isCurrentPlayer ? 'var(--accent-primary)' : 'var(--muted-foreground)'}
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            style={{
+                                strokeDasharray: `${radialCircumference} ${radialCircumference}`,
+                                strokeDashoffset: radialStrokeOffset,
+                                transition: 'stroke-dashoffset 200ms ease-out',
+                                opacity: isCurrentPlayer ? 1 : 0.7,
+                            }}
+                        />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        {isLoading || isAnonymous ? (
+                            <PlayerAvatar
+                                key="avatar"
+                                size={avatarSize}
+                                identity={identityHash}
+                                isHighlighted={isCurrentPlayer}
+                                isLoading={isLoading}
+                                placement={placement}
+                                playerColorTag={playerColorTag}
+                            />
+                        ) : (
+                            <Link key="avatar-link" to={`/profile/${playerPublicId}`} className="shrink-0">
+                                <PlayerAvatar
+                                    key="avatar"
+                                    size={avatarSize}
+                                    identity={identityHash}
+                                    isHighlighted={isCurrentPlayer}
+                                    isLoading={isLoading}
+                                    placement={placement}
+                                    playerColorTag={playerColorTag}
+                                />
+                            </Link>
+                        )}
+                    </div>
+                </div>
+            ) : isLoading || isAnonymous ? (
                 <PlayerAvatar
                     key="avatar"
                     size={avatarSize}

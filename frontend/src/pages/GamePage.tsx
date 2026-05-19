@@ -254,7 +254,7 @@ export const GamePage = () => {
 
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4">
         <div className="content-container w-full my-auto">
-          <div className="mb-3 flex gap-3 overflow-x-auto pb-1">
+          <div className="mb-3 flex w-full gap-3 pb-1">
             {Array.from({ length: totalSlots }).map((_, index) => {
               const pp = gamePlayerProgress[index];
               const isCurrentPlayer =
@@ -265,7 +265,7 @@ export const GamePage = () => {
                   return null;
                 }
                 return (
-                  <div key={`loading-${index}`} className="w-[180px] sm:w-[220px] md:w-[240px] lg:w-[280px] shrink-0">
+                  <div key={`loading-${index}`} className="min-w-0 flex-1 basis-0 max-w-[280px]">
                     <PlayerProgressBar
                       name={t.waitingForPlayer}
                       level={1}
@@ -281,7 +281,7 @@ export const GamePage = () => {
               }
 
               return (
-                <div key={pp.id.toString()} className="w-[180px] sm:w-[220px] md:w-[240px] lg:w-[280px] shrink-0">
+                <div key={pp.id.toString()} className="min-w-0 flex-1 basis-0 max-w-[280px]">
                   <PlayerProgressBar
                     key={pp.id.toString()}
                     name={pp.playerName}
