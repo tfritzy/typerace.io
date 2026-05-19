@@ -5,10 +5,11 @@ import { memo, useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { getPlayerProgressGradient } from '../utils/colorMapping';
 import { getInitialTheme } from '../utils/themes';
 
-const AVATAR_ONLY_THRESHOLD = 90;
-const NO_WPM_THRESHOLD = 180;
-const NO_LEVEL_THRESHOLD = 220;
-const NO_BOT_THRESHOLD = 250;
+const COMPACT_MODE_AVATAR_ONLY_THRESHOLD = 90;
+const COMPACT_MODE_NO_WPM_THRESHOLD = 180;
+const COMPACT_MODE_NO_LEVEL_THRESHOLD = 220;
+const COMPACT_MODE_NO_BOT_THRESHOLD = 250;
+const DEFAULT_CONTAINER_WIDTH = 280;
 const NAME_MAX_WIDTH_CLASS = 'max-w-[120px]';
 
 type PlayerProgressBarProps = {
@@ -46,7 +47,7 @@ export const PlayerProgressBar = memo(({
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
     const containerRef = useRef<HTMLDivElement | null>(null);
-    const [containerWidth, setContainerWidth] = useState(280);
+    const [containerWidth, setContainerWidth] = useState(DEFAULT_CONTAINER_WIDTH);
 
     const [currentTheme, setCurrentTheme] = useState(getInitialTheme);
     const onThemeChange = useCallback(() => setCurrentTheme(getInitialTheme()), []);
@@ -75,10 +76,10 @@ export const PlayerProgressBar = memo(({
     }, []);
 
     const compactMode = useMemo(() => {
-        if (containerWidth <= AVATAR_ONLY_THRESHOLD) return 'avatar';
-        if (containerWidth <= NO_WPM_THRESHOLD) return 'noWpm';
-        if (containerWidth <= NO_LEVEL_THRESHOLD) return 'noLevel';
-        if (containerWidth <= NO_BOT_THRESHOLD) return 'noBot';
+        if (containerWidth <= COMPACT_MODE_AVATAR_ONLY_THRESHOLD) return 'avatar';
+        if (containerWidth <= COMPACT_MODE_NO_WPM_THRESHOLD) return 'noWpm';
+        if (containerWidth <= COMPACT_MODE_NO_LEVEL_THRESHOLD) return 'noLevel';
+        if (containerWidth <= COMPACT_MODE_NO_BOT_THRESHOLD) return 'noBot';
         return 'full';
     }, [containerWidth]);
     const showAvatarOnly = compactMode === 'avatar';
@@ -87,7 +88,9 @@ export const PlayerProgressBar = memo(({
     const isCompactEnoughForWpm = compactMode === 'full' || compactMode === 'noBot' || compactMode === 'noLevel';
     const showWpm = !isLoading && isCompactEnoughForWpm && wpm !== undefined && wpm > 0;
     const avatarSize = showAvatarOnly ? 32 : 40;
-    const accessibilityLabel = isLoading ? 'Waiting for player' : `${name}${showWpm ? `, ${Math.round(wpm)} WPM` : ''}`;
+    const accessibilityLabel = isLoading
+        ? 'Waiting for player'
+        : `${name}, level ${level}${isBot ? ', bot' : ''}${showWpm ? `, ${Math.round(wpm)} WPM` : ''}`;
 
     return (
         <div
