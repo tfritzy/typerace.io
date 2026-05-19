@@ -66,6 +66,10 @@ export const PlayerProgressBar = memo(({
         if (!containerRef.current) {
             return;
         }
+        const initialWidth = containerRef.current.getBoundingClientRect().width;
+        if (initialWidth > 0) {
+            setContainerWidth(initialWidth);
+        }
         const observer = new ResizeObserver(([entry]) => {
             if (entry?.contentRect?.width) {
                 setContainerWidth(entry.contentRect.width);
@@ -119,22 +123,23 @@ export const PlayerProgressBar = memo(({
                             cy={radialCenter}
                             r={radialRadius}
                             fill="none"
-                            stroke="var(--secondary)"
+                            stroke="var(--secondary-foreground)"
                             strokeWidth={radialStrokeWidth}
+                            opacity={0.25}
                         />
                         <circle
                             cx={radialCenter}
                             cy={radialCenter}
                             r={radialRadius}
                             fill="none"
-                            stroke={isCurrentPlayer ? 'var(--accent-primary)' : 'var(--muted-foreground)'}
+                            stroke="var(--accent-primary)"
                             strokeWidth={radialStrokeWidth}
                             strokeLinecap="round"
                             style={{
                                 strokeDasharray: `${radialCircumference} ${radialCircumference}`,
                                 strokeDashoffset: radialStrokeOffset,
                                 transition: 'stroke-dashoffset 200ms ease-out',
-                                opacity: isCurrentPlayer ? 1 : 0.7,
+                                opacity: isCurrentPlayer ? 1 : 0.85,
                             }}
                         />
                     </svg>
