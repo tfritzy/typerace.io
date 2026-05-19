@@ -90,8 +90,11 @@ export const PlayerProgressBar = memo(({
     const avatarSize = showAvatarOnly ? 32 : 40;
     const clampedProgressPercentage = Math.min(100, Math.max(0, progressPercentage));
     const radialRadius = 18;
+    const radialStrokeWidth = 2;
     const radialCircumference = 2 * Math.PI * radialRadius;
     const radialStrokeOffset = radialCircumference * (1 - clampedProgressPercentage / 100);
+    const radialViewBoxSize = (radialRadius + radialStrokeWidth) * 2;
+    const radialCenter = radialRadius + radialStrokeWidth;
     const accessibilityLabel = isLoading
         ? 'Waiting for player'
         : `${name}, level ${level}${isBot ? ', bot' : ''}${showWpm ? `, ${Math.round(wpm)} WPM` : ''}`;
@@ -110,22 +113,22 @@ export const PlayerProgressBar = memo(({
         >
             {showAvatarOnly ? (
                 <div className="relative h-10 w-10 shrink-0">
-                    <svg className="absolute inset-0 -rotate-90" viewBox="0 0 44 44" aria-hidden="true">
+                    <svg className="absolute inset-0 -rotate-90" viewBox={`0 0 ${radialViewBoxSize} ${radialViewBoxSize}`} aria-hidden="true">
                         <circle
-                            cx={22}
-                            cy={22}
+                            cx={radialCenter}
+                            cy={radialCenter}
                             r={radialRadius}
                             fill="none"
                             stroke="var(--secondary)"
-                            strokeWidth={2}
+                            strokeWidth={radialStrokeWidth}
                         />
                         <circle
-                            cx={22}
-                            cy={22}
+                            cx={radialCenter}
+                            cy={radialCenter}
                             r={radialRadius}
                             fill="none"
                             stroke={isCurrentPlayer ? 'var(--accent-primary)' : 'var(--muted-foreground)'}
-                            strokeWidth={2}
+                            strokeWidth={radialStrokeWidth}
                             strokeLinecap="round"
                             style={{
                                 strokeDasharray: `${radialCircumference} ${radialCircumference}`,
