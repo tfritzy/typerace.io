@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
-import "../components/SelectionButton.css";
-import { GameMode } from "../../module_bindings";
-import { ChevronUp, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
-import { languages, getContentTypeFromMode, type ContentTypeValue } from "../utils/modes";
+import { useState } from "react";
+import { type GameMode } from "../types/stdb";
+import { ChevronDown, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
+import { getContentTypeFromMode, type ContentTypeValue, type LanguageInfo } from "../utils/modes";
+import { LanguageDropdown } from "./LanguageDropdown";
+import { getTranslations } from "../utils/translations";
 
 export type GameTypeValue = "Public" | "Private" | "Practice";
 
@@ -11,17 +12,47 @@ interface GameOptionsSelectorProps {
     onModeSelect: (mode: GameMode) => void;
     gameType: GameTypeValue;
     setGameType: (value: GameTypeValue) => void;
+    currentLang: LanguageInfo;
 }
 
-export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setGameType }: GameOptionsSelectorProps) {
+interface ModeButtonProps {
+    isSelected: boolean;
+    onClick: () => void;
+    icon: React.ReactNode;
+    label: string;
+    disabled?: boolean;
+}
+
+function ModeButton({ isSelected, onClick, icon, label, disabled }: ModeButtonProps) {
+    const base = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer";
+    const selected = "bg-secondary text-secondary-foreground";
+    const unselected = "text-muted-foreground hover:text-foreground hover:bg-secondary";
+    const disabledStyle = "opacity-40 cursor-not-allowed pointer-events-none";
+
+    return (
+        <button
+            className={`${base} ${isSelected ? selected : unselected} ${disabled ? disabledStyle : ''}`}
+            onClick={onClick}
+            disabled={disabled}
+        >
+            {icon}
+            <span>{label}</span>
+        </button>
+    );
+}
+
+export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setGameType, currentLang }: GameOptionsSelectorProps) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [contentType, setContentType] = useState<ContentTypeValue>(() => getContentTypeFromMode(selectedMode.tag));
+    const t = getTranslations();
 
-    const selectedLanguage = useMemo(() => {
-        return languages.find(l =>
-            l.randomWordsMode === selectedMode.tag || l.quotesMode === selectedMode.tag
-        ) || languages[0];
-    }, [selectedMode.tag]);
+    const gameTypeLabel = (type: GameTypeValue): string => {
+        if (type === "Public") return t.publicMatch;
+        if (type === "Private") return t.privateLobby;
+        return t.practiceMode;
+    };
+
+    const selectedLanguage = currentLang;
 
     const quotesAvailableForLanguage = selectedLanguage.quotesMode !== null;
 
@@ -40,96 +71,29 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
 
     return (
         <>
-            <div className="hidden md:block">
-                <div className="mb-4">
-                    <h2 className="text-white/50 text-sm font-medium mb-2">Match Type</h2>
-                    <div className="flex gap-2">
-                        <button
-                            className={`selection-button ${gameType === "Public" ? 'selected' : ''}`}
-                            onClick={() => setGameType("Public")}
-                        >
-                            <Globe size={20} />
-                            <span>Public Match</span>
-                        </button>
-                        <button
-                            className={`selection-button ${gameType === "Private" ? 'selected' : ''}`}
-                            onClick={() => setGameType("Private")}
-                        >
-                            <Lock size={20} />
-                            <span>Private Lobby</span>
-                        </button>
-                        <button
-                            className={`selection-button ${gameType === "Practice" ? 'selected' : ''}`}
-                            onClick={() => setGameType("Practice")}
-                        >
-                            <Target size={20} />
-                            <span>Practice Mode</span>
-                        </button>
-                    </div>
-                </div>
-                <div className="mb-4">
-                    <h2 className="text-white/50 text-sm font-medium mb-2">Mode</h2>
-                    <div className="flex gap-2">
-                        <button
-                            className={`selection-button ${contentType === "Quotes" ? 'selected' : ''}`}
-                            onClick={() => handleContentTypeChange("Quotes")}
-                        >
-                            <Quote size={20} />
-                            <span>Quotes</span>
-                        </button>
-                        <button
-                            className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
-                            onClick={() => handleContentTypeChange("RandomWords")}
-                        >
-                            <Shuffle size={20} />
-                            <span>Random words</span>
-                        </button>
-                    </div>
-                </div>
-                <div className="pb-6">
-                    <h2 className="text-white/50 text-sm font-medium mb-2">Language</h2>
-                    <div className="grid grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2">
-                        {languages.map((lang) => {
-                            const mode = contentType === "Quotes" ? lang.quotesMode : lang.randomWordsMode;
-                            const isDisabled = contentType === "Quotes" && !lang.quotesMode;
-
-                            return (
-                                <button
-                                    key={lang.language}
-                                    className={`selection-button ${selectedMode.tag === mode ? "selected" : ""}`}
-                                    onClick={() => {
-                                        if (mode) {
-                                            onModeSelect({ tag: mode } as GameMode);
-                                        }
-                                    }}
-                                    disabled={isDisabled}
-                                >
-                                    <span className="flag leading-none">{lang.flag}</span>
-                                    <span>{lang.language}</span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
+            <div className="hidden md:flex items-center justify-center gap-1 flex-wrap">
+                <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label={t.publicMatch} />
+                <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label={t.privateLobby} />
+                <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label={t.practiceMode} />
+                <span className="mx-2 text-border-hover select-none">|</span>
+                <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
+                <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label={t.quotes} disabled={!quotesAvailableForLanguage} />
+                <span className="mx-2 text-border-hover select-none">|</span>
+                <LanguageDropdown />
             </div>
 
-            <div className="md:hidden pb-2">
+            <div className="md:hidden flex items-center justify-center gap-2">
                 <button
-                    className="selection-button selected w-full justify-between"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-secondary text-secondary-foreground transition-all duration-200"
                     onClick={() => setIsDrawerOpen(true)}
                 >
-                    <div className="flex items-center gap-2">
-                        {gameType === "Public" && <Globe size={18} />}
-                        {gameType === "Private" && <Lock size={18} />}
-                        {gameType === "Practice" && <Target size={18} />}
-                        {contentType === "Quotes" ? <Quote size={18} /> : <Shuffle size={18} />}
-                        <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>
-                            {selectedLanguage.flag}
-                        </span>
-                        <span>{selectedLanguage.language}</span>
-                    </div>
-                    <ChevronUp size={20} />
+                    {gameType === "Public" && <Globe size={16} />}
+                    {gameType === "Private" && <Lock size={16} />}
+                    {gameType === "Practice" && <Target size={16} />}
+                    <span>{gameTypeLabel(gameType)} · {contentType === "Quotes" ? t.quotes : t.randomWords}</span>
+                    <ChevronDown size={16} />
                 </button>
+                <LanguageDropdown />
             </div>
 
             {isDrawerOpen && (
@@ -139,81 +103,27 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                         onClick={() => setIsDrawerOpen(false)}
                     />
                     <div className="fixed inset-x-0 bottom-0 z-50 md:hidden animate-slideUp">
-                        <div className="bg-(--color-box-bg) border-t border-(--color-box-border) rounded-t-2xl max-h-[70vh] overflow-y-auto">
-                            <div className="sticky top-0 bg-(--color-box-bg) border-b border-(--color-box-border) px-4 py-3 flex items-center justify-between">
-                                <h3 className="text-white text-lg font-medium">Game Options</h3>
+                        <div className="bg-card border-t border-border rounded-t-2xl max-h-[70vh] overflow-y-auto">
+                            <div className="sticky top-0 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
+                                <h3 className="text-foreground text-lg font-medium">{t.gameOptions}</h3>
                                 <button
                                     onClick={() => setIsDrawerOpen(false)}
-                                    className="text-white/60 hover:text-white transition-colors"
+                                    className="text-muted-foreground hover:text-foreground transition-colors"
                                 >
-                                    <ChevronUp size={24} className="rotate-180" />
+                                    <ChevronDown size={24} />
                                 </button>
                             </div>
                             <div className="p-4 pb-8">
-                                <h3 className="text-white/80 text-base font-medium mb-3">Match Type</h3>
-                                <div className="flex flex-col gap-2 mb-6">
-                                    <button
-                                        className={`selection-button ${gameType === "Public" ? 'selected' : ''}`}
-                                        onClick={() => setGameType("Public")}
-                                    >
-                                        <Globe size={20} />
-                                        <span>Public Match</span>
-                                    </button>
-                                    <button
-                                        className={`selection-button ${gameType === "Private" ? 'selected' : ''}`}
-                                        onClick={() => setGameType("Private")}
-                                    >
-                                        <Lock size={20} />
-                                        <span>Private Lobby</span>
-                                    </button>
-                                    <button
-                                        className={`selection-button ${gameType === "Practice" ? 'selected' : ''}`}
-                                        onClick={() => setGameType("Practice")}
-                                    >
-                                        <Target size={20} />
-                                        <span>Practice Mode</span>
-                                    </button>
+                                <h3 className="text-secondary-foreground text-sm font-medium mb-3 uppercase tracking-wider">{t.matchType}</h3>
+                                <div className="flex flex-wrap gap-2 mb-6">
+                                    <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label={t.publicMatch} />
+                                    <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label={t.privateLobby} />
+                                    <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label={t.practiceMode} />
                                 </div>
-                                <h3 className="text-white/80 text-base font-medium mb-3">Mode</h3>
-                                <div className="flex flex-col gap-2 mb-6">
-                                    <button
-                                        className={`selection-button ${contentType === "RandomWords" ? 'selected' : ''}`}
-                                        onClick={() => handleContentTypeChange("RandomWords")}
-                                    >
-                                        <Shuffle size={20} />
-                                        <span>Random Words</span>
-                                    </button>
-                                    <button
-                                        className={`selection-button ${contentType === "Quotes" ? 'selected' : ''}`}
-                                        onClick={() => handleContentTypeChange("Quotes")}
-                                        disabled={!quotesAvailableForLanguage}
-                                    >
-                                        <Quote size={20} />
-                                        <span>Quotes</span>
-                                    </button>
-                                </div>
-                                <h3 className="text-white/80 text-base font-medium mb-3">Language</h3>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {languages.map((lang) => {
-                                        const mode = contentType === "Quotes" ? lang.quotesMode : lang.randomWordsMode;
-                                        const isDisabled = contentType === "Quotes" && !lang.quotesMode;
-
-                                        return (
-                                            <button
-                                                key={lang.language}
-                                                className={`selection-button ${selectedMode.tag === mode ? "selected" : ""}`}
-                                                onClick={() => {
-                                                    if (mode) {
-                                                        onModeSelect({ tag: mode } as GameMode);
-                                                    }
-                                                }}
-                                                disabled={isDisabled}
-                                            >
-                                                <span className="text-xl leading-none" style={{ textShadow: '-1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white' }}>{lang.flag}</span>
-                                                <span>{lang.language}</span>
-                                            </button>
-                                        );
-                                    })}
+                                <h3 className="text-secondary-foreground text-sm font-medium mb-3 uppercase tracking-wider">{t.mode}</h3>
+                                <div className="flex flex-wrap gap-2 mb-6">
+                                    <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
+                                    <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label={t.quotes} disabled={!quotesAvailableForLanguage} />
                                 </div>
                             </div>
                         </div>

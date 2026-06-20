@@ -1,0 +1,62 @@
+{
+  "frames": {
+    "engine-1-big-0": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      }
+    },
+    "engine-1-big-1": {
+      "frame": {
+        "x": 32,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      }
+    },
+    "engine-1-big-2": {
+      "frame": {
+        "x": 64,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      }
+    },
+    "engine-1-big-3": {
+      "frame": {
+        "x": 96,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      }
+    },
+    "engine-1-big-4": {
+      "frame": {
+        "x": 128,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      }
+    }
+  },
+  "animations": {
+    "engine-1-big": [
+      "engine-1-big-0",
+      "engine-1-big-1",
+      "engine-1-big-2",
+      "engine-1-big-3",
+      "engine-1-big-4"
+    ]
+  },
+  "meta": {
+    "image": "Engine_1_Big.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 160,
+      "h": 32
+    },
+    "scale": "1"
+  }
+}

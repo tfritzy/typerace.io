@@ -15,14 +15,11 @@ const SpacetimeContext = createContext<SpacetimeContextType | undefined>(undefin
 
 export const useDatabase = () => {
     const context = useContext(SpacetimeContext);
-    if (!context) {
-        throw new Error('useDatabase must be used within SpacetimeProvider');
-    }
-    return context.conn;
+    return context?.conn ?? null;
 };
 
 export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [conn, setConn] = useState<DbConnection | null>(null);
     const [showReconnectModal, setShowReconnectModal] = useState(false);
     const [isReconnecting, setIsReconnecting] = useState(false);
@@ -31,23 +28,25 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     const failureTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const connect = async (isAutoReconnect = false) => {
-        if (!user) return;
-
         if (isAutoReconnect) {
             setIsReconnecting(true);
             setReconnectFailed(false);
         }
 
         try {
-            const idToken = await user.getIdToken();
-
-            const connection = DbConnection.builder()
+            let builder = DbConnection.builder()
                 .withUri(import.meta.env.VITE_SPACETIMEDB_URI || 'ws://localhost:3000')
-                .withModuleName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace')
-                .withToken(idToken)
+                .withModuleName(import.meta.env.VITE_SPACETIMEDB_MODULE || 'typerace');
+
+            if (user) {
+                const idToken = await user.getIdToken();
+                builder = builder.withToken(idToken);
+            }
+
+            const connection = builder
                 .onConnect((conn) => {
                     console.log('Connected to SpacetimeDB');
-                    conn.reducers.syncAnonymousStatus(user.isAnonymous);
+                    conn.reducers.syncAnonymousStatus({ isAnonymous: !user });
                     setConn(conn);
                     setShowReconnectModal(false);
                     setIsReconnecting(false);
@@ -115,9 +114,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     };
 
     useEffect(() => {
-        if (!user) {
-            return;
-        }
+        if (authLoading) return;
 
         const connectionPromise = connect();
 
@@ -133,11 +130,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                 setConn(null);
             });
         };
-    }, [user?.uid]);
-
-    if (!user) {
-        return <LoadingDots />;
-    }
+    }, [user?.uid, authLoading]);
 
     if (!conn?.identity && !showReconnectModal) {
         return <LoadingDots />;
@@ -160,47 +153,40 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                         `}
                     </style>
                     <div
-                        className="bg-[#272727] border border-white/15 rounded-xl p-8 min-w-[400px] max-w-[500px]"
+                        className="bg-card border border-border rounded-xl p-8 min-w-[400px] max-w-[500px]"
                         style={{
                             animation: 'modalSlideIn 0.2s ease-out'
                         }}
                     >
-                        <h2 className="text-white text-2xl font-bold mb-4 mt-0">
+                        <h2 className="text-foreground text-2xl font-bold mb-4 mt-0">
                             Connection Lost
                         </h2>
                         {isReconnecting ? (
                             <div className="flex flex-col items-center py-4">
                                 <div
+                                    className="w-8 h-8 border-[3px] border-secondary border-t-muted-foreground rounded-full"
                                     style={{
-                                        width: '32px',
-                                        height: '32px',
-                                        border: '3px solid rgba(255, 255, 255, 0.1)',
-                                        borderTopColor: 'rgba(255, 255, 255, 0.6)',
-                                        borderRadius: '50%',
                                         animation: 'spin 0.8s linear infinite'
                                     }}
                                 />
-                                <p className="text-white/60 mt-4 mb-0">
+                                <p className="text-muted-foreground mt-4 mb-0">
                                     Reconnecting...
                                 </p>
                             </div>
                         ) : reconnectFailed ? (
                             <>
-                                <p className="text-white/60 mb-8">
+                                <p className="text-muted-foreground mb-8">
                                     Failed to reconnect automatically. Please try again.
                                 </p>
                                 <button
                                     onClick={handleManualReconnect}
-                                    className="w-full border-0 rounded-md px-5 py-2.5 text-sm font-semibold text-white cursor-pointer"
-                                    style={{
-                                        backgroundColor: 'var(--color-accent)'
-                                    }}
+                                    className="w-full border-0 rounded-md px-5 py-2.5 text-sm font-semibold text-foreground cursor-pointer bg-primary"
                                 >
                                     Reconnect
                                 </button>
                             </>
                         ) : (
-                            <p className="text-white/60 mb-0">
+                            <p className="text-muted-foreground mb-0">
                                 Your connection to the server has been lost.
                             </p>
                         )}

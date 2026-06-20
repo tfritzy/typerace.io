@@ -11,22 +11,16 @@ export const ToastContainer = () => {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className="flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-slideInRight bg-(--color-box-bg) border border-(--color-box-border)"
-          style={{
-            borderColor: toast.type === "error" ? "var(--color-error)" : undefined,
-          }}
+          className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-slideInRight bg-card border ${toast.type === "error" ? 'border-destructive' : 'border-border'}`}
         >
           <span
-            className="text-sm font-medium"
-            style={{
-              color: toast.type === "error" ? "var(--color-error)" : "var(--color-white)",
-            }}
+            className={`text-sm font-medium ${toast.type === "error" ? 'text-destructive' : 'text-foreground'}`}
           >
             {toast.message}
           </span>
           <button
             onClick={() => removeToast(toast.id)}
-            className="text-white/50 hover:text-white transition-colors cursor-pointer"
+            className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
             <X size={16} />
           </button>

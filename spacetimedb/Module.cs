@@ -84,6 +84,7 @@ public enum PlayerColor
     Rose
 }
 
+
 public struct Quote
 {
     public string Id;
@@ -131,6 +132,71 @@ public static partial class Module
     private const long PRACTICE_GAME_COUNTDOWN_START_DELAY_MICROSECONDS = 1_000_000;
     private const int EVENT_SIZE_BYTES = 3;
     private const ushort MAX_DECISECONDS = ushort.MaxValue;
+    private const long BOT_RECOGNITION_DELAY_MIN_MICROSECONDS = 100_000;
+    private const long BOT_RECOGNITION_DELAY_RANGE_MICROSECONDS = 300_000;
+    private const long BOT_HESITATION_DELAY_MIN_MICROSECONDS = 400_000;
+    private const long BOT_HESITATION_DELAY_RANGE_MICROSECONDS = 600_000;
+    private const long BOT_MIN_KEYSTROKE_DELAY_MICROSECONDS = 50_000;
+    private const double BOT_BURST_PROBABILITY = 0.10;
+    private const double BOT_HESITATION_PROBABILITY = 0.04;
+    private const double BOT_BURST_SPEED_MULTIPLIER = 0.65;
+    private const double BOT_BACKSPACE_SPEED_MULTIPLIER = 0.6;
+    private const double BOT_RECOVERY_DELAY_MIN_MULTIPLIER = 0.5;
+    private const double BOT_RECOVERY_DELAY_RANGE_MULTIPLIER = 0.5;
+
+    private static double GetLanguageTypingSpeedModifier(GameMode mode)
+    {
+        switch (mode)
+        {
+            case GameMode.English500:
+            case GameMode.EnglishQuotes:
+                return 1.0;
+            case GameMode.Spanish500:
+            case GameMode.SpanishQuotes:
+                return 40.0 / 35.0;
+            case GameMode.French500:
+            case GameMode.FrenchQuotes:
+                return 40.0 / 35.0;
+            case GameMode.German500:
+            case GameMode.GermanQuotes:
+                return 40.0 / 35.0;
+            case GameMode.Italian500:
+            case GameMode.ItalianQuotes:
+                return 40.0 / 35.0;
+            case GameMode.Portuguese500:
+            case GameMode.PortugueseQuotes:
+                return 40.0 / 35.0;
+            case GameMode.Japanese500:
+            case GameMode.JapaneseQuotes:
+                return 40.0 / 30.0;
+            case GameMode.Korean500:
+            case GameMode.KoreanQuotes:
+                return 40.0 / 25.0;
+            case GameMode.Chinese500:
+            case GameMode.ChineseQuotes:
+                return 40.0 / 20.0;
+            case GameMode.Ukrainian500:
+            case GameMode.UkrainianQuotes:
+                return 40.0 / 30.0;
+            case GameMode.Arabic500:
+            case GameMode.ArabicQuotes:
+                return 40.0 / 25.0;
+            case GameMode.Hindi500:
+            case GameMode.HindiQuotes:
+                return 40.0 / 25.0;
+            case GameMode.Dutch500:
+            case GameMode.DutchQuotes:
+                return 40.0 / 38.0;
+            case GameMode.Swedish500:
+            case GameMode.SwedishQuotes:
+                return 40.0 / 38.0;
+            case GameMode.Turkish500:
+            case GameMode.TurkishQuotes:
+                return 40.0 / 32.0;
+            default:
+                return 1.0;
+        }
+    }
 
     private static byte[] EncodeCharacterEvent(long gameStartMicros, long eventMicros, CharacterEventType eventType)
     {
@@ -274,6 +340,38 @@ public static partial class Module
         public int TotalXp;
     }
 
+    [Table(Name = "game_score", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language), nameof(Day) })]
+    public partial struct GameScore
+    {
+        [PrimaryKey]
+        public string Id;
+        public string GameId;
+        public string Language;
+        public Identity PlayerId;
+        public string PlayerName;
+        public int Value;
+        [SpacetimeDB.Index.BTree]
+        public long Timestamp;
+        public long TimeMs;
+        public string Day;
+    }
+
+    [Table(Name = "game_highscore", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(GameId), nameof(Language) })]
+    public partial struct GameHighScore
+    {
+        [PrimaryKey]
+        public string Id;
+        public string GameId;
+        public string Language;
+        public Identity PlayerId;
+        public string PlayerName;
+        public int Value;
+        public long Timestamp;
+        public long TimeMs;
+    }
+
     [Table(Name = "elo", Public = true)]
     [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
     public partial struct Elo
@@ -336,6 +434,15 @@ public static partial class Module
         public ScheduleAt ScheduledAt;
     }
 
+    [Table(Scheduled = nameof(CleanupOldScores))]
+    public partial struct ScoreCleaner
+    {
+        [AutoInc]
+        [PrimaryKey]
+        public ulong ScheduledId;
+        public ScheduleAt ScheduledAt;
+    }
+
     [Table(Name = "globalstats", Public = true)]
     public partial struct GlobalStats
     {
@@ -385,7 +492,7 @@ public static partial class Module
     }
 
     [Reducer(ReducerKind.Init)]
-    public static void Init(ReducerContext ctx)
+    public static void init(ReducerContext ctx)
     {
         var fiveMinutes = new TimeDuration { Microseconds = 300_000_000 };
 
@@ -396,6 +503,14 @@ public static partial class Module
         });
 
         Log.Info("Initialized game archiver with 5-minute interval");
+
+        ctx.Db.ScoreCleaner.Insert(new ScoreCleaner
+        {
+            ScheduledId = 0,
+            ScheduledAt = new ScheduleAt.Interval(fiveMinutes)
+        });
+
+        Log.Info("Initialized score cleaner with 5-minute interval");
 
         for (int i = 0; i < 100; i++)
         {
@@ -468,7 +583,7 @@ public static partial class Module
     }
 
     [Reducer(ReducerKind.ClientConnected)]
-    public static void ClientConnected(ReducerContext ctx)
+    public static void clientConnected(ReducerContext ctx)
     {
         var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
 
@@ -489,7 +604,7 @@ public static partial class Module
                 TotalTimeSpentMs = 0,
                 IsBot = false,
                 BotConfig = null,
-                Color = PlayerColor.Amber,
+                Color = GenerateRandomColor(ctx.Rng),
                 IsAnonymous = true,
                 LastGameDate = 0
             });
@@ -498,12 +613,12 @@ public static partial class Module
     }
 
     [Reducer(ReducerKind.ClientDisconnected)]
-    public static void ClientDisconnected(ReducerContext ctx)
+    public static void clientDisconnected(ReducerContext ctx)
     {
     }
 
     [Reducer]
-    public static void SyncAnonymousStatus(ReducerContext ctx, bool isAnonymous)
+    public static void syncAnonymousStatus(ReducerContext ctx, bool isAnonymous)
     {
         var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
 
@@ -531,7 +646,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void SetPlayerName(ReducerContext ctx, string name)
+    public static void setPlayerName(ReducerContext ctx, string name)
     {
         const int MinNameLength = 1;
         const int MaxNameLength = 30;
@@ -562,21 +677,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void SetPlayerColor(ReducerContext ctx, PlayerColor color)
-    {
-        var existingPlayer = ctx.Db.player.Identity.Find(ctx.Sender);
-
-        if (existingPlayer != null)
-        {
-            var updatedPlayer = existingPlayer.Value;
-            updatedPlayer.Color = color;
-            ctx.Db.player.Identity.Update(updatedPlayer);
-            Log.Info($"Updated player color for {ctx.Sender} to {color}");
-        }
-    }
-
-    [Reducer]
-    public static void JoinGame(ReducerContext ctx, GameMode gameMode, string joinCode, GameType gameType)
+    public static void joinGame(ReducerContext ctx, GameMode gameMode, string joinCode, GameType gameType)
     {
         Log.Info($"Player {ctx.Sender} looking for game.");
         var foundGame = FindLobbyGame(ctx, gameMode, gameType);
@@ -681,14 +782,17 @@ public static partial class Module
 
         foreach (var game in ctx.Db.game.State_GameType.Filter((GameState.Lobby, GameType.Public)))
         {
-            if (CountPlayersInGame(ctx, game.Id) < GetMaxPlayerCount(gameType))
-            {
-                if (FindPlayerProgress(ctx, ctx.Sender, game.Id) == null)
+            if (game.GameMode == gameMode) {
+                if (CountPlayersInGame(ctx, game.Id) < GetMaxPlayerCount(gameType))
                 {
-                    return game;
+                    if (FindPlayerProgress(ctx, ctx.Sender, game.Id) == null)
+                    {
+                        return game;
+                    }
                 }
             }
         }
+        
         return null;
     }
 
@@ -704,7 +808,13 @@ public static partial class Module
 
     private static int GetMaxPlayerCount(GameType gameType)
     {
-        return gameType == GameType.Practice ? 1 : 3;
+        return gameType switch
+        {
+            GameType.Practice => 1,
+            GameType.Public => 3,
+            GameType.Private => 6,
+            _ => 3
+        };
     }
 
     private static long GetCountdownDuration(GameType gameType)
@@ -762,7 +872,6 @@ public static partial class Module
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
-        var playerColor = player?.Color ?? PlayerColor.Amber;
         var playerPublicId = player?.PlayerId ?? "";
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
@@ -781,7 +890,7 @@ public static partial class Module
             Time = 0,
             Placement = -1,
             JoinCode = joinCode,
-            PlayerColor = playerColor
+            PlayerColor = GenerateRandomColor(ctx.Rng)
         });
     }
 
@@ -843,7 +952,7 @@ public static partial class Module
                     Time = 0,
                     Placement = -1,
                     JoinCode = "",
-                    PlayerColor = selectedBot.Color
+                    PlayerColor = GenerateRandomColor(ctx.Rng)
                 });
 
                 Log.Info($"Added bot {selectedBot.Name} (ELO: {GetBotElo(ctx, selectedBot.Identity, game.Value.GameMode)}) to game {args.GameId} (target ELO: {targetElo})");
@@ -929,22 +1038,45 @@ public static partial class Module
                 }
 
                 var botConfig = botPlayer.Value.BotConfig.Value;
-                var shouldError = ctx.Rng.NextDouble() < botConfig.ErrorRate;
+                var langModifier = GetLanguageTypingSpeedModifier(game.Value.GameMode);
+                var adjustedTypingRate = botConfig.TypingRate * langModifier;
+                var shouldError = ctx.Rng.NextDouble() < botConfig.ErrorRate / 4;
 
                 if (shouldError)
                 {
+                    var phrase = game.Value.Phrase;
+                    var progressIndex = progress.Value.ProgressIndex;
+
+                    int wordStart = progressIndex;
+                    while (wordStart > 0 && phrase[wordStart - 1] != ' ')
+                    {
+                        wordStart--;
+                    }
+                    int charsToDelete = progressIndex - wordStart;
+
                     var updatedProgress = progress.Value;
                     AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, CharacterEventType.Incorrect);
-                    AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, CharacterEventType.Backspace);
+
+                    long recognitionDelay = BOT_RECOGNITION_DELAY_MIN_MICROSECONDS + (long)(ctx.Rng.NextDouble() * BOT_RECOGNITION_DELAY_RANGE_MICROSECONDS);
+                    long backspaceInterval = (long)(adjustedTypingRate * BOT_BACKSPACE_SPEED_MULTIPLIER);
+
+                    for (int i = 0; i <= charsToDelete; i++)
+                    {
+                        long eventTime = ctx.Timestamp.MicrosecondsSinceUnixEpoch + recognitionDelay + i * backspaceInterval;
+                        AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, eventTime, CharacterEventType.Backspace);
+                    }
+
+                    updatedProgress.ProgressIndex = wordStart;
                     ctx.Db.playerprogress.Id.Update(updatedProgress);
 
-                    var errorDelay = new TimeDuration { Microseconds = (long)(botConfig.TypingRate * 0.5) };
+                    long totalBackspaceTime = recognitionDelay + (charsToDelete + 1) * backspaceInterval;
+                    long recoveryDelay = (long)(adjustedTypingRate * (BOT_RECOVERY_DELAY_MIN_MULTIPLIER + ctx.Rng.NextDouble() * BOT_RECOVERY_DELAY_RANGE_MULTIPLIER));
                     ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
                     {
                         ScheduledId = 0,
                         PlayerProgressId = args.PlayerProgressId,
                         PhraseLength = args.PhraseLength,
-                        ScheduledAt = new ScheduleAt.Time(ctx.Timestamp + errorDelay)
+                        ScheduledAt = new ScheduleAt.Time(ctx.Timestamp + new TimeDuration { Microseconds = totalBackspaceTime + recoveryDelay })
                     });
                 }
                 else
@@ -954,18 +1086,50 @@ public static partial class Module
 
                     if (newIndex < args.PhraseLength)
                     {
-                        var delay = new TimeDuration { Microseconds = GenerateBotDelayWithVariance(ctx.Rng, botConfig.TypingRate) };
+                        bool justTypedSpace = progress.Value.ProgressIndex < game.Value.Phrase.Length &&
+                                              game.Value.Phrase[progress.Value.ProgressIndex] == ' ';
+
+                        var delay = GenerateRealisticBotDelay(ctx.Rng, adjustedTypingRate, justTypedSpace);
                         ctx.Db.BotProgressUpdate.Insert(new BotProgressUpdate
                         {
                             ScheduledId = 0,
                             PlayerProgressId = args.PlayerProgressId,
                             PhraseLength = args.PhraseLength,
-                            ScheduledAt = new ScheduleAt.Time(ctx.Timestamp + delay)
+                            ScheduledAt = new ScheduleAt.Time(ctx.Timestamp + new TimeDuration { Microseconds = delay })
                         });
                     }
                 }
             }
         }
+    }
+
+    private static long GenerateRealisticBotDelay(Random rng, double baseTypingRate, bool justTypedSpace)
+    {
+        bool inBurst = rng.NextDouble() < BOT_BURST_PROBABILITY;
+        bool hesitate = !inBurst && rng.NextDouble() < BOT_HESITATION_PROBABILITY;
+
+        double rate = baseTypingRate;
+
+        if (inBurst)
+        {
+            rate *= BOT_BURST_SPEED_MULTIPLIER;
+        }
+
+        if (justTypedSpace)
+        {
+            rate *= 1.5 + rng.NextDouble() * 1.0;
+        }
+
+        var variance = 0.2;
+        var randomFactor = 1.0 + (rng.NextDouble() * 2.0 - 1.0) * variance;
+        long delay = (long)(rate * randomFactor);
+
+        if (hesitate)
+        {
+            delay += BOT_HESITATION_DELAY_MIN_MICROSECONDS + (long)(rng.NextDouble() * BOT_HESITATION_DELAY_RANGE_MICROSECONDS);
+        }
+
+        return Math.Max(delay, BOT_MIN_KEYSTROKE_DELAY_MICROSECONDS);
     }
 
     private static long GenerateBotDelayWithVariance(Random rng, double baseTypingRate)
@@ -1030,7 +1194,9 @@ public static partial class Module
                     if (botPlayer != null && botPlayer.Value.BotConfig != null)
                     {
                         var botConfig = botPlayer.Value.BotConfig.Value;
-                        delayMicroseconds = GenerateBotDelayWithVariance(ctx.Rng, botConfig.TypingRate);
+                        var langModifier = GetLanguageTypingSpeedModifier(updatedGame.GameMode);
+                        var adjustedRate = botConfig.TypingRate * langModifier;
+                        delayMicroseconds = GenerateBotDelayWithVariance(ctx.Rng, adjustedRate);
                     }
                     else
                     {
@@ -1051,7 +1217,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void StartPrivateGame(ReducerContext ctx, string gameId)
+    public static void startPrivateGame(ReducerContext ctx, string gameId)
     {
         var game = ctx.Db.game.Id.Find(gameId);
 
@@ -1105,7 +1271,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void JoinPrivateGame(ReducerContext ctx, string gameId)
+    public static void joinPrivateGame(ReducerContext ctx, string gameId)
     {
         var game = ctx.Db.game.Id.Find(gameId);
 
@@ -1139,7 +1305,47 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void Rematch(ReducerContext ctx, string gameId)
+    public static void kickPlayer(ReducerContext ctx, string gameId, Identity targetPlayerId)
+    {
+        var game = ctx.Db.game.Id.Find(gameId);
+
+        if (game == null)
+        {
+            Log.Info($"Game {gameId} not found");
+            return;
+        }
+
+        if (game.Value.GameType != GameType.Private)
+        {
+            Log.Info($"Game {gameId} is not a private game");
+            return;
+        }
+
+        if (game.Value.Owner != ctx.Sender)
+        {
+            Log.Info($"Player {ctx.Sender} is not the owner of private game {gameId}");
+            return;
+        }
+
+        if (targetPlayerId == ctx.Sender)
+        {
+            Log.Info($"Owner {ctx.Sender} cannot kick themselves from game {gameId}");
+            return;
+        }
+
+        var targetProgress = FindPlayerProgress(ctx, targetPlayerId, gameId);
+        if (targetProgress == null)
+        {
+            Log.Info($"Target player {targetPlayerId} is not in game {gameId}");
+            return;
+        }
+
+        ctx.Db.playerprogress.Id.Delete(targetProgress.Value.Id);
+        Log.Info($"Player {targetPlayerId} was kicked from game {gameId} by owner {ctx.Sender}");
+    }
+
+    [Reducer]
+    public static void rematch(ReducerContext ctx, string gameId)
     {
         var game = ctx.Db.game.Id.Find(gameId);
 
@@ -1174,7 +1380,6 @@ public static partial class Module
                 var playerName = player?.Name ?? "Unknown";
                 var playerLevel = player?.Level ?? 1;
                 var isAnonymous = player?.IsAnonymous ?? true;
-                var playerColor = player?.Color ?? PlayerColor.Amber;
                 var playerPublicId = player?.PlayerId ?? "";
 
                 ctx.Db.playerprogress.Insert(new PlayerProgress
@@ -1193,7 +1398,7 @@ public static partial class Module
                     Time = 0,
                     Placement = -1,
                     JoinCode = gameId,
-                    PlayerColor = playerColor
+                    PlayerColor = GenerateRandomColor(ctx.Rng)
                 });
 
                 Log.Info($"Added player {progress.PlayerId} to rematch game {newGame.Id} with join code {gameId}");
@@ -1389,11 +1594,160 @@ public static partial class Module
                 Log.Info($"Game {game.Id} transitioned to Archived state");
             }
         }
+
+        var thirtySecondsAgo = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 30_000_000;
+        var oneHourAgo = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 3_600_000_000;
+
+        foreach (var game in ctx.Db.game.State.Filter(GameState.Lobby))
+        {
+            bool shouldDelete =
+                (game.GameType == GameType.Public && game.CreatedAt < thirtySecondsAgo) ||
+                (game.GameType == GameType.Private && game.CreatedAt < oneHourAgo);
+
+            if (shouldDelete)
+            {
+                foreach (var pp in ctx.Db.playerprogress.GameId.Filter(game.Id))
+                {
+                    ctx.Db.playerprogress.Id.Delete(pp.Id);
+                }
+
+                ctx.Db.game.Id.Delete(game.Id);
+                Log.Info($"Deleted stale {game.GameType} lobby game {game.Id}");
+            }
+        }
     }
 
     [Reducer]
     public static void CleanupOldXpGains(ReducerContext ctx, XpGainCleaner args)
     {
+    }
+
+    [Reducer]
+    public static void CleanupOldScores(ReducerContext ctx, ScoreCleaner args)
+    {
+        var cutoff = ctx.Timestamp.MicrosecondsSinceUnixEpoch - 86_400_000_000;
+        ctx.Db.game_score.Timestamp.Delete((long.MinValue, cutoff));
+    }
+
+    [Reducer]
+    public static void publishScore(ReducerContext ctx, string gameId, string language, int score, long scoreProof)
+    {
+        if (!IsValidScoreGameId(gameId))
+        {
+            throw new Exception("Invalid game ID");
+        }
+
+        if (!IsValidScoreLanguage(language))
+        {
+            throw new Exception("Invalid language");
+        }
+
+        if (score < 0)
+        {
+            throw new Exception("Score cannot be negative");
+        }
+
+        if (!IsValidScoreProof(gameId, language, score, scoreProof))
+        {
+            throw new Exception("Invalid score proof");
+        }
+
+        var timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
+        var day = DateTimeOffset.FromUnixTimeSeconds(timestamp / 1_000_000).ToUniversalTime().ToString("yyyy-MM-dd");
+        var player = ctx.Db.player.Identity.Find(ctx.Sender);
+        var playerName = player?.Name ?? $"Anonymous {AnimalNameGenerator.Generate(ctx.Rng)}";
+        var scoreId = $"{gameId}_{language}_{day}_{ctx.Sender}";
+        var existingScore = ctx.Db.game_score.Id.Find(scoreId);
+        if (existingScore == null)
+        {
+            ctx.Db.game_score.Insert(new GameScore
+            {
+                Id = scoreId,
+                GameId = gameId,
+                Language = language,
+                PlayerId = ctx.Sender,
+                PlayerName = playerName,
+                Value = score,
+                Timestamp = timestamp,
+                TimeMs = 0,
+                Day = day
+            });
+        }
+        else if (score > existingScore.Value.Value)
+        {
+            var currentScore = existingScore.Value;
+            ctx.Db.game_score.Id.Update(new GameScore
+            {
+                Id = currentScore.Id,
+                GameId = currentScore.GameId,
+                Language = currentScore.Language,
+                PlayerId = currentScore.PlayerId,
+                PlayerName = playerName,
+                Value = score,
+                Timestamp = timestamp,
+                TimeMs = currentScore.TimeMs,
+                Day = currentScore.Day
+            });
+        }
+
+        var highScoreId = $"{gameId}_{language}_{ctx.Sender}";
+        var existingHighScore = ctx.Db.game_highscore.Id.Find(highScoreId);
+        if (existingHighScore == null)
+        {
+            ctx.Db.game_highscore.Insert(new GameHighScore
+            {
+                Id = highScoreId,
+                GameId = gameId,
+                Language = language,
+                PlayerId = ctx.Sender,
+                PlayerName = playerName,
+                Value = score,
+                Timestamp = timestamp,
+                TimeMs = 0
+            });
+            return;
+        }
+
+        if (score > existingHighScore.Value.Value)
+        {
+            var updatedHighScore = existingHighScore.Value;
+            updatedHighScore.PlayerName = playerName;
+            updatedHighScore.Value = score;
+            updatedHighScore.Timestamp = timestamp;
+            updatedHighScore.TimeMs = 0;
+            ctx.Db.game_highscore.Id.Update(updatedHighScore);
+        }
+    }
+
+    private static bool IsValidScoreGameId(string gameId) =>
+        IsValidScoreKey(gameId, 64, c => c == '_' || (c >= '0' && c <= '9'));
+
+    private static bool IsValidScoreLanguage(string language) =>
+        IsValidScoreKey(language, 16, c => c == '-');
+
+    private static bool IsValidScoreKey(string value, int maxLength, Func<char, bool> allowExtra) =>
+        value.Length > 0 && value.Length <= maxLength && value.All(c => (c >= 'a' && c <= 'z') || allowExtra(c));
+
+    private const long ScoreProofMod = 2_147_483_647;
+
+    private static bool IsValidScoreProof(string gameId, string language, int score, long scoreProof) =>
+        scoreProof == CreateScoreProof(gameId, language, score);
+
+    private static long CreateScoreProof(string gameId, string language, int score)
+    {
+        var proof = (score + 73_210_291L) % ScoreProofMod;
+        proof = AddScoreProofText(proof, gameId);
+        proof = AddScoreProofText(proof, language);
+        return (proof * 97 + score * 13L + 1_664_525L) % ScoreProofMod;
+    }
+
+    private static long AddScoreProofText(long proof, string value)
+    {
+        foreach (var c in value)
+        {
+            proof = (proof * 31 + c) % ScoreProofMod;
+        }
+        return proof;
     }
 
     private static void UpdateDailyActivePlayerCount(ReducerContext ctx, Identity playerId, string dateKey)
@@ -1744,7 +2098,7 @@ public static partial class Module
     }
 
     [Reducer]
-    public static void UpdateProgress(ReducerContext ctx, string gameId, int newIndex, CharacterEventType eventType)
+    public static void updateProgress(ReducerContext ctx, string gameId, int newIndex, CharacterEventType eventType)
     {
         var playerId = ctx.Sender;
         var game = ctx.Db.game.Id.Find(gameId);

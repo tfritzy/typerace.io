@@ -1,9 +1,9 @@
 import { PlayerAvatar } from './PlayerAvatar';
-import { getColorConfig } from '../utils/colorMapping';
-import { PlayerColor } from "../../module_bindings";
-import { Bot } from 'lucide-react';
+import { Bot, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { memo } from 'react';
+import { memo, useMemo, useState, useEffect, useCallback } from 'react';
+import { getPlayerProgressGradient } from '../utils/colorMapping';
+import { getInitialTheme } from '../utils/themes';
 
 type PlayerProgressBarProps = {
     name: string;
@@ -14,11 +14,12 @@ type PlayerProgressBarProps = {
     playerPublicId: string;
     isCurrentPlayer?: boolean;
     isLoading?: boolean;
-    playerColor?: PlayerColor;
     wpm?: number;
     placement?: number;
     isBot?: boolean;
     isAnonymous?: boolean;
+    onKick?: () => void;
+    playerColorTag?: string;
 };
 
 export const PlayerProgressBar = memo(({
@@ -30,18 +31,33 @@ export const PlayerProgressBar = memo(({
     playerPublicId,
     isCurrentPlayer = false,
     isLoading = false,
-    playerColor = PlayerColor.Amber,
     wpm,
     placement,
     isBot = false,
     isAnonymous = false,
+    onKick,
+    playerColorTag,
 }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
-    const colorConfig = getColorConfig(playerColor);
+
+    const [currentTheme, setCurrentTheme] = useState(getInitialTheme);
+    const onThemeChange = useCallback(() => setCurrentTheme(getInitialTheme()), []);
+    useEffect(() => {
+        window.addEventListener('themechange', onThemeChange);
+        return () => window.removeEventListener('themechange', onThemeChange);
+    }, [onThemeChange]);
+
+    const progressGradient = useMemo(
+        () => playerColorTag
+            ? getPlayerProgressGradient(playerColorTag)
+            : 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))',
+        [playerColorTag, currentTheme]
+    );
 
     return (
+        <div className="box w-full rounded-lg px-4 py-3 sm:px-8 sm:py-6 relative">
         <div
-            className={`w-full flex items-center gap-5 transition-all duration-500 relative ${isLoading
+            className={`w-full flex items-center gap-5 transition-all duration-500 ${isLoading
                 ? 'opacity-20'
                 : 'opacity-100 animate-[slideInFromLeft_0.5s_ease-out]'
                 }`}
@@ -51,10 +67,10 @@ export const PlayerProgressBar = memo(({
                     key="avatar"
                     size={40}
                     identity={identityHash}
-                    color={playerColor}
                     isHighlighted={isCurrentPlayer}
                     isLoading={isLoading}
                     placement={placement}
+                    playerColorTag={playerColorTag}
                 />
             ) : (
                 <Link key="avatar-link" to={`/profile/${playerPublicId}`} className="shrink-0">
@@ -62,10 +78,10 @@ export const PlayerProgressBar = memo(({
                         key="avatar"
                         size={40}
                         identity={identityHash}
-                        color={playerColor}
                         isHighlighted={isCurrentPlayer}
                         isLoading={isLoading}
                         placement={placement}
+                        playerColorTag={playerColorTag}
                     />
                 </Link>
             )}
@@ -74,46 +90,56 @@ export const PlayerProgressBar = memo(({
                 <div className="flex items-center gap-2 justify-between">
                     <div className="flex items-center gap-2">
                         {isLoading ? (
-                            <span className="text-sm font-semibold text-white/30">Waiting...</span>
+                            <span className="text-sm font-semibold text-muted-foreground">Waiting...</span>
                         ) : (
                             <>
                                 <div className="flex items-center gap-1">
-                                    <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-white' : 'text-white/70'}`}>
+                                    <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-foreground' : 'text-muted-foreground'}`}>
                                         {name}
                                     </span>
                                     {isBot && (
                                         <div className="group relative">
-                                            <Bot className="w-4 h-4 text-white/50" />
-                                            <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-(--color-box-bg) text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-10 shadow-lg w-64">
+                                            <Bot className="w-4 h-4 text-muted-foreground" />
+                                            <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-card text-foreground text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-10 shadow-lg w-64">
                                                 This player is a bot. Share this game with your friends to reduce the amount they need to be added to games.
-                                                <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-(--color-box-bg)"></div>
+                                                <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-card"></div>
                                             </div>
                                         </div>
                                     )}
                                 </div>
-                                <span className="text-xs font-medium text-white/50">
+                                <span className="text-xs font-medium text-muted-foreground">
                                     Lvl {level}
                                 </span>
                             </>
                         )}
                     </div>
                     {!isLoading && wpm !== undefined && wpm > 0 && (
-                        <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-white' : 'text-white/70'}`}>
+                        <span className={`text-sm font-semibold ${isCurrentPlayer ? 'text-foreground' : 'text-muted-foreground'}`}>
                             {Math.round(wpm)} WPM
                         </span>
                     )}
                 </div>
-                <div className="w-full h-2.5 bg-white/10 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
                     <div
                         className="h-full rounded-full transition-all duration-200"
                         style={{
                             width: `${Math.min(100, progressPercentage)}%`,
-                            background: colorConfig.gradient
+                            background: progressGradient,
+                            opacity: isCurrentPlayer ? 1 : 0.35
                         }}
                     />
                 </div>
             </div>
+            {onKick && (
+                <button
+                    onClick={onKick}
+                    className="absolute right-2 top-2 p-0.5 rounded-full bg-card text-muted-foreground opacity-50 hover:opacity-100 hover:text-foreground transition-all duration-200 cursor-pointer"
+                    aria-label="Kick player"
+                >
+                    <X size={14} />
+                </button>
+            )}
+        </div>
         </div>
     );
 });
-

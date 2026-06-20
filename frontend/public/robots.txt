@@ -1,6 +1,21 @@
 User-agent: *
 Allow: /$
 Allow: /favicons/
+Allow: /es$
+Allow: /fr$
+Allow: /de$
+Allow: /it$
+Allow: /pt$
+Allow: /ja$
+Allow: /ko$
+Allow: /zh$
+Allow: /uk$
+Allow: /hi$
+Allow: /nl$
+Allow: /sv$
+Allow: /tr$
+Allow: /privacy-policy$
+Allow: /stats$
 Disallow: /game/
 Disallow: /profile/
 

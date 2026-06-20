@@ -9,7 +9,7 @@ public static class AnimalNameGenerator
         "Aardvark", "Albatross", "Alligator", "Alpaca", "Ant", "Anteater", "Antelope", "Ape",
         "Badger", "Barracuda", "Bat", "Bear", "Beaver", "Bee", "Bison", "Butterfly",
         "Camel", "Capybara", "Caribou", "Cassowary", "Cat", "Caterpillar", "Cheetah", "Chicken",
-        "Chimpanzee", "Chinchilla", "Clownfish", "Cobra", "Cockroach", "Cod", "Cormorant", "Coyote",
+        "Chimpanzee", "Chinchilla", "Clownfish", "Cobra", "Cod", "Cormorant", "Coyote",
         "Crab", "Crane", "Crocodile", "Crow", "Curlew",
         "Deer", "Dinosaur", "Dog", "Dogfish", "Dolphin", "Donkey", "Dotterel", "Dove",
         "Dragonfly", "Duck", "Dugong", "Dunlin",
@@ -38,9 +38,7 @@ public static class AnimalNameGenerator
         "Tapir", "Tarsier", "Termite", "Tiger", "Toad", "Trout", "Turkey", "Turtle",
         "Viper", "Vulture",
         "Wallaby", "Walrus", "Wasp", "Weasel", "Whale", "Wildcat", "Wolf", "Wolverine",
-        "Wombat", "Woodpecker", "Worm",
-        "Yak",
-        "Zebra"
+        "Wombat", "Woodpecker", "Yak", "Zebra"
     };
 
     public static string Generate(Random rng)

@@ -71,35 +71,35 @@ public static class PhraseGenerator
         switch (mode)
         {
             case GameMode.English500:
-                return new Phrase(SanitizeText(GeneratePhrase(English500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(English500Words.Words, rng, 10, 14)));
             case GameMode.Spanish500:
-                return new Phrase(SanitizeText(GeneratePhrase(Spanish500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(Spanish500Words.Words, rng, 8, 11)));
             case GameMode.French500:
-                return new Phrase(SanitizeText(GeneratePhrase(French500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(French500Words.Words, rng, 8, 11)));
             case GameMode.German500:
-                return new Phrase(SanitizeText(GeneratePhrase(German500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(German500Words.Words, rng, 9, 12)));
             case GameMode.Italian500:
-                return new Phrase(SanitizeText(GeneratePhrase(Italian500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(Italian500Words.Words, rng, 8, 11)));
             case GameMode.Portuguese500:
-                return new Phrase(SanitizeText(GeneratePhrase(Portuguese500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(Portuguese500Words.Words, rng, 9, 12)));
             case GameMode.Japanese500:
-                return new Phrase(SanitizeText(GeneratePhrase(Japanese500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(Japanese500Words.Words, rng, 13, 18)));
             case GameMode.Korean500:
-                return new Phrase(SanitizeText(GeneratePhrase(Korean500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(Korean500Words.Words, rng, 11, 15)));
             case GameMode.Chinese500:
-                return new Phrase(SanitizeText(GeneratePhrase(Chinese500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(Chinese500Words.Words, rng, 12, 16)));
             case GameMode.Ukrainian500:
-                return new Phrase(SanitizeText(GeneratePhrase(Ukrainian500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(Ukrainian500Words.Words, rng, 8, 11)));
             case GameMode.Arabic500:
-                return new Phrase(SanitizeText(GeneratePhrase(Arabic500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(Arabic500Words.Words, rng, 7, 10)));
             case GameMode.Hindi500:
-                return new Phrase(SanitizeText(GeneratePhrase(Hindi500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(Hindi500Words.Words, rng, 7, 9)));
             case GameMode.Dutch500:
-                return new Phrase(SanitizeText(GeneratePhrase(Dutch500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(Dutch500Words.Words, rng, 9, 13)));
             case GameMode.Swedish500:
-                return new Phrase(SanitizeText(GeneratePhrase(Swedish500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(Swedish500Words.Words, rng, 10, 14)));
             case GameMode.Turkish500:
-                return new Phrase(SanitizeText(GeneratePhrase(Turkish500Words.Words, rng)));
+                return new Phrase(SanitizeText(GeneratePhrase(Turkish500Words.Words, rng, 8, 10)));
             case GameMode.EnglishQuotes:
             case GameMode.SpanishQuotes:
             case GameMode.FrenchQuotes:

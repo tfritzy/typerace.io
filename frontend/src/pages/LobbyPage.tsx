@@ -1,28 +1,26 @@
-import { useState, useCallback, useRef, useMemo } from "react";
-import "../components/SelectionButton.css";
-import type {
-  GameMode,
-} from "../../module_bindings";
+import { useState, useCallback, useRef, useMemo, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { type GameMode } from "../types/stdb";
 import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
 import { GameOptionsSelector, type GameTypeValue } from "../components/ModeSelector";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
-import { getRandomStartupPhrase } from "../utils/modes";
+import { getRandomStartupPhrase, getLanguageFromSlug, getContentTypeFromMode, storeLangSlug } from "../utils/modes";
 import { useFindGame } from "../hooks/useFindGame";
+import { getTranslations } from "../utils/translations";
 
-const SELECTED_MODE_KEY = "typerace_selected_mode";
 const GAME_TYPE_KEY = "typerace_game_type";
+const CONTENT_TYPE_KEY = "typerace_content_type";
 
-const getInitialMode = (): GameMode => {
+const getInitialMode = (langSlug: string | undefined): GameMode => {
+  const langInfo = getLanguageFromSlug(langSlug);
   try {
-    const stored = localStorage.getItem(SELECTED_MODE_KEY);
-    if (stored) {
-      return JSON.parse(stored) as GameMode;
+    const storedContentType = localStorage.getItem(CONTENT_TYPE_KEY);
+    if (storedContentType === "Quotes" && langInfo.quotesMode) {
+      return { tag: langInfo.quotesMode } as GameMode;
     }
-  } catch (error) {
-    console.error("Failed to load selected mode from localStorage:", error);
-  }
-  return { tag: "EnglishQuotes" };
+  } catch {}
+  return { tag: langInfo.randomWordsMode } as GameMode;
 };
 
 const getInitialGameType = (): GameTypeValue => {
@@ -38,18 +36,25 @@ const getInitialGameType = (): GameTypeValue => {
 };
 
 export const LobbyPage = () => {
-  const [selectedMode, setSelectedMode] = useState<GameMode>(getInitialMode);
+  const { lang } = useParams<{ lang?: string }>();
+  const [selectedMode, setSelectedMode] = useState<GameMode>(() => getInitialMode(lang));
   const [gameType, setGameType] = useState<GameTypeValue>(getInitialGameType);
   const typeBoxRef = useRef<TypeBoxRef>(null);
   const { findGame } = useFindGame();
+  const currentLang = getLanguageFromSlug(lang);
+
+  useMemo(() => storeLangSlug(currentLang.slug), [currentLang.slug]);
+
+  useEffect(() => {
+    document.title = currentLang.title;
+  }, [currentLang.title]);
 
   const handleModeSelect = useCallback((mode: GameMode) => {
     setSelectedMode(mode);
     try {
-      localStorage.setItem(SELECTED_MODE_KEY, JSON.stringify(mode));
-    } catch (error) {
-      console.error("Failed to save selected mode to localStorage:", error);
-    }
+      const contentType = getContentTypeFromMode(mode.tag);
+      localStorage.setItem(CONTENT_TYPE_KEY, contentType);
+    } catch {}
   }, []);
 
   const handleGameTypeChange = useCallback((type: GameTypeValue) => {
@@ -70,11 +75,13 @@ export const LobbyPage = () => {
   }, [findGame, selectedMode, gameType]);
 
   return (
-    <div className="relative h-screen flex flex-col overflow-hidden">
+    <div className="relative h-full flex flex-col">
       <Header />
-      <div className="flex-1 flex items-center justify-center p-4">
+      <main className="flex-1 flex flex-col items-center p-4 min-h-0">
+        <h1 className="sr-only">{getTranslations().tagline}</h1>
+        <div className="flex-[4]" />
         <div className="content-container">
-          <div className="text-2xl mb-[400px]">
+          <div className="text-2xl">
             <TypeBox
               ref={typeBoxRef}
               phrase={startupPhrase}
@@ -82,20 +89,18 @@ export const LobbyPage = () => {
               resetOnComplete={true}
             />
           </div>
-        </div>
-      </div>
-      <div className="fixed bottom-10 left-0 right-0">
-        <div className="px-4">
-          <div className="content-container">
+          <div className="mt-6">
             <GameOptionsSelector
               selectedMode={selectedMode}
               onModeSelect={handleModeSelect}
               gameType={gameType}
               setGameType={handleGameTypeChange}
+              currentLang={currentLang}
             />
           </div>
         </div>
-      </div>
+                <div className="flex-[6]" />
+      </main>
       <Footer />
     </div>
   );

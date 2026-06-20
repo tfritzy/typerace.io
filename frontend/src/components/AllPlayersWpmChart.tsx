@@ -8,8 +8,10 @@ import {
 } from 'chart.js';
 import type { ChartOptions } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import type { PlayerProgress } from '../../module_bindings/player_progress_type';
+import type { PlayerProgress } from '../types/stdb';
 import { getAggWpmBySecond } from '../utils/wpmCalculator';
+import { getDisplayColorHex } from '../utils/colorMapping';
+import { useDatabase } from '../contexts/SpacetimeContext';
 
 ChartJS.register(
     LinearScale,
@@ -24,26 +26,29 @@ interface AllPlayersWpmChartProps {
     raceStartTimestamp: bigint;
 }
 
-const PLAYER_COLORS = [
-    'rgb(251, 191, 36)',
-    'rgb(96, 165, 250)',
-    'rgb(167, 139, 250)',
-    'rgb(248, 113, 113)',
-    'rgb(74, 222, 128)',
-    'rgb(250, 204, 21)',
-    'rgb(192, 132, 252)',
-    'rgb(34, 211, 238)',
-];
-
 export const AllPlayersWpmChart = ({
     allPlayerProgress,
     raceStartTimestamp
 }: AllPlayersWpmChartProps) => {
-    const datasets = allPlayerProgress.map((playerProgress, index) => {
+    const conn = useDatabase();
+    const style = getComputedStyle(document.documentElement);
+
+    const resolvedColors = {
+        gridLine: style.getPropertyValue('--grid-line').trim(),
+        mutedFg: style.getPropertyValue('--muted-foreground').trim(),
+        secondaryFg: style.getPropertyValue('--secondary-foreground').trim(),
+        foreground: style.getPropertyValue('--foreground').trim(),
+        input: style.getPropertyValue('--input').trim(),
+        border: style.getPropertyValue('--border').trim(),
+    };
+    const datasets = allPlayerProgress.map((playerProgress) => {
         const wpmData = getAggWpmBySecond(
             playerProgress.characterHistory,
             raceStartTimestamp
         );
+        const currentPlayerId = conn?.identity;
+        const isCurrentPlayer = !!(currentPlayerId && playerProgress.playerId.isEqual(currentPlayerId));
+        const lineColor = getDisplayColorHex(playerProgress.playerColor?.tag, isCurrentPlayer);
 
         return {
             label: playerProgress.playerName,
@@ -51,8 +56,8 @@ export const AllPlayersWpmChart = ({
                 x: second,
                 y: wpm
             })),
-            borderColor: PLAYER_COLORS[index % PLAYER_COLORS.length],
-            backgroundColor: PLAYER_COLORS[index % PLAYER_COLORS.length],
+            borderColor: lineColor,
+            backgroundColor: lineColor,
             pointRadius: 0,
             pointHoverRadius: 8,
             pointHitRadius: 20,
@@ -76,7 +81,7 @@ export const AllPlayersWpmChart = ({
                 position: 'top',
                 align: 'end',
                 labels: {
-                    color: 'rgba(255, 255, 255, 0.9)',
+                    color: resolvedColors.secondaryFg,
                     font: {
                         size: 12,
                     },
@@ -86,11 +91,11 @@ export const AllPlayersWpmChart = ({
                 }
             },
             tooltip: {
-                backgroundColor: 'rgba(26, 26, 26, 0.95)',
-                borderColor: 'rgba(255, 255, 255, 0.2)',
+                backgroundColor: resolvedColors.input,
+                borderColor: resolvedColors.border,
                 borderWidth: 1,
-                titleColor: 'rgba(255, 255, 255, 0.7)',
-                bodyColor: '#ffffff',
+                titleColor: resolvedColors.foreground,
+                bodyColor: resolvedColors.foreground,
                 padding: 16,
                 displayColors: true,
                 usePointStyle: true,
@@ -125,19 +130,19 @@ export const AllPlayersWpmChart = ({
                 title: {
                     display: true,
                     text: 'Time (seconds)',
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: resolvedColors.mutedFg,
                     font: {
                         size: 12
                     }
                 },
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: resolvedColors.mutedFg,
                     font: {
                         size: 11
                     }
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: resolvedColors.gridLine,
                     drawTicks: false
                 },
                 border: {
@@ -148,20 +153,20 @@ export const AllPlayersWpmChart = ({
                 title: {
                     display: true,
                     text: 'WPM',
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: resolvedColors.mutedFg,
                     font: {
                         size: 12
                     }
                 },
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: resolvedColors.mutedFg,
                     font: {
                         size: 11
                     },
                     padding: 8
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.06)',
+                    color: resolvedColors.gridLine,
                     drawTicks: false
                 },
                 border: {
@@ -173,7 +178,7 @@ export const AllPlayersWpmChart = ({
 
     if (allPlayerProgress.length === 0) {
         return (
-            <div className="w-full text-center text-white/60 py-6">
+            <div className="w-full text-center text-muted-foreground py-6">
                 No player data available
             </div>
         );

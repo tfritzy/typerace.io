@@ -18,7 +18,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "The division between those who accept, and those who deny, Christian revelation I take to be the most profound division between human beings.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "No verse is free for the man who wants to do a good job. Poetry remains one person talking to another. no poet can write a poem of amplitude unless he is the master of the prosaic.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "Fortunate the man who, at the right moment meets the right friend; fortunate also the man who at the right moment meets the right enemy.", Author = "T. S. Eliot" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "No one can become really educated without having pursued some study in which he took no interest—for it is a part of education to interest ourselves in subjects for which we have no aptitude.", Author = "T. S. Eliot" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "No one can become really educated without having pursued some study in which he took no interest-for it is a part of education to interest ourselves in subjects for which we have no aptitude.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "Do I dare Disturb the universe? In a minute there is time For decisions and revisions which a minute will reverse.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "I have measured out my life with coffee spoons;", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "It is impossible to say just what I mean!", Author = "T. S. Eliot" },
@@ -42,7 +42,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "The awful daring of a moment's surrender Which an age of prudence can never retract By this, and this only, we have existed.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "Shantih shantih shantih", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "We are the hollow men We are the stuffed men Leaning together Headpiece filled with straw.", Author = "T. S. Eliot" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "Those who have crossed With direct eyes, to death's other Kingdom Remember us — if at all — not as lost Violent souls, but only As the hollow men The stuffed men.", Author = "T. S. Eliot" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "Those who have crossed With direct eyes, to death's other Kingdom Remember us - if at all - not as lost Violent souls, but only As the hollow men The stuffed men.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "Eyes I dare not meet in dreams In death's dream kingdom These do not appear: There, the eyes are Sunlight on a broken column There, is a tree swinging And voices are In the wind's singing More distant and more solemn Than a fading star.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "This is the dead land This is cactus land Here the stone images Are raised, here they receive The supplication of a dead man's hand Under the twinkle of a fading star.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "In this last of meeting places We grope together And avoid speech Gathered on this beach of the tumid river", Author = "T. S. Eliot" },
@@ -79,7 +79,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "The work of creation is never without travail", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "Light Light The visible reminder of Invisible Light.", Author = "T. S. Eliot" },
             new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "Macavity, Macavity, there's no one like Macavity, He's broken every human law, he breaks the law of gravity.", Author = "T. S. Eliot" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "For some are sane and some are mad And some are good and some are bad And some are better, some are worse — But all may be described in verse.", Author = "T. S. Eliot" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/T._S._Eliot", Text = "For some are sane and some are mad And some are good and some are bad And some are better, some are worse - But all may be described in verse.", Author = "T. S. Eliot" },
         };
     }
 }

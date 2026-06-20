@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { XpGain } from "../../module_bindings/xp_gain_type";
+import type { XpGain } from "../types/stdb";
 
 interface XpGainPopupProps {
     xpGain: XpGain;
@@ -17,11 +17,7 @@ export const XpGainPopup = ({ xpGain, onComplete }: XpGainPopupProps) => {
 
     return (
         <div
-            className="rounded-lg px-4 py-3 shadow-lg min-w-[280px] animate-[modalFadeIn_0.3s_ease-out,modalFadeOut_0.3s_ease-in_5.3s_forwards]"
-            style={{
-                backgroundColor: 'var(--color-box-bg)',
-                border: '1px solid var(--color-box-border)',
-            }}
+            className="rounded-lg px-4 py-3 shadow-lg min-w-[280px] animate-[modalFadeIn_0.3s_ease-out,modalFadeOut_0.3s_ease-in_5.3s_forwards] bg-card border border-border"
         >
             <div className="space-y-0.5 text-xs">
                 {xpGain.multipliers.map((multiplier, index) => (
@@ -32,21 +28,14 @@ export const XpGainPopup = ({ xpGain, onComplete }: XpGainPopupProps) => {
                     />
                 ))}
 
-                <div className="my-2 border-t" style={{ borderColor: 'rgba(255, 255, 255, 0.15)' }} />
+                <div className="my-2 border-t border-border" />
 
                 <div
-                    className="flex items-center justify-between py-2 px-3 rounded font-semibold text-sm"
-                    style={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                        color: 'rgba(255, 255, 255, 0.95)',
-                    }}
+                    className="flex items-center justify-between py-2 px-3 rounded font-semibold text-sm bg-secondary text-secondary-foreground"
                 >
                     <span>Total XP</span>
                     <span
-                        className="tabular-nums text-base"
-                        style={{
-                            color: 'rgba(255, 255, 255, 0.95)',
-                        }}
+                        className="tabular-nums text-base text-secondary-foreground"
                     >
                         +{xpGain.totalXp}
                     </span>
@@ -66,17 +55,11 @@ const MultiplierRow = ({ label, value }: MultiplierRowProps) => {
 
     return (
         <div
-            className="flex items-center justify-between py-1.5 px-2"
-            style={{
-                color: isBonus ? 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 255, 255, 0.65)',
-            }}
+            className={`flex items-center justify-between py-1.5 px-2 ${isBonus ? 'text-secondary-foreground' : 'text-muted-foreground'}`}
         >
             <span className="font-medium text-sm">{label}</span>
             <span
-                className="font-bold tabular-nums text-sm tracking-wide"
-                style={{
-                    color: isBonus ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.75)',
-                }}
+                className={`font-bold tabular-nums text-sm tracking-wide ${isBonus ? 'text-secondary-foreground' : 'text-muted-foreground'}`}
             >
                 {value}
             </span>

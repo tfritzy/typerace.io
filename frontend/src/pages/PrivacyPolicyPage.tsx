@@ -1,14 +1,21 @@
+import { useEffect } from "react";
 import { Header } from "../components/Header";
+import { getDefaultSiteTitle } from "../utils/modes";
 
 export const PrivacyPolicyPage = () => {
+    useEffect(() => {
+        document.title = "Privacy Policy - TypeRace.io";
+        return () => { document.title = getDefaultSiteTitle(); };
+    }, []);
+
     return (
-        <div className="relative h-screen flex flex-col overflow-hidden">
+        <div className="relative h-full flex flex-col overflow-hidden">
             <Header />
-            <div className="flex-1 overflow-y-auto p-4">
+            <main className="flex-1 overflow-y-auto p-4">
                 <div className="content-container">
-                    <div className="box p-8 my-8 text-white">
+                    <div className="box p-8 my-8 text-foreground">
                         <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
-                        <p className="text-sm text-gray-400 mb-6">Last Updated: November 22, 2024</p>
+                        <p className="text-sm text-muted-foreground mb-6">Last Updated: November 22, 2024</p>
 
                         <section className="mb-6">
                             <h2 className="text-2xl font-semibold mb-3">Introduction</h2>
@@ -162,7 +169,7 @@ export const PrivacyPolicyPage = () => {
                                     href="https://github.com/tfritzy/typerace.io" 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="text-amber-400 hover:text-amber-300 underline"
+                                    className="text-accent-primary hover:text-accent-light underline"
                                 >
                                     https://github.com/tfritzy/typerace.io
                                 </a>
@@ -170,7 +177,7 @@ export const PrivacyPolicyPage = () => {
                         </section>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     );
 };

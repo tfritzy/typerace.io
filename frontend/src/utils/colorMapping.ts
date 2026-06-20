@@ -1,4 +1,4 @@
-import { PlayerColor } from "../../module_bindings";
+import { getThemeConfig, type ThemeTag } from "./themes";
 
 export interface ColorConfig {
     primary: string;
@@ -10,175 +10,368 @@ export interface ColorConfig {
     gradient: string;
 }
 
-export const COLOR_CONFIGS: Record<PlayerColor['tag'], ColorConfig> = {
-    [PlayerColor.Red.tag]: {
-        primary: '#ef4444',
-        light: '#f87171',
-        dark: '#dc2626',
-        darker: '#b91c1c',
-        darkest: '#991b1b',
-        avatarColors: ['#ef4444', '#6b4a4a', '#4a2d2d'],
-        gradient: 'linear-gradient(to right, #dc2626, #ef4444)'
-    },
-    [PlayerColor.Orange.tag]: {
-        primary: '#f97316',
-        light: '#fb923c',
-        dark: '#ea580c',
-        darker: '#c2410c',
-        darkest: '#9a3412',
-        avatarColors: ['#f97316', '#8b6a4a', '#5c4a36'],
-        gradient: 'linear-gradient(to right, #ea580c, #f97316)'
-    },
-     [PlayerColor.Amber.tag]: {
-        primary: '#fbbf24',
-        light: '#fcd34d',
-        dark: '#f59e0b',
-        darker: '#d97706',
-        darkest: '#b45309',
-        avatarColors: ['#fbbf24', '#8b7355', '#5c4a3a'],
-        gradient: 'linear-gradient(to right, #f59e0b, #fbbf24)'
-    },
-    [PlayerColor.Yellow.tag]: {
-        primary: '#eab308',
-        light: '#facc15',
-        dark: '#ca8a04',
-        darker: '#a16207',
-        darkest: '#854d0e',
-        avatarColors: ['#eab308', '#8b8355', '#5c543a'],
-        gradient: 'linear-gradient(to right, #ca8a04, #eab308)'
-    },
-    [PlayerColor.Lime.tag]: {
-        primary: '#84cc16',
-        light: '#a3e635',
-        dark: '#65a30d',
-        darker: '#4d7c0f',
-        darkest: '#3f6212',
-        avatarColors: ['#84cc16', '#5d6b4a', '#3d4a2d'],
-        gradient: 'linear-gradient(to right, #65a30d, #84cc16)'
-    },
-    [PlayerColor.Green.tag]: {
-        primary: '#22c55e',
-        light: '#4ade80',
-        dark: '#16a34a',
-        darker: '#15803d',
-        darkest: '#166534',
-        avatarColors: ['#22c55e', '#4a5d52', '#2d3e36'],
-        gradient: 'linear-gradient(to right, #16a34a, #22c55e)'
-    },
-    [PlayerColor.Emerald.tag]: {
-        primary: '#10b981',
-        light: '#34d399',
-        dark: '#059669',
-        darker: '#047857',
-        darkest: '#065f46',
-        avatarColors: ['#10b981', '#4a5d56', '#2d3e38'],
-        gradient: 'linear-gradient(to right, #059669, #10b981)'
-    },
-    [PlayerColor.Teal.tag]: {
-        primary: '#14b8a6',
-        light: '#2dd4bf',
-        dark: '#0d9488',
-        darker: '#0f766e',
-        darkest: '#115e59',
-        avatarColors: ['#14b8a6', '#4a5d5c', '#2d3e3d'],
-        gradient: 'linear-gradient(to right, #0d9488, #14b8a6)'
-    },
-    [PlayerColor.Cyan.tag]: {
-        primary: '#06b6d4',
-        light: '#22d3ee',
-        dark: '#0891b2',
-        darker: '#0e7490',
-        darkest: '#155e75',
-        avatarColors: ['#06b6d4', '#4a5d68', '#2d3e47'],
-        gradient: 'linear-gradient(to right, #0891b2, #06b6d4)'
-    },
-    [PlayerColor.Sky.tag]: {
-        primary: '#0ea5e9',
-        light: '#38bdf8',
-        dark: '#0284c7',
-        darker: '#0369a1',
-        darkest: '#075985',
-        avatarColors: ['#0ea5e9', '#4a5a68', '#2d3a47'],
-        gradient: 'linear-gradient(to right, #0284c7, #0ea5e9)'
-    },
-    [PlayerColor.Blue.tag]: {
-        primary: '#3b82f6',
-        light: '#60a5fa',
-        dark: '#2563eb',
-        darker: '#1d4ed8',
-        darkest: '#1e40af',
-        avatarColors: ['#3b82f6', '#4a5568', '#2d3748'],
-        gradient: 'linear-gradient(to right, #2563eb, #3b82f6)'
-    },
-    [PlayerColor.Indigo.tag]: {
-        primary: '#6366f1',
-        light: '#818cf8',
-        dark: '#4f46e5',
-        darker: '#4338ca',
-        darkest: '#3730a3',
-        avatarColors: ['#6366f1', '#4a4d68', '#2e3047'],
-        gradient: 'linear-gradient(to right, #4f46e5, #6366f1)'
-    },
-    [PlayerColor.Violet.tag]: {
-        primary: '#8b5cf6',
-        light: '#a78bfa',
-        dark: '#7c3aed',
-        darker: '#6d28d9',
-        darkest: '#5b21b6',
-        avatarColors: ['#8b5cf6', '#534a68', '#3a2e47'],
-        gradient: 'linear-gradient(to right, #7c3aed, #8b5cf6)'
-    },
-    [PlayerColor.Purple.tag]: {
-        primary: '#a855f7',
-        light: '#c084fc',
-        dark: '#9333ea',
-        darker: '#7e22ce',
-        darkest: '#6b21a8',
-        avatarColors: ['#a855f7', '#5d4a68', '#3d2e47'],
-        gradient: 'linear-gradient(to right, #9333ea, #a855f7)'
-    },
-    [PlayerColor.Fuchsia.tag]: {
-        primary: '#d946ef',
-        light: '#e879f9',
-        dark: '#c026d3',
-        darker: '#a21caf',
-        darkest: '#86198f',
-        avatarColors: ['#d946ef', '#684a68', '#472e47'],
-        gradient: 'linear-gradient(to right, #c026d3, #d946ef)'
-    },
-    [PlayerColor.Pink.tag]: {
-        primary: '#ec4899',
-        light: '#f472b6',
-        dark: '#db2777',
-        darker: '#be185d',
-        darkest: '#9f1239',
-        avatarColors: ['#ec4899', '#6b4a5d', '#4a2d3d'],
-        gradient: 'linear-gradient(to right, #db2777, #ec4899)'
-    },
-    [PlayerColor.Rose.tag]: {
-        primary: '#f43f5e',
-        light: '#fb7185',
-        dark: '#e11d48',
-        darker: '#be123c',
-        darkest: '#9f1239',
-        avatarColors: ['#f43f5e', '#6b4a52', '#4a2d36'],
-        gradient: 'linear-gradient(to right, #e11d48, #f43f5e)'
-    }
-};
-
-export function getColorConfig(color: PlayerColor): ColorConfig {
-    return COLOR_CONFIGS[color.tag] || COLOR_CONFIGS[PlayerColor.Amber.tag];
+export function getColorConfig(tag: ThemeTag): ColorConfig {
+    const theme = getThemeConfig(tag);
+    return {
+        primary: theme.colors.accentPrimary,
+        light: theme.colors.accentLight,
+        dark: theme.colors.accentDark,
+        darker: theme.colors.accentDark,
+        darkest: theme.colors.accentDark,
+        avatarColors: theme.avatarColors,
+        gradient: theme.gradient,
+    };
 }
 
-export function setAccentColor(color: PlayerColor): void {
-    const config = getColorConfig(color);
-    const root = document.documentElement;
-    root.style.setProperty('--color-accent', config.primary);
-    root.style.setProperty('--color-accent-light', config.light);
-    root.style.setProperty('--color-accent-dark', config.dark);
-    
+const PLAYER_COLOR_HEX: Record<string, string> = {
+    Coral: '#E06C75',
+    Red: '#EF4444',
+    Orange: '#F97316',
+    Rose: '#F43F5E',
+    Teal: '#56B6C2',
+    Cyan: '#06B6D4',
+    Purple: '#C678DD',
+    Violet: '#8B5CF6',
+    Indigo: '#6366F1',
+    Fuchsia: '#D946EF',
+    Pink: '#EC4899',
+    Green: '#98C379',
+    Lime: '#84CC16',
+    Emerald: '#10B981',
+    Gold: '#E5C07B',
+    Amber: '#F59E0B',
+    Yellow: '#EAB308',
+    Blue: '#61AFEF',
+    Sky: '#0EA5E9',
+};
+
+const THEME_PLAYER_COLORS: Record<ThemeTag, Record<string, string>> = {
+    OneDark: { ...PLAYER_COLOR_HEX },
+    Dracula: {
+        Coral: '#ff6e6e',
+        Red: '#ff5555',
+        Orange: '#ffb86c',
+        Rose: '#ff79c6',
+        Teal: '#50e8c0',
+        Cyan: '#8be9fd',
+        Purple: '#bd93f9',
+        Violet: '#9580ff',
+        Indigo: '#7070f1',
+        Fuchsia: '#e466ff',
+        Pink: '#ff92d0',
+        Green: '#50fa7b',
+        Lime: '#88ff70',
+        Emerald: '#3ce8a0',
+        Gold: '#f0d878',
+        Amber: '#ffd580',
+        Yellow: '#f1fa8c',
+        Blue: '#6e9eff',
+        Sky: '#62d6ff',
+    },
+    Monokai: {
+        Coral: '#ff6b6b',
+        Red: '#f92672',
+        Orange: '#fd971f',
+        Rose: '#ff4488',
+        Teal: '#4ec9b0',
+        Cyan: '#66d9ef',
+        Purple: '#ae81ff',
+        Violet: '#9966ff',
+        Indigo: '#6666ff',
+        Fuchsia: '#e040e0',
+        Pink: '#ff6eb4',
+        Green: '#a6e22e',
+        Lime: '#c0ff40',
+        Emerald: '#30d080',
+        Gold: '#d4c060',
+        Amber: '#ffa940',
+        Yellow: '#e6db74',
+        Blue: '#5599ee',
+        Sky: '#55c8e8',
+    },
+    Nord: {
+        Coral: '#d4727c',
+        Red: '#bf616a',
+        Orange: '#d08770',
+        Rose: '#c46070',
+        Teal: '#8fbcbb',
+        Cyan: '#93d3e4',
+        Purple: '#b48ead',
+        Violet: '#a08cc0',
+        Indigo: '#7b88b0',
+        Fuchsia: '#c47aaf',
+        Pink: '#c28097',
+        Green: '#a3be8c',
+        Lime: '#b4c87a',
+        Emerald: '#7db89b',
+        Gold: '#d9b878',
+        Amber: '#d9a76a',
+        Yellow: '#ebcb8b',
+        Blue: '#81a1c1',
+        Sky: '#5e81ac',
+    },
+    TokyoNight: {
+        Coral: '#f0776f',
+        Red: '#f7768e',
+        Orange: '#ff9e64',
+        Rose: '#f24e8f',
+        Teal: '#73daca',
+        Cyan: '#2ac3de',
+        Purple: '#bb9af7',
+        Violet: '#9d7cf4',
+        Indigo: '#7b7ff0',
+        Fuchsia: '#d465e8',
+        Pink: '#f589b5',
+        Green: '#9ece6a',
+        Lime: '#b5e046',
+        Emerald: '#53d68a',
+        Gold: '#d4a050',
+        Amber: '#f0a848',
+        Yellow: '#e0af68',
+        Blue: '#7aa2f7',
+        Sky: '#7dcfff',
+    },
+    GruvboxDark: {
+        Coral: '#f06858',
+        Red: '#fb4934',
+        Orange: '#fe8019',
+        Rose: '#d65080',
+        Teal: '#689d6a',
+        Cyan: '#8ec07c',
+        Purple: '#d3869b',
+        Violet: '#b16286',
+        Indigo: '#7060a8',
+        Fuchsia: '#cc60a0',
+        Pink: '#e49090',
+        Green: '#b8bb26',
+        Lime: '#c8cc3a',
+        Emerald: '#6aab70',
+        Gold: '#d9b030',
+        Amber: '#e09030',
+        Yellow: '#fabd2f',
+        Blue: '#83a598',
+        Sky: '#7dbbaa',
+    },
+    CatppuccinMocha: {
+        Coral: '#eba0ac',
+        Red: '#f38ba8',
+        Orange: '#fab387',
+        Rose: '#e88da0',
+        Teal: '#94e2d5',
+        Cyan: '#89dceb',
+        Purple: '#cba6f7',
+        Violet: '#b4befe',
+        Indigo: '#7287d6',
+        Fuchsia: '#e0a0e8',
+        Pink: '#f5c2e7',
+        Green: '#a6e3a1',
+        Lime: '#c0ea90',
+        Emerald: '#6dd8a0',
+        Gold: '#e8c878',
+        Amber: '#f0a860',
+        Yellow: '#f9e2af',
+        Blue: '#89b4fa',
+        Sky: '#74c7ec',
+    },
+    RosePine: {
+        Coral: '#e0727e',
+        Red: '#eb6f92',
+        Orange: '#ea9d6f',
+        Rose: '#ebbcba',
+        Teal: '#6db5a8',
+        Cyan: '#9ccfd8',
+        Purple: '#c4a7e7',
+        Violet: '#a88ed4',
+        Indigo: '#7a8bc0',
+        Fuchsia: '#d080c0',
+        Pink: '#ebb5c0',
+        Green: '#89c28a',
+        Lime: '#a6c870',
+        Emerald: '#5bba8a',
+        Gold: '#f6c177',
+        Amber: '#e8a860',
+        Yellow: '#ebd090',
+        Blue: '#5e97c0',
+        Sky: '#7ec0d0',
+    },
+    AyuDark: {
+        Coral: '#f08070',
+        Red: '#f07178',
+        Orange: '#ff8f40',
+        Rose: '#e85080',
+        Teal: '#6dc7a8',
+        Cyan: '#95e6cb',
+        Purple: '#d2a6ff',
+        Violet: '#b080e8',
+        Indigo: '#7b80e0',
+        Fuchsia: '#e060cc',
+        Pink: '#f090b0',
+        Green: '#aad94c',
+        Lime: '#c0e838',
+        Emerald: '#50c880',
+        Gold: '#e6b450',
+        Amber: '#f0a030',
+        Yellow: '#ffb454',
+        Blue: '#39bae6',
+        Sky: '#59c2ff',
+    },
+    Kanagawa: {
+        Coral: '#d0646e',
+        Red: '#c34043',
+        Orange: '#ffa066',
+        Rose: '#d27e99',
+        Teal: '#7aa89f',
+        Cyan: '#a3d4d5',
+        Purple: '#957fb8',
+        Violet: '#8070b0',
+        Indigo: '#6a80b8',
+        Fuchsia: '#b870a8',
+        Pink: '#e090a8',
+        Green: '#98bb6c',
+        Lime: '#b0c858',
+        Emerald: '#70a880',
+        Gold: '#d4a868',
+        Amber: '#e0a858',
+        Yellow: '#e6c384',
+        Blue: '#7e9cd8',
+        Sky: '#7fb4ca',
+    },
+    Pico8: {
+        Coral: '#FF6E59',
+        Red: '#FF004D',
+        Orange: '#FFA300',
+        Rose: '#FF77A8',
+        Teal: '#008751',
+        Cyan: '#29ADFF',
+        Purple: '#83769C',
+        Violet: '#754665',
+        Indigo: '#065AB5',
+        Fuchsia: '#BE1250',
+        Pink: '#FF9D81',
+        Green: '#00E436',
+        Lime: '#A8E72E',
+        Emerald: '#00B543',
+        Gold: '#F3EF7D',
+        Amber: '#FF6C24',
+        Yellow: '#FFEC27',
+        Blue: '#29ADFF',
+        Sky: '#29ADFF',
+    },
+    Endesga: {
+        Coral: '#f6757a',
+        Red: '#e43b44',
+        Orange: '#f77622',
+        Rose: '#b55088',
+        Teal: '#30a898',
+        Cyan: '#2ce8f5',
+        Purple: '#9060a8',
+        Violet: '#68386c',
+        Indigo: '#124e89',
+        Fuchsia: '#d050a0',
+        Pink: '#e8b796',
+        Green: '#63c74d',
+        Lime: '#a0d840',
+        Emerald: '#3e8948',
+        Gold: '#feae34',
+        Amber: '#d77643',
+        Yellow: '#fee761',
+        Blue: '#0099db',
+        Sky: '#40c0e8',
+    },
+    Sweetie16: {
+        Coral: '#e06060',
+        Red: '#b13e53',
+        Orange: '#ef7d57',
+        Rose: '#d04868',
+        Teal: '#257179',
+        Cyan: '#73eff7',
+        Purple: '#7b3880',
+        Violet: '#5d275d',
+        Indigo: '#29366f',
+        Fuchsia: '#c040a0',
+        Pink: '#f090a0',
+        Green: '#a7f070',
+        Lime: '#c8f050',
+        Emerald: '#38b764',
+        Gold: '#ffcd75',
+        Amber: '#e0a050',
+        Yellow: '#f0e060',
+        Blue: '#3b5dc9',
+        Sky: '#41a6f6',
+    },
+};
+
+function getCurrentThemeTag(): string {
     try {
-        localStorage.setItem('accentColor', config.primary);
-    } catch (e) {
+        return localStorage.getItem('selectedTheme') ?? 'GruvboxDark';
+    } catch {
+        return 'GruvboxDark';
     }
+}
+
+export function getPlayerColorHex(playerColorTag: string): string {
+    const themeTag = getCurrentThemeTag();
+    const themeColors = THEME_PLAYER_COLORS[themeTag as ThemeTag];
+    if (themeColors?.[playerColorTag]) {
+        return themeColors[playerColorTag];
+    }
+    return PLAYER_COLOR_HEX[playerColorTag] ?? '#61AFEF';
+}
+
+export function getThemePlayerColorList(): string[] {
+    const themeTag = getCurrentThemeTag();
+    const themeColors = THEME_PLAYER_COLORS[themeTag as ThemeTag] ?? PLAYER_COLOR_HEX;
+    return Object.values(themeColors);
+}
+
+function hexToHsl(hex: string): [number, number, number] {
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    if (max === min) return [0, 0, l];
+    const d = max - min;
+    const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    let h = 0;
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+    else if (max === g) h = ((b - r) / d + 2) / 6;
+    else h = ((r - g) / d + 4) / 6;
+    return [h * 360, s, l];
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+    const hNorm = (((h % 360) + 360) % 360) / 360;
+    const a = s * Math.min(l, 1 - l);
+    const f = (n: number) => {
+        const k = (n + hNorm * 12) % 12;
+        const c = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(Math.max(0, Math.min(1, c)) * 255).toString(16).padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+export function getDisplayColorHex(playerColorTag: string | undefined, isCurrentPlayer: boolean): string {
+    if (isCurrentPlayer) {
+        return getComputedStyle(document.documentElement).getPropertyValue('--accent-primary').trim();
+    }
+    return getPlayerColorHex(playerColorTag ?? '');
+}
+
+export function getPlayerAvatarColors(playerColorTag: string): string[] {
+    const hex = getPlayerColorHex(playerColorTag);
+    const [h] = hexToHsl(hex);
+    return [
+        hex,
+        hslToHex(h, 0.15, 0.22),
+        hslToHex(h, 0.08, 0.15),
+    ];
+}
+
+export function getPlayerProgressGradient(playerColorTag: string): string {
+    const hex = getPlayerColorHex(playerColorTag);
+    const [h, s, l] = hexToHsl(hex);
+    const darkColor = hslToHex(h, Math.min(1, s * 0.9), Math.max(0.2, l - 0.15));
+    return `linear-gradient(to right, ${darkColor}, ${hex})`;
 }

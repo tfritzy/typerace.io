@@ -1,0 +1,258 @@
+import { RelicType } from "./relicConfig";
+
+export enum GemType {
+  ChippedTopaz = "ChippedTopaz",
+  FlawedTopaz = "FlawedTopaz",
+  Topaz = "Topaz",
+  FlawlessTopaz = "FlawlessTopaz",
+  ChippedRuby = "ChippedRuby",
+  FlawedRuby = "FlawedRuby",
+  Ruby = "Ruby",
+  FlawlessRuby = "FlawlessRuby",
+  ChippedEmerald = "ChippedEmerald",
+  FlawedEmerald = "FlawedEmerald",
+  Emerald = "Emerald",
+  FlawlessEmerald = "FlawlessEmerald",
+  ChippedSapphire = "ChippedSapphire",
+  FlawedSapphire = "FlawedSapphire",
+  Sapphire = "Sapphire",
+  FlawlessSapphire = "FlawlessSapphire",
+  ChippedAmethyst = "ChippedAmethyst",
+  FlawedAmethyst = "FlawedAmethyst",
+  Amethyst = "Amethyst",
+  FlawlessAmethyst = "FlawlessAmethyst",
+  ChippedDiamond = "ChippedDiamond",
+  FlawedDiamond = "FlawedDiamond",
+  Diamond = "Diamond",
+  FlawlessDiamond = "FlawlessDiamond",
+}
+
+export type ItemType = RelicType | GemType | "Gold";
+
+export interface ItemConfig {
+  stackable: boolean;
+  maxStack?: number;
+}
+
+export interface Item {
+  id: number;
+  type: ItemType;
+  amount: number;
+  price?: number;
+}
+
+let nextItemId = 1;
+export function createItem(type: ItemType, amount: number, price?: number): Item {
+  return { id: nextItemId++, type, amount, price };
+}
+
+export const ITEM_DISPLAY: Record<ItemType, string> = {
+  [RelicType.EmbercrestBlade]: "Embercrest Blade",
+  [RelicType.BriarthornSaber]: "Briarthorn Saber",
+  [RelicType.RavenplumeEdge]: "Ravenplume Edge",
+  [RelicType.RubyguardGreatsword]: "Rubyguard Greatsword",
+  [RelicType.SunfireScimitar]: "Sunfire Scimitar",
+  [RelicType.CloudveilLongsword]: "Cloudveil Longsword",
+  [RelicType.VoidthornBlade]: "Voidthorn Blade",
+  [RelicType.GildedPlumeblade]: "Gilded Plumeblade",
+  [RelicType.GlacialCrusader]: "Glacial Crusader",
+  [RelicType.BloodthornDirk]: "Bloodthorn Dirk",
+  [RelicType.TwinflareCrossblades]: "Twinflare Crossblades",
+  [RelicType.MoltenZweihander]: "Molten Zweihander",
+  [RelicType.FrostfangClaymore]: "Frostfang Claymore",
+  [RelicType.SporesparkGlaive]: "Sporespark Glaive",
+  [RelicType.AzureCrescent]: "Azure Crescent",
+  [RelicType.RosevineRapier]: "Rosevine Rapier",
+  [RelicType.CrystalbreakSaber]: "Crystalbreak Saber",
+  [RelicType.CinderstoneBlade]: "Cinderstone Blade",
+  [RelicType.EmeraldFang]: "Emerald Fang",
+  [RelicType.StarfallStiletto]: "Starfall Stiletto",
+  [RelicType.CrimsonCleaver]: "Crimson Cleaver",
+  [RelicType.TigerstripeFalchion]: "Tigerstripe Falchion",
+  [RelicType.DawnfireCutlass]: "Dawnfire Cutlass",
+  [RelicType.JadecrossBroadsword]: "Jadecross Broadsword",
+  [RelicType.ChainlinkEstoc]: "Chainlink Estoc",
+  [RelicType.PermafrostGreatsword]: "Permafrost Greatsword",
+  [RelicType.MistralSabre]: "Mistral Sabre",
+  [RelicType.TidecallerBlade]: "Tidecaller Blade",
+  [RelicType.SolarisEdge]: "Solaris Edge",
+  [RelicType.InfernalRavager]: "Infernal Ravager",
+  [RelicType.SteelBattleaxe]: "Steel Battleaxe",
+  [RelicType.MoonlitHatchet]: "Moonlit Hatchet",
+  [RelicType.ObsidianReaver]: "Obsidian Reaver",
+  [RelicType.RubyflareGreataxe]: "Rubyflare Greataxe",
+  [RelicType.GildedWaraxe]: "Gilded Waraxe",
+  [RelicType.CopperheadCleaver]: "Copperhead Cleaver",
+  [RelicType.BonecrestAxe]: "Bonecrest Axe",
+  [RelicType.DarkwoodHatchet]: "Darkwood Hatchet",
+  [RelicType.DuskforgeHalberd]: "Duskforge Halberd",
+  [RelicType.RosegoldBroadaxe]: "Rosegold Broadaxe",
+  [RelicType.FrostbiteCleaver]: "Frostbite Cleaver",
+  [RelicType.BloodmoonReaver]: "Bloodmoon Reaver",
+  [RelicType.TidebreakAxe]: "Tidebreak Axe",
+  [RelicType.IronwoodTomahawk]: "Ironwood Tomahawk",
+  [RelicType.GreystoneBroadaxe]: "Greystone Broadaxe",
+  [RelicType.SandstoneHatchet]: "Sandstone Hatchet",
+  [RelicType.CrimsonWaraxe]: "Crimson Waraxe",
+  [RelicType.GoldscarHalberd]: "Goldscar Halberd",
+  [RelicType.FlamecrestGreataxe]: "Flamecrest Greataxe",
+  [RelicType.WroughtIronChopper]: "Wrought Iron Chopper",
+  [RelicType.SpectralCleaver]: "Spectral Cleaver",
+  [RelicType.BloodruneAxe]: "Bloodrune Axe",
+  [RelicType.PearlsteelHatchet]: "Pearlsteel Hatchet",
+  [RelicType.EmberstrikeTomahawk]: "Emberstrike Tomahawk",
+  [RelicType.NightbloomReaver]: "Nightbloom Reaver",
+  [RelicType.BlackironSplitter]: "Blackiron Splitter",
+  [RelicType.VerdantWaraxe]: "Verdant Waraxe",
+  [RelicType.AshenBroadaxe]: "Ashen Broadaxe",
+  [RelicType.PrismaticGreataxe]: "Prismatic Greataxe",
+  [RelicType.HellforgedCleaver]: "Hellforged Cleaver",
+  [RelicType.GraniteWaraxe]: "Granite Waraxe",
+  [GemType.ChippedTopaz]: "topaz-0",
+  [GemType.FlawedTopaz]: "topaz-1",
+  [GemType.Topaz]: "topaz-2",
+  [GemType.FlawlessTopaz]: "topaz-3",
+  [GemType.ChippedRuby]: "ruby-0",
+  [GemType.FlawedRuby]: "ruby-1",
+  [GemType.Ruby]: "ruby-2",
+  [GemType.FlawlessRuby]: "ruby-3",
+  [GemType.ChippedEmerald]: "emerald-0",
+  [GemType.FlawedEmerald]: "emerald-1",
+  [GemType.Emerald]: "emerald-2",
+  [GemType.FlawlessEmerald]: "emerald-3",
+  [GemType.ChippedSapphire]: "sapphire-0",
+  [GemType.FlawedSapphire]: "sapphire-1",
+  [GemType.Sapphire]: "sapphire-2",
+  [GemType.FlawlessSapphire]: "sapphire-3",
+  [GemType.ChippedAmethyst]: "amethyst-0",
+  [GemType.FlawedAmethyst]: "amethyst-1",
+  [GemType.Amethyst]: "amethyst-2",
+  [GemType.FlawlessAmethyst]: "amethyst-3",
+  [GemType.ChippedDiamond]: "diamond-0",
+  [GemType.FlawedDiamond]: "diamond-1",
+  [GemType.Diamond]: "diamond-2",
+  [GemType.FlawlessDiamond]: "diamond-3",
+  Gold: "coin-1",
+};
+
+export const ITEM_CONFIGS: Record<ItemType, ItemConfig> = {
+  [RelicType.EmbercrestBlade]: { stackable: false },
+  [RelicType.BriarthornSaber]: { stackable: false },
+  [RelicType.RavenplumeEdge]: { stackable: false },
+  [RelicType.RubyguardGreatsword]: { stackable: false },
+  [RelicType.SunfireScimitar]: { stackable: false },
+  [RelicType.CloudveilLongsword]: { stackable: false },
+  [RelicType.VoidthornBlade]: { stackable: false },
+  [RelicType.GildedPlumeblade]: { stackable: false },
+  [RelicType.GlacialCrusader]: { stackable: false },
+  [RelicType.BloodthornDirk]: { stackable: false },
+  [RelicType.TwinflareCrossblades]: { stackable: false },
+  [RelicType.MoltenZweihander]: { stackable: false },
+  [RelicType.FrostfangClaymore]: { stackable: false },
+  [RelicType.SporesparkGlaive]: { stackable: false },
+  [RelicType.AzureCrescent]: { stackable: false },
+  [RelicType.RosevineRapier]: { stackable: false },
+  [RelicType.CrystalbreakSaber]: { stackable: false },
+  [RelicType.CinderstoneBlade]: { stackable: false },
+  [RelicType.EmeraldFang]: { stackable: false },
+  [RelicType.StarfallStiletto]: { stackable: false },
+  [RelicType.CrimsonCleaver]: { stackable: false },
+  [RelicType.TigerstripeFalchion]: { stackable: false },
+  [RelicType.DawnfireCutlass]: { stackable: false },
+  [RelicType.JadecrossBroadsword]: { stackable: false },
+  [RelicType.ChainlinkEstoc]: { stackable: false },
+  [RelicType.PermafrostGreatsword]: { stackable: false },
+  [RelicType.MistralSabre]: { stackable: false },
+  [RelicType.TidecallerBlade]: { stackable: false },
+  [RelicType.SolarisEdge]: { stackable: false },
+  [RelicType.InfernalRavager]: { stackable: false },
+  [RelicType.SteelBattleaxe]: { stackable: false },
+  [RelicType.MoonlitHatchet]: { stackable: false },
+  [RelicType.ObsidianReaver]: { stackable: false },
+  [RelicType.RubyflareGreataxe]: { stackable: false },
+  [RelicType.GildedWaraxe]: { stackable: false },
+  [RelicType.CopperheadCleaver]: { stackable: false },
+  [RelicType.BonecrestAxe]: { stackable: false },
+  [RelicType.DarkwoodHatchet]: { stackable: false },
+  [RelicType.DuskforgeHalberd]: { stackable: false },
+  [RelicType.RosegoldBroadaxe]: { stackable: false },
+  [RelicType.FrostbiteCleaver]: { stackable: false },
+  [RelicType.BloodmoonReaver]: { stackable: false },
+  [RelicType.TidebreakAxe]: { stackable: false },
+  [RelicType.IronwoodTomahawk]: { stackable: false },
+  [RelicType.GreystoneBroadaxe]: { stackable: false },
+  [RelicType.SandstoneHatchet]: { stackable: false },
+  [RelicType.CrimsonWaraxe]: { stackable: false },
+  [RelicType.GoldscarHalberd]: { stackable: false },
+  [RelicType.FlamecrestGreataxe]: { stackable: false },
+  [RelicType.WroughtIronChopper]: { stackable: false },
+  [RelicType.SpectralCleaver]: { stackable: false },
+  [RelicType.BloodruneAxe]: { stackable: false },
+  [RelicType.PearlsteelHatchet]: { stackable: false },
+  [RelicType.EmberstrikeTomahawk]: { stackable: false },
+  [RelicType.NightbloomReaver]: { stackable: false },
+  [RelicType.BlackironSplitter]: { stackable: false },
+  [RelicType.VerdantWaraxe]: { stackable: false },
+  [RelicType.AshenBroadaxe]: { stackable: false },
+  [RelicType.PrismaticGreataxe]: { stackable: false },
+  [RelicType.HellforgedCleaver]: { stackable: false },
+  [RelicType.GraniteWaraxe]: { stackable: false },
+  [GemType.ChippedTopaz]: { stackable: false },
+  [GemType.FlawedTopaz]: { stackable: false },
+  [GemType.Topaz]: { stackable: false },
+  [GemType.FlawlessTopaz]: { stackable: false },
+  [GemType.ChippedRuby]: { stackable: false },
+  [GemType.FlawedRuby]: { stackable: false },
+  [GemType.Ruby]: { stackable: false },
+  [GemType.FlawlessRuby]: { stackable: false },
+  [GemType.ChippedEmerald]: { stackable: false },
+  [GemType.FlawedEmerald]: { stackable: false },
+  [GemType.Emerald]: { stackable: false },
+  [GemType.FlawlessEmerald]: { stackable: false },
+  [GemType.ChippedSapphire]: { stackable: false },
+  [GemType.FlawedSapphire]: { stackable: false },
+  [GemType.Sapphire]: { stackable: false },
+  [GemType.FlawlessSapphire]: { stackable: false },
+  [GemType.ChippedAmethyst]: { stackable: false },
+  [GemType.FlawedAmethyst]: { stackable: false },
+  [GemType.Amethyst]: { stackable: false },
+  [GemType.FlawlessAmethyst]: { stackable: false },
+  [GemType.ChippedDiamond]: { stackable: false },
+  [GemType.FlawedDiamond]: { stackable: false },
+  [GemType.Diamond]: { stackable: false },
+  [GemType.FlawlessDiamond]: { stackable: false },
+  Gold: { stackable: true, maxStack: 2147483647 },
+};
+
+export const TOPAZ_TIERS: GemType[] = [
+  GemType.ChippedTopaz, GemType.FlawedTopaz, GemType.Topaz,
+  GemType.FlawlessTopaz,
+];
+export const RUBY_TIERS: GemType[] = [
+  GemType.ChippedRuby, GemType.FlawedRuby, GemType.Ruby,
+  GemType.FlawlessRuby,
+];
+export const EMERALD_TIERS: GemType[] = [
+  GemType.ChippedEmerald, GemType.FlawedEmerald, GemType.Emerald,
+  GemType.FlawlessEmerald,
+];
+export const SAPPHIRE_TIERS: GemType[] = [
+  GemType.ChippedSapphire, GemType.FlawedSapphire, GemType.Sapphire,
+  GemType.FlawlessSapphire,
+];
+export const AMETHYST_TIERS: GemType[] = [
+  GemType.ChippedAmethyst, GemType.FlawedAmethyst, GemType.Amethyst,
+  GemType.FlawlessAmethyst,
+];
+export const DIAMOND_TIERS: GemType[] = [
+  GemType.ChippedDiamond, GemType.FlawedDiamond, GemType.Diamond,
+  GemType.FlawlessDiamond,
+];
+
+export function getItemDisplay(type: ItemType): string {
+  return ITEM_DISPLAY[type];
+}
+
+export function getItemConfig(type: ItemType): ItemConfig {
+  return ITEM_CONFIGS[type];
+}

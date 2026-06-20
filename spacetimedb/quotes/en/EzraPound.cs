@@ -10,7 +10,6 @@ public static partial class EnglishQuotes
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/Ezra_Pound", Text = "Poetry is a sort of inspired mathematics, which gives us equations, not for abstract figures, triangles, spheres, and the like, but for the human emotions.", Author = "Ezra Pound" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ezra_Pound", Text = "It is better to present one image in a lifetime than to produce voluminous work.", Author = "Ezra Pound" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Ezra_Pound", Text = "Image…that which presents an intellectual and emotional complex in an instant of time.", Author = "Ezra Pound" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ezra_Pound", Text = "The apparition of these faces in the crowd: Petals on a wet, black bough.", Author = "Ezra Pound" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ezra_Pound", Text = "One discards rhyme, not because one is incapable of rhyming neat, fleet, sweet, meet, treat, eat, feet but because there are certain emotions or energies which are nor represented by the over-familiar devices or patterns.", Author = "Ezra Pound" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ezra_Pound", Text = "Poetry must be as well written as prose.", Author = "Ezra Pound" },
@@ -32,7 +31,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Ezra_Pound", Text = "Without character you will be unable to play on that instrument", Author = "Ezra Pound" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ezra_Pound", Text = "The blossoms of the apricot blow from the east to the west, And I have tried to keep them from falling.", Author = "Ezra Pound" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ezra_Pound", Text = "no picture is made to endure nor to live with but it is made to sell and sell quickly", Author = "Ezra Pound" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Ezra_Pound", Text = "What thou lovest well remains, the rest is dross What thou lov’st well shall not be reft from thee What thou lov’st well is thy true heritage", Author = "Ezra Pound" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ezra_Pound", Text = "Pull down thy vanity', it is not man Made courage, or made order, or made grace, Pull down thy vanity, I say pull down. Learn of the green world what can be thy place", Author = "Ezra Pound" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ezra_Pound", Text = "How mean thy hates Fostered in falsity", Author = "Ezra Pound" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ezra_Pound", Text = "To have gathered from the air a live tradition or from a fine old eye the unconquered flame This is not vanity. Here error is all in the not done, all in the diffidence that faltered . . .", Author = "Ezra Pound" },

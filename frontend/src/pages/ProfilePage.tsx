@@ -1,13 +1,12 @@
-import type { Player, GameRecord, PlayerColor } from "../../module_bindings";
+import { type Player, type GameRecord } from "../types/stdb";
 import { WpmChart } from "../components/WpmChart";
 import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/Header";
 import { PlayerAvatar } from "../components/PlayerAvatar";
 import { useParams, useNavigate } from "react-router-dom";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
-import { getColorConfig } from "../utils/colorMapping";
 import { EditNameModal } from "../components/EditNameModal";
-import { EditColorModal } from "../components/EditColorModal";
+import { getDefaultSiteTitle, getLangHome } from "../utils/modes";
 import { formatNumber, formatTimeSpent } from "../utils/formatters";
 import { useAuth } from "../firebase/AuthContext";
 import { Select } from "../components/Select";
@@ -24,16 +23,21 @@ export const ProfilePage = () => {
     const [selectedMode, setSelectedMode] = useState<string>('all');
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('all');
     const [isEditNameModalOpen, setIsEditNameModalOpen] = useState(false);
-    const [isEditColorModalOpen, setIsEditColorModalOpen] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isMenuClosing, setIsMenuClosing] = useState(false);
     const { signOut } = useAuth();
     const navigate = useNavigate();
 
     const isOwnProfile = conn?.identity && viewedPlayer && conn.identity.isEqual(viewedPlayer.identity);
 
     useEffect(() => {
+        if (viewedPlayer) {
+            document.title = `${viewedPlayer.name} - TypeRace.io`;
+        }
+        return () => { document.title = getDefaultSiteTitle(); };
+    }, [viewedPlayer]);
+
+    useEffect(() => {
         if (!conn || !playerId) return;
+        setViewedPlayer(null);
 
         const handlePlayerInsert = (_ctx: any, player: Player) => {
             if (player.playerId === playerId) {
@@ -51,11 +55,6 @@ export const ProfilePage = () => {
         conn.db.player.onUpdate(handlePlayerUpdate);
 
         const subscription = conn.subscriptionBuilder()
-            .onApplied(() => {
-                const allPlayers = Array.from(conn.db.player.iter());
-                const p = allPlayers.find(player => player.playerId === playerId);
-                if (p) setViewedPlayer(p);
-            })
             .subscribe([`SELECT * FROM player WHERE PlayerId = '${playerId}'`]);
 
         return () => {
@@ -91,47 +90,23 @@ export const ProfilePage = () => {
 
     useEffect(() => {
         if (viewedPlayer && viewedPlayer.isAnonymous) {
-            navigate('/');
+            navigate(getLangHome());
         }
     }, [viewedPlayer, navigate]);
 
     const handleNameSave = (name: string) => {
         if (!conn) return;
-        conn.reducers.setPlayerName(name);
-    };
-
-    const handleColorSave = (color: PlayerColor['tag']) => {
-        if (!conn) return;
-        conn.reducers.setPlayerColor({ tag: color });
+        conn.reducers.setPlayerName({ name });
+        setIsEditNameModalOpen(false);
     };
 
     const handleSignOut = async () => {
         try {
             await signOut();
-            navigate('/');
+            navigate(getLangHome());
         } catch (error) {
             console.error('Error signing out:', error);
         }
-    };
-
-    const handleMenuToggle = () => {
-        if (isMenuOpen) {
-            setIsMenuClosing(true);
-            setTimeout(() => {
-                setIsMenuOpen(false);
-                setIsMenuClosing(false);
-            }, 150);
-        } else {
-            setIsMenuOpen(true);
-        }
-    };
-
-    const handleMenuClose = () => {
-        setIsMenuClosing(true);
-        setTimeout(() => {
-            setIsMenuOpen(false);
-            setIsMenuClosing(false);
-        }, 150);
     };
 
     const getTimeFrameFilter = (timeFrame: TimeFrame): number => {
@@ -190,161 +165,114 @@ export const ProfilePage = () => {
         return Array.from(modesSet).sort();
     }, [gameRecords, viewedPlayer]);
 
+    if (!viewedPlayer) {
+        return (
+            <div className="h-full flex flex-col">
+                <Header hideAvatar={true} />
+            </div>
+        );
+    }
+
     return (
-        <div className="min-h-screen">
+        <div className="h-full flex flex-col">
             <Header hideAvatar={true} />
 
-            <div className="flex flex-col items-center px-4 pb-12">
+            <main className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
                 <div className="content-container">
-                    <div className="box box-shadow rounded-xl p-8 mb-8 relative">
-                        {isOwnProfile && (
-                            <div className="absolute top-5 right-5 flex items-center gap-2">
-                                <div className="relative">
-                                    <button
-                                        onClick={handleMenuToggle}
-                                        className="bg-transparent border-0 text-white/50 cursor-pointer p-2 hover:text-white/70 transition-colors"
-                                        title="Options"
-                                    >
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <circle cx="12" cy="12" r="1" />
-                                            <circle cx="12" cy="5" r="1" />
-                                            <circle cx="12" cy="19" r="1" />
-                                        </svg>
-                                    </button>
-                                    {isMenuOpen && (
-                                        <>
-                                            <div
-                                                className="fixed inset-0 z-10"
-                                                onClick={handleMenuClose}
-                                            />
-                                            <div
-                                                className="absolute right-0 top-full mt-2 bg-[#272727] border border-white/15 rounded-lg shadow-lg p-2 min-w-40 z-20"
-                                                style={{
-                                                    animation: isMenuClosing ? 'menuSlideOut 0.15s ease-out' : 'menuSlideIn 0.15s ease-out'
-                                                }}
-                                            >
-                                                <button
-                                                    onClick={() => {
-                                                        setIsEditColorModalOpen(true);
-                                                        handleMenuClose();
-                                                    }}
-                                                    className="w-full text-left px-3 py-2 text-white text-sm hover:bg-white/10 transition-colors bg-transparent border-0 cursor-pointer rounded-md"
-                                                >
-                                                    Change Color
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        handleSignOut();
-                                                        handleMenuClose();
-                                                    }}
-                                                    className="w-full text-left px-3 py-2 text-red-400 text-sm hover:bg-white/10 transition-colors bg-transparent border-0 cursor-pointer rounded-md"
-                                                >
-                                                    Sign Out
-                                                </button>
-                                            </div>
-                                        </>
+                    <div className="box box-shadow rounded-xl p-4 sm:p-8 mb-8 relative">
+                        <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6">
+                            <PlayerAvatar
+                                size={80}
+                                identity={viewedPlayer.identity.toHexString()}
+                                isHighlighted={true}
+                            />
+
+                            <div className="flex-1 min-w-0 w-full">
+                                <div className="flex items-center gap-2 mb-3 min-w-0">
+                                    <h1 className="text-foreground text-2xl sm:text-3xl font-bold m-0 truncate" title={viewedPlayer.name}>
+                                        {viewedPlayer.name}
+                                    </h1>
+                                    {isOwnProfile && (
+                                        <button
+                                            onClick={() => setIsEditNameModalOpen(true)}
+                                            className="bg-transparent border-0 text-muted-foreground cursor-pointer p-1 hover:text-foreground/70 transition-colors"
+                                            title="Edit Name"
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                            </svg>
+                                        </button>
                                     )}
                                 </div>
+
+                                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                                    <span className="text-muted-foreground text-xs sm:text-sm font-medium">
+                                        Level {viewedPlayer.level}
+                                    </span>
+                                    <span className="text-muted-foreground text-xs sm:text-sm font-mono">
+                                        {viewedPlayer.xp}/{viewedPlayer.xpRequiredForNextLevel}
+                                    </span>
+                                    <div className="w-full sm:flex-1 h-2 sm:h-2.5 bg-secondary rounded-[5px] overflow-hidden">
+                                        <div
+                                            className="h-full rounded-[5px] transition-[width_0.3s_ease]"
+                                            style={{
+                                                background: 'linear-gradient(to right, var(--accent-dark), var(--accent-primary))',
+                                                width: `${xpProgressToNextLevel(viewedPlayer.xp, viewedPlayer.xpRequiredForNextLevel)}%`
+                                            }}
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                        )}
-                        {viewedPlayer && (
-                            <>
-                                <div className="flex items-start gap-6 mb-6">
-                                    <PlayerAvatar
-                                        size={80}
-                                        identity={viewedPlayer.identity.toHexString()}
-                                        color={viewedPlayer.color}
-                                        isHighlighted={true}
-                                    />
+                        </div>
 
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <h1 className="text-white text-3xl font-bold m-0">
-                                                {viewedPlayer.name}
-                                            </h1>
-                                            {isOwnProfile && (
-                                                <button
-                                                    onClick={() => setIsEditNameModalOpen(true)}
-                                                    className="bg-transparent border-0 text-white/50 cursor-pointer p-1 hover:text-white/70 transition-colors"
-                                                    title="Edit Name"
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                                    </svg>
-                                                </button>
-                                            )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-6 sm:mt-8">
+                            <div className="bg-black/5 border border-border rounded-lg p-4 sm:p-5">
+                                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                                    <div>
+                                        <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
+                                            Games Played
                                         </div>
-
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-white/60 text-sm font-medium">
-                                                Level {viewedPlayer.level}
-                                            </span>
-                                            <div className="flex-1 h-2.5 bg-white/10 rounded-[5px] overflow-hidden">
-                                                <div
-                                                    className="h-full rounded-[5px] transition-[width_0.3s_ease]"
-                                                    style={{
-                                                        background: viewedPlayer ? getColorConfig(viewedPlayer.color).gradient : 'var(--color-accent)',
-                                                        width: `${viewedPlayer ? xpProgressToNextLevel(viewedPlayer.xp, viewedPlayer.xpRequiredForNextLevel) : 0}%`
-                                                    }}
-                                                />
-                                            </div>
-                                            <span className="text-white/60 text-sm font-mono">
-                                                {viewedPlayer.xp}/{viewedPlayer.xpRequiredForNextLevel}
-                                            </span>
+                                        <div className="text-foreground text-2xl sm:text-3xl font-bold">
+                                            {viewedPlayer.totalGames}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
+                                            Wins
+                                        </div>
+                                        <div className="text-foreground text-2xl sm:text-3xl font-bold">
+                                            {viewedPlayer.wins}
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="grid grid-cols-2 gap-4 mt-8">
-                                    <div className="bg-black/5 border border-white/8 rounded-lg p-5">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <div className="text-white/50 text-xs mb-2 uppercase tracking-wider font-semibold">
-                                                    Games Played
-                                                </div>
-                                                <div className="text-white text-3xl font-bold">
-                                                    {viewedPlayer.totalGames}
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div className="text-white/50 text-xs mb-2 uppercase tracking-wider font-semibold">
-                                                    Wins
-                                                </div>
-                                                <div className="text-white text-3xl font-bold">
-                                                    {viewedPlayer.wins}
-                                                </div>
-                                            </div>
+                            </div>
+                            <div className="bg-black/5 border border-border rounded-lg p-4 sm:p-5">
+                                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                                    <div>
+                                        <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
+                                            Words Typed
+                                        </div>
+                                        <div className="text-foreground text-2xl sm:text-3xl font-bold">
+                                            {formatNumber(viewedPlayer.totalWordsTyped)}
                                         </div>
                                     </div>
-                                    <div className="bg-black/5 border border-white/8 rounded-lg p-5">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <div className="text-white/50 text-xs mb-2 uppercase tracking-wider font-semibold">
-                                                    Words Typed
-                                                </div>
-                                                <div className="text-white text-3xl font-bold">
-                                                    {formatNumber(viewedPlayer.totalWordsTyped)}
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div className="text-white/50 text-xs mb-2 uppercase tracking-wider font-semibold">
-                                                    Time Spent
-                                                </div>
-                                                <div className="text-white text-3xl font-bold">
-                                                    {formatTimeSpent(Number(viewedPlayer.totalTimeSpentMs))}
-                                                </div>
-                                            </div>
+                                    <div>
+                                        <div className="text-muted-foreground text-xs mb-2 uppercase tracking-wider font-semibold">
+                                            Time Spent
+                                        </div>
+                                        <div className="text-foreground text-2xl sm:text-3xl font-bold">
+                                            {formatTimeSpent(Number(viewedPlayer.totalTimeSpentMs))}
                                         </div>
                                     </div>
                                 </div>
-                            </>
-                        )}
+                            </div>
+                        </div>
                     </div>
 
                     <div>
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-white text-2xl font-bold m-0">
+                        <div className="flex flex-wrap justify-between items-center gap-y-3 mb-6">
+                            <h2 className="text-foreground text-2xl font-bold m-0">
                                 Performance History
                             </h2>
 
@@ -383,27 +311,31 @@ export const ProfilePage = () => {
                     </div>
 
                     <div className="mt-8">
-                        <h2 className="text-white text-2xl font-bold mb-6">
+                        <h2 className="text-foreground text-2xl font-bold mb-6">
                             Recent Games
                         </h2>
                         <RecentGames gameRecords={realGameData} />
                     </div>
+
+                    {isOwnProfile && (
+                        <div className="mt-8 flex justify-center">
+                            <button
+                                onClick={handleSignOut}
+                                className="text-sm text-muted-foreground hover:text-destructive transition-colors bg-transparent border-0 cursor-pointer px-4 py-2"
+                                aria-label="Sign out of your account"
+                            >
+                                Sign Out
+                            </button>
+                        </div>
+                    )}
                 </div>
-            </div>
+            </main>
 
             {isEditNameModalOpen && viewedPlayer && (
                 <EditNameModal
                     currentName={viewedPlayer.name}
                     onSave={handleNameSave}
                     onClose={() => setIsEditNameModalOpen(false)}
-                />
-            )}
-
-            {isEditColorModalOpen && viewedPlayer && (
-                <EditColorModal
-                    currentColor={viewedPlayer.color.tag}
-                    onSave={handleColorSave}
-                    onClose={() => setIsEditColorModalOpen(false)}
                 />
             )}
         </div>

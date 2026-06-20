@@ -8,13 +8,13 @@ public static partial class EnglishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Newton", Text = "Plato is my friend — Aristotle is my friend — but my greatest friend is truth.", Author = "Isaac Newton" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Newton", Text = "Plato is my friend - Aristotle is my friend - but my greatest friend is truth.", Author = "Isaac Newton" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Newton", Text = "If I have seen further it is by standing on ye sholders of Giants.", Author = "Isaac Newton" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Newton", Text = "I frame no hypotheses.", Author = "Isaac Newton" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Newton", Text = "Christ comes as a thief in the night, & it is not for us to know the times & seasons which God hath put into his own breast.", Author = "Isaac Newton" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Newton", Text = "To explain all nature is too difficult a task for any one man or even for any one age...", Author = "Isaac Newton" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Newton", Text = "I keep the subject constantly before me, and wait 'till the first dawnings open slowly, by little and little, into a full and clear light.", Author = "Isaac Newton" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Newton", Text = "I have studied these things — you have not.", Author = "Isaac Newton" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Newton", Text = "I have studied these things - you have not.", Author = "Isaac Newton" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Newton", Text = "Truth is ever to be found in simplicity, and not in the multiplicity and confusion of things.", Author = "Isaac Newton" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Newton", Text = "The best and safest method of philosophizing seems to be, first to enquire diligently into the properties of things, and to establish these properties by experiment, and then to proceed more slowly to hypothesis for the explanation of them.", Author = "Isaac Newton" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Newton", Text = "For hypotheses should be employed only in explaining the properties of things, but not assumed in determining them, unless so far as they may furnish experiments.", Author = "Isaac Newton" },

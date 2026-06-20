@@ -1,4 +1,4 @@
-import type { PlayerProgress } from "../../module_bindings/player_progress_type";
+import { type PlayerProgress } from "../types/stdb";
 
 const CHARS_PER_WORD = 5;
 const EVENT_SIZE_BYTES = 3;

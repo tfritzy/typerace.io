@@ -1,7 +1,11 @@
 import { Logo } from "./Logo";
 import { useEffect, useRef } from "react";
 
-export const LoadingDots = () => {
+type LoadingDotsProps = {
+    showLogo?: boolean;
+};
+
+export const LoadingDots = ({ showLogo = true }: LoadingDotsProps) => {
     const spinnerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -14,10 +18,7 @@ export const LoadingDots = () => {
     }, []);
 
     return (
-        <div style={{
-            width: '100%',
-            padding: '0 1rem'
-        }}>
+        <div className="w-full px-4">
             <style>
                 {`
                     @keyframes spin {
@@ -25,30 +26,12 @@ export const LoadingDots = () => {
                     }
                 `}
             </style>
-            <div style={{
-                width: '100%',
-                maxWidth: '1000px',
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                height: '4rem'
-            }}>
-                <Logo />
+            <div className={`w-full max-w-[1000px] mx-auto flex items-center h-16 ${showLogo ? 'justify-between' : 'justify-center'}`}>
+                {showLogo && <Logo />}
                 <div
                     ref={spinnerRef}
+                    className="fixed top-1/2 left-1/2 -ml-4 -mt-4 w-8 h-8 border-[3px] border-border border-t-muted-foreground rounded-full"
                     style={{
-                        position: 'fixed',
-                        top: '50%',
-                        left: '50%',
-                        marginLeft: '-16px',
-                        marginTop: '-16px',
-                        width: '32px',
-                        height: '32px',
-                        border: '3px solid rgba(255, 255, 255, 0.1)',
-                        borderTopColor: 'rgba(255, 255, 255, 0.6)',
-                        borderRadius: '50%',
                         animation: 'spin 0.8s linear infinite'
                     }}
                 />

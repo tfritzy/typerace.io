@@ -1,18 +1,20 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useCallback, useState } from "react";
-import {
-  type Game,
-  PlayerProgress,
-} from "../../module_bindings";
+import { useEffect, useCallback, useState, useMemo } from "react";
+import { type Game, type PlayerProgress } from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { Header } from "../components/Header";
-import { Countdown } from "../components/Countdown";
 import { PlayerStatsRow } from "../components/PlayerStatsRow";
 import { AllPlayersResults } from "../components/AllPlayersResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { getMaxPlayerCount } from "../utils/modes";
+import { GhostCursor } from "../components/GhostCursor";
+import { getPlayerColorHex } from "../utils/colorMapping";
+import { getTranslations } from "../utils/translations";
+
+type UiGameType = "Public" | "Private" | "Practice";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -20,10 +22,11 @@ export const GamePage = () => {
   const conn = useDatabase();
   const [hasFinished, setHasFinished] = useState(false);
   const [game, setGame] = useState<Game | null>(null);
-  const [gamePlayerProgress, setGamePlayerProgress] = useState<PlayerProgress[]>([]);
+  const [gamePlayerProgress, setGamePlayerProgress] = useState<
+    PlayerProgress[]
+  >([]);
 
   useEffect(() => {
-    // Reset data when game switches to a new one via play again.
     setGame(null);
     setGamePlayerProgress([]);
     setHasFinished(false);
@@ -44,64 +47,98 @@ export const GamePage = () => {
       }
     };
 
-    conn.db.game.onInsert(handleGameInsert);
-    conn.db.game.onUpdate(handleGameUpdate);
-
-    const gameSubscription = conn.subscriptionBuilder()
-      .onApplied(() => {
-        const g = conn.db.game.id.find(gameId);
-        if (g) setGame(g);
-      })
-      .subscribe([`SELECT * FROM game WHERE Id = '${gameId}'`]);
-
-    return () => {
-      conn.db.game.removeOnInsert(handleGameInsert);
-      conn.db.game.removeOnUpdate(handleGameUpdate);
-      gameSubscription.unsubscribe();
-    };
-  }, [conn, gameId]);
-
-  useEffect(() => {
-    if (!conn || !gameId) return;
-
     const handleProgressInsert = (_ctx: any, pp: PlayerProgress) => {
       if (pp.gameId.toString() === gameId) {
-        setGamePlayerProgress(prev => {
-          if (prev.some(p => p.id === pp.id)) {
+        setGamePlayerProgress((prev) => {
+          if (prev.some((p) => p.id === pp.id)) {
             return prev;
           }
           return [...prev, pp];
         });
       }
 
-      if (conn?.identity && pp.playerId.isEqual(conn.identity)) {
+      if (conn.identity && pp.playerId.isEqual(conn.identity)) {
         if (pp.joinCode === gameId && pp.gameId.toString() !== gameId) {
           navigate(`/game/${pp.gameId.toString()}`, { replace: true });
         }
       }
     };
 
-    const handleProgressUpdate = (_ctx: any, _oldPP: PlayerProgress, newPP: PlayerProgress) => {
+    const handleProgressUpdate = (
+      _ctx: any,
+      _oldPP: PlayerProgress,
+      newPP: PlayerProgress,
+    ) => {
       if (newPP.gameId.toString() === gameId) {
-        setGamePlayerProgress(prev =>
-          prev.map(pp => pp.id === newPP.id ? newPP : pp)
-        );
+        setGamePlayerProgress((prev) => {
+          const existingIndex = prev.findIndex((pp) => pp.id === newPP.id);
+          if (existingIndex === -1) {
+            return [...prev, newPP];
+          }
+
+          const next = [...prev];
+          next[existingIndex] = newPP;
+          return next;
+        });
       }
     };
 
+    const handleProgressDelete = (_ctx: any, pp: PlayerProgress) => {
+      if (pp.gameId.toString() === gameId) {
+        setGamePlayerProgress((prev) => prev.filter((p) => p.id !== pp.id));
+        if (conn.identity && pp.playerId.isEqual(conn.identity)) {
+          setTimeout(() => {
+            const stillExists = Array.from(conn.db.playerprogress.iter()).some(
+              (p) =>
+                p.gameId.toString() === gameId &&
+                p.playerId.isEqual(conn.identity!),
+            );
+            if (!stillExists) {
+              navigate("/", { replace: true });
+            }
+          }, 200);
+        }
+      }
+    };
+
+    conn.db.game.onInsert(handleGameInsert);
+    conn.db.game.onUpdate(handleGameUpdate);
     conn.db.playerprogress.onInsert(handleProgressInsert);
     conn.db.playerprogress.onUpdate(handleProgressUpdate);
+    conn.db.playerprogress.onDelete(handleProgressDelete);
 
-    const progressSubscription = conn.subscriptionBuilder()
+    const progressQuery = `SELECT * FROM playerprogress WHERE GameId = '${gameId}'`;
+    const gameQuery = `SELECT * FROM game WHERE Id = '${gameId}'`;
+    const subscriptionQueries = [gameQuery, progressQuery];
+
+    if (conn.identity) {
+      subscriptionQueries.push(
+        `SELECT * FROM playerprogress WHERE PlayerId = '${conn.identity}'`,
+      );
+    }
+
+    const pageSubscription = conn
+      .subscriptionBuilder()
       .onApplied(() => {
-        setGamePlayerProgress(Array.from(conn.db.playerprogress.iter()));
+        const currentGame = conn.db.game.id.find(gameId);
+        if (currentGame) {
+          setGame(currentGame);
+        }
+
+        const currentGameProgress = Array.from(
+          conn.db.playerprogress.iter(),
+        ).filter((pp) => pp.gameId.toString() === gameId);
+        setGamePlayerProgress(currentGameProgress);
       })
-      .subscribe([`SELECT * FROM playerprogress WHERE GameId = '${gameId}'`]);
+      .subscribe(subscriptionQueries);
 
     return () => {
       conn.db.playerprogress.removeOnInsert(handleProgressInsert);
       conn.db.playerprogress.removeOnUpdate(handleProgressUpdate);
-      progressSubscription.unsubscribe();
+      conn.db.playerprogress.removeOnDelete(handleProgressDelete);
+      conn.db.game.removeOnInsert(handleGameInsert);
+      conn.db.game.removeOnUpdate(handleGameUpdate);
+      pageSubscription.unsubscribe();
     };
   }, [conn, gameId, navigate]);
 
@@ -111,19 +148,26 @@ export const GamePage = () => {
     const currentPlayerId = conn.identity;
     if (!currentPlayerId) return;
 
-    const currentPlayerProgress = gamePlayerProgress.find(
-      (pp) => pp.playerId.isEqual(currentPlayerId)
+    const currentPlayerProgress = gamePlayerProgress.find((pp) =>
+      pp.playerId.isEqual(currentPlayerId),
     );
 
     if (currentPlayerProgress && game.phrase) {
-      const hasCompletedRace = currentPlayerProgress.progressIndex >= game.phrase.length;
-      setHasFinished(hasCompletedRace);
-    } else if (gamePlayerProgress.length > 0 && !currentPlayerProgress) {
+      if (currentPlayerProgress.progressIndex >= game.phrase.length) {
+        setHasFinished(true);
+      }
+    }
+
+    if (gamePlayerProgress.length > 0 && gamePlayerProgress.every(pp => pp.progressIndex >= game.phrase.length)) {
       setHasFinished(true);
-    } else {
-      setHasFinished(false);
     }
   }, [conn, game, gamePlayerProgress]);
+
+  useEffect(() => {
+    if (game?.state?.tag === "Archived") {
+      setHasFinished(true);
+    }
+  }, [game]);
 
   useEffect(() => {
     if (!conn || !game || !gameId) return;
@@ -131,11 +175,11 @@ export const GamePage = () => {
     if (game.gameType?.tag === "Private" && game.state?.tag === "Lobby") {
       const currentPlayerId = conn.identity;
       const hasProgress = gamePlayerProgress.some(
-        (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
+        (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
       );
 
       if (!hasProgress) {
-        conn.reducers.joinPrivateGame(gameId);
+        conn.reducers.joinPrivateGame({ gameId });
       }
     }
   }, [conn, game, gameId, gamePlayerProgress]);
@@ -144,35 +188,76 @@ export const GamePage = () => {
     setHasFinished(true);
   }, []);
 
+  const handleKickPlayer = useCallback(
+    (targetPlayerId: PlayerProgress["playerId"]) => {
+      if (!conn || !gameId) return;
+      conn.reducers.kickPlayer({ gameId, targetPlayerId });
+    },
+    [conn, gameId],
+  );
+
+  const currentPlayerId = conn?.identity;
+
+  const otherPlayerProgress = useMemo(() => {
+    if (!currentPlayerId || !game?.phrase) return [];
+    return gamePlayerProgress.filter(
+      (pp) =>
+        !pp.playerId.isEqual(currentPlayerId) &&
+        pp.progressIndex < game.phrase.length,
+    );
+  }, [gamePlayerProgress, currentPlayerId, game?.phrase]);
+
+  useEffect(() => {
+    if (game) return;
+
+    const timeout = setTimeout(() => {
+      navigate("/", { replace: true });
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, [game, navigate]);
+
   if (!game) {
     return null;
   }
 
-  const currentPlayerId = conn?.identity;
-  const maxPlayers = game.gameType?.tag === "Practice" ? 1 : 3;
+  const gameTypeTag = game.gameType?.tag ?? "Public";
+  const actionBarGameType: UiGameType =
+    gameTypeTag === "Private" || gameTypeTag === "Practice" ? gameTypeTag : "Public";
+  const maxPlayers =
+    gameTypeTag === "Private"
+      ? gamePlayerProgress.length
+      : getMaxPlayerCount(gameTypeTag);
+  const totalSlots = Math.max(maxPlayers, gamePlayerProgress.length);
   const isInLobby = game.state?.tag === "Lobby";
   const isLobby = game.gameType?.tag === "Private" && isInLobby;
+  const isPrivateGameOwner =
+    game.gameType?.tag === "Private" &&
+    currentPlayerId &&
+    game.owner?.isEqual(currentPlayerId);
   const isCountdown = game.state?.tag === "Countdown";
-  const isDisabled = isInLobby || isCountdown;
+  const t = getTranslations();
 
   const currentPlayerProgress = gamePlayerProgress.find(
-    (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
+    (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
   );
   const initialProgress = currentPlayerProgress?.progressIndex ?? 0;
   const hasCompletedRace = currentPlayerProgress
     ? currentPlayerProgress.progressIndex >= game.phrase.length
     : false;
+  const isMemberOfRace = !!currentPlayerProgress;
+  const isDisabled = isInLobby || isCountdown || !currentPlayerProgress;
 
   return (
-    <div className="relative min-h-screen flex flex-col">
+    <div className="relative h-full flex flex-col">
       <Header />
 
-      <Countdown />
-
-      <div className="flex-1 flex flex-col items-center justify-center px-4">
-        <div className="content-container w-full">
-          <div className="mb-3 space-y-3">
-            {Array.from({ length: maxPlayers }).map((_, index) => {
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4">
+        <div className="content-container w-full my-auto">
+          <div
+            className={`mb-3 grid gap-3 ${totalSlots > 3 ? "sm:grid-cols-2" : ""}`}
+          >
+            {Array.from({ length: totalSlots }).map((_, index) => {
               const pp = gamePlayerProgress[index];
               const isCurrentPlayer =
                 pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
@@ -182,9 +267,9 @@ export const GamePage = () => {
                   return null;
                 }
                 return (
-                  <div key={`loading-${index}`} className="box w-full rounded-lg px-8 py-6">
+                  <div key={`loading-${index}`}>
                     <PlayerProgressBar
-                      name="Waiting for player..."
+                      name={t.waitingForPlayer}
                       level={1}
                       progressIndex={0}
                       phraseLength={game.phrase.length}
@@ -198,7 +283,7 @@ export const GamePage = () => {
               }
 
               return (
-                <div key={pp.id.toString()} className="box w-full rounded-lg px-8 py-6 relative">
+                <div key={pp.id.toString()}>
                   <PlayerProgressBar
                     key={pp.id.toString()}
                     name={pp.playerName}
@@ -208,11 +293,18 @@ export const GamePage = () => {
                     identityHash={pp.playerId.toHexString()}
                     playerPublicId={pp.playerPublicId}
                     isCurrentPlayer={isCurrentPlayer}
-                    playerColor={pp.playerColor}
                     wpm={pp.wpm}
                     placement={pp.placement}
                     isBot={pp.isBot}
                     isAnonymous={pp.isAnonymous}
+                    onKick={
+                      isPrivateGameOwner && !isCurrentPlayer
+                        ? () => handleKickPlayer(pp.playerId)
+                        : undefined
+                    }
+                    playerColorTag={
+                      isCurrentPlayer ? undefined : pp.playerColor?.tag
+                    }
                   />
                 </div>
               );
@@ -222,14 +314,21 @@ export const GamePage = () => {
           {hasFinished || hasCompletedRace ? (
             (() => {
               const currentPP = gamePlayerProgress.find(
-                (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId)
+                (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
               );
 
-              const isOwner = currentPlayerId && game.owner && currentPlayerId.isEqual(game.owner);
-              const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;
+              const isOwner =
+                currentPlayerId &&
+                game.owner &&
+                currentPlayerId.isEqual(game.owner);
+              const rematchDisabled =
+                game.gameType?.tag === "Private" && !isOwner;
 
               return (
-                <div key="stats-section" className="w-full animate-slideUpFadeIn pb-4">
+                <div
+                  key="stats-section"
+                  className="w-full animate-slideUpFadeIn pb-4"
+                >
                   {currentPP && (
                     <PlayerStatsRow
                       playerProgress={currentPP}
@@ -245,7 +344,7 @@ export const GamePage = () => {
                   {currentPP && (
                     <ActionBar
                       mode={game.gameMode}
-                      gameType={game.gameType?.tag as any}
+                      gameType={actionBarGameType}
                       gameId={gameId}
                       rematchDisabled={rematchDisabled}
                       conn={conn || undefined}
@@ -258,7 +357,11 @@ export const GamePage = () => {
             <GameLobby
               gameId={gameId!}
               conn={conn}
-              isOwner={currentPlayerId ? game.owner?.isEqual(currentPlayerId) ?? false : false}
+              isOwner={
+                currentPlayerId
+                  ? (game.owner?.isEqual(currentPlayerId) ?? false)
+                  : false
+              }
             />
           ) : (
             <GamePageTypeBox
@@ -270,10 +373,22 @@ export const GamePage = () => {
               onFinish={handleFinish}
               disabled={isDisabled}
               initialProgress={initialProgress}
+              isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
+              hideCursor={!isMemberOfRace}
             />
           )}
         </div>
       </div>
+      {!(hasFinished || hasCompletedRace) &&
+        !isLobby &&
+        otherPlayerProgress.map((pp) => (
+          <GhostCursor
+            key={pp.id.toString()}
+            charIndex={pp.progressIndex}
+            color={getPlayerColorHex(pp.playerColor?.tag ?? "")}
+            lerp={0.15}
+          />
+        ))}
     </div>
   );
 };

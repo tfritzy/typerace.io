@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState, type RefObject } from "react";
+import { memo, useLayoutEffect, useRef, useState, type RefObject } from "react";
 
 type CursorProps = {
     targetRef: RefObject<HTMLElement | null>;
@@ -7,7 +7,7 @@ type CursorProps = {
     visible?: boolean;
 };
 
-export const Cursor = memo(({ targetRef, lerp = .2, fadeDelay = 2000, visible = true }: CursorProps) => {
+export const Cursor = memo(({ targetRef, lerp = .3, fadeDelay = 2000, visible = true }: CursorProps) => {
     const followerRef = useRef<HTMLDivElement>(null);
     const position = useRef({ x: 0, y: 0 });
     const target = useRef({ x: 0, y: 0 });
@@ -15,7 +15,7 @@ export const Cursor = memo(({ targetRef, lerp = .2, fadeDelay = 2000, visible = 
     const lastMoveTime = useRef(Date.now());
     const [isBlinking, setIsBlinking] = useState(false);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!targetRef?.current || !followerRef.current) return;
 
         const updateTarget = () => {
@@ -38,6 +38,7 @@ export const Cursor = memo(({ targetRef, lerp = .2, fadeDelay = 2000, visible = 
             if (!initialized.current) {
                 position.current = { ...target.current };
                 initialized.current = true;
+                followerRef.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`;
             }
         };
 
@@ -80,10 +81,10 @@ export const Cursor = memo(({ targetRef, lerp = .2, fadeDelay = 2000, visible = 
     return (
         <div
             ref={followerRef}
-            className={`max-w-0 h-8 -translate-y-px fixed -top-0.5 left-0 ${isBlinking && visible ? 'animate-blink' : ''}`}
+            className={`max-w-0 h-10 -translate-y-px fixed top-0 -translate-x-0.5 left-0  ${isBlinking && visible ? 'animate-blink' : ''}`}
             style={{ opacity: visible ? 1 : 0 }}
         >
-            <div className="h-full rounded-full" style={{ borderRight: '2px solid var(--color-accent)' }} />
+            <div className="h-full rounded-full border-r border-r-accent" />
         </div>
     );
 });

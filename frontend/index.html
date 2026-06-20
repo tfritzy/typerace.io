@@ -6,8 +6,9 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;400;500;600&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@200;400;500;700&family=Inter:wght@400;500;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
     <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="/favicons/favicon.ico" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
@@ -16,23 +17,24 @@
     <link rel="manifest" href="/favicons/site.webmanifest" />
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#282828" />
     
     <!-- SEO Meta Tags -->
-    <title>TypeRace.io - Practive Typing by Racing Against Real People</title>
+    <title>Typerace.io | Fast-Paced Typing Battles and WPM Tracker</title>
     <meta name="description" content="Race against players worldwide in real-time typing competitions. Test and improve your typing speed in multiplayer races with multiple language support." />
     <meta name="keywords" content="typing game, typing test, typing speed, multiplayer typing, typing race, wpm test, words per minute" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://typerace.io/" />
-    <meta property="og:title" content="TypeRace.io - Practive Typing by Racing Against Real People" />
+    <meta property="og:title" content="Typerace.io | Fast-Paced Typing Battles and WPM Tracker" />
     <meta property="og:description" content="Race against players worldwide in real-time typing competitions. Test and improve your typing speed." />
     <meta property="og:image" content="https://typerace.io/favicons/android-chrome-512x512.png" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://typerace.io/" />
-    <meta property="twitter:title" content="TypeRace.io - Practive Typing by Racing Against Real People" />
+    <meta property="twitter:title" content="Typerace.io | Fast-Paced Typing Battles and WPM Tracker" />
     <meta property="twitter:description" content="Race against players worldwide in real-time typing competitions. Test and improve your typing speed." />
     <meta property="twitter:image" content="https://typerace.io/favicons/android-chrome-512x512.png" />
     
@@ -64,7 +66,7 @@
     
     <!-- Semantic HTML for Screen Readers (hidden but crawlable) -->
     <noscript>
-      <h1>TypeRace.io - Practive Typing by Racing Against Real People</h1>
+      <h1>Typerace.io | Fast-Paced Typing Battles and WPM Tracker</h1>
       <p>
         Compete in real-time multiplayer typing races. Choose from multiple languages including 
         English, Spanish, French, German, Italian, Portuguese, Japanese, Korean, Chinese, Ukrainian, 
@@ -76,25 +78,103 @@
     <script>
       (function() {
         try {
-          const savedColor = localStorage.getItem('accentColor');
-          if (savedColor) {
-            document.documentElement.style.setProperty('--color-accent', savedColor);
+          var themes = {
+            Dracula:{bg:'#282a36',fg:'#f8f8f2',ac:'#bd93f9',bc:'rgba(248,248,242,0.1)',bw:1,br:8},
+            Monokai:{bg:'#272822',fg:'#f8f8f2',ac:'#a6e22e',bc:'rgba(248,248,242,0.1)',bw:1,br:8},
+            Nord:{bg:'#2e3440',fg:'#eceff4',ac:'#88c0d0',bc:'rgba(236,239,244,0.1)',bw:1,br:12},
+            TokyoNight:{bg:'#1a1b26',fg:'#a9b1d6',ac:'#7aa2f7',bc:'rgba(169,177,214,0.1)',bw:1,br:8},
+            GruvboxDark:{bg:'#282828',fg:'#ebdbb2',ac:'#fabd2f',bc:'rgba(235,219,178,0.1)',bw:1,br:8},
+            CatppuccinMocha:{bg:'#1e1e2e',fg:'#cdd6f4',ac:'#cba6f7',bc:'rgba(205,214,244,0.1)',bw:1,br:8},
+            OneDark:{bg:'#282c34',fg:'#abb2bf',ac:'#61afef',bc:'rgba(171,178,191,0.1)',bw:1,br:8},
+            RosePine:{bg:'#191724',fg:'#e0def4',ac:'#c4a7e7',bc:'rgba(224,222,244,0.1)',bw:1,br:8},
+            AyuDark:{bg:'#0d1017',fg:'#bfbdb6',ac:'#e6b450',bc:'rgba(191,189,182,0.1)',bw:1,br:8},
+            Kanagawa:{bg:'#1f1f28',fg:'#dcd7ba',ac:'#7e9cd8',bc:'rgba(220,215,186,0.1)',bw:1,br:8},
+            Pico8:{bg:'#1D2B53',fg:'#FFF1E8',ac:'#29ADFF',bc:'rgba(255,241,232,0.20)',bw:2,br:0},
+            Endesga:{bg:'#10141f',fg:'#c5dbd4',ac:'#f77622',bc:'rgba(197,219,212,0.20)',bw:2,br:0},
+            Sweetie16:{bg:'#1a1c2c',fg:'#f4f4f4',ac:'#b13e53',bc:'rgba(244,244,244,0.20)',bw:2,br:0}
+          };
+          var saved = localStorage.getItem('selectedTheme');
+          var t = saved && themes[saved] ? themes[saved] : null;
+          if (!t && saved === 'custom') {
+            try {
+              var raw = localStorage.getItem('customTheme');
+              if (raw) {
+                var c = JSON.parse(raw);
+                t = {bg:c.backgroundColor,fg:c.textColor,ac:c.accentColor,bc:c.borderColor,bw:c.borderWidth||1,br:c.borderRadius||8};
+              }
+            } catch(_){}
           }
+          if (!t) {
+            t = themes.GruvboxDark;
+          }
+          function p(h){h=h.replace('#','');return[parseInt(h.substring(0,2),16),parseInt(h.substring(2,4),16),parseInt(h.substring(4,6),16)];}
+          function cl(v){return Math.max(0,Math.min(255,Math.round(v)));}
+          function hx(v){return cl(v).toString(16).padStart(2,'0');}
+          function adj(hex,a){var c=p(hex);return'#'+hx(c[0]+a)+hx(c[1]+a)+hx(c[2]+a);}
+          function adjA(hex,a){var c=p(hex);if(a>0)return'#'+hx(c[0]+(255-c[0])*a)+hx(c[1]+(255-c[1])*a)+hx(c[2]+(255-c[2])*a);var f=1+a;return'#'+hx(c[0]*f)+hx(c[1]*f)+hx(c[2]*f);}
+          var fg=p(t.fg),bgc=p(t.bg),fga=fg[0]+','+fg[1]+','+fg[2];
+          var dk=(0.299*bgc[0]+0.587*bgc[1]+0.114*bgc[2])/255<0.5;
+          var card=dk?adj(t.bg,12):adj(t.bg,-10);
+          var pop=dk?adj(t.bg,20):adj(t.bg,-10);
+          var inp=dk?adj(t.bg,-8):adj(t.bg,-5);
+          var acL=adjA(t.ac,0.2),acD=adjA(t.ac,-0.25);
+          var acCon=(0.299*p(t.ac)[0]+0.587*p(t.ac)[1]+0.114*p(t.ac)[2])/255>0.5?'#000000':'#ffffff';
+          var ioOp=dk?0.25:0.45;
+          var r=document.documentElement.style;
+          document.documentElement.dataset.mode = dk ? 'dark' : 'light';
+          r.setProperty('--background',t.bg);
+          r.setProperty('--foreground',t.fg);
+          r.setProperty('--card',card);
+          r.setProperty('--card-foreground',t.fg);
+          r.setProperty('--popover',pop);
+          r.setProperty('--popover-foreground',t.fg);
+          r.setProperty('--primary',t.ac);
+          r.setProperty('--primary-foreground',acCon);
+          r.setProperty('--secondary',dk?'rgba('+fga+',0.08)':'rgba('+fga+',0.06)');
+          r.setProperty('--secondary-foreground',dk?'rgba('+fga+',0.9)':'rgba('+fga+',0.8)');
+          r.setProperty('--muted','rgba('+fga+',0.04)');
+          r.setProperty('--muted-foreground','rgba('+fga+',0.5)');
+          r.setProperty('--accent',t.ac);
+          r.setProperty('--accent-foreground',acCon);
+          r.setProperty('--accent-primary',t.ac);
+          r.setProperty('--accent-light',acL);
+          r.setProperty('--accent-dark',acD);
+          r.setProperty('--destructive',dk?'#f85149':'#d1242f');
+          r.setProperty('--destructive-foreground',dk?t.fg:'#ffffff');
+          r.setProperty('--border',t.bc);
+          r.setProperty('--input',inp);
+          r.setProperty('--ring',t.ac);
+          r.setProperty('--grid-line','rgba('+fga+',0.06)');
+          r.setProperty('--text-completed',dk?'rgba('+fga+',0.15)':'rgba('+fga+',0.2)');
+          r.setProperty('--text-untyped',dk?'rgba('+fga+',0.35)':'rgba('+fga+',0.4)');
+          r.setProperty('--border-hover','rgba('+fga+',0.25)');
+          r.setProperty('--color-accent',t.ac);
+          r.setProperty('--color-accent-light',acL);
+          r.setProperty('--color-accent-dark',acD);
+          r.setProperty('--color-bg-primary',t.bg);
+          r.setProperty('--color-white',t.fg);
+          r.setProperty('--color-white-25','rgba('+fg[0]+','+fg[1]+','+fg[2]+','+ioOp+')');
+          r.setProperty('--color-box-bg',card);
+          r.setProperty('--color-box-border',t.bc);
+          r.setProperty('--border-width',t.bw+'px');
+          r.setProperty('--radius',t.br+'px');
         } catch (e) {}
       })();
     </script>
     <style>
       :root {
-        --color-bg-primary: #202020;
-        --color-white: #ffffff;
-        --color-white-25: rgba(255, 255, 255, 0.25);
-        --color-accent: #fbbf24;
+        --color-bg-primary: #1e1e2e;
+        --color-white: #cdd6f4;
+        --color-white-25: rgba(205, 214, 244, 0.25);
+        --color-accent: #cba6f7;
         --max-content-width: 1000px;
       }
 
       * { box-sizing: border-box; }
-      body { margin: 0; background-color: var(--color-bg-primary); min-height: 100vh; }
+      body { margin: 0; background-color: var(--color-bg-primary); }
+      #root { height: 100dvh; }
       noscript { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
 
       .loading-container {
         width: 100%;
@@ -113,37 +193,22 @@
       }
 
       .loading-logo {
-        display: flex;
-        align-items: baseline;
-        gap: 0.15rem;
         font-size: 1.65rem;
         font-weight: 800;
-        letter-spacing: -0.025em;
         user-select: none;
-        font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+        font-family: system-ui, sans-serif;
       }
 
       .loading-logo-text {
         color: var(--color-white);
-        text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
       }
 
       .loading-logo-accent {
-        background: linear-gradient(135deg, #fbbf24 0%, color-mix(in srgb, #fbbf24 70%, white) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-style: italic;
-        position: relative;
-        filter: drop-shadow(0 0 10px color-mix(in srgb, #fbbf24 50%, transparent));
+        color: var(--color-accent);
       }
 
       .loading-logo-io {
-        color: var(--color-white-25);
-        font-size: 1.1rem;
-        font-weight: 600;
-        font-style: italic;
-        margin-left: -0.2rem;
+        color: var(--color-accent);
       }
 
       .loading-spinner {
@@ -178,13 +243,10 @@
   </head>
   <body>
     <div id="root">
+      <h1 class="sr-only">Multiplayer Typing Races</h1>
       <div class="loading-container">
         <div class="loading-content">
-          <div class="loading-logo">
-            <span class="loading-logo-text">Type</span>
-            <span class="loading-logo-accent">Race</span>
-            <span class="loading-logo-io">.io</span>
-          </div>
+          <div class="loading-logo"><span class="loading-logo-text">Type</span><span class="loading-logo-accent">Race</span><span class="loading-logo-io">.io</span></div>
           <div class="loading-spinner"></div>
         </div>
       </div>

@@ -26,7 +26,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "The course of true love never did run smooth.", Author = "William Shakespeare" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "Lord, what fools these mortals be!", Author = "William Shakespeare" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "Love looks not with the eyes, but with the mind, And therefore is wing'd Cupid painted blind.", Author = "William Shakespeare" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "If to do were as easy as to know what were good to do, chapels had been churches, and poor men’s cottages princes’ palaces.", Author = "William Shakespeare" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "It is a wise father that knows his own child.", Author = "William Shakespeare" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "All that glisters is not gold.", Author = "William Shakespeare" },
             new Quote { Id = "https://en.wikiquote.org/wiki/William_Shakespeare", Text = "The better part of valour is discretion; in the which better part I have saved my life.", Author = "William Shakespeare" },

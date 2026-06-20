@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import type {
-  GameMode,
-} from "../../module_bindings";
+import { type GameMode, type GameType } from "../types/stdb";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { useToast } from "./useToast";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { getLangPrefix } from "../utils/modes";
 
 export const useFindGame = () => {
   const [isSearching, setIsSearching] = useState(false);
@@ -22,7 +21,7 @@ export const useFindGame = () => {
     const handleInsert = (_ctx: any, progress: any) => {
       if (conn?.identity && progress.playerId.isEqual(conn.identity)) {
         if (progress.joinCode === joinCode) {
-          navigate(`/game/${progress.gameId.toString()}`, { replace: true });
+          navigate(`${getLangPrefix()}/game/${progress.gameId}`, { replace: true });
           setIsSearching(false);
           pendingJoinCodeRef.current = null;
         }
@@ -45,11 +44,10 @@ export const useFindGame = () => {
 
     const handleJoinGameResult: Parameters<typeof conn.reducers.onJoinGame>[0] = (
       ctx,
-      _gameMode,
-      responseJoinCode
+      args
     ) => {
       if (!ctx.event.callerIdentity.isEqual(conn.identity!)) return;
-      if (pendingJoinCodeRef.current !== responseJoinCode) return;
+      if (pendingJoinCodeRef.current !== args.joinCode) return;
 
       if (ctx.event.status.tag === "Failed") {
         showToast(ctx.event.status.value);
@@ -73,11 +71,18 @@ export const useFindGame = () => {
 
     setIsSearching(true);
 
-    const newJoinCode = `join_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    const uniqueId = typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}_${Math.floor(Math.random() * 1_000_000_000)}`;
+    const newJoinCode = `join_${uniqueId}`;
     pendingJoinCodeRef.current = newJoinCode;
 
-    const gameTypeEnum = { tag: gameType };
-    conn.reducers.joinGame(mode, newJoinCode, gameTypeEnum);
+    const gameTypeEnum: GameType = { tag: gameType };
+    conn.reducers.joinGame({
+      gameMode: mode,
+      joinCode: newJoinCode,
+      gameType: gameTypeEnum
+    });
   }, [conn, isSearching]);
 
   return { findGame, isSearching };
