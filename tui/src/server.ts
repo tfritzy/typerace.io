@@ -1,5 +1,4 @@
 import { createServer, logging } from "@opentui/ssh";
-import { mountCounter } from "./app";
 import { mountMainMenu } from "./mainMenu";
 
 const port = Number(process.env.PORT ?? 2222);

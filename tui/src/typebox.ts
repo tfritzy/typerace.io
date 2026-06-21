@@ -13,28 +13,68 @@ const complete: TextChunk = {
   __isChunk: true,
   text: "",
 };
-const currentWord = {
-  fg: "#fbf1c7",
+const currentWord: TextChunk = {
+  fg: RGBA.fromHex("#fbf1c7"),
   __isChunk: true,
   text: "",
 };
-const incorrect = {
-  fg: "#fb4934",
+const incorrect: TextChunk = {
+  fg: RGBA.fromHex("#fb4934"),
   attributes: TextAttributes.UNDERLINE,
   __isChunk: true,
   text: "",
 };
-const cursor = {
-  fg: "#000000",
-  bg: "#fabd2f",
+const cursor: TextChunk = {
+  fg: RGBA.fromHex("#000000"),
+  bg: RGBA.fromHex("#fabd2f"),
   __isChunk: true,
   text: "",
 };
-const incomplete = {
-  fg: "#bdae93",
+const incomplete: TextChunk = {
+  fg: RGBA.fromHex("#bdae93"),
   __isChunk: true,
   text: "",
 };
+
+function computeWordStart(phrase: string, typed: string) {
+  let correctUpTo = 0;
+  for (let i = 0; i < phrase.length; i++) {
+    if (phrase[i] === typed[i]) correctUpTo += 1;
+    else break;
+  }
+
+  let wordStart = correctUpTo;
+  for (let i = wordStart - 1; i >= 0; i--) {
+    wordStart = i;
+    if (phrase[i] === " ") break;
+  }
+
+  return wordStart;
+}
+
+let chunks: TextChunk[] = [];
+function updateText(text: TextRenderable, phrase: string, typed: string) {
+  const wordStart = computeWordStart(phrase, typed);
+
+  chunks.length = 0;
+  for (let i = 0; i < phrase.length; i++) {
+    if (i < wordStart) {
+      chunks.push({ ...complete, text: phrase[i] });
+    } else if (i === typed.length) {
+      chunks.push({ ...cursor, text: phrase[i] });
+    } else if (i < typed.length) {
+      if (typed[i] === phrase[i]) {
+        chunks.push({ ...currentWord, text: phrase[i] });
+      } else {
+        chunks.push({ ...incorrect, text: phrase[i] });
+      }
+    } else {
+      chunks.push({ ...incomplete, text: phrase[i] });
+    }
+  }
+
+  text.content = new StyledText(chunks);
+}
 
 export function mountTypeBox(
   renderer: CliRenderer,
@@ -42,78 +82,33 @@ export function mountTypeBox(
   onComplete: () => void,
 ): void {
   const phraseBox = new BoxRenderable(renderer, {
-    width: "100%",
-    height: "100%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
   });
 
+  let typed = "";
   const text = new TextRenderable(renderer, {});
-
-  let chunks: TextChunk[] = [];
-  const updateTexts = (
-    wordStart: number,
-    progress: number,
-    errorCount: number,
-  ) => {
-    text.clear();
-
-    chunks.length = 0;
-    for (let i = 0; i < phrase.length; i++) {
-      if (i < wordStart) {
-        chunks.push({ ...complete, text: phrase[i] });
-      }
-
-      if (phrase[i] === typed[i]) {
-        chunks.push({ text: phrase[i], ...complete, __isChunk: true });
-      }
-    }
-  };
-
   phraseBox.add(text);
   renderer.root.add(phraseBox);
 
-  let typed = "";
+  updateText(text, phrase, typed);
+
   renderer.keyInput.on("keypress", (key) => {
-    let correctUpTo = 0;
-    for (let i = 0; i < phrase.length; i++) {
-      if (phrase[i] === typed[i]) correctUpTo += 1;
-      else break;
-    }
-
-    let wordStart = correctUpTo;
-    for (let i = wordStart - 1; i >= 0; i--) {
-      wordStart = i;
-      if (phrase[i] === " ") break;
-    }
-
-    let wordEnd = correctUpTo;
-    for (let i = wordEnd; i < phrase.length; i++) {
-      wordEnd = i;
-      if (phrase[i] === " ") break;
-    }
+    const wordStart = computeWordStart(phrase, typed);
 
     if (key.name === "w" && key.ctrl) {
       typed = "";
     } else if (key.name === "backspace") {
       typed = typed.substring(0, typed.length - 1);
     } else {
-      if (errorCount > 0) {
-        errorCount += 1;
-      } else {
-        console.log("expected", phrase[progress], "actual", key.raw);
-        if (phrase[progress] === key.raw) {
-          progress += 1;
-        } else {
-          errorCount = 1;
-        }
-      }
+      typed += key.raw;
     }
 
-    progress = Math.max(0, progress);
-    progress = Math.max(progress, wordStart > 0 ? wordStart + 1 : 0);
+    if (typed.length <= wordStart && wordStart != 0) {
+      typed = phrase.substring(0, wordStart + 1);
+    }
 
-    updateTexts(wordStart, progress, errorCount);
+    updateText(text, phrase, typed);
   });
 }
