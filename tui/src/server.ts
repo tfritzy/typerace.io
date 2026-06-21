@@ -22,7 +22,15 @@ const server = createServer({
   .use(logging())
   .serve((session) => mountMainMenu(session.renderer));
 
-await server.listen(port, host);
+try {
+  console.log(`Attempting to start server on ${host}:${port}...`);
+  await server.listen(port, host);
+  console.log(`Server successfully listening on ${host}:${port}`);
+} catch (error) {
+  console.error("❌ CRITICAL RUNTIME ERROR ON STARTUP:");
+  console.error(error);
+  process.exit(1);
+}
 
 async function shutdown(): Promise<void> {
   await server.close();

@@ -2,7 +2,7 @@ import { BoxRenderable, TextRenderable, type CliRenderer } from "@opentui/core";
 import { mountTypeBox } from "./typebox";
 
 export function mountMainMenu(renderer: CliRenderer): void {
-  renderer.setBackgroundColor("#282828");
+  renderer.setBackgroundColor("#1d2021");
 
   const screen = new BoxRenderable(renderer, {
     width: "100%",

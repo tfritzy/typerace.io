@@ -4,20 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun --watch src/server.ts",
-    "start": "bun src/server.ts",
-    "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "dev": "SSH2_NO_NATIVE=true bun --watch src/server.ts",
+    "start": "SSH2_NO_NATIVE=true bun src/server.ts"
   },
   "dependencies": {
     "@opentui/core": "0.4.1",
     "@opentui/ssh": "0.4.1"
   },
   "devDependencies": {
-    "@types/bun": "^1.3.14",
+    "@types/node": "^20.11.0",
+    "tsx": "^4.22.4",
     "typescript": "^5.9.3"
-  },
-  "engines": {
-    "bun": ">=1.3.0"
   }
 }

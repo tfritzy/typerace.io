@@ -117,9 +117,9 @@ export const Countdown = () => {
         <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
           <div
             key={count}
-            className="countdown-number text-foreground"
+            className="countdown-number text-accent"
             style={{
-              fontSize: "20rem",
+              fontSize: "12rem",
               fontWeight: "bold",
               animation: "countdownPop 1s ease-out forwards",
             }}
