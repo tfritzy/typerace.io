@@ -49,12 +49,12 @@ function computeWordStart(phrase: string, typed: string) {
     if (phrase[i] === " ") break;
   }
 
-  return wordStart;
+  return { correctUpTo, wordStart };
 }
 
 let chunks: TextChunk[] = [];
 function updateText(text: TextRenderable, phrase: string, typed: string) {
-  const wordStart = computeWordStart(phrase, typed);
+  const { wordStart } = computeWordStart(phrase, typed);
 
   chunks.length = 0;
   for (let i = 0; i < phrase.length; i++) {
@@ -88,6 +88,8 @@ export function mountTypeBox(
   });
 
   let typed = "";
+  let isComplete = false;
+
   const text = new TextRenderable(renderer, {});
   phraseBox.add(text);
   renderer.root.add(phraseBox);
@@ -95,7 +97,7 @@ export function mountTypeBox(
   updateText(text, phrase, typed);
 
   renderer.keyInput.on("keypress", (key) => {
-    const wordStart = computeWordStart(phrase, typed);
+    const { wordStart, correctUpTo } = computeWordStart(phrase, typed);
 
     if (key.name === "w" && key.ctrl) {
       typed = "";
@@ -107,6 +109,12 @@ export function mountTypeBox(
 
     if (typed.length <= wordStart && wordStart != 0) {
       typed = phrase.substring(0, wordStart + 1);
+    }
+
+    console.log(correctUpTo, phrase.length);
+    if (correctUpTo >= phrase.length - 1 && !isComplete) {
+      isComplete = true;
+      onComplete();
     }
 
     updateText(text, phrase, typed);

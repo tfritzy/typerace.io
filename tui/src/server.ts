@@ -1,5 +1,7 @@
 import { createServer, logging } from "@opentui/ssh";
 import { mountMainMenu } from "./mainMenu";
+import * as dotenv from "dotenv";
+import { mountApp } from "./app";
 
 const port = Number(process.env.PORT ?? 2222);
 const host = process.env.HOST ?? "0.0.0.0";
@@ -11,6 +13,8 @@ if (!Number.isInteger(port) || port < 1 || port > 65_535) {
   );
 }
 
+dotenv.config();
+
 const server = createServer({
   hostKey: { path: hostKeyPath },
   auth: "open",
@@ -19,7 +23,7 @@ const server = createServer({
   onError: (error) => console.error(error),
 })
   .use(logging())
-  .serve((session) => mountMainMenu(session.renderer));
+  .serve((session) => mountApp(session.renderer));
 
 try {
   console.log(`Attempting to start server on ${host}:${port}...`);
