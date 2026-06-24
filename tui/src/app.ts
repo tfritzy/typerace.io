@@ -1,11 +1,32 @@
 import { CliRenderer } from "@opentui/core";
-import { Database } from "./database";
 import { mountMainMenu } from "./mainMenu";
+import { DbConnection } from "../module_bindings";
 
 export function mountApp(renderer: CliRenderer) {
   renderer.setBackgroundColor("#1d2021");
-  const database = new Database();
-  const mainMenu = mountMainMenu(renderer, database);
-  renderer.root.add(mainMenu);
-  database.connect();
+
+  let builder = DbConnection.builder()
+    .withUri(process.env.VITE_SPACETIMEDB_URI || "ws://localhost:3000")
+    .withModuleName(process.env.VITE_SPACETIMEDB_MODULE || "typerace");
+
+  const connect = new Promise<DbConnection>((resolve, reject) => {
+    builder
+      .onConnect((c) => {
+        console.log("Connected to SpacetimeDB");
+        resolve(c);
+      })
+      .onConnectError((e) => {
+        console.error("Failed to connect to stdb", e);
+        reject();
+      })
+      .onDisconnect(() => {
+        console.warn("Disconnected from SpacetimeDB");
+      })
+      .build();
+  });
+
+  connect.then((conn) => {
+    const mainMenu = mountMainMenu(renderer, conn);
+    renderer.root.add(mainMenu);
+  });
 }
