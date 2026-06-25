@@ -76,47 +76,71 @@ function updateText(text: TextRenderable, phrase: string, typed: string) {
   text.content = new StyledText(chunks);
 }
 
-export function mountTypeBox(
-  renderer: CliRenderer,
-  phrase: string,
-  onComplete: () => void,
-): void {
-  const phraseBox = new BoxRenderable(renderer, {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  });
+export class TypeBox {
+  private text: TextRenderable;
+  private phrase: string;
+  private typed: string;
+  private isComplete: boolean;
+  private cleanup: () => void;
 
-  let typed = "";
-  let isComplete = false;
+  constructor(renderer: CliRenderer, phrase: string, onComplete: () => void) {
+    this.phrase = phrase;
+    const phraseBox = new BoxRenderable(renderer, {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+    });
 
-  const text = new TextRenderable(renderer, {});
-  phraseBox.add(text);
-  renderer.root.add(phraseBox);
+    this.typed = "";
+    this.isComplete = false;
 
-  updateText(text, phrase, typed);
+    this.text = new TextRenderable(renderer, {});
+    phraseBox.add(this.text);
+    renderer.root.add(phraseBox);
 
-  renderer.keyInput.on("keypress", (key) => {
-    const { wordStart, correctUpTo } = computeWordStart(phrase, typed);
+    updateText(this.text, this.phrase, this.typed);
 
-    if (key.name === "w" && key.ctrl) {
-      typed = "";
-    } else if (key.name === "backspace") {
-      typed = typed.substring(0, typed.length - 1);
-    } else {
-      typed += key.raw;
+    renderer.keyInput.on("keypress", (key) => {
+      const { wordStart, correctUpTo } = computeWordStart(
+        this.phrase,
+        this.typed,
+      );
+
+      if (key.name === "w" && key.ctrl) {
+        this.typed = "";
+      } else if (key.name === "backspace") {
+        this.typed = this.typed.substring(0, this.typed.length - 1);
+      } else {
+        this.typed += key.raw;
+      }
+
+      if (this.typed.length <= wordStart && wordStart != 0) {
+        this.typed = this.phrase.substring(0, wordStart + 1);
+      }
+
+      if (correctUpTo >= this.phrase.length - 1 && !this.isComplete) {
+        this.isComplete = true;
+        onComplete();
+      }
+
+      updateText(this.text, this.phrase, this.typed);
+    });
+
+    this.cleanup = () => {
+      phraseBox.destroyRecursively();
+    };
+  }
+
+  public setPhrase(phrase: string) {
+    if (phrase != this.phrase) {
+      this.phrase = phrase;
+      this.typed = "";
+      this.isComplete = false;
+      updateText(this.text, this.phrase, this.typed);
     }
+  }
 
-    if (typed.length <= wordStart && wordStart != 0) {
-      typed = phrase.substring(0, wordStart + 1);
-    }
-
-    console.log(correctUpTo, phrase.length);
-    if (correctUpTo >= phrase.length - 1 && !isComplete) {
-      isComplete = true;
-      onComplete();
-    }
-
-    updateText(text, phrase, typed);
-  });
+  public unMount() {
+    this.cleanup();
+  }
 }

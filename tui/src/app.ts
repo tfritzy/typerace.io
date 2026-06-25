@@ -1,6 +1,7 @@
 import { CliRenderer } from "@opentui/core";
-import { mountMainMenu } from "./mainMenu";
+import { MainMenu } from "./mainMenu";
 import { DbConnection } from "../module_bindings";
+import { GamePage } from "./game";
 
 export function mountApp(renderer: CliRenderer) {
   renderer.setBackgroundColor("#1d2021");
@@ -25,8 +26,13 @@ export function mountApp(renderer: CliRenderer) {
       .build();
   });
 
+  let mainMenu: MainMenu;
   connect.then((conn) => {
-    const mainMenu = mountMainMenu(renderer, conn);
+    mainMenu = new MainMenu(renderer, conn, (gameId) => {
+      mainMenu.unMount();
+
+      renderer.root.add(new GamePage(renderer, conn, gameId));
+    });
     renderer.root.add(mainMenu);
   });
 }
