@@ -9,7 +9,7 @@ import {
 } from "@opentui/core";
 
 const complete: TextChunk = {
-  fg: RGBA.fromHex("#3c3836"),
+  fg: RGBA.fromHex("#282828"),
   __isChunk: true,
   text: "",
 };
@@ -92,8 +92,7 @@ export class TypeBox {
     this.phrase = phrase;
     const phraseBox = new BoxRenderable(renderer, {
       flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
+      padding: 0,
     });
 
     this.typed = "";
