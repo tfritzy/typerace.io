@@ -23,6 +23,17 @@ export class GamePage {
       if (game.id === gameId) this.gameView.updateGame(game);
     });
 
+    conn.db.playerprogress.onInsert((_, playerProgress) => {
+      if (playerProgress.gameId === gameId) {
+        this.gameView.addPlayerProgress(playerProgress);
+      }
+    });
+    conn.db.playerprogress.onUpdate((_ctx, _old, playerProgress) => {
+      if (playerProgress.gameId === gameId) {
+        this.gameView.updatePlayerProgress(playerProgress);
+      }
+    });
+
     this.gameView = new GameView(renderer);
     renderer.root.add(this.gameView);
   }

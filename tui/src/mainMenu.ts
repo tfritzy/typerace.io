@@ -5,7 +5,6 @@ import { PlayerProgress } from "./stdb";
 
 export class MainMenu {
   private screen: BoxRenderable;
-  private renderer: CliRenderer;
   private cleanup: () => void;
 
   constructor(
@@ -13,7 +12,6 @@ export class MainMenu {
     conn: DbConnection,
     navigateToGame: (gameId: string) => void,
   ) {
-    this.renderer = renderer;
     this.screen = new BoxRenderable(renderer, {
       width: "100%",
       height: "100%",
@@ -22,7 +20,7 @@ export class MainMenu {
       justifyContent: "center",
     });
 
-    const typeBox = new TypeBox(renderer, "Hello world", () => {
+    const typeBox = new TypeBox(renderer, this.screen, "Hell", () => {
       conn.reducers.joinGame({
         gameMode: { tag: "English500" },
         joinCode: crypto.randomUUID(),
@@ -47,9 +45,9 @@ export class MainMenu {
       subscription.unsubscribe();
       conn.db.playerprogress.removeOnInsert(handleNavigate);
       typeBox.unMount();
+      this.screen.destroyRecursively();
     };
 
-    this.screen.add(typeBox);
     renderer.root.add(this.screen);
   }
 

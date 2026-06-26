@@ -83,7 +83,12 @@ export class TypeBox {
   private isComplete: boolean;
   private cleanup: () => void;
 
-  constructor(renderer: CliRenderer, phrase: string, onComplete: () => void) {
+  constructor(
+    renderer: CliRenderer,
+    parent: BoxRenderable,
+    phrase: string,
+    onComplete: () => void,
+  ) {
     this.phrase = phrase;
     const phraseBox = new BoxRenderable(renderer, {
       flexDirection: "row",
@@ -96,7 +101,7 @@ export class TypeBox {
 
     this.text = new TextRenderable(renderer, {});
     phraseBox.add(this.text);
-    renderer.root.add(phraseBox);
+    parent.add(phraseBox);
 
     updateText(this.text, this.phrase, this.typed);
 

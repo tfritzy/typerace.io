@@ -31,8 +31,7 @@ export function mountApp(renderer: CliRenderer) {
     mainMenu = new MainMenu(renderer, conn, (gameId) => {
       mainMenu.unMount();
 
-      renderer.root.add(new GamePage(renderer, conn, gameId));
+      new GamePage(renderer, conn, gameId);
     });
-    renderer.root.add(mainMenu);
   });
 }
