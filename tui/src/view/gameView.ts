@@ -8,15 +8,18 @@ export class GameView {
   private typeBox: TypeBox;
   private playerProgresses: PlayerProgressView[] = [];
 
-  constructor(renderer: CliRenderer) {
+  constructor(
+    renderer: CliRenderer,
+    incrementProgress: (progress: number) => void,
+  ) {
     this.screen = new BoxRenderable(renderer, {
-      width: "50%",
+      width: "90%",
+      maxWidth: 128,
       height: "100%",
       marginX: "auto",
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      gap: 2,
     });
 
     const ppBox = new BoxRenderable(renderer, {
@@ -25,8 +28,6 @@ export class GameView {
       alignItems: "center",
       justifyContent: "flex-end",
       flexGrow: 1,
-      gap: 2,
-      paddingY: 2,
       paddingX: 0,
     });
 
@@ -38,12 +39,20 @@ export class GameView {
     this.screen.add(ppBox);
 
     const typeBoxBox = new BoxRenderable(renderer, {
-      paddingY: 1,
-      paddingX: 0,
-      flexGrow: 2,
+      paddingX: 1,
+      width: "100%",
+      flexGrow: 9,
+      border: true,
+      borderColor: "#282828",
     });
     this.screen.add(typeBoxBox);
-    this.typeBox = new TypeBox(renderer, typeBoxBox, "", () => {});
+    this.typeBox = new TypeBox(
+      renderer,
+      typeBoxBox,
+      "",
+      incrementProgress,
+      () => {},
+    );
 
     renderer.root.add(this.screen);
   }

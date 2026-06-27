@@ -87,6 +87,7 @@ export class TypeBox {
     renderer: CliRenderer,
     parent: BoxRenderable,
     phrase: string,
+    onProgress: (progress: number) => void,
     onComplete: () => void,
   ) {
     this.phrase = phrase;
@@ -109,6 +110,8 @@ export class TypeBox {
         this.phrase,
         this.typed,
       );
+
+      onProgress(correctUpTo);
 
       if (key.name === "w" && key.ctrl) {
         this.typed = "";

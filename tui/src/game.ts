@@ -34,7 +34,13 @@ export class GamePage {
       }
     });
 
-    this.gameView = new GameView(renderer);
+    this.gameView = new GameView(renderer, (progress) => {
+      conn.reducers.updateProgress({
+        gameId: gameId,
+        newIndex: progress,
+        eventType: { tag: "Correct" },
+      });
+    });
     renderer.root.add(this.gameView);
   }
 

@@ -1,4 +1,10 @@
-import { BoxRenderable, CliRenderer, TextRenderable } from "@opentui/core";
+import {
+  BoxRenderable,
+  CliRenderer,
+  RGBA,
+  StyledText,
+  TextRenderable,
+} from "@opentui/core";
 import { TypeBox } from "../typebox";
 import { Game, PlayerProgress } from "../stdb";
 
@@ -8,7 +14,7 @@ export class PlayerProgressView {
   private cleanup: () => void;
   private playerName: TextRenderable;
   private wpm: TextRenderable;
-  private progress: BoxRenderable;
+  private progress: TextRenderable;
   private phraseLength: number;
 
   constructor(
@@ -23,6 +29,9 @@ export class PlayerProgressView {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
+      paddingX: 1,
+      border: true,
+      borderColor: "#282828",
     });
 
     const playerDetails = new BoxRenderable(renderer, {
@@ -33,7 +42,7 @@ export class PlayerProgressView {
     });
 
     this.playerName = new TextRenderable(renderer, {
-      fg: "#bdae93",
+      fg: "#504945",
       content: "Waiting...",
     });
     this.wpm = new TextRenderable(renderer, {
@@ -43,40 +52,15 @@ export class PlayerProgressView {
     playerDetails.add(this.playerName);
     playerDetails.add(this.wpm);
 
-    const progressBar = new BoxRenderable(renderer, {
+    this.progress = new TextRenderable(renderer, {
       width: "100%",
+      height: 1,
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: "#282828",
     });
-
-    this.progress = new BoxRenderable(renderer, {
-      width: "0%",
-      flexDirection: "row",
-      alignItems: "center",
-      //   backgroundColor: "#d79921",
-      visible: false,
-      customBorderChars: {
-        topT: "▬",
-        topLeft: "▬",
-        topRight: "▬",
-        bottomLeft: "▬",
-        bottomRight: "▬",
-        horizontal: "▬",
-        vertical: "▬",
-        bottomT: "▬",
-        leftT: "▬",
-        rightT: "▬",
-        cross: "▬",
-      },
-      border: ["top"],
-      borderColor: "#d79921",
-    });
-
-    progressBar.add(this.progress);
 
     div.add(playerDetails);
-    div.add(progressBar);
+    div.add(this.progress);
     parent.add(div);
 
     this.cleanup = () => {
@@ -85,11 +69,25 @@ export class PlayerProgressView {
   }
 
   public updateProgress(pp: PlayerProgress) {
-    this.playerName.content = pp.playerName;
-    this.wpm.content = `${pp.wpm.toFixed(0)} wpm`;
-    this.progress.width = `${(pp.progressIndex / this.phraseLength) * 100}%`;
-    this.progress.visible = pp.progressIndex > 0;
     this.data = pp;
+    this.playerName.content = pp.playerName;
+    this.playerName.fg = "#bdae93";
+    this.wpm.content = `${pp.wpm.toFixed(0)} wpm`;
+
+    const charWidth = this.progress.getLayoutNode().getComputedWidth();
+    const filledChars = (pp.progressIndex / this.phraseLength) * charWidth;
+    this.progress.content = new StyledText([
+      {
+        text: "▄".repeat(filledChars),
+        fg: RGBA.fromHex("#fabd2f"),
+        __isChunk: true,
+      },
+      {
+        text: "▄".repeat(charWidth - filledChars),
+        fg: RGBA.fromHex("#282828"),
+        __isChunk: true,
+      },
+    ]);
   }
 
   public setPhraseLength(phraseLength: number) {
