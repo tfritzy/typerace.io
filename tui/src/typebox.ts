@@ -87,7 +87,10 @@ export class TypeBox {
     renderer: CliRenderer,
     parent: BoxRenderable,
     phrase: string,
-    onProgress: (progress: number) => void,
+    onProgress: (
+      progress: number,
+      eventType: "backspace" | "correct" | "incorrect",
+    ) => void,
     onComplete: () => void,
   ) {
     this.phrase = phrase;
@@ -106,19 +109,28 @@ export class TypeBox {
     updateText(this.text, this.phrase, this.typed);
 
     renderer.keyInput.on("keypress", (key) => {
-      const { wordStart, correctUpTo } = computeWordStart(
+      let { wordStart, correctUpTo } = computeWordStart(
         this.phrase,
         this.typed,
       );
 
-      onProgress(correctUpTo);
-
       if (key.name === "w" && key.ctrl) {
         this.typed = "";
+        onProgress(wordStart + 1, "backspace");
       } else if (key.name === "backspace") {
         this.typed = this.typed.substring(0, this.typed.length - 1);
+        onProgress(correctUpTo, "backspace");
       } else {
-        this.typed += key.raw;
+        this.typed += key.raw[0];
+        const newCorrectUpTo = computeWordStart(
+          this.phrase,
+          this.typed,
+        ).correctUpTo;
+
+        const eventType =
+          newCorrectUpTo > correctUpTo ? "correct" : "incorrect";
+        correctUpTo = newCorrectUpTo;
+        onProgress(correctUpTo, eventType);
       }
 
       if (this.typed.length <= wordStart && wordStart != 0) {

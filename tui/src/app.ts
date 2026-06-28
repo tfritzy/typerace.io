@@ -2,8 +2,9 @@ import { CliRenderer } from "@opentui/core";
 import { MainMenu } from "./mainMenu";
 import { DbConnection } from "../module_bindings";
 import { GamePage } from "./game";
+import { Session } from "@opentui/ssh";
 
-export function mountApp(renderer: CliRenderer) {
+export function mountApp(renderer: CliRenderer, session: Session) {
   renderer.setBackgroundColor("#1d2021");
 
   let builder = DbConnection.builder()
@@ -26,8 +27,19 @@ export function mountApp(renderer: CliRenderer) {
       .build();
   });
 
+  let connection: DbConnection;
   let mainMenu: MainMenu;
+
+  renderer.keyInput.on("keypress", (key) => {
+    if (key.name === "c" && key.ctrl) {
+      connection?.disconnect();
+      session.end();
+    }
+  });
+
   connect.then((conn) => {
+    connection = conn;
+
     mainMenu = new MainMenu(renderer, conn, (gameId) => {
       mainMenu.unMount();
 

@@ -1,5 +1,4 @@
 import { createServer, logging } from "@opentui/ssh";
-import { mountMainMenu } from "./mainMenu";
 import * as dotenv from "dotenv";
 import { mountApp } from "./app";
 
@@ -23,7 +22,7 @@ const server = createServer({
   onError: (error) => console.error(error),
 })
   .use(logging())
-  .serve((session) => mountApp(session.renderer));
+  .serve((session) => mountApp(session.renderer, session));
 
 try {
   console.log(`Attempting to start server on ${host}:${port}...`);
