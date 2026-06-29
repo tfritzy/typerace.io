@@ -1,13 +1,20 @@
 import { type CliRenderer } from "@opentui/core";
 import { DbConnection, SubscriptionHandle } from "../module_bindings";
 import { GameView } from "./view/gameView";
+import { Game, PlayerProgress } from "./stdb";
 
 export class GamePage {
-  private subscription: SubscriptionHandle;
+  public cleanup: () => void;
   private gameView: GameView;
 
-  constructor(renderer: CliRenderer, conn: DbConnection, gameId: string) {
-    this.subscription = conn
+  constructor(
+    renderer: CliRenderer,
+    conn: DbConnection,
+    gameId: string,
+    navMainMenu: () => void,
+    navGame: (game: string) => void,
+  ) {
+    const subscription = conn
       .subscriptionBuilder()
       .onApplied(() => console.log("applied"))
       .onError((err) => console.error("sub error", err))
@@ -16,35 +23,51 @@ export class GamePage {
         `SELECT * FROM game where Id='${gameId}'`,
       ]);
 
-    conn.db.game.onInsert((_, game) => {
+    const onGameInsert = (_: any, game: Game) => {
       if (game.id === gameId) this.gameView.updateGame(game);
-    });
-    conn.db.game.onUpdate((_ctx, _oldGame, game) => {
-      if (game.id === gameId) this.gameView.updateGame(game);
-    });
+    };
+    conn.db.game.onInsert(onGameInsert);
 
-    conn.db.playerprogress.onInsert((_, playerProgress) => {
+    const onGameUpdate = (_: any, _old: Game, game: Game) => {
+      if (game.id === gameId) this.gameView.updateGame(game);
+    };
+    conn.db.game.onUpdate(onGameUpdate);
+
+    const onPpInsert = (_: any, playerProgress: PlayerProgress) => {
       if (playerProgress.gameId === gameId) {
         this.gameView.addPlayerProgress(playerProgress);
       }
-    });
-    conn.db.playerprogress.onUpdate((_ctx, _old, playerProgress) => {
+    };
+    conn.db.playerprogress.onInsert(onPpInsert);
+
+    const onPpUpdate = (_: any, _old: any, playerProgress: PlayerProgress) => {
       if (playerProgress.gameId === gameId) {
         this.gameView.updatePlayerProgress(playerProgress);
       }
-    });
+    };
+    conn.db.playerprogress.onUpdate(onPpUpdate);
 
-    this.gameView = new GameView(renderer, (progress) => {
-      conn.reducers.updateProgress({
-        gameId: gameId,
-        newIndex: progress,
-        eventType: { tag: "Correct" },
-      });
-    });
-    renderer.root.add(this.gameView);
-  }
+    this.gameView = new GameView(
+      renderer,
+      conn.identity!,
+      (progress) => {
+        conn.reducers.updateProgress({
+          gameId: gameId,
+          newIndex: progress,
+          eventType: { tag: "Correct" },
+        });
+      },
+      navMainMenu,
+      navGame,
+    );
 
-  public unMount() {
-    this.subscription.unsubscribe();
+    this.cleanup = () => {
+      subscription.unsubscribe();
+      conn.db.game.removeOnInsert(onGameInsert);
+      conn.db.game.removeOnUpdate(onGameUpdate);
+      conn.db.playerprogress.removeOnInsert(onPpInsert);
+      conn.db.playerprogress.removeOnUpdate(onPpUpdate);
+      this.gameView.cleanup();
+    };
   }
 }

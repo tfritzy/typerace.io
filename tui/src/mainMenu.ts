@@ -6,6 +6,8 @@ import { PlayerProgress } from "./stdb";
 export class MainMenu {
   private screen: BoxRenderable;
   private cleanup: () => void;
+  private typeBox: TypeBox;
+  private joinCode: string;
 
   constructor(
     renderer: CliRenderer,
@@ -20,16 +22,26 @@ export class MainMenu {
       justifyContent: "center",
     });
 
-    const typeBox = new TypeBox(renderer, this.screen, "Hell", () => {
-      conn.reducers.joinGame({
-        gameMode: { tag: "English500" },
-        joinCode: crypto.randomUUID(),
-        gameType: { tag: "Public" },
-      });
-    });
+    this.joinCode = crypto.randomUUID();
+    this.typeBox = new TypeBox(
+      renderer,
+      this.screen,
+      "Hell",
+      () => {},
+      () => {
+        conn.reducers.joinGame({
+          gameMode: { tag: "English500" },
+          joinCode: this.joinCode,
+          gameType: { tag: "Public" },
+        });
+      },
+    );
 
     const handleNavigate = (_: any, pp: PlayerProgress) => {
-      navigateToGame(pp.gameId);
+      if (pp.joinCode === this.joinCode) {
+        navigateToGame(pp.gameId);
+        this.joinCode = crypto.randomUUID();
+      }
     };
     conn.db.playerprogress.onInsert(handleNavigate);
 
@@ -44,7 +56,7 @@ export class MainMenu {
     this.cleanup = () => {
       subscription.unsubscribe();
       conn.db.playerprogress.removeOnInsert(handleNavigate);
-      typeBox.unMount();
+      this.typeBox.unMount();
       this.screen.destroyRecursively();
     };
 
@@ -53,5 +65,11 @@ export class MainMenu {
 
   public unMount() {
     this.cleanup();
+  }
+
+  public setVisible(visible: boolean) {
+    this.screen.visible = visible;
+    this.typeBox.reset();
+    this.joinCode = crypto.randomUUID();
   }
 }

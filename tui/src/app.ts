@@ -29,6 +29,7 @@ export function mountApp(renderer: CliRenderer, session: Session) {
 
   let connection: DbConnection;
   let mainMenu: MainMenu;
+  let gamePage: GamePage;
 
   renderer.keyInput.on("keypress", (key) => {
     if (key.name === "c" && key.ctrl) {
@@ -37,13 +38,28 @@ export function mountApp(renderer: CliRenderer, session: Session) {
     }
   });
 
+  const navigateToMainMenu = () => {
+    console.log("nav to main menu");
+    mainMenu.setVisible(true);
+    gamePage.cleanup();
+  };
+
+  const navigateToGame = (game: string) => {
+    console.log("nav to game", game);
+    mainMenu.setVisible(false);
+    gamePage?.cleanup();
+    gamePage = new GamePage(
+      renderer,
+      connection,
+      game,
+      navigateToMainMenu,
+      navigateToGame,
+    );
+  };
+
   connect.then((conn) => {
     connection = conn;
 
-    mainMenu = new MainMenu(renderer, conn, (gameId) => {
-      mainMenu.unMount();
-
-      new GamePage(renderer, conn, gameId);
-    });
+    mainMenu = new MainMenu(renderer, conn, navigateToGame);
   });
 }

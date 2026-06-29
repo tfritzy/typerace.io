@@ -137,7 +137,7 @@ export class TypeBox {
         this.typed = this.phrase.substring(0, wordStart + 1);
       }
 
-      if (correctUpTo >= this.phrase.length - 1 && !this.isComplete) {
+      if (correctUpTo >= this.phrase.length && !this.isComplete) {
         this.isComplete = true;
         onComplete();
       }
@@ -157,6 +157,12 @@ export class TypeBox {
       this.isComplete = false;
       updateText(this.text, this.phrase, this.typed);
     }
+  }
+
+  public reset() {
+    this.typed = "";
+    this.isComplete = false;
+    updateText(this.text, this.phrase, this.typed);
   }
 
   public unMount() {
