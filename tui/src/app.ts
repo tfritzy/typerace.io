@@ -29,7 +29,7 @@ export function mountApp(renderer: CliRenderer, session: Session) {
 
   let connection: DbConnection;
   let mainMenu: MainMenu;
-  let gamePage: GamePage;
+  let gamePage: GamePage | null;
 
   renderer.keyInput.on("keypress", (key) => {
     if (key.name === "c" && key.ctrl) {
@@ -41,7 +41,8 @@ export function mountApp(renderer: CliRenderer, session: Session) {
   const navigateToMainMenu = () => {
     console.log("nav to main menu");
     mainMenu.setVisible(true);
-    gamePage.cleanup();
+    gamePage?.cleanup();
+    gamePage = null;
   };
 
   const navigateToGame = (game: string) => {

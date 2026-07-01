@@ -6,6 +6,7 @@ import { Game, PlayerProgress } from "./stdb";
 export class GamePage {
   public cleanup: () => void;
   private gameView: GameView;
+  private game: Game | undefined;
 
   constructor(
     renderer: CliRenderer,
@@ -20,22 +21,36 @@ export class GamePage {
       .onError((err) => console.error("sub error", err))
       .subscribe([
         `SELECT * FROM playerprogress where GameId='${gameId}'`,
+        `SELECT * FROM playerprogress where JoinCode='${gameId}'`,
         `SELECT * FROM game where Id='${gameId}'`,
       ]);
 
     const onGameInsert = (_: any, game: Game) => {
-      if (game.id === gameId) this.gameView.updateGame(game);
+      if (game.id === gameId) {
+        this.gameView.updateGame(game);
+        this.game = game;
+      }
     };
     conn.db.game.onInsert(onGameInsert);
 
     const onGameUpdate = (_: any, _old: Game, game: Game) => {
-      if (game.id === gameId) this.gameView.updateGame(game);
+      if (game.id === gameId) {
+        this.gameView.updateGame(game);
+        this.game = game;
+      }
     };
     conn.db.game.onUpdate(onGameUpdate);
 
     const onPpInsert = (_: any, playerProgress: PlayerProgress) => {
       if (playerProgress.gameId === gameId) {
         this.gameView.addPlayerProgress(playerProgress);
+      }
+
+      if (
+        playerProgress.joinCode === gameId &&
+        gameId != playerProgress.gameId
+      ) {
+        navGame(playerProgress.gameId);
       }
     };
     conn.db.playerprogress.onInsert(onPpInsert);
@@ -47,6 +62,13 @@ export class GamePage {
     };
     conn.db.playerprogress.onUpdate(onPpUpdate);
 
+    const requestNewGame = () => {
+      conn.reducers.joinGame({
+        gameMode: this.game?.gameMode || { tag: "English500" },
+        gameType: this.game?.gameType || { tag: "Public" },
+        joinCode: gameId,
+      });
+    };
     this.gameView = new GameView(
       renderer,
       conn.identity!,
@@ -58,7 +80,7 @@ export class GamePage {
         });
       },
       navMainMenu,
-      navGame,
+      requestNewGame,
     );
 
     this.cleanup = () => {

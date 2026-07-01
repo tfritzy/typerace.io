@@ -8,7 +8,7 @@ export class ResultsView {
   constructor(
     renderer: CliRenderer,
     navMainMenu: () => void,
-    navGame: (game: string) => void,
+    requestNewGame: () => void,
   ) {
     this.screen = new BoxRenderable(renderer, {
       width: "90%",
@@ -60,7 +60,7 @@ export class ResultsView {
       }
 
       if (key.name === "n") {
-        navGame("todo");
+        requestNewGame();
       }
     };
     renderer.keyInput.on("keypress", keyListener);

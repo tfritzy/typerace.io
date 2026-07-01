@@ -28,6 +28,7 @@ const cursor: TextChunk = {
   fg: RGBA.fromHex("#000000"),
   bg: RGBA.fromHex("#fabd2f"),
   __isChunk: true,
+  attributes: TextAttributes.BOLD,
   text: "",
 };
 const incomplete: TextChunk = {

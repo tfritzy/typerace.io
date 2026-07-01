@@ -14,10 +14,10 @@ export class GameView {
     ownIdentity: Identity,
     incrementProgress: (progress: number) => void,
     navMainMenu: () => void,
-    navGame: (game: string) => void,
+    requestNewGame: () => void,
   ) {
     this.racingView = new RacingView(renderer, incrementProgress);
-    this.resultsView = new ResultsView(renderer, navMainMenu, navGame);
+    this.resultsView = new ResultsView(renderer, navMainMenu, requestNewGame);
     this.ownIdentity = ownIdentity;
     this.resultsView.setVisible(false);
   }
