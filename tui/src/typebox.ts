@@ -7,26 +7,27 @@ import {
   TextRenderable,
   type CliRenderer,
 } from "@opentui/core";
+import { THEME } from "./theme";
 
 const complete: TextChunk = {
-  fg: RGBA.fromHex("#282828"),
+  fg: RGBA.fromHex(THEME.bg0),
   __isChunk: true,
   text: "",
 };
 const currentWord: TextChunk = {
-  fg: RGBA.fromHex("#fbf1c7"),
+  fg: RGBA.fromHex(THEME.fg0),
   __isChunk: true,
   text: "",
 };
 const incorrect: TextChunk = {
-  fg: RGBA.fromHex("#fb4934"),
+  fg: RGBA.fromHex(THEME.red),
   attributes: TextAttributes.UNDERLINE,
   __isChunk: true,
   text: "",
 };
 const cursor: TextChunk = {
   fg: RGBA.fromHex("#000000"),
-  bg: RGBA.fromHex("#fabd2f"),
+  bg: RGBA.fromHex(THEME.accent),
   __isChunk: true,
   attributes: TextAttributes.BOLD,
   text: "",

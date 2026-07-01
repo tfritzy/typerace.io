@@ -7,6 +7,7 @@ import {
 } from "@opentui/core";
 import { TypeBox } from "../typebox";
 import { Game, PlayerProgress } from "../stdb";
+import { THEME } from "../theme";
 
 export class PlayerProgressView {
   public data: PlayerProgress | undefined;
@@ -31,7 +32,7 @@ export class PlayerProgressView {
       justifyContent: "center",
       paddingX: 1,
       border: true,
-      borderColor: "#282828",
+      borderColor: THEME.bg0,
     });
 
     const playerDetails = new BoxRenderable(renderer, {
@@ -79,12 +80,12 @@ export class PlayerProgressView {
     this.progress.content = new StyledText([
       {
         text: "▄".repeat(filledChars),
-        fg: RGBA.fromHex("#fabd2f"),
+        fg: RGBA.fromHex(THEME.accent),
         __isChunk: true,
       },
       {
         text: "▄".repeat(charWidth - filledChars),
-        fg: RGBA.fromHex("#282828"),
+        fg: RGBA.fromHex(THEME.bg0),
         __isChunk: true,
       },
     ]);

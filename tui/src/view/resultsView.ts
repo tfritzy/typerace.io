@@ -1,9 +1,19 @@
-import { BoxRenderable, CliRenderer, TextRenderable } from "@opentui/core";
+import {
+  BoxRenderable,
+  CliRenderer,
+  TextAttributes,
+  TextRenderable,
+} from "@opentui/core";
 import { ResultBox } from "./resultBox";
+import { PlayerProgress } from "../stdb";
 
 export class ResultsView {
   private screen: BoxRenderable;
   public cleanup = () => {};
+  private placeBox: ResultBox;
+  private wpmBox: ResultBox;
+  private timeBox: ResultBox;
+  private accuracyBox: ResultBox;
 
   constructor(
     renderer: CliRenderer,
@@ -20,6 +30,38 @@ export class ResultsView {
       justifyContent: "center",
     });
 
+    const placementsBar = new BoxRenderable(renderer, {
+      width: "100%",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      marginX: "auto",
+    });
+
+    this.placeBox = new ResultBox(
+      renderer,
+      placementsBar,
+      "1st",
+      "PLACE",
+      { paddingY: 1 },
+      true,
+    );
+    this.wpmBox = new ResultBox(renderer, placementsBar, "98", "WPM", {
+      paddingY: 1,
+    });
+    this.timeBox = new ResultBox(renderer, placementsBar, "23s", "TIME", {
+      paddingY: 1,
+    });
+    this.accuracyBox = new ResultBox(
+      renderer,
+      placementsBar,
+      "98%",
+      "ACCURACY",
+      { paddingY: 1 },
+    );
+
+    this.screen.add(placementsBar);
+
     const actionBar = new BoxRenderable(renderer, {
       width: "100%",
       flexDirection: "row",
@@ -28,23 +70,9 @@ export class ResultsView {
       marginX: "auto",
     });
 
-    new ResultBox(
-      renderer,
-      actionBar,
-      new TextRenderable(renderer, { content: "Main menu (m)", fg: "#bdae93" }),
-    );
-
-    new ResultBox(
-      renderer,
-      actionBar,
-      new TextRenderable(renderer, { content: "Replay (r)", fg: "#bdae93" }),
-    );
-
-    new ResultBox(
-      renderer,
-      actionBar,
-      new TextRenderable(renderer, { content: "New match (n)", fg: "#bdae93" }),
-    );
+    new ResultBox(renderer, actionBar, "Main menu (m)");
+    new ResultBox(renderer, actionBar, "Replay (r)");
+    new ResultBox(renderer, actionBar, "New match (n)");
 
     this.screen.add(actionBar);
 
@@ -71,7 +99,27 @@ export class ResultsView {
     };
   }
 
+  public updateOwnPlayerProgress(pp: PlayerProgress) {
+    this.placeBox.setText(this.formatPlace(pp.placement), pp.placement <= 1);
+    this.wpmBox.setText(pp.wpm.toFixed(0), pp.wpm >= 100);
+    this.timeBox.setText(pp.time.toLocaleString(), pp.placement <= 1);
+    this.accuracyBox.setText("100%", true);
+  }
+
   public setVisible(visible: boolean) {
     this.screen.visible = visible;
+  }
+
+  private formatPlace(place: number) {
+    switch (place) {
+      case 1:
+        return "1st";
+      case 2:
+        return "2nd";
+      case 3:
+        return "3rd";
+      default:
+        return place + "th";
+    }
   }
 }

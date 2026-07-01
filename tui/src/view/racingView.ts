@@ -2,6 +2,7 @@ import { BoxRenderable, CliRenderer } from "@opentui/core";
 import { TypeBox } from "../typebox";
 import { Game, PlayerProgress } from "../stdb";
 import { PlayerProgressView } from "./playerProgress";
+import { THEME } from "../theme";
 
 export class RacingView {
   private screen: BoxRenderable;
@@ -44,7 +45,7 @@ export class RacingView {
       width: "100%",
       flexGrow: 9,
       border: true,
-      borderColor: "#282828",
+      borderColor: THEME.bg0,
     });
     this.screen.add(typeBoxBox);
     this.typeBox = new TypeBox(
