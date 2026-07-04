@@ -27,15 +27,15 @@ export class GamePage {
 
     const onGameInsert = (_: any, game: Game) => {
       if (game.id === gameId) {
-        this.gameView.updateGame(game);
+        this.gameView.updateGame(game, undefined);
         this.game = game;
       }
     };
     conn.db.game.onInsert(onGameInsert);
 
-    const onGameUpdate = (_: any, _old: Game, game: Game) => {
+    const onGameUpdate = (_: any, prevGame: Game, game: Game) => {
       if (game.id === gameId) {
-        this.gameView.updateGame(game);
+        this.gameView.updateGame(game, prevGame);
         this.game = game;
       }
     };

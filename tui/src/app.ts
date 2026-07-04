@@ -3,6 +3,7 @@ import { MainMenu } from "./mainMenu";
 import { DbConnection } from "../module_bindings";
 import { GamePage } from "./game";
 import { Session } from "@opentui/ssh";
+import { Countdown } from "./view/countdown";
 
 export function mountApp(renderer: CliRenderer, session: Session) {
   renderer.setBackgroundColor("#1d2021");
