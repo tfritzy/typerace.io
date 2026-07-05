@@ -1,4 +1,4 @@
-import { CliRenderer, TextRenderable } from "@opentui/core";
+import { BoxRenderable, CliRenderer, TextRenderable } from "@opentui/core";
 import { THEME } from "../theme";
 
 const numbers = [
@@ -54,17 +54,29 @@ const numbers = [
 
 export class Countdown {
   private text: TextRenderable;
+  private cleanup: () => void;
 
   constructor(renderer: CliRenderer) {
+    const box = new BoxRenderable(renderer, {
+      width: "100%",
+      height: "100%",
+      position: "absolute",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+    });
+
     this.text = new TextRenderable(renderer, {
       fg: THEME.fg1,
-      position: "absolute",
-      left: "50%",
-      top: "50%",
       visible: false,
     });
 
-    renderer.root.add(this.text);
+    box.add(this.text);
+    renderer.root.add(box);
+
+    this.cleanup = () => {
+      box.destroyRecursively();
+    };
   }
 
   public start(duration_ms: number) {
@@ -83,12 +95,12 @@ export class Countdown {
           () => {
             this.text.content = "";
           },
-          numberStart_ms - i + 750,
+          numberStart_ms - i + 900,
         );
       }
 
       setTimeout(() => {
-        this.text.destroyRecursively();
+        this.cleanup();
       }, numberStart_ms);
     }, delay);
   }
