@@ -8,7 +8,7 @@ public static partial class DutchQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://nl.wikiquote.org/wiki/Nicolaas_Beets", Text = "Maar waar vooroordeel met vooroordeel strijdt,\nWat is het – dan verlies van tijd!", Author = "Nicolaas Beets" },
+            new Quote { Id = "https://nl.wikiquote.org/wiki/Nicolaas_Beets", Text = "Maar waar vooroordeel met vooroordeel strijdt, Wat is het – dan verlies van tijd!", Author = "Nicolaas Beets" },
         };
     }
 }

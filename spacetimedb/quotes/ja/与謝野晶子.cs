@@ -17,7 +17,7 @@ public static partial class JapaneseQuotes
             new Quote { Id = "https://ja.wikiquote.org/wiki/与謝野晶子", Text = "鎌倉や御仏なれど釈迦牟尼は美男におはす夏木立かな", Author = "与謝野晶子" },
             new Quote { Id = "https://ja.wikiquote.org/wiki/与謝野晶子", Text = "産屋なるわが枕辺に白く立つ大逆囚の十二の棺", Author = "与謝野晶子" },
             new Quote { Id = "https://ja.wikiquote.org/wiki/与謝野晶子", Text = "山の動く日來（きた）る。かく云えども人われを信ぜじ。山は姑（しばら）く眠りしのみ。その昔に於て山は皆火に燃えて動きしものを。されど、そは信ぜずともよし。人よ、ああ、唯これを信ぜよ。すべて眠りし女（をなご）今ぞ目覚めて動くなる。", Author = "与謝野晶子" },
-            new Quote { Id = "https://ja.wikiquote.org/wiki/与謝野晶子", Text = "一人稱（いちにんしょう）にてのみ物書かばや。われは[[女]]（をなご）ぞ。一人稱にてのみ物書かばや。われは、われは。", Author = "与謝野晶子" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/与謝野晶子", Text = "-人稱（いちにんしょう）にてのみ物書かばや。われは[[女]]（をなご）ぞ。-人稱にてのみ物書かばや。われは、われは。", Author = "与謝野晶子" },
             new Quote { Id = "https://ja.wikiquote.org/wiki/与謝野晶子", Text = "額（ひたい）にも肩にもわが髪ぞほつるるしおたれて湯瀧（ゆだき）に打たるるこころもち、ほとつくため息は火の如く且つ狂ほし。かかること知らぬ[[男]]。われを褒め、やがてまた譏（そし）るらん。", Author = "与謝野晶子" },
             new Quote { Id = "https://ja.wikiquote.org/wiki/与謝野晶子", Text = "金色のちひさき鳥のかたちして銀杏（いてふ）ちるなり夕日の丘に", Author = "与謝野晶子" },
             new Quote { Id = "https://ja.wikiquote.org/wiki/与謝野晶子", Text = "夏風山よりきたり三百の牧の若馬耳ふかりけり", Author = "与謝野晶子" },

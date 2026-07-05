@@ -133,7 +133,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Oscar_Wilde", Text = "In old days books were written by men of letters and read by the public. Nowadays books are written by the public and read by nobody.", Author = "Oscar Wilde" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Oscar_Wilde", Text = "Friendship is far more tragic than love. It lasts longer.", Author = "Oscar Wilde" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Oscar_Wilde", Text = "Art is the only serious thing in the world. And the artist is the only person who is never serious.", Author = "Oscar Wilde" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Oscar_Wilde", Text = "To be really mediæval one should have no body. To be really modern one should have no soul. To be really Greek one should have no clothes.", Author = "Oscar Wilde" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Oscar_Wilde", Text = "Even the disciple has his uses. He stands behind one's throne, and at the moment of one's triumph whispers in one's ear that, after all, one is immortal.", Author = "Oscar Wilde" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Oscar_Wilde", Text = "The only thing that can console one for being poor is extravagance. The only thing that can console one for being rich is economy.", Author = "Oscar Wilde" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Oscar_Wilde", Text = "Ambition is the last refuge of the failure.", Author = "Oscar Wilde" },

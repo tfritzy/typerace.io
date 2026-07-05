@@ -32,10 +32,10 @@ public static partial class ChineseQuotes
             new Quote { Id = "https://zh.wikiquote.org/wiki/李大钊", Text = "为人民服务，是革命者永恒的使命。", Author = "李大钊" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/李大钊", Text = "思想的解放，是社会进步的 fundamental premise.", Author = "李大钊" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/李大钊", Text = "吾尝终日而思矣，不如须臾之所学也。", Author = "李大钊" },
-            new Quote { Id = "https://zh.wikiquote.org/wiki/李大钊", Text = "为了理想，我们可以牺牲一切。", Author = "李大钊" },
+            new Quote { Id = "https://zh.wikiquote.org/wiki/李大钊", Text = "为了理想，我们可以牺牲-切。", Author = "李大钊" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/李大钊", Text = "青年人要敢于担当，勇于实践。", Author = "李大钊" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/李大钊", Text = "历史的车轮，碾过无数的愚昧和黑暗，驶向光明。", Author = "李大钊" },
-            new Quote { Id = "https://zh.wikiquote.org/wiki/李大钊", Text = "只有团结起来，我们才能战胜一切困难。", Author = "李大钊" },
+            new Quote { Id = "https://zh.wikiquote.org/wiki/李大钊", Text = "只有团结起来，我们才能战胜-切困难。", Author = "李大钊" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/李大钊", Text = "吾之信仰，在于解放全人类。", Author = "李大钊" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/李大钊", Text = "生命诚可贵，爱情价更高；若为自由故，两者皆可抛。", Author = "李大钊" },
         };

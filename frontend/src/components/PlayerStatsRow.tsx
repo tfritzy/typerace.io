@@ -28,6 +28,19 @@ export const PlayerStatsRow = memo(
       <div className="flex gap-3 mb-3 items-stretch min-h-[100px] flex-wrap">
         <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
           <div
+            className={`text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold ${isFirstPlace ? "text-accent-primary" : "text-muted-foreground"}`}
+          >
+            {t.place}
+          </div>
+          <div
+            className={`text-4xl font-bold leading-none font-mono ${isFirstPlace ? "text-accent-primary" : "text-secondary-foreground"}`}
+          >
+            {getOrdinalPlacement(placement)}
+          </div>
+        </div>
+
+        <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
+          <div
             className={`text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold ${isHighWpm ? "text-accent-primary" : "text-muted-foreground"}`}
           >
             {t.wpm}
@@ -49,19 +62,6 @@ export const PlayerStatsRow = memo(
             className={`text-4xl font-bold leading-none font-mono ${isFirstPlace ? "text-accent-primary" : "text-secondary-foreground"}`}
           >
             {formatStopwatchTime(raceTime)}
-          </div>
-        </div>
-
-        <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
-          <div
-            className={`text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold ${isFirstPlace ? "text-accent-primary" : "text-muted-foreground"}`}
-          >
-            {t.place}
-          </div>
-          <div
-            className={`text-4xl font-bold leading-none font-mono ${isFirstPlace ? "text-accent-primary" : "text-secondary-foreground"}`}
-          >
-            {getOrdinalPlacement(placement)}
           </div>
         </div>
 

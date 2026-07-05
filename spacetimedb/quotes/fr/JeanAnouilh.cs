@@ -22,8 +22,8 @@ public static partial class FrenchQuotes
             new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Anouilh", Text = "La vie c'est un livre qu'on aime, c'est Un enfant qui joue à nos pieds, un outil qu'on tient bien dans la main, un banc pour se reposer le soir devant la maison", Author = "Jean Anouilh" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Anouilh", Text = "La vie n'est peut-être tout de même que le bonheur", Author = "Jean Anouilh" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Anouilh", Text = "Mourir, mourir… ce n’est rien. Commence donc par vivre. C’est moins drôle, et c’est plus long.", Author = "Jean Anouilh" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Anouilh", Text = "Ne faites pas\nLe travail de vos avocats\nTout le mal vient de la tête\nLes corps sont souvent amis\nEt, le temps qu’ils se font fête\nIl faut leur être soumis.", Author = "Jean Anouilh" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Anouilh", Text = "Jamais ce que l’on vous donne\nNe vaudra ce que l’on prend.", Author = "Jean Anouilh" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Anouilh", Text = "Ne faites pas Le travail de vos avocats Tout le mal vient de la tête Les corps sont souvent amis Et, le temps qu’ils se font fête Il faut leur être soumis.", Author = "Jean Anouilh" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Anouilh", Text = "Jamais ce que l’on vous donne Ne vaudra ce que l’on prend.", Author = "Jean Anouilh" },
         };
     }
 }

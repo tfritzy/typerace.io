@@ -32,7 +32,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "My appearance still made people laugh, with that hearty jovial laugh so good for the health.", Author = "Samuel Beckett" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "Strictly speaking I wasn't there. Strictly speaking I believe I've never been anywhere.", Author = "Samuel Beckett" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "I knew it would soon be the end, so I played the part, you know, the part of - how shall I say, I don't know.", Author = "Samuel Beckett" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "By nature I mean here, like the naïvest realist, a composite of perceiver and perceived, not a datum, an experience.", Author = "Samuel Beckett" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "The expression that there is nothing to express, nothing with which to express, nothing from which to express, no power to express, no desire to express, together with the obligation to express.", Author = "Samuel Beckett" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "Don't wait to be hunted to hide, that's always been my motto.", Author = "Samuel Beckett" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Samuel_Beckett", Text = "To restore silence is the role of objects.", Author = "Samuel Beckett" },

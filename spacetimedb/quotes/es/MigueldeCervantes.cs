@@ -16,7 +16,7 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Ayer lloraba el que hoy ríe, y hoy llora el que ayer rió.", Author = "Miguel de Cervantes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Cada cual se fabrica su destino, no tiene aquí fortuna parte alguna.", Author = "Miguel de Cervantes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Cada uno es como Dios le hizo y aun peor muchas veces.", Author = "Miguel de Cervantes" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Casamientos de parientes,\nTienen mil inconvenientes.", Author = "Miguel de Cervantes" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Casamientos de parientes, Tienen mil inconvenientes.", Author = "Miguel de Cervantes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Cuando la cólera sale de madre no tiene la lengua padre, ayo ni freno que la corrija.", Author = "Miguel de Cervantes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Cuando la zorra predica, no están seguros los pollos.", Author = "Miguel de Cervantes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Dádivas quebrantan peñas.", Author = "Miguel de Cervantes" },
@@ -51,13 +51,13 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Una onza de buena fama vale más que una libra de perlas.", Author = "Miguel de Cervantes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Una retirada no es una derrota.", Author = "Miguel de Cervantes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Un hombre no es mayor que otro hasta que no hace cosas mayores", Author = "Miguel de Cervantes" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Advierte que es desatino\nsiendo de vidrio el tejado,\ntomar piedras en la mano\npara tirar al vecino.", Author = "Miguel de Cervantes" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Entre casados de honor,\ncuando hay pleito descubierto\nmás vale el peor concierto\nque no el divorcio mejor.", Author = "Miguel de Cervantes" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Es de vidrio la mujer;\npero no se ha de probar\nsi se puede o no quebrar,\nporque todo podría ser.", Author = "Miguel de Cervantes" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Y yo soy del parecer\ny la experiencia lo enseña,\nque ablandaran una peña\nlágrimas de una mujer.", Author = "Miguel de Cervantes" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Advierte que es desatino siendo de vidrio el tejado, tomar piedras en la mano para tirar al vecino.", Author = "Miguel de Cervantes" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Entre casados de honor, cuando hay pleito descubierto más vale el peor concierto que no el divorcio mejor.", Author = "Miguel de Cervantes" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Es de vidrio la mujer; pero no se ha de probar si se puede o no quebrar, porque todo podría ser.", Author = "Miguel de Cervantes" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Y yo soy del parecer y la experiencia lo enseña, que ablandaran una peña lágrimas de una mujer.", Author = "Miguel de Cervantes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Amor y deseo son dos cosas diferentes; que no todo lo que se ama se desea, ni todo lo que se desea se ama.", Author = "Miguel de Cervantes" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Ligeras horas del ligero tiempo\npara mí perezosas y cansadas.", Author = "Miguel de Cervantes" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Por eso juzgo y discierno\npor cosa cierta y notoria;\nque tiene el amor su gloria\na las puertas de infierno.", Author = "Miguel de Cervantes" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Ligeras horas del ligero tiempo para mí perezosas y cansadas.", Author = "Miguel de Cervantes" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/Miguel_de_Cervantes", Text = "Por eso juzgo y discierno por cosa cierta y notoria; que tiene el amor su gloria a las puertas de infierno.", Author = "Miguel de Cervantes" },
         };
     }
 }

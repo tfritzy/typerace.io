@@ -25,7 +25,6 @@ public static partial class EnglishQuotes
         .Concat(BeatrixPotter.Quotes)
         .Concat(BenjaminFranklin.Quotes)
         .Concat(BertrandRussell.Quotes)
-        .Concat(BillGates.Quotes)
         .Concat(BillOReilly.Quotes)
         .Concat(BillWennington.Quotes)
         .Concat(BlaisePascal.Quotes)

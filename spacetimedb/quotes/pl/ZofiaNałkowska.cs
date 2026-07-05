@@ -42,7 +42,7 @@ public static partial class PolishQuotes
             new Quote { Id = "https://pl.wikiquote.org/wiki/Zofia_Nałkowska", Text = "Nie lubi się ludzi, którym wyrządziło się krzywdę. Ma się żal do nich, że byli przyczyną tego, co nas zawstydza, chociaż w istocie byli tylko pretekstem.", Author = "Zofia Nałkowska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Zofia_Nałkowska", Text = "Religia nie powinna zawierać się w formułkach, a w duszy.", Author = "Zofia Nałkowska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Zofia_Nałkowska", Text = "Słusznie jest gdzieś tam powiedziane, że estetyczna twórczość kobiety wyraża zawsze tylko niedobór uczuciowy.", Author = "Zofia Nałkowska" },
-            new Quote { Id = "https://pl.wikiquote.org/wiki/Zofia_Nałkowska", Text = "W haremie tęsknot samotna dziś błądzę,<br />Spragniona świeżych ust, krwi i gorąca,<br />Z pod kwiatów senną wygrzebałam rządzę<br />I patrzę smutnie w pobladłą twarz słońca.", Author = "Zofia Nałkowska" },
+            new Quote { Id = "https://pl.wikiquote.org/wiki/Zofia_Nałkowska", Text = "W haremie tęsknot samotna dziś błądzę, Spragniona świeżych ust, krwi i gorąca, Z pod kwiatów senną wygrzebałam rządzę I patrzę smutnie w pobladłą twarz słońca.", Author = "Zofia Nałkowska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Zofia_Nałkowska", Text = "Wystarczy zwrócić uwagę na człowieka, by stał się pociągający i na swój sposób piękny.", Author = "Zofia Nałkowska" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Zofia_Nałkowska", Text = "Za zadanie wzięłam sobie obalić ten przesąd niemądry, że kobieta, co skończyła uniwersytet, przestaje być kobietą.", Author = "Zofia Nałkowska" },
         };
