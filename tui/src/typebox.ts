@@ -55,7 +55,12 @@ function computeWordStart(phrase: string, typed: string) {
 }
 
 let chunks: TextChunk[] = [];
-function updateText(text: TextRenderable, phrase: string, typed: string) {
+function updateText(
+  text: TextRenderable,
+  phrase: string,
+  typed: string,
+  cursors: number[],
+) {
   const { wordStart } = computeWordStart(phrase, typed);
 
   chunks.length = 0;
@@ -73,6 +78,10 @@ function updateText(text: TextRenderable, phrase: string, typed: string) {
     } else {
       chunks.push({ ...incomplete, text: phrase[i] });
     }
+
+    if (cursors.includes(i)) {
+      chunks[i].attributes = TextAttributes.UNDERLINE;
+    }
   }
 
   text.content = new StyledText(chunks);
@@ -83,6 +92,7 @@ export class TypeBox {
   private phrase: string;
   private typed: string;
   private isComplete: boolean;
+  private cursors: number[] = [];
   private cleanup: () => void;
 
   constructor(
@@ -108,7 +118,7 @@ export class TypeBox {
     phraseBox.add(this.text);
     parent.add(phraseBox);
 
-    updateText(this.text, this.phrase, this.typed);
+    this.rerender();
 
     renderer.keyInput.on("keypress", (key) => {
       let { wordStart, correctUpTo } = computeWordStart(
@@ -144,7 +154,7 @@ export class TypeBox {
         onComplete();
       }
 
-      updateText(this.text, this.phrase, this.typed);
+      this.rerender();
     });
 
     this.cleanup = () => {
@@ -152,19 +162,28 @@ export class TypeBox {
     };
   }
 
+  public rerender() {
+    updateText(this.text, this.phrase, this.typed, this.cursors);
+  }
+
   public setPhrase(phrase: string) {
     if (phrase != this.phrase) {
       this.phrase = phrase;
       this.typed = "";
       this.isComplete = false;
-      updateText(this.text, this.phrase, this.typed);
+      this.rerender();
     }
+  }
+
+  public setCursors(cursors: number[]) {
+    this.cursors = cursors;
+    this.rerender();
   }
 
   public reset() {
     this.typed = "";
     this.isComplete = false;
-    updateText(this.text, this.phrase, this.typed);
+    this.rerender();
   }
 
   public unMount() {

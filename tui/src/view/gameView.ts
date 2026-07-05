@@ -40,6 +40,7 @@ export class GameView {
 
   public updatePlayerProgress(pp: PlayerProgress) {
     this.racingView.updatePlayerProgress(pp);
+
     if (pp.playerId.isEqual(this.ownIdentity)) {
       this.resultsView.updateOwnPlayerProgress(pp);
     }

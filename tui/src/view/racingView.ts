@@ -73,7 +73,14 @@ export class RacingView {
     const view = this.playerProgresses.find((p) =>
       p.data?.playerId.isEqual(pp.playerId),
     );
+
     view?.updateProgress(pp);
+
+    this.typeBox.setCursors(
+      this.playerProgresses
+        .filter((p) => p.data !== undefined)
+        .map((p) => p.data!.progressIndex),
+    );
   }
 
   public addPlayerProgress(pp: PlayerProgress) {
