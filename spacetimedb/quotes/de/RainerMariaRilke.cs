@@ -9,7 +9,7 @@ public static partial class GermanQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://de.wikiquote.org/wiki/Rainer_Maria_Rilke", Text = "Das Erz hat Heimweh. Und verlassen will es die Münzen und die Räder, die es ein kleines Leben lehren. Und aus Fabriken und aus Kassen wird es zurück in das Geäder der aufgetanen Berge kehren, die sich verschließen hinter ihm.", Author = "Rainer Maria Rilke" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Rainer_Maria_Rilke", Text = "Denn Armut ist ein großer Glanz aus Innen ... ", Author = "Rainer Maria Rilke" },
+            new Quote { Id = "https://de.wikiquote.org/wiki/Rainer_Maria_Rilke", Text = "Denn Armut ist ein großer Glanz aus Innen ...", Author = "Rainer Maria Rilke" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Rainer_Maria_Rilke", Text = "Des Sommers Wochen standen still, es stieg der Bäume Blut; jetzt fühlst du, daß es fallen will in den, der alles tut.", Author = "Rainer Maria Rilke" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Rainer_Maria_Rilke", Text = "O Herr, gib jedem seinen eignen Tod, das Sterben, das aus jenem Leben geht, darin er Liebe hatte, Sinn und Not.", Author = "Rainer Maria Rilke" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Rainer_Maria_Rilke", Text = "Wir bauen an dir mit zitternden Händen, und wir türmen Atom auf Atom. Aber wer kann dich vollenden, du Dom.", Author = "Rainer Maria Rilke" },

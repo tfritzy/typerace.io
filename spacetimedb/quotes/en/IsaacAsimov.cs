@@ -72,7 +72,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Asimov", Text = "Once you've dissected a joke, you're about where you are when you've dissected a frog. It's dead.", Author = "Isaac Asimov" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Asimov", Text = "There is more to a science fiction story than the science it contains. There is also the 'story'.", Author = "Isaac Asimov" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Asimov", Text = "All life is nucleic acid; the rest is commentary", Author = "Isaac Asimov" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Asimov", Text = "Good literature, all if it, is supposed to illuminate the human condition.", Author = "Isaac Asimov" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Asimov", Text = "Good literature, all of it, is supposed to illuminate the human condition.", Author = "Isaac Asimov" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Asimov", Text = "The Law of conservation of energy tells us we can't get something for nothing, but we refuse to believe it.", Author = "Isaac Asimov" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Asimov", Text = "All mankind, right down to those you most despise, are your neighbors.", Author = "Isaac Asimov" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Isaac_Asimov", Text = "[Writing] is an addiction more powerful than alcohol, than nicotine, than crack. I could not conceive of not writing.", Author = "Isaac Asimov" },

@@ -36,13 +36,13 @@ public static partial class ArabicQuotes
             new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "اياك والغرور فانه يظهر للناس كلهم نقائصك كلها ولا يخفيها الا عليك.", Author = "طه حسين" },
             new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "كم أتمنى أن يقرأ الكاتب أكثر مما يكتب.", Author = "طه حسين" },
             new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "وما عساك من القتل تجني غير الهدم والفناء.", Author = "طه حسين" },
-            new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "ما أكثر ما أعجب من نفسي ، وما أسرع ما يستحيل هذا العجب إل سخرية منها أول الأمر ، ثم إلى رثاء وعطف عليها.", Author = "طه حسين" },
-            new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "لمرض الذي لا أجد منه برءاً ، مرض التماس العلة والانتهاء إلى المصادر .", Author = "طه حسين" },
-            new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "الأكل فن من الفنون لا بد فيه من الروية واصطناع المهل والأناة .", Author = "طه حسين" },
+            new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "ما أكثر ما أعجب من نفسي، وما أسرع ما يستحيل هذا العجب إلى سخرية منها أول الأمر، ثم إلى رثاء وعطف عليها.", Author = "طه حسين" },
+            new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "المرض الذي لا أجد منه برءاً، مرض التماس العلة والانتهاء إلى المصادر.", Author = "طه حسين" },
+            new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "الأكل فن من الفنون لا بد فيه من الروية واصطناع المهل والأناة.", Author = "طه حسين" },
             new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "لا أنكر الحياة الجاهلية وإنما أنكر أن يمثلها هذا الشعر الذي يسمونه الشعر الجاهلي.", Author = "طه حسين" },
-            new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "الأمة الذليلة لا يمكن أن يكون لها شعر راق ، إلا في فن التضرع والاستعطاف.", Author = "طه حسين" },
-            new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "الإنسان مفطور على حب البحث ، والرغبة في الاستطلاع لكن الحياة وأطوارها قد تصرفه عن مقتضى هذه الفطرة.", Author = "طه حسين" },
-            new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "لا تنخدعوا .. لو كان للغة وزن في تقرير مصير الأمم ، لما كانت بلجيكا وسويسرا ولا أميركا ولا البرازيل ولا البرتغال .", Author = "طه حسين" },
+            new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "الأمة الذليلة لا يمكن أن يكون لها شعر راق، إلا في فن التضرع والاستعطاف.", Author = "طه حسين" },
+            new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "الإنسان مفطور على حب البحث، والرغبة في الاستطلاع لكن الحياة وأطوارها قد تصرفه عن مقتضى هذه الفطرة.", Author = "طه حسين" },
+            new Quote { Id = "https://ar.wikiquote.org/wiki/طه_حسين", Text = "لا تنخدعوا .. لو كان للغة وزن في تقرير مصير الأمم، لما كانت بلجيكا وسويسرا ولا أميركا ولا البرازيل ولا البرتغال.", Author = "طه حسين" },
         };
     }
 }

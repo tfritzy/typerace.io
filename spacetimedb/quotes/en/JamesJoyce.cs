@@ -9,7 +9,7 @@ public static partial class EnglishQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "Art is the human disposition of sensible or intelligible matter for an aesthetic end.", Author = "James Joyce" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "There is not past, no future; everything flows in an eternal present.", Author = "James Joyce" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "There is no past, no future; everything flows in an eternal present.", Author = "James Joyce" },
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "I want to give a picture of Dublin so complete that if the city suddenly disappeared from the earth it could be reconstructed out of my book.", Author = "James Joyce" },
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "Does nobody understand?", Author = "James Joyce" },
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "Love (understood as the desire of good for another) is in fact so unnatural a phenomenon that it can scarcely repeat itself, the soul being unable to become virgin again and not having energy enough to cast itself out again into the ocean of another's soul.", Author = "James Joyce" },
@@ -42,8 +42,8 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "His soul swooned slowly as he heard the snow falling faintly through the universe and faintly falling, like the descent of their last end, upon all the living and the dead.", Author = "James Joyce" },
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "The heaventree of stars hung with humid nightblue fruit.", Author = "James Joyce" },
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "A man of genius makes no mistakes. His errors are volitional and are the portals of discovery", Author = "James Joyce" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "Frail the white rose and frail are Her hands that gave ", Author = "James Joyce" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "How soft, how sad his voice is ever calling,Ever unanswered, and the dark rain falling,Then as now.", Author = "James Joyce" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "Frail the white rose and frail are Her hands that gave", Author = "James Joyce" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "How soft, how sad his voice is ever calling, Ever unanswered, and the dark rain falling, Then as now.", Author = "James Joyce" },
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "Seraphim, The lost hosts awaken", Author = "James Joyce" },
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "Again!", Author = "James Joyce" },
             new Quote { Id = "https://en.wikiquote.org/wiki/James_Joyce", Text = "Phall if you but will, rise you must: and none so soon either shall the pharce for the nunce come to a setdown secular phoenish.", Author = "James Joyce" },

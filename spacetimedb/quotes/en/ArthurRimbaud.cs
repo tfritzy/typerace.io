@@ -29,7 +29,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Rimbaud", Text = "I! I who fashioned myself a sorcerer or an angel, who dispensed with all morality, I have come back to earth.", Author = "Arthur Rimbaud" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Rimbaud", Text = "One must be absolutely modern.", Author = "Arthur Rimbaud" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Rimbaud", Text = "I is an other.", Author = "Arthur Rimbaud" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Rimbaud", Text = "I say one must be a ''seer'', make oneself a ''seer''. The poet makes himself a ''seer'' by an immense, long, deliberate ''derangement'' of all the senses.", Author = "Arthur Rimbaud" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Rimbaud", Text = "I say one must be a 'seer', make oneself a 'seer'. The poet makes himself a 'seer' by an immense, long, deliberate 'derangement' of all the senses.", Author = "Arthur Rimbaud" },
         };
     }
 }

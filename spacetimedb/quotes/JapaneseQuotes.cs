@@ -22,7 +22,7 @@ public static partial class JapaneseQuotes
         .Concat(石川啄木.Quotes)
         .Concat(芥川龍之介.Quotes)
         .Concat(萩原朔太郎.Quotes)
-        .Concat(谷崎潤 - 郎.Quotes)
+        .Concat(谷崎潤一郎.Quotes)
         .Concat(高村光太郎.Quotes)
         .ToArray();
 }

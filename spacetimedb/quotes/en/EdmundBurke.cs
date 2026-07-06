@@ -28,7 +28,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "A definition may be very exact, and yet go but a very little way towards informing us of the nature of the thing defined.", Author = "Edmund Burke" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "The first and the simplest emotion which we discover in the human mind is Curiosity.", Author = "Edmund Burke" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "No passion so effectually robs the mind of all its powers of acting and reasoning as fear.", Author = "Edmund Burke" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "When any work seems to have required immense force and labor to affect it, the idea is grand.", Author = "Edmund Burke" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "When any work seems to have required immense force and labor to effect it, the idea is grand.", Author = "Edmund Burke" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "A great profusion of things, which are splendid or valuable in themselves, is magnificent.", Author = "Edmund Burke" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "Custom reconciles us to every thing.", Author = "Edmund Burke" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Edmund_Burke", Text = "There is a sort of enthusiasm in all projectors, absolutely necessary for their affairs, which makes them proof against the most fatiguing delays, the most mortifying disappointments, the most shocking insults.", Author = "Edmund Burke" },

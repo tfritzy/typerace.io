@@ -33,7 +33,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Anne_Frank", Text = "Where there's hope, there's life. It fills us with fresh courage and makes us strong again.", Author = "Anne Frank" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Anne_Frank", Text = "All people are born equal, all people die in the end and keep nothing of their worldly status. All riches, all power and all greatness exist only for so few years, why then is that mortality clung to so strongly?", Author = "Anne Frank" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Anne_Frank", Text = "We all know that a good example is more effective than advice. So set a good example, and it won't take long for others to follow.", Author = "Anne Frank" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Anne_Frank", Text = "Who knows, perhaps one day people will listen more to \"the little piece of God\", which we call a conscience, than to their own desires!.", Author = "Anne Frank" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Anne_Frank", Text = "Who knows, perhaps one day people will listen more to \"the little piece of God\", which we call a conscience, than to their own desires!", Author = "Anne Frank" },
         };
     }
 }

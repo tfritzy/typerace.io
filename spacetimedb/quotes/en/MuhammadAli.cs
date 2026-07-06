@@ -26,7 +26,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "Frazier is so ugly that he should donate his face to the US Bureau of Wildlife.", Author = "Muhammad Ali" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "There live a great man named Joe who was belittled by a loudmouth foe. While his rival would taunt and tease Joe silently bore the stings. And then fought like gladiator in the ring.", Author = "Muhammad Ali" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "That's the only way you gonna save this sucker. He's doomed.", Author = "Muhammad Ali" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "I predict that when i meet Joe Frazier. This will be like a good amateur fighting a real professional. This will be like a kid out of the Olympics meeting the fastest heavyweight champion who ever lived.", Author = "Muhammad Ali" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Muhammad_Ali", Text = "I predict that when I meet Joe Frazier. This will be like a good amateur fighting a real professional. This will be like a kid out of the Olympics meeting the fastest heavyweight champion who ever lived.", Author = "Muhammad Ali" },
         };
     }
 }

@@ -37,7 +37,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "I would ask him to consider that the function of the Church in every age has been conservative-to transmit undiminished and uncontaminated the creed inherited from its predecessors.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "It is natural to the Germans to make a row.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "We seek no \"Sieg Heils\". We pray in silence.", Author = "Evelyn Waugh" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "Participation\" means God hearing our voices.", Author = "Evelyn Waugh" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "\"Participation\" means God hearing our voices.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "Anyone who has taken part in a play knows that he can rant on the stage with his mind elsewhere.", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "If the Germans want to be noisy, let them. But why should they disturb our devotions?", Author = "Evelyn Waugh" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Evelyn_Waugh", Text = "Every attendance at Mass leaves me without comfort or edification.", Author = "Evelyn Waugh" },

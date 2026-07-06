@@ -15,7 +15,7 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Heinrich_Böll", Text = "als Luftveränderung kann Bonn für Stunden Wunder wirken.", Author = "Heinrich Böll" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Heinrich_Böll", Text = "Der Feierabend des Nichtkünstlers ist die Arbeitszeit eines Clowns.", Author = "Heinrich Böll" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Heinrich_Böll", Text = "Mir muß eine Sache Spaß machen, sonst werde ich krank.", Author = "Heinrich Böll" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Heinrich_Böll", Text = "Personen und Handlung dieser Erzählung sind frei erfunden. Sollten sich bei der Schilderung gewisser journalistischer Praktiken Ähnlichkeiten mit den Praktiken der Bild -Zeitung ergeben haben, so sind diese Ähnlichkeiten weder beabsichtigt noch zufällig, sondern unvermeidlich.", Author = "Heinrich Böll" },
+            new Quote { Id = "https://de.wikiquote.org/wiki/Heinrich_Böll", Text = "Personen und Handlung dieser Erzählung sind frei erfunden. Sollten sich bei der Schilderung gewisser journalistischer Praktiken Ähnlichkeiten mit den Praktiken der Bild-Zeitung ergeben haben, so sind diese Ähnlichkeiten weder beabsichtigt noch zufällig, sondern unvermeidlich.", Author = "Heinrich Böll" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Heinrich_Böll", Text = "Inzwischen ist die Bild-Zeitung ja fast schon das regierungsamtliche Blatt.", Author = "Heinrich Böll" },
         };
     }

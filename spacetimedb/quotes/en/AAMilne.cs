@@ -39,7 +39,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/A._A._Milne", Text = "I shouldn't be surprised if it hailed a good deal tomorrow, Eeyore was saying. Blizzards and what-not. Being fine today doesn't mean anything. It has no sig - what's that word? Well, it has none of that. It's just a small piece of weather.", Author = "A. A. Milne" },
             new Quote { Id = "https://en.wikiquote.org/wiki/A._A._Milne", Text = "If I plant a honeycomb outside my house, then it will grow up into a beehive.", Author = "A. A. Milne" },
             new Quote { Id = "https://en.wikiquote.org/wiki/A._A._Milne", Text = "Then Christopher Robin and Winnie the Pooh walked hand in hand down the forest path and they said goodbye. So they went off together. But wherever they go, and whatever happens to them along the way, in that enchanted place on the top of the forest a little boy and his bear will always be playing.", Author = "A. A. Milne" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/A._A._Milne", Text = "That's what Jagular's always do, said Pooh, much interested. They call 'Help! Help!' and then when you look up, they'll drop on you.", Author = "A. A. Milne" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/A._A._Milne", Text = "That's what Jagulars always do, said Pooh, much interested. They call 'Help! Help!' and then when you look up, they'll drop on you.", Author = "A. A. Milne" },
             new Quote { Id = "https://en.wikiquote.org/wiki/A._A._Milne", Text = "They wanted to come in after the pounds, explained Pooh, so I let them. It's the best way to write poetry, letting things come.", Author = "A. A. Milne" },
         };
     }

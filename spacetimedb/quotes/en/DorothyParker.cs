@@ -22,7 +22,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "You can lead a horticulture, but you can't make her think.", Author = "Dorothy Parker" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "If you have any young friends who aspire to become writers, the second greatest favor you can do them is to present them with copies of The Elements of Style. The first greatest, of course, is to shoot them now, while they're happy.", Author = "Dorothy Parker" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "Scratch a lover, and find a foe.", Author = "Dorothy Parker" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "Razors pain you, rivers are damp, acids stain you, and drugs cause cramp Guns aren't lawful, nooses give, gas smells awful You might as well live.", Author = "Dorothy Parker" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "Razors pain you, rivers are damp, acids stain you, and drugs cause cramp. Guns aren't lawful, nooses give, gas smells awful. You might as well live.", Author = "Dorothy Parker" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "Men seldom make passes at girls who wear glasses.", Author = "Dorothy Parker" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "By the time you swear you're his, shivering and sighing, and he vows his passion is infinite, undying, lady, make a note of this - one of you is lying.", Author = "Dorothy Parker" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "Some men tear your heart in two, some men flirt and flatter, some men never look at you, and that clears up the matter.", Author = "Dorothy Parker" },
@@ -51,7 +51,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "If you arrive late, you won't know what anything is about, and if you are there all the way from the beginning, you won't care.", Author = "Dorothy Parker" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "There is one thing that appreciably eases the strain for the plays that arrive at this time of year, and that is that practically nothing is expected of them.", Author = "Dorothy Parker" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "It is advertised as \"a seagoin' comedy,\" and anytime they go leaving off the final g that way, you know what to expect.", Author = "Dorothy Parker" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "Two things made The Dice of the Gods, another play about drugs, seem much better than it had any real right to seem. One was that Morphia had come first, and once you had seen Morphia, nothing seemd so very terrible to you.", Author = "Dorothy Parker" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "Two things made The Dice of the Gods, another play about drugs, seem much better than it had any real right to seem. One was that Morphia had come first, and once you had seen Morphia, nothing seemed so very terrible to you.", Author = "Dorothy Parker" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Dorothy_Parker", Text = "Get me a new husband", Author = "Dorothy Parker" },
         };
     }
