@@ -9,7 +9,7 @@ public static partial class EnglishQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Frost", Text = "Forgive me my nonsense as I also forgive the nonsense of those who think they talk sense.", Author = "Robert Frost" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Frost", Text = "A poem...begins as a lump in the throat, a sense of wrong, a homesickness, a lovesickness. It is a reaching-out toward expression; an effort to find fulfillment. A complete poem is one where an emotion finds the thought and the thought finds the words.", Author = "Robert Frost" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Frost", Text = "A poem... begins as a lump in the throat, a sense of wrong, a homesickness, a lovesickness. It is a reaching-out toward expression; an effort to find fulfillment. A complete poem is one where an emotion finds the thought and the thought finds the words.", Author = "Robert Frost" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Frost", Text = "The fact is the sweetest dream that labor knows.", Author = "Robert Frost" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Frost", Text = "Ah, when to the heart of man Was it ever less than a treason To go with the drift of things, To yield with a grace to reason, And bow and accept the end Of a love or a season?", Author = "Robert Frost" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Frost", Text = "Men work together, Whether they work together or apart.", Author = "Robert Frost" },

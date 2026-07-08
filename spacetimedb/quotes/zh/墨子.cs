@@ -16,9 +16,9 @@ public static partial class ChineseQuotes
             new Quote { Id = "https://zh.wikiquote.org/wiki/墨子", Text = "興天下之利，除天下之害", Author = "墨子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/墨子", Text = "兼相愛，交相利；別相惡，交相賊。", Author = "墨子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/墨子", Text = "天下兼相愛則治，相惡則亂。", Author = "墨子" },
-            new Quote { Id = "https://zh.wikiquote.org/wiki/墨子", Text = "江河之水非-源，千鎰之裘非-狐", Author = "墨子" },
+            new Quote { Id = "https://zh.wikiquote.org/wiki/墨子", Text = "江河之水非一源，千鎰之裘非一狐", Author = "墨子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/墨子", Text = "法不仁，不可以为法。", Author = "墨子" },
-            new Quote { Id = "https://zh.wikiquote.org/wiki/墨子", Text = "[[志]]不强者[[智]]不达；言不信者行不果。据财不能以分人者，不足与友；守道不笃，遍物不博，辩是非不察者，不足与游。本不固者，末必几。雄而不修者，其后必惰。原浊者，流不清；行不信者，名必耗。名不徒生，而誉不自长。功成名遂，名誉不可虚假反之身者也。务言而缓行，虽辯必不聽。多力而伐功，雖勞必不圖。慧者心辩而不繁说，多力而不伐功，此以名誉扬天下。言无务多而务为智，无务为文而务为察。故彼智与察在身，而情反其路者也。善无主于心者不留，行莫辩于身者不立；名不可简而成也，誉不可巧而立也，君子以身戴行者也。思利寻焉，忘名忽焉，可以为士于天下者，未嘗有也。", Author = "墨子" },
+            new Quote { Id = "https://zh.wikiquote.org/wiki/墨子", Text = "志不强者智不达；言不信者行不果。据财不能以分人者，不足与友；守道不笃，遍物不博，辩是非不察者，不足与游。本不固者，末必几。雄而不修者，其后必惰。原浊者，流不清；行不信者，名必耗。名不徒生，而誉不自长。功成名遂，名誉不可虚假反之身者也。务言而缓行，虽辯必不聽。多力而伐功，雖勞必不圖。慧者心辩而不繁说，多力而不伐功，此以名誉扬天下。言无务多而务为智，无务为文而务为察。故彼智与察在身，而情反其路者也。善无主于心者不留，行莫辩于身者不立；名不可简而成也，誉不可巧而立也，君子以身戴行者也。思利寻焉，忘名忽焉，可以为士于天下者，未嘗有也。", Author = "墨子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/墨子", Text = "墨子兼愛，摩頂放踵利天下為之。", Author = "墨子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/墨子", Text = "墨子泛愛兼利。", Author = "墨子" },
         };

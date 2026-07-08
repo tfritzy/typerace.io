@@ -168,13 +168,13 @@ public static partial class Module
                 return 40.0 / 35.0;
             case GameMode.Japanese500:
             case GameMode.JapaneseQuotes:
-                return 40.0 / 30.0;
+                return 40.0 / 30.0 * 5.0;
             case GameMode.Korean500:
             case GameMode.KoreanQuotes:
-                return 40.0 / 25.0;
+                return 40.0 / 25.0 * 5.0;
             case GameMode.Chinese500:
             case GameMode.ChineseQuotes:
-                return 40.0 / 20.0;
+                return 40.0 / 20.0 * 5.0;
             case GameMode.Ukrainian500:
             case GameMode.UkrainianQuotes:
                 return 40.0 / 30.0;
@@ -782,7 +782,8 @@ public static partial class Module
 
         foreach (var game in ctx.Db.game.State_GameType.Filter((GameState.Lobby, GameType.Public)))
         {
-            if (game.GameMode == gameMode) {
+            if (game.GameMode == gameMode)
+            {
                 if (CountPlayersInGame(ctx, game.Id) < GetMaxPlayerCount(gameType))
                 {
                     if (FindPlayerProgress(ctx, ctx.Sender, game.Id) == null)
@@ -792,7 +793,7 @@ public static partial class Module
                 }
             }
         }
-        
+
         return null;
     }
 

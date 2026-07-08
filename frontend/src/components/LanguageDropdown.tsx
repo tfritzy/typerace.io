@@ -6,7 +6,7 @@ import {
   type LanguageInfo,
 } from "../utils/modes";
 
-function getCurrentLang(): LanguageInfo {
+export function getCurrentLang(): LanguageInfo {
   try {
     const slug = localStorage.getItem("typerace_lang_slug") ?? undefined;
     return getLanguageFromSlug(slug);

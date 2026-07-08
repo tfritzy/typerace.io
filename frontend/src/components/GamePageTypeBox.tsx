@@ -3,6 +3,8 @@ import { TypeBox, type TypeBoxRef } from "./TypeBox";
 import type { DbConnection } from "../../module_bindings";
 import { Countdown } from "./Countdown";
 import { WordXpIndicator } from "./WordXpIndicator";
+import { getLanguageFromSlug } from "@/utils/modes";
+import { useParams } from "react-router-dom";
 
 interface XpIndicatorInstance {
   id: number;
@@ -37,22 +39,25 @@ export const GamePageTypeBox = memo(
     const typeBoxRef = useRef<TypeBoxRef>(null);
     const [xpIndicators, setXpIndicators] = useState<XpIndicatorInstance[]>([]);
     const xpIndicatorIdCounter = useRef(0);
+    const lang = useParams().lang;
+    const language = getLanguageFromSlug(lang);
+    const noSpacesLang = language.hasNoSpaces;
 
     const handleProgress = useCallback(
       (
         correctCharCount: number,
-        eventType: "Correct" | "Incorrect" | "Backspace"
+        eventType: "Correct" | "Incorrect" | "Backspace",
       ) => {
         if (!conn || !gameId) return;
 
         const eventTypeEnum = { tag: eventType };
         conn.reducers.updateProgress({
-            gameId,
-            newIndex: correctCharCount,
-            eventType: eventTypeEnum
+          gameId,
+          newIndex: correctCharCount,
+          eventType: eventTypeEnum,
         });
       },
-      [conn, gameId]
+      [conn, gameId],
     );
 
     const handleComplete = useCallback(() => {
@@ -70,12 +75,12 @@ export const GamePageTypeBox = memo(
         };
         setXpIndicators((prev) => [...prev, newIndicator]);
       },
-      [isAnonymous]
+      [isAnonymous],
     );
 
     const handleXpIndicatorComplete = useCallback((id: number) => {
       setXpIndicators((prev) =>
-        prev.filter((indicator) => indicator.id !== id)
+        prev.filter((indicator) => indicator.id !== id),
       );
     }, []);
 
@@ -101,12 +106,13 @@ export const GamePageTypeBox = memo(
             height="430px"
             initialProgress={initialProgress}
             hideCursor={hideCursor}
+            noSpacesInPhrase={noSpacesLang}
           />
           <Countdown />
         </div>
       </div>
     );
-  }
+  },
 );
 
 export type { GamePageTypeBoxProps };

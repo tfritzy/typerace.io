@@ -8,7 +8,7 @@ public static partial class ChineseQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://zh.wikiquote.org/wiki/曹禺", Text = "-時強弱在於力，千秋勝負在於理。", Author = "曹禺" },
+            new Quote { Id = "https://zh.wikiquote.org/wiki/曹禺", Text = "一時強弱在於力，千秋勝負在於理。", Author = "曹禺" },
         };
     }
 }

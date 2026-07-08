@@ -72,7 +72,7 @@ public static partial class ChineseQuotes
             new Quote { Id = "https://zh.wikiquote.org/wiki/孔子", Text = "百姓足，君孰与不足？百姓不足，君孰与足？", Author = "孔子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/孔子", Text = "君子之行也，度于礼。施，取其厚；事，举其中；敛，从其薄。", Author = "孔子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/孔子", Text = "君于惠而不费，劳而不怨，欲而不貪，泰而不驕，威而不猛。……因民之利而利之，斯不亦惠而不費乎？擇可勞而勞之，又誰怨？欲仁而得仁，又焉貪？君子無眾寡、無小大、無敢慢，斯不亦泰而不驕乎？君子正其衣冠，尊其瞻視，儼然人望而畏之，斯不亦威而不猛乎？", Author = "孔子" },
-            new Quote { Id = "https://zh.wikiquote.org/wiki/孔子", Text = "文武之政，布在方策。其人存，則其政舉；其人亡，則其政息。....故为政在人。", Author = "孔子" },
+            new Quote { Id = "https://zh.wikiquote.org/wiki/孔子", Text = "文武之政，布在方策。其人存，則其政舉；其人亡，則其政息。……故为政在人。", Author = "孔子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/孔子", Text = "君使臣以礼．臣事君以忠。", Author = "孔子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/孔子", Text = "子路问事君。子日: \" 勿欺也，而犯之。”", Author = "孔子" },
             new Quote { Id = "https://zh.wikiquote.org/wiki/孔子", Text = "其身正，不令而行；其身不正，雖令不從。", Author = "孔子" },

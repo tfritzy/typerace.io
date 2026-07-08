@@ -23,6 +23,7 @@ type TypeBoxProps = {
   disabled?: boolean;
   initialProgress?: number;
   hideCursor?: boolean;
+  noSpacesInPhrase?: boolean;
 };
 
 export type TypeBoxRef = {
@@ -43,6 +44,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       disabled = false,
       initialProgress = 0,
       hideCursor = false,
+      noSpacesInPhrase: noSpacesLang,
     },
     ref,
   ) => {
@@ -51,7 +53,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const [focused, setFocused] = useState(true);
     const [input, setInput] = useState(phrase.substring(0, initialProgress));
     const [isComplete, setIsComplete] = useState(false);
-    const [hasReachedErrorLimit, setHasReachedErrorLimit] = useState(false);
+    const [showErrorWarning, setShowErrorWarning] = useState(false);
 
     const targetRef = useRef<HTMLElement>(null);
     const phraseRef = useRef<HTMLDivElement>(null);
@@ -94,16 +96,12 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     }, []);
 
     const handleChange = useCallback(
-      (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      (targetValue: string) => {
         if (disabled) {
           return;
         }
 
-        const newValue = event.target.value;
-
-        if (newValue.length > phrase.length) {
-          return;
-        }
+        const newValue = targetValue;
 
         const oldValue = input;
 
@@ -139,9 +137,9 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           }
         }
 
-        const reachedLimit =
+        const showErrorWarning =
           firstErrorPos !== null && newValue.length - firstErrorPos - 1 >= 10;
-        setHasReachedErrorLimit(reachedLimit);
+        setShowErrorWarning(showErrorWarning);
         setInput(newValue);
 
         if (onWordComplete && newValue.length > oldValue.length) {
@@ -181,7 +179,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           }
         }
 
-        if (onProgress && newValue.length !== oldValue.length) {
+        if (onProgress) {
           if (newValue.length < oldValue.length) {
             const charsDeleted = oldValue.length - newValue.length;
             for (let i = 0; i < charsDeleted; i++) {
@@ -207,7 +205,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             setTimeout(() => {
               setInput("");
               setIsComplete(false);
-              setHasReachedErrorLimit(false);
+              setShowErrorWarning(false);
             }, 0);
           }
         }
@@ -221,6 +219,27 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         resetOnComplete,
         disabled,
       ],
+    );
+
+    const handleInputUpdate = useCallback(
+      (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        handleChange(event.target.value);
+      },
+      [handleChange],
+    );
+
+    const handleCompositionUpdate = useCallback(
+      (event: React.CompositionEvent<HTMLTextAreaElement>) => {
+        handleChange(event.currentTarget.value);
+      },
+      [handleChange],
+    );
+
+    const handleCompositionCommit = useCallback(
+      (event: React.CompositionEvent<HTMLTextAreaElement>) => {
+        handleChange(event.currentTarget.value);
+      },
+      [handleChange],
     );
 
     const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -279,7 +298,12 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         const isError = isTyped && !isCorrect;
 
         return (
-          <span key={i} data-char-index={i} className="relative">
+          <span
+            key={i}
+            data-char-index={i}
+            className="relative"
+            style={noSpacesLang ? { display: "inline-block" } : {}}
+          >
             <span
               className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[1em] leading-none text-destructive text-xs`}
             >
@@ -302,11 +326,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     return (
       <div
-        className={`relative box-with-focus w-full px-6 py-3 cursor-text flex items-start ${hasReachedErrorLimit ? "border-destructive!" : ""} ${disabled ? "opacity-60" : ""} ${className || ""}`}
+        className={`relative box-with-focus w-full px-6 py-3 cursor-text flex items-start ${disabled ? "opacity-60" : ""} ${className || ""}`}
         style={containerStyle}
         onClick={() => inputRef.current?.focus()}
       >
-        {hasReachedErrorLimit && (
+        {showErrorWarning && (
           <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-destructive">
             {getTranslations().tooManyErrors}
           </div>
@@ -330,11 +354,13 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             <textarea
               ref={inputRef}
               value={input}
-              onChange={handleChange}
+              onChange={handleInputUpdate}
               onKeyDown={handleKeyDown}
               onPaste={handlePaste}
               onFocus={handleFocus}
               onBlur={handleBlur}
+              onCompositionUpdate={handleCompositionUpdate}
+              onCompositionEnd={handleCompositionCommit}
               id="type-box"
               className="outline-none resize-none absolute top-0 left-0 opacity-0 pointer-events-none"
               autoCapitalize="none"

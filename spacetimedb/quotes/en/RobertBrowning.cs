@@ -50,7 +50,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Browning", Text = "Any nose May ravage with impunity a rose.", Author = "Robert Browning" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Browning", Text = "Say not \"a small event!\" Why \"small\"? Costs it more pain that this ye call A \"great event\" should come to pass From that? Untwine me from the mass Of deeds which make up life, one deed Power shall fall short in or exceed!", Author = "Robert Browning" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Browning", Text = "God's in His heaven- All's right with the world!", Author = "Robert Browning" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Browning", Text = "Some unsuspected isle in the far seas,-Some. unsuspected isle in far-off seas.", Author = "Robert Browning" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Browning", Text = "Some unsuspected isle in the far seas,-Some unsuspected isle in far-off seas.", Author = "Robert Browning" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Browning", Text = "In the morning of the world, When earth was nigher heaven than now.", Author = "Robert Browning" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Browning", Text = "All service ranks the same with God,-With God, whose puppets, best and worst, Are we: there is no last nor first.", Author = "Robert Browning" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Robert_Browning", Text = "When is man strong until he feels alone?", Author = "Robert Browning" },

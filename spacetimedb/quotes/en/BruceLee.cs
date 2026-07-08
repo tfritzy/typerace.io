@@ -17,7 +17,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "When you're talking about fighting, as it is, with no rules, well then, baby you'd better train every part of your body!", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "Boards don't hit back.", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "A good martial artist does not become tense, but ready.", Author = "Bruce Lee" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "Don't think, feel....it is like a finger pointing a way to the moon. Don't concentrate on the finger or you will miss all that heavenly glory!", Author = "Bruce Lee" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "Don't think, feel... it is like a finger pointing a way to the moon. Don't concentrate on the finger or you will miss all that heavenly glory!", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "Forget about winning and losing; forget about pride and pain. Lay your life before him.", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "There are no limits. There are plateaus, but you must not stay there, you must go beyond them.", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "Be water, my friend.", Author = "Bruce Lee" },

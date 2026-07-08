@@ -16,7 +16,7 @@ public static partial class JapaneseQuotes
             new Quote { Id = "https://ja.wikiquote.org/wiki/石川啄木", Text = "はたらけどはたらけど猶わが生活楽にならざりぢつと手を見る", Author = "石川啄木" },
             new Quote { Id = "https://ja.wikiquote.org/wiki/石川啄木", Text = "函館の青柳町こそ悲しけれ友の恋歌矢ぐるまの花", Author = "石川啄木" },
             new Quote { Id = "https://ja.wikiquote.org/wiki/石川啄木", Text = "石をもて追はるるごとくふるさとを出でしかなしみ消ゆる時なし", Author = "石川啄木" },
-            new Quote { Id = "https://ja.wikiquote.org/wiki/石川啄木", Text = "-度でも我に頭を下げさせし人みな死ねといのりてしこと", Author = "石川啄木" },
+            new Quote { Id = "https://ja.wikiquote.org/wiki/石川啄木", Text = "一度でも我に頭を下げさせし人みな死ねといのりてしこと", Author = "石川啄木" },
         };
     }
 }

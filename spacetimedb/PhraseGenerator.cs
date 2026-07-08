@@ -44,7 +44,12 @@ public static class PhraseGenerator
         return sb.ToString();
     }
 
-    public static string GeneratePhrase(string[] wordList, Random rng, int minWordCount = 20, int maxWordCount = 35)
+    public static string GeneratePhrase(
+        string[] wordList,
+        Random rng,
+        int minWordCount = 20,
+        int maxWordCount = 35,
+        bool noSpaces = false)
     {
         var words = new List<string>();
         int wordCount = rng.Next(minWordCount, maxWordCount + 1);
@@ -63,7 +68,9 @@ public static class PhraseGenerator
             words.Add(selectedWord);
         }
 
-        return string.Join(" ", words);
+        var delim = noSpaces ? "" : " ";
+
+        return string.Join(delim, words);
     }
 
     public static Phrase GeneratePhraseForMode(GameMode mode, Random rng)
@@ -83,11 +90,11 @@ public static class PhraseGenerator
             case GameMode.Portuguese500:
                 return new Phrase(SanitizeText(GeneratePhrase(Portuguese500Words.Words, rng, 9, 12)));
             case GameMode.Japanese500:
-                return new Phrase(SanitizeText(GeneratePhrase(Japanese500Words.Words, rng, 13, 18)));
+                return new Phrase(SanitizeText(GeneratePhrase(Japanese500Words.Words, rng, 13, 18, noSpaces: true)));
             case GameMode.Korean500:
                 return new Phrase(SanitizeText(GeneratePhrase(Korean500Words.Words, rng, 11, 15)));
             case GameMode.Chinese500:
-                return new Phrase(SanitizeText(GeneratePhrase(Chinese500Words.Words, rng, 12, 16)));
+                return new Phrase(SanitizeText(GeneratePhrase(Chinese500Words.Words, rng, 12, 16, noSpaces: true)));
             case GameMode.Ukrainian500:
                 return new Phrase(SanitizeText(GeneratePhrase(Ukrainian500Words.Words, rng, 8, 11)));
             case GameMode.Arabic500:
