@@ -14,10 +14,12 @@ import {
     Legend,
     TimeScale,
     Filler,
+    type TooltipItem,
 } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
-import { getDefaultSiteTitle } from "../utils/modes";
+import { Select } from "../components/Select";
+import { getDefaultSiteTitle, languages } from "../utils/modes";
 
 ChartJS.register(
     CategoryScale,
@@ -32,7 +34,8 @@ ChartJS.register(
     Filler
 );
 
-type TimeFrame = '1month' | '6months' | '1year' | 'all';
+type TimeFrame = '1week' | '1month' | '6months' | '1year' | 'all';
+type GameModeFilter = 'all' | string;
 
 interface GameModeCount {
     gameType: { tag: string };
@@ -57,6 +60,7 @@ export const SiteStatsPage = () => {
     const conn = useDatabase();
     const [globalStats, setGlobalStats] = useState<GlobalStats[]>([]);
     const [selectedTimeFrame, setSelectedTimeFrame] = useState<TimeFrame>('1month');
+    const [selectedGameMode, setSelectedGameMode] = useState<GameModeFilter>('all');
     const [themeTick, setThemeTick] = useState(0);
 
     const onThemeChange = useCallback(() => setThemeTick(t => t + 1), []);
@@ -111,6 +115,9 @@ export const SiteStatsPage = () => {
         const cutoffDate = new Date();
 
         switch (selectedTimeFrame) {
+            case '1week':
+                cutoffDate.setDate(now.getDate() - 7);
+                break;
             case '1month':
                 cutoffDate.setMonth(now.getMonth() - 1);
                 break;
@@ -130,6 +137,37 @@ export const SiteStatsPage = () => {
     };
 
     const filteredStats = getFilteredStats();
+
+    const gameModeOptions = useMemo(() => {
+        const modeOptions = languages.flatMap(lang => {
+            const options = [
+                {
+                    value: lang.randomWordsMode,
+                    label: `${lang.nativeName} 500`,
+                },
+            ];
+
+            if (lang.quotesMode) {
+                options.push({
+                    value: lang.quotesMode,
+                    label: `${lang.nativeName} Quotes`,
+                });
+            }
+
+            return options;
+        });
+
+        return [
+            { value: 'all', label: 'All modes' },
+            ...modeOptions,
+        ];
+    }, []);
+
+    const gameModeLabelByValue = useMemo(() => {
+        return new Map(gameModeOptions.map(option => [option.value, option.label]));
+    }, [gameModeOptions]);
+
+    const selectedGameModeLabel = gameModeLabelByValue.get(selectedGameMode) ?? selectedGameMode;
 
     const chartColors = useMemo(() => getThemePlayerColorList(), [themeTick]);
 
@@ -154,6 +192,27 @@ export const SiteStatsPage = () => {
     }, []);
 
     const chartBackgroundAlpha = '33';
+
+    const getStatsForSelectedMode = (stat: GlobalStats): GameModeCount => {
+        if (selectedGameMode === 'all') {
+            return stat.total;
+        }
+
+        const matchingStats = stat.stats.filter(modeCount => modeCount.gameMode.tag === selectedGameMode);
+        const countsWithGames = matchingStats.filter(modeCount => modeCount.gameCount > 0);
+
+        return {
+            gameType: { tag: 'Public' },
+            gameMode: { tag: selectedGameMode },
+            finishedGames: matchingStats.reduce((sum, modeCount) => sum + modeCount.finishedGames, 0),
+            nonLonelyGames: matchingStats.reduce((sum, modeCount) => sum + modeCount.nonLonelyGames, 0),
+            startedGames: matchingStats.reduce((sum, modeCount) => sum + modeCount.startedGames, 0),
+            totalWpm: matchingStats.reduce((sum, modeCount) => sum + modeCount.totalWpm, 0),
+            minWpm: countsWithGames.length > 0 ? Math.min(...countsWithGames.map(modeCount => modeCount.minWpm)) : 0,
+            maxWpm: countsWithGames.length > 0 ? Math.max(...countsWithGames.map(modeCount => modeCount.maxWpm)) : 0,
+            gameCount: matchingStats.reduce((sum, modeCount) => sum + modeCount.gameCount, 0),
+        };
+    };
 
     const createLineDatasets = (gameModes: Map<string, number[]>) => {
         return Array.from(gameModes.entries()).map(([mode, data], index) => ({
@@ -180,7 +239,9 @@ export const SiteStatsPage = () => {
     };
 
     const createBarDatasets = (gameModes: Map<string, number[]>) => {
-        return Array.from(gameModes.entries()).map(([mode, data], index) => ({
+        return Array.from(gameModes.entries())
+            .filter(([, data]) => data.some(value => value > 0))
+            .map(([mode, data], index) => ({
             label: mode,
             data,
             backgroundColor: chartColors[index % chartColors.length],
@@ -196,8 +257,17 @@ export const SiteStatsPage = () => {
         const gameModes = new Map<string, number[]>();
 
         filteredStats.forEach((stat, index) => {
+            if (selectedGameMode !== 'all') {
+                const selectedModeStats = getStatsForSelectedMode(stat);
+                if (!gameModes.has(selectedGameModeLabel)) {
+                    gameModes.set(selectedGameModeLabel, new Array(filteredStats.length).fill(0));
+                }
+                gameModes.get(selectedGameModeLabel)![index] = fieldAccessor(selectedModeStats);
+                return;
+            }
+
             stat.stats.forEach(modeCount => {
-                const modeName = modeCount.gameMode.tag;
+                const modeName = gameModeLabelByValue.get(modeCount.gameMode.tag) ?? modeCount.gameMode.tag;
                 if (!gameModes.has(modeName)) {
                     gameModes.set(modeName, new Array(filteredStats.length).fill(0));
                 }
@@ -214,6 +284,10 @@ export const SiteStatsPage = () => {
 
     const getGamesPerDayData = () => {
         return processGameModeData(modeCount => modeCount.finishedGames, 'bar');
+    };
+
+    const getAbandonedGamesData = () => {
+        return processGameModeData(modeCount => Math.max(0, modeCount.startedGames - modeCount.finishedGames), 'bar');
     };
 
     const getPlayersPerDayData = () => {
@@ -246,8 +320,9 @@ export const SiteStatsPage = () => {
         const lonelyPercentages: number[] = [];
 
         filteredStats.forEach(stat => {
-            const total = stat.total.finishedGames;
-            const nonLonely = stat.total.nonLonelyGames;
+            const selectedStats = getStatsForSelectedMode(stat);
+            const total = selectedStats.finishedGames;
+            const nonLonely = selectedStats.nonLonelyGames;
             const nonLonelyPercent = total > 0 ? (nonLonely / total) * 100 : 0;
             nonLonelyPercentages.push(nonLonelyPercent);
             lonelyPercentages.push(100 - nonLonelyPercent);
@@ -284,8 +359,9 @@ export const SiteStatsPage = () => {
         const incompletePercentages: number[] = [];
 
         filteredStats.forEach(stat => {
-            const started = stat.total.startedGames;
-            const finished = stat.total.finishedGames;
+            const selectedStats = getStatsForSelectedMode(stat);
+            const started = selectedStats.startedGames;
+            const finished = selectedStats.finishedGames;
             const completionPercent = started > 0 ? (finished / started) * 100 : 0;
             completionPercentages.push(completionPercent);
             incompletePercentages.push(100 - completionPercent);
@@ -315,6 +391,7 @@ export const SiteStatsPage = () => {
     };
 
     const gamesPerDayData = getGamesPerDayData();
+    const abandonedGamesData = getAbandonedGamesData();
     const playersPerDayData = getPlayersPerDayData();
     const nonLonelyGamesData = getNonLonelyGamesData();
     const completionRateData = getCompletionRateData();
@@ -322,6 +399,10 @@ export const SiteStatsPage = () => {
     const stackedChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: {
+            mode: 'index' as const,
+            intersect: false,
+        },
         plugins: {
             legend: {
                 display: true,
@@ -340,6 +421,7 @@ export const SiteStatsPage = () => {
                 titleColor: resolvedColors.foreground,
                 bodyColor: resolvedColors.secondaryFg,
                 padding: 12,
+                filter: (context: TooltipItem<'bar'>) => context.parsed.y > 0,
             }
         },
         scales: {
@@ -374,6 +456,10 @@ export const SiteStatsPage = () => {
     const lineChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: {
+            mode: 'index' as const,
+            intersect: false,
+        },
         plugins: {
             legend: {
                 display: true,
@@ -424,6 +510,10 @@ export const SiteStatsPage = () => {
     const areaChartOptions = {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: {
+            mode: 'index' as const,
+            intersect: false,
+        },
         plugins: {
             legend: {
                 display: true,
@@ -485,21 +575,30 @@ export const SiteStatsPage = () => {
                 <div className="content-container">
                     <h1 className="text-3xl font-bold mb-6 text-foreground">Site Statistics</h1>
 
-                    <div className="mb-6 flex gap-2">
-                        {(['1month', '6months', '1year', 'all'] as TimeFrame[]).map(timeFrame => (
-                            <button
-                                key={timeFrame}
-                                onClick={() => setSelectedTimeFrame(timeFrame)}
-                                className={`px-4 py-2 rounded-lg transition-all ${selectedTimeFrame === timeFrame
-                                    ? 'bg-primary text-primary-foreground font-semibold'
-                                    : 'bg-muted text-secondary-foreground hover:bg-secondary'
-                                    }`}
-                            >
-                                {timeFrame === '1month' ? '1 Month' :
-                                    timeFrame === '6months' ? '6 Months' :
-                                        timeFrame === '1year' ? '1 Year' : 'All Time'}
-                            </button>
-                        ))}
+                    <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                        <div className="flex flex-wrap gap-2">
+                            {(['1week', '1month', '6months', '1year', 'all'] as TimeFrame[]).map(timeFrame => (
+                                <button
+                                    key={timeFrame}
+                                    onClick={() => setSelectedTimeFrame(timeFrame)}
+                                    className={`px-4 py-2 rounded-lg transition-all ${selectedTimeFrame === timeFrame
+                                        ? 'bg-primary text-primary-foreground font-semibold'
+                                        : 'bg-muted text-secondary-foreground hover:bg-secondary'
+                                        }`}
+                                >
+                                    {timeFrame === '1week' ? '1 Week' :
+                                        timeFrame === '1month' ? '1 Month' :
+                                            timeFrame === '6months' ? '6 Months' :
+                                                timeFrame === '1year' ? '1 Year' : 'All Time'}
+                                </button>
+                            ))}
+                        </div>
+                        <Select
+                            value={selectedGameMode}
+                            onChange={setSelectedGameMode}
+                            options={gameModeOptions}
+                            className="md:items-end"
+                        />
                     </div>
 
                     <section className="mb-8 box box-shadow rounded-lg p-6">
@@ -509,12 +608,14 @@ export const SiteStatsPage = () => {
                         </div>
                     </section>
 
-                    <section className="mb-8 box box-shadow rounded-lg p-6">
-                        <h2 className="text-xl font-semibold mb-4 text-foreground">Unique Daily Active Players</h2>
-                        <div className="h-[300px]">
-                            <Line data={playersPerDayData} options={lineChartOptions} />
-                        </div>
-                    </section>
+                    {selectedGameMode === 'all' && (
+                        <section className="mb-8 box box-shadow rounded-lg p-6">
+                            <h2 className="text-xl font-semibold mb-4 text-foreground">Unique Daily Active Players</h2>
+                            <div className="h-[300px]">
+                                <Line data={playersPerDayData} options={lineChartOptions} />
+                            </div>
+                        </section>
+                    )}
 
                     <section className="mb-8 box box-shadow rounded-lg p-6">
                         <h2 className="text-xl font-semibold mb-2 text-foreground">Non-Lonely Games</h2>
@@ -533,6 +634,13 @@ export const SiteStatsPage = () => {
                         </p>
                         <div className="h-[280px]">
                             <Line data={completionRateData} options={areaChartOptions} />
+                        </div>
+                    </section>
+
+                    <section className="mb-8 box box-shadow rounded-lg p-6">
+                        <h2 className="text-xl font-semibold mb-4 text-foreground">Abandoned Games Per Day by Game Mode</h2>
+                        <div className="h-[300px]">
+                            <Bar data={abandonedGamesData} options={stackedChartOptions} />
                         </div>
                     </section>
                 </div>
