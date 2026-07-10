@@ -5,7 +5,8 @@ import {
   TextRenderable,
 } from "@opentui/core";
 import { ResultBox } from "./resultBox";
-import { PlayerProgress } from "../stdb";
+import { Game, PlayerProgress } from "../stdb";
+import { WpmChart } from "./wpmChart";
 
 export class ResultsView {
   private screen: BoxRenderable;
@@ -14,6 +15,7 @@ export class ResultsView {
   private wpmBox: ResultBox;
   private timeBox: ResultBox;
   private accuracyBox: ResultBox;
+  private wpmChart: WpmChart;
 
   constructor(
     renderer: CliRenderer,
@@ -29,6 +31,9 @@ export class ResultsView {
       alignItems: "center",
       justifyContent: "center",
     });
+
+    this.wpmChart = new WpmChart(renderer);
+    this.screen.add(this.wpmChart);
 
     const placementsBar = new BoxRenderable(renderer, {
       width: "100%",
@@ -104,6 +109,11 @@ export class ResultsView {
     this.wpmBox.setText(pp.wpm.toFixed(0), pp.wpm >= 100);
     this.timeBox.setText(pp.time.toLocaleString(), pp.placement <= 1);
     this.accuracyBox.setText("100%", true);
+    this.wpmChart.updatePlayerProgress(pp);
+  }
+
+  public updateGame(game: Game) {
+    this.wpmChart.updateGame(game);
   }
 
   public setVisible(visible: boolean) {

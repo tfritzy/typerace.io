@@ -36,6 +36,8 @@ export class GameView {
     if (prevGame?.state.tag != "Countdown" && game.state.tag === "Countdown") {
       this.countdown.start(Number(game.countdownDurationMs));
     }
+
+    this.resultsView.updateGame(game);
   }
 
   public updatePlayerProgress(pp: PlayerProgress) {

@@ -1,18 +1,19 @@
-import { BoxRenderable, CliRenderer, Renderable } from "@opentui/core";
+import {
+  BoxRenderable,
+  OptimizedBuffer,
+  RenderContext,
+  RGBA,
+} from "@opentui/core";
 import { Game, PlayerProgress } from "../stdb";
-import playerprogress_table from "../../module_bindings/playerprogress_table";
 import { getAggWpmBySecond } from "../util/wpmCalculator";
+import { THEME } from "../theme";
 
-export class WpmChart {
-  private div: BoxRenderable;
-  private renderer: CliRenderer;
+export class WpmChart extends BoxRenderable {
   private gameStartTime: bigint = BigInt(0);
+  private playerProgress: PlayerProgress | undefined;
 
-  constructor(renderer: CliRenderer, parent: Renderable) {
-    this.div = new BoxRenderable(renderer, { width: "100%", height: "100%" });
-    parent.add(this.div);
-
-    this.renderer = renderer;
+  constructor(ctx: RenderContext) {
+    super(ctx, { width: "100%", height: 20 });
   }
 
   public updateGame(game: Game) {
@@ -20,19 +21,34 @@ export class WpmChart {
   }
 
   public updatePlayerProgress(playerProgress: PlayerProgress) {
-    const width = this.div.getLayoutNode().getComputedWidth();
-    const height = this.div.getLayoutNode().getComputedHeight();
+    this.playerProgress = playerProgress;
+  }
 
+  protected renderSelf(buffer: OptimizedBuffer) {
+    if (!this.playerProgress) return;
+
+    super.renderSelf(buffer);
+
+    const layoutNode = this.getLayoutNode();
+    const width = layoutNode.getComputedWidth();
+    const height = layoutNode.getComputedHeight();
     const aggWpmBySecond = getAggWpmBySecond(
-      playerProgress.characterHistory,
+      this.playerProgress.characterHistory,
       this.gameStartTime,
     );
 
     const maxWpm = Math.floor(Math.max(...aggWpmBySecond) * 1.2);
 
-    const buffer = this.renderer.currentRenderBuffer;
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < aggWpmBySecond.length; x++) {}
+    for (let y = this.y; y < height; y++) {
+      for (let x = this.x; x < width; x++) {
+        buffer.setCell(
+          x,
+          y,
+          "h",
+          RGBA.fromHex(THEME.accent),
+          RGBA.fromHex(THEME.bg0_h),
+        );
+      }
     }
   }
 }
