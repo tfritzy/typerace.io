@@ -66,122 +66,6 @@ export function getWpm(charCount: number, timeSeconds: number): number {
   return charCount / CHARS_PER_WORD / (timeSeconds / 60.0);
 }
 
-export function getRawWpmBySecond(
-  compressedHistory: Uint8Array,
-  raceStartTimestamp: bigint,
-): number[] {
-  const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
-
-  if (!events || events.length === 0) {
-    return [];
-  }
-
-  const charCountBySecond: number[] = [];
-  const wpmBySecond: number[] = [];
-
-  for (const evt of events) {
-    if (evt.eventType.tag === "Backspace") {
-      continue;
-    }
-
-    const elapsedMicros = evt.timestamp - raceStartTimestamp;
-    const second = Number(elapsedMicros / 1_000_000n);
-
-    if (second < 0) {
-      continue;
-    }
-
-    while (charCountBySecond.length <= second) {
-      charCountBySecond.push(0);
-      wpmBySecond.push(0);
-    }
-
-    charCountBySecond[second]++;
-  }
-
-  for (let i = 0; i < wpmBySecond.length; i++) {
-    if (charCountBySecond[i] === 0) {
-      wpmBySecond[i] = 0;
-      continue;
-    }
-
-    wpmBySecond[i] = getWpm(charCountBySecond[i], 1);
-  }
-
-  const smoothedWpm: number[] = [];
-  const windowSize = 3;
-
-  for (let i = 0; i < wpmBySecond.length; i++) {
-    let sum = 0;
-    let count = 0;
-
-    for (
-      let j = Math.max(0, i - windowSize + 1);
-      j <= Math.min(wpmBySecond.length - 1, i + windowSize - 1);
-      j++
-    ) {
-      sum += wpmBySecond[j];
-      count++;
-    }
-
-    smoothedWpm.push(sum / count);
-  }
-
-  return smoothedWpm;
-}
-
-export function getAggWpmBySecond(
-  compressedHistory: Uint8Array,
-  raceStartTimestamp: bigint,
-): number[] {
-  const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
-
-  if (!events || events.length === 0) {
-    return [];
-  }
-
-  const progressionStack: number[] = [];
-  for (const evt of events) {
-    const elapsedMicros = evt.timestamp - raceStartTimestamp;
-    const seconds = Number(elapsedMicros) / 1_000_000.0;
-
-    if (evt.eventType.tag === "Backspace") {
-      if (progressionStack.length > 0) {
-        progressionStack.pop();
-      }
-    } else {
-      progressionStack.push(seconds);
-    }
-  }
-
-  if (progressionStack.length === 0) {
-    return [];
-  }
-
-  const finalTime = progressionStack[progressionStack.length - 1];
-  const maxSecond = Math.floor(finalTime);
-  const wpmBySecond: number[] = [];
-
-  for (let second = 0; second <= maxSecond; second++) {
-    let charCountAtSecond = 0;
-    for (let i = 0; i < progressionStack.length; i++) {
-      if (progressionStack[i] <= second) {
-        charCountAtSecond = i + 1;
-      } else {
-        break;
-      }
-    }
-
-    if (charCountAtSecond > 0 && second > 0) {
-      wpmBySecond.push(getWpm(charCountAtSecond, second));
-    } else {
-      wpmBySecond.push(0);
-    }
-  }
-
-  return wpmBySecond;
-}
-
 export function getFinalWpm(playerProgress: PlayerProgress): number {
   if (playerProgress.time === 0n || playerProgress.placement === 0) {
     return 0;
@@ -265,4 +149,72 @@ export function getErrorCountsBySecond(
   }
 
   return errorCountBySecond;
+}
+
+export function getWpmPerKeystroke(
+  compressedHistory: Uint8Array,
+  raceStartTimestamp: bigint,
+): number[][] {
+  const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
+
+  const wpms = [];
+  const stack = [];
+  let correctChars = 0;
+  for (let evt of events) {
+    if (evt.eventType.tag === "Correct") {
+      if (stack[stack.length - 1]) {
+        stack.push(true);
+        correctChars += 1;
+      }
+    } else if (evt.eventType.tag === "Incorrect") {
+      stack.push(false);
+    } else {
+      stack.pop();
+      if (correctChars > stack.length) {
+        correctChars = stack.length;
+      }
+    }
+
+    const time = Number(evt.timestamp - raceStartTimestamp);
+    const wpm = getWpm(correctChars, time);
+    wpms.push([time, wpm]);
+  }
+
+  return wpms;
+}
+
+export function getWpmByBucket(
+  compressedHistory: Uint8Array,
+  raceStartTimestamp: bigint,
+  bucketSize: number,
+) {
+  const wpmPerKeystroke = getWpmPerKeystroke(
+    compressedHistory,
+    raceStartTimestamp,
+  );
+  const finishTime = wpmPerKeystroke[wpmPerKeystroke.length - 1][0];
+
+  const wpms = [];
+
+  let keyI = 0;
+  for (let t = 0; t <= finishTime; t += bucketSize) {
+    while (t > wpmPerKeystroke[keyI][0]) {
+      keyI += 1;
+    }
+
+    if (keyI === 0) {
+      wpms.push(wpmPerKeystroke[0][1]);
+    } else {
+      const low = wpmPerKeystroke[keyI - 1][1];
+      const lowTime = wpmPerKeystroke[keyI - 1][0];
+      const high = wpmPerKeystroke[keyI][1];
+      const highTime = wpmPerKeystroke[keyI][0];
+
+      const amtInto = t - lowTime;
+      const percentInto = amtInto / (highTime - lowTime);
+      const wpm = percentInto * (high - low);
+
+      wpms.push(wpm);
+    }
+  }
 }

@@ -8,12 +8,26 @@ import { Game, PlayerProgress } from "../stdb";
 import { getAggWpmBySecond } from "../util/wpmCalculator";
 import { THEME } from "../theme";
 
+const bars = ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
+
+const dots = {
+  "44": "⣿",
+  "43": "⣷",
+  "42": "⣧",
+  "41": "⣇",
+  "40": "⡇",
+  "34": "⣾",
+  "24": "⣼",
+  "14": "⣸",
+  "04": "⢸",
+};
+
 export class WpmChart extends BoxRenderable {
   private gameStartTime: bigint = BigInt(0);
   private playerProgress: PlayerProgress | undefined;
 
   constructor(ctx: RenderContext) {
-    super(ctx, { width: "100%", height: 20 });
+    super(ctx, { width: "100%", height: 10, minHeight: 10 });
   }
 
   public updateGame(game: Game) {
@@ -44,7 +58,7 @@ export class WpmChart extends BoxRenderable {
         buffer.setCell(
           x,
           y,
-          "h",
+          "⣿",
           RGBA.fromHex(THEME.accent),
           RGBA.fromHex(THEME.bg0_h),
         );
