@@ -5,8 +5,8 @@ import {
   RGBA,
 } from "@opentui/core";
 import { Game, PlayerProgress } from "../stdb";
-import { getAggWpmBySecond } from "../util/wpmCalculator";
 import { THEME } from "../theme";
+import { getWpmByBucket } from "../util/wpmCalculator";
 
 const bars = ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
 
@@ -27,7 +27,14 @@ export class WpmChart extends BoxRenderable {
   private playerProgress: PlayerProgress | undefined;
 
   constructor(ctx: RenderContext) {
-    super(ctx, { width: "100%", height: 10, minHeight: 10 });
+    super(ctx, {
+      width: "100%",
+      height: 10,
+      minHeight: 10,
+      flexShrink: 0,
+      flexGrow: 0,
+      backgroundColor: THEME.fg0,
+    });
   }
 
   public updateGame(game: Game) {
@@ -46,19 +53,24 @@ export class WpmChart extends BoxRenderable {
     const layoutNode = this.getLayoutNode();
     const width = layoutNode.getComputedWidth();
     const height = layoutNode.getComputedHeight();
-    const aggWpmBySecond = getAggWpmBySecond(
+    const wpmByBucket = getWpmByBucket(
       this.playerProgress.characterHistory,
       this.gameStartTime,
+      width * 2,
     );
 
-    const maxWpm = Math.floor(Math.max(...aggWpmBySecond) * 1.2);
+    const maxWpm = Math.floor(Math.max(...wpmByBucket) * 1.2);
+    console.log(wpmByBucket);
+    for (let y = this.y; y < this.y + height; y++) {
+      for (let x = this.x; x < this.x + width; x++) {
+        const wpm = wpmByBucket[Math.round(x * 2)];
 
-    for (let y = this.y; y < height; y++) {
-      for (let x = this.x; x < width; x++) {
+        console.log(wpm, maxWpm, y, this.y + height);
+
         buffer.setCell(
           x,
           y,
-          "⣿",
+          wpm / maxWpm > y / height ? "⣿" : "n",
           RGBA.fromHex(THEME.accent),
           RGBA.fromHex(THEME.bg0_h),
         );

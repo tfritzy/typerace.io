@@ -11,7 +11,8 @@
     "@opentui/core": "0.4.1",
     "@opentui/ssh": "0.4.1",
     "dotenv": "^17.4.2",
-    "spacetimedb": "^1.10.0"
+    "spacetimedb": "^1.10.0",
+    "vitest": "^4.1.10"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",

@@ -10,7 +10,7 @@ export enum CharacterEventType {
 }
 
 export interface CharacterEvent {
-  timestamp: bigint;
+  timestamp_s: number;
   eventType: { tag: "Correct" | "Incorrect" | "Backspace" };
 }
 
@@ -28,8 +28,8 @@ export function decodeCharacterHistory(
     const deciseconds = compressedHistory[i] | (compressedHistory[i + 1] << 8);
     const eventType = compressedHistory[i + 2];
 
-    const elapsedMicros = BigInt(deciseconds) * 100_000n;
-    const timestamp = raceStartTimestamp + elapsedMicros;
+    const elapsedSeconds = deciseconds / 10;
+    const timestamp_s = Number(raceStartTimestamp) / 1_000_000 + elapsedSeconds;
 
     let eventTag: "Correct" | "Incorrect" | "Backspace";
     switch (eventType) {
@@ -50,7 +50,7 @@ export function decodeCharacterHistory(
     }
 
     events.push({
-      timestamp,
+      timestamp_s,
       eventType: { tag: eventTag },
     });
   }
@@ -134,7 +134,7 @@ export function getErrorCountsBySecond(
       continue;
     }
 
-    const elapsedMicros = evt.timestamp - raceStartTimestamp;
+    const elapsedMicros = evt.timestamp_s - raceStartTimestamp;
     const second = Number(elapsedMicros / 1_000_000n);
 
     if (second < 0) {
@@ -152,17 +152,15 @@ export function getErrorCountsBySecond(
 }
 
 export function getWpmPerKeystroke(
-  compressedHistory: Uint8Array,
+  events: CharacterEvent[],
   raceStartTimestamp: bigint,
 ): number[][] {
-  const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
-
   const wpms = [];
   const stack = [];
   let correctChars = 0;
   for (let evt of events) {
     if (evt.eventType.tag === "Correct") {
-      if (stack[stack.length - 1]) {
+      if (stack.length == 0 || stack[stack.length - 1]) {
         stack.push(true);
         correctChars += 1;
       }
@@ -175,7 +173,10 @@ export function getWpmPerKeystroke(
       }
     }
 
-    const time = Number(evt.timestamp - raceStartTimestamp);
+    const time = Math.max(
+      evt.timestamp_s - Number(raceStartTimestamp) / 1_000_000,
+      0,
+    );
     const wpm = getWpm(correctChars, time);
     wpms.push([time, wpm]);
   }
@@ -184,20 +185,21 @@ export function getWpmPerKeystroke(
 }
 
 export function getWpmByBucket(
-  compressedHistory: Uint8Array,
+  compressedHistory: CharacterEvent[],
   raceStartTimestamp: bigint,
-  bucketSize: number,
-) {
+  numBuckets: number,
+): number[] {
   const wpmPerKeystroke = getWpmPerKeystroke(
     compressedHistory,
     raceStartTimestamp,
   );
   const finishTime = wpmPerKeystroke[wpmPerKeystroke.length - 1][0];
+  const bucketSize = (finishTime - numBuckets) / numBuckets;
 
   const wpms = [];
 
   let keyI = 0;
-  for (let t = 0; t <= finishTime; t += bucketSize) {
+  for (let t = 0; t < finishTime; t += bucketSize) {
     while (t > wpmPerKeystroke[keyI][0]) {
       keyI += 1;
     }
@@ -209,12 +211,16 @@ export function getWpmByBucket(
       const lowTime = wpmPerKeystroke[keyI - 1][0];
       const high = wpmPerKeystroke[keyI][1];
       const highTime = wpmPerKeystroke[keyI][0];
+      // console.log(low, lowTime, high, highTime);
 
       const amtInto = t - lowTime;
       const percentInto = amtInto / (highTime - lowTime);
       const wpm = percentInto * (high - low);
+      // console.log(amtInto, percentInto, wpm);
 
       wpms.push(wpm);
     }
   }
+
+  return wpms;
 }
