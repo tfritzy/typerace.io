@@ -57,22 +57,29 @@ export class WpmChartInterior extends BoxRenderable {
       this.raceStartTime_s,
       width * 2,
     );
-
     const maxWpm = Math.floor(Math.max(...wpmByBucket) * 1.2);
-    for (let y = this.y; y < this.y + height; y++) {
-      for (let x = this.x; x < this.x + width; x++) {
-        const wpm = wpmByBucket[Math.round(x * 2)];
 
-        console.log(wpm, maxWpm, y, this.y + height);
+    const bars = new Array<number>(width * 2);
+    for (let x = 0; x < width * 2; x++) {
+      bars[x] = Math.floor((wpmByBucket[x] / maxWpm) * height * 4);
+    }
 
-        const percentUp = 1 - (y - this.y) / height;
-        buffer.setCell(
-          x,
-          y,
-          wpm / maxWpm > percentUp ? "⣿" : "⢸",
-          RGBA.fromHex(THEME.bg0_s),
-          RGBA.fromHex(THEME.bg0_h),
-        );
+    console.log(bars);
+
+    for (let x = this.x; x < this.x + width; x++) {
+      const firstBar = bars[x - this.x * 2];
+      const secondBar = bars[x - this.x * 2 + 1];
+      for (let y = this.y; y < this.y + height; y++) {
+        const h = y - this.y;
+        if (firstBar > h * 4 && secondBar > h * 4) {
+          buffer.setCell(
+            x,
+            y,
+            "⣿",
+            RGBA.fromHex(THEME.bg0_s),
+            RGBA.fromHex(THEME.bg0_h),
+          );
+        }
       }
     }
   }
