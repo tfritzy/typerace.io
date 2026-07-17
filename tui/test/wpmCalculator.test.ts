@@ -28,10 +28,32 @@ describe("getWpmPerKeystroke", () => {
       { timestamp_s: 1.6, eventType: { tag: "Correct" } },
     ];
 
-    const wpm = getWpmPerKeystroke(history, BigInt(10));
-    console.log(wpm);
-    const result = 2 + 2;
+    const wpm = getWpmPerKeystroke(history, 0.9);
+    expect(wpm.length).to.equal(7);
+  });
+});
 
-    expect(result).toBe(5);
+describe("getWpmByBucket", () => {
+  it("is approximately correct", () => {
+    const history: CharacterEvent[] = [
+      { timestamp_s: 1, eventType: { tag: "Correct" } },
+      { timestamp_s: 1.5, eventType: { tag: "Correct" } },
+      { timestamp_s: 2, eventType: { tag: "Correct" } },
+      { timestamp_s: 5, eventType: { tag: "Incorrect" } },
+    ];
+
+    const wpm = getWpmByBucket(history, 0, 9);
+
+    // keystrokes: [[ 1, 12 ], [ 1.5, 16 ], [ 2, 18 ], [ 5, 7.2 ]]
+    expect(wpm[0]).to.equal(12); // t = 1
+    expect(wpm[1]).to.equal(16); // t = 1.5
+    expect(wpm[2]).to.equal(18); // t = 2
+    expect(wpm[3]).to.equal(16.2); // t = 2.5
+    expect(wpm[4]).to.equal(14.4); // t = 3
+    expect(wpm[5]).to.equal(12.6); // t = 3.5
+    expect(wpm[6]).to.equal(10.8); // t = 4
+    expect(wpm[7]).to.closeTo(8.9, 0.1); // t = 4.5
+    expect(wpm[8]).to.closeTo(7.2, 0.1); // t = 5
+    expect(wpm.length).to.equal(9);
   });
 });

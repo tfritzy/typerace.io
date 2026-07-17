@@ -3,10 +3,16 @@ import {
   OptimizedBuffer,
   RenderContext,
   RGBA,
+  TextRenderable,
 } from "@opentui/core";
 import { Game, PlayerProgress } from "../stdb";
 import { THEME } from "../theme";
-import { getWpmByBucket } from "../util/wpmCalculator";
+import {
+  decodeCharacterHistory,
+  getWpmByBucket,
+  getWpmPerKeystroke,
+} from "../util/wpmCalculator";
+import { WpmChartInterior } from "./wpmChartInterior";
 
 const bars = ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
 
@@ -23,58 +29,67 @@ const dots = {
 };
 
 export class WpmChart extends BoxRenderable {
-  private gameStartTime: bigint = BigInt(0);
+  private raceStartTime_s: number = 0;
   private playerProgress: PlayerProgress | undefined;
+  private highWpm: TextRenderable;
+  private midWpm: TextRenderable;
+  private interior: WpmChartInterior;
 
   constructor(ctx: RenderContext) {
     super(ctx, {
       width: "100%",
       height: 10,
       minHeight: 10,
-      flexShrink: 0,
-      flexGrow: 0,
-      backgroundColor: THEME.fg0,
     });
+
+    const chart = new BoxRenderable(ctx, {
+      flexDirection: "row",
+      width: "100%",
+      height: "100%",
+    });
+    const yLegend = new BoxRenderable(ctx, {
+      width: 3,
+      height: "100%",
+      justifyContent: "space-between",
+      paddingBottom: 1,
+    });
+    this.highWpm = new TextRenderable(ctx, { content: "100" });
+    this.midWpm = new TextRenderable(ctx, { content: "50" });
+    yLegend.add(this.highWpm);
+    yLegend.add(this.midWpm);
+    yLegend.add(new TextRenderable(ctx, { content: "0" }));
+    chart.add(yLegend);
+    const interiorContainer = new BoxRenderable(ctx, {
+      border: ["left", "bottom"],
+      borderColor: THEME.bg0,
+      width: "100%",
+    });
+    this.interior = new WpmChartInterior(ctx);
+    interiorContainer.add(this.interior);
+    chart.add(interiorContainer);
+    this.add(chart);
   }
 
   public updateGame(game: Game) {
-    this.gameStartTime = game.racingStartedAt;
+    this.raceStartTime_s = Number(game.racingStartedAt / 1_000_000n);
+    this.interior.updateGame(game);
   }
 
   public updatePlayerProgress(playerProgress: PlayerProgress) {
     this.playerProgress = playerProgress;
-  }
-
-  protected renderSelf(buffer: OptimizedBuffer) {
-    if (!this.playerProgress) return;
-
-    super.renderSelf(buffer);
-
-    const layoutNode = this.getLayoutNode();
-    const width = layoutNode.getComputedWidth();
-    const height = layoutNode.getComputedHeight();
-    const wpmByBucket = getWpmByBucket(
-      this.playerProgress.characterHistory,
-      this.gameStartTime,
-      width * 2,
+    this.interior.updatePlayerProgress(playerProgress);
+    const wpmPerKeystroke = getWpmPerKeystroke(
+      decodeCharacterHistory(
+        playerProgress.characterHistory,
+        this.raceStartTime_s,
+      ),
+      this.raceStartTime_s,
+    );
+    const maxWpm = Math.ceil(
+      Math.max(...wpmPerKeystroke.map((w) => w[1])) * 1.2,
     );
 
-    const maxWpm = Math.floor(Math.max(...wpmByBucket) * 1.2);
-    console.log(wpmByBucket);
-    for (let y = this.y; y < this.y + height; y++) {
-      for (let x = this.x; x < this.x + width; x++) {
-        const wpm = wpmByBucket[Math.round(x * 2)];
-
-        console.log(wpm, maxWpm, y, this.y + height);
-
-        buffer.setCell(
-          x,
-          y,
-          wpm / maxWpm > y / height ? "⣿" : "n",
-          RGBA.fromHex(THEME.accent),
-          RGBA.fromHex(THEME.bg0_h),
-        );
-      }
-    }
+    this.highWpm.content = maxWpm.toFixed(0);
+    this.midWpm.content = (Math.floor(maxWpm) / 2).toFixed(0);
   }
 }

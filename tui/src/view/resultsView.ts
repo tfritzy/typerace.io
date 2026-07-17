@@ -1,9 +1,4 @@
-import {
-  BoxRenderable,
-  CliRenderer,
-  TextAttributes,
-  TextRenderable,
-} from "@opentui/core";
+import { BoxRenderable, CliRenderer } from "@opentui/core";
 import { ResultBox } from "./resultBox";
 import { Game, PlayerProgress } from "../stdb";
 import { WpmChart } from "./wpmChart";

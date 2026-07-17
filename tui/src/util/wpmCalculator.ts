@@ -16,7 +16,7 @@ export interface CharacterEvent {
 
 export function decodeCharacterHistory(
   compressedHistory: Uint8Array,
-  raceStartTimestamp: bigint,
+  raceStartTime_s: number,
 ): CharacterEvent[] {
   const events: CharacterEvent[] = [];
 
@@ -29,7 +29,7 @@ export function decodeCharacterHistory(
     const eventType = compressedHistory[i + 2];
 
     const elapsedSeconds = deciseconds / 10;
-    const timestamp_s = Number(raceStartTimestamp) / 1_000_000 + elapsedSeconds;
+    const timestamp_s = raceStartTime_s + elapsedSeconds;
 
     let eventTag: "Correct" | "Incorrect" | "Backspace";
     switch (eventType) {
@@ -153,7 +153,7 @@ export function getErrorCountsBySecond(
 
 export function getWpmPerKeystroke(
   events: CharacterEvent[],
-  raceStartTimestamp: bigint,
+  raceStart_s: number,
 ): number[][] {
   const wpms = [];
   const stack = [];
@@ -163,6 +163,8 @@ export function getWpmPerKeystroke(
       if (stack.length == 0 || stack[stack.length - 1]) {
         stack.push(true);
         correctChars += 1;
+      } else {
+        stack.push(false);
       }
     } else if (evt.eventType.tag === "Incorrect") {
       stack.push(false);
@@ -173,10 +175,7 @@ export function getWpmPerKeystroke(
       }
     }
 
-    const time = Math.max(
-      evt.timestamp_s - Number(raceStartTimestamp) / 1_000_000,
-      0,
-    );
+    const time = Math.max(evt.timestamp_s - raceStart_s, 0);
     const wpm = getWpm(correctChars, time);
     wpms.push([time, wpm]);
   }
@@ -185,22 +184,22 @@ export function getWpmPerKeystroke(
 }
 
 export function getWpmByBucket(
-  compressedHistory: CharacterEvent[],
-  raceStartTimestamp: bigint,
+  history: CharacterEvent[],
+  raceStart_s: number,
   numBuckets: number,
 ): number[] {
-  const wpmPerKeystroke = getWpmPerKeystroke(
-    compressedHistory,
-    raceStartTimestamp,
-  );
+  const wpmPerKeystroke = getWpmPerKeystroke(history, raceStart_s);
+  const startTime = wpmPerKeystroke[0][0];
   const finishTime = wpmPerKeystroke[wpmPerKeystroke.length - 1][0];
-  const bucketSize = (finishTime - numBuckets) / numBuckets;
+  // -1 because we want both start and end as points
+  const bucketSize = (finishTime - startTime) / (numBuckets - 1);
+  if (bucketSize < 0) return [];
 
   const wpms = [];
 
   let keyI = 0;
-  for (let t = 0; t < finishTime; t += bucketSize) {
-    while (t > wpmPerKeystroke[keyI][0]) {
+  for (let t = startTime; t <= finishTime; t += bucketSize) {
+    while (keyI < wpmPerKeystroke.length && t > wpmPerKeystroke[keyI][0]) {
       keyI += 1;
     }
 
@@ -211,12 +210,10 @@ export function getWpmByBucket(
       const lowTime = wpmPerKeystroke[keyI - 1][0];
       const high = wpmPerKeystroke[keyI][1];
       const highTime = wpmPerKeystroke[keyI][0];
-      // console.log(low, lowTime, high, highTime);
 
       const amtInto = t - lowTime;
       const percentInto = amtInto / (highTime - lowTime);
-      const wpm = percentInto * (high - low);
-      // console.log(amtInto, percentInto, wpm);
+      const wpm = low + percentInto * (high - low);
 
       wpms.push(wpm);
     }
