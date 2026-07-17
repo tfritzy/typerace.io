@@ -8,19 +8,38 @@ import { Game, PlayerProgress } from "../stdb";
 import { THEME } from "../theme";
 import { decodeCharacterHistory, getWpmByBucket } from "../util/wpmCalculator";
 
-const bars = ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
-
 const dots = {
-  "44": "⣿",
-  "43": "⣷",
-  "42": "⣧",
-  "41": "⣇",
-  "40": "⡇",
-  "34": "⣾",
-  "24": "⣼",
-  "14": "⣸",
+  "00": "⠀",
+
+  "01": "⢀",
+  "02": "⢠",
+  "03": "⢰",
   "04": "⢸",
-};
+
+  "10": "⡀",
+  "11": "⣀",
+  "12": "⣠",
+  "13": "⣰",
+  "14": "⣸",
+
+  "20": "⡄",
+  "21": "⣄",
+  "22": "⣤",
+  "23": "⣴",
+  "24": "⣼",
+
+  "30": "⡆",
+  "31": "⣆",
+  "32": "⣦",
+  "33": "⣶",
+  "34": "⣾",
+
+  "40": "⡇",
+  "41": "⣇",
+  "42": "⣧",
+  "43": "⣷",
+  "44": "⣿",
+} as const;
 
 export class WpmChartInterior extends BoxRenderable {
   private raceStartTime_s: number = 0;
@@ -67,19 +86,20 @@ export class WpmChartInterior extends BoxRenderable {
     console.log(bars);
 
     for (let x = this.x; x < this.x + width; x++) {
-      const firstBar = bars[x - this.x * 2];
-      const secondBar = bars[x - this.x * 2 + 1];
+      const firstBar = bars[(x - this.x) * 2];
+      const secondBar = bars[(x - this.x) * 2 + 1];
       for (let y = this.y; y < this.y + height; y++) {
-        const h = y - this.y;
-        if (firstBar > h * 4 && secondBar > h * 4) {
-          buffer.setCell(
-            x,
-            y,
-            "⣿",
-            RGBA.fromHex(THEME.bg0_s),
-            RGBA.fromHex(THEME.bg0_h),
-          );
-        }
+        const h = height - 1 - (y - this.y);
+        const firstGap = Math.max(Math.min(firstBar - h * 4, 4), 0);
+        const secondGap = Math.max(Math.min(secondBar - h * 4, 4), 0);
+        const key = firstGap.toString() + secondGap.toString();
+        buffer.setCell(
+          x,
+          y,
+          dots[key as keyof typeof dots] || " ",
+          RGBA.fromHex(THEME.accent),
+          RGBA.fromHex(THEME.bg0_h),
+        );
       }
     }
   }

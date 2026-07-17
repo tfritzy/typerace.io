@@ -53,11 +53,11 @@ export class WpmChart extends BoxRenderable {
       justifyContent: "space-between",
       paddingBottom: 1,
     });
-    this.highWpm = new TextRenderable(ctx, { content: "100" });
-    this.midWpm = new TextRenderable(ctx, { content: "50" });
+    this.highWpm = new TextRenderable(ctx, { content: "100", fg: THEME.fg0 });
+    this.midWpm = new TextRenderable(ctx, { content: "50", fg: THEME.fg0 });
     yLegend.add(this.highWpm);
     yLegend.add(this.midWpm);
-    yLegend.add(new TextRenderable(ctx, { content: "0" }));
+    yLegend.add(new TextRenderable(ctx, { content: "0", fg: THEME.fg0 }));
     chart.add(yLegend);
     const interiorContainer = new BoxRenderable(ctx, {
       border: ["left", "bottom"],
