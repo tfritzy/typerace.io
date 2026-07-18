@@ -1,4 +1,4 @@
-# typerace.io
+# TypeRace.io
 
 A minimal [OpenTUI](https://github.com/anomalyco/opentui) application served directly over SSH. Each connection gets an independent counter centered in its terminal.
 
@@ -31,7 +31,7 @@ Create `/etc/systemd/system/typerace-tui.service` (adjust `User`, `WorkingDirect
 
 ```ini
 [Unit]
-Description=typerace.io OpenTUI SSH server
+Description=TypeRace.io OpenTUI SSH server
 After=network.target
 
 [Service]

@@ -44,7 +44,7 @@ export const languages: LanguageInfo[] = [
     nativeName: "English",
     htmlLang: "en",
     measurementMode: "wpm" as const,
-    title: "Typerace.io | Fast-Paced Typing Battles and WPM Tracker",
+    title: "TypeRace.io | Fast-Paced Typing Battles and WPM Tracker",
     description:
       "Race against players worldwide in real-time typing competitions. Test and improve your typing speed in multiplayer races.",
   },
@@ -59,7 +59,7 @@ export const languages: LanguageInfo[] = [
     htmlLang: "es",
     measurementMode: "wpm" as const,
     title:
-      "Typerace.io | Batallas de mecanografía trepidantes y medidor de PPM",
+      "TypeRace.io | Batallas de mecanografía trepidantes y medidor de PPM",
     description:
       "Compite contra jugadores de todo el mundo en carreras de mecanografía en tiempo real. Mejora tu velocidad de escritura.",
   },
@@ -73,7 +73,7 @@ export const languages: LanguageInfo[] = [
     nativeName: "Français",
     htmlLang: "fr",
     measurementMode: "wpm" as const,
-    title: "Typerace.io | Duels de frappe effrénés et suivi MPM",
+    title: "TypeRace.io | Duels de frappe effrénés et suivi MPM",
     description:
       "Affrontez des joueurs du monde entier dans des compétitions de frappe en temps réel. Améliorez votre vitesse de frappe.",
   },
@@ -87,7 +87,7 @@ export const languages: LanguageInfo[] = [
     nativeName: "Deutsch",
     htmlLang: "de",
     measurementMode: "wpm" as const,
-    title: "Typerace.io | Rasante Tippduelle und WPM-Tracker",
+    title: "TypeRace.io | Rasante Tippduelle und WPM-Tracker",
     description:
       "Tritt gegen Spieler weltweit in Echtzeit-Tippwettbewerben an. Verbessere deine Tippgeschwindigkeit.",
   },
@@ -101,7 +101,7 @@ export const languages: LanguageInfo[] = [
     nativeName: "Italiano",
     htmlLang: "it",
     measurementMode: "wpm" as const,
-    title: "Typerace.io | Sfide di digitazione ad alto ritmo e tracker PPM",
+    title: "TypeRace.io | Sfide di digitazione ad alto ritmo e tracker PPM",
     description:
       "Gareggia contro giocatori di tutto il mondo in competizioni di digitazione in tempo reale. Migliora la tua velocità di battitura.",
   },
@@ -116,7 +116,7 @@ export const languages: LanguageInfo[] = [
     htmlLang: "pt",
     measurementMode: "wpm" as const,
     title:
-      "Typerace.io | Batalhas de digitação em ritmo acelerado e rastreador de PPM",
+      "TypeRace.io | Batalhas de digitação em ritmo acelerado e rastreador de PPM",
     description:
       "Compita contra jogadores de todo o mundo em competições de digitação em tempo real. Melhore sua velocidade de digitação.",
   },
@@ -131,7 +131,7 @@ export const languages: LanguageInfo[] = [
     htmlLang: "ja",
     measurementMode: "cpm" as const,
     hasNoSpaces: true,
-    title: "Typerace.io | ハイペースなタイピングバトルとWPMトラッカー",
+    title: "TypeRace.io | ハイペースなタイピングバトルとWPMトラッカー",
     description:
       "世界中のプレイヤーとリアルタイムのタイピング競争で対戦しましょう。タイピング速度を向上させましょう。",
   },
@@ -145,7 +145,7 @@ export const languages: LanguageInfo[] = [
     nativeName: "한국어",
     htmlLang: "ko",
     measurementMode: "cpm" as const,
-    title: "Typerace.io | 빠른 템포의 타이핑 배틀과 WPM 추적기",
+    title: "TypeRace.io | 빠른 템포의 타이핑 배틀과 WPM 추적기",
     description:
       "전 세계 플레이어와 실시간 타이핑 대회에서 경쟁하세요. 타이핑 속도를 향상시키세요.",
   },
@@ -160,7 +160,7 @@ export const languages: LanguageInfo[] = [
     htmlLang: "zh",
     measurementMode: "cpm" as const,
     hasNoSpaces: true,
-    title: "Typerace.io | 快节奏打字对战与 WPM 追踪器",
+    title: "TypeRace.io | 快节奏打字对战与 WPM 追踪器",
     description: "与全球玩家进行实时打字比赛。提高你的打字速度。",
   },
   {
@@ -173,7 +173,7 @@ export const languages: LanguageInfo[] = [
     nativeName: "Українська",
     htmlLang: "uk",
     measurementMode: "wpm" as const,
-    title: "Typerace.io | Динамічні батли з друку та трекер швидкості друку",
+    title: "TypeRace.io | Динамічні батли з друку та трекер швидкості друку",
     description:
       "Змагайтеся з гравцями з усього світу в змаганнях з друку в реальному часі. Покращуйте швидкість друку.",
   },
@@ -187,7 +187,7 @@ export const languages: LanguageInfo[] = [
     nativeName: "हिन्दी",
     htmlLang: "hi",
     measurementMode: "wpm" as const,
-    title: "Typerace.io | तेज़-रफ़्तार टाइपिंग मुकाबले और WPM ट्रैकर",
+    title: "TypeRace.io | तेज़-रफ़्तार टाइपिंग मुकाबले और WPM ट्रैकर",
     description:
       "वास्तविक समय में टाइपिंग प्रतियोगिताओं में दुनिया भर के खिलाड़ियों के खिलाफ प्रतिस्पर्धा करें। अपनी टाइपिंग गति में सुधार करें।",
   },
@@ -201,7 +201,7 @@ export const languages: LanguageInfo[] = [
     nativeName: "Nederlands",
     htmlLang: "nl",
     measurementMode: "wpm" as const,
-    title: "Typerace.io | Snelle typegevechten en WPM-tracker",
+    title: "TypeRace.io | Snelle typegevechten en WPM-tracker",
     description:
       "Race tegen spelers wereldwijd in real-time typwedstrijden. Verbeter je typsnelheid.",
   },
@@ -215,7 +215,7 @@ export const languages: LanguageInfo[] = [
     nativeName: "Svenska",
     htmlLang: "sv",
     measurementMode: "wpm" as const,
-    title: "Typerace.io | Snabba skrivdueller och WPM-spårare",
+    title: "TypeRace.io | Snabba skrivdueller och WPM-spårare",
     description:
       "Tävla mot spelare världen över i skrivtävlingar i realtid. Förbättra din skrivhastighet.",
   },
@@ -229,7 +229,7 @@ export const languages: LanguageInfo[] = [
     nativeName: "Türkçe",
     htmlLang: "tr",
     measurementMode: "wpm" as const,
-    title: "Typerace.io | Hızlı tempolu yazma düelloları ve WPM takipçisi",
+    title: "TypeRace.io | Hızlı tempolu yazma düelloları ve WPM takipçisi",
     description:
       "Dünya genelindeki oyuncularla gerçek zamanlı yazma yarışmalarında yarışın. Yazma hızınızı geliştirin.",
   },

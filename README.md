@@ -1,4 +1,4 @@
-# typerace.io
+# TypeRace.io
 
 Deployed at https://typerace.io
 
