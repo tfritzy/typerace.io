@@ -67,6 +67,10 @@
           "destination": "/sv/index.html"
         },
         {
+          "source": "/ru",
+          "destination": "/ru/index.html"
+        },
+        {
           "source": "/tr",
           "destination": "/tr/index.html"
         },
@@ -132,6 +136,10 @@
         {
           "source": "/sv",
           "destination": "/sv/index.html"
+        },
+        {
+          "source": "/ru",
+          "destination": "/ru/index.html"
         },
         {
           "source": "/tr",

@@ -107,6 +107,8 @@ public static class PhraseGenerator
                 return new Phrase(SanitizeText(GeneratePhrase(Swedish500Words.Words, rng, 10, 14)));
             case GameMode.Turkish500:
                 return new Phrase(SanitizeText(GeneratePhrase(Turkish500Words.Words, rng, 8, 10)));
+            case GameMode.Russian500:
+                return new Phrase(SanitizeText(GeneratePhrase(Russian500Words.Words, rng, 8, 11)));
             case GameMode.EnglishQuotes:
             case GameMode.SpanishQuotes:
             case GameMode.FrenchQuotes:
@@ -122,6 +124,7 @@ public static class PhraseGenerator
             case GameMode.DutchQuotes:
             case GameMode.SwedishQuotes:
             case GameMode.TurkishQuotes:
+            case GameMode.RussianQuotes:
                 return QuoteGenerator.GetRandomQuote(mode, rng);
             default:
                 return new Phrase(SanitizeText("The quick brown fox jumps over the lazy dog"));

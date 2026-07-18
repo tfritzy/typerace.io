@@ -303,9 +303,9 @@ const THEME_PLAYER_COLORS: Record<ThemeTag, Record<string, string>> = {
 
 function getCurrentThemeTag(): string {
   try {
-    return localStorage.getItem("selectedTheme") ?? "TokyoNight";
+    return localStorage.getItem("selectedTheme") ?? "Kanagawa";
   } catch {
-    return "TokyoNight";
+    return "Kanagawa";
   }
 }
 

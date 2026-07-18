@@ -16,6 +16,7 @@ export enum Language {
   Dutch = "Dutch",
   Swedish = "Swedish",
   Turkish = "Turkish",
+  Russian = "Russian",
 }
 
 export interface LanguageInfo {
@@ -204,6 +205,20 @@ export const languages: LanguageInfo[] = [
     title: "TypeRace.io | Snelle typegevechten en WPM-tracker",
     description:
       "Race tegen spelers wereldwijd in real-time typwedstrijden. Verbeter je typsnelheid.",
+  },
+  {
+    language: Language.Russian,
+    flag: "🇷🇺",
+    countryCode: "ru",
+    slug: "ru",
+    randomWordsMode: "Russian500",
+    quotesMode: "RussianQuotes",
+    nativeName: "Русский",
+    htmlLang: "ru",
+    measurementMode: "wpm" as const,
+    title: "TypeRace.io | Динамичные гонки печати и трекер скорости",
+    description:
+      "Соревнуйтесь с игроками со всего мира в гонках печати в реальном времени. Улучшайте скорость и точность набора текста.",
   },
   {
     language: Language.Swedish,
@@ -440,6 +455,16 @@ const languageStartupPhrases: Record<Language, string[]> = {
     "lyckan står den djärve bi",
     "kom an då",
     "ge order",
+  ],
+  [Language.Russian]: [
+    "готов к бою",
+    "системы готовы",
+    "начать гонку",
+    "готов к старту",
+    "вперёд",
+    "удача любит смелых",
+    "пусть начнётся игра",
+    "жду команды",
   ],
   [Language.Turkish]: [
     "savaşa hazır",

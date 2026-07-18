@@ -175,7 +175,7 @@ export function resolveTheme(
   };
 }
 
-const DEFAULT_THEME_TAG: ThemeTag = "TokyoNight";
+const DEFAULT_THEME_TAG: ThemeTag = "Kanagawa";
 
 const DEFAULT_THEME_SETTINGS: ThemeSettings = {
   backgroundColor: "#282828",

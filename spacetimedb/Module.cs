@@ -43,7 +43,9 @@ public enum GameMode
     HindiQuotes,
     DutchQuotes,
     SwedishQuotes,
-    TurkishQuotes
+    TurkishQuotes,
+    Russian500,
+    RussianQuotes
 }
 
 [Type]
@@ -193,6 +195,9 @@ public static partial class Module
             case GameMode.Turkish500:
             case GameMode.TurkishQuotes:
                 return 40.0 / 32.0;
+            case GameMode.Russian500:
+            case GameMode.RussianQuotes:
+                return 40.0 / 30.0;
             default:
                 return 1.0;
         }

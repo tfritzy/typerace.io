@@ -23,6 +23,7 @@ public static class QuoteGenerator
             GameMode.DutchQuotes => DutchQuotes.Quotes,
             GameMode.SwedishQuotes => SwedishQuotes.Quotes,
             GameMode.TurkishQuotes => TurkishQuotes.Quotes,
+            GameMode.RussianQuotes => RussianQuotes.Quotes,
             _ => EnglishQuotes.Quotes
         };
 
