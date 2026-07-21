@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { Game } from "../types/stdb";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import bufoLetsGo from "../assets/bufo-lets-goo.gif";
 
 const PULSE_PERIOD_MS = 1000;
 const PULSE_BRIGHT_MS = 150;
@@ -15,6 +16,7 @@ export const Countdown = () => {
   const [showCount, setShowCount] = useState(false);
   const [showImage, setShowImage] = useState(false);
   const [pulseOn, setPulseOn] = useState(false);
+  const previousGameState = useRef<string>();
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -45,7 +47,6 @@ export const Countdown = () => {
   useEffect(() => {
     if (!isCountdown || !game) {
       setShowCount(false);
-      setShowImage(false);
       return;
     }
     const ms = Number(game.countdownDurationMs);
@@ -58,16 +59,33 @@ export const Countdown = () => {
   useEffect(() => {
     if (!isCountdown) return;
     if (count <= 0) {
-      setShowImage(true);
-      const t = setTimeout(() => {
-        setShowCount(false);
-        setShowImage(false);
-      }, 2000);
-      return () => clearTimeout(t);
+      setShowCount(false);
+      return;
     }
     const t = setTimeout(() => setCount((c) => c - 1), 1000);
     return () => clearTimeout(t);
   }, [isCountdown, count]);
+
+  useEffect(() => {
+    const previousState = previousGameState.current;
+    previousGameState.current = tag;
+
+    if (isCountdown) {
+      setShowImage(false);
+      return;
+    }
+
+    if (!isRacing) {
+      setShowImage(false);
+      return;
+    }
+
+    if (previousState !== "Countdown") return;
+
+    setShowImage(true);
+    const timeout = setTimeout(() => setShowImage(false), 2000);
+    return () => clearTimeout(timeout);
+  }, [isCountdown, isRacing, tag]);
 
   useEffect(() => {
     if (!isCountdown) {
@@ -140,7 +158,7 @@ export const Countdown = () => {
       `}</style>
         </div>
       )}
-      {showCount && showImage && (
+      {showImage && (
         <div
           className="fixed top-[52%] -translate-y-1/2 pointer-events-none z-50"
           style={{
@@ -148,7 +166,7 @@ export const Countdown = () => {
           }}
         >
           <img
-            src="/bufo-lets-goo.gif"
+            src={bufoLetsGo}
             alt=""
             aria-hidden="true"
             className="w-10 h-10 sm:w-14 sm:h-14"
