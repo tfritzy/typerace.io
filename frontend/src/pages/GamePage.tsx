@@ -13,6 +13,8 @@ import { getMaxPlayerCount } from "../utils/modes";
 import { GhostCursor } from "../components/GhostCursor";
 import { getPlayerColorHex } from "../utils/colorMapping";
 import { EmptyPlayerProgressBars } from "../components/EmptyPlayerProgressBars";
+import { GameSkeleton } from "../components/GameSkeleton";
+import { getPreferredGameType } from "../utils/gamePreferences";
 
 type UiGameType = "Public" | "Private" | "Practice";
 
@@ -218,7 +220,11 @@ export const GamePage = () => {
   }, [game, navigate]);
 
   if (!game) {
-    return null;
+    return (
+      <GameSkeleton
+        playerCount={getPreferredGameType() === "Practice" ? 1 : 3}
+      />
+    );
   }
 
   const gameTypeTag = game.gameType?.tag ?? "Public";

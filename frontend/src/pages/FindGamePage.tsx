@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { TypeBox } from "../components/TypeBox";
-import { EmptyPlayerProgressBars } from "../components/EmptyPlayerProgressBars";
-import { Header } from "../components/Header";
+import { GameSkeleton } from "../components/GameSkeleton";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import type { GameType, PlayerProgress } from "../types/stdb";
 import {
@@ -59,18 +57,6 @@ export function FindGamePage() {
   }, [conn, gameType, joinCode, langPrefix, mode, navigate]);
 
   return (
-    <div className="relative h-full flex flex-col">
-      <Header />
-      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4">
-        <div className="content-container w-full my-auto">
-          <div className="mb-3 grid gap-3">
-            <EmptyPlayerProgressBars count={slotCount} />
-          </div>
-          <div className="text-2xl leading-[1.6]">
-            <TypeBox phrase="" disabled hideCursor height="430px" />
-          </div>
-        </div>
-      </div>
-    </div>
+    <GameSkeleton playerCount={slotCount} />
   );
 }
