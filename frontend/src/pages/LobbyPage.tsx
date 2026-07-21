@@ -6,7 +6,6 @@ import {
   GameOptionsSelector,
   type GameTypeValue,
 } from "../components/ModeSelector";
-import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import {
   getRandomStartupPhrase,
@@ -64,8 +63,7 @@ export const LobbyPage = () => {
   }, [lang, navigate]);
 
   return (
-    <div className="relative h-full flex flex-col">
-      <Header />
+    <div className="relative flex-1 min-h-0 flex flex-col">
       <main className="flex-1 flex flex-col items-center p-4 min-h-0">
         <h1 className="sr-only">{getTranslations().tagline}</h1>
         <div className="flex-[4]" />

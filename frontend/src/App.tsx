@@ -6,12 +6,14 @@ import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { SiteStatsPage } from "./pages/SiteStatsPage";
 import { FindGamePage } from "./pages/FindGamePage";
 import { SpacetimeProvider } from "./contexts/SpacetimeContext";
+import { AppLayout } from "./components/AppLayout";
 
 function App() {
   return (
     <BrowserRouter>
       <SpacetimeProvider>
         <Routes>
+          <Route element={<AppLayout />}>
             <Route path="/" element={<LobbyPage />} />
             <Route path="/game" element={<FindGamePage />} />
             <Route path="/game/:gameId" element={<GamePage />} />
@@ -22,6 +24,7 @@ function App() {
             <Route path="/:lang/game" element={<FindGamePage />} />
             <Route path="/:lang/game/:gameId" element={<GamePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
         </Routes>
       </SpacetimeProvider>
     </BrowserRouter>

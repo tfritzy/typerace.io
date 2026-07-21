@@ -1,7 +1,6 @@
 import { type Player, type GameRecord } from "../types/stdb";
 import { WpmChart } from "../components/WpmChart";
 import { useEffect, useMemo, useState } from "react";
-import { Header } from "../components/Header";
 import { PlayerAvatar } from "../components/PlayerAvatar";
 import { useParams, useNavigate } from "react-router-dom";
 import { xpProgressToNextLevel } from "../utils/xpCalculator";
@@ -166,17 +165,11 @@ export const ProfilePage = () => {
     }, [gameRecords, viewedPlayer]);
 
     if (!viewedPlayer) {
-        return (
-            <div className="h-full flex flex-col">
-                <Header hideAvatar={true} />
-            </div>
-        );
+        return <div className="flex-1 min-h-0" />;
     }
 
     return (
-        <div className="h-full flex flex-col">
-            <Header hideAvatar={true} />
-
+        <div className="flex-1 min-h-0 flex flex-col">
             <main className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
                 <div className="content-container">
                     <div className="box box-shadow rounded-xl p-4 sm:p-8 mb-8 relative">

@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Header } from "../components/Header";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import { getThemePlayerColorList } from "../utils/colorMapping";
 import {
@@ -706,8 +705,7 @@ export const SiteStatsPage = () => {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <Header />
+    <div className="flex-1 min-h-0 flex flex-col">
       <main className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4 pb-12">
         <div className="content-container">
           <h1 className="text-3xl font-bold mb-6 text-foreground">
