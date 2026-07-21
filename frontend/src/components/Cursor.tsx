@@ -1,5 +1,7 @@
 import { memo, useLayoutEffect, useRef, useState, type RefObject } from "react";
 
+const CURSOR_SPEED_MULTIPLIER = 2;
+
 type CursorProps = {
     targetRef: RefObject<HTMLElement | null>;
     lerp?: number;
@@ -42,11 +44,24 @@ export const Cursor = memo(({ targetRef, lerp = .3, fadeDelay = 2000, visible = 
             }
         };
 
-        const animate = () => {
+        let previousFrameTime: number | null = null;
+
+        const animate = (frameTime: number) => {
             updateTarget();
 
-            position.current.x += (target.current.x - position.current.x) * lerp;
-            position.current.y += (target.current.y - position.current.y) * lerp;
+            const deltaTime = previousFrameTime === null
+                ? 1000 / 60
+                : frameTime - previousFrameTime;
+            previousFrameTime = frameTime;
+
+            const normalizedLerp = Math.min(Math.max(lerp, 0), 1);
+            const frameIndependentLerp = 1 - Math.pow(
+                1 - normalizedLerp,
+                CURSOR_SPEED_MULTIPLIER * deltaTime / (1000 / 60),
+            );
+
+            position.current.x += (target.current.x - position.current.x) * frameIndependentLerp;
+            position.current.y += (target.current.y - position.current.y) * frameIndependentLerp;
 
             if (followerRef.current) {
                 followerRef.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`;
