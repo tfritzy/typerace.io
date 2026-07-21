@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import type { DbConnection } from "../../module_bindings";
 import { type GameMode } from "../types/stdb";
 import type { GameTypeValue } from "../components/MatchTypeSelector";
-import { useFindGame } from "../hooks/useFindGame";
-import { getLangHome } from "../utils/modes";
+import { getLangHome, getLangPrefix } from "../utils/modes";
 import { getTranslations } from "../utils/translations";
+import { storeGameSearchPreferences } from "../utils/gamePreferences";
 
 type ActionBarProps = {
   mode?: GameMode;
@@ -17,7 +17,6 @@ type ActionBarProps = {
 
 export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: ActionBarProps) => {
   const navigate = useNavigate();
-  const { findGame } = useFindGame();
   const t = getTranslations();
 
   const canRematch = !rematchDisabled;
@@ -31,8 +30,9 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
   const handlePlayAgain = useCallback(() => {
     const selectedMode: GameMode = mode || { tag: "English500" };
     const selectedGameType = gameType || "Public";
-    findGame(selectedMode, selectedGameType);
-  }, [findGame, mode, gameType]);
+    storeGameSearchPreferences(selectedMode, selectedGameType);
+    navigate(`${getLangPrefix()}/game`, { replace: true });
+  }, [navigate, mode, gameType]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {

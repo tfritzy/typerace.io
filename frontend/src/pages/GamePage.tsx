@@ -12,7 +12,7 @@ import { useDatabase } from "../contexts/SpacetimeContext";
 import { getMaxPlayerCount } from "../utils/modes";
 import { GhostCursor } from "../components/GhostCursor";
 import { getPlayerColorHex } from "../utils/colorMapping";
-import { getTranslations } from "../utils/translations";
+import { EmptyPlayerProgressBars } from "../components/EmptyPlayerProgressBars";
 
 type UiGameType = "Public" | "Private" | "Practice";
 
@@ -236,7 +236,6 @@ export const GamePage = () => {
     currentPlayerId &&
     game.owner?.isEqual(currentPlayerId);
   const isCountdown = game.state?.tag === "Countdown";
-  const t = getTranslations();
 
   const currentPlayerProgress = gamePlayerProgress.find(
     (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
@@ -248,42 +247,20 @@ export const GamePage = () => {
   const isMemberOfRace = !!currentPlayerProgress;
   const isDisabled = isInLobby || isCountdown || !currentPlayerProgress;
 
-  return (
-    <div className="relative h-full flex flex-col">
-      <Header />
+  const progressBars = Array.from({ length: totalSlots }).map((_, index) => {
+    const pp = gamePlayerProgress[index];
+    const isCurrentPlayer =
+      pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
 
-      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4">
-        <div className="content-container w-full my-auto">
-          <div
-            className={`mb-3 grid gap-3 ${totalSlots > 3 ? "sm:grid-cols-2" : ""}`}
-          >
-            {Array.from({ length: totalSlots }).map((_, index) => {
-              const pp = gamePlayerProgress[index];
-              const isCurrentPlayer =
-                pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
+    if (!pp) {
+      if (game.gameType?.tag === "Private") {
+        return null;
+      }
+      return <EmptyPlayerProgressBars key={`loading-${index}`} count={1} />;
+    }
 
-              if (!pp) {
-                if (game.gameType?.tag === "Private") {
-                  return null;
-                }
-                return (
-                  <div key={`loading-${index}`}>
-                    <PlayerProgressBar
-                      name={t.waitingForPlayer}
-                      level={1}
-                      progressIndex={0}
-                      phraseLength={game.phrase.length}
-                      identityHash={`loading-${index}`}
-                      playerPublicId=""
-                      isCurrentPlayer={false}
-                      isLoading={true}
-                    />
-                  </div>
-                );
-              }
-
-              return (
-                <div key={pp.id.toString()}>
+    return (
+      <div key={pp.id.toString()}>
                   <PlayerProgressBar
                     key={pp.id.toString()}
                     name={pp.playerName}
@@ -306,11 +283,20 @@ export const GamePage = () => {
                       isCurrentPlayer ? undefined : pp.playerColor?.tag
                     }
                   />
-                </div>
-              );
-            })}
-          </div>
+      </div>
+    );
+  });
 
+  return (
+    <div className="relative h-full flex flex-col">
+      <Header />
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4">
+        <div className="content-container w-full my-auto">
+          <div
+            className={`mb-3 grid gap-3 ${totalSlots > 3 ? "sm:grid-cols-2" : ""}`}
+          >
+            {progressBars}
+          </div>
           {hasFinished || hasCompletedRace ? (
             (() => {
               const currentPP = gamePlayerProgress.find(

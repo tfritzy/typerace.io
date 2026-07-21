@@ -45,7 +45,7 @@ export const languages: LanguageInfo[] = [
     nativeName: "English",
     htmlLang: "en",
     measurementMode: "wpm" as const,
-    title: "TypeRace.io | Fast-Paced Typing Battles and WPM Tracker",
+    title: "TypeRace.io | Multiplayer Typing Races and WPM Tracker",
     description:
       "Race against players worldwide in real-time typing competitions. Test and improve your typing speed in multiplayer races.",
   },

@@ -1,46 +1,35 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { type GameMode } from "../types/stdb";
 import { TypeBox, type TypeBoxRef } from "../components/TypeBox";
-import { GameOptionsSelector, type GameTypeValue } from "../components/ModeSelector";
+import {
+  GameOptionsSelector,
+  type GameTypeValue,
+} from "../components/ModeSelector";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
-import { getRandomStartupPhrase, getLanguageFromSlug, getContentTypeFromMode, storeLangSlug } from "../utils/modes";
-import { useFindGame } from "../hooks/useFindGame";
+import {
+  getRandomStartupPhrase,
+  getLanguageFromSlug,
+  getContentTypeFromMode,
+  storeLangSlug,
+} from "../utils/modes";
 import { getTranslations } from "../utils/translations";
-
-const GAME_TYPE_KEY = "typerace_game_type";
-const CONTENT_TYPE_KEY = "typerace_content_type";
-
-const getInitialMode = (langSlug: string | undefined): GameMode => {
-  const langInfo = getLanguageFromSlug(langSlug);
-  try {
-    const storedContentType = localStorage.getItem(CONTENT_TYPE_KEY);
-    if (storedContentType === "Quotes" && langInfo.quotesMode) {
-      return { tag: langInfo.quotesMode } as GameMode;
-    }
-  } catch {}
-  return { tag: langInfo.randomWordsMode } as GameMode;
-};
-
-const getInitialGameType = (): GameTypeValue => {
-  try {
-    const stored = localStorage.getItem(GAME_TYPE_KEY);
-    if (stored) {
-      return stored as GameTypeValue;
-    }
-  } catch (error) {
-    console.error("Failed to load game type from localStorage:", error);
-  }
-  return "Public";
-};
+import {
+  CONTENT_TYPE_KEY,
+  GAME_TYPE_KEY,
+  getPreferredGameType,
+  getPreferredMode,
+} from "../utils/gamePreferences";
 
 export const LobbyPage = () => {
   const { lang } = useParams<{ lang?: string }>();
-  const [selectedMode, setSelectedMode] = useState<GameMode>(() => getInitialMode(lang));
-  const [gameType, setGameType] = useState<GameTypeValue>(getInitialGameType);
+  const navigate = useNavigate();
+  const [selectedMode, setSelectedMode] = useState<GameMode>(() =>
+    getPreferredMode(lang),
+  );
+  const [gameType, setGameType] = useState<GameTypeValue>(getPreferredGameType);
   const typeBoxRef = useRef<TypeBoxRef>(null);
-  const { findGame } = useFindGame();
   const currentLang = getLanguageFromSlug(lang);
 
   useMemo(() => storeLangSlug(currentLang.slug), [currentLang.slug]);
@@ -71,8 +60,8 @@ export const LobbyPage = () => {
   }, [selectedMode.tag]);
 
   const handlePhraseComplete = useCallback(() => {
-    findGame(selectedMode, gameType);
-  }, [findGame, selectedMode, gameType]);
+    navigate(`${lang ? `/${lang}` : ""}/game`, { replace: true });
+  }, [lang, navigate]);
 
   return (
     <div className="relative h-full flex flex-col">
@@ -99,7 +88,7 @@ export const LobbyPage = () => {
             />
           </div>
         </div>
-                <div className="flex-[6]" />
+        <div className="flex-[6]" />
       </main>
       <Footer />
     </div>
