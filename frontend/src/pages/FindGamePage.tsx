@@ -10,7 +10,7 @@ import {
 
 export function FindGamePage() {
   const { lang } = useParams<{ lang?: string }>();
-  const { conn } = useDatabase();
+  const { conn, status, reconnect } = useDatabase();
   const navigate = useNavigate();
   const [{ mode, gameType, joinCode, langPrefix }] = useState(() => ({
     mode: getPreferredMode(lang),
@@ -20,6 +20,14 @@ export function FindGamePage() {
   }));
   const slotCount = gameType === "Practice" ? 1 : 3;
   const hasSubmittedSearch = useRef(false);
+  const hasAttemptedReconnect = useRef(false);
+
+  useEffect(() => {
+    if (conn || status !== "error" || hasAttemptedReconnect.current) return;
+
+    hasAttemptedReconnect.current = true;
+    reconnect();
+  }, [conn, reconnect, status]);
 
   useEffect(() => {
     if (!conn) return;
