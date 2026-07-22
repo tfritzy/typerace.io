@@ -8,7 +8,7 @@ import { useDatabase } from "../contexts/SpacetimeContext";
 
 export const ProfileAvatar = memo(() => {
   const navigate = useNavigate();
-  const conn = useDatabase();
+  const { conn } = useDatabase();
   const { signInWithGoogle, signInWithGithub } = useAuth();
   const [myPlayer, setMyPlayer] = useState<Player | null>(null);
   const [showMenu, setShowMenu] = useState(false);

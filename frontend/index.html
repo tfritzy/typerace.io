@@ -183,80 +183,11 @@
       noscript { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
       .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
 
-      .loading-container {
-        width: 100%;
-        padding: 0 1rem;
-      }
-
-      .loading-content {
-        width: 100%;
-        max-width: var(--max-content-width);
-        margin-left: auto;
-        margin-right: auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 4rem;
-      }
-
-      .loading-logo {
-        font-size: 1.65rem;
-        font-weight: 800;
-        user-select: none;
-        font-family: system-ui, sans-serif;
-      }
-
-      .loading-logo-text {
-        color: var(--color-white);
-      }
-
-      .loading-logo-accent {
-        color: var(--color-accent);
-      }
-
-      .loading-logo-io {
-        color: var(--color-accent);
-      }
-
-      .loading-spinner {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        margin-left: -16px;
-        margin-top: -16px;
-        width: 32px;
-        height: 32px;
-        border: 3px solid rgba(255, 255, 255, 0.1);
-        border-top-color: rgba(255, 255, 255, 0.6);
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-      }
-
-      @keyframes spin {
-        to { transform: rotate(360deg); }
-      }
     </style>
-    <script>
-      window.__spinnerStartTime = Date.now();
-      document.addEventListener('DOMContentLoaded', () => {
-        const spinner = document.querySelector('.loading-spinner');
-        if (spinner) {
-          const elapsed = Date.now() - window.__spinnerStartTime;
-          const delay = -(elapsed % 800);
-          spinner.style.animationDelay = delay + 'ms';
-        }
-      });
-    </script>
   </head>
   <body>
     <div id="root">
       <h1 class="sr-only">Multiplayer Typing Races</h1>
-      <div class="loading-container">
-        <div class="loading-content">
-          <div class="loading-logo"><span class="loading-logo-text">Type</span><span class="loading-logo-accent">Race</span><span class="loading-logo-io">.io</span></div>
-          <div class="loading-spinner"></div>
-        </div>
-      </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -10,7 +10,7 @@ import {
 
 export function FindGamePage() {
   const { lang } = useParams<{ lang?: string }>();
-  const conn = useDatabase();
+  const { conn } = useDatabase();
   const navigate = useNavigate();
   const [{ mode, gameType, joinCode, langPrefix }] = useState(() => ({
     mode: getPreferredMode(lang),

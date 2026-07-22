@@ -30,7 +30,7 @@ export const AllPlayersWpmChart = ({
     allPlayerProgress,
     raceStartTimestamp
 }: AllPlayersWpmChartProps) => {
-    const conn = useDatabase();
+    const { conn } = useDatabase();
     const style = getComputedStyle(document.documentElement);
 
     const resolvedColors = {

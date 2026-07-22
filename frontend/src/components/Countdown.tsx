@@ -10,7 +10,7 @@ const PULSE_FADE_MS = 800;
 
 export const Countdown = () => {
   const { gameId } = useParams<{ gameId: string }>();
-  const conn = useDatabase();
+  const { conn } = useDatabase();
   const [game, setGame] = useState<Game | null>(null);
   const [count, setCount] = useState(3);
   const [showCount, setShowCount] = useState(false);

@@ -15,7 +15,7 @@ export const AllPlayersResults = ({
     raceStartTimestamp,
     initialSelectedPlayerId
 }: AllPlayersResultsProps) => {
-    const conn = useDatabase();
+    const { conn } = useDatabase();
     if (!allPlayerProgress || allPlayerProgress.length === 0) {
         return null;
     }

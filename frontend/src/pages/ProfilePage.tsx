@@ -16,7 +16,7 @@ type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
 
 export const ProfilePage = () => {
     const { playerId } = useParams<{ playerId: string }>();
-    const conn = useDatabase();
+    const { conn } = useDatabase();
     const [viewedPlayer, setViewedPlayer] = useState<Player | null>(null);
     const [gameRecords, setGameRecords] = useState<GameRecord[]>([]);
     const [selectedMode, setSelectedMode] = useState<string>('all');

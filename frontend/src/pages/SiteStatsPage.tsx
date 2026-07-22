@@ -56,7 +56,7 @@ interface GlobalStats {
 }
 
 export const SiteStatsPage = () => {
-  const conn = useDatabase();
+  const { conn } = useDatabase();
   const [globalStats, setGlobalStats] = useState<GlobalStats[]>([]);
   const [selectedTimeFrame, setSelectedTimeFrame] =
     useState<TimeFrame>("1month");

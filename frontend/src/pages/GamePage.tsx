@@ -20,7 +20,7 @@ type UiGameType = "Public" | "Private" | "Practice";
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
-  const conn = useDatabase();
+  const { conn, status: databaseStatus } = useDatabase();
   const [hasFinished, setHasFinished] = useState(false);
   const [game, setGame] = useState<Game | null>(null);
   const [gamePlayerProgress, setGamePlayerProgress] = useState<
@@ -209,14 +209,14 @@ export const GamePage = () => {
   }, [gamePlayerProgress, currentPlayerId, game?.phrase]);
 
   useEffect(() => {
-    if (game) return;
+    if (game || databaseStatus !== "connected") return;
 
     const timeout = setTimeout(() => {
       navigate("/", { replace: true });
     }, 3000);
 
     return () => clearTimeout(timeout);
-  }, [game, navigate]);
+  }, [databaseStatus, game, navigate]);
 
   if (!game) {
     return (

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Outlet, useMatch } from "react-router-dom";
 import { Header } from "./Header";
 
@@ -7,7 +8,9 @@ export function AppLayout() {
   return (
     <div className="h-full flex flex-col">
       <Header hideAvatar={Boolean(isProfilePage)} />
-      <Outlet />
+      <Suspense fallback={null}>
+        <Outlet />
+      </Suspense>
     </div>
   );
 }
