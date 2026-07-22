@@ -7,6 +7,11 @@ import { getInitialTheme, applyTheme } from "./utils/themes.ts";
 
 applyTheme(getInitialTheme());
 
+window.addEventListener("vite:preloadError", (event) => {
+  event.preventDefault();
+  window.location.reload();
+});
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AuthProvider>

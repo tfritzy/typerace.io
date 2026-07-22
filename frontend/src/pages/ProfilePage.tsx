@@ -36,7 +36,14 @@ export const ProfilePage = () => {
 
     useEffect(() => {
         if (!conn || !playerId) return;
-        setViewedPlayer(null);
+
+        const resolvePlayer = () => {
+            const player = Array.from(conn.db.player.iter())
+                .find(candidate => candidate.playerId === playerId);
+            setViewedPlayer(player ?? null);
+        };
+
+        resolvePlayer();
 
         const handlePlayerInsert = (_ctx: any, player: Player) => {
             if (player.playerId === playerId) {
@@ -54,6 +61,7 @@ export const ProfilePage = () => {
         conn.db.player.onUpdate(handlePlayerUpdate);
 
         const subscription = conn.subscriptionBuilder()
+            .onApplied(resolvePlayer)
             .subscribe([`SELECT * FROM player WHERE PlayerId = '${playerId}'`]);
 
         return () => {
