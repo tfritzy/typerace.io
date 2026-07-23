@@ -6,9 +6,14 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@200;400;500;700&family=Inter:wght@400;500;600;700&display=swap">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,400;0,700;1,400&display=swap" rel="stylesheet">
-
+    <link
+      id="google-fonts"
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Handlee&family=IBM+Plex+Mono:ital,wght@0,100;0,400;0,700;1,400&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@200;400;500;700&display=swap"
+      media="print"
+      onload="this.media='all';this.dataset.loaded='true'"
+      onerror="this.dataset.loaded='error'"
+    >
     <!-- Favicons -->
     <link rel="icon" type="image/png" sizes="192x192" href="/favicons/android-chrome-192x192.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
@@ -70,17 +75,6 @@
       "url": "https://typerace.io"
     }
     </script>
-    
-    <!-- Semantic HTML for Screen Readers (hidden but crawlable) -->
-    <noscript>
-      <h1>TypeRace.io | Multiplayer Typing Races and WPM Tracker</h1>
-      <p>
-        Compete in real-time multiplayer typing races. Choose from multiple languages including 
-        English, Spanish, French, German, Italian, Portuguese, Japanese, Korean, Chinese, Ukrainian, 
-        Arabic, Hindi, Dutch, Russian, Swedish, and Turkish. Practice your typing speed in public matches,
-        private lobbies, or solo practice mode.
-      </p>
-    </noscript>
     
     <script>
       (function() {
@@ -186,6 +180,15 @@
     </style>
   </head>
   <body>
+    <noscript>
+      <h1>TypeRace.io | Multiplayer Typing Races and WPM Tracker</h1>
+      <p>
+        Compete in real-time multiplayer typing races. Choose from multiple languages including
+        English, Spanish, French, German, Italian, Portuguese, Japanese, Korean, Chinese, Ukrainian,
+        Arabic, Hindi, Dutch, Russian, Swedish, and Turkish. Practice your typing speed in public matches,
+        private lobbies, or solo practice mode.
+      </p>
+    </noscript>
     <div id="root">
       <h1 class="sr-only">Multiplayer Typing Races</h1>
     </div>

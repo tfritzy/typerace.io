@@ -29,6 +29,10 @@ export interface Translations {
   place: string;
   accuracy: string;
   tooManyErrors: string;
+  startPrompt?: {
+    instruction: string;
+    constraint: string;
+  };
 }
 
 const translations: Record<Language, Translations> = {
@@ -61,6 +65,10 @@ const translations: Record<Language, Translations> = {
     accuracy: "Accuracy",
     tagline: "Multiplayer Typing Races",
     tooManyErrors: "You must fix all errors",
+    startPrompt: {
+      instruction: "Type to start",
+      constraint: "no errors allowed",
+    },
   },
   [Language.Spanish]: {
     publicMatch: "Partida pública",
@@ -76,7 +84,8 @@ const translations: Record<Language, Translations> = {
     theme: "Tema",
     waitingForPlayers: "Esperando jugadores...",
     waitingForOwner: "Esperando al anfitrión...",
-    shareLink: "Comparte este enlace con tus amigos para invitarlos a esta carrera",
+    shareLink:
+      "Comparte este enlace con tus amigos para invitarlos a esta carrera",
     copied: "¡Copiado!",
     gameLink: "Enlace de partida",
     startGame: "Iniciar partida",
@@ -91,6 +100,10 @@ const translations: Record<Language, Translations> = {
     accuracy: "Precisión",
     tagline: "Carreras de mecanografía multijugador",
     tooManyErrors: "Debes corregir todos los errores",
+    startPrompt: {
+      instruction: "Escribe para empezar",
+      constraint: "no se permiten errores",
+    },
   },
   [Language.French]: {
     publicMatch: "Partie publique",
@@ -121,6 +134,10 @@ const translations: Record<Language, Translations> = {
     accuracy: "Précision",
     tagline: "Courses de dactylographie multijoueur",
     tooManyErrors: "Vous devez corriger toutes les erreurs",
+    startPrompt: {
+      instruction: "Tapez pour commencer",
+      constraint: "aucune erreur permise",
+    },
   },
   [Language.German]: {
     publicMatch: "Öffentliches Spiel",
@@ -151,6 +168,10 @@ const translations: Record<Language, Translations> = {
     accuracy: "Genauigkeit",
     tagline: "Multiplayer-Tippwettbewerbe",
     tooManyErrors: "Du musst alle Fehler korrigieren",
+    startPrompt: {
+      instruction: "Tippe zum Starten",
+      constraint: "keine Fehler erlaubt",
+    },
   },
   [Language.Italian]: {
     publicMatch: "Partita pubblica",
@@ -181,6 +202,10 @@ const translations: Record<Language, Translations> = {
     accuracy: "Precisione",
     tagline: "Gare di digitazione multiplayer",
     tooManyErrors: "Devi correggere tutti gli errori",
+    startPrompt: {
+      instruction: "Digita per iniziare",
+      constraint: "nessun errore consentito",
+    },
   },
   [Language.Portuguese]: {
     publicMatch: "Partida pública",
@@ -196,7 +221,8 @@ const translations: Record<Language, Translations> = {
     theme: "Tema",
     waitingForPlayers: "Aguardando jogadores...",
     waitingForOwner: "Aguardando o anfitrião...",
-    shareLink: "Compartilhe este link com amigos para convidá-los para esta corrida",
+    shareLink:
+      "Compartilhe este link com amigos para convidá-los para esta corrida",
     copied: "Copiado!",
     gameLink: "Link da partida",
     startGame: "Iniciar partida",
@@ -211,6 +237,10 @@ const translations: Record<Language, Translations> = {
     accuracy: "Precisão",
     tagline: "Corridas de digitação multijogador",
     tooManyErrors: "Você deve corrigir todos os erros",
+    startPrompt: {
+      instruction: "Digite para começar",
+      constraint: "nenhum erro permitido",
+    },
   },
   [Language.Japanese]: {
     publicMatch: "パブリックマッチ",
@@ -316,7 +346,8 @@ const translations: Record<Language, Translations> = {
     theme: "Тема",
     waitingForPlayers: "Очікування гравців...",
     waitingForOwner: "Очікування на хоста...",
-    shareLink: "Поділіться цим посиланням з друзями, щоб запросити їх до змагання",
+    shareLink:
+      "Поділіться цим посиланням з друзями, щоб запросити їх до змагання",
     copied: "Скопійовано!",
     gameLink: "Посилання на гру",
     startGame: "Почати гру",
@@ -376,7 +407,8 @@ const translations: Record<Language, Translations> = {
     theme: "थीम",
     waitingForPlayers: "खिलाड़ियों की प्रतीक्षा...",
     waitingForOwner: "होस्ट के शुरू करने की प्रतीक्षा...",
-    shareLink: "इस लिंक को दोस्तों के साथ साझा करें और उन्हें रेस में आमंत्रित करें",
+    shareLink:
+      "इस लिंक को दोस्तों के साथ साझा करें और उन्हें रेस में आमंत्रित करें",
     copied: "कॉपी हो गया!",
     gameLink: "गेम लिंक",
     startGame: "गेम शुरू करें",
@@ -406,7 +438,8 @@ const translations: Record<Language, Translations> = {
     theme: "Thema",
     waitingForPlayers: "Wachten op spelers...",
     waitingForOwner: "Wachten op de host...",
-    shareLink: "Deel deze link met vrienden om ze uit te nodigen voor deze race",
+    shareLink:
+      "Deel deze link met vrienden om ze uit te nodigen voor deze race",
     copied: "Gekopieerd!",
     gameLink: "Spellink",
     startGame: "Spel starten",
@@ -421,6 +454,10 @@ const translations: Record<Language, Translations> = {
     accuracy: "Nauwkeurigheid",
     tagline: "Multiplayer typwedstrijden",
     tooManyErrors: "Je moet alle fouten corrigeren",
+    startPrompt: {
+      instruction: "Typ om te beginnen",
+      constraint: "geen fouten toegestaan",
+    },
   },
   [Language.Swedish]: {
     publicMatch: "Offentlig match",
@@ -451,6 +488,10 @@ const translations: Record<Language, Translations> = {
     accuracy: "Noggrannhet",
     tagline: "Multiplayer-skrivtävlingar",
     tooManyErrors: "Du måste rätta alla fel",
+    startPrompt: {
+      instruction: "Skriv för att börja",
+      constraint: "inga fel tillåtna",
+    },
   },
   [Language.Russian]: {
     publicMatch: "Публичный матч",
@@ -466,7 +507,8 @@ const translations: Record<Language, Translations> = {
     theme: "Тема",
     waitingForPlayers: "Ожидание игроков...",
     waitingForOwner: "Ожидание запуска владельцем...",
-    shareLink: "Поделитесь этой ссылкой с друзьями, чтобы пригласить их в гонку",
+    shareLink:
+      "Поделитесь этой ссылкой с друзьями, чтобы пригласить их в гонку",
     copied: "Скопировано!",
     gameLink: "Ссылка на игру",
     startGame: "Начать игру",
@@ -511,6 +553,10 @@ const translations: Record<Language, Translations> = {
     accuracy: "Doğruluk",
     tagline: "Çok oyunculu yazma yarışları",
     tooManyErrors: "Tüm hataları düzeltmelisiniz",
+    startPrompt: {
+      instruction: "Başlamak için yaz",
+      constraint: "hatalara izin yok",
+    },
   },
 };
 

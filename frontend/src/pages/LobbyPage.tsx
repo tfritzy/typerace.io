@@ -20,6 +20,7 @@ import {
   getPreferredGameType,
   getPreferredMode,
 } from "../utils/gamePreferences";
+import { TypeToStartNotice } from "../components/TypeToStartNotice";
 
 export const LobbyPage = () => {
   const { lang } = useParams<{ lang?: string }>();
@@ -32,6 +33,7 @@ export const LobbyPage = () => {
   const currentLang = getLanguageFromSlug(lang);
 
   useMemo(() => storeLangSlug(currentLang.slug), [currentLang.slug]);
+  const translations = getTranslations();
 
   useEffect(() => {
     document.title = currentLang.title;
@@ -65,10 +67,11 @@ export const LobbyPage = () => {
   return (
     <div className="relative flex-1 min-h-0 flex flex-col">
       <main className="flex-1 flex flex-col items-center p-4 min-h-0">
-        <h1 className="sr-only">{getTranslations().tagline}</h1>
+        <h1 className="sr-only">{translations.tagline}</h1>
         <div className="flex-[4]" />
         <div className="content-container">
-          <div className="text-2xl">
+          <div className="text-3xl relative">
+            <TypeToStartNotice prompt={translations.startPrompt} />
             <TypeBox
               ref={typeBoxRef}
               phrase={startupPhrase}

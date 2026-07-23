@@ -26,8 +26,13 @@ function ThemeRow({
             onClick={onSelect}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
-            className="flex items-center w-full px-4 py-3 cursor-pointer text-left relative"
-            style={{ background: resolved.colors.background }}
+            className="flex items-center w-full px-4 py-4 cursor-pointer text-left relative rounded-xl overflow-hidden border"
+            style={{
+                background: resolved.colors.background,
+                borderColor: isSelected
+                    ? resolved.colors.accent
+                    : resolved.colors.border,
+            }}
         >
             <div
                 className="absolute inset-0 transition-opacity duration-150"
@@ -98,14 +103,14 @@ export const ThemeShowcaseModal = ({ open, onClose }: ThemeShowcaseModalProps) =
 
     return (
         <Dialog open={open} onOpenChange={(open) => { if (!open) onClose(); }}>
-            <DialogContent className="max-w-sm max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
+            <DialogContent className="max-w-md max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
                 <DialogTitle className="sr-only">Theme Settings</DialogTitle>
                 <div className="px-5 pt-5 pb-3 border-b border-border shrink-0">
                     <h2 className="text-lg font-semibold text-foreground">Themes</h2>
                 </div>
 
                 <div className="flex-1 overflow-y-auto">
-                    <div className="flex flex-col">
+                    <div className="grid grid-cols-2 gap-3 p-4">
                         {themeTags.map((tag) => (
                             <ThemeRow
                                 key={tag}
