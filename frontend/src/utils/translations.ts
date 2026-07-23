@@ -66,8 +66,8 @@ const translations: Record<Language, Translations> = {
     tagline: "Multiplayer Typing Races",
     tooManyErrors: "You must fix all errors",
     startPrompt: {
-      instruction: "Type to start",
-      constraint: "no errors allowed",
+      instruction: "Type",
+      constraint: "no errors",
     },
   },
   [Language.Spanish]: {
@@ -101,8 +101,8 @@ const translations: Record<Language, Translations> = {
     tagline: "Carreras de mecanografía multijugador",
     tooManyErrors: "Debes corregir todos los errores",
     startPrompt: {
-      instruction: "Escribe para empezar",
-      constraint: "no se permiten errores",
+      instruction: "Escribe",
+      constraint: "sin errores",
     },
   },
   [Language.French]: {
@@ -135,8 +135,8 @@ const translations: Record<Language, Translations> = {
     tagline: "Courses de dactylographie multijoueur",
     tooManyErrors: "Vous devez corriger toutes les erreurs",
     startPrompt: {
-      instruction: "Tapez pour commencer",
-      constraint: "aucune erreur permise",
+      instruction: "Tapez",
+      constraint: "sans erreurs",
     },
   },
   [Language.German]: {
@@ -169,8 +169,8 @@ const translations: Record<Language, Translations> = {
     tagline: "Multiplayer-Tippwettbewerbe",
     tooManyErrors: "Du musst alle Fehler korrigieren",
     startPrompt: {
-      instruction: "Tippe zum Starten",
-      constraint: "keine Fehler erlaubt",
+      instruction: "Tippe",
+      constraint: "keine Fehler",
     },
   },
   [Language.Italian]: {
@@ -203,8 +203,8 @@ const translations: Record<Language, Translations> = {
     tagline: "Gare di digitazione multiplayer",
     tooManyErrors: "Devi correggere tutti gli errori",
     startPrompt: {
-      instruction: "Digita per iniziare",
-      constraint: "nessun errore consentito",
+      instruction: "Digita",
+      constraint: "nessun errore",
     },
   },
   [Language.Portuguese]: {
@@ -238,8 +238,8 @@ const translations: Record<Language, Translations> = {
     tagline: "Corridas de digitação multijogador",
     tooManyErrors: "Você deve corrigir todos os erros",
     startPrompt: {
-      instruction: "Digite para começar",
-      constraint: "nenhum erro permitido",
+      instruction: "Digite",
+      constraint: "sem erros",
     },
   },
   [Language.Japanese]: {
@@ -455,8 +455,8 @@ const translations: Record<Language, Translations> = {
     tagline: "Multiplayer typwedstrijden",
     tooManyErrors: "Je moet alle fouten corrigeren",
     startPrompt: {
-      instruction: "Typ om te beginnen",
-      constraint: "geen fouten toegestaan",
+      instruction: "Typ",
+      constraint: "geen fouten",
     },
   },
   [Language.Swedish]: {
@@ -489,8 +489,8 @@ const translations: Record<Language, Translations> = {
     tagline: "Multiplayer-skrivtävlingar",
     tooManyErrors: "Du måste rätta alla fel",
     startPrompt: {
-      instruction: "Skriv för att börja",
-      constraint: "inga fel tillåtna",
+      instruction: "Skriv",
+      constraint: "inga fel",
     },
   },
   [Language.Russian]: {
@@ -554,8 +554,8 @@ const translations: Record<Language, Translations> = {
     tagline: "Çok oyunculu yazma yarışları",
     tooManyErrors: "Tüm hataları düzeltmelisiniz",
     startPrompt: {
-      instruction: "Başlamak için yaz",
-      constraint: "hatalara izin yok",
+      instruction: "Yaz",
+      constraint: "hata yok",
     },
   },
 };

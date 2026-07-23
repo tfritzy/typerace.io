@@ -321,17 +321,6 @@ body {
   }
 }
 
-@keyframes handwritingReveal {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes slideInRight {
   from {
     opacity: 0;

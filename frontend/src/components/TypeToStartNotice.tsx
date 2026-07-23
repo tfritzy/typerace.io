@@ -60,16 +60,16 @@ export function TypeToStartNotice({ prompt }: TypeToStartNoticeProps) {
     >
       <RoughPaperFilter id="rough-handwriting" />
       <div
-        className="absolute inset-0 animate-[handwritingReveal_250ms_ease-out]"
+        className="absolute inset-0 animate-[fadeIn_150ms_ease-out]"
         style={{ filter: "url(#rough-handwriting)" }}
       >
-        <div className="absolute left-12 -top-5">
+        <div className="absolute left-14 -top-3">
           <div className="text-4xl whitespace-nowrap">{prompt.instruction}</div>
-          <div className="mt-1 ml-4 text-2xl whitespace-nowrap">
-            ∗{prompt.constraint}
+          <div className="mt-1 ml-2 text-2xl whitespace-nowrap">
+            - {prompt.constraint}
           </div>
         </div>
-        <HandDrawnArrow className="absolute left-1 top-6 h-[84px] w-14" />
+        <HandDrawnArrow className="absolute left-2 top-[30px] h-[72px] w-12" />
       </div>
     </div>
   );
