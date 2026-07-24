@@ -76,22 +76,22 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                 <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label={t.privateLobby} />
                 <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label={t.practiceMode} />
                 <span className="mx-2 text-border-hover select-none">|</span>
-                <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
                 <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label={t.quotes} disabled={!quotesAvailableForLanguage} />
+                <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
                 <span className="mx-2 text-border-hover select-none">|</span>
                 <LanguageDropdown />
             </div>
 
-            <div className="md:hidden flex items-center justify-center gap-2">
+            <div className="md:hidden flex w-full max-w-full min-w-0 items-center justify-center gap-2">
                 <button
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-secondary text-secondary-foreground transition-all duration-200"
+                    className="inline-flex min-w-0 items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-secondary text-secondary-foreground transition-all duration-200"
                     onClick={() => setIsDrawerOpen(true)}
                 >
                     {gameType === "Public" && <Globe size={16} />}
                     {gameType === "Private" && <Lock size={16} />}
                     {gameType === "Practice" && <Target size={16} />}
-                    <span>{gameTypeLabel(gameType)} · {contentType === "Quotes" ? t.quotes : t.randomWords}</span>
-                    <ChevronDown size={16} />
+                    <span className="truncate">{gameTypeLabel(gameType)} · {contentType === "Quotes" ? t.quotes : t.randomWords}</span>
+                    <ChevronDown className="shrink-0" size={16} />
                 </button>
                 <LanguageDropdown />
             </div>
@@ -122,8 +122,8 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                 </div>
                                 <h3 className="text-secondary-foreground text-sm font-medium mb-3 uppercase tracking-wider">{t.mode}</h3>
                                 <div className="flex flex-wrap gap-2 mb-6">
-                                    <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
                                     <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label={t.quotes} disabled={!quotesAvailableForLanguage} />
+                                    <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
                                 </div>
                             </div>
                         </div>

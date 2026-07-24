@@ -66,7 +66,7 @@ const translations: Record<Language, Translations> = {
     tagline: "Multiplayer Typing Races",
     tooManyErrors: "You must fix all errors",
     startPrompt: {
-      instruction: "Type",
+      instruction: "Type!",
       constraint: "no errors",
     },
   },
@@ -101,7 +101,7 @@ const translations: Record<Language, Translations> = {
     tagline: "Carreras de mecanografía multijugador",
     tooManyErrors: "Debes corregir todos los errores",
     startPrompt: {
-      instruction: "Escribe",
+      instruction: "Escribe!",
       constraint: "sin errores",
     },
   },
@@ -135,7 +135,7 @@ const translations: Record<Language, Translations> = {
     tagline: "Courses de dactylographie multijoueur",
     tooManyErrors: "Vous devez corriger toutes les erreurs",
     startPrompt: {
-      instruction: "Tapez",
+      instruction: "Tapez!",
       constraint: "sans erreurs",
     },
   },
@@ -169,7 +169,7 @@ const translations: Record<Language, Translations> = {
     tagline: "Multiplayer-Tippwettbewerbe",
     tooManyErrors: "Du musst alle Fehler korrigieren",
     startPrompt: {
-      instruction: "Tippe",
+      instruction: "Tippe!",
       constraint: "keine Fehler",
     },
   },
@@ -203,7 +203,7 @@ const translations: Record<Language, Translations> = {
     tagline: "Gare di digitazione multiplayer",
     tooManyErrors: "Devi correggere tutti gli errori",
     startPrompt: {
-      instruction: "Digita",
+      instruction: "Digita!",
       constraint: "nessun errore",
     },
   },
@@ -238,7 +238,7 @@ const translations: Record<Language, Translations> = {
     tagline: "Corridas de digitação multijogador",
     tooManyErrors: "Você deve corrigir todos os erros",
     startPrompt: {
-      instruction: "Digite",
+      instruction: "Digite!",
       constraint: "sem erros",
     },
   },
@@ -455,7 +455,7 @@ const translations: Record<Language, Translations> = {
     tagline: "Multiplayer typwedstrijden",
     tooManyErrors: "Je moet alle fouten corrigeren",
     startPrompt: {
-      instruction: "Typ",
+      instruction: "Typ!",
       constraint: "geen fouten",
     },
   },
@@ -489,7 +489,7 @@ const translations: Record<Language, Translations> = {
     tagline: "Multiplayer-skrivtävlingar",
     tooManyErrors: "Du måste rätta alla fel",
     startPrompt: {
-      instruction: "Skriv",
+      instruction: "Skriv!",
       constraint: "inga fel",
     },
   },
@@ -554,7 +554,7 @@ const translations: Record<Language, Translations> = {
     tagline: "Çok oyunculu yazma yarışları",
     tooManyErrors: "Tüm hataları düzeltmelisiniz",
     startPrompt: {
-      instruction: "Yaz",
+      instruction: "Yaz!",
       constraint: "hata yok",
     },
   },

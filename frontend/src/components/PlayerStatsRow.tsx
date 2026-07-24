@@ -25,10 +25,10 @@ export const PlayerStatsRow = memo(
     const isHighWpm = finalWpm >= 100;
 
     return (
-      <div className="flex gap-3 mb-3 items-stretch min-h-[100px] flex-wrap">
-        <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
+      <div className="flex gap-3 mb-3 items-stretch min-h-[90px] flex-wrap">
+        <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-2 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
           <div
-            className={`text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold ${isFirstPlace ? "text-accent-primary" : "text-muted-foreground"}`}
+            className={`text-[10px] uppercase tracking-[1.2px] mb-1 font-semibold ${isFirstPlace ? "text-accent-primary" : "text-muted-foreground"}`}
           >
             {t.place}
           </div>
@@ -41,7 +41,7 @@ export const PlayerStatsRow = memo(
 
         <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
           <div
-            className={`text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold ${isHighWpm ? "text-accent-primary" : "text-muted-foreground"}`}
+            className={`text-[10px] uppercase tracking-[1.2px] mb-1 font-semibold ${isHighWpm ? "text-accent-primary" : "text-muted-foreground"}`}
           >
             {t.wpm}
           </div>
@@ -54,7 +54,7 @@ export const PlayerStatsRow = memo(
 
         <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
           <div
-            className={`text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold ${isFirstPlace ? "text-accent-primary" : "text-muted-foreground"}`}
+            className={`text-[10px] uppercase tracking-[1.2px] mb-1 font-semibold ${isFirstPlace ? "text-accent-primary" : "text-muted-foreground"}`}
           >
             {t.time}
           </div>
@@ -67,7 +67,7 @@ export const PlayerStatsRow = memo(
 
         <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
           <div
-            className={`text-[10px] uppercase tracking-[1.2px] mb-2 font-semibold ${isPerfectAccuracy ? "text-accent-primary" : "text-muted-foreground"}`}
+            className={`text-[10px] uppercase tracking-[1.2px] mb-1 font-semibold ${isPerfectAccuracy ? "text-accent-primary" : "text-muted-foreground"}`}
           >
             {t.accuracy}
           </div>

@@ -71,9 +71,9 @@ export const PlayerProgressBar = memo(
     }
 
     return (
-      <div className="box w-full rounded-lg px-4 py-3 sm:px-8 sm:py-6 relative">
+      <div className="box w-full rounded-lg p-4 py-4 relative">
         <div
-          className={`w-full flex items-center gap-5 transition-all duration-500 ${
+          className={`w-full flex items-center gap-4 transition-all duration-500 ${
             isLoading
               ? "opacity-20"
               : "opacity-100 animate-[slideInFromLeft_0.5s_ease-out]"

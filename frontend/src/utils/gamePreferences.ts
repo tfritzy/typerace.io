@@ -8,13 +8,16 @@ export const CONTENT_TYPE_KEY = "typerace_content_type";
 export function getPreferredMode(langSlug?: string): GameMode {
   const language = getLanguageFromSlug(langSlug);
   try {
-    if (
-      localStorage.getItem(CONTENT_TYPE_KEY) === "Quotes" &&
-      language.quotesMode
-    ) {
-      return { tag: language.quotesMode } as GameMode;
+    const storedContentType = localStorage.getItem(CONTENT_TYPE_KEY);
+    if (storedContentType === "RandomWords") {
+      return { tag: language.randomWordsMode } as GameMode;
     }
   } catch {}
+
+  if (language.quotesMode) {
+    return { tag: language.quotesMode } as GameMode;
+  }
+
   return { tag: language.randomWordsMode } as GameMode;
 }
 

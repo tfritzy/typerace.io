@@ -164,9 +164,9 @@ body {
 
 @keyframes blink {
   0% { opacity: 1; }
-  10% { opacity: 0; }
-  50% { opacity: 0; }
-  60% { opacity: 1; }
+  45% { opacity: 1; }
+  55% { opacity: 0; }
+  95% { opacity: 0; }
   100% { opacity: 1; }
 }
 .animate-blink {
