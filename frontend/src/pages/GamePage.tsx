@@ -15,6 +15,7 @@ import { EmptyPlayerProgressBars } from "../components/EmptyPlayerProgressBars";
 import { GameSkeleton } from "../components/GameSkeleton";
 import { getPreferredGameType } from "../utils/gamePreferences";
 import { WinnerConfetti } from "../components/WinnerConfetti";
+import { GameReplay } from "../components/GameReplay";
 
 type UiGameType = "Public" | "Private" | "Practice";
 
@@ -23,6 +24,7 @@ export const GamePage = () => {
   const navigate = useNavigate();
   const { conn, status: databaseStatus } = useDatabase();
   const [hasFinished, setHasFinished] = useState(false);
+  const [isWatchingReplay, setIsWatchingReplay] = useState(false);
   const [game, setGame] = useState<Game | null>(null);
   const [gamePlayerProgress, setGamePlayerProgress] = useState<
     PlayerProgress[]
@@ -32,6 +34,7 @@ export const GamePage = () => {
     setGame(null);
     setGamePlayerProgress([]);
     setHasFinished(false);
+    setIsWatchingReplay(false);
   }, [gameId]);
 
   useEffect(() => {
@@ -312,7 +315,17 @@ export const GamePage = () => {
             {progressBars}
           </div>
           {hasFinished || hasCompletedRace ? (
-            (() => {
+            isWatchingReplay ? (
+              <GameReplay
+                phrase={game.phrase}
+                attribution={game.attribution}
+                players={gamePlayerProgress}
+                raceStartTimestamp={game.racingStartedAt}
+                initialPlayerId={currentPlayerId?.toHexString()}
+                onExit={() => setIsWatchingReplay(false)}
+              />
+            ) : (
+              (() => {
               const currentPP = gamePlayerProgress.find(
                 (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
               );
@@ -348,11 +361,19 @@ export const GamePage = () => {
                       gameId={gameId}
                       rematchDisabled={rematchDisabled}
                       conn={conn || undefined}
+                      onWatchReplay={
+                        gamePlayerProgress.some(
+                          (player) => player.characterHistory.length > 0,
+                        )
+                          ? () => setIsWatchingReplay(true)
+                          : undefined
+                      }
                     />
                   )}
                 </div>
               );
-            })()
+              })()
+            )
           ) : isLobby ? (
             <GameLobby
               gameId={gameId!}
@@ -371,10 +392,10 @@ export const GamePage = () => {
               gameId={gameId!}
               conn={conn}
               onFinish={handleFinish}
-              disabled={isDisabled}
+              inputState={isDisabled ? "disabled-dimmed" : "enabled"}
               initialProgress={initialProgress}
               isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
-              hideCursor={!isMemberOfRace}
+              cursorState={isMemberOfRace ? "auto" : "hidden"}
             />
           )}
         </div>

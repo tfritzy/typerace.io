@@ -1,5 +1,10 @@
 import { memo, useCallback, useRef, useState } from "react";
-import { TypeBox, type TypeBoxRef } from "./TypeBox";
+import {
+  TypeBox,
+  type TypeBoxCursorState,
+  type TypeBoxInputState,
+  type TypeBoxRef,
+} from "./TypeBox";
 import type { DbConnection } from "../../module_bindings";
 import { Countdown } from "./Countdown";
 import { WordXpIndicator } from "./WordXpIndicator";
@@ -18,10 +23,10 @@ type GamePageTypeBoxProps = {
   gameId: string;
   conn: DbConnection | null;
   onFinish: () => void;
-  disabled?: boolean;
+  inputState?: TypeBoxInputState;
   initialProgress?: number;
   isAnonymous?: boolean;
-  hideCursor?: boolean;
+  cursorState?: TypeBoxCursorState;
 };
 
 export const GamePageTypeBox = memo(
@@ -31,10 +36,10 @@ export const GamePageTypeBox = memo(
     gameId,
     conn,
     onFinish,
-    disabled = false,
+    inputState = "enabled",
     initialProgress = 0,
     isAnonymous = true,
-    hideCursor = false,
+    cursorState = "auto",
   }: GamePageTypeBoxProps) => {
     const typeBoxRef = useRef<TypeBoxRef>(null);
     const [xpIndicators, setXpIndicators] = useState<XpIndicatorInstance[]>([]);
@@ -102,10 +107,10 @@ export const GamePageTypeBox = memo(
             onProgress={handleProgress}
             onComplete={handleComplete}
             onWordComplete={handleWordComplete}
-            disabled={disabled}
+            inputState={inputState}
             height="430px"
             initialProgress={initialProgress}
-            hideCursor={hideCursor}
+            cursorState={cursorState}
             noSpacesInPhrase={noSpacesLang}
           />
           <Countdown />

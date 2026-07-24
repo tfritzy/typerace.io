@@ -13,9 +13,10 @@ type ActionBarProps = {
   gameId?: string;
   rematchDisabled?: boolean;
   conn?: DbConnection;
+  onWatchReplay?: () => void;
 };
 
-export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: ActionBarProps) => {
+export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn, onWatchReplay }: ActionBarProps) => {
   const navigate = useNavigate();
   const t = getTranslations();
 
@@ -42,12 +43,14 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
         navigate(getLangHome());
       } else if ((event.key === "r" || event.key === "R") && canRematch) {
         handleRematch();
+      } else if ((event.key === "w" || event.key === "W") && onWatchReplay) {
+        onWatchReplay();
       }
     };
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [navigate, gameType, canRematch, handlePlayAgain, handleRematch]);
+  }, [navigate, gameType, canRematch, handlePlayAgain, handleRematch, onWatchReplay]);
 
   return (
     <div className="flex gap-3 mt-3 animate-slideUpFadeIn" style={{ animationDelay: '0.2s' }}>
@@ -57,6 +60,14 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn }: Act
       >
         {t.mainMenu} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">M</span>
       </button>
+      {onWatchReplay && (
+        <button
+          onClick={onWatchReplay}
+          className="box rounded-lg px-8 py-4 bg-transparent text-foreground text-base font-semibold cursor-pointer opacity-80 flex-1"
+        >
+          {t.watchReplay} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">W</span>
+        </button>
+      )}
       {gameId && gameType === "Private" && (
         <div className="relative flex-1 group">
           <button
