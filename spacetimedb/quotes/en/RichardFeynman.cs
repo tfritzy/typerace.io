@@ -19,7 +19,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "The real problem in speech is not precise language. The problem is clear language.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "The desire is to have the idea clearly communicated to the other person.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "It is really quite impossible to say anything with absolute precision, unless that thing is so abstracted from the real world as to not represent any real thing.", Author = "Richard Feynman" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "even though we may consistently consider ourselves to be the outside observer when we look at the rest of the world, the rest of the world is at the same time observing us, and that often we agree on what we see in each other.", Author = "Richard Feynman" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "Even though we may consistently consider ourselves to be the outside observer when we look at the rest of the world, the rest of the world is at the same time observing us, and often we agree on what we see in each other.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "Do you seriously entertain the idea that without the observer there is no reality?", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "We have a habit in writing articles published in scientific journals to make the work as finished as possible, to cover all the tracks, to not worry about the blind alleys or to describe how you had the wrong idea first, and so on.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "A very great deal more truth can become known than can be proven.", Author = "Richard Feynman" },
@@ -34,7 +34,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "And it's this type of integrity, this kind of care not to fool yourself, that is missing to a large extent in much of the research in cargo cult science.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "And that is the experiment that tells exactly what conditions you have to use in order to be careful and control everything in an experiment with rat-running.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "But not paying attention to experiments like that is a characteristic of cargo cult science.", Author = "Richard Feynman" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "you'll have to accept it, because it's the way nature works. If you want to know the way nature works... We looked at it, carefully... That's the way it looks!", Author = "Richard Feynman" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "You'll have to accept it, because it's the way nature works. If you want to know the way nature works... We looked at it, carefully... That's the way it looks!", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "Go somewhere else... to another universe where the rules are simpler, philosophically more pleasing, more psychologically easy.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "We are not to tell Nature what she's gotta be!", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "She's clever. She's always got better imagination than we have, and she finds a cleverer way to do it than we have thought of.", Author = "Richard Feynman" },
@@ -76,7 +76,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "It is important to realize that in physics today, we have no knowledge what energy is.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "We cannot define anything precisely.", Author = "Richard Feynman" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "The answer is simple: because we can solve them!", Author = "Richard Feynman" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "because if we understand linear equations, we are ready, in principle, to understand a lot of things.", Author = "Richard Feynman" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Richard_Feynman", Text = "If we understand linear equations, we are ready, in principle, to understand a lot of things.", Author = "Richard Feynman" },
         };
     }
 }

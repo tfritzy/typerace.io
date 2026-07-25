@@ -8,7 +8,7 @@ public static partial class GermanQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "die abstrakten Worte, deren sich doch die Zunge naturgemäß bedienen muß, um irgendwelches Urtheil an den Tag zu geben, zerfielen mir im Munde wie modrige Pilze.", Author = "Hugo von Hofmannsthal" },
+            new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Die abstrakten Worte, deren sich doch die Zunge naturgemäß bedienen muß, um irgendwelches Urtheil an den Tag zu geben, zerfielen mir im Munde wie modrige Pilze.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Es ist mir völlig die Fähigkeit abhanden gekommen, über irgend etwas zusammenhängend zu denken oder zu sprechen.", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Was ist der Mensch, daß er Pläne macht!", Author = "Hugo von Hofmannsthal" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Hugo_von_Hofmannsthal", Text = "Die Zeit, die ist ein sonderbares Ding.", Author = "Hugo von Hofmannsthal" },

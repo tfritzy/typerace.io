@@ -10,7 +10,7 @@ public static partial class RussianQuotes
         {
             new Quote { Id = "https://ru.wikiquote.org/wiki/Михаил_Булгаков", Text = "Рукописи не горят.", Author = "Михаил Булгаков" },
             new Quote { Id = "https://ru.wikiquote.org/wiki/Михаил_Булгаков", Text = "Никогда ничего не просите! Никогда и ничего, и в особенности у тех, кто сильнее вас. Сами предложат и сами всё дадут!", Author = "Михаил Булгаков" },
-            new Quote { Id = "https://ru.wikiquote.org/wiki/Михаил_Булгаков", Text = "Что бы ни делал, все делается на свой страх и риск.", Author = "Михаил Булгаков" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Михаил_Булгаков", Text = "Что бы ни делал человек, всё делается на свой страх и риск.", Author = "Михаил Булгаков" },
             new Quote { Id = "https://ru.wikiquote.org/wiki/Михаил_Булгаков", Text = "Не надо бояться, не надо бояться!", Author = "Михаил Булгаков" },
             new Quote { Id = "https://ru.wikiquote.org/wiki/Михаил_Булгаков", Text = "Правду говорить легко и приятно.", Author = "Михаил Булгаков" },
             new Quote { Id = "https://ru.wikiquote.org/wiki/Михаил_Булгаков", Text = "Есть только один способ прожить жизнь – это жить.", Author = "Михаил Булгаков" },

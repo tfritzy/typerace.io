@@ -9,10 +9,10 @@ public static partial class FrenchQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://fr.wikiquote.org/wiki/François_Mauriac", Text = "Je n'aime que ce qui se dévore.", Author = "François Mauriac" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/François_Mauriac", Text = "la défaite d'un adolescent vient de ce qu'il se laisse persuader de sa misère.", Author = "François Mauriac" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/François_Mauriac", Text = "elle ne savait pas que l'amour, dans les vies les plus pleines, sait toujours se creuser sa place ; qu'un homme d'État surmené, autour de l'heure où sa maîtresse l'attend, arrête le monde. Cette ignorance l'empêchait de souffrir.", Author = "François Mauriac" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/François_Mauriac", Text = "la contemplation délivre.", Author = "François Mauriac" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/François_Mauriac", Text = "ce qui est inaccessible ne vaut pas qu'on s'y sacrifie.", Author = "François Mauriac" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/François_Mauriac", Text = "La défaite d'un adolescent vient de ce qu'il se laisse persuader de sa misère.", Author = "François Mauriac" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/François_Mauriac", Text = "Elle ne savait pas que l'amour, dans les vies les plus pleines, sait toujours se creuser sa place ; qu'un homme d'État surmené, autour de l'heure où sa maîtresse l'attend, arrête le monde. Cette ignorance l'empêchait de souffrir.", Author = "François Mauriac" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/François_Mauriac", Text = "La contemplation délivre.", Author = "François Mauriac" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/François_Mauriac", Text = "Ce qui est inaccessible ne vaut pas qu'on s'y sacrifie.", Author = "François Mauriac" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/François_Mauriac", Text = "C'est la grand misère des femmes que rien ne les détourne de l'obscur ennemi qui les ronge.", Author = "François Mauriac" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/François_Mauriac", Text = "On ne pense jamais que ce sont les passions des pères qui le plus souvent les séparent de leurs fils.", Author = "François Mauriac" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/François_Mauriac", Text = "Un bouquin bouleverse la vie d'un homme quelquefois, et encore ! ça se dit… mais d'une femme ? Allons donc ! Nous ne sommes jamais troublés profondément que par ce qui vit – que par ce qui est sang et chair. Un bouquin ?", Author = "François Mauriac" },

@@ -13,7 +13,7 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Stefan_Zweig", Text = "Nur Ferne gewinnt dich dir selber zurück!", Author = "Stefan Zweig" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Stefan_Zweig", Text = "Wozu lebt man, wenn der Wind hinter unserm Schuh schon die letzte Spur von uns wegträgt?", Author = "Stefan Zweig" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Stefan_Zweig", Text = "Das Schicksal aber gibt den Frechen mehr als den Fleißigen, den Groben lieber als den Geduldigen […].", Author = "Stefan Zweig" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Stefan_Zweig", Text = "dem einem fehlt der Wein, dem andern der Becher", Author = "Stefan Zweig" },
+            new Quote { Id = "https://de.wikiquote.org/wiki/Stefan_Zweig", Text = "Dem einen fehlt der Wein, dem andern der Becher", Author = "Stefan Zweig" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Stefan_Zweig", Text = "Hans Dampf in allen Gassen hat kein Steckenpferd, aber er weiß auf jedem zu reiten, das man ihm zwischen die Beine schiebt.", Author = "Stefan Zweig" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Stefan_Zweig", Text = "Einzig dann, wenn ein Mensch seine ganzen Kräfte ins Spiel bringt, ist er für sich, ist er für die anderen wahrhaft lebendig; immer nur dann, wenn ihm innen die Seele lodert und glüht, wird er auch äußerlich Gestalt.", Author = "Stefan Zweig" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Stefan_Zweig", Text = "Ein Mensch, der sich der Politik verschworen, gehört nicht mehr sich selbst und muß anderen Gesetzen gehorchen als den heiligen seiner Natur.", Author = "Stefan Zweig" },

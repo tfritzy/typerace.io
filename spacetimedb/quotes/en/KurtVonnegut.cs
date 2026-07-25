@@ -81,7 +81,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Kurt_Vonnegut", Text = "Things don't stay the way they are. It's too entertaining to try to change them.", Author = "Kurt Vonnegut" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Kurt_Vonnegut", Text = "If only it weren't for the people, the goddamned people, always getting tangled up in the machinery.", Author = "Kurt Vonnegut" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Kurt_Vonnegut", Text = "Mankind, ignorant of the truths that lie within every human being, looked outward-pushed ever outward.", Author = "Kurt Vonnegut" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Kurt_Vonnegut", Text = "These unhappy agents found what had already been found in abundance on Earth-a nightmare of meaningless without end.", Author = "Kurt Vonnegut" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Kurt_Vonnegut", Text = "These unhappy agents found what had already been found in abundance on Earth - a nightmare of meaninglessness without end.", Author = "Kurt Vonnegut" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Kurt_Vonnegut", Text = "He ransacked his memory like a thief going through another man's billfold.", Author = "Kurt Vonnegut" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Kurt_Vonnegut", Text = "I tell you, Mr. Constant, it's a thankless job, telling people it's a hard, hard Universe they're in.", Author = "Kurt Vonnegut" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Kurt_Vonnegut", Text = "The insane, on occasion, are not without their charms.", Author = "Kurt Vonnegut" },

@@ -18,7 +18,7 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Martí", Text = "Las fronteras de nuestro espíritu son las de nuestro lenguaje.", Author = "José Martí" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Martí", Text = "La única fuerza y la única verdad que hay en esta vida es el amor. El patriotismo no es más que amor, la amistad no es más que amor.", Author = "José Martí" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Martí", Text = "Lo divino está en lo humano.", Author = "José Martí" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/José_Martí", Text = "Los bárbaros que todo lo confían a la fuerza y al violencia, nada construyen, porque sus cimientos son de odio.", Author = "José Martí" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/José_Martí", Text = "Los bárbaros que todo lo confían a la fuerza y a la violencia, nada construyen, porque sus cimientos son de odio.", Author = "José Martí" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Martí", Text = "Los derechos se toman, no se piden; se arrancan, no se mendigan.", Author = "José Martí" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Martí", Text = "No hay batalla entre la civilización y la barbarie, sino entre la falsa erudición y la naturaleza.", Author = "José Martí" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Martí", Text = "No hay odio de razas, porque no hay razas.", Author = "José Martí" },

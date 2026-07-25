@@ -146,7 +146,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Winston_Churchill", Text = "The Irish claim has never been fairly treated by the statesmen of Great Britain.", Author = "Winston Churchill" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Winston_Churchill", Text = "They have never tried to deal with Ireland in the spirit in which both great parties face the large problems of the British Empire.", Author = "Winston Churchill" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Winston_Churchill", Text = "And yet, why should not Ireland have her chance?", Author = "Winston Churchill" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Winston_Churchill", Text = "Why should not her venerable nationhood enjoy a recognised", Author = "Winston Churchill" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Winston_Churchill", Text = "Why should not her venerable nationhood enjoy a recognised and respected existence?", Author = "Winston Churchill" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Winston_Churchill", Text = "The greatest woman of our age.", Author = "Winston Churchill" },
         };
     }

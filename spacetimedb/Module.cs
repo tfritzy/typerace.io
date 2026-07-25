@@ -2069,6 +2069,12 @@ public static partial class Module
         int newIndex,
         CharacterEventType eventType)
     {
+        if (progress.Placement > 0 || game.Placements.Contains(progress.PlayerId))
+        {
+            Log.Info($"Ignoring progress update for player {progress.PlayerId}: already finished game {game.Id}");
+            return;
+        }
+
         var updatedProgress = progress;
         updatedProgress.ProgressIndex = newIndex;
         AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, eventType);

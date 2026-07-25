@@ -45,7 +45,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Edison", Text = "Everyone steals in commerce and industry. I've stolen a lot, myself.", Author = "Thomas Edison" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Edison", Text = "I never did a day's work in my life, it was all fun.", Author = "Thomas Edison" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Edison", Text = "Our greatest weakness lies in giving up. The most certain way to succeed is always to try just one more time.", Author = "Thomas Edison" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Edison", Text = "I do not believe in the God of the theologians; but that there is a Supreme Intelligence I do not doubt", Author = "Thomas Edison" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Edison", Text = "I do not believe in the God of the theologians; but that there is a Supreme Intelligence I do not doubt.", Author = "Thomas Edison" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Edison", Text = "I owe my success to the fact that I never had a clock in my workroom.", Author = "Thomas Edison" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Edison", Text = "Non-violence leads to the highest ethics, which is the goal of all evolution.", Author = "Thomas Edison" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Edison", Text = "Until we stop harming all other living beings, we are still savages.", Author = "Thomas Edison" },

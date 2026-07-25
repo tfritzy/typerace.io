@@ -17,7 +17,7 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Juan_Ramón_Jiménez", Text = "No hemos de ser inmortales para los demás, sino para nosotros mismos.", Author = "Juan Ramón Jiménez" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Juan_Ramón_Jiménez", Text = "No le toques ya más, que así es la rosa.", Author = "Juan Ramón Jiménez" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Juan_Ramón_Jiménez", Text = "Los dioses no tuvieron más sustancia que la que tengo yo.", Author = "Juan Ramón Jiménez" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Juan_Ramón_Jiménez", Text = "‘Perfecto’ no es ‘retórico’, sino ‘completo’. Clásico es, unicamente, vivo.", Author = "Juan Ramón Jiménez" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/Juan_Ramón_Jiménez", Text = "‘Perfecto’ no es ‘retórico’, sino ‘completo’. Clásico es, únicamente, vivo.", Author = "Juan Ramón Jiménez" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Juan_Ramón_Jiménez", Text = "¡Qué triste es amarlo todo, sin saber lo que se ama!", Author = "Juan Ramón Jiménez" },
         };
     }

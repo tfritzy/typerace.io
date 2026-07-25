@@ -137,8 +137,7 @@ export const Countdown = () => {
             key={count}
             className="countdown-number text-accent"
             style={{
-              fontSize: "12rem",
-              fontWeight: "bold",
+              fontSize: "9rem",
               animation: "countdownPop 1s ease-out forwards",
             }}
           >

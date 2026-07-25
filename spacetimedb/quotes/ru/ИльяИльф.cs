@@ -23,7 +23,7 @@ public static partial class RussianQuotes
             new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Смешную фразу надо лелеять, холить, ласково поглаживая по подлежащему.", Author = "Илья Ильф" },
             new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Орда взбунтовавшихся чиновников.", Author = "Илья Ильф" },
             new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "По линии наименьшего сопротивления всё обстоит благополучно.", Author = "Илья Ильф" },
-            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "В фантастических романах главное это было радио. При нём ожидалось счастье человечества. Вот радио есть, а счастья нет.", Author = "Илья Ильф" },
+            new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "В фантастических романах главным было радио. При нём ожидалось счастье человечества. Вот радио есть, а счастья нет.", Author = "Илья Ильф" },
             new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Счастливец, бредущий по краю планеты в погоне за счастьем, которого солнечная система не может предложить. Безумец, беспрерывно лопочущий и размахивающий руками.", Author = "Илья Ильф" },
             new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Входит, уходит, смеётся, застреливается.", Author = "Илья Ильф" },
             new Quote { Id = "https://ru.wikiquote.org/wiki/Илья_Ильф", Text = "Любопытства было больше, чем пищи для него.", Author = "Илья Ильф" },

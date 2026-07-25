@@ -16,7 +16,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Paine", Text = "Where knowledge is a duty, ignorance is a crime.", Author = "Thomas Paine" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Paine", Text = "War involves in its progress such a train of unforeseen and unsupposed circumstances ... that no human wisdom can calculate the end.", Author = "Thomas Paine" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Paine", Text = "It is from the Bible that man has learned cruelty, rapine, and murder; for the belief of a cruel God makes a cruel man.", Author = "Thomas Paine" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Paine", Text = "We live to improve, or we live in vain", Author = "Thomas Paine" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Paine", Text = "We live to improve, or we live in vain.", Author = "Thomas Paine" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Paine", Text = "If every individual is to indulge his private malignancy or his private ambition, to denounce at random and without any kind of proof, all confidence will be undermined and all authority be destroyed.", Author = "Thomas Paine" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Paine", Text = "One good schoolmaster is of more use than a hundred priests.", Author = "Thomas Paine" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Thomas_Paine", Text = "It is a want of feeling to talk of priests and bells while so many infants are perishing in the hospitals, and aged and infirm poor in the streets, from the want of necessaries.", Author = "Thomas Paine" },

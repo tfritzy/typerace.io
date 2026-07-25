@@ -35,6 +35,7 @@ export const GamePage = () => {
 
   useEffect(() => {
     if (!conn || !gameId) return;
+    let progressDeleteRedirect: ReturnType<typeof setTimeout> | undefined;
 
     const handleGameInsert = (_ctx: any, g: Game) => {
       if (g.id.toString() === gameId) {
@@ -88,7 +89,8 @@ export const GamePage = () => {
       if (pp.gameId.toString() === gameId) {
         setGamePlayerProgress((prev) => prev.filter((p) => p.id !== pp.id));
         if (conn.identity && pp.playerId.isEqual(conn.identity)) {
-          setTimeout(() => {
+          clearTimeout(progressDeleteRedirect);
+          progressDeleteRedirect = setTimeout(() => {
             const stillExists = Array.from(conn.db.playerprogress.iter()).some(
               (p) =>
                 p.gameId.toString() === gameId &&
@@ -139,6 +141,7 @@ export const GamePage = () => {
       conn.db.playerprogress.removeOnDelete(handleProgressDelete);
       conn.db.game.removeOnInsert(handleGameInsert);
       conn.db.game.removeOnUpdate(handleGameUpdate);
+      clearTimeout(progressDeleteRedirect);
       pageSubscription.unsubscribe();
     };
   }, [conn, gameId, navigate]);

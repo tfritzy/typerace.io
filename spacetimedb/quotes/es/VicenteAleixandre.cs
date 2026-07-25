@@ -12,7 +12,7 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Vicente_Aleixandre", Text = "La poesía tiene que ser humana. Si no es humana, no es poesía.", Author = "Vicente Aleixandre" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Vicente_Aleixandre", Text = "Lealtad a sí mismo (y a la vida en torno) que es el único modo de empezar a ser leal a los demás.", Author = "Vicente Aleixandre" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Vicente_Aleixandre", Text = "Ni siquiera la prueba de lo absurdo de sus sospechas podrá consolar al celoso, porque los celos son una enfermedad de la imaginación.", Author = "Vicente Aleixandre" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Vicente_Aleixandre", Text = "Sabemos a donde vamos y de donde venimos. Entre dos oscuridades, un destello.", Author = "Vicente Aleixandre" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/Vicente_Aleixandre", Text = "Sabemos adónde vamos y de dónde venimos. Entre dos oscuridades, un destello.", Author = "Vicente Aleixandre" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Vicente_Aleixandre", Text = "Amar, amar, ¿quién no ama si es nacido?", Author = "Vicente Aleixandre" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Vicente_Aleixandre", Text = "Hay quien llora lágrimas del color de la ira.", Author = "Vicente Aleixandre" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Vicente_Aleixandre", Text = "La soledad destella en el mundo sin amor. La vida es una vívida corteza, una rugosa piel inmóvil donde el hombre no puede encontrar su descanso, por más que aplique su sueño contra un astro apagado.", Author = "Vicente Aleixandre" },

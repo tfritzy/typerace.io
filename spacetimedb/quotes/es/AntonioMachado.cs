@@ -28,10 +28,10 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Antonio_Machado", Text = "Aprende a dudar, hijo, y acabarás dudando de tu propia duda; de este modo premia Dios al escéptico y confunde al creyente.", Author = "Antonio Machado" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Antonio_Machado", Text = "Ayudadme a comprender lo que os digo y os lo explicaré más despacio.", Author = "Antonio Machado" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Antonio_Machado", Text = "Quien avanza hacia atrás, huye hacia adelante. Que las espantadas de los reaccionarios no os cojan desprevenidos.", Author = "Antonio Machado" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Antonio_Machado", Text = "Hay en el mundo —decía Juan de Mairena— muchos píllos que se hacen los tontos y un número abrumador de tontos que presumen de pillos.", Author = "Antonio Machado" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/Antonio_Machado", Text = "Hay en el mundo —decía Juan de Mairena— muchos pillos que se hacen los tontos y un número abrumador de tontos que presumen de pillos.", Author = "Antonio Machado" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Antonio_Machado", Text = "La Sociedad de las Naciones (...) fiel a su corta y lamentable tradición, sigue siendo un instrumento en manos de los poderosos para asegurarse la paz armada, que es acrecentar la guerra futura por el camino más corto, es decir, mediante el exterminio de los débiles.", Author = "Antonio Machado" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Antonio_Machado", Text = "Caminante no hay camino, se hace camino al andar.", Author = "Antonio Machado" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Antonio_Machado", Text = "¿Para qué llamar caminos a los surcos del azar.", Author = "Antonio Machado" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/Antonio_Machado", Text = "¿Para qué llamar caminos a los surcos del azar?", Author = "Antonio Machado" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Antonio_Machado", Text = "Todo pasa y todo queda, pero lo nuestro es pasar, pasar haciendo caminos, caminos sobre la mar.", Author = "Antonio Machado" },
         };
     }

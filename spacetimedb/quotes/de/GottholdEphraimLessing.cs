@@ -12,7 +12,7 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Die beste Lunge erschöpft sich, auch sogar eine weibliche.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Laß dich den Teufel bey Einem Haare fassen; und du bist sein auf ewig?", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Noch einen Schritt vom Ziele, oder noch gar nicht ausgelaufen seyn, ist im Grunde eines.", Author = "Gotthold Ephraim Lessing" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "daß man den Künstler dann erst recht lobt, wenn man über sein Werk sein Lob vergißt.", Author = "Gotthold Ephraim Lessing" },
+            new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Daß man den Künstler dann erst recht lobt, wenn man über sein Werk sein Lob vergißt.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Perlen bedeuten Thränen.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Still mit dem Aber! Die Aber kosten Überlegung.", Author = "Gotthold Ephraim Lessing" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Gotthold_Ephraim_Lessing", Text = "Thu, was du nicht lassen kannst!", Author = "Gotthold Ephraim Lessing" },

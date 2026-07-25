@@ -30,7 +30,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Flannery_O'Connor", Text = "The truth does not change according to our ability to stomach it emotionally.", Author = "Flannery O'Connor" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Flannery_O'Connor", Text = "Conviction without experience makes for harshness.", Author = "Flannery O'Connor" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Flannery_O'Connor", Text = "Charity is beyond reason, and that God can be known through charity.", Author = "Flannery O'Connor" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Flannery_O'Connor", Text = "About the only way we know whether we believe or not is by what we do", Author = "Flannery O'Connor" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Flannery_O'Connor", Text = "About the only way we know whether we believe or not is by what we do.", Author = "Flannery O'Connor" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Flannery_O'Connor", Text = "One result of the stimulation of your intellectual life that takes place in college is usually a shrinking of the imaginative life. This sounds like a paradox, but I have often found it to be true.", Author = "Flannery O'Connor" },
         };
     }

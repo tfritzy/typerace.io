@@ -12,7 +12,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Ernest_Hemingway", Text = "Switzerland is a small, steep country, much more up and down than sideways, and is all stuck over with large brown hotels built on the cuckoo clock style of architecture.", Author = "Ernest Hemingway" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ernest_Hemingway", Text = "Somebody just back of you while you are fishing is as bad as someone looking over your shoulder while you write a letter to your girl.", Author = "Ernest Hemingway" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ernest_Hemingway", Text = "A man's got to take a lot of punishment to write a really funny book.", Author = "Ernest Hemingway" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Ernest_Hemingway", Text = "Write me at the Hotel Quintana, Pamplona, Spain. Or don't you like to write letters? I do because it's such a swell way to keep from working and yet feel you've done something", Author = "Ernest Hemingway" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Ernest_Hemingway", Text = "Write me at the Hotel Quintana, Pamplona, Spain. Or don't you like to write letters? I do because it's such a swell way to keep from working and yet feel you've done something.", Author = "Ernest Hemingway" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ernest_Hemingway", Text = "I've tried to reduce profanity but I reduced so much profanity when writing the book that I'm afraid not much could come out. Perhaps we will have to consider it simply as a profane book and hope that the next book will be less profane or perhaps more sacred.", Author = "Ernest Hemingway" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ernest_Hemingway", Text = "In the fall the war was always there but we did not go to it any more.", Author = "Ernest Hemingway" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ernest_Hemingway", Text = "'It's his sense of self-preservation.' 'The great Italian sense.' 'The greatest Italian sense.'", Author = "Ernest Hemingway" },
@@ -67,7 +67,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Ernest_Hemingway", Text = "When a man is still in rebellion against death he has pleasure in taking to himself one of the Godlike attributes; that of giving it.", Author = "Ernest Hemingway" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ernest_Hemingway", Text = "Personal columnists ... are jackals and no jackal has been known to live on grass once he had learned about meat - no matter who killed the meat for him.", Author = "Ernest Hemingway" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ernest_Hemingway", Text = "No catalogue of horrors ever kept men from war. Before the war you always think that it's not you that dies. But you will die, brother, if you go to it long enough.", Author = "Ernest Hemingway" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Ernest_Hemingway", Text = "The first panacea for a mismanaged nation is inflation of the currency;", Author = "Ernest Hemingway" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Ernest_Hemingway", Text = "The first panacea for a mismanaged nation is inflation of the currency.", Author = "Ernest Hemingway" },
         };
     }
 }

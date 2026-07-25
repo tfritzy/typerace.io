@@ -9,9 +9,9 @@ public static partial class FrenchQuotes
         public static readonly Quote[] Quotes = new Quote[]
         {
             new Quote { Id = "https://fr.wikiquote.org/wiki/Marcel_Proust", Text = "Tâchez de garder toujours un morceau de ciel au-dessus de votre vie, …", Author = "Marcel Proust" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Marcel_Proust", Text = "il n'y a guère que le sadisme qui donne un fondement dans la vie à l'esthétique du mélodrame.", Author = "Marcel Proust" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Marcel_Proust", Text = "les modes changent étant nées elles-mêmes du besoin de changement", Author = "Marcel Proust" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Marcel_Proust", Text = "momentanément éclipsé, mon passé ne projetait plus devant moi cette ombre de lui-même que nous appelons notre avenir.", Author = "Marcel Proust" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Marcel_Proust", Text = "Il n'y a guère que le sadisme qui donne un fondement dans la vie à l'esthétique du mélodrame.", Author = "Marcel Proust" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Marcel_Proust", Text = "Les modes changent, étant nées elles-mêmes du besoin de changement", Author = "Marcel Proust" },
+            new Quote { Id = "https://fr.wikiquote.org/wiki/Marcel_Proust", Text = "Momentanément éclipsé, mon passé ne projetait plus devant moi cette ombre de lui-même que nous appelons notre avenir.", Author = "Marcel Proust" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Marcel_Proust", Text = "Sauf chez quelques illettrés du peuple et du monde, pour qui la différence des genres est lettre morte, ce qui rapproche, ce n’est pas la communauté des opinions, c’est la consanguinité des esprits.", Author = "Marcel Proust" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Marcel_Proust", Text = "Un artiste n’a pas besoin d’exprimer directement sa pensée dans son ouvrage pour que celui-ci en reflète la qualité ; on a même pu dire que la louange la plus haute de Dieu est dans la négation de l’athée qui trouve la création assez parfaite pour se passer d’un créateur.", Author = "Marcel Proust" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Marcel_Proust", Text = "Laissons les jolies femmes aux hommes sans imagination.", Author = "Marcel Proust" },

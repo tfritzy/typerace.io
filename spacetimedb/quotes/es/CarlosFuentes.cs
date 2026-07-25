@@ -13,7 +13,7 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Carlos_Fuentes", Text = "Hay que impedir que el arte sea asunto, no de los creadores, sino de burócratas, oportunistas, mediocres y adulones.", Author = "Carlos Fuentes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Carlos_Fuentes", Text = "La memoria es el deseo satisfecho.", Author = "Carlos Fuentes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Carlos_Fuentes", Text = "Las revoluciones las hacen los hombres de carne y hueso y no los santos, y todas acaban por crear una nueva casta privilegiada.", Author = "Carlos Fuentes" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Carlos_Fuentes", Text = "Lo que mejor hace los Estados Unidos es comprenderse a sí mismo. Lo que peor hace en comprender a los demás.", Author = "Carlos Fuentes" },
+            new Quote { Id = "https://es.wikiquote.org/wiki/Carlos_Fuentes", Text = "Lo que mejor hacen los Estados Unidos es comprenderse a sí mismos. Lo que peor hacen es comprender a los demás.", Author = "Carlos Fuentes" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Carlos_Fuentes", Text = "Toda obra de arte es una lectura del mundo y, simultáneamente, una lectura de sí misma.", Author = "Carlos Fuentes" },
         };
     }

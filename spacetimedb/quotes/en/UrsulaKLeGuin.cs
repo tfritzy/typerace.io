@@ -13,7 +13,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "Great artists make the roads; good teachers and good companions can point them out. But there ain't no free rides, baby.", Author = "Ursula K. Le Guin" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "All of us have to learn how to invent our lives, make them up, imagine them. We need to be taught these skills; we need guides to show us how. If we don't, our lives get made up for us by other people.", Author = "Ursula K. Le Guin" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "To think that realistic fiction is by definition superior to imaginative fiction is to think imitation is superior to invention.", Author = "Ursula K. Le Guin" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "the realists of a larger reality.", Author = "Ursula K. Le Guin" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "The realists of a larger reality.", Author = "Ursula K. Le Guin" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "We live in capitalism. Its power seems inescapable; so did the divine right of kings.", Author = "Ursula K. Le Guin" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "The name of our beautiful reward is not profit. Its name is freedom.", Author = "Ursula K. Le Guin" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Ursula_K._Le_Guin", Text = "Morning comes whether you set the alarm or not.", Author = "Ursula K. Le Guin" },
