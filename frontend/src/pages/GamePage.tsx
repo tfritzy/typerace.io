@@ -100,7 +100,7 @@ export const GamePage = () => {
             if (!stillExists) {
               navigate("/", { replace: true });
             }
-          }, 200);
+          }, 500);
         }
       }
     };
@@ -163,7 +163,10 @@ export const GamePage = () => {
       }
     }
 
-    if (gamePlayerProgress.length > 0 && gamePlayerProgress.every(pp => pp.progressIndex >= game.phrase.length)) {
+    if (
+      gamePlayerProgress.length > 0 &&
+      gamePlayerProgress.every((pp) => pp.progressIndex >= game.phrase.length)
+    ) {
       setHasFinished(true);
     }
   }, [conn, game, gamePlayerProgress]);
@@ -217,7 +220,7 @@ export const GamePage = () => {
 
     const timeout = setTimeout(() => {
       navigate("/", { replace: true });
-    }, 3000);
+    }, 7000);
 
     return () => clearTimeout(timeout);
   }, [databaseStatus, game, navigate]);
@@ -232,7 +235,9 @@ export const GamePage = () => {
 
   const gameTypeTag = game.gameType?.tag ?? "Public";
   const actionBarGameType: UiGameType =
-    gameTypeTag === "Private" || gameTypeTag === "Practice" ? gameTypeTag : "Public";
+    gameTypeTag === "Private" || gameTypeTag === "Practice"
+      ? gameTypeTag
+      : "Public";
   const maxPlayers =
     gameTypeTag === "Private"
       ? gamePlayerProgress.length
@@ -254,8 +259,7 @@ export const GamePage = () => {
     ? currentPlayerProgress.progressIndex >= game.phrase.length
     : false;
   const hasWonRace =
-    currentPlayerProgress?.placement === 1 &&
-    (hasFinished || hasCompletedRace);
+    currentPlayerProgress?.placement === 1 && (hasFinished || hasCompletedRace);
   const isMemberOfRace = !!currentPlayerProgress;
   const isDisabled = isInLobby || isCountdown || !currentPlayerProgress;
 
@@ -273,28 +277,26 @@ export const GamePage = () => {
 
     return (
       <div key={pp.id.toString()}>
-                  <PlayerProgressBar
-                    key={pp.id.toString()}
-                    name={pp.playerName}
-                    level={pp.playerLevel}
-                    progressIndex={pp.progressIndex}
-                    phraseLength={game.phrase.length}
-                    identityHash={pp.playerId.toHexString()}
-                    playerPublicId={pp.playerPublicId}
-                    isCurrentPlayer={isCurrentPlayer}
-                    wpm={pp.wpm}
-                    placement={pp.placement}
-                    isBot={pp.isBot}
-                    isAnonymous={pp.isAnonymous}
-                    onKick={
-                      isPrivateGameOwner && !isCurrentPlayer
-                        ? () => handleKickPlayer(pp.playerId)
-                        : undefined
-                    }
-                    playerColorTag={
-                      isCurrentPlayer ? undefined : pp.playerColor?.tag
-                    }
-                  />
+        <PlayerProgressBar
+          key={pp.id.toString()}
+          name={pp.playerName}
+          level={pp.playerLevel}
+          progressIndex={pp.progressIndex}
+          phraseLength={game.phrase.length}
+          identityHash={pp.playerId.toHexString()}
+          playerPublicId={pp.playerPublicId}
+          isCurrentPlayer={isCurrentPlayer}
+          wpm={pp.wpm}
+          placement={pp.placement}
+          isBot={pp.isBot}
+          isAnonymous={pp.isAnonymous}
+          onKick={
+            isPrivateGameOwner && !isCurrentPlayer
+              ? () => handleKickPlayer(pp.playerId)
+              : undefined
+          }
+          playerColorTag={isCurrentPlayer ? undefined : pp.playerColor?.tag}
+        />
       </div>
     );
   });
