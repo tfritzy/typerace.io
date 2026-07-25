@@ -45,7 +45,7 @@ export const WinnerConfetti = () => {
 
     const followUpBurst = window.setTimeout(() => {
       launchFromSides(accentColor || "#cba6f7", 15, 25);
-    }, 180);
+    }, 60);
 
     return () => {
       window.clearTimeout(followUpBurst);

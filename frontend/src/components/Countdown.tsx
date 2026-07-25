@@ -132,10 +132,10 @@ export const Countdown = () => {
         />
       )}
       {showCount && (
-        <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
           <div
             key={count}
-            className="countdown-number text-accent"
+            className="countdown-number text-accent relative -top-6"
             style={{
               fontSize: "9rem",
               animation: "countdownPop 1s ease-out forwards",
@@ -158,12 +158,7 @@ export const Countdown = () => {
         </div>
       )}
       {showImage && (
-        <div
-          className="fixed top-[52%] -translate-y-1/2 pointer-events-none z-50"
-          style={{
-            left: "max(1rem, calc((100vw - var(--max-content-width)) / 2 - 4.5rem))",
-          }}
-        >
+        <div className="absolute top-0 left-0 pointer-events-none z-50 -translate-x-full -ml-1">
           <img
             src={bufoLetsGo}
             alt=""
