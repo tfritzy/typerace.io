@@ -14,9 +14,10 @@ import { Chart } from "react-chartjs-2";
 import { memo } from "react";
 import type { PlayerProgress } from "../types/stdb";
 import {
-  getRawWpmBySecond,
-  getAggWpmBySecond,
+  decodeCharacterHistory,
   getErrorCountsBySecond,
+  getRawWpmByBucket,
+  getWpmByBucket,
 } from "../utils/wpmCalculator";
 import { getDisplayColorHex } from "../utils/colorMapping";
 
@@ -31,6 +32,7 @@ ChartJS.register(
   Legend,
 );
 
+const BUCKETS_PER_SECOND = 3;
 const RAW_LINE_OPACITY_HEX = "99";
 
 interface RaceResultsChartProps {
@@ -45,23 +47,41 @@ export const RaceResultsChart = memo(
     raceStartTimestamp,
     isCurrentPlayer,
   }: RaceResultsChartProps) => {
-    const rawWpmData = getRawWpmBySecond(
+    const characterHistory = decodeCharacterHistory(
       playerProgress.characterHistory,
       raceStartTimestamp,
     );
-    const aggWpmData = getAggWpmBySecond(
-      playerProgress.characterHistory,
+    const firstEventTime = characterHistory[0]?.timestamp;
+    const lastEventTime = characterHistory.at(-1)?.timestamp;
+    const startTime = firstEventTime
+      ? Number(firstEventTime - raceStartTimestamp) / 1_000_000
+      : 0;
+    const finishTime = lastEventTime
+      ? Number(lastEventTime - raceStartTimestamp) / 1_000_000
+      : 0;
+    const numBuckets =
+      Math.ceil((finishTime - startTime) * BUCKETS_PER_SECOND) + 1;
+    const wpmData = getWpmByBucket(
+      characterHistory,
       raceStartTimestamp,
+      numBuckets,
     );
+    const bucketSize =
+      wpmData.length > 1 ? (finishTime - startTime) / (wpmData.length - 1) : 0;
     const errorCountsData = getErrorCountsBySecond(
       playerProgress.characterHistory,
       raceStartTimestamp,
     );
+    const rawWpmData = getRawWpmByBucket(
+      characterHistory,
+      raceStartTimestamp,
+      numBuckets,
+    );
 
-    const maxDataIndex = Math.max(
-      rawWpmData.length - 1,
-      aggWpmData.length - 1,
+    const maxDataTime = Math.max(
+      finishTime,
       errorCountsData.length - 1,
+      0,
     );
 
     const style = getComputedStyle(document.documentElement);
@@ -83,9 +103,9 @@ export const RaceResultsChart = memo(
       datasets: [
         {
           type: "line" as const,
-          label: "Aggregate WPM",
-          data: aggWpmData.map((wpm, index) => ({
-            x: index,
+          label: "WPM",
+          data: wpmData.map((wpm, index) => ({
+            x: startTime + index * bucketSize,
             y: wpm,
           })),
           borderColor: primaryColor,
@@ -101,7 +121,7 @@ export const RaceResultsChart = memo(
           type: "line" as const,
           label: "Raw WPM",
           data: rawWpmData.map((wpm, index) => ({
-            x: index,
+            x: startTime + index * bucketSize,
             y: wpm,
           })),
           borderColor: rawLineColor,
@@ -192,8 +212,8 @@ export const RaceResultsChart = memo(
       scales: {
         x: {
           type: "linear",
-          min: 0,
-          max: maxDataIndex,
+          min: startTime,
+          max: maxDataTime,
           offset: false,
           title: {
             display: true,
@@ -273,8 +293,8 @@ export const RaceResultsChart = memo(
     };
 
     if (
+      wpmData.length === 0 &&
       rawWpmData.length === 0 &&
-      aggWpmData.length === 0 &&
       errorCountsData.length === 0
     ) {
       return (
