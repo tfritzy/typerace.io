@@ -14,6 +14,7 @@ import { getPlayerColorHex } from "../utils/colorMapping";
 import { EmptyPlayerProgressBars } from "../components/EmptyPlayerProgressBars";
 import { GameSkeleton } from "../components/GameSkeleton";
 import { getPreferredGameType } from "../utils/gamePreferences";
+import { WinnerConfetti } from "../components/WinnerConfetti";
 
 type UiGameType = "Public" | "Private" | "Practice";
 
@@ -252,6 +253,9 @@ export const GamePage = () => {
   const hasCompletedRace = currentPlayerProgress
     ? currentPlayerProgress.progressIndex >= game.phrase.length
     : false;
+  const hasWonRace =
+    currentPlayerProgress?.placement === 1 &&
+    (hasFinished || hasCompletedRace);
   const isMemberOfRace = !!currentPlayerProgress;
   const isDisabled = isInLobby || isCountdown || !currentPlayerProgress;
 
@@ -297,6 +301,7 @@ export const GamePage = () => {
 
   return (
     <div className="relative flex-1 min-h-0 flex flex-col">
+      {hasWonRace && <WinnerConfetti key={gameId} />}
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4">
         <div className="content-container w-full my-auto">
           <div
