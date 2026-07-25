@@ -14,10 +14,6 @@ export function getPreferredMode(langSlug?: string): GameMode {
     }
   } catch {}
 
-  if (language.quotesMode) {
-    return { tag: language.quotesMode } as GameMode;
-  }
-
   return { tag: language.randomWordsMode } as GameMode;
 }
 

@@ -41,9 +41,7 @@ export function LanguageDropdown() {
         className="inline-flex min-w-0 max-w-full items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer bg-secondary text-secondary-foreground"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="truncate">
-          {currentLang.flag} {currentLang.nativeName}
-        </span>
+        <span className="truncate">{currentLang.nativeName}</span>
         <ChevronDown
           size={14}
           className={`shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
@@ -67,10 +65,11 @@ export function LanguageDropdown() {
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors no-underline ${
                 isSelected
                   ? "bg-secondary text-secondary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                  : "text-foreground hover:bg-secondary"
               }`}
             >
-              {lang.flag} {lang.nativeName}
+              <span>{lang.flag}</span>
+              <span>{lang.nativeName}</span>
             </a>
           );
         })}

@@ -59,7 +59,7 @@ export const SiteStatsPage = () => {
   const { conn } = useDatabase();
   const [globalStats, setGlobalStats] = useState<GlobalStats[]>([]);
   const [selectedTimeFrame, setSelectedTimeFrame] =
-    useState<TimeFrame>("1month");
+    useState<TimeFrame>("1week");
   const [selectedGameMode, setSelectedGameMode] =
     useState<GameModeFilter>("all");
   const [themeTick, setThemeTick] = useState(0);

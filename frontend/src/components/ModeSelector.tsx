@@ -72,12 +72,12 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
     return (
         <>
             <div className="hidden md:flex items-center justify-center gap-1 flex-wrap">
+                <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
+                <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label={t.quotes} disabled={!quotesAvailableForLanguage} />
+                <span className="mx-2 text-border-hover select-none">|</span>
                 <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label={t.publicMatch} />
                 <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label={t.privateLobby} />
                 <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label={t.practiceMode} />
-                <span className="mx-2 text-border-hover select-none">|</span>
-                <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label={t.quotes} disabled={!quotesAvailableForLanguage} />
-                <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
                 <span className="mx-2 text-border-hover select-none">|</span>
                 <LanguageDropdown />
             </div>
@@ -114,16 +114,16 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                                 </button>
                             </div>
                             <div className="p-4 pb-8">
+                                <h3 className="text-secondary-foreground text-sm font-medium mb-3 uppercase tracking-wider">{t.mode}</h3>
+                                <div className="flex flex-wrap gap-2 mb-6">
+                                    <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
+                                    <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label={t.quotes} disabled={!quotesAvailableForLanguage} />
+                                </div>
                                 <h3 className="text-secondary-foreground text-sm font-medium mb-3 uppercase tracking-wider">{t.matchType}</h3>
                                 <div className="flex flex-wrap gap-2 mb-6">
                                     <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label={t.publicMatch} />
                                     <ModeButton isSelected={gameType === "Private"} onClick={() => setGameType("Private")} icon={<Lock size={16} />} label={t.privateLobby} />
                                     <ModeButton isSelected={gameType === "Practice"} onClick={() => setGameType("Practice")} icon={<Target size={16} />} label={t.practiceMode} />
-                                </div>
-                                <h3 className="text-secondary-foreground text-sm font-medium mb-3 uppercase tracking-wider">{t.mode}</h3>
-                                <div className="flex flex-wrap gap-2 mb-6">
-                                    <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label={t.quotes} disabled={!quotesAvailableForLanguage} />
-                                    <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
                                 </div>
                             </div>
                         </div>

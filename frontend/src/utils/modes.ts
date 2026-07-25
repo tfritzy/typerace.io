@@ -8,11 +8,8 @@ export enum Language {
   Italian = "Italian",
   Portuguese = "Portuguese",
   Japanese = "Japanese",
-  Korean = "Korean",
-  Chinese = "Chinese",
   Ukrainian = "Ukrainian",
   Arabic = "Arabic",
-  Hindi = "Hindi",
   Dutch = "Dutch",
   Swedish = "Swedish",
   Turkish = "Turkish",
@@ -137,34 +134,6 @@ export const languages: LanguageInfo[] = [
       "世界中のプレイヤーとリアルタイムのタイピング競争で対戦しましょう。タイピング速度を向上させましょう。",
   },
   {
-    language: Language.Korean,
-    flag: "🇰🇷",
-    countryCode: "kr",
-    slug: "ko",
-    randomWordsMode: "Korean500",
-    quotesMode: "KoreanQuotes",
-    nativeName: "한국어",
-    htmlLang: "ko",
-    measurementMode: "cpm" as const,
-    title: "TypeRace.io | 빠른 템포의 타이핑 배틀과 WPM 추적기",
-    description:
-      "전 세계 플레이어와 실시간 타이핑 대회에서 경쟁하세요. 타이핑 속도를 향상시키세요.",
-  },
-  {
-    language: Language.Chinese,
-    flag: "🇨🇳",
-    countryCode: "cn",
-    slug: "zh",
-    randomWordsMode: "Chinese500",
-    quotesMode: "ChineseQuotes",
-    nativeName: "中文",
-    htmlLang: "zh",
-    measurementMode: "cpm" as const,
-    hasNoSpaces: true,
-    title: "TypeRace.io | 快节奏打字对战与 WPM 追踪器",
-    description: "与全球玩家进行实时打字比赛。提高你的打字速度。",
-  },
-  {
     language: Language.Ukrainian,
     flag: "🇺🇦",
     countryCode: "ua",
@@ -177,20 +146,6 @@ export const languages: LanguageInfo[] = [
     title: "TypeRace.io | Динамічні батли з друку та трекер швидкості друку",
     description:
       "Змагайтеся з гравцями з усього світу в змаганнях з друку в реальному часі. Покращуйте швидкість друку.",
-  },
-  {
-    language: Language.Hindi,
-    flag: "🇮🇳",
-    countryCode: "in",
-    slug: "hi",
-    randomWordsMode: "Hindi500",
-    quotesMode: "HindiQuotes",
-    nativeName: "हिन्दी",
-    htmlLang: "hi",
-    measurementMode: "wpm" as const,
-    title: "TypeRace.io | तेज़-रफ़्तार टाइपिंग मुकाबले और WPM ट्रैकर",
-    description:
-      "वास्तविक समय में टाइपिंग प्रतियोगिताओं में दुनिया भर के खिलाड़ियों के खिलाफ प्रतिस्पर्धा करें। अपनी टाइपिंग गति में सुधार करें।",
   },
   {
     language: Language.Dutch,
@@ -287,7 +242,9 @@ export function getDefaultSiteTitle(slug?: string): string {
 export function getLangHome(): string {
   try {
     const slug = localStorage.getItem(LANG_SLUG_KEY);
-    if (slug) return `/${slug}`;
+    if (slug && languages.some((language) => language.slug === slug)) {
+      return `/${slug}`;
+    }
   } catch {}
   return "/";
 }
@@ -295,7 +252,9 @@ export function getLangHome(): string {
 export function getLangPrefix(): string {
   try {
     const slug = localStorage.getItem(LANG_SLUG_KEY);
-    if (slug) return `/${slug}`;
+    if (slug && languages.some((language) => language.slug === slug)) {
+      return `/${slug}`;
+    }
   } catch {}
   return "";
 }
@@ -384,26 +343,6 @@ const languageStartupPhrases: Record<Language, string[]> = {
     "かかってこい",
     "任せろ",
   ],
-  [Language.Korean]: [
-    "전투 준비 완료",
-    "시스템 가동",
-    "포격 개시",
-    "출격 준비 완료",
-    "돌격",
-    "행운은 용감한 자의 편",
-    "덤벼라",
-    "명령만 내려라",
-  ],
-  [Language.Chinese]: [
-    "战斗准备完毕",
-    "系统就绪",
-    "开始炮击",
-    "准备出击",
-    "发起进攻",
-    "天助勇者",
-    "放马过来",
-    "听候命令",
-  ],
   [Language.Ukrainian]: [
     "готові до бою",
     "системи активовано",
@@ -423,16 +362,6 @@ const languageStartupPhrases: Record<Language, string[]> = {
     "الحظ حليف الجريء",
     "هاتوا ما عندكم",
     "في خدمتكم",
-  ],
-  [Language.Hindi]: [
-    "युद्ध के लिए तैयार",
-    "तंत्र सक्रिय",
-    "गोलाबारी शुरू",
-    "उड़ान भरने को तैयार",
-    "हमला बोलो",
-    "साहसी का साथ देती है किस्मत",
-    "आ जाओ सामने",
-    "आदेश दीजिए",
   ],
   [Language.Dutch]: [
     "klaar voor de strijd",

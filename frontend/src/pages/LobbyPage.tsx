@@ -58,7 +58,7 @@ export const LobbyPage = () => {
 
   const startupPhrase = useMemo(() => {
     return getRandomStartupPhrase(selectedMode.tag);
-  }, [selectedMode.tag]);
+  }, [currentLang]);
 
   const handlePhraseComplete = useCallback(() => {
     navigate(`${lang ? `/${lang}` : ""}/game`, { replace: true });
