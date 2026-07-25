@@ -10,29 +10,55 @@ const PULSE_FADE_MS = 800;
 
 export const Countdown = () => {
   const { gameId } = useParams<{ gameId: string }>();
-  const { conn } = useDatabase();
+  const { conn, latency } = useDatabase();
   const [game, setGame] = useState<Game | null>(null);
+  const [countdownEndsAt, setCountdownEndsAt] = useState<number | null>(null);
   const [count, setCount] = useState(3);
   const [showCount, setShowCount] = useState(false);
   const [showImage, setShowImage] = useState(false);
   const [pulseOn, setPulseOn] = useState(false);
   const previousGameState = useRef<string>();
+  const oneWayLatencyRef = useRef<number | null>(latency.oneWayMs);
+
+  useEffect(() => {
+    oneWayLatencyRef.current = latency.oneWayMs;
+    console.log("Latency diff", oneWayLatencyRef.current);
+  }, [latency.oneWayMs]);
 
   useEffect(() => {
     if (!conn || !gameId) return;
 
-    const handleGameInsert = (_ctx: unknown, g: Game) => {
-      if (g.id.toString() === gameId) setGame(g);
+    const beginCountdown = (g: Game) => {
+      const adjustedDurationMs = Math.max(
+        0,
+        Number(g.countdownDurationMs) - (oneWayLatencyRef.current ?? 0),
+      );
+      setCountdownEndsAt(performance.now() + adjustedDurationMs);
     };
-    const handleGameUpdate = (_ctx: unknown, _o: Game, g: Game) => {
-      if (g.id.toString() === gameId) setGame(g);
+
+    const handleGameInsert = (_ctx: unknown, g: Game) => {
+      if (g.id.toString() !== gameId) return;
+      setGame(g);
+      if (g.state?.tag === "Countdown") beginCountdown(g);
+    };
+    const handleGameUpdate = (_ctx: unknown, oldGame: Game, g: Game) => {
+      if (g.id.toString() !== gameId) return;
+      setGame(g);
+      if (oldGame.state?.tag !== "Countdown" && g.state?.tag === "Countdown") {
+        beginCountdown(g);
+      } else if (g.state?.tag !== "Countdown") {
+        setCountdownEndsAt(null);
+      }
     };
 
     conn.db.game.onInsert(handleGameInsert);
     conn.db.game.onUpdate(handleGameUpdate);
 
     const currentGame = conn.db.game.id.find(gameId);
-    if (currentGame) setGame(currentGame);
+    if (currentGame) {
+      setGame(currentGame);
+      if (currentGame.state?.tag === "Countdown") beginCountdown(currentGame);
+    }
 
     return () => {
       conn.db.game.removeOnInsert(handleGameInsert);
@@ -49,22 +75,37 @@ export const Countdown = () => {
       setShowCount(false);
       return;
     }
-    const ms = Number(game.countdownDurationMs);
-    const initial = Math.max(1, Math.ceil(ms / 1000));
-    setCount(initial);
+    if (countdownEndsAt === null) return;
+
+    const updateCount = () => {
+      const remainingMs = countdownEndsAt - performance.now();
+      const nextCount = Math.max(0, Math.ceil(remainingMs / 1000));
+      setCount(nextCount);
+      setShowCount(nextCount > 0);
+      return remainingMs;
+    };
+
+    let remainingMs = updateCount();
     setShowCount(true);
     setShowImage(false);
-  }, [isCountdown, game?.id]);
 
-  useEffect(() => {
-    if (!isCountdown) return;
-    if (count <= 0) {
-      setShowCount(false);
-      return;
-    }
-    const t = setTimeout(() => setCount((c) => c - 1), 1000);
-    return () => clearTimeout(t);
-  }, [isCountdown, count]);
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const scheduleNextTick = () => {
+      if (remainingMs <= 0) return;
+      const displayedCount = Math.ceil(remainingMs / 1000);
+      const untilNextBoundary = Math.max(
+        1,
+        remainingMs - (displayedCount - 1) * 1000,
+      );
+      timeout = setTimeout(() => {
+        remainingMs = updateCount();
+        scheduleNextTick();
+      }, untilNextBoundary);
+    };
+    scheduleNextTick();
+
+    return () => clearTimeout(timeout);
+  }, [isCountdown, game?.id, countdownEndsAt]);
 
   useEffect(() => {
     const previousState = previousGameState.current;

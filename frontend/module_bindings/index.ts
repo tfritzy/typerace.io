@@ -49,6 +49,8 @@ import JoinPrivateGame from "./join_private_game_reducer";
 export { JoinPrivateGame };
 import KickPlayer from "./kick_player_reducer";
 export { KickPlayer };
+import Ping from "./ping_reducer";
+export { Ping };
 import PublishScore from "./publish_score_reducer";
 export { PublishScore };
 import Rematch from "./rematch_reducer";
@@ -446,6 +448,7 @@ const reducersSchema = __reducers(
   __reducerSchema("joinGame", JoinGame),
   __reducerSchema("joinPrivateGame", JoinPrivateGame),
   __reducerSchema("kickPlayer", KickPlayer),
+  __reducerSchema("ping", Ping),
   __reducerSchema("publishScore", PublishScore),
   __reducerSchema("rematch", Rematch),
   __reducerSchema("setPlayerName", SetPlayerName),

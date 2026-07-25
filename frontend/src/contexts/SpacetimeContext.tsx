@@ -8,6 +8,13 @@ import {
 } from 'react';
 import { DbConnection } from '../../module_bindings';
 import { useAuth } from '../firebase/AuthContext';
+import {
+    EMPTY_DATABASE_LATENCY,
+    SpacetimeLatencySampler,
+    type DatabaseLatency,
+} from '../utils/latency';
+
+export type { DatabaseLatency } from '../utils/latency';
 
 interface SpacetimeProviderProps {
     children: React.ReactNode;
@@ -18,6 +25,7 @@ export type DatabaseStatus = 'loading' | 'connected' | 'reconnecting' | 'error';
 interface SpacetimeContextType {
     conn: DbConnection | null;
     status: DatabaseStatus;
+    latency: DatabaseLatency;
     reconnect: () => void;
 }
 
@@ -25,7 +33,6 @@ const SpacetimeContext = createContext<SpacetimeContextType | undefined>(undefin
 const CONNECTION_TIMEOUT_MS = 5_000;
 const CONNECTION_STABLE_MS = 30_000;
 const MAX_RECONNECT_ATTEMPTS = 1;
-
 export const useDatabase = () => {
     const context = useContext(SpacetimeContext);
     if (!context) {
@@ -38,9 +45,11 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     const { user, loading: authLoading } = useAuth();
     const [conn, setConn] = useState<DbConnection | null>(null);
     const [status, setStatus] = useState<DatabaseStatus>('loading');
+    const [latency, setLatency] = useState<DatabaseLatency>(EMPTY_DATABASE_LATENCY);
     const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const connectionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const connectionStableTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const latencySamplerRef = useRef<SpacetimeLatencySampler | null>(null);
     const connectionRef = useRef<DbConnection | null>(null);
     const activeRef = useRef(true);
     const connectionAttemptRef = useRef(0);
@@ -65,6 +74,19 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
             clearTimeout(connectionStableTimeoutRef.current);
             connectionStableTimeoutRef.current = null;
         }
+    };
+
+    const clearLatencySampling = (resetEstimate = true) => {
+        latencySamplerRef.current?.stop();
+        latencySamplerRef.current = null;
+        if (resetEstimate) setLatency(EMPTY_DATABASE_LATENCY);
+    };
+
+    const startLatencySampling = (connected: DbConnection) => {
+        clearLatencySampling();
+        const sampler = new SpacetimeLatencySampler(connected, setLatency);
+        latencySamplerRef.current = sampler;
+        sampler.start();
     };
 
     const connect = useCallback(async (isReconnect = false) => {
@@ -111,6 +133,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                     connectionRef.current = connected;
                     setConn(connected);
                     setStatus('connected');
+                    startLatencySampling(connected);
                 })
                 .onConnectError((_ctx, error) => {
                     if (!activeRef.current || attempt !== connectionAttemptRef.current) return;
@@ -124,6 +147,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
                     if (!activeRef.current || attempt !== connectionAttemptRef.current) return;
                     clearConnectionTimeout();
                     clearConnectionStableTimeout();
+                    clearLatencySampling();
                     console.warn('Disconnected from SpacetimeDB');
                     connectionRef.current = null;
                     setConn(null);
@@ -175,6 +199,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
             clearReconnectTimeout();
             clearConnectionTimeout();
             clearConnectionStableTimeout();
+            clearLatencySampling(false);
             connectionRef.current?.disconnect();
             connectionRef.current = null;
             setConn(null);
@@ -182,7 +207,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
     }, [authLoading, connect]);
 
     return (
-        <SpacetimeContext.Provider value={{ conn, status, reconnect }}>
+        <SpacetimeContext.Provider value={{ conn, status, latency, reconnect }}>
             {children}
         </SpacetimeContext.Provider>
     );

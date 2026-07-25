@@ -644,6 +644,14 @@ public static partial class Module
         }
     }
 
+    [Reducer]
+    public static void ping(ReducerContext ctx, ulong nonce)
+    {
+        // The generated reducer callback echoes the nonce. Keeping this reducer
+        // side-effect free lets clients measure the real database round trip
+        // without creating rows or subscription traffic.
+    }
+
     private static string GenerateNonAnonymousAdjective(Random rng)
     {
         string[] adjectives = { "Shiny", "Sparkly", "Exothermic", "Exuberant" };
