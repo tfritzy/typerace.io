@@ -33,15 +33,13 @@ const median = (values: number[]) => {
     : sorted[middle];
 };
 
-export const summarizeLatencySamples = (
-  samples: number[],
-): DatabaseLatency => {
+export const summarizeLatencySamples = (samples: number[]): DatabaseLatency => {
   if (samples.length === 0) return EMPTY_DATABASE_LATENCY;
 
   const roundTripMs = median(samples);
-  const differences = samples.slice(1).map((sample, index) =>
-    Math.abs(sample - samples[index]),
-  );
+  const differences = samples
+    .slice(1)
+    .map((sample, index) => Math.abs(sample - samples[index]));
 
   return {
     roundTripMs,
@@ -100,10 +98,7 @@ export class SpacetimeLatencySampler {
     }, PING_TIMEOUT_MS);
   };
 
-  private handlePing = (
-    ctx: ReducerEventContext,
-    args: { nonce: bigint },
-  ) => {
+  private handlePing = (ctx: ReducerEventContext, args: { nonce: bigint }) => {
     if (!ctx.event.callerConnectionId?.isEqual(this.connection.connectionId)) {
       return;
     }
@@ -113,9 +108,7 @@ export class SpacetimeLatencySampler {
 
     this.pending = null;
     const roundTripMs = performance.now() - pending.startedAt;
-    this.samples = [...this.samples, roundTripMs].slice(
-      -LATENCY_SAMPLE_WINDOW,
-    );
+    this.samples = [...this.samples, roundTripMs].slice(-LATENCY_SAMPLE_WINDOW);
     this.onEstimate(summarizeLatencySamples(this.samples));
 
     this.schedulePing(

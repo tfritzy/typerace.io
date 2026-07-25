@@ -1,5 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useCallback, useState, useMemo } from "react";
+import {
+  useEffect,
+  useCallback,
+  useLayoutEffect,
+  useState,
+  useMemo,
+} from "react";
 import { type Game, type PlayerProgress } from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { PlayerStatsRow } from "../components/PlayerStatsRow";
@@ -15,24 +21,38 @@ import { EmptyPlayerProgressBars } from "../components/EmptyPlayerProgressBars";
 import { GameSkeleton } from "../components/GameSkeleton";
 import { getPreferredGameType } from "../utils/gamePreferences";
 import { WinnerConfetti } from "../components/WinnerConfetti";
+import { useCountdownTiming } from "../hooks/useCountdownTiming";
 
 type UiGameType = "Public" | "Private" | "Practice";
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
-  const { conn, status: databaseStatus } = useDatabase();
+  const { conn, status: databaseStatus, latency } = useDatabase();
   const [hasFinished, setHasFinished] = useState(false);
   const [game, setGame] = useState<Game | null>(null);
   const [gamePlayerProgress, setGamePlayerProgress] = useState<
     PlayerProgress[]
   >([]);
+  const {
+    timing: raceTiming,
+    start: startCountdown,
+    clear: clearCountdown,
+    reset: resetCountdown,
+    setServerPhase,
+    setOneWayLatency,
+  } = useCountdownTiming();
+
+  useLayoutEffect(() => {
+    setOneWayLatency(latency.oneWayMs);
+  }, [latency.oneWayMs, setOneWayLatency]);
 
   useEffect(() => {
     setGame(null);
     setGamePlayerProgress([]);
     setHasFinished(false);
-  }, [gameId]);
+    resetCountdown();
+  }, [gameId, resetCountdown]);
 
   useEffect(() => {
     if (!conn || !gameId) return;
@@ -41,12 +61,25 @@ export const GamePage = () => {
     const handleGameInsert = (_ctx: any, g: Game) => {
       if (g.id.toString() === gameId) {
         setGame(g);
+        setServerPhase(g.state?.tag);
+        if (g.state?.tag === "Countdown") {
+          startCountdown(Number(g.countdownDurationMs));
+        }
       }
     };
 
     const handleGameUpdate = (_ctx: any, _oldGame: Game, newGame: Game) => {
       if (newGame.id.toString() === gameId) {
         setGame(newGame);
+        setServerPhase(newGame.state?.tag);
+        if (
+          _oldGame.state?.tag !== "Countdown" &&
+          newGame.state?.tag === "Countdown"
+        ) {
+          startCountdown(Number(newGame.countdownDurationMs));
+        } else if (newGame.state?.tag !== "Countdown") {
+          clearCountdown();
+        }
       }
     };
 
@@ -127,6 +160,10 @@ export const GamePage = () => {
         const currentGame = conn.db.game.id.find(gameId);
         if (currentGame) {
           setGame(currentGame);
+          setServerPhase(currentGame.state?.tag);
+          if (currentGame.state?.tag === "Countdown") {
+            startCountdown(Number(currentGame.countdownDurationMs));
+          }
         }
 
         const currentGameProgress = Array.from(
@@ -145,7 +182,14 @@ export const GamePage = () => {
       clearTimeout(progressDeleteRedirect);
       pageSubscription.unsubscribe();
     };
-  }, [conn, gameId, navigate]);
+  }, [
+    conn,
+    gameId,
+    navigate,
+    startCountdown,
+    clearCountdown,
+    setServerPhase,
+  ]);
 
   useEffect(() => {
     if (!conn || !game) return;
@@ -244,7 +288,6 @@ export const GamePage = () => {
     game.gameType?.tag === "Private" &&
     currentPlayerId &&
     game.owner?.isEqual(currentPlayerId);
-  const isCountdown = game.state?.tag === "Countdown";
 
   const currentPlayerProgress = gamePlayerProgress.find(
     (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
@@ -257,7 +300,8 @@ export const GamePage = () => {
     currentPlayerProgress?.placement === 1 &&
     (hasFinished || hasCompletedRace);
   const isMemberOfRace = !!currentPlayerProgress;
-  const isDisabled = isInLobby || isCountdown || !currentPlayerProgress;
+  const isDisabled =
+    raceTiming.phase !== "racing" || !currentPlayerProgress;
 
   const progressBars = Array.from({ length: totalSlots }).map((_, index) => {
     const pp = gamePlayerProgress[index];

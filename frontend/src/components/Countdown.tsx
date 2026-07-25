@@ -1,111 +1,80 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
-import type { Game } from "../types/stdb";
-import { useDatabase } from "../contexts/SpacetimeContext";
 import bufoLetsGo from "../assets/bufo-lets-goo.gif";
+import { useCountdownTiming } from "../hooks/useCountdownTiming";
 
 const PULSE_PERIOD_MS = 1000;
 const PULSE_BRIGHT_MS = 150;
 const PULSE_FADE_MS = 800;
+const MIN_INITIAL_NUMBER_MS = 800;
+
+const getCountdownPosition = (remainingMs: number) => {
+  const count = Math.max(0, Math.ceil(remainingMs / PULSE_PERIOD_MS));
+  const timeUntilNextNumber =
+    remainingMs - (count - 1) * PULSE_PERIOD_MS;
+  return { count, timeUntilNextNumber };
+};
 
 export const Countdown = () => {
-  const { gameId } = useParams<{ gameId: string }>();
-  const { conn, latency } = useDatabase();
-  const [game, setGame] = useState<Game | null>(null);
-  const [countdownEndsAt, setCountdownEndsAt] = useState<number | null>(null);
+  const { timing: raceTiming } = useCountdownTiming();
   const [count, setCount] = useState(3);
   const [showCount, setShowCount] = useState(false);
   const [showImage, setShowImage] = useState(false);
   const [pulseOn, setPulseOn] = useState(false);
   const previousGameState = useRef<string>();
-  const oneWayLatencyRef = useRef<number | null>(latency.oneWayMs);
+  const isCountdown = raceTiming.phase === "countdown";
+  const isRacing = raceTiming.phase === "racing";
+  const deadlineMs = isCountdown ? raceTiming.deadlineMs : null;
+  const tag = raceTiming.phase;
 
   useEffect(() => {
-    oneWayLatencyRef.current = latency.oneWayMs;
-    console.log("Latency diff", oneWayLatencyRef.current);
-  }, [latency.oneWayMs]);
-
-  useEffect(() => {
-    if (!conn || !gameId) return;
-
-    const beginCountdown = (g: Game) => {
-      const adjustedDurationMs = Math.max(
-        0,
-        Number(g.countdownDurationMs) - (oneWayLatencyRef.current ?? 0),
-      );
-      setCountdownEndsAt(performance.now() + adjustedDurationMs);
-    };
-
-    const handleGameInsert = (_ctx: unknown, g: Game) => {
-      if (g.id.toString() !== gameId) return;
-      setGame(g);
-      if (g.state?.tag === "Countdown") beginCountdown(g);
-    };
-    const handleGameUpdate = (_ctx: unknown, oldGame: Game, g: Game) => {
-      if (g.id.toString() !== gameId) return;
-      setGame(g);
-      if (oldGame.state?.tag !== "Countdown" && g.state?.tag === "Countdown") {
-        beginCountdown(g);
-      } else if (g.state?.tag !== "Countdown") {
-        setCountdownEndsAt(null);
-      }
-    };
-
-    conn.db.game.onInsert(handleGameInsert);
-    conn.db.game.onUpdate(handleGameUpdate);
-
-    const currentGame = conn.db.game.id.find(gameId);
-    if (currentGame) {
-      setGame(currentGame);
-      if (currentGame.state?.tag === "Countdown") beginCountdown(currentGame);
-    }
-
-    return () => {
-      conn.db.game.removeOnInsert(handleGameInsert);
-      conn.db.game.removeOnUpdate(handleGameUpdate);
-    };
-  }, [conn, gameId]);
-
-  const tag = game?.state?.tag;
-  const isCountdown = tag === "Countdown";
-  const isRacing = tag === "Racing";
-
-  useEffect(() => {
-    if (!isCountdown || !game) {
+    if (!isCountdown) {
       setShowCount(false);
       return;
     }
-    if (countdownEndsAt === null) return;
+    if (deadlineMs === null) return;
 
     const updateCount = () => {
-      const remainingMs = countdownEndsAt - performance.now();
-      const nextCount = Math.max(0, Math.ceil(remainingMs / 1000));
+      const remainingMs = deadlineMs - performance.now();
+      const nextCount = Math.max(
+        0,
+        Math.ceil(remainingMs / PULSE_PERIOD_MS),
+      );
       setCount(nextCount);
       setShowCount(nextCount > 0);
-      return remainingMs;
+      return { remainingMs, displayedCount: nextCount };
     };
 
-    let remainingMs = updateCount();
-    setShowCount(true);
+    const initialRemainingMs = deadlineMs - performance.now();
+    const initialPosition = getCountdownPosition(initialRemainingMs);
+    const skipInitialNumber =
+      initialPosition.count > 1 &&
+      initialPosition.timeUntilNextNumber <= MIN_INITIAL_NUMBER_MS;
+    let current = skipInitialNumber
+      ? {
+          remainingMs: initialRemainingMs,
+          displayedCount: initialPosition.count,
+        }
+      : updateCount();
+    if (skipInitialNumber) setShowCount(false);
     setShowImage(false);
 
     let timeout: ReturnType<typeof setTimeout> | undefined;
     const scheduleNextTick = () => {
-      if (remainingMs <= 0) return;
-      const displayedCount = Math.ceil(remainingMs / 1000);
+      if (current.remainingMs <= 0 || current.displayedCount <= 0) return;
       const untilNextBoundary = Math.max(
         1,
-        remainingMs - (displayedCount - 1) * 1000,
+        current.remainingMs -
+          (current.displayedCount - 1) * PULSE_PERIOD_MS,
       );
       timeout = setTimeout(() => {
-        remainingMs = updateCount();
+        current = updateCount();
         scheduleNextTick();
       }, untilNextBoundary);
     };
     scheduleNextTick();
 
     return () => clearTimeout(timeout);
-  }, [isCountdown, game?.id, countdownEndsAt]);
+  }, [isCountdown, deadlineMs]);
 
   useEffect(() => {
     const previousState = previousGameState.current;
@@ -121,7 +90,7 @@ export const Countdown = () => {
       return;
     }
 
-    if (previousState !== "Countdown") return;
+    if (previousState !== "countdown") return;
 
     setShowImage(true);
     const timeout = setTimeout(() => setShowImage(false), 2000);
@@ -129,23 +98,63 @@ export const Countdown = () => {
   }, [isCountdown, isRacing, tag]);
 
   useEffect(() => {
-    if (!isCountdown) {
+    if (!isCountdown || deadlineMs === null) {
       setPulseOn(false);
       return;
     }
+
     let offTimer: ReturnType<typeof setTimeout> | null = null;
+    let nextPulseTimer: ReturnType<typeof setTimeout> | null = null;
+
     const fire = () => {
       setPulseOn(true);
       offTimer = setTimeout(() => setPulseOn(false), PULSE_BRIGHT_MS);
     };
-    fire();
-    const interval = setInterval(fire, PULSE_PERIOD_MS);
+
+    const scheduleNextPulse = (displayedCount: number) => {
+      const remainingMs = deadlineMs - performance.now();
+      if (displayedCount <= 1) return;
+
+      const untilNextBoundary = Math.max(
+        1,
+        remainingMs - (displayedCount - 1) * PULSE_PERIOD_MS,
+      );
+      nextPulseTimer = setTimeout(() => {
+        fire();
+        const nextCount = Math.max(
+          0,
+          Math.ceil((deadlineMs - performance.now()) / PULSE_PERIOD_MS),
+        );
+        scheduleNextPulse(nextCount);
+      }, untilNextBoundary);
+    };
+
+    const initialRemainingMs = deadlineMs - performance.now();
+    const initialPosition = getCountdownPosition(initialRemainingMs);
+    const skipInitialPulse =
+      initialPosition.count > 1 &&
+      initialPosition.timeUntilNextNumber <= MIN_INITIAL_NUMBER_MS;
+
+    if (skipInitialPulse) {
+      nextPulseTimer = setTimeout(() => {
+        fire();
+        const nextCount = Math.max(
+          0,
+          Math.ceil((deadlineMs - performance.now()) / PULSE_PERIOD_MS),
+        );
+        scheduleNextPulse(nextCount);
+      }, Math.max(1, initialPosition.timeUntilNextNumber));
+    } else {
+      fire();
+      scheduleNextPulse(initialPosition.count);
+    }
+
     return () => {
-      clearInterval(interval);
+      if (nextPulseTimer) clearTimeout(nextPulseTimer);
       if (offTimer) clearTimeout(offTimer);
       setPulseOn(false);
     };
-  }, [isCountdown]);
+  }, [isCountdown, deadlineMs]);
 
   const showBorder = isCountdown || isRacing;
   const bright = isRacing || pulseOn;
@@ -172,7 +181,7 @@ export const Countdown = () => {
           }}
         />
       )}
-      {showCount && (
+      {showCount && isCountdown && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
           <div
             key={count}

@@ -127,9 +127,9 @@ public partial struct GameModeCount
 
 public static partial class Module
 {
-    private const long PUBLIC_GAME_COUNTDOWN_MICROSECONDS = 3_000_000;
-    private const long PRIVATE_GAME_COUNTDOWN_MICROSECONDS = 5_000_000;
-    private const long PRACTICE_GAME_COUNTDOWN_MICROSECONDS = 3_000_000;
+    private const long PUBLIC_GAME_COUNTDOWN_MICROSECONDS = 4_000_000;
+    private const long PRIVATE_GAME_COUNTDOWN_MICROSECONDS = 6_000_000;
+    private const long PRACTICE_GAME_COUNTDOWN_MICROSECONDS = 4_000_000;
     private const long BOT_FILL_DELAY_MICROSECONDS = 5_000_000;
     private const long PRACTICE_GAME_COUNTDOWN_START_DELAY_MICROSECONDS = 1_000_000;
     private const int EVENT_SIZE_BYTES = 3;
