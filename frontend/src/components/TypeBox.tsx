@@ -56,8 +56,9 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const nonBreakingSpace = "\u00A0";
     const spaceIndicatorChar = "␣";
     const isInputDisabled = inputState !== "enabled";
+    const initialInput = phrase.substring(0, initialProgress);
     const [focused, setFocused] = useState(true);
-    const [input, setInput] = useState(phrase.substring(0, initialProgress));
+    const [input, setInput] = useState(initialInput);
     const [isComplete, setIsComplete] = useState(false);
     const [showErrorWarning, setShowErrorWarning] = useState(false);
 
@@ -67,6 +68,9 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     React.useEffect(() => {
       if (overrideInputValue !== undefined) {
+        if (inputRef.current) {
+          inputRef.current.value = overrideInputValue;
+        }
         setInput(overrideInputValue);
         setShowErrorWarning(false);
       }
@@ -115,8 +119,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
 
         const newValue = targetValue;
-
         const oldValue = input;
+
+        if (newValue === oldValue) {
+          return;
+        }
 
         if (newValue.length < oldValue.length) {
           let lastCompletedWordEnd = 0;
@@ -131,6 +138,9 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
           if (newValue.length < lastCompletedWordEnd) {
             const correctPrefix = phrase.substring(0, lastCompletedWordEnd);
+            if (inputRef.current) {
+              inputRef.current.value = correctPrefix;
+            }
             setInput(correctPrefix);
             return;
           }
@@ -206,7 +216,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               const expectedChar = phrase[charIndex];
               const eventType =
                 newChar === expectedChar ? "Correct" : "Incorrect";
-              onProgress(correctCharCount, eventType);
+              const correctCharCountAfterEvent = Math.min(
+                correctCharCount,
+                charIndex + 1,
+              );
+              onProgress(correctCharCountAfterEvent, eventType);
             }
           }
         }
@@ -216,6 +230,9 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           onComplete();
           if (resetOnComplete) {
             setTimeout(() => {
+              if (inputRef.current) {
+                inputRef.current.value = "";
+              }
               setInput("");
               setIsComplete(false);
               setShowErrorWarning(false);
@@ -235,14 +252,12 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     );
 
     const handleInputUpdate = useCallback(
-      (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        handleChange(event.target.value);
-      },
-      [handleChange],
-    );
+      (event: React.FormEvent<HTMLTextAreaElement>) => {
+        const nativeInputEvent = event.nativeEvent as InputEvent;
+        if (nativeInputEvent.isComposing) {
+          return;
+        }
 
-    const handleCompositionUpdate = useCallback(
-      (event: React.CompositionEvent<HTMLTextAreaElement>) => {
         handleChange(event.currentTarget.value);
       },
       [handleChange],
@@ -383,14 +398,14 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
             <textarea
               ref={inputRef}
-              value={input}
-              onChange={handleInputUpdate}
+              defaultValue={initialInput}
+              onInput={handleInputUpdate}
               onKeyDown={handleKeyDown}
               onPaste={handlePaste}
               onFocus={handleFocus}
               onBlur={handleBlur}
-              onCompositionUpdate={handleCompositionUpdate}
               onCompositionEnd={handleCompositionCommit}
+              readOnly={isInputDisabled}
               id="type-box"
               className="outline-none resize-none absolute top-0 left-0 opacity-0 pointer-events-none"
               autoCapitalize="none"

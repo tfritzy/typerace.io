@@ -13,6 +13,9 @@ dist-ssr
 *.local
 *.tsbuildinfo
 
+# Generated Firebase Hosting deployment cache
+.firebase/hosting.*.cache
+
 # C# build artifacts
 bin/
 obj/
