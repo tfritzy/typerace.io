@@ -14,13 +14,25 @@ type ActionBarProps = {
   rematchDisabled?: boolean;
   conn?: DbConnection;
   onWatchReplay?: () => void;
+  isParticipant?: boolean;
 };
 
-export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn, onWatchReplay }: ActionBarProps) => {
+export const ActionBar = ({
+  mode,
+  gameType,
+  gameId,
+  rematchDisabled,
+  conn,
+  onWatchReplay,
+  isParticipant = true,
+}: ActionBarProps) => {
   const navigate = useNavigate();
   const t = getTranslations();
 
-  const canRematch = !rematchDisabled;
+  const isPrivateGame = gameType === "Private";
+  const showPlayAgain = isParticipant && !isPrivateGame;
+  const showRematch = isParticipant && isPrivateGame && !!gameId;
+  const canRematch = showRematch && !rematchDisabled;
 
   const handleRematch = useCallback(() => {
     if (conn && gameId && canRematch) {
@@ -37,20 +49,32 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn, onWat
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (gameType !== "Private" && (event.key === "p" || event.key === "P")) {
-        handlePlayAgain();
-      } else if (event.key === "m" || event.key === "M") {
-        navigate(getLangHome());
-      } else if ((event.key === "r" || event.key === "R") && canRematch) {
-        handleRematch();
-      } else if ((event.key === "w" || event.key === "W") && onWatchReplay) {
-        onWatchReplay();
+      switch (event.key.toLowerCase()) {
+        case "m":
+          navigate(getLangHome());
+          break;
+        case "w":
+          onWatchReplay?.();
+          break;
+        case "p":
+          if (showPlayAgain) handlePlayAgain();
+          break;
+        case "r":
+          if (canRematch) handleRematch();
+          break;
       }
     };
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [navigate, gameType, canRematch, handlePlayAgain, handleRematch, onWatchReplay]);
+  }, [
+    navigate,
+    showPlayAgain,
+    canRematch,
+    handlePlayAgain,
+    handleRematch,
+    onWatchReplay,
+  ]);
 
   return (
     <div className="flex gap-3 mt-3 animate-slideUpFadeIn" style={{ animationDelay: '0.2s' }}>
@@ -68,7 +92,7 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn, onWat
           {t.watchReplay} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">W</span>
         </button>
       )}
-      {gameId && gameType === "Private" && (
+      {showRematch && (
         <div className="relative flex-1 group">
           <button
             onClick={handleRematch}
@@ -86,7 +110,7 @@ export const ActionBar = ({ mode, gameType, gameId, rematchDisabled, conn, onWat
           )}
         </div>
       )}
-      {gameType !== "Private" && (
+      {showPlayAgain && (
         <button
           onClick={handlePlayAgain}
           className="box rounded-lg px-8 py-4 bg-transparent text-foreground text-base font-semibold cursor-pointer opacity-80 flex-1"

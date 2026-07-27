@@ -7,6 +7,7 @@ type CursorProps = {
   lerp?: number;
   fadeDelay?: number;
   visible?: boolean;
+  color?: string;
 };
 
 export const Cursor = memo(
@@ -15,6 +16,7 @@ export const Cursor = memo(
     lerp = 0.3,
     fadeDelay = 2000,
     visible = true,
+    color,
   }: CursorProps) => {
     const followerRef = useRef<HTMLDivElement>(null);
     const position = useRef({ x: 0, y: 0 });
@@ -113,7 +115,10 @@ export const Cursor = memo(
         className={`max-w-0 h-10 -translate-y-px fixed top-0 -translate-x-0.5 left-0  ${isBlinking && visible ? "animate-blink" : ""}`}
         style={{ opacity: visible ? 1 : 0 }}
       >
-        <div className="h-full rounded-full border-r-2 border-r-accent" />
+        <div
+          className="h-full rounded-full border-r-2 border-r-accent"
+          style={color ? { borderRightColor: color } : undefined}
+        />
       </div>
     );
   },

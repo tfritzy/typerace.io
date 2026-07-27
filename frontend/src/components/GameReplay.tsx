@@ -2,9 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 import { useParams } from "react-router-dom";
 import type { PlayerProgress } from "../types/stdb";
-import { getPlayerColorHex } from "../utils/colorMapping";
+import { getDisplayColorHex } from "../utils/colorMapping";
 import { getLanguageFromSlug } from "../utils/modes";
 import { getTranslations } from "../utils/translations";
+import { useDatabase } from "../contexts/SpacetimeContext";
 import {
   applyReplayEvent,
   buildReplayTimeline,
@@ -38,6 +39,8 @@ export function GameReplay({
   onExit,
 }: GameReplayProps) {
   const lang = useParams().lang;
+  const { conn } = useDatabase();
+  const currentPlayerId = conn?.identity;
   const noSpacesInPhrase = getLanguageFromSlug(lang).hasNoSpaces;
   const translations = getTranslations();
   const timeline = useMemo(
@@ -124,6 +127,16 @@ export function GameReplay({
   }, [phrase, replayNumber, timeline]);
 
   const selectedInput = inputs[selectedPlayerId] ?? "";
+  const selectedPlayer = players.find(
+    (player) => player.playerId.toHexString() === selectedPlayerId,
+  );
+  const isSelectedCurrentPlayer = !!(
+    currentPlayerId && selectedPlayer?.playerId.isEqual(currentPlayerId)
+  );
+  const selectedPlayerColor = getDisplayColorHex(
+    selectedPlayer?.playerColor?.tag ?? "",
+    isSelectedCurrentPlayer,
+  );
 
   return (
     <div className="w-full pb-4 animate-[fadeIn_150ms_ease-out]">
@@ -177,7 +190,8 @@ export function GameReplay({
           attribution={attribution}
           inputState="disabled"
           cursorState="visible"
-          inputValue={selectedInput}
+          cursorColor={selectedPlayerColor}
+          overrideInputValue={selectedInput}
           height="430px"
           noSpacesInPhrase={noSpacesInPhrase}
         />
@@ -187,6 +201,9 @@ export function GameReplay({
         .filter((player) => player.playerId.toHexString() !== selectedPlayerId)
         .map((player) => {
           const playerId = player.playerId.toHexString();
+          const isCurrentPlayer = !!(
+            currentPlayerId && player.playerId.isEqual(currentPlayerId)
+          );
           return (
             <GhostCursor
               key={playerId}
@@ -194,7 +211,10 @@ export function GameReplay({
                 inputs[playerId] ?? "",
                 phrase,
               )}
-              color={getPlayerColorHex(player.playerColor?.tag ?? "")}
+              color={getDisplayColorHex(
+                player.playerColor?.tag,
+                isCurrentPlayer,
+              )}
               lerp={0.3}
             />
           );

@@ -22,8 +22,9 @@ type TypeBoxProps = {
   inputState?: TypeBoxInputState;
   initialProgress?: number;
   cursorState?: TypeBoxCursorState;
+  cursorColor?: string;
   noSpacesInPhrase?: boolean;
-  inputValue?: string;
+  overrideInputValue?: string;
 };
 
 export type TypeBoxCursorState = "auto" | "visible" | "hidden";
@@ -46,8 +47,9 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       inputState = "enabled",
       initialProgress = 0,
       cursorState = "auto",
+      cursorColor,
       noSpacesInPhrase: noSpacesLang,
-      inputValue,
+      overrideInputValue,
     },
     ref,
   ) => {
@@ -64,11 +66,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
     React.useEffect(() => {
-      if (inputValue !== undefined) {
-        setInput(inputValue);
+      if (overrideInputValue !== undefined) {
+        setInput(overrideInputValue);
         setShowErrorWarning(false);
       }
-    }, [inputValue]);
+    }, [overrideInputValue]);
 
     React.useEffect(() => {
       if (targetRef.current && focused && !isComplete) {
@@ -372,6 +374,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               targetRef={targetRef}
               lerp={0.3}
               fadeDelay={500}
+              color={cursorColor}
               visible={
                 cursorState === "visible" ||
                 (cursorState === "auto" && focused && !isComplete)
