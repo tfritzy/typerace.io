@@ -17,14 +17,18 @@ type TypeBoxProps = {
     eventType: "Correct" | "Incorrect" | "Backspace",
   ) => void;
   onWordComplete?: (wordXp: number, position: { x: number; y: number }) => void;
-  className?: string;
   height?: string;
   resetOnComplete?: boolean;
-  disabled?: boolean;
+  inputState?: TypeBoxInputState;
   initialProgress?: number;
-  hideCursor?: boolean;
+  cursorState?: TypeBoxCursorState;
+  cursorColor?: string;
   noSpacesInPhrase?: boolean;
+  overrideInputValue?: string;
 };
+
+export type TypeBoxCursorState = "auto" | "visible" | "hidden";
+export type TypeBoxInputState = "enabled" | "disabled" | "disabled-dimmed";
 
 export type TypeBoxRef = {
   focus: () => void;
@@ -38,18 +42,20 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       onComplete,
       onProgress,
       onWordComplete,
-      className,
       height,
       resetOnComplete = false,
-      disabled = false,
+      inputState = "enabled",
       initialProgress = 0,
-      hideCursor = false,
+      cursorState = "auto",
+      cursorColor,
       noSpacesInPhrase: noSpacesLang,
+      overrideInputValue,
     },
     ref,
   ) => {
     const nonBreakingSpace = "\u00A0";
     const spaceIndicatorChar = "␣";
+    const isInputDisabled = inputState !== "enabled";
     const [focused, setFocused] = useState(true);
     const [input, setInput] = useState(phrase.substring(0, initialProgress));
     const [isComplete, setIsComplete] = useState(false);
@@ -58,6 +64,13 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const targetRef = useRef<HTMLElement>(null);
     const phraseRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
+
+    React.useEffect(() => {
+      if (overrideInputValue !== undefined) {
+        setInput(overrideInputValue);
+        setShowErrorWarning(false);
+      }
+    }, [overrideInputValue]);
 
     React.useEffect(() => {
       if (targetRef.current && focused && !isComplete) {
@@ -97,7 +110,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     const handleChange = useCallback(
       (targetValue: string) => {
-        if (disabled) {
+        if (isInputDisabled) {
           return;
         }
 
@@ -217,7 +230,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         onWordComplete,
         input,
         resetOnComplete,
-        disabled,
+        isInputDisabled,
       ],
     );
 
@@ -278,11 +291,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
       }
 
-      return chars.map((char, i) => {
+      const renderedCharacters = chars.map((char, i) => {
         const isTyped = i < input.length;
         const isCorrect = input[i] === char;
         const isCursor = i === input.length;
-        const isInCompletedWord = i < lastCompletedWordEnd;
+        const isInCompletedWord = input === phrase || i < lastCompletedWordEnd;
         const isInCurrentWord =
           i >= lastCompletedWordEnd && i < input.length && isCorrect;
 
@@ -318,6 +331,19 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           </span>
         );
       });
+
+      if (input.length >= phrase.length) {
+        renderedCharacters.push(
+          <span
+            key="cursor-at-end"
+            id="target"
+            data-char-index={phrase.length}
+            ref={targetRef}
+          />,
+        );
+      }
+
+      return renderedCharacters;
     };
 
     const containerStyle: React.CSSProperties = {
@@ -326,7 +352,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     return (
       <div
-        className={`relative box-with-focus w-full px-6 py-3 cursor-text flex items-start ${disabled ? "opacity-60" : ""} ${className || ""}`}
+        className={`relative box-with-focus w-full px-6 py-3 cursor-text flex items-start ${inputState === "disabled-dimmed" ? "opacity-60" : ""}`}
         style={containerStyle}
         onClick={() => inputRef.current?.focus()}
       >
@@ -348,7 +374,11 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               targetRef={targetRef}
               lerp={0.3}
               fadeDelay={500}
-              visible={focused && !isComplete && !hideCursor}
+              color={cursorColor}
+              visible={
+                cursorState === "visible" ||
+                (cursorState === "auto" && focused && !isComplete)
+              }
             />
 
             <textarea

@@ -15,6 +15,7 @@ import { EmptyPlayerProgressBars } from "../components/EmptyPlayerProgressBars";
 import { GameSkeleton } from "../components/GameSkeleton";
 import { getPreferredGameType } from "../utils/gamePreferences";
 import { WinnerConfetti } from "../components/WinnerConfetti";
+import { GameReplay } from "../components/GameReplay";
 
 type UiGameType = "Public" | "Private" | "Practice";
 
@@ -23,6 +24,7 @@ export const GamePage = () => {
   const navigate = useNavigate();
   const { conn, status: databaseStatus } = useDatabase();
   const [hasFinished, setHasFinished] = useState(false);
+  const [isWatchingReplay, setIsWatchingReplay] = useState(false);
   const [game, setGame] = useState<Game | null>(null);
   const [gamePlayerProgress, setGamePlayerProgress] = useState<
     PlayerProgress[]
@@ -32,6 +34,7 @@ export const GamePage = () => {
     setGame(null);
     setGamePlayerProgress([]);
     setHasFinished(false);
+    setIsWatchingReplay(false);
   }, [gameId]);
 
   useEffect(() => {
@@ -262,6 +265,10 @@ export const GamePage = () => {
     currentPlayerProgress?.placement === 1 && (hasFinished || hasCompletedRace);
   const isMemberOfRace = !!currentPlayerProgress;
   const isDisabled = isInLobby || isCountdown || !currentPlayerProgress;
+  const isRaceFinished = hasFinished || hasCompletedRace;
+  const isOwner =
+    currentPlayerId && game.owner && currentPlayerId.isEqual(game.owner);
+  const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;
 
   const progressBars = Array.from({ length: totalSlots }).map((_, index) => {
     const pp = gamePlayerProgress[index];
@@ -301,6 +308,76 @@ export const GamePage = () => {
     );
   });
 
+  let gameContent;
+
+  if (isRaceFinished) {
+    if (isWatchingReplay) {
+      gameContent = (
+        <GameReplay
+          phrase={game.phrase}
+          attribution={game.attribution}
+          players={gamePlayerProgress}
+          raceStartTimestamp={game.racingStartedAt}
+          initialPlayerId={currentPlayerId?.toHexString()}
+          onExit={() => setIsWatchingReplay(false)}
+        />
+      );
+    } else {
+      gameContent = (
+        <div key="stats-section" className="w-full animate-slideUpFadeIn pb-4">
+          {currentPlayerProgress && (
+            <PlayerStatsRow
+              playerProgress={currentPlayerProgress}
+              raceStartTimestamp={game.racingStartedAt}
+              placement={currentPlayerProgress.placement}
+            />
+          )}
+          <AllPlayersResults
+            allPlayerProgress={gamePlayerProgress}
+            raceStartTimestamp={game.racingStartedAt}
+            initialSelectedPlayerId={currentPlayerProgress?.playerId.toHexString()}
+          />
+          <ActionBar
+            mode={game.gameMode}
+            gameType={actionBarGameType}
+            gameId={gameId}
+            rematchDisabled={rematchDisabled}
+            conn={conn || undefined}
+            isParticipant={isMemberOfRace}
+            onWatchReplay={() => setIsWatchingReplay(true)}
+          />
+        </div>
+      );
+    }
+  } else if (isLobby) {
+    gameContent = (
+      <GameLobby
+        gameId={gameId!}
+        conn={conn}
+        isOwner={
+          currentPlayerId
+            ? (game.owner?.isEqual(currentPlayerId) ?? false)
+            : false
+        }
+      />
+    );
+  } else {
+    gameContent = (
+      <GamePageTypeBox
+        key={gameId}
+        phrase={game.phrase}
+        attribution={game.attribution}
+        gameId={gameId!}
+        conn={conn}
+        onFinish={handleFinish}
+        inputState={isDisabled ? "disabled-dimmed" : "enabled"}
+        initialProgress={initialProgress}
+        isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
+        cursorState={isMemberOfRace ? "auto" : "hidden"}
+      />
+    );
+  }
+
   return (
     <div className="relative flex-1 min-h-0 flex flex-col">
       {hasWonRace && <WinnerConfetti key={gameId} />}
@@ -311,75 +388,10 @@ export const GamePage = () => {
           >
             {progressBars}
           </div>
-          {hasFinished || hasCompletedRace ? (
-            (() => {
-              const currentPP = gamePlayerProgress.find(
-                (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
-              );
-
-              const isOwner =
-                currentPlayerId &&
-                game.owner &&
-                currentPlayerId.isEqual(game.owner);
-              const rematchDisabled =
-                game.gameType?.tag === "Private" && !isOwner;
-
-              return (
-                <div
-                  key="stats-section"
-                  className="w-full animate-slideUpFadeIn pb-4"
-                >
-                  {currentPP && (
-                    <PlayerStatsRow
-                      playerProgress={currentPP}
-                      raceStartTimestamp={game.racingStartedAt}
-                      placement={currentPP.placement}
-                    />
-                  )}
-                  <AllPlayersResults
-                    allPlayerProgress={gamePlayerProgress}
-                    raceStartTimestamp={game.racingStartedAt}
-                    initialSelectedPlayerId={currentPP?.playerId.toHexString()}
-                  />
-                  {currentPP && (
-                    <ActionBar
-                      mode={game.gameMode}
-                      gameType={actionBarGameType}
-                      gameId={gameId}
-                      rematchDisabled={rematchDisabled}
-                      conn={conn || undefined}
-                    />
-                  )}
-                </div>
-              );
-            })()
-          ) : isLobby ? (
-            <GameLobby
-              gameId={gameId!}
-              conn={conn}
-              isOwner={
-                currentPlayerId
-                  ? (game.owner?.isEqual(currentPlayerId) ?? false)
-                  : false
-              }
-            />
-          ) : (
-            <GamePageTypeBox
-              key={gameId}
-              phrase={game.phrase}
-              attribution={game.attribution}
-              gameId={gameId!}
-              conn={conn}
-              onFinish={handleFinish}
-              disabled={isDisabled}
-              initialProgress={initialProgress}
-              isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
-              hideCursor={!isMemberOfRace}
-            />
-          )}
+          {gameContent}
         </div>
       </div>
-      {!(hasFinished || hasCompletedRace) &&
+      {!isRaceFinished &&
         !isLobby &&
         otherPlayerProgress.map((pp) => (
           <GhostCursor

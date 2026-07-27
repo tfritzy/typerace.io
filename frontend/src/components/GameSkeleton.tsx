@@ -10,7 +10,12 @@ export function GameSkeleton({ playerCount = 3 }: { playerCount?: number }) {
             <EmptyPlayerProgressBars count={playerCount} />
           </div>
           <div className="text-2xl leading-[1.6]">
-            <TypeBox phrase="" disabled hideCursor height="430px" />
+            <TypeBox
+              phrase=""
+              inputState="disabled-dimmed"
+              cursorState="hidden"
+              height="430px"
+            />
           </div>
         </div>
       </div>
