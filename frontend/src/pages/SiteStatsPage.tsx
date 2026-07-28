@@ -16,9 +16,11 @@ import {
   type TooltipItem,
 } from "chart.js";
 import { Line, Bar } from "react-chartjs-2";
+import { useNavigate } from "react-router-dom";
 import "chartjs-adapter-date-fns";
 import { Select } from "../components/Select";
 import { getDefaultSiteTitle, languages } from "../utils/modes";
+import type { AbandonedGame } from "../types/stdb";
 
 ChartJS.register(
   CategoryScale,
@@ -57,7 +59,9 @@ interface GlobalStats {
 
 export const SiteStatsPage = () => {
   const { conn } = useDatabase();
+  const navigate = useNavigate();
   const [globalStats, setGlobalStats] = useState<GlobalStats[]>([]);
+  const [abandonedGames, setAbandonedGames] = useState<AbandonedGame[]>([]);
   const [selectedTimeFrame, setSelectedTimeFrame] =
     useState<TimeFrame>("1week");
   const [selectedGameMode, setSelectedGameMode] =
@@ -112,6 +116,40 @@ export const SiteStatsPage = () => {
     return () => {
       conn.db.globalstats.removeOnInsert(handleStatsInsert);
       conn.db.globalstats.removeOnUpdate(handleStatsUpdate);
+      subscription.unsubscribe();
+    };
+  }, [conn]);
+
+  useEffect(() => {
+    if (!conn) return;
+
+    const handleGameInsert = (_ctx: unknown, game: AbandonedGame) => {
+      setAbandonedGames((previousGames) => {
+        if (previousGames.some(({ gameId }) => gameId === game.gameId)) {
+          return previousGames;
+        }
+        return [...previousGames, game];
+      });
+    };
+    const handleGameDelete = (_ctx: unknown, game: AbandonedGame) => {
+      setAbandonedGames((previousGames) =>
+        previousGames.filter(({ gameId }) => gameId !== game.gameId),
+      );
+    };
+
+    conn.db.abandonedgames.onInsert(handleGameInsert);
+    conn.db.abandonedgames.onDelete(handleGameDelete);
+
+    const subscription = conn
+      .subscriptionBuilder()
+      .onApplied(() => {
+        setAbandonedGames(Array.from(conn.db.abandonedgames.iter()));
+      })
+      .subscribe([`SELECT * FROM abandonedgames`]);
+
+    return () => {
+      conn.db.abandonedgames.removeOnInsert(handleGameInsert);
+      conn.db.abandonedgames.removeOnDelete(handleGameDelete);
       subscription.unsubscribe();
     };
   }, [conn]);
@@ -176,6 +214,23 @@ export const SiteStatsPage = () => {
 
   const selectedGameModeLabel =
     gameModeLabelByValue.get(selectedGameMode) ?? selectedGameMode;
+
+  const recentAbandonedGames = useMemo(
+    () =>
+      [...abandonedGames].sort((a, b) => {
+        if (a.archivedAt !== b.archivedAt) {
+          return a.archivedAt > b.archivedAt ? -1 : 1;
+        }
+        if (a.createdAt !== b.createdAt) {
+          return a.createdAt > b.createdAt ? -1 : 1;
+        }
+        return b.gameId.localeCompare(a.gameId);
+      }),
+    [abandonedGames],
+  );
+
+  const formatGameTimestamp = (timestamp: bigint) =>
+    new Date(Number(timestamp / 1000n)).toLocaleString();
 
   const chartColors = useMemo(() => getThemePlayerColorList(), [themeTick]);
 
@@ -812,6 +867,68 @@ export const SiteStatsPage = () => {
                 options={percentageBarChartOptions}
               />
             </div>
+          </section>
+
+          <section className="mb-8 box box-shadow rounded-lg p-6">
+            <h2 className="text-xl font-semibold mb-2 text-foreground">
+              Recent Abandoned Games
+            </h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              The ten most recent public abandoned games
+            </p>
+            {recentAbandonedGames.length === 0 ? (
+              <p className="py-6 text-center text-muted-foreground">
+                No abandoned games have been archived yet
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[680px] text-left">
+                  <thead>
+                    <tr className="border-b border-border text-xs uppercase tracking-wider text-muted-foreground">
+                      <th className="px-3 py-3">Game Mode</th>
+                      <th className="px-3 py-3 text-center">Finished</th>
+                      <th className="px-3 py-3">Created</th>
+                      <th className="px-3 py-3">Archived</th>
+                      <th className="px-3 py-3 text-right">Game</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentAbandonedGames.map((game) => (
+                      <tr
+                        key={game.gameId}
+                        role="link"
+                        tabIndex={0}
+                        aria-label={`View game ${game.gameId}`}
+                        onClick={() => navigate(`/game/${game.gameId}`)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            navigate(`/game/${game.gameId}`);
+                          }
+                        }}
+                        className="cursor-pointer border-b border-border transition-colors last:border-b-0 hover:bg-muted focus-visible:outline-2 focus-visible:outline-accent-primary"
+                      >
+                        <td className="px-3 py-3 text-foreground">
+                          {gameModeLabelByValue.get(game.gameMode.tag) ??
+                            game.gameMode.tag}
+                        </td>
+                        <td className="px-3 py-3 text-center text-muted-foreground">
+                          {game.placementCount} / 3
+                        </td>
+                        <td className="px-3 py-3 text-muted-foreground">
+                          {formatGameTimestamp(game.createdAt)}
+                        </td>
+                        <td className="px-3 py-3 text-muted-foreground">
+                          {formatGameTimestamp(game.archivedAt)}
+                        </td>
+                        <td className="px-3 py-3 text-right font-medium text-accent-primary">
+                          View
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </section>
         </div>
       </main>

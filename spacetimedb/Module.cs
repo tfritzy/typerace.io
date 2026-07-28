@@ -127,6 +127,7 @@ public partial struct GameModeCount
 
 public static partial class Module
 {
+    private const int MAX_ABANDONED_GAMES = 10;
     private const long PUBLIC_GAME_COUNTDOWN_MICROSECONDS = 3_000_000;
     private const long PRIVATE_GAME_COUNTDOWN_MICROSECONDS = 5_000_000;
     private const long PRACTICE_GAME_COUNTDOWN_MICROSECONDS = 3_000_000;
@@ -457,6 +458,18 @@ public static partial class Module
         public GameModeCount Total;
         [Default(0)]
         public int DailyActivePlayers;
+    }
+
+    [Table(Name = "abandonedgames", Public = true)]
+    public partial struct AbandonedGame
+    {
+        [PrimaryKey]
+        public string GameId;
+        public GameMode GameMode;
+        public long CreatedAt;
+        [SpacetimeDB.Index.BTree]
+        public long ArchivedAt;
+        public int PlacementCount;
     }
 
     [Table(Name = "playerprogress", Public = true)]
@@ -1582,6 +1595,52 @@ public static partial class Module
         Log.Info($"Updated global stats for date {dateKey}, GameType {game.GameType}, GameMode {game.GameMode}");
     }
 
+    private static void RecordAbandonedGame(ReducerContext ctx, Game game)
+    {
+        if (game.GameType != GameType.Public || game.Placements.Count >= GetMaxPlayerCount(game.GameType))
+        {
+            return;
+        }
+
+        AbandonedGame? oldestGame = null;
+        var abandonedGameCount = 0;
+        foreach (var abandonedGame in ctx.Db.abandonedgames.Iter())
+        {
+            abandonedGameCount++;
+            if (
+                oldestGame == null ||
+                abandonedGame.ArchivedAt < oldestGame.Value.ArchivedAt ||
+                (
+                    abandonedGame.ArchivedAt == oldestGame.Value.ArchivedAt &&
+                    (
+                        abandonedGame.CreatedAt < oldestGame.Value.CreatedAt ||
+                        (
+                            abandonedGame.CreatedAt == oldestGame.Value.CreatedAt &&
+                            string.CompareOrdinal(abandonedGame.GameId, oldestGame.Value.GameId) < 0
+                        )
+                    )
+                )
+            )
+            {
+                oldestGame = abandonedGame;
+            }
+        }
+
+        if (abandonedGameCount >= MAX_ABANDONED_GAMES && oldestGame != null)
+        {
+            ctx.Db.abandonedgames.GameId.Delete(oldestGame.Value.GameId);
+        }
+
+        ctx.Db.abandonedgames.Insert(new AbandonedGame
+        {
+            GameId = game.Id,
+            GameMode = game.GameMode,
+            CreatedAt = game.CreatedAt,
+            ArchivedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+            PlacementCount = game.Placements.Count
+        });
+    }
+
     [Reducer]
     public static void ArchiveOldGames(ReducerContext ctx, GameArchiver args)
     {
@@ -1592,6 +1651,7 @@ public static partial class Module
             if (game.CreatedAt < fiveMinutesAgo)
             {
                 UpdateGlobalStatsForGame(ctx, game);
+                RecordAbandonedGame(ctx, game);
 
                 var updatedGame = game;
                 updatedGame.State = GameState.Archived;

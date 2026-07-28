@@ -12,5 +12,6 @@ export type GameHighScore = Infer<typeof Bindings.GameHighScore>;
 export type GameState = Infer<typeof Bindings.GameState>;
 export type GameType = Infer<typeof Bindings.GameType>;
 export type GlobalStats = Infer<typeof Bindings.GlobalStats>;
+export type AbandonedGame = Infer<typeof Bindings.AbandonedGame>;
 export type PersonalRecord = Infer<typeof Bindings.PersonalRecord>;
 export type CharacterEventType = Infer<typeof Bindings.CharacterEventType>;
