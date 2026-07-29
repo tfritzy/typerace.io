@@ -1,288 +1,267 @@
 import {
-    Chart as ChartJS,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Tooltip,
-    Legend,
-    TimeScale,
-} from 'chart.js';
-import type { ChartOptions } from 'chart.js';
-import { Line } from 'react-chartjs-2';
-import 'chartjs-adapter-date-fns';
-import type { GameRecord } from '../types/stdb';
-import { formatStopwatchTime, getOrdinalPlacement } from '../utils/formatters';
-import { useState, useEffect } from 'react';
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  TimeScale,
+  Tooltip,
+} from "chart.js";
+import type { ChartData, ChartOptions } from "chart.js";
+import "chartjs-adapter-date-fns";
+import { memo, useEffect, useMemo, useState } from "react";
+import { Line } from "react-chartjs-2";
+import type { GameRecord } from "../types/stdb";
+import { formatStopwatchTime, getOrdinalPlacement } from "../utils/formatters";
+import { prepareWpmChartData } from "./wpmChartData";
 
 ChartJS.register(
-    LinearScale,
-    PointElement,
-    LineElement,
-    Tooltip,
-    Legend,
-    TimeScale
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend,
+  TimeScale,
 );
 
 interface WpmChartProps {
-    data: GameRecord[];
+  data: GameRecord[];
 }
 
-export const WpmChart = ({ data }: WpmChartProps) => {
-    const [colorTrigger, setColorTrigger] = useState(0);
+interface ChartColors {
+  accent: string;
+  border: string;
+  foreground: string;
+  grid: string;
+  input: string;
+  muted: string;
+  secondaryForeground: string;
+}
 
-    const sortedData = [...data].sort((a, b) => Number(a.date - b.date));
-
-    useEffect(() => {
-        const observer = new MutationObserver(() => {
-            setColorTrigger(prev => prev + 1);
-        });
-
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['style']
-        });
-
-        return () => observer.disconnect();
-    }, []);
-    const calculateRollingAverage = () => {
-        if (sortedData.length === 0) return [];
-
-        const startTime = Number(sortedData[0].date);
-        const endTime = Number(sortedData[sortedData.length - 1].date);
-        const timeSpan = endTime - startTime;
-
-        const numSamples = Math.min(50, sortedData.length);
-        const timeStep = timeSpan / (numSamples - 1);
-        const windowSizeMicros = timeSpan * 0.15;
-
-        const rollingAvg: { x: number; y: number }[] = [];
-
-        for (let i = 0; i < numSamples; i++) {
-            const sampleTime = startTime + (i * timeStep);
-            const windowStart = sampleTime - windowSizeMicros / 2;
-            const windowEnd = sampleTime + windowSizeMicros / 2;
-
-            const pointsInWindow = sortedData.filter(p => {
-                const t = Number(p.date);
-                return t >= windowStart && t <= windowEnd;
-            });
-
-            if (pointsInWindow.length > 0) {
-                const avgWpm = pointsInWindow.reduce((sum, p) => sum + p.wpm, 0) / pointsInWindow.length;
-                rollingAvg.push({
-                    x: sampleTime / 1000,
-                    y: avgWpm
-                });
-            }
-        }
-
-        return rollingAvg;
+const readChartColors = (): ChartColors => {
+  if (typeof document === "undefined") {
+    return {
+      accent: "#888",
+      border: "#444",
+      foreground: "#fff",
+      grid: "#333",
+      input: "#222",
+      muted: "#999",
+      secondaryForeground: "#ccc",
     };
+  }
 
-    const calculateMaxWpm = () => {
-        if (sortedData.length === 0) return [];
-
-        const maxWpmLine: { x: number; y: number }[] = [];
-        let currentMax = 0;
-
-        for (const point of sortedData) {
-            if (point.wpm > currentMax) {
-                currentMax = point.wpm;
-            }
-            maxWpmLine.push({
-                x: Number(point.date) / 1000,
-                y: currentMax
-            });
-        }
-
-        return maxWpmLine;
-    };
-
-    const rollingAverage = calculateRollingAverage();
-    const maxWpmLine = calculateMaxWpm();
-
-    const getTimeConfig = () => {
-        if (sortedData.length === 0) return { unit: 'day' as const, format: 'MMM d' };
-
-        const timeSpanMicros = Number(sortedData[sortedData.length - 1].date - sortedData[0].date);
-        const days = timeSpanMicros / (1000 * 1000 * 60 * 60 * 24);
-
-        if (days < 1) {
-            return { unit: 'hour' as const, format: 'HH:mm' };
-        } else if (days < 7) {
-            return { unit: 'day' as const, format: 'MMM d' };
-        } else if (days < 60) {
-            return { unit: 'week' as const, format: 'MMM d' };
-        } else if (days < 365) {
-            return { unit: 'month' as const, format: 'MMM yyyy' };
-        } else {
-            return { unit: 'year' as const, format: 'yyyy' };
-        }
-    };
-
-    const timeConfig = getTimeConfig();
-
-    void colorTrigger;
-    const style = getComputedStyle(document.documentElement);
-    const accentColor = style.getPropertyValue('--accent-primary').trim();
-    const secondaryColor = style.getPropertyValue('--muted-foreground').trim();
-    const borderColorVal = style.getPropertyValue('--border').trim();
-    const gridLineColor = style.getPropertyValue('--grid-line').trim();
-    const foregroundColor = style.getPropertyValue('--foreground').trim();
-    const inputColor = style.getPropertyValue('--input').trim();
-    const secondaryFgColor = style.getPropertyValue('--secondary-foreground').trim();
-
-
-    const chartData = {
-        datasets: [
-            {
-                label: 'Rolling Average',
-                data: rollingAverage,
-                borderColor: accentColor,
-                pointRadius: 0,
-                pointHoverRadius: 0,
-                showLine: true,
-                borderWidth: 3,
-                tension: 0.5,
-            },
-            {
-                label: 'WPM',
-                data: data.map(point => ({
-                    x: Number(point.date) / 1000,
-                    y: point.wpm
-                })),
-                backgroundColor: `${accentColor}33`,
-                borderColor: `${accentColor}77`,
-                pointRadius: 3,
-                pointHitRadius: 10,
-                pointHoverRadius: 6,
-                pointHoverBackgroundColor: accentColor,
-                pointHoverBorderColor: foregroundColor,
-                pointHoverBorderWidth: 2,
-                showLine: false,
-            },
-            {
-                label: 'Max WPM',
-                data: maxWpmLine,
-                borderColor: secondaryColor,
-                pointRadius: 0,
-                pointHoverRadius: 0,
-                showLine: true,
-                borderWidth: 2,
-                stepped: 'before' as const,
-            },
-        ]
-    };
-
-    const options: ChartOptions<'line'> = {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: false,
-        plugins: {
-            legend: {
-                display: false,
-            },
-            tooltip: {
-                backgroundColor: inputColor,
-                borderColor: borderColorVal,
-                borderWidth: 1,
-                titleColor: foregroundColor,
-                bodyColor: secondaryFgColor,
-                padding: 16,
-                displayColors: false,
-                titleFont: {
-                    size: 13,
-                    weight: 'normal'
-                },
-                titleMarginBottom: 12,
-                bodyFont: {
-                    size: 13,
-                    weight: 'lighter'
-                },
-                bodySpacing: 8,
-                cornerRadius: 8,
-                caretSize: 8,
-                caretPadding: 12,
-                callbacks: {
-                    title: (context) => {
-                        const date = new Date(context[0].parsed.x);
-                        return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
-                    },
-                    label: (context) => {
-                        const dataPoint = data[context.dataIndex];
-                        if (!dataPoint) return `${context.parsed.y.toFixed(1)} WPM`;
-
-                        const totalSeconds = Number(dataPoint.timeMs) / 1000;
-                        const time = formatStopwatchTime(totalSeconds);
-
-                        return [
-                            `${context.parsed.y.toFixed(1)} WPM`,
-                            `Time: ${time}`,
-                            `Place: ${getOrdinalPlacement(dataPoint.placement)}`,
-                            `Mode: ${dataPoint.gameMode.tag}`
-                        ];
-                    }
-                }
-            }
-        },
-        scales: {
-            x: {
-                type: 'time',
-                time: {
-                    unit: timeConfig.unit,
-                    displayFormats: {
-                        hour: timeConfig.format,
-                        day: timeConfig.format,
-                        week: timeConfig.format,
-                        month: timeConfig.format,
-                        year: timeConfig.format
-                    }
-                },
-                title: {
-                    display: false
-                },
-                ticks: {
-                    color: secondaryColor,
-                    font: {
-                        size: 11
-                    }
-                },
-                grid: {
-                    color: gridLineColor,
-                    drawTicks: false
-                },
-                border: {
-                    display: false
-                }
-            },
-            y: {
-                beginAtZero: true,
-                title: {
-                    display: false
-                },
-                ticks: {
-                    color: secondaryColor,
-                    font: {
-                        size: 11
-                    },
-                    padding: 8
-                },
-                grid: {
-                    color: gridLineColor,
-                    drawTicks: false
-                },
-                border: {
-                    display: false
-                }
-            }
-        }
-    };
-
-    return (
-        <div className="mb-8 bg-card border border-border rounded-lg p-6 w-full box-shadow">
-            <div className="h-[280px] relative w-full">
-                <Line data={chartData} options={options} />
-            </div>
-        </div>
-    );
+  const styles = getComputedStyle(document.documentElement);
+  const cssColor = (property: string) =>
+    styles.getPropertyValue(property).trim();
+  return {
+    accent: cssColor("--accent-primary"),
+    border: cssColor("--border"),
+    foreground: cssColor("--foreground"),
+    grid: cssColor("--grid-line"),
+    input: cssColor("--input"),
+    muted: cssColor("--muted-foreground"),
+    secondaryForeground: cssColor("--secondary-foreground"),
+  };
 };
+
+const sameColors = (a: ChartColors, b: ChartColors) =>
+  Object.keys(a).every(
+    (key) => a[key as keyof ChartColors] === b[key as keyof ChartColors],
+  );
+
+const useChartColors = () => {
+  const [colors, setColors] = useState(readChartColors);
+
+  useEffect(() => {
+    let frame = 0;
+    const updateColors = () => {
+      frame = 0;
+      const nextColors = readChartColors();
+      setColors((current) =>
+        sameColors(current, nextColors) ? current : nextColors,
+      );
+    };
+    const scheduleUpdate = () => {
+      if (!frame) frame = requestAnimationFrame(updateColors);
+    };
+    const observer = new MutationObserver(scheduleUpdate);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "data-mode", "style"],
+    });
+
+    updateColors();
+    return () => {
+      observer.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  return colors;
+};
+
+const RACE_DATASET_INDEX = 1;
+
+const WpmChartComponent = ({ data }: WpmChartProps) => {
+  const colors = useChartColors();
+  const prepared = useMemo(() => prepareWpmChartData(data), [data]);
+
+  const chartData = useMemo<ChartData<"line">>(
+    () => ({
+      datasets: [
+        {
+          label: "Long-term average",
+          data: prepared.averagePoints,
+          borderColor: colors.muted,
+          borderWidth: 2,
+          cubicInterpolationMode: "monotone",
+          pointHoverRadius: 0,
+          pointRadius: 0,
+          showLine: true,
+          tension: 0.35,
+        },
+        {
+          label: "WPM",
+          data: prepared.racePoints,
+          backgroundColor: `${colors.accent}33`,
+          borderColor: `${colors.accent}77`,
+          pointHitRadius: 10,
+          pointHoverBackgroundColor: colors.accent,
+          pointHoverBorderColor: colors.foreground,
+          pointHoverBorderWidth: 2,
+          pointHoverRadius: 6,
+          pointRadius: 3,
+          showLine: false,
+        },
+        {
+          label: "Best WPM",
+          data: prepared.bestWpmPoints,
+          borderColor: colors.accent,
+          borderWidth: 2,
+          pointHoverRadius: 0,
+          pointRadius: 0,
+          showLine: true,
+          stepped: "before",
+        },
+      ],
+    }),
+    [colors, prepared],
+  );
+
+  const options = useMemo<ChartOptions<"line">>(
+    () => ({
+      animation: false,
+      maintainAspectRatio: false,
+      normalized: true,
+      parsing: false,
+      responsive: true,
+      plugins: {
+        legend: {
+          align: "start",
+          display: true,
+          position: "bottom",
+          labels: {
+            boxWidth: 24,
+            color: colors.secondaryForeground,
+            filter: (item) => item.datasetIndex !== RACE_DATASET_INDEX,
+            font: { size: 11 },
+            padding: 16,
+            pointStyle: "line",
+            pointStyleWidth: 24,
+            usePointStyle: true,
+          },
+        },
+        tooltip: {
+          backgroundColor: colors.input,
+          bodyColor: colors.secondaryForeground,
+          bodyFont: { size: 13, weight: "lighter" },
+          bodySpacing: 8,
+          borderColor: colors.border,
+          borderWidth: 1,
+          caretPadding: 12,
+          caretSize: 8,
+          cornerRadius: 8,
+          displayColors: false,
+          padding: 16,
+          titleColor: colors.foreground,
+          titleFont: { size: 13, weight: "normal" },
+          titleMarginBottom: 12,
+          callbacks: {
+            title: (items) => {
+              const timestamp = items[0]?.parsed.x;
+              if (timestamp === undefined) return "";
+              const date = new Date(timestamp);
+              return `${date.toLocaleDateString()} ${date.toLocaleTimeString(
+                [],
+                { hour: "numeric", minute: "2-digit" },
+              )}`;
+            },
+            label: (context) => {
+              if (context.datasetIndex !== RACE_DATASET_INDEX) {
+                return `${context.parsed.y.toFixed(1)} WPM`;
+              }
+
+              const record = prepared.sortedRecords[context.dataIndex];
+              if (!record) return `${context.parsed.y.toFixed(1)} WPM`;
+              return [
+                `${context.parsed.y.toFixed(1)} WPM`,
+                `Time: ${formatStopwatchTime(Number(record.timeMs) / 1000)}`,
+                `Place: ${getOrdinalPlacement(record.placement)}`,
+                `Mode: ${record.gameMode.tag}`,
+              ];
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          type: "time",
+          time: {
+            unit: prepared.timeConfig.unit,
+            displayFormats: {
+              day: prepared.timeConfig.format,
+              hour: prepared.timeConfig.format,
+              month: prepared.timeConfig.format,
+              week: prepared.timeConfig.format,
+              year: prepared.timeConfig.format,
+            },
+          },
+          ticks: {
+            align: "inner",
+            autoSkip: true,
+            color: colors.muted,
+            font: { size: 11 },
+            maxRotation: 0,
+            padding: 8,
+          },
+          grid: { display: false, drawTicks: false },
+          border: { display: false },
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: colors.muted,
+            font: { size: 11 },
+            maxTicksLimit: 15,
+            padding: 8,
+            stepSize: 10,
+          },
+          grid: { color: colors.grid, drawTicks: false },
+          border: { display: false },
+        },
+      },
+    }),
+    [colors, prepared],
+  );
+
+  return (
+    <div className="w-full rounded-lg border border-border bg-card px-6 pb-3 pt-6 box-shadow">
+      <div className="relative h-[400px] w-full">
+        <Line data={chartData} options={options} />
+      </div>
+    </div>
+  );
+};
+
+export const WpmChart = memo(WpmChartComponent);

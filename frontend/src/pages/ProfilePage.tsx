@@ -12,7 +12,7 @@ import { Select } from "../components/Select";
 import { RecentGames } from "../components/RecentGames";
 import { useDatabase } from "../contexts/SpacetimeContext";
 
-type TimeFrame = 'all' | 'today' | 'week' | 'month' | '3months';
+type TimeFrame = 'all' | 'week' | 'month' | '3months';
 
 export const ProfilePage = () => {
     const { playerId } = useParams<{ playerId: string }>();
@@ -119,10 +119,6 @@ export const ProfilePage = () => {
     const getTimeFrameFilter = (timeFrame: TimeFrame): number => {
         const now = Date.now() * 1000;
         switch (timeFrame) {
-            case 'today':
-                const startOfDay = new Date();
-                startOfDay.setHours(0, 0, 0, 0);
-                return startOfDay.getTime() * 1000;
             case 'week':
                 return now - (7 * 24 * 60 * 60 * 1000 * 1000);
             case 'month':
@@ -279,7 +275,7 @@ export const ProfilePage = () => {
 
                             <div className="flex gap-3 items-center">
                                 <Select
-                                    label="Mode"
+                                    ariaLabel="Mode"
                                     value={selectedMode}
                                     onChange={setSelectedMode}
                                     options={[
@@ -292,15 +288,14 @@ export const ProfilePage = () => {
                                 />
 
                                 <Select
-                                    label="Time Frame"
+                                    ariaLabel="Time Frame"
                                     value={selectedTimeFrame}
                                     onChange={(value) => setSelectedTimeFrame(value as TimeFrame)}
                                     options={[
                                         { value: 'all', label: 'All Time' },
-                                        { value: 'today', label: 'Today' },
-                                        { value: 'week', label: 'Last Week' },
+                                        { value: '3months', label: 'Last 3 Months' },
                                         { value: 'month', label: 'Last Month' },
-                                        { value: '3months', label: 'Last 3 Months' }
+                                        { value: 'week', label: 'Last Week' }
                                     ]}
                                 />
                             </div>

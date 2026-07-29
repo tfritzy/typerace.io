@@ -3,10 +3,11 @@ type SelectProps = {
     onChange: (value: string) => void;
     options: { value: string; label: string }[];
     label?: string;
+    ariaLabel?: string;
     className?: string;
 };
 
-export const Select = ({ value, onChange, options, label, className = '' }: SelectProps) => {
+export const Select = ({ value, onChange, options, label, ariaLabel, className = '' }: SelectProps) => {
     return (
         <div className={`flex flex-col gap-1 ${className}`}>
             {label && (
@@ -16,6 +17,7 @@ export const Select = ({ value, onChange, options, label, className = '' }: Sele
             )}
             <div className="relative min-w-[150px]">
                 <select
+                    aria-label={ariaLabel ?? label}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     className="w-full bg-input text-foreground border border-border rounded-md pl-4 pr-10 py-2.5 text-sm cursor-pointer outline-none appearance-none h-[42px]"
