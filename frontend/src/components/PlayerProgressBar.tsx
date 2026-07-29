@@ -88,6 +88,7 @@ export const PlayerProgressBar = memo(
               isLoading={isLoading}
               placement={placement}
               playerColorTag={playerColorTag}
+              isBot={isBot}
             />
           ) : (
             <Link
@@ -103,6 +104,7 @@ export const PlayerProgressBar = memo(
                 isLoading={isLoading}
                 placement={placement}
                 playerColorTag={playerColorTag}
+                isBot={isBot}
               />
             </Link>
           )}

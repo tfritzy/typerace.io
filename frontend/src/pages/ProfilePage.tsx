@@ -182,6 +182,7 @@ export const ProfilePage = () => {
                                 size={80}
                                 identity={viewedPlayer.identity.toHexString()}
                                 isHighlighted={true}
+                                isBot={viewedPlayer.isBot}
                             />
 
                             <div className="flex-1 min-w-0 w-full">

@@ -129,6 +129,7 @@ export const ProfileAvatar = memo(() => {
               size={40}
               identity={identityHash}
               isHighlighted={false}
+              isBot={myPlayer.isBot}
             />
           </div>
 
@@ -224,6 +225,7 @@ export const ProfileAvatar = memo(() => {
           size={40}
           identity={identityHash}
           isHighlighted={true}
+          isBot={myPlayer.isBot}
         />
       </div>
 

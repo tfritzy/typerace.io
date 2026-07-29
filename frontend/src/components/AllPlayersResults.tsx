@@ -47,6 +47,7 @@ export const AllPlayersResults = ({
                                     size={24}
                                     identity={pp.playerId.toHexString()}
                                     playerColorTag={isCurrentPlayer ? undefined : pp.playerColor?.tag}
+                                    isBot={pp.isBot}
                                 />
                                 {pp.playerName}
                             </button>

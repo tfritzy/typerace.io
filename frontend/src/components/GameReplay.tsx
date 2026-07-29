@@ -176,6 +176,7 @@ export function GameReplay({
                   size={22}
                   identity={playerId}
                   playerColorTag={player.playerColor?.tag}
+                  isBot={player.isBot}
                 />
                 {player.playerName}
               </button>

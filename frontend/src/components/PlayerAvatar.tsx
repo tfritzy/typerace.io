@@ -1,67 +1,73 @@
 import Avatar from "boring-avatars";
-import { Crown } from 'lucide-react';
+import { Crown } from "lucide-react";
 import { memo, useState, useEffect, useCallback, useMemo } from "react";
 import { getPlayerAvatarColors } from "../utils/colorMapping";
 
 type PlayerAvatarProps = {
-    size: number;
-    identity: string;
-    isHighlighted?: boolean;
-    isLoading?: boolean;
-    placement?: number;
-    playerColorTag?: string;
+  size: number;
+  identity: string;
+  isHighlighted?: boolean;
+  isLoading?: boolean;
+  placement?: number;
+  playerColorTag?: string;
+  isBot?: boolean;
 };
 
 function getAvatarColorsFromCSS(): string[] {
-    const style = getComputedStyle(document.documentElement);
-    return [
-        style.getPropertyValue('--avatar-color-1').trim(),
-        style.getPropertyValue('--avatar-color-2').trim(),
-        style.getPropertyValue('--avatar-color-3').trim(),
-    ];
+  const style = getComputedStyle(document.documentElement);
+  return [
+    style.getPropertyValue("--avatar-color-1").trim(),
+    style.getPropertyValue("--avatar-color-2").trim(),
+    style.getPropertyValue("--avatar-color-3").trim(),
+  ];
 }
 
-export const PlayerAvatar = memo(({
+export const PlayerAvatar = memo(
+  ({
     size,
     identity,
     isLoading = false,
     placement,
-    playerColorTag
-}: PlayerAvatarProps) => {
-    const [fallbackColors, setFallbackColors] = useState(getAvatarColorsFromCSS);
+    playerColorTag,
+    isBot = false,
+  }: PlayerAvatarProps) => {
+    const [fallbackColors, setFallbackColors] = useState(
+      getAvatarColorsFromCSS,
+    );
 
     const onThemeChange = useCallback(() => {
-        setFallbackColors(getAvatarColorsFromCSS());
+      setFallbackColors(getAvatarColorsFromCSS());
     }, []);
 
     useEffect(() => {
-        window.addEventListener('themechange', onThemeChange);
-        return () => window.removeEventListener('themechange', onThemeChange);
+      window.addEventListener("themechange", onThemeChange);
+      return () => window.removeEventListener("themechange", onThemeChange);
     }, [onThemeChange]);
 
     const avatarColors = useMemo(
-        () => playerColorTag ? getPlayerAvatarColors(playerColorTag) : fallbackColors,
-        [playerColorTag, fallbackColors]
+      () =>
+        playerColorTag ? getPlayerAvatarColors(playerColorTag) : fallbackColors,
+      [playerColorTag, fallbackColors],
     );
 
     const getCrownColor = (place: number) => {
-        if (place === 1) return 'var(--medal-gold)';
-        return null;
+      if (place === 1) return "var(--medal-gold)";
+      return null;
     };
 
     const getMedalColor = (place: number) => {
-        if (place === 1) return 'var(--medal-gold)';
-        if (place === 2) return 'var(--medal-silver)';
-        if (place === 3) return 'var(--medal-bronze)';
-        if (place > 3) return 'var(--medal-default)';
-        return null;
+      if (place === 1) return "var(--medal-gold)";
+      if (place === 2) return "var(--medal-silver)";
+      if (place === 3) return "var(--medal-bronze)";
+      if (place > 3) return "var(--medal-default)";
+      return null;
     };
 
     const getBorderColor = (place: number) => {
-        if (place === 1) return 'var(--medal-gold)';
-        if (place === 2) return 'var(--medal-silver)';
-        if (place === 3) return 'var(--medal-bronze)';
-        return null;
+      if (place === 1) return "var(--medal-gold)";
+      if (place === 2) return "var(--medal-silver)";
+      if (place === 3) return "var(--medal-bronze)";
+      return null;
     };
 
     const crownColor = placement ? getCrownColor(placement) : null;
@@ -69,53 +75,57 @@ export const PlayerAvatar = memo(({
     const borderColor = placement ? getBorderColor(placement) : null;
 
     return (
-        <div
-            className={`relative shrink-0 border-2 rounded-full ${isLoading ? 'border-dashed' : ''}`}
-            style={{ borderColor: borderColor || avatarColors[1] }}
-        >
-            {crownColor && (
-                <div
-                    className="absolute left-1/2 -translate-x-1/2 z-10 animate-[crownDescend_0.6s_ease-out]"
-                    style={{ top: -(size * 0.35), filter: `drop-shadow(0 -1px 6px ${crownColor})` }}
-                >
-                    <Crown
-                        size={size * 0.5}
-                        fill={crownColor}
-                        stroke="none"
-                        strokeWidth={1.5}
-                    />
-                </div>
-            )}
-            {medalColor && placement && (
-                <div
-                    className="absolute -bottom-1 -right-0.5 z-10 flex items-center justify-center rounded-full"
-                    style={{
-                        width: size * 0.4,
-                        height: size * 0.4,
-                        backgroundColor: medalColor,
-                        border: '2px solid var(--background)',
-                        fontSize: size * 0.2,
-                        fontWeight: 800,
-                        color: placement > 3 ? '#fff' : '#1a1a2e',
-                        lineHeight: 1,
-                    }}
-                >
-                    {placement}
-                </div>
-            )}
-            {isLoading ? (
-                <div
-                    className="bg-muted rounded-full"
-                    style={{ width: size, height: size }}
-                />
-            ) : (
-                <Avatar
-                    size={size}
-                    name={identity}
-                    variant="beam"
-                    colors={avatarColors}
-                />
-            )}
-        </div>
+      <div
+        className={`relative shrink-0 border-2 rounded-full ${isLoading ? "border-dashed" : ""}`}
+        style={{ borderColor: borderColor || avatarColors[1] }}
+      >
+        {crownColor && (
+          <div
+            className="absolute left-1/2 -translate-x-1/2 z-10 animate-[crownDescend_0.6s_ease-out]"
+            style={{
+              top: -(size * 0.35),
+              filter: `drop-shadow(0 -1px 6px ${crownColor})`,
+            }}
+          >
+            <Crown
+              size={size * 0.5}
+              fill={crownColor}
+              stroke="none"
+              strokeWidth={1.5}
+            />
+          </div>
+        )}
+        {medalColor && placement && (
+          <div
+            className="absolute -bottom-1 -right-0.5 z-10 flex items-center justify-center rounded-full"
+            style={{
+              width: size * 0.4,
+              height: size * 0.4,
+              backgroundColor: medalColor,
+              border: "2px solid var(--background)",
+              fontSize: size * 0.2,
+              fontWeight: 800,
+              color: placement > 3 ? "#fff" : "#1a1a2e",
+              lineHeight: 1,
+            }}
+          >
+            {placement}
+          </div>
+        )}
+        {isLoading ? (
+          <div
+            className="bg-muted rounded-full"
+            style={{ width: size, height: size }}
+          />
+        ) : (
+          <Avatar
+            size={size}
+            name={identity}
+            variant={isBot ? "abstract" : "beam"}
+            colors={avatarColors}
+          />
+        )}
+      </div>
     );
-});
+  },
+);
