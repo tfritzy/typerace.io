@@ -44,16 +44,19 @@ export const Footer = () => {
                         <span>{t.privacyPolicy}</span>
                     </Link>
                     <span className="opacity-50">|</span >
-                    <button
-                        onClick={() => setShowThemeModal(true)}
-                        className="flex items-center gap-1.5 hover:text-foreground/60 transition-colors cursor-pointer bg-transparent border-0 p-0 text-sm text-muted-foreground"
-                    >
-                        <Palette className="w-4 h-4" />
-                        <span>{t.theme}</span>
-                    </button>
+                    <div className="relative">
+                        <button
+                            data-theme-trigger
+                            onClick={() => setShowThemeModal((open) => !open)}
+                            className="flex items-center gap-1.5 hover:text-foreground/60 transition-colors cursor-pointer bg-transparent border-0 p-0 text-sm text-muted-foreground"
+                        >
+                            <Palette className="w-4 h-4" />
+                            <span>{t.theme}</span>
+                        </button>
+                        <ThemeShowcaseModal open={showThemeModal} onClose={() => setShowThemeModal(false)} />
+                    </div>
                 </div>
             </div>
-            <ThemeShowcaseModal open={showThemeModal} onClose={() => setShowThemeModal(false)} />
         </footer>
     );
 };

@@ -123,7 +123,7 @@ export const Countdown = () => {
             border: `1px solid ${accent}`,
             opacity: bright ? 1 : 0,
             boxShadow: bright
-              ? `0 0 12px 0 color-mix(in srgb, ${accent} 35%, transparent)`
+              ? `0 0 9px 0 color-mix(in srgb, ${accent} 24%, transparent)`
               : "0 0 0 0 transparent",
             transition: bright
               ? "none"

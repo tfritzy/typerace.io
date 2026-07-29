@@ -1,5 +1,5 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCCgYjvH4LSkEW8IY5boFxKfT1XaKcN6-c",
@@ -7,12 +7,8 @@ const firebaseConfig = {
   projectId: "typerace-160d3",
   storageBucket: "typerace-160d3.firebasestorage.app",
   messagingSenderId: "233596416640",
-  appId: "1:233596416640:web:b71b0781c58bdf98faec65"
+  appId: "1:233596416640:web:b71b0781c58bdf98faec65",
 };
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-
-if (import.meta.env.DEV && typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-  connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
-}

@@ -19,9 +19,7 @@ export const Header = ({ hideAvatar = false }: HeaderProps) => {
         <header className="w-full px-4">
             <nav className="content-container flex justify-between items-center h-16">
                 <Logo onClick={onClick} />
-                <div className={hideAvatar ? "invisible" : ""}>
-                    <ProfileAvatar />
-                </div>
+                {!hideAvatar && <ProfileAvatar />}
             </nav>
         </header>
     );

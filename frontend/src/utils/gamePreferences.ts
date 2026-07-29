@@ -9,6 +9,9 @@ export function getPreferredMode(langSlug?: string): GameMode {
   const language = getLanguageFromSlug(langSlug);
   try {
     const storedContentType = localStorage.getItem(CONTENT_TYPE_KEY);
+    if (storedContentType === "Quotes" && language.quotesMode) {
+      return { tag: language.quotesMode } as GameMode;
+    }
     if (storedContentType === "RandomWords") {
       return { tag: language.randomWordsMode } as GameMode;
     }

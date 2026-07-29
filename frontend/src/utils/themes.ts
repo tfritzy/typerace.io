@@ -1,12 +1,15 @@
 export type ThemeTag =
   | "Dracula"
+  | "Cobalt2"
+  | "EverforestDark"
+  | "GitHubDarkDimmed"
+  | "NightOwl"
   | "Monokai"
   | "Nord"
   | "TokyoNight"
   | "GruvboxDark"
   | "CatppuccinMocha"
   | "OneDark"
-  | "RosePine"
   | "AyuDark"
   | "Kanagawa"
   | "Pico8"
@@ -185,6 +188,38 @@ const DEFAULT_THEME_SETTINGS: ThemeSettings = {
 };
 
 export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
+  EverforestDark: {
+    name: "Everforest Dark",
+    backgroundColor: "#2d353b",
+    textColor: "#d3c6aa",
+    borderColor: "#475258",
+    accentColor: "#a7c080",
+    previewColors: ["#2d353b", "#a7c080", "#7fbbb3", "#e67e80"],
+  },
+  GitHubDarkDimmed: {
+    name: "GitHub Dark",
+    backgroundColor: "#22272e",
+    textColor: "#adbac7",
+    borderColor: "#444c56",
+    accentColor: "#57ab5a",
+    previewColors: ["#22272e", "#57ab5a", "#539bf5", "#986ee2"],
+  },
+  NightOwl: {
+    name: "Night Owl",
+    backgroundColor: "#011627",
+    textColor: "#d6deeb",
+    borderColor: "#122d42",
+    accentColor: "#82aaff",
+    previewColors: ["#011627", "#82aaff", "#c792ea", "#7fdbca"],
+  },
+  Cobalt2: {
+    name: "Cobalt2",
+    backgroundColor: "#193549",
+    textColor: "#ffffff",
+    borderColor: "#0d3a58",
+    accentColor: "#ffc600",
+    previewColors: ["#193549", "#ffc600", "#0088ff", "#ff628c"],
+  },
   Dracula: {
     name: "Dracula",
     backgroundColor: "#282a36",
@@ -240,14 +275,6 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
     borderColor: "rgba(171, 178, 191, 0.1)",
     accentColor: "#61afef",
     previewColors: ["#282c34", "#61afef", "#c678dd", "#98c379"],
-  },
-  RosePine: {
-    name: "Rosé Pine",
-    backgroundColor: "#191724",
-    textColor: "#e0def4",
-    borderColor: "rgba(224, 222, 244, 0.1)",
-    accentColor: "#c4a7e7",
-    previewColors: ["#191724", "#c4a7e7", "#ebbcba", "#9ccfd8"],
   },
   AyuDark: {
     name: "Ayu Dark",
@@ -332,6 +359,14 @@ export function getCustomThemeSettings(): ThemeSettings | null {
 }
 
 export function applyTheme(colorTag: string): void {
+  applyThemeByTag(colorTag, true);
+}
+
+export function previewTheme(colorTag: string): void {
+  applyThemeByTag(colorTag, false);
+}
+
+function applyThemeByTag(colorTag: string, persist: boolean): void {
   let theme: ResolvedTheme;
   if (colorTag === "custom") {
     const custom = getCustomThemeSettings();
@@ -341,7 +376,7 @@ export function applyTheme(colorTag: string): void {
   } else {
     theme = THEMES[DEFAULT_THEME_TAG];
   }
-  applyResolvedTheme(theme, colorTag);
+  applyResolvedTheme(theme, colorTag, persist);
 }
 
 export function applyCustomTheme(settings: ThemeSettings): void {
@@ -352,7 +387,11 @@ export function applyCustomTheme(settings: ThemeSettings): void {
   applyResolvedTheme(theme, "custom");
 }
 
-function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
+function applyResolvedTheme(
+  theme: ResolvedTheme,
+  tag: string,
+  persist = true,
+): void {
   const root = document.documentElement;
   const fg = hexToRgb(theme.colors.foreground);
 
@@ -417,9 +456,11 @@ function applyResolvedTheme(theme: ResolvedTheme, tag: string): void {
 
   root.dataset.mode = theme.mode;
 
-  try {
-    localStorage.setItem("selectedTheme", tag);
-  } catch (_e) {}
+  if (persist) {
+    try {
+      localStorage.setItem("selectedTheme", tag);
+    } catch (_e) {}
+  }
 
   window.dispatchEvent(new Event("themechange"));
 }

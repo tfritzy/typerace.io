@@ -43,7 +43,7 @@ function ModeButton({ isSelected, onClick, icon, label, disabled }: ModeButtonPr
 
 export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setGameType, currentLang }: GameOptionsSelectorProps) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const [contentType, setContentType] = useState<ContentTypeValue>(() => getContentTypeFromMode(selectedMode.tag));
+    const contentType = getContentTypeFromMode(selectedMode.tag);
     const t = getTranslations();
 
     const gameTypeLabel = (type: GameTypeValue): string => {
@@ -60,8 +60,6 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
         if (newContentType === "Quotes" && !quotesAvailableForLanguage) {
             return;
         }
-
-        setContentType(newContentType);
 
         const newMode = newContentType === "Quotes" ? selectedLanguage.quotesMode : selectedLanguage.randomWordsMode;
         if (newMode) {
