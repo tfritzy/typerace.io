@@ -237,7 +237,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
       if (!ctx.event.callerConnectionId?.isEqual(conn.connectionId)) return;
       if (!pending || pending.nonce !== args.nonce) return;
 
-      const delta = 2300; //performance.now() - pending.startedAt;
+      const delta = performance.now() - pending.startedAt;
       pending = null;
       setLatencyDeltaMs(delta);
       schedulePing(PING_INTERVAL_MS);
