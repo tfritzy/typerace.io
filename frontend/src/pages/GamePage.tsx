@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useCallback, useState, useMemo } from "react";
+import { useEffect, useCallback, useState, useMemo, useRef } from "react";
 import { type Game, type PlayerProgress } from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { PlayerStatsRow } from "../components/PlayerStatsRow";
@@ -22,34 +22,67 @@ type UiGameType = "Public" | "Private" | "Practice";
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
-  const { conn, status: databaseStatus } = useDatabase();
+  const { conn, status: databaseStatus, latencyDeltaMs } = useDatabase();
   const [hasFinished, setHasFinished] = useState(false);
   const [isWatchingReplay, setIsWatchingReplay] = useState(false);
+  const [countdownComplete, setCountdownComplete] = useState(false);
   const [game, setGame] = useState<Game | null>(null);
   const [gamePlayerProgress, setGamePlayerProgress] = useState<
     PlayerProgress[]
   >([]);
+  const latencyDeltaRef = useRef(latencyDeltaMs);
+
+  useEffect(() => {
+    latencyDeltaRef.current = latencyDeltaMs;
+  }, [latencyDeltaMs]);
 
   useEffect(() => {
     setGame(null);
     setGamePlayerProgress([]);
     setHasFinished(false);
     setIsWatchingReplay(false);
+    setCountdownComplete(false);
   }, [gameId]);
 
   useEffect(() => {
     if (!conn || !gameId) return;
     let progressDeleteRedirect: ReturnType<typeof setTimeout> | undefined;
+    let countdownTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const syncCountdown = (current: Game, previous?: Game) => {
+      const enteredCountdown =
+        current.state?.tag === "Countdown" &&
+        previous?.state?.tag !== "Countdown";
+
+      if (enteredCountdown) {
+        clearTimeout(countdownTimer);
+        setCountdownComplete(false);
+        const oneWayLatencyMs = (latencyDeltaRef.current ?? 0) / 2;
+        const remainingMs = Math.max(
+          0,
+          Number(current.countdownDurationMs) - oneWayLatencyMs,
+        );
+        countdownTimer = setTimeout(
+          () => setCountdownComplete(true),
+          remainingMs,
+        );
+      } else if (current.state?.tag !== "Countdown") {
+        clearTimeout(countdownTimer);
+        setCountdownComplete(current.state?.tag === "Racing");
+      }
+    };
 
     const handleGameInsert = (_ctx: any, g: Game) => {
       if (g.id.toString() === gameId) {
         setGame(g);
+        syncCountdown(g);
       }
     };
 
     const handleGameUpdate = (_ctx: any, _oldGame: Game, newGame: Game) => {
       if (newGame.id.toString() === gameId) {
         setGame(newGame);
+        syncCountdown(newGame, _oldGame);
       }
     };
 
@@ -130,6 +163,7 @@ export const GamePage = () => {
         const currentGame = conn.db.game.id.find(gameId);
         if (currentGame) {
           setGame(currentGame);
+          syncCountdown(currentGame);
         }
 
         const currentGameProgress = Array.from(
@@ -146,6 +180,7 @@ export const GamePage = () => {
       conn.db.game.removeOnInsert(handleGameInsert);
       conn.db.game.removeOnUpdate(handleGameUpdate);
       clearTimeout(progressDeleteRedirect);
+      clearTimeout(countdownTimer);
       pageSubscription.unsubscribe();
     };
   }, [conn, gameId, navigate]);
@@ -264,7 +299,8 @@ export const GamePage = () => {
   const hasWonRace =
     currentPlayerProgress?.placement === 1 && (hasFinished || hasCompletedRace);
   const isMemberOfRace = !!currentPlayerProgress;
-  const isDisabled = isInLobby || isCountdown || !currentPlayerProgress;
+  const isDisabled =
+    isInLobby || (isCountdown && !countdownComplete) || !currentPlayerProgress;
   const isRaceFinished = hasFinished || hasCompletedRace;
   const isOwner =
     currentPlayerId && game.owner && currentPlayerId.isEqual(game.owner);

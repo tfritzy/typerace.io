@@ -2,37 +2,82 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { Game } from "../types/stdb";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { getCountdownStep } from "../utils/countdown";
 import bufoLetsGo from "../assets/bufo-lets-goo.gif";
 
-const PULSE_PERIOD_MS = 1000;
-const PULSE_BRIGHT_MS = 150;
-const PULSE_FADE_MS = 800;
+type VisualState =
+  | { phase: "idle" }
+  | {
+      phase: "countdown";
+      gameId: string;
+      deadlineMs: number;
+      count: number | null;
+    }
+  | { phase: "racing"; gameId: string; celebrate: boolean };
 
 export const Countdown = () => {
   const { gameId } = useParams<{ gameId: string }>();
-  const { conn } = useDatabase();
-  const [game, setGame] = useState<Game | null>(null);
-  const [count, setCount] = useState(3);
-  const [showCount, setShowCount] = useState(false);
-  const [showImage, setShowImage] = useState(false);
-  const [pulseOn, setPulseOn] = useState(false);
-  const previousGameState = useRef<string>();
+  const { conn, latencyDeltaMs } = useDatabase();
+  const [visual, setVisual] = useState<VisualState>({ phase: "idle" });
+  const latencyDeltaRef = useRef(latencyDeltaMs);
+  latencyDeltaRef.current = latencyDeltaMs;
 
   useEffect(() => {
     if (!conn || !gameId) return;
 
-    const handleGameInsert = (_ctx: unknown, g: Game) => {
-      if (g.id.toString() === gameId) setGame(g);
+    const startCountdown = (game: Game) => {
+      const deadlineMs =
+        performance.now() +
+        Math.max(
+          0,
+          Number(game.countdownDurationMs) - (latencyDeltaRef.current ?? 0) / 2,
+        );
+      const step = getCountdownStep(deadlineMs - performance.now(), true);
+
+      setVisual((current) =>
+        current.phase === "countdown" && current.gameId === game.id
+          ? current
+          : {
+              phase: "countdown",
+              gameId: game.id,
+              deadlineMs,
+              count: step.count,
+            },
+      );
     };
-    const handleGameUpdate = (_ctx: unknown, _o: Game, g: Game) => {
-      if (g.id.toString() === gameId) setGame(g);
+
+    const syncGame = (game: Game, previous?: Game) => {
+      if (game.id !== gameId) return;
+
+      if (
+        game.state?.tag === "Countdown" &&
+        previous?.state?.tag !== "Countdown"
+      ) {
+        startCountdown(game);
+      } else if (game.state?.tag === "Racing") {
+        setVisual((current) =>
+          current.phase === "racing" && current.gameId === game.id
+            ? current
+            : {
+                phase: "racing",
+                gameId: game.id,
+                celebrate: previous?.state?.tag === "Countdown",
+              },
+        );
+      } else if (game.state?.tag !== "Countdown") {
+        setVisual({ phase: "idle" });
+      }
     };
+
+    const handleGameInsert = (_ctx: unknown, game: Game) => syncGame(game);
+    const handleGameUpdate = (_ctx: unknown, previous: Game, game: Game) =>
+      syncGame(game, previous);
 
     conn.db.game.onInsert(handleGameInsert);
     conn.db.game.onUpdate(handleGameUpdate);
 
     const currentGame = conn.db.game.id.find(gameId);
-    if (currentGame) setGame(currentGame);
+    if (currentGame) syncGame(currentGame);
 
     return () => {
       conn.db.game.removeOnInsert(handleGameInsert);
@@ -40,80 +85,37 @@ export const Countdown = () => {
     };
   }, [conn, gameId]);
 
-  const tag = game?.state?.tag;
-  const isCountdown = tag === "Countdown";
-  const isRacing = tag === "Racing";
-
   useEffect(() => {
-    if (!isCountdown || !game) {
-      setShowCount(false);
-      return;
-    }
-    const ms = Number(game.countdownDurationMs);
-    const initial = Math.max(1, Math.ceil(ms / 1000));
-    setCount(initial);
-    setShowCount(true);
-    setShowImage(false);
-  }, [isCountdown, game?.id]);
+    if (visual.phase !== "countdown") return;
 
-  useEffect(() => {
-    if (!isCountdown) return;
-    if (count <= 0) {
-      setShowCount(false);
-      return;
-    }
-    const t = setTimeout(() => setCount((c) => c - 1), 1000);
-    return () => clearTimeout(t);
-  }, [isCountdown, count]);
+    const step = getCountdownStep(visual.deadlineMs - performance.now());
+    const timeout = setTimeout(() => {
+      const nextStep = getCountdownStep(visual.deadlineMs - performance.now());
+      setVisual((current) => {
+        if (
+          current.phase !== "countdown" ||
+          current.deadlineMs !== visual.deadlineMs
+        ) {
+          return current;
+        }
+        return !nextStep.complete
+          ? { ...current, count: nextStep.count }
+          : { phase: "racing", gameId: current.gameId, celebrate: true };
+      });
+    }, step.delayMs);
 
-  useEffect(() => {
-    const previousState = previousGameState.current;
-    previousGameState.current = tag;
-
-    if (isCountdown) {
-      setShowImage(false);
-      return;
-    }
-
-    if (!isRacing) {
-      setShowImage(false);
-      return;
-    }
-
-    if (previousState !== "Countdown") return;
-
-    setShowImage(true);
-    const timeout = setTimeout(() => setShowImage(false), 2000);
     return () => clearTimeout(timeout);
-  }, [isCountdown, isRacing, tag]);
+  }, [visual]);
 
-  useEffect(() => {
-    if (!isCountdown) {
-      setPulseOn(false);
-      return;
-    }
-    let offTimer: ReturnType<typeof setTimeout> | null = null;
-    const fire = () => {
-      setPulseOn(true);
-      offTimer = setTimeout(() => setPulseOn(false), PULSE_BRIGHT_MS);
-    };
-    fire();
-    const interval = setInterval(fire, PULSE_PERIOD_MS);
-    return () => {
-      clearInterval(interval);
-      if (offTimer) clearTimeout(offTimer);
-      setPulseOn(false);
-    };
-  }, [isCountdown]);
-
-  const showBorder = isCountdown || isRacing;
-  const bright = isRacing || pulseOn;
+  const isCountdown = visual.phase === "countdown" && visual.gameId === gameId;
+  const isRacing = visual.phase === "racing" && visual.gameId === gameId;
   const accent = "var(--accent-primary)";
 
   return (
     <>
-      {showBorder && (
+      {(isCountdown || isRacing) && (
         <div
+          key={isCountdown ? visual.count : "racing"}
           aria-hidden="true"
           style={{
             position: "absolute",
@@ -121,29 +123,57 @@ export const Countdown = () => {
             pointerEvents: "none",
             borderRadius: "calc(var(--radius, 8px) * 2)",
             border: `1px solid ${accent}`,
-            opacity: bright ? 1 : 0,
-            boxShadow: bright
+            opacity: isRacing ? 1 : 0,
+            boxShadow: isRacing
               ? `0 0 9px 0 color-mix(in srgb, ${accent} 24%, transparent)`
-              : "0 0 0 0 transparent",
-            transition: bright
-              ? "none"
-              : `opacity ${PULSE_FADE_MS}ms ease-in, box-shadow ${PULSE_FADE_MS}ms ease-out`,
+              : "none",
+            animation:
+              isCountdown && visual.count !== null
+                ? "countdownPulse 1s linear forwards"
+                : undefined,
           }}
         />
       )}
-      {showCount && (
+
+      {isCountdown && visual.count !== null && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
           <div
-            key={count}
+            key={visual.count}
             className="countdown-number text-accent relative -top-6"
             style={{
               fontSize: "9rem",
               animation: "countdownPop 1s ease-out forwards",
             }}
           >
-            {count}
+            {visual.count}
           </div>
-          <style>{`
+        </div>
+      )}
+
+      {isRacing && visual.celebrate && (
+        <div className="absolute top-0 left-0 pointer-events-none z-50 -translate-x-full -ml-1">
+          <img
+            src={bufoLetsGo}
+            alt=""
+            aria-hidden="true"
+            className="w-10 h-10 sm:w-14 sm:h-14"
+            style={{ animation: "countdownCelebrate 2s ease-out forwards" }}
+          />
+        </div>
+      )}
+
+      <style>{`
+        @keyframes countdownPulse {
+          0%, 15% {
+            opacity: 1;
+            box-shadow: 0 0 9px 0 color-mix(in srgb, ${accent} 24%, transparent);
+          }
+          95%, 100% {
+            opacity: 0;
+            box-shadow: 0 0 0 0 transparent;
+          }
+        }
+
         @keyframes countdownPop {
           0% {
             opacity: 1;
@@ -154,30 +184,12 @@ export const Countdown = () => {
             transform: scale(0.8);
           }
         }
-      `}</style>
-        </div>
-      )}
-      {showImage && (
-        <div className="absolute top-0 left-0 pointer-events-none z-50 -translate-x-full -ml-1">
-          <img
-            src={bufoLetsGo}
-            alt=""
-            aria-hidden="true"
-            className="w-10 h-10 sm:w-14 sm:h-14"
-            style={{
-              animation: "fadeInOut 2s ease-out forwards",
-            }}
-          />
-          <style>{`
-        @keyframes fadeInOut {
+
+        @keyframes countdownCelebrate {
           0% {
             transform: scale(0.9) scaleX(-1);
           }
-          20% {
-            opacity: 1;
-            transform: scale(1) scaleX(-1);
-          }
-          80% {
+          20%, 80% {
             opacity: 1;
             transform: scale(1) scaleX(-1);
           }
@@ -187,8 +199,6 @@ export const Countdown = () => {
           }
         }
       `}</style>
-        </div>
-      )}
     </>
   );
 };

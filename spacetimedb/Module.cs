@@ -128,9 +128,9 @@ public partial struct GameModeCount
 public static partial class Module
 {
     private const int MAX_ABANDONED_GAMES = 10;
-    private const long PUBLIC_GAME_COUNTDOWN_MICROSECONDS = 3_000_000;
-    private const long PRIVATE_GAME_COUNTDOWN_MICROSECONDS = 5_000_000;
-    private const long PRACTICE_GAME_COUNTDOWN_MICROSECONDS = 3_000_000;
+    private const long PUBLIC_GAME_COUNTDOWN_MICROSECONDS = 4_000_000;
+    private const long PRIVATE_GAME_COUNTDOWN_MICROSECONDS = 6_000_000;
+    private const long PRACTICE_GAME_COUNTDOWN_MICROSECONDS = 4_000_000;
     private const long BOT_FILL_DELAY_MICROSECONDS = 5_000_000;
     private const long PRACTICE_GAME_COUNTDOWN_START_DELAY_MICROSECONDS = 1_000_000;
     private const int EVENT_SIZE_BYTES = 3;
@@ -146,6 +146,7 @@ public static partial class Module
     private const double BOT_BACKSPACE_SPEED_MULTIPLIER = 0.6;
     private const double BOT_RECOVERY_DELAY_MIN_MULTIPLIER = 0.5;
     private const double BOT_RECOVERY_DELAY_RANGE_MULTIPLIER = 0.5;
+
 
     private static double GetLanguageTypingSpeedModifier(GameMode mode)
     {
@@ -655,6 +656,13 @@ public static partial class Module
             ctx.Db.player.Identity.Update(updatedPlayer);
             Log.Info($"Updated anonymous status for {ctx.Sender} to {isAnonymous}");
         }
+    }
+
+    [Reducer]
+    public static void ping(ReducerContext ctx, ulong nonce)
+    {
+        // The reducer callback echoes the nonce, which lets the caller measure
+        // the database round trip without creating subscription traffic.
     }
 
     private static string GenerateNonAnonymousAdjective(Random rng)
