@@ -26,6 +26,7 @@ export const GamePage = () => {
   const [hasFinished, setHasFinished] = useState(false);
   const [isWatchingReplay, setIsWatchingReplay] = useState(false);
   const [countdownComplete, setCountdownComplete] = useState(false);
+  const [raceStartsAt, setRaceStartsAt] = useState<number | null>(null);
   const [game, setGame] = useState<Game | null>(null);
   const [gamePlayerProgress, setGamePlayerProgress] = useState<
     PlayerProgress[]
@@ -42,6 +43,7 @@ export const GamePage = () => {
     setHasFinished(false);
     setIsWatchingReplay(false);
     setCountdownComplete(false);
+    setRaceStartsAt(null);
   }, [gameId]);
 
   useEffect(() => {
@@ -62,13 +64,18 @@ export const GamePage = () => {
           0,
           Number(current.countdownDurationMs) - oneWayLatencyMs,
         );
+        setRaceStartsAt(performance.now() + remainingMs);
         countdownTimer = setTimeout(
           () => setCountdownComplete(true),
           remainingMs,
         );
+      } else if (current.state?.tag === "Racing") {
+        clearTimeout(countdownTimer);
+        setCountdownComplete(true);
       } else if (current.state?.tag !== "Countdown") {
         clearTimeout(countdownTimer);
-        setCountdownComplete(current.state?.tag === "Racing");
+        setCountdownComplete(false);
+        setRaceStartsAt(null);
       }
     };
 
@@ -410,6 +417,7 @@ export const GamePage = () => {
         initialProgress={initialProgress}
         isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
         cursorState={isMemberOfRace ? "auto" : "hidden"}
+        raceStartsAt={raceStartsAt}
       />
     );
   }
@@ -434,7 +442,6 @@ export const GamePage = () => {
             key={pp.id.toString()}
             charIndex={pp.progressIndex}
             color={getPlayerColorHex(pp.playerColor?.tag ?? "")}
-            lerp={0.15}
           />
         ))}
     </div>

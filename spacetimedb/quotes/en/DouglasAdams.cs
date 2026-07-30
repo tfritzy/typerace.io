@@ -20,11 +20,9 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "There are some oddities in the perspective with which we see the world.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "The world is a thing of utter inordinate complexity and richness and strangeness that is absolutely awesome.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "CLIXBY (adj.) Politely rude. Briskly vague. Firmly uninformative.", Author = "Douglas Adams" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "SHOEBURYNESS (abs.n.) The vague uncomfortable feeling you get when sitting on a seat which is still warm from somebody else's bottom.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "WOKING (vb.) To enter the kitchen with the precise determination to perform something only to forget what it is just before you do it.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "If it looks like a duck, and quacks like a duck, we have at least to consider the possibility that we have a small aquatic bird of the family Anatidae on our hands.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "The teacher usually learns more than the pupils. Isn't that true? \"It would be hard to learn much less than my pupils,\" came a low growl from somewhere on the table, \"without undergoing a pre-frontal lobotomy.\"", Author = "Douglas Adams" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "The door was the way to... to... The Door was The Way. Good. Capital letters were always the best way of dealing with things you didn't have a good answer to.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "It can hardly be a coincidence that no language on Earth has ever produced the expression \"As pretty as an airport.\"", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Always expecting this and expecting that. May I recommend serenity to you? A life that is burdened with expectations is a heavy life. Its fruit is sorrow and disappointment. Learn to be one with the joy of the moment.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "The kid was deliberately and maliciously watching television at him.", Author = "Douglas Adams" },
@@ -34,7 +32,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "They won't be rivers anymore, just currents in the ocean.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Radio did not kill books and television did not kill radio or movies - what television did kill was cinema newsreel. TV does it much better because it can deliver it instantly. Who wants last week's news?", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Generally, old media don't die. They just have to grow old gracefully.", Author = "Douglas Adams" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "You will need to know the difference between Friday and a fried egg. It's quite a simple difference, but an important one. [...] It's all rather complicated, but it makes a kind of sense if you think about it for a while.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "All opinions are not equal. Some are a very great deal more robust, sophisticated and well supported in logic and argument than others.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Anything invented after you're thirty-five is against the natural order of things.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "The future of computer power is pure simplicity.", Author = "Douglas Adams" },
@@ -45,7 +42,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "I love deadlines. I love the whooshing noise they make as they go by.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "He was constantly reminded of how startlingly different a place the world was when viewed from a point only three feet to the left.", Author = "Douglas Adams" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Solutions nearly always come from the direction you least expect, which means there's no point trying to look in that direction because it won't be coming from there.", Author = "Douglas Adams" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Douglas_Adams", Text = "Five years later, while he was struggling to think of a legitimate reason for an alien to visit Earth, the phrase returned to him. The rest is history...", Author = "Douglas Adams" },
         };
     }
 }

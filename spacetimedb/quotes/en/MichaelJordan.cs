@@ -15,8 +15,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "I've missed over 9,000 shots in my career. I've lost almost 300 games. 26 times I've been trusted to take the game-winning shot and missed. I've failed over and over and over again in my life. And that is why I succeed.", Author = "Michael Jordan" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "There will be a player greater than me.", Author = "Michael Jordan" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "Enjoy every minute of life. Never second-guess life.", Author = "Michael Jordan" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "Limits, like fears, are often just an illusion", Author = "Michael Jordan" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "Can I still dunk... Are you stupid?", Author = "Michael Jordan" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "If we all work together, we can foster greater understanding, positive change and create a more peaceful world for ourselves, our children, our families and our communities.", Author = "Michael Jordan" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Michael_Jordan", Text = "When Kobe Bryant died, a piece of me died.", Author = "Michael Jordan" },
         };

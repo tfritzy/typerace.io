@@ -6,6 +6,7 @@ import React, {
   forwardRef,
 } from "react";
 import { Cursor } from "./Cursor";
+import { PhraseCharacters } from "./PhraseCharacters";
 import { getTranslations } from "../utils/translations";
 
 type TypeBoxProps = {
@@ -53,8 +54,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     },
     ref,
   ) => {
-    const nonBreakingSpace = "\u00A0";
-    const spaceIndicatorChar = "␣";
     const isInputDisabled = inputState !== "enabled";
     const initialInput = phrase.substring(0, initialProgress);
     const [focused, setFocused] = useState(true);
@@ -285,82 +284,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       }
     }, []);
 
-    const getMistypeIndicatorChar = (
-      isError: boolean,
-      typedChar: string | undefined,
-    ) => {
-      if (!isError || typedChar === undefined) return nonBreakingSpace;
-      return typedChar === " " ? spaceIndicatorChar : typedChar;
-    };
-
-    const renderText = () => {
-      const chars = phrase.split("");
-
-      let lastCompletedWordEnd = 0;
-      for (let i = 0; i < input.length && i < phrase.length; i++) {
-        if (input[i] !== phrase[i]) {
-          break;
-        }
-        if (phrase[i] === " ") {
-          lastCompletedWordEnd = i + 1;
-        }
-      }
-
-      const renderedCharacters = chars.map((char, i) => {
-        const isTyped = i < input.length;
-        const isCorrect = input[i] === char;
-        const isCursor = i === input.length;
-        const isInCompletedWord = input === phrase || i < lastCompletedWordEnd;
-        const isInCurrentWord =
-          i >= lastCompletedWordEnd && i < input.length && isCorrect;
-
-        let colorClass = "text-text-untyped";
-        if (isTyped && !isCorrect) {
-          colorClass = "text-destructive";
-        } else if (isInCompletedWord) {
-          colorClass = "text-text-completed";
-        } else if (isInCurrentWord) {
-          colorClass = "text-foreground";
-        }
-
-        const isError = isTyped && !isCorrect;
-
-        return (
-          <span
-            key={i}
-            data-char-index={i}
-            className="relative"
-            style={noSpacesLang ? { display: "inline-block" } : {}}
-          >
-            <span
-              className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[1em] leading-none text-destructive text-xs`}
-            >
-              {getMistypeIndicatorChar(isError, input[i])}
-            </span>
-            <span
-              className={`transition-all duration-150 leading-none ${colorClass} ${isError ? "underline decoration-2 decoration-destructive" : ""}`}
-            >
-              {isCursor && <span id="target" ref={targetRef} />}
-              {char}
-            </span>
-          </span>
-        );
-      });
-
-      if (input.length >= phrase.length) {
-        renderedCharacters.push(
-          <span
-            key="cursor-at-end"
-            id="target"
-            data-char-index={phrase.length}
-            ref={targetRef}
-          />,
-        );
-      }
-
-      return renderedCharacters;
-    };
-
     const containerStyle: React.CSSProperties = {
       ...(height ? { minHeight: height } : null),
     };
@@ -382,12 +305,16 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               className="text-start text-[26px] font-mono leading-12 height"
               ref={phraseRef}
             >
-              {renderText()}
+              <PhraseCharacters
+                phrase={phrase}
+                input={input}
+                noSpaces={noSpacesLang}
+                targetRef={targetRef}
+              />
             </div>
 
             <Cursor
               targetRef={targetRef}
-              lerp={0.3}
               fadeDelay={500}
               color={cursorColor}
               visible={

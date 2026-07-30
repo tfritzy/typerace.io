@@ -216,7 +216,6 @@ export function GameReplay({
                 player.playerColor?.tag,
                 isCurrentPlayer,
               )}
-              lerp={0.3}
             />
           );
         })}

@@ -16,7 +16,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Einstein", Text = "In living through this \"great epoch,\" it is difficult to reconcile oneself to the fact that one belongs to that mad, degenerate species that boasts of its free will.", Author = "Albert Einstein" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Einstein", Text = "How does it happen that a properly endowed natural scientist comes to concern himself with epistemology?", Author = "Albert Einstein" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Einstein", Text = "Concepts that have proven useful in ordering things easily achieve such authority over us that we forget their earthly origins and accept them as unalterable givens.", Author = "Albert Einstein" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Einstein", Text = "Therefore it is by no means an idle game if we become practiced in analysing long-held commonplace concepts and showing the circumstances on which their justification and usefulness depend, and how they have grown up, individually, out of the givens of experience.", Author = "Albert Einstein" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Einstein", Text = "Our entire much-praised technological progress, and civilization generally, could be compared to an axe in the hand of a pathological criminal.", Author = "Albert Einstein" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Einstein", Text = "The most beautiful fate of a physical theory is to point the way to the establishment of a more inclusive theory, in which it lives on as a limiting case.", Author = "Albert Einstein" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Einstein", Text = "The physical world is real.", Author = "Albert Einstein" },
@@ -62,7 +61,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Einstein", Text = "Human beings, vegetables or cosmic dust, we all dance to a mysterious tune, intoned in the distance by an invisible player.", Author = "Albert Einstein" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Einstein", Text = "How can it be that mathematics, being, after all, a product of human thought which is independent of experience, is so admirably appropriate to the objects of reality?", Author = "Albert Einstein" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Einstein", Text = "Is human reason, then, without experience, merely by taking thought, able to fathom the properties of real things?", Author = "Albert Einstein" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Albert_Einstein", Text = "One reason why mathematics enjoys special esteem, above all other sciences, is that its laws are absolutely certain and indisputable, while those of other sciences are to some extent debatable and in constant danger of being overthrown by newly discovered facts.", Author = "Albert Einstein" },
         };
     }
 }

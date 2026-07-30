@@ -27,6 +27,7 @@ type GamePageTypeBoxProps = {
   initialProgress?: number;
   isAnonymous?: boolean;
   cursorState?: TypeBoxCursorState;
+  raceStartsAt: number | null;
 };
 
 export const GamePageTypeBox = memo(
@@ -40,6 +41,7 @@ export const GamePageTypeBox = memo(
     initialProgress = 0,
     isAnonymous = true,
     cursorState = "auto",
+    raceStartsAt,
   }: GamePageTypeBoxProps) => {
     const typeBoxRef = useRef<TypeBoxRef>(null);
     const [xpIndicators, setXpIndicators] = useState<XpIndicatorInstance[]>([]);
@@ -113,7 +115,7 @@ export const GamePageTypeBox = memo(
             cursorState={cursorState}
             noSpacesInPhrase={noSpacesLang}
           />
-          <Countdown />
+          <Countdown raceStartsAt={raceStartsAt} />
         </div>
       </div>
     );

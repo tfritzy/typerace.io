@@ -1,12 +1,12 @@
 import { memo, useEffect, useRef } from "react";
+import { followPoint } from "../utils/smoothMotion";
 
 type GhostCursorProps = {
     charIndex: number;
-    lerp?: number;
     color: string;
 };
 
-export const GhostCursor = memo(({ charIndex, lerp = 0.15, color }: GhostCursorProps) => {
+export const GhostCursor = memo(({ charIndex, color }: GhostCursorProps) => {
     const followerRef = useRef<HTMLDivElement>(null);
     const position = useRef({ x: 0, y: 0 });
     const target = useRef({ x: 0, y: 0 });
@@ -18,6 +18,7 @@ export const GhostCursor = memo(({ charIndex, lerp = 0.15, color }: GhostCursorP
 
     useEffect(() => {
         if (!followerRef.current) return;
+        let measuredTarget: Element | null = null;
 
         const findTarget = () => {
             if (cachedIndex.current !== charIndexRef.current) {
@@ -30,30 +31,33 @@ export const GhostCursor = memo(({ charIndex, lerp = 0.15, color }: GhostCursorP
         const updateTarget = () => {
             const targetEl = findTarget();
             if (!targetEl || !followerRef.current) return;
+            measuredTarget = targetEl;
             const targetRect = targetEl.getBoundingClientRect();
 
-            const newTarget = {
-                x: targetRect.left,
-                y: targetRect.bottom - 2,
-            };
-
-            target.current = newTarget;
+            target.current.x = targetRect.left;
+            target.current.y = targetRect.bottom - 2;
 
             if (!initialized.current) {
-                position.current = { ...target.current };
+                position.current.x = target.current.x;
+                position.current.y = target.current.y;
                 initialized.current = true;
-                followerRef.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`;
+                followerRef.current.style.transform = `translate3d(${position.current.x}px, ${position.current.y}px, 0)`;
             }
         };
 
-        const animate = () => {
-            updateTarget();
+        let previousFrameTime: number | null = null;
 
-            position.current.x += (target.current.x - position.current.x) * lerp;
-            position.current.y += (target.current.y - position.current.y) * lerp;
+        const animate = (frameTime: number) => {
+            if (measuredTarget !== findTarget()) updateTarget();
+
+            const elapsedMs = previousFrameTime === null
+                ? 1000 / 60
+                : frameTime - previousFrameTime;
+            previousFrameTime = frameTime;
+            followPoint(position.current, target.current, elapsedMs);
 
             if (followerRef.current) {
-                followerRef.current.style.transform = `translate(${position.current.x}px, ${position.current.y}px)`;
+                followerRef.current.style.transform = `translate3d(${position.current.x}px, ${position.current.y}px, 0)`;
             }
 
             rafId = requestAnimationFrame(animate);
@@ -63,24 +67,24 @@ export const GhostCursor = memo(({ charIndex, lerp = 0.15, color }: GhostCursorP
 
         let rafId = requestAnimationFrame(animate);
 
-        window.addEventListener("scroll", updateTarget);
+        window.addEventListener("scroll", updateTarget, true);
         window.addEventListener("resize", updateTarget);
 
         return () => {
             cancelAnimationFrame(rafId);
-            window.removeEventListener("scroll", updateTarget);
+            window.removeEventListener("scroll", updateTarget, true);
             window.removeEventListener("resize", updateTarget);
             initialized.current = false;
             cachedIndex.current = -1;
             cachedEl.current = null;
         };
-    }, [lerp]);
+    }, []);
 
     return (
         <div
             ref={followerRef}
             className="fixed top-0 left-0 pointer-events-none opacity-20 w-[10px] h-[2px]"
-            style={{ backgroundColor: color }}
+            style={{ backgroundColor: color, willChange: "transform" }}
         />
     );
 });
