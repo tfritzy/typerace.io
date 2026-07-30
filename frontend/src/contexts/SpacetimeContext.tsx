@@ -240,6 +240,7 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
       const delta = performance.now() - pending.startedAt;
       pending = null;
       setLatencyDeltaMs(delta);
+      console.log("latency delta", delta);
       schedulePing(PING_INTERVAL_MS);
     };
 

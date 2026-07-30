@@ -134,7 +134,6 @@ public static partial class EnglishQuotes
         .Concat(OscarWilde.Quotes)
         .Concat(PGWodehouse.Quotes)
         .Concat(PaulValéry.Quotes)
-        .Concat(PercyByssheShelley.Quotes)
         .Concat(PhilJackson.Quotes)
         .Concat(Plato.Quotes)
         .Concat(RalphWaldoEmerson.Quotes)
