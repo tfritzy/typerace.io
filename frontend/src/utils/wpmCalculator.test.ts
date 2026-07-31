@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   type CharacterEvent,
+  getAccuracy,
+  getErrorCountsBySecond,
   getRawWpmByBucket,
   getWpmByBucket,
   getWpmPerKeystroke,
@@ -79,6 +81,32 @@ describe("getRawWpmByBucket", () => {
 
     expect(getRawWpmByBucket(history, raceStartTimestamp, 4)).toEqual([
       12, 8, 8, 6,
+    ]);
+  });
+});
+
+describe("compressed history summaries", () => {
+  it("calculates accuracy without materializing decoded events", () => {
+    const history = new Uint8Array([
+      10, 0, 0,
+      11, 0, 1,
+      12, 0, 2,
+      13, 0, 0,
+    ]);
+
+    expect(getAccuracy(history, raceStartTimestamp)).toBe(50);
+  });
+
+  it("buckets encoded errors directly by second", () => {
+    const history = new Uint8Array([
+      9, 0, 1,
+      10, 0, 1,
+      15, 0, 0,
+      21, 0, 1,
+    ]);
+
+    expect(getErrorCountsBySecond(history, raceStartTimestamp)).toEqual([
+      1, 1, 1,
     ]);
   });
 });

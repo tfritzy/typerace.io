@@ -58,14 +58,14 @@ export function GameReplay({
   const inputsRef = useRef(inputs);
   const playersRef = useRef(players);
   const startedAtRef = useRef(performance.now());
-  const processedEventsRef = useRef(new Set<string>());
+  const nextEventIndexRef = useRef(0);
   playersRef.current = players;
 
   useEffect(() => {
     const emptyInputs = createEmptyInputs(playersRef.current);
     inputsRef.current = emptyInputs;
     setInputs(emptyInputs);
-    processedEventsRef.current.clear();
+    nextEventIndexRef.current = 0;
     startedAtRef.current = performance.now();
   }, [phrase, raceStartTimestamp, replayNumber]);
 
@@ -95,29 +95,27 @@ export function GameReplay({
     const playFrame = (now: number) => {
       const elapsedMs = now - startedAtRef.current;
       let changed = false;
-      let hasFutureEvents = false;
+      let nextEventIndex = nextEventIndexRef.current;
 
-      for (const event of timeline) {
-        const eventId = `${event.playerId}:${event.eventIndex}`;
-        if (processedEventsRef.current.has(eventId)) continue;
-
-        if (event.elapsedMs > elapsedMs) {
-          hasFutureEvents = true;
-          continue;
-        }
+      while (
+        nextEventIndex < timeline.length &&
+        timeline[nextEventIndex].elapsedMs <= elapsedMs
+      ) {
+        const event = timeline[nextEventIndex];
 
         inputsRef.current[event.playerId] = applyReplayEvent(
           inputsRef.current[event.playerId] ?? "",
           phrase,
           event.eventType,
         );
-        processedEventsRef.current.add(eventId);
+        nextEventIndex++;
         changed = true;
       }
+      nextEventIndexRef.current = nextEventIndex;
 
       if (changed) setInputs({ ...inputsRef.current });
 
-      if (hasFutureEvents) {
+      if (nextEventIndex < timeline.length) {
         frameId = requestAnimationFrame(playFrame);
       }
     };

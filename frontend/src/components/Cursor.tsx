@@ -1,8 +1,16 @@
-import { memo, useLayoutEffect, useRef, useState, type RefObject } from "react";
-import { followPoint } from "../utils/smoothMotion";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 
 type CursorProps = {
   targetRef: RefObject<HTMLElement | null>;
+  targetIndex: number;
   fadeDelay?: number;
   visible?: boolean;
   color?: string;
@@ -11,98 +19,65 @@ type CursorProps = {
 export const Cursor = memo(
   ({
     targetRef,
+    targetIndex,
     fadeDelay = 2000,
     visible = true,
     color,
   }: CursorProps) => {
-    const followerRef = useRef<HTMLDivElement>(null);
-    const position = useRef({ x: 0, y: 0 });
-    const target = useRef({ x: 0, y: 0 });
-    const initialized = useRef(false);
+    const cursorRef = useRef<HTMLDivElement>(null);
+    const positioned = useRef(false);
     const lastMoveTime = useRef(Date.now());
+    const blinking = useRef(false);
     const [isBlinking, setIsBlinking] = useState(false);
 
-    useLayoutEffect(() => {
-      if (!targetRef?.current || !followerRef.current) return;
-      let measuredTarget: HTMLElement | null = null;
+    const updatePosition = useCallback(() => {
+      if (!targetRef.current || !cursorRef.current) return;
 
-      const updateTarget = () => {
-        if (!targetRef?.current || !followerRef.current) return;
-        measuredTarget = targetRef.current;
-        const targetRect = targetRef.current.getBoundingClientRect();
-        const followerRect = followerRef.current.getBoundingClientRect();
+      const element = cursorRef.current;
+      const target = targetRef.current.getBoundingClientRect();
+      const cursor = element.getBoundingClientRect();
 
-        const targetX = targetRect.left - followerRect.width / 2;
-        const targetY =
-          targetRect.top + (targetRect.height - followerRect.height) / 2;
+      if (!positioned.current) element.style.transition = "none";
+      element.style.transform = `translate3d(${target.left - cursor.width / 2}px, ${target.top + (target.height - cursor.height) / 2}px, 0)`;
+      if (!positioned.current) {
+        void element.offsetWidth;
+        element.style.transition = "";
+        positioned.current = true;
+      }
+      lastMoveTime.current = Date.now();
 
-        if (
-          targetX !== target.current.x ||
-          targetY !== target.current.y
-        ) {
-          lastMoveTime.current = Date.now();
-          setIsBlinking(false);
-        }
+      if (blinking.current) {
+        blinking.current = false;
+        setIsBlinking(false);
+      }
+    }, [targetRef]);
 
-        target.current.x = targetX;
-        target.current.y = targetY;
+    useLayoutEffect(updatePosition, [targetIndex, updatePosition]);
 
-        if (!initialized.current) {
-          position.current.x = targetX;
-          position.current.y = targetY;
-          initialized.current = true;
-          followerRef.current.style.transform = `translate3d(${position.current.x}px, ${position.current.y}px, 0)`;
-        }
-      };
-
-      let previousFrameTime: number | null = null;
-
-      const animate = (frameTime: number) => {
-        if (measuredTarget !== targetRef.current) updateTarget();
-
-        const deltaTime =
-          previousFrameTime === null
-            ? 1000 / 60
-            : frameTime - previousFrameTime;
-        previousFrameTime = frameTime;
-
-        followPoint(position.current, target.current, deltaTime);
-
-        if (followerRef.current) {
-          followerRef.current.style.transform = `translate3d(${position.current.x}px, ${position.current.y}px, 0)`;
-        }
-
-        rafId = requestAnimationFrame(animate);
-      };
-
-      updateTarget();
-
-      let rafId = requestAnimationFrame(animate);
-
+    useEffect(() => {
       const fadeInterval = setInterval(() => {
-        const timeSinceMove = Date.now() - lastMoveTime.current;
-        if (timeSinceMove >= fadeDelay) {
+        if (
+          !blinking.current &&
+          Date.now() - lastMoveTime.current >= fadeDelay
+        ) {
+          blinking.current = true;
           setIsBlinking(true);
         }
       }, 100);
 
-      window.addEventListener("scroll", updateTarget, true);
-      window.addEventListener("resize", updateTarget);
-
+      window.addEventListener("scroll", updatePosition, true);
+      window.addEventListener("resize", updatePosition);
       return () => {
-        cancelAnimationFrame(rafId);
         clearInterval(fadeInterval);
-        window.removeEventListener("scroll", updateTarget, true);
-        window.removeEventListener("resize", updateTarget);
-        initialized.current = false;
+        window.removeEventListener("scroll", updatePosition, true);
+        window.removeEventListener("resize", updatePosition);
       };
-    }, [targetRef, fadeDelay]);
+    }, [fadeDelay, updatePosition]);
 
     return (
       <div
-        ref={followerRef}
-        className={`max-w-0 h-10 -translate-y-px fixed top-0 -translate-x-0.5 left-0  ${isBlinking && visible ? "animate-blink" : ""}`}
-        style={{ opacity: visible ? 1 : 0, willChange: "transform" }}
+        ref={cursorRef}
+        className={`fixed left-0 top-0 h-10 max-w-0 -translate-x-0.5 -translate-y-px transition-transform duration-[70ms] ease-out will-change-transform ${visible ? "opacity-100" : "opacity-0"} ${isBlinking && visible ? "animate-blink" : ""}`}
       >
         <div
           className="h-full rounded-full border-r-2 border-r-accent"

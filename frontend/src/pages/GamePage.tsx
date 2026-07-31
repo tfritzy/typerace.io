@@ -1,5 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useCallback, useState, useMemo, useRef } from "react";
+import {
+  useEffect,
+  useCallback,
+  useState,
+  useMemo,
+  useRef,
+  type ReactNode,
+} from "react";
 import { type Game, type PlayerProgress } from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { PlayerStatsRow } from "../components/PlayerStatsRow";
@@ -32,6 +39,11 @@ export const GamePage = () => {
     PlayerProgress[]
   >([]);
   const latencyDeltaRef = useRef(latencyDeltaMs);
+  const initProgress = useRef({
+    gameId: "",
+    playerProgressId: "",
+    value: 0,
+  });
 
   useEffect(() => {
     latencyDeltaRef.current = latencyDeltaMs;
@@ -299,7 +311,19 @@ export const GamePage = () => {
   const currentPlayerProgress = gamePlayerProgress.find(
     (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
   );
-  const initialProgress = currentPlayerProgress?.progressIndex ?? 0;
+  if (initProgress.current.gameId !== gameId) {
+    initProgress.current.gameId = gameId ?? "";
+    initProgress.current.playerProgressId = "";
+    initProgress.current.value = 0;
+  }
+  if (
+    currentPlayerProgress &&
+    initProgress.current.playerProgressId !== currentPlayerProgress.id
+  ) {
+    initProgress.current.playerProgressId = currentPlayerProgress.id;
+    initProgress.current.value = currentPlayerProgress.progressIndex;
+  }
+  const initialProgress = initProgress.current.value;
   const hasCompletedRace = currentPlayerProgress
     ? currentPlayerProgress.progressIndex >= game.phrase.length
     : false;
@@ -313,22 +337,26 @@ export const GamePage = () => {
     currentPlayerId && game.owner && currentPlayerId.isEqual(game.owner);
   const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;
 
-  const progressBars = Array.from({ length: totalSlots }).map((_, index) => {
+  const progressBars: ReactNode[] = [];
+  for (let index = 0; index < totalSlots; index++) {
     const pp = gamePlayerProgress[index];
     const isCurrentPlayer =
       pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
 
     if (!pp) {
       if (game.gameType?.tag === "Private") {
-        return null;
+        progressBars.push(null);
+        continue;
       }
-      return <EmptyPlayerProgressBars key={`loading-${index}`} count={1} />;
+      progressBars.push(
+        <EmptyPlayerProgressBars key={`loading-${index}`} count={1} />,
+      );
+      continue;
     }
 
-    return (
+    progressBars.push(
       <div key={pp.id.toString()}>
         <PlayerProgressBar
-          key={pp.id.toString()}
           name={pp.playerName}
           level={pp.playerLevel}
           progressIndex={pp.progressIndex}
@@ -341,15 +369,15 @@ export const GamePage = () => {
           isBot={pp.isBot}
           isAnonymous={pp.isAnonymous}
           onKick={
-            isPrivateGameOwner && !isCurrentPlayer
+            isLobby && isPrivateGameOwner && !isCurrentPlayer
               ? () => handleKickPlayer(pp.playerId)
               : undefined
           }
           playerColorTag={isCurrentPlayer ? undefined : pp.playerColor?.tag}
         />
-      </div>
+      </div>,
     );
-  });
+  }
 
   let gameContent;
 

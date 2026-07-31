@@ -1,5 +1,7 @@
 import type { PlayerProgress } from "../types/stdb";
-import { decodeCharacterHistory } from "./wpmCalculator";
+import { CharacterEventType } from "./wpmCalculator";
+
+const EVENT_SIZE_BYTES = 3;
 
 export type ReplayEvent = {
   elapsedMs: number;
@@ -10,21 +12,46 @@ export type ReplayEvent = {
 
 export function buildReplayTimeline(
   players: PlayerProgress[],
-  raceStartTimestamp: bigint,
+  _raceStartTimestamp: bigint,
 ): ReplayEvent[] {
-  return players
-    .flatMap((player) =>
-      decodeCharacterHistory(
-        player.characterHistory,
-        raceStartTimestamp,
-      ).map((event, eventIndex) => ({
-        elapsedMs: Number(event.timestamp - raceStartTimestamp) / 1_000,
-        playerId: player.playerId.toHexString(),
-        eventIndex,
-        eventType: event.eventType.tag,
-      })),
-    )
-    .sort((a, b) => a.elapsedMs - b.elapsedMs);
+  let eventCount = 0;
+  for (const player of players) {
+    eventCount += Math.floor(player.characterHistory.length / EVENT_SIZE_BYTES);
+  }
+
+  const timeline = new Array<ReplayEvent>(eventCount);
+  let timelineIndex = 0;
+
+  for (const player of players) {
+    const history = player.characterHistory;
+    const playerId = player.playerId.toHexString();
+    let eventIndex = 0;
+
+    for (
+      let offset = 0;
+      offset + EVENT_SIZE_BYTES <= history.length;
+      offset += EVENT_SIZE_BYTES
+    ) {
+      const deciseconds = history[offset] | (history[offset + 1] << 8);
+      const encodedType = history[offset + 2];
+      const eventType =
+        encodedType === CharacterEventType.Incorrect
+          ? "Incorrect"
+          : encodedType === CharacterEventType.Backspace
+            ? "Backspace"
+            : "Correct";
+
+      timeline[timelineIndex++] = {
+        elapsedMs: deciseconds * 100,
+        playerId,
+        eventIndex: eventIndex++,
+        eventType,
+      };
+    }
+  }
+
+  timeline.sort((a, b) => a.elapsedMs - b.elapsedMs);
+  return timeline;
 }
 
 export function applyReplayEvent(

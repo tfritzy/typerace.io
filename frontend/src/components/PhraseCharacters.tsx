@@ -18,6 +18,7 @@ const COMPLETED_CHARACTER_CLASS =
   "transition-all duration-150 leading-none text-text-completed";
 const CURRENT_CHARACTER_CLASS =
   "transition-all duration-150 leading-none text-foreground";
+const INLINE_CHARACTER_STYLE = { display: "inline-block" } as const;
 
 interface PhraseCharactersProps {
   phrase: string;
@@ -42,7 +43,7 @@ export const PhraseCharacters = memo(
             }}
             data-char-index={index}
             className="relative"
-            style={noSpaces ? { display: "inline-block" } : undefined}
+            style={noSpaces ? INLINE_CHARACTER_STYLE : undefined}
           >
             <span
               ref={(element) => {

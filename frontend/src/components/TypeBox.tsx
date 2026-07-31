@@ -1,5 +1,6 @@
 import React, {
   useCallback,
+  useMemo,
   useRef,
   useState,
   useImperativeHandle,
@@ -8,6 +9,20 @@ import React, {
 import { Cursor } from "./Cursor";
 import { PhraseCharacters } from "./PhraseCharacters";
 import { getTranslations } from "../utils/translations";
+
+const BLOCKED_CURSOR_KEYS = new Set([
+  "ArrowLeft",
+  "ArrowRight",
+  "Home",
+  "End",
+  "PageUp",
+  "PageDown",
+]);
+const SCROLL_OPTIONS: ScrollIntoViewOptions = {
+  behavior: "smooth",
+  block: "center",
+  inline: "center",
+};
 
 type TypeBoxProps = {
   phrase: string;
@@ -60,6 +75,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const [input, setInput] = useState(initialInput);
     const [isComplete, setIsComplete] = useState(false);
     const [showErrorWarning, setShowErrorWarning] = useState(false);
+    const inputValueRef = useRef(initialInput);
+    const showErrorWarningRef = useRef(false);
 
     const targetRef = useRef<HTMLElement>(null);
     const phraseRef = useRef<HTMLDivElement>(null);
@@ -70,18 +87,18 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         if (inputRef.current) {
           inputRef.current.value = overrideInputValue;
         }
+        inputValueRef.current = overrideInputValue;
         setInput(overrideInputValue);
-        setShowErrorWarning(false);
+        if (showErrorWarningRef.current) {
+          showErrorWarningRef.current = false;
+          setShowErrorWarning(false);
+        }
       }
     }, [overrideInputValue]);
 
     React.useEffect(() => {
       if (targetRef.current && focused && !isComplete) {
-        targetRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-          inline: "center",
-        });
+        targetRef.current.scrollIntoView(SCROLL_OPTIONS);
       }
     }, [input.length, focused, isComplete]);
 
@@ -118,7 +135,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
 
         const newValue = targetValue;
-        const oldValue = input;
+        const oldValue = inputValueRef.current;
 
         if (newValue === oldValue) {
           return;
@@ -140,6 +157,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             if (inputRef.current) {
               inputRef.current.value = correctPrefix;
             }
+            inputValueRef.current = correctPrefix;
             setInput(correctPrefix);
             return;
           }
@@ -159,9 +177,13 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           }
         }
 
-        const showErrorWarning =
+        const shouldShowErrorWarning =
           firstErrorPos !== null && newValue.length - firstErrorPos - 1 >= 10;
-        setShowErrorWarning(showErrorWarning);
+        if (showErrorWarningRef.current !== shouldShowErrorWarning) {
+          showErrorWarningRef.current = shouldShowErrorWarning;
+          setShowErrorWarning(shouldShowErrorWarning);
+        }
+        inputValueRef.current = newValue;
         setInput(newValue);
 
         if (onWordComplete && newValue.length > oldValue.length) {
@@ -185,12 +207,13 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
             const wordLength = wordEndIndex - wordStartIndex + 1;
 
             if (phraseRef.current && wordLength > 0) {
-              const spans =
-                phraseRef.current.querySelectorAll<HTMLElement>(
-                  "[data-char-index]",
-                );
-              const startSpan = spans[wordStartIndex];
-              const endSpan = spans[wordEndIndex];
+              const characters = phraseRef.current.children;
+              const startSpan = characters[wordStartIndex] as
+                | HTMLElement
+                | undefined;
+              const endSpan = characters[wordEndIndex] as
+                | HTMLElement
+                | undefined;
               if (startSpan && endSpan) {
                 const startRect = startSpan.getBoundingClientRect();
                 const endRect = endSpan.getBoundingClientRect();
@@ -232,9 +255,13 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               if (inputRef.current) {
                 inputRef.current.value = "";
               }
+              inputValueRef.current = "";
               setInput("");
               setIsComplete(false);
-              setShowErrorWarning(false);
+              if (showErrorWarningRef.current) {
+                showErrorWarningRef.current = false;
+                setShowErrorWarning(false);
+              }
             }, 0);
           }
         }
@@ -244,7 +271,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         onComplete,
         onProgress,
         onWordComplete,
-        input,
         resetOnComplete,
         isInputDisabled,
       ],
@@ -270,29 +296,22 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     );
 
     const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
-      const cursorKeys = [
-        "ArrowLeft",
-        "ArrowRight",
-        "Home",
-        "End",
-        "PageUp",
-        "PageDown",
-      ];
-
-      if (cursorKeys.includes(event.key)) {
+      if (BLOCKED_CURSOR_KEYS.has(event.key)) {
         event.preventDefault();
       }
     }, []);
 
-    const containerStyle: React.CSSProperties = {
-      ...(height ? { minHeight: height } : null),
-    };
+    const containerStyle = useMemo<React.CSSProperties | undefined>(
+      () => (height ? { minHeight: height } : undefined),
+      [height],
+    );
+    const focusInput = useCallback(() => inputRef.current?.focus(), []);
 
     return (
       <div
         className={`relative box-with-focus w-full px-6 py-3 cursor-text flex items-start ${inputState === "disabled-dimmed" ? "opacity-60" : ""}`}
         style={containerStyle}
-        onClick={() => inputRef.current?.focus()}
+        onClick={focusInput}
       >
         {showErrorWarning && (
           <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-destructive">
@@ -315,6 +334,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
             <Cursor
               targetRef={targetRef}
+              targetIndex={Math.min(input.length, phrase.length)}
               fadeDelay={500}
               color={cursorColor}
               visible={

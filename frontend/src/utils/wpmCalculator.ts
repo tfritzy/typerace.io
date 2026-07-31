@@ -238,21 +238,30 @@ export function getRaceTime(playerProgress: PlayerProgress): number {
   return Number(playerProgress.time) / 1_000_000.0;
 }
 
-export function getAccuracy(compressedHistory: Uint8Array, raceStartTimestamp: bigint): number {
-  const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
-  
-  if (!events || events.length === 0) {
+export function getAccuracy(compressedHistory: Uint8Array, _raceStartTimestamp: bigint): number {
+  if (compressedHistory.length < EVENT_SIZE_BYTES) {
     return 0;
   }
 
   let correctChars = 0;
   let totalKeystrokes = 0;
 
-  for (const evt of events) {
-    if (evt.eventType.tag === "Correct") {
+  for (
+    let offset = 0;
+    offset + EVENT_SIZE_BYTES <= compressedHistory.length;
+    offset += EVENT_SIZE_BYTES
+  ) {
+    const eventType = compressedHistory[offset + 2];
+    if (eventType === CharacterEventType.Correct) {
       correctChars++;
       totalKeystrokes++;
-    } else if (evt.eventType.tag === "Incorrect" || evt.eventType.tag === "Backspace") {
+    } else if (
+      eventType === CharacterEventType.Incorrect ||
+      eventType === CharacterEventType.Backspace
+    ) {
+      totalKeystrokes++;
+    } else {
+      correctChars++;
       totalKeystrokes++;
     }
   }
@@ -266,27 +275,26 @@ export function getAccuracy(compressedHistory: Uint8Array, raceStartTimestamp: b
 
 export function getErrorCountsBySecond(
   compressedHistory: Uint8Array,
-  raceStartTimestamp: bigint
+  _raceStartTimestamp: bigint
 ): number[] {
-  const events = decodeCharacterHistory(compressedHistory, raceStartTimestamp);
-  
-  if (!events || events.length === 0) {
+  if (compressedHistory.length < EVENT_SIZE_BYTES) {
     return [];
   }
 
   const errorCountBySecond: number[] = [];
 
-  for (const evt of events) {
-    if (evt.eventType.tag !== "Incorrect") {
+  for (
+    let offset = 0;
+    offset + EVENT_SIZE_BYTES <= compressedHistory.length;
+    offset += EVENT_SIZE_BYTES
+  ) {
+    if (compressedHistory[offset + 2] !== CharacterEventType.Incorrect) {
       continue;
     }
 
-    const elapsedMicros = evt.timestamp - raceStartTimestamp;
-    const second = Number(elapsedMicros / 1_000_000n);
-
-    if (second < 0) {
-      continue;
-    }
+    const deciseconds =
+      compressedHistory[offset] | (compressedHistory[offset + 1] << 8);
+    const second = Math.floor(deciseconds / 10);
 
     while (errorCountBySecond.length <= second) {
       errorCountBySecond.push(0);
