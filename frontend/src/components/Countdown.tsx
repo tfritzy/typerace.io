@@ -15,13 +15,9 @@ export const Countdown = ({ raceStartsAt }: CountdownProps) => {
     const remainingMs = raceStartsAt - performance.now();
     const timers = [3, 2, 1].flatMap((count) => {
       const delayMs = remainingMs - count * 1000;
-      return delayMs >= 0
-        ? [setTimeout(() => setCue(count), delayMs)]
-        : [];
+      return delayMs >= 0 ? [setTimeout(() => setCue(count), delayMs)] : [];
     });
-    timers.push(
-      setTimeout(() => setCue("go"), Math.max(0, remainingMs)),
-    );
+    timers.push(setTimeout(() => setCue("go"), Math.max(0, remainingMs)));
 
     return () => timers.forEach(clearTimeout);
   }, [raceStartsAt]);
@@ -41,7 +37,7 @@ export const Countdown = ({ raceStartsAt }: CountdownProps) => {
             pointerEvents: "none",
             borderRadius: "calc(var(--radius, 8px) * 2)",
             border: `1px solid ${accent}`,
-            opacity: isRacing ? 1 : 0,
+            opacity: isRacing ? 0.7 : 0,
             boxShadow: isRacing
               ? `0 0 9px 0 color-mix(in srgb, ${accent} 24%, transparent)`
               : "none",

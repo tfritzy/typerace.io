@@ -20,7 +20,7 @@ export const prepareWpmDistribution = (
     .sort((a, b) => a - b);
 
   if (values.length === 0) {
-    return { buckets: [], average: 0, median: 0, total: 0 };
+    return { buckets: [], best: 0, median: 0, total: 0 };
   }
 
   const minimum = values[0];
@@ -60,7 +60,5 @@ export const prepareWpmDistribution = (
     buckets[index].count += 1;
   }
 
-  const average = values.reduce((sum, value) => sum + value, 0) / values.length;
-
-  return { buckets, average, median, total: values.length };
+  return { buckets, best: maximum, median, total: values.length };
 };

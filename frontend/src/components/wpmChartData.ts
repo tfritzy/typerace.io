@@ -9,7 +9,6 @@ export type WpmChartRecord = Pick<GameRecord, "date" | "wpm">;
 
 const AVERAGE_SEED_GAMES = 50;
 const AVERAGE_SMOOTHING = 0.02;
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 const timestampMs = (record: WpmChartRecord) => Number(record.date) / 1000;
 
@@ -79,20 +78,6 @@ const buildBestWpmLine = (records: WpmChartRecord[]) => {
   return points;
 };
 
-const getTimeConfig = (records: WpmChartRecord[]) => {
-  if (records.length < 2) return { unit: "day" as const, format: "MMM d" };
-
-  const spanDays =
-    (timestampMs(records.at(-1)!) - timestampMs(records[0])) / DAY_MS;
-  if (spanDays < 1) return { unit: "hour" as const, format: "HH:mm" };
-  if (spanDays < 7) return { unit: "day" as const, format: "MMM d" };
-  if (spanDays < 60) return { unit: "week" as const, format: "MMM d" };
-  if (spanDays < 365) {
-    return { unit: "month" as const, format: "MMM yyyy" };
-  }
-  return { unit: "year" as const, format: "yyyy" };
-};
-
 export const prepareWpmChartData = <T extends WpmChartRecord>(
   records: readonly T[],
 ) => {
@@ -105,6 +90,5 @@ export const prepareWpmChartData = <T extends WpmChartRecord>(
     })),
     averagePoints: buildAverageLine(sortedRecords),
     bestWpmPoints: buildBestWpmLine(sortedRecords),
-    timeConfig: getTimeConfig(sortedRecords),
   };
 };

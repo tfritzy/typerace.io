@@ -51,7 +51,6 @@ const WpmDistributionChartComponent = ({ data }: WpmDistributionChartProps) => {
         mode: "index",
       },
       maintainAspectRatio: false,
-      responsive: true,
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -87,10 +86,8 @@ const WpmDistributionChartComponent = ({ data }: WpmDistributionChartProps) => {
             text: "WPM range",
           },
           ticks: {
-            autoSkip: true,
             color: colors.muted,
             font: { size: 11 },
-            maxRotation: 0,
             padding: 8,
           },
         },
@@ -123,7 +120,7 @@ const WpmDistributionChartComponent = ({ data }: WpmDistributionChartProps) => {
         </span>
         {distribution.total > 0 && (
           <span className="text-xs text-muted-foreground">
-            Average {Math.round(distribution.average)} WPM · Median {Math.round(distribution.median)} WPM
+            Best {Math.round(distribution.best)} WPM · Median {Math.round(distribution.median)} WPM
           </span>
         )}
       </div>

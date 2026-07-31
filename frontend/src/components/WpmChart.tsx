@@ -8,6 +8,7 @@ import {
   Tooltip,
 } from "chart.js";
 import type { ChartData, ChartOptions } from "chart.js";
+import { color } from "chart.js/helpers";
 import "chartjs-adapter-date-fns";
 import { memo, useMemo } from "react";
 import { Line } from "react-chartjs-2";
@@ -34,6 +35,22 @@ const RACE_DATASET_INDEX = 1;
 const WpmChartComponent = ({ data }: WpmChartProps) => {
   const colors = useChartColors();
   const prepared = useMemo(() => prepareWpmChartData(data), [data]);
+  const minorTickColor = useMemo(
+    () => color(colors.muted).clearer(0.3).rgbString(),
+    [colors.muted],
+  );
+  const averageLineColor = useMemo(
+    () => color(colors.muted).clearer(0.4).rgbString(),
+    [colors.muted],
+  );
+  const bestLineColor = useMemo(
+    () => color(colors.accent).alpha(0.55).rgbString(),
+    [colors.accent],
+  );
+  const racePointColor = useMemo(
+    () => color(colors.accent).alpha(0.65).rgbString(),
+    [colors.accent],
+  );
 
   const chartData = useMemo<ChartData<"line">>(
     () => ({
@@ -41,23 +58,21 @@ const WpmChartComponent = ({ data }: WpmChartProps) => {
         {
           label: "Long-term average",
           data: prepared.averagePoints,
-          borderColor: colors.muted,
+          borderColor: averageLineColor,
           borderWidth: 2,
           cubicInterpolationMode: "monotone",
           pointHoverRadius: 0,
           pointRadius: 0,
-          showLine: true,
           tension: 0.35,
         },
         {
           label: "WPM",
           data: prepared.racePoints,
-          backgroundColor: `${colors.accent}33`,
-          borderColor: `${colors.accent}77`,
+          backgroundColor: racePointColor,
+          pointBorderWidth: 0,
           pointHitRadius: 10,
           pointHoverBackgroundColor: colors.accent,
-          pointHoverBorderColor: colors.foreground,
-          pointHoverBorderWidth: 2,
+          pointHoverBorderWidth: 0,
           pointHoverRadius: 6,
           pointRadius: 3,
           showLine: false,
@@ -65,16 +80,15 @@ const WpmChartComponent = ({ data }: WpmChartProps) => {
         {
           label: "Best WPM",
           data: prepared.bestWpmPoints,
-          borderColor: colors.accent,
+          borderColor: bestLineColor,
           borderWidth: 2,
           pointHoverRadius: 0,
           pointRadius: 0,
-          showLine: true,
           stepped: "before",
         },
       ],
     }),
-    [colors, prepared],
+    [averageLineColor, bestLineColor, colors, prepared, racePointColor],
   );
 
   const options = useMemo<ChartOptions<"line">>(
@@ -83,11 +97,9 @@ const WpmChartComponent = ({ data }: WpmChartProps) => {
       maintainAspectRatio: false,
       normalized: true,
       parsing: false,
-      responsive: true,
       plugins: {
         legend: {
           align: "start",
-          display: true,
           position: "bottom",
           labels: {
             boxWidth: 24,
@@ -145,22 +157,12 @@ const WpmChartComponent = ({ data }: WpmChartProps) => {
       scales: {
         x: {
           type: "time",
-          time: {
-            unit: prepared.timeConfig.unit,
-            displayFormats: {
-              day: prepared.timeConfig.format,
-              hour: prepared.timeConfig.format,
-              month: prepared.timeConfig.format,
-              week: prepared.timeConfig.format,
-              year: prepared.timeConfig.format,
-            },
-          },
           ticks: {
-            align: "inner",
-            autoSkip: true,
-            color: colors.muted,
+            color: (context) => context.tick?.major
+              ? colors.muted
+              : minorTickColor,
             font: { size: 11 },
-            maxRotation: 0,
+            major: { enabled: true },
             padding: 8,
           },
           grid: { display: false, drawTicks: false },
@@ -171,7 +173,6 @@ const WpmChartComponent = ({ data }: WpmChartProps) => {
           ticks: {
             color: colors.muted,
             font: { size: 11 },
-            maxTicksLimit: 15,
             padding: 8,
             stepSize: 10,
           },
@@ -180,7 +181,7 @@ const WpmChartComponent = ({ data }: WpmChartProps) => {
         },
       },
     }),
-    [colors, prepared],
+    [colors, minorTickColor, prepared],
   );
 
   return (
