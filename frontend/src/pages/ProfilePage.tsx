@@ -1,5 +1,6 @@
 import { type Player, type GameRecord } from "../types/stdb";
 import { WpmChart } from "../components/WpmChart";
+import { WpmDistributionChart } from "../components/WpmDistributionChart";
 import { useEffect, useMemo, useState } from "react";
 import { PlayerAvatar } from "../components/PlayerAvatar";
 import { useParams, useNavigate } from "react-router-dom";
@@ -305,6 +306,13 @@ export const ProfilePage = () => {
                         <WpmChart
                             data={realGameData}
                         />
+
+                        <div className="mt-8">
+                            <h2 className="text-foreground text-2xl font-bold mb-6">
+                                WPM Distribution
+                            </h2>
+                            <WpmDistributionChart data={realGameData} />
+                        </div>
                     </div>
 
                     <div className="mt-8">
