@@ -2102,6 +2102,20 @@ public static partial class Module
         return characterCount / charsPerWord / timeMinutes;
     }
 
+    private static void AwardXpForCorrectCharacter(ReducerContext ctx, PlayerProgress progress)
+    {
+        var player = ctx.Db.player.Identity.Find(progress.PlayerId);
+        if (player == null || player.Value.IsAnonymous)
+        {
+            return;
+        }
+
+        var updatedPlayer = player.Value;
+        updatedPlayer.Xp += 1;
+        LevelUpPlayer(ref updatedPlayer);
+        ctx.Db.player.Identity.Update(updatedPlayer);
+    }
+
     private static void ProcessProgressUpdate(
         ReducerContext ctx,
         PlayerProgress progress,
@@ -2125,6 +2139,11 @@ public static partial class Module
         if (newIndex > updatedProgress.HighestProgress)
         {
             updatedProgress.HighestProgress = newIndex;
+
+            if (eventType == CharacterEventType.Correct)
+            {
+                AwardXpForCorrectCharacter(ctx, progress);
+            }
         }
 
         ctx.Db.playerprogress.Id.Update(updatedProgress);

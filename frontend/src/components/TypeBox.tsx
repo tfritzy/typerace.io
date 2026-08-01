@@ -38,7 +38,6 @@ type TypeBoxProps = {
   initialProgress?: number;
   cursorState?: TypeBoxCursorState;
   cursorColor?: string;
-  noSpacesInPhrase?: boolean;
   overrideInputValue?: string;
   autofixesRemaining?: number;
   onAutofixesConsumed?: (count: number) => void;
@@ -64,7 +63,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       initialProgress = 0,
       cursorState = "auto",
       cursorColor,
-      noSpacesInPhrase: noSpacesLang,
       overrideInputValue,
       autofixesRemaining = 0,
       onAutofixesConsumed,
@@ -220,7 +218,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               <PhraseCharacters
                 phrase={phrase}
                 input={input}
-                noSpaces={noSpacesLang}
                 targetRef={targetRef}
               />
             </div>

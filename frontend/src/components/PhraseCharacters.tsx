@@ -18,17 +18,14 @@ const COMPLETED_CHARACTER_CLASS =
   "transition-all duration-150 leading-none text-text-completed";
 const CURRENT_CHARACTER_CLASS =
   "transition-all duration-150 leading-none text-foreground";
-const INLINE_CHARACTER_STYLE = { display: "inline-block" } as const;
-
 interface PhraseCharactersProps {
   phrase: string;
   input: string;
-  noSpaces?: boolean;
   targetRef: MutableRefObject<HTMLElement | null>;
 }
 
 export const PhraseCharacters = memo(
-  ({ phrase, input, noSpaces, targetRef }: PhraseCharactersProps) => {
+  ({ phrase, input, targetRef }: PhraseCharactersProps) => {
     const characterRefs = useRef<Array<HTMLSpanElement | null>>([]);
     const textRefs = useRef<Array<HTMLSpanElement | null>>([]);
     const errorRefs = useRef<Array<HTMLSpanElement | null>>([]);
@@ -43,7 +40,6 @@ export const PhraseCharacters = memo(
             }}
             data-char-index={index}
             className="relative"
-            style={noSpaces ? INLINE_CHARACTER_STYLE : undefined}
           >
             <span
               ref={(element) => {
@@ -71,7 +67,7 @@ export const PhraseCharacters = memo(
           data-char-index={phrase.length}
         />,
       ],
-      [phrase, noSpaces],
+      [phrase],
     );
 
     useLayoutEffect(() => {

@@ -10,7 +10,6 @@ export enum Language {
   German = "German",
   Italian = "Italian",
   Portuguese = "Portuguese",
-  Japanese = "Japanese",
   Ukrainian = "Ukrainian",
   Arabic = "Arabic",
   Dutch = "Dutch",
@@ -29,7 +28,6 @@ export interface LanguageInfo {
   nativeName: string;
   htmlLang: string;
   measurementMode: "wpm" | "cpm";
-  hasNoSpaces?: boolean;
   title: string;
   description: string;
 }
@@ -120,21 +118,6 @@ export const languages: LanguageInfo[] = [
       "TypeRace.io | Batalhas de digitação em ritmo acelerado e rastreador de PPM",
     description:
       "Compita contra jogadores de todo o mundo em competições de digitação em tempo real. Melhore sua velocidade de digitação.",
-  },
-  {
-    language: Language.Japanese,
-    flag: "🇯🇵",
-    countryCode: "jp",
-    slug: "ja",
-    randomWordsMode: "Japanese500",
-    quotesMode: "JapaneseQuotes",
-    nativeName: "日本語",
-    htmlLang: "ja",
-    measurementMode: "cpm" as const,
-    hasNoSpaces: true,
-    title: "TypeRace.io | ハイペースなタイピングバトルとWPMトラッカー",
-    description:
-      "世界中のプレイヤーとリアルタイムのタイピング競争で対戦しましょう。タイピング速度を向上させましょう。",
   },
   {
     language: Language.Ukrainian,
@@ -345,16 +328,6 @@ const languageStartupPhrases: Record<Language, string[]> = {
     "a sorte favorece os ousados",
     "vamos acabar com eles",
     "manda ver",
-  ],
-  [Language.Japanese]: [
-    "戦闘準備完了",
-    "システム稼働",
-    "砲撃開始",
-    "発進準備よし",
-    "突撃",
-    "幸運は勇者に味方する",
-    "かかってこい",
-    "任せろ",
   ],
   [Language.Ukrainian]: [
     "готові до бою",

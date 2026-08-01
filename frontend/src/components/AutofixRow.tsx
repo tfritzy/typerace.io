@@ -25,10 +25,8 @@ export function AutofixRow(props: AutofixRowProps) {
         <AutofixIndicator remaining={props.remaining} />
       )}
       <div
-        className={`mr-2 flex select-none items-baseline font-sans leading-none ${
-          loading
-            ? "text-muted-foreground/50"
-            : "text-muted-foreground"
+        className={`mr-2 flex -translate-y-0.5 select-none items-baseline font-sans leading-none ${
+          loading ? "text-muted-foreground/50" : "text-muted-foreground"
         }`}
         role={loading ? undefined : "meter"}
         aria-label={loading ? undefined : "Words completed"}

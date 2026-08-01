@@ -16,17 +16,9 @@ export function AutofixIndicator(props: AutofixIndicatorProps) {
 
   if (props.loading) {
     return (
-      <div className="mb-2 flex items-center gap-3 text-[11px] text-muted-foreground/50">
+      <div className="mb-2 flex items-center text-[11px] text-muted-foreground/50">
         <span className="font-medium uppercase tracking-[0.12em]">
           Auto-fixes
-        </span>
-        <span className="flex items-center gap-1 motion-safe:animate-pulse">
-          {Array.from({ length: 5 }, (_, index) => (
-            <span
-              key={index}
-              className="size-2 shrink-0 rounded-full bg-accent-primary/20 sm:size-2.5"
-            />
-          ))}
         </span>
       </div>
     );

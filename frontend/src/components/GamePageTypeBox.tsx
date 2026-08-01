@@ -6,8 +6,6 @@ import {
 } from "./TypeBox";
 import type { DbConnection } from "../../module_bindings";
 import { Countdown } from "./Countdown";
-import { getLanguageFromSlug } from "@/utils/modes";
-import { useParams } from "react-router-dom";
 import {
   getCompletedWordCount,
   getWordCount,
@@ -49,10 +47,6 @@ export const GamePageTypeBox = memo(
       getCompletedWordCount(phrase, initialProgress),
     );
     const completedWordsRef = useRef(completedWords);
-    const lang = useParams().lang;
-    const language = getLanguageFromSlug(lang);
-    const noSpacesLang = language.hasNoSpaces;
-
     const handleProgress = useCallback(
       (
         correctCharCount: number,
@@ -101,7 +95,6 @@ export const GamePageTypeBox = memo(
             height="430px"
             initialProgress={initialProgress}
             cursorState={cursorState}
-            noSpacesInPhrase={noSpacesLang}
             autofixesRemaining={autofixesRemaining}
             onAutofixesConsumed={onAutofixesConsumed}
           />

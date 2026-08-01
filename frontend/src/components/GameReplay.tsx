@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
-import { useParams } from "react-router-dom";
 import type { PlayerProgress } from "../types/stdb";
 import { getDisplayColorHex } from "../utils/colorMapping";
-import { getLanguageFromSlug } from "../utils/modes";
 import { getTranslations } from "../utils/translations";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import {
@@ -38,10 +36,8 @@ export function GameReplay({
   initialPlayerId,
   onExit,
 }: GameReplayProps) {
-  const lang = useParams().lang;
   const { conn } = useDatabase();
   const currentPlayerId = conn?.identity;
-  const noSpacesInPhrase = getLanguageFromSlug(lang).hasNoSpaces;
   const translations = getTranslations();
   const timeline = useMemo(
     () => buildReplayTimeline(players, raceStartTimestamp),
@@ -192,7 +188,6 @@ export function GameReplay({
           cursorColor={selectedPlayerColor}
           overrideInputValue={selectedInput}
           height="430px"
-          noSpacesInPhrase={noSpacesInPhrase}
         />
       </div>
 
