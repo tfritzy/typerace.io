@@ -6,10 +6,7 @@ import {
 } from "./TypeBox";
 import type { DbConnection } from "../../module_bindings";
 import { Countdown } from "./Countdown";
-import {
-  getCompletedWordCount,
-  getWordCount,
-} from "@/utils/typeBoxCore";
+import { getCompletedWordCount, getWordCount } from "@/utils/typeBoxCore";
 import { AutofixRow } from "./AutofixRow";
 
 type GamePageTypeBoxProps = {
@@ -77,7 +74,7 @@ export const GamePageTypeBox = memo(
     }, [onFinish]);
 
     return (
-      <div className="mt-8 text-2xl leading-[1.6] sm:mt-10">
+      <div className="mt-6 min-h-[550px] text-2xl leading-[1.6] sm:mt-8">
         {isParticipant && (
           <AutofixRow
             remaining={autofixesRemaining}

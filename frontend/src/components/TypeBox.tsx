@@ -212,9 +212,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       >
         <div className="relative select-none flex-1">
           <div className="type-box">
-            <div
-              className="text-start text-[26px] font-mono leading-12 height"
-            >
+            <div className="text-start text-[24px] font-mono leading-12 height">
               <PhraseCharacters
                 phrase={phrase}
                 input={input}

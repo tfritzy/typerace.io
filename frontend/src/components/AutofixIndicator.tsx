@@ -37,9 +37,7 @@ export function AutofixIndicator(props: AutofixIndicatorProps) {
     >
       <span
         className={`flex items-center gap-3 text-[11px] ${
-          hasAutofixes
-            ? "text-muted-foreground"
-            : "text-muted-foreground/50"
+          hasAutofixes ? "text-muted-foreground" : "text-muted-foreground/50"
         }`}
       >
         <span className="font-medium uppercase tracking-[0.12em]">
@@ -53,11 +51,10 @@ export function AutofixIndicator(props: AutofixIndicatorProps) {
             <span
               key={index}
               data-autofix-charge
-              className={`size-2 shrink-0 rounded-full transition-colors duration-200 sm:size-2.5 ${
-                index < remaining
-                  ? "bg-accent-primary"
-                  : "bg-accent-primary/15"
+              className={`size-2 shrink-0 rounded-full transition-colors duration-1000 motion-safe:animate-[fadeIn_150ms_linear_forwards] motion-safe:opacity-0 sm:size-2.5 ${
+                index < remaining ? "bg-accent-primary" : "bg-accent-primary/15"
               }`}
+              style={{ animationDelay: `${5}ms` }}
             />
           ))}
         </span>
