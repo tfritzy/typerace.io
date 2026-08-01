@@ -41,6 +41,8 @@ import ClientConnected from "./client_connected_reducer";
 export { ClientConnected };
 import ClientDisconnected from "./client_disconnected_reducer";
 export { ClientDisconnected };
+import ConsumeAutofixes from "./consume_autofixes_reducer";
+export { ConsumeAutofixes };
 import FillGameWithBots from "./fill_game_with_bots_reducer";
 export { FillGameWithBots };
 import JoinGame from "./join_game_reducer";
@@ -49,6 +51,8 @@ import JoinPrivateGame from "./join_private_game_reducer";
 export { JoinPrivateGame };
 import KickPlayer from "./kick_player_reducer";
 export { KickPlayer };
+import Ping from "./ping_reducer";
+export { Ping };
 import PublishScore from "./publish_score_reducer";
 export { PublishScore };
 import Rematch from "./rematch_reducer";
@@ -85,6 +89,8 @@ import ScoreCleanerRow from "./score_cleaner_table";
 export { ScoreCleanerRow };
 import XpGainCleanerRow from "./xp_gain_cleaner_table";
 export { XpGainCleanerRow };
+import AbandonedgamesRow from "./abandonedgames_table";
+export { AbandonedgamesRow };
 import EloRow from "./elo_table";
 export { EloRow };
 import GameRow from "./game_table";
@@ -107,6 +113,8 @@ import XpgainRow from "./xpgain_table";
 export { XpgainRow };
 
 // Import and reexport all types
+import AbandonedGame from "./abandoned_game_type";
+export { AbandonedGame };
 import BotConfig from "./bot_config_type";
 export { BotConfig };
 import BotFillTrigger from "./bot_fill_trigger_type";
@@ -240,6 +248,20 @@ const tablesSchema = __schema(
       { name: 'XpGainCleaner_ScheduledId_key', constraint: 'unique', columns: ['scheduledId'] },
     ],
   }, XpGainCleanerRow),
+  __table({
+    name: 'abandonedgames',
+    indexes: [
+      { name: 'ArchivedAt', algorithm: 'btree', columns: [
+        'archivedAt',
+      ] },
+      { name: 'GameId', algorithm: 'btree', columns: [
+        'gameId',
+      ] },
+    ],
+    constraints: [
+      { name: 'abandonedgames_GameId_key', constraint: 'unique', columns: ['gameId'] },
+    ],
+  }, AbandonedgamesRow),
   __table({
     name: 'elo',
     indexes: [
@@ -410,6 +432,9 @@ const tablesSchema = __schema(
       { name: 'Id', algorithm: 'btree', columns: [
         'id',
       ] },
+      { name: 'JoinCode', algorithm: 'btree', columns: [
+        'joinCode',
+      ] },
       { name: 'PlayerId', algorithm: 'btree', columns: [
         'playerId',
       ] },
@@ -442,10 +467,12 @@ const reducersSchema = __reducers(
   __reducerSchema("ArchiveOldGames", ArchiveOldGames),
   __reducerSchema("CleanupOldScores", CleanupOldScores),
   __reducerSchema("CleanupOldXpGains", CleanupOldXpGains),
+  __reducerSchema("consumeAutofixes", ConsumeAutofixes),
   __reducerSchema("FillGameWithBots", FillGameWithBots),
   __reducerSchema("joinGame", JoinGame),
   __reducerSchema("joinPrivateGame", JoinPrivateGame),
   __reducerSchema("kickPlayer", KickPlayer),
+  __reducerSchema("ping", Ping),
   __reducerSchema("publishScore", PublishScore),
   __reducerSchema("rematch", Rematch),
   __reducerSchema("setPlayerName", SetPlayerName),

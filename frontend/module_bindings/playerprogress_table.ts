@@ -32,4 +32,5 @@ export default __t.row({
     return PlayerColor;
   },
   highestProgress: __t.i32(),
+  autofixesRemaining: __t.i32(),
 });

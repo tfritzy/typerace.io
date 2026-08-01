@@ -227,3 +227,31 @@ describe("TypeBox Japanese IME composition", () => {
     expect(onComplete).not.toHaveBeenCalled();
   });
 });
+
+describe("TypeBox autofix", () => {
+  it("syncs a final-word correction and reports its consumed balance", () => {
+    const onComplete = vi.fn();
+    const onProgress = vi.fn();
+    const onAutofixesConsumed = vi.fn();
+    const { getByRole } = render(
+      <TypeBox
+        phrase="hello"
+        autofixesRemaining={1}
+        onProgress={onProgress}
+        onAutofixesConsumed={onAutofixesConsumed}
+        onComplete={onComplete}
+      />,
+    );
+    const input = getByRole("textbox") as HTMLTextAreaElement;
+
+    fireEvent.input(input, { target: { value: "hellx" } });
+
+    expect(input.value).toBe("hello");
+    expect(onProgress.mock.calls.slice(-2)).toEqual([
+      [4, "Backspace"],
+      [5, "Correct"],
+    ]);
+    expect(onAutofixesConsumed).toHaveBeenCalledWith(1);
+    expect(onComplete).toHaveBeenCalledOnce();
+  });
+});

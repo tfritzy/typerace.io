@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { Cursor } from "./Cursor";
 import { PhraseCharacters } from "./PhraseCharacters";
-import { getTranslations } from "../utils/translations";
+import { processTypeBoxChange } from "../utils/typeBoxCore";
 
 const BLOCKED_CURSOR_KEYS = new Set([
   "ArrowLeft",
@@ -32,7 +32,6 @@ type TypeBoxProps = {
     correctCharCount: number,
     eventType: "Correct" | "Incorrect" | "Backspace",
   ) => void;
-  onWordComplete?: (wordXp: number, position: { x: number; y: number }) => void;
   height?: string;
   resetOnComplete?: boolean;
   inputState?: TypeBoxInputState;
@@ -41,6 +40,8 @@ type TypeBoxProps = {
   cursorColor?: string;
   noSpacesInPhrase?: boolean;
   overrideInputValue?: string;
+  autofixesRemaining?: number;
+  onAutofixesConsumed?: (count: number) => void;
 };
 
 export type TypeBoxCursorState = "auto" | "visible" | "hidden";
@@ -57,7 +58,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       attribution,
       onComplete,
       onProgress,
-      onWordComplete,
       height,
       resetOnComplete = false,
       inputState = "enabled",
@@ -66,6 +66,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
       cursorColor,
       noSpacesInPhrase: noSpacesLang,
       overrideInputValue,
+      autofixesRemaining = 0,
+      onAutofixesConsumed,
     },
     ref,
   ) => {
@@ -74,12 +76,9 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const [focused, setFocused] = useState(true);
     const [input, setInput] = useState(initialInput);
     const [isComplete, setIsComplete] = useState(false);
-    const [showErrorWarning, setShowErrorWarning] = useState(false);
     const inputValueRef = useRef(initialInput);
-    const showErrorWarningRef = useRef(false);
 
     const targetRef = useRef<HTMLElement>(null);
-    const phraseRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
     React.useEffect(() => {
@@ -89,10 +88,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
         inputValueRef.current = overrideInputValue;
         setInput(overrideInputValue);
-        if (showErrorWarningRef.current) {
-          showErrorWarningRef.current = false;
-          setShowErrorWarning(false);
-        }
       }
     }, [overrideInputValue]);
 
@@ -130,124 +125,31 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
 
     const handleChange = useCallback(
       (targetValue: string) => {
-        if (isInputDisabled) {
-          return;
+        if (isInputDisabled) return;
+        if (targetValue === inputValueRef.current) return;
+
+        const inputCorrection = processTypeBoxChange(
+          phrase,
+          inputValueRef.current,
+          targetValue,
+          autofixesRemaining,
+          onProgress,
+          onAutofixesConsumed,
+        );
+        const nextValue = inputCorrection ?? targetValue;
+
+        if (inputCorrection !== null && inputRef.current) {
+          inputRef.current.value = inputCorrection;
+          inputRef.current.setSelectionRange(
+            inputCorrection.length,
+            inputCorrection.length,
+          );
         }
 
-        const newValue = targetValue;
-        const oldValue = inputValueRef.current;
+        inputValueRef.current = nextValue;
+        setInput(nextValue);
 
-        if (newValue === oldValue) {
-          return;
-        }
-
-        if (newValue.length < oldValue.length) {
-          let lastCompletedWordEnd = 0;
-          for (let i = 0; i < oldValue.length; i++) {
-            if (oldValue[i] !== phrase[i]) {
-              break;
-            }
-            if (phrase[i] === " ") {
-              lastCompletedWordEnd = i + 1;
-            }
-          }
-
-          if (newValue.length < lastCompletedWordEnd) {
-            const correctPrefix = phrase.substring(0, lastCompletedWordEnd);
-            if (inputRef.current) {
-              inputRef.current.value = correctPrefix;
-            }
-            inputValueRef.current = correctPrefix;
-            setInput(correctPrefix);
-            return;
-          }
-        }
-
-        let correctCharCount = 0;
-        let firstErrorPos: number | null = null;
-        for (let i = 0; i < newValue.length; i++) {
-          if (newValue[i] === phrase[i]) {
-            if (firstErrorPos === null) {
-              correctCharCount++;
-            }
-          } else {
-            if (firstErrorPos === null) {
-              firstErrorPos = i;
-            }
-          }
-        }
-
-        const shouldShowErrorWarning =
-          firstErrorPos !== null && newValue.length - firstErrorPos - 1 >= 10;
-        if (showErrorWarningRef.current !== shouldShowErrorWarning) {
-          showErrorWarningRef.current = shouldShowErrorWarning;
-          setShowErrorWarning(shouldShowErrorWarning);
-        }
-        inputValueRef.current = newValue;
-        setInput(newValue);
-
-        if (onWordComplete && newValue.length > oldValue.length) {
-          const lastCharIndex = newValue.length - 1;
-          const lastChar = newValue[lastCharIndex];
-          const justTypedCorrectSpace =
-            lastChar === " " && lastChar === phrase[lastCharIndex];
-          const justCompletedPhrase = newValue === phrase;
-
-          const wordIsFullyCorrect =
-            justTypedCorrectSpace && firstErrorPos === null;
-
-          if (wordIsFullyCorrect || justCompletedPhrase) {
-            const wordEndIndex = justTypedCorrectSpace
-              ? lastCharIndex - 1
-              : phrase.length - 1;
-            let wordStartIndex = wordEndIndex;
-            while (wordStartIndex > 0 && phrase[wordStartIndex - 1] !== " ") {
-              wordStartIndex--;
-            }
-            const wordLength = wordEndIndex - wordStartIndex + 1;
-
-            if (phraseRef.current && wordLength > 0) {
-              const characters = phraseRef.current.children;
-              const startSpan = characters[wordStartIndex] as
-                | HTMLElement
-                | undefined;
-              const endSpan = characters[wordEndIndex] as
-                | HTMLElement
-                | undefined;
-              if (startSpan && endSpan) {
-                const startRect = startSpan.getBoundingClientRect();
-                const endRect = endSpan.getBoundingClientRect();
-                const centerX = (startRect.left + endRect.right) / 2;
-                onWordComplete(wordLength, { x: centerX, y: startRect.top });
-              }
-            }
-          }
-        }
-
-        if (onProgress) {
-          if (newValue.length < oldValue.length) {
-            const charsDeleted = oldValue.length - newValue.length;
-            for (let i = 0; i < charsDeleted; i++) {
-              onProgress(correctCharCount, "Backspace");
-            }
-          } else {
-            const charsAdded = newValue.length - oldValue.length;
-            for (let i = 0; i < charsAdded; i++) {
-              const charIndex = oldValue.length + i;
-              const newChar = newValue[charIndex];
-              const expectedChar = phrase[charIndex];
-              const eventType =
-                newChar === expectedChar ? "Correct" : "Incorrect";
-              const correctCharCountAfterEvent = Math.min(
-                correctCharCount,
-                charIndex + 1,
-              );
-              onProgress(correctCharCountAfterEvent, eventType);
-            }
-          }
-        }
-
-        if (newValue === phrase && onComplete) {
+        if (nextValue === phrase && onComplete) {
           setIsComplete(true);
           onComplete();
           if (resetOnComplete) {
@@ -258,10 +160,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               inputValueRef.current = "";
               setInput("");
               setIsComplete(false);
-              if (showErrorWarningRef.current) {
-                showErrorWarningRef.current = false;
-                setShowErrorWarning(false);
-              }
             }, 0);
           }
         }
@@ -270,7 +168,8 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         phrase,
         onComplete,
         onProgress,
-        onWordComplete,
+        autofixesRemaining,
+        onAutofixesConsumed,
         resetOnComplete,
         isInputDisabled,
       ],
@@ -313,16 +212,10 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         style={containerStyle}
         onClick={focusInput}
       >
-        {showErrorWarning && (
-          <div className="absolute bottom-2 left-0 right-0 font-semibold text-center text-destructive">
-            {getTranslations().tooManyErrors}
-          </div>
-        )}
         <div className="relative select-none flex-1">
           <div className="type-box">
             <div
               className="text-start text-[26px] font-mono leading-12 height"
-              ref={phraseRef}
             >
               <PhraseCharacters
                 phrase={phrase}

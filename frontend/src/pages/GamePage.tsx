@@ -5,6 +5,7 @@ import {
   useState,
   useMemo,
   useRef,
+  startTransition,
   type ReactNode,
 } from "react";
 import { type Game, type PlayerProgress } from "../types/stdb";
@@ -250,7 +251,7 @@ export const GamePage = () => {
   }, [conn, game, gameId, gamePlayerProgress]);
 
   const handleFinish = useCallback(() => {
-    setHasFinished(true);
+    startTransition(() => setHasFinished(true));
   }, []);
 
   const handleKickPlayer = useCallback(
@@ -262,6 +263,33 @@ export const GamePage = () => {
   );
 
   const currentPlayerId = conn?.identity;
+
+  const handleAutofixesConsumed = useCallback(
+    (consumed: number) => {
+      if (!conn || !gameId || !currentPlayerId) return;
+
+      setGamePlayerProgress((progressRows) => {
+        const index = progressRows.findIndex(
+          (progress) =>
+            progress.gameId === gameId &&
+            progress.playerId.isEqual(currentPlayerId),
+        );
+        if (index === -1) return progressRows;
+
+        const next = [...progressRows];
+        next[index] = {
+          ...next[index],
+          autofixesRemaining: Math.max(
+            0,
+            next[index].autofixesRemaining - consumed,
+          ),
+        };
+        return next;
+      });
+      conn.reducers.consumeAutofixes({ gameId, count: consumed });
+    },
+    [conn, currentPlayerId, gameId],
+  );
 
   const otherPlayerProgress = useMemo(() => {
     if (!currentPlayerId || !game?.phrase) return [];
@@ -443,7 +471,9 @@ export const GamePage = () => {
         onFinish={handleFinish}
         inputState={isDisabled ? "disabled-dimmed" : "enabled"}
         initialProgress={initialProgress}
-        isAnonymous={currentPlayerProgress?.isAnonymous ?? true}
+        autofixesRemaining={currentPlayerProgress?.autofixesRemaining ?? 0}
+        onAutofixesConsumed={handleAutofixesConsumed}
+        isParticipant={isMemberOfRace}
         cursorState={isMemberOfRace ? "auto" : "hidden"}
         raceStartsAt={raceStartsAt}
       />

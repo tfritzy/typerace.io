@@ -498,6 +498,8 @@ public static partial class Module
         public PlayerColor PlayerColor;
         [Default(0)]
         public int HighestProgress;
+        [Default(0)]
+        public int AutofixesRemaining;
     }
 
     [Table(Scheduled = nameof(UpdateBotProgress))]
@@ -896,11 +898,13 @@ public static partial class Module
 
     private static void InsertPlayerProgress(ReducerContext ctx, string gameId, string joinCode)
     {
+        var game = ctx.Db.game.Id.Find(gameId);
         var player = ctx.Db.player.Identity.Find(ctx.Sender);
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
         var playerPublicId = player?.PlayerId ?? "";
+        var autofixCount = game == null ? 0 : GetAutofixCount(game.Value.Phrase);
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
         {
@@ -911,6 +915,7 @@ public static partial class Module
             PlayerName = playerName,
             PlayerLevel = playerLevel,
             ProgressIndex = 0,
+            AutofixesRemaining = autofixCount,
             IsBot = false,
             IsAnonymous = isAnonymous,
             CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
@@ -973,6 +978,7 @@ public static partial class Module
                     PlayerName = selectedBot.Name,
                     PlayerLevel = selectedBot.Level,
                     ProgressIndex = 0,
+                    AutofixesRemaining = 0,
                     IsBot = true,
                     IsAnonymous = false,
                     CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
@@ -1397,6 +1403,7 @@ public static partial class Module
         }
 
         var newGame = InsertGame(ctx, game.Value.GameMode, game.Value.GameType);
+        var autofixCount = GetAutofixCount(newGame.Phrase);
 
         Log.Info($"Created rematch game {newGame.Id} for original game {gameId}");
 
@@ -1419,6 +1426,7 @@ public static partial class Module
                     PlayerName = playerName,
                     PlayerLevel = playerLevel,
                     ProgressIndex = 0,
+                    AutofixesRemaining = autofixCount,
                     IsBot = false,
                     IsAnonymous = isAnonymous,
                     CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
@@ -2094,43 +2102,6 @@ public static partial class Module
         return characterCount / charsPerWord / timeMinutes;
     }
 
-    private static void AwardInstantXpForProgress(ReducerContext ctx, PlayerProgress progress, Game game, int newIndex)
-    {
-        var player = ctx.Db.player.Identity.Find(progress.PlayerId);
-        if (player == null || player.Value.IsAnonymous)
-        {
-            return;
-        }
-
-        if (newIndex > 0 && newIndex <= game.Phrase.Length)
-        {
-            var currentChar = game.Phrase[newIndex - 1];
-            if (currentChar == ' ' || newIndex == game.Phrase.Length)
-            {
-                var wordStart = newIndex - 1;
-                while (wordStart > 0 && game.Phrase[wordStart - 1] != ' ')
-                {
-                    wordStart--;
-                }
-
-                var wordLength = newIndex - wordStart;
-                if (currentChar == ' ')
-                {
-                    wordLength--;
-                }
-
-                if (wordLength > 0)
-                {
-                    var xpToAward = wordLength;
-                    var updatedPlayer = player.Value;
-                    updatedPlayer.Xp += xpToAward;
-                    LevelUpPlayer(ref updatedPlayer);
-                    ctx.Db.player.Identity.Update(updatedPlayer);
-                }
-            }
-        }
-    }
-
     private static void ProcessProgressUpdate(
         ReducerContext ctx,
         PlayerProgress progress,
@@ -2154,11 +2125,6 @@ public static partial class Module
         if (newIndex > updatedProgress.HighestProgress)
         {
             updatedProgress.HighestProgress = newIndex;
-
-            if (eventType == CharacterEventType.Correct)
-            {
-                AwardInstantXpForProgress(ctx, progress, game, newIndex);
-            }
         }
 
         ctx.Db.playerprogress.Id.Update(updatedProgress);
@@ -2199,6 +2165,41 @@ public static partial class Module
         }
 
         ProcessProgressUpdate(ctx, existingProgress.Value, game.Value, newIndex, eventType);
+    }
+
+    [Reducer]
+    public static void consumeAutofixes(ReducerContext ctx, string gameId, int count)
+    {
+        if (count <= 0)
+        {
+            return;
+        }
+
+        var game = ctx.Db.game.Id.Find(gameId);
+        if (game == null || game.Value.State != GameState.Racing)
+        {
+            Log.Info($"Cannot consume autofixes: game {gameId} is not in Racing state");
+            return;
+        }
+
+        var progress = FindPlayerProgress(ctx, ctx.Sender, gameId);
+        if (progress == null)
+        {
+            Log.Info($"No progress found for player {ctx.Sender} in game {gameId}");
+            return;
+        }
+
+        var updatedProgress = progress.Value;
+        updatedProgress.AutofixesRemaining = Math.Max(
+            0,
+            updatedProgress.AutofixesRemaining - count
+        );
+        ctx.Db.playerprogress.Id.Update(updatedProgress);
+    }
+
+    private static int GetAutofixCount(string phrase)
+    {
+        return (int)Math.Ceiling(phrase.Length * 0.075);
     }
 
     private static PlayerProgress? FindPlayerProgress(ReducerContext ctx, Identity playerId, string gameId)

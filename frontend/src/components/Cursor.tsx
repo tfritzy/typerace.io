@@ -80,7 +80,7 @@ export const Cursor = memo(
         className={`fixed left-0 top-0 h-10 max-w-0 -translate-x-0.5 -translate-y-px transition-transform duration-[70ms] ease-out will-change-transform ${visible ? "opacity-100" : "opacity-0"} ${isBlinking && visible ? "animate-blink" : ""}`}
       >
         <div
-          className="h-full rounded-full border-r-[1.5px] border-r-accent"
+          className="h-full rounded-full border-r-2 border-r-accent"
           style={color ? { borderRightColor: color } : undefined}
         />
       </div>

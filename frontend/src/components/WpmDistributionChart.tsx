@@ -114,14 +114,26 @@ const WpmDistributionChartComponent = ({ data }: WpmDistributionChartProps) => {
 
   return (
     <div className="w-full rounded-lg border border-border bg-card px-6 pb-4 pt-5 box-shadow">
-      <div className="mb-3 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-        <span className="text-sm text-secondary-foreground">
-          {distribution.total} race{distribution.total === 1 ? "" : "s"}
-        </span>
-        {distribution.total > 0 && (
-          <span className="text-xs text-muted-foreground">
-            Best {Math.round(distribution.best)} WPM · Median {Math.round(distribution.median)} WPM
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+          <span className="text-sm text-secondary-foreground">
+            {distribution.total} race{distribution.total === 1 ? "" : "s"}
           </span>
+          {distribution.total > 0 && (
+            <span className="text-xs text-muted-foreground">
+              Median {Math.round(distribution.median)} WPM
+            </span>
+          )}
+        </div>
+        {distribution.total > 0 && (
+          <div className="flex items-baseline gap-2">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Best
+            </span>
+            <span className="text-sm font-semibold text-accent-primary">
+              {Math.round(distribution.best)} WPM
+            </span>
+          </div>
         )}
       </div>
       {distribution.total === 0 ? (

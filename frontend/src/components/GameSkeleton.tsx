@@ -1,5 +1,6 @@
 import { EmptyPlayerProgressBars } from "./EmptyPlayerProgressBars";
 import { TypeBox } from "./TypeBox";
+import { AutofixRow } from "./AutofixRow";
 
 export function GameSkeleton({ playerCount = 3 }: { playerCount?: number }) {
   return (
@@ -9,7 +10,8 @@ export function GameSkeleton({ playerCount = 3 }: { playerCount?: number }) {
           <div className="mb-3 grid gap-3">
             <EmptyPlayerProgressBars count={playerCount} />
           </div>
-          <div className="text-2xl leading-[1.6]">
+          <div className="mt-8 text-2xl leading-[1.6] sm:mt-10">
+            <AutofixRow loading />
             <TypeBox
               phrase=""
               inputState="disabled-dimmed"
