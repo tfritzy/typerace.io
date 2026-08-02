@@ -26,7 +26,7 @@ export function AutofixRow(props: AutofixRowProps) {
       )}
       <div
         className={`mr-2 flex -translate-y-0.5 select-none items-baseline font-sans leading-none ${
-          loading ? "text-muted-foreground/50" : "text-muted-foreground"
+          loading ? "text-muted-foreground/50" : "text-muted-foreground/70"
         }`}
         role={loading ? undefined : "meter"}
         aria-label={loading ? undefined : "Words completed"}
@@ -34,11 +34,7 @@ export function AutofixRow(props: AutofixRowProps) {
         aria-valuemax={totalWords}
         aria-valuenow={loading ? undefined : completedWords}
       >
-        <span
-          className={`font-mono text-sm font-medium tabular-nums tracking-[0.12em] ${
-            loading ? "" : "text-secondary-foreground"
-          }`}
-        >
+        <span className="font-mono text-sm font-medium tabular-nums tracking-[0.12em]">
           {completedWords}/
           {loading ? (
             <span className="inline-block w-[2ch] text-center">-</span>

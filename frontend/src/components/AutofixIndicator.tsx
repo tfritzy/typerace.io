@@ -51,7 +51,7 @@ export function AutofixIndicator(props: AutofixIndicatorProps) {
             <span
               key={index}
               data-autofix-charge
-              className={`size-2 shrink-0 rounded-full transition-colors duration-1000 motion-safe:animate-[fadeIn_150ms_linear_forwards] motion-safe:opacity-0 sm:size-2.5 ${
+              className={`size-2 shrink-0 rounded-full transition-colors duration-300 motion-safe:animate-[fadeIn_150ms_linear_forwards] motion-safe:opacity-0 sm:size-2.5 ${
                 index < remaining ? "bg-accent-primary" : "bg-accent-primary/15"
               }`}
               style={{ animationDelay: `${5}ms` }}

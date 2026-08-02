@@ -1619,6 +1619,21 @@ public static partial class Module
             return;
         }
 
+        var hasHumanTypingData = false;
+        foreach (var progress in ctx.Db.playerprogress.GameId.Filter(game.Id))
+        {
+            if (!progress.IsBot && progress.CharacterHistory.Length > 0)
+            {
+                hasHumanTypingData = true;
+                break;
+            }
+        }
+
+        if (!hasHumanTypingData)
+        {
+            return;
+        }
+
         AbandonedGame? oldestGame = null;
         var abandonedGameCount = 0;
         foreach (var abandonedGame in ctx.Db.abandonedgames.Iter())

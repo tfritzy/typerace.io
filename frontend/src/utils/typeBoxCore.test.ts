@@ -117,6 +117,116 @@ describe("processTypeBoxChange", () => {
     expect(result.operationOrder[0]).toBe("consume");
   });
 
+  it("uses one autofix to remove an extra character that shifted the word", () => {
+    const shifted = processChange({
+      phrase: "hello world",
+      previousValue: "heyll",
+      rawValue: "heyllo",
+      autofixesRemaining: 1,
+    });
+
+    expect(shifted).toMatchObject({
+      value: "hello",
+      shouldSyncInput: true,
+      progressEvents: [
+        { correctCharCount: 2, eventType: "Correct" },
+      ],
+      autofixesConsumed: 1,
+    });
+    expect(shifted.autofixProgressEvents.at(-1)).toEqual({
+      correctCharCount: 5,
+      eventType: "Correct",
+    });
+
+    const nextCharacter = processChange({
+      phrase: "hello world",
+      previousValue: shifted.value,
+      rawValue: "hello ",
+      autofixesRemaining: 0,
+    });
+
+    expect(nextCharacter).toMatchObject({
+      value: "hello ",
+      inputCorrection: null,
+      progressEvents: [
+        { correctCharCount: 6, eventType: "Correct" },
+      ],
+      autofixesConsumed: 0,
+    });
+  });
+
+  it("aligns the remaining characters after multiple insertions", () => {
+    const result = processChange({
+      phrase: "hello world",
+      previousValue: "he",
+      rawValue: "hexyllo",
+      autofixesRemaining: 2,
+    });
+
+    expect(result).toMatchObject({
+      value: "hello",
+      shouldSyncInput: true,
+      progressEvents: [
+        { correctCharCount: 2, eventType: "Incorrect" },
+        { correctCharCount: 2, eventType: "Incorrect" },
+        { correctCharCount: 2, eventType: "Correct" },
+        { correctCharCount: 2, eventType: "Correct" },
+        { correctCharCount: 2, eventType: "Correct" },
+      ],
+      autofixesConsumed: 2,
+    });
+  });
+
+  it("reports shifted characters as correct before applying the autofix", () => {
+    const firstShiftedCharacter = processChange({
+      phrase: "hello world",
+      previousValue: "hey",
+      rawValue: "heyl",
+      autofixesRemaining: 1,
+    });
+    const secondShiftedCharacter = processChange({
+      phrase: "hello world",
+      previousValue: "heyl",
+      rawValue: "heyll",
+      autofixesRemaining: 1,
+    });
+
+    expect(firstShiftedCharacter).toMatchObject({
+      inputCorrection: null,
+      progressEvents: [
+        { correctCharCount: 2, eventType: "Correct" },
+      ],
+    });
+    expect(secondShiftedCharacter).toMatchObject({
+      inputCorrection: null,
+      progressEvents: [
+        { correctCharCount: 2, eventType: "Correct" },
+      ],
+    });
+  });
+
+  it("uses the same alignment to restore a missing character", () => {
+    const result = processChange({
+      phrase: "hello world",
+      previousValue: "helo ",
+      rawValue: "helo w",
+      autofixesRemaining: 1,
+    });
+
+    expect(result).toMatchObject({
+      value: "hello w",
+      shouldSyncInput: true,
+      progressEvents: [
+        { correctCharCount: 3, eventType: "Correct" },
+      ],
+      autofixesConsumed: 1,
+    });
+    expect(result.autofixProgressEvents.at(-1)).toEqual({
+      correctCharCount: 7,
+      eventType: "Correct",
+    });
+  });
+
   it("uses newly crossed target boundaries rather than typed spaces", () => {
     const crossedBoundary = processChange({
       phrase: "hello world",

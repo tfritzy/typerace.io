@@ -1,3 +1,11 @@
+import {
+  alignToClosestTargetPrefix,
+  type AlignmentStep,
+} from "./levenshteinAlignment";
+
+const EMPTY_CHARACTER_ALIGNMENT: ReadonlyMap<number, number | null> =
+  new Map();
+
 export type TypeBoxProgressEventType =
   | "Correct"
   | "Incorrect"
@@ -70,11 +78,81 @@ function getCorrectPrefix(phrase: string, input: string) {
   return correctCharCount;
 }
 
+function applyAlignment(
+  source: string,
+  target: string,
+  steps: AlignmentStep[],
+  availableAutofixes: number,
+) {
+  let value = "";
+  let autofixesConsumed = 0;
+
+  for (const step of steps) {
+    if (step.type === "Insert") {
+      if (autofixesConsumed < availableAutofixes) {
+        value += target[step.targetIndex];
+        autofixesConsumed++;
+      }
+      continue;
+    }
+
+    if (step.type === "Delete") {
+      if (autofixesConsumed < availableAutofixes) {
+        autofixesConsumed++;
+      } else {
+        value += source[step.sourceIndex];
+      }
+      continue;
+    }
+
+    const shouldReplace =
+      step.type === "Replace" &&
+      autofixesConsumed < availableAutofixes;
+    value += shouldReplace
+      ? target[step.targetIndex]
+      : source[step.sourceIndex];
+    if (shouldReplace) autofixesConsumed++;
+  }
+
+  return { value, autofixesConsumed };
+}
+
+function alignRawCharacterIndexes(
+  phrase: string,
+  rawValue: string,
+  autofixesRemaining: number,
+): ReadonlyMap<number, number | null> {
+  if (phrase.startsWith(rawValue)) return EMPTY_CHARACTER_ALIGNMENT;
+
+  const rawCharacterTargetIndexes = new Map<number, number | null>();
+  const alignmentStart = getLastCompletedWordEnd(phrase, rawValue);
+  const source = rawValue.substring(alignmentStart);
+  const targetEnd = Math.min(
+    phrase.length,
+    alignmentStart + source.length + autofixesRemaining,
+  );
+  const target = phrase.substring(alignmentStart, targetEnd);
+
+  for (const step of alignToClosestTargetPrefix(source, target)) {
+    if (step.type === "Insert") continue;
+
+    rawCharacterTargetIndexes.set(
+      alignmentStart + step.sourceIndex,
+      step.type === "Delete"
+        ? null
+        : alignmentStart + step.targetIndex,
+    );
+  }
+
+  return rawCharacterTargetIndexes;
+}
+
 function emitProgressEvents(
   phrase: string,
   previousValue: string,
   rawValue: string,
   onProgress?: TypeBoxProgressCallback,
+  rawCharacterTargetIndexes: ReadonlyMap<number, number | null> = new Map(),
 ) {
   if (!onProgress) return;
 
@@ -91,8 +169,15 @@ function emitProgressEvents(
   const charactersAdded = rawValue.length - previousValue.length;
   for (let index = 0; index < charactersAdded; index++) {
     const characterIndex = previousValue.length + index;
+    const alignedCharacterIndex = rawCharacterTargetIndexes.has(
+      characterIndex,
+    )
+      ? rawCharacterTargetIndexes.get(characterIndex)
+      : characterIndex;
     const eventType =
-      rawValue[characterIndex] === phrase[characterIndex]
+      alignedCharacterIndex !== null &&
+      alignedCharacterIndex !== undefined &&
+      rawValue[characterIndex] === phrase[alignedCharacterIndex]
         ? "Correct"
         : "Incorrect";
     onProgress(
@@ -170,15 +255,29 @@ export function processTypeBoxChange(
       if (!isBoundary) continue;
 
       const wordStart = phrase.lastIndexOf(" ", boundaryIndex - 1) + 1;
-      for (let index = wordStart; index <= boundaryIndex; index++) {
-        if (value[index] === phrase[index]) continue;
-        if (autofixesConsumed >= availableAutofixes) break;
+      const remainingAutofixes =
+        availableAutofixes - autofixesConsumed;
+      const windowEnd = boundaryIndex + 1 + remainingAutofixes;
+      const sourceEnd = Math.min(value.length, windowEnd);
+      const targetEnd = Math.min(phrase.length, windowEnd);
+      if (sourceEnd <= wordStart || targetEnd <= wordStart) continue;
 
+      const source = value.substring(wordStart, sourceEnd);
+      const target = phrase.substring(wordStart, targetEnd);
+      const alignment = alignToClosestTargetPrefix(source, target);
+      const correction = applyAlignment(
+        source,
+        target,
+        alignment,
+        remainingAutofixes,
+      );
+
+      if (correction.autofixesConsumed > 0) {
         value =
-          value.substring(0, index) +
-          phrase[index] +
-          value.substring(index + 1);
-        autofixesConsumed++;
+          value.substring(0, wordStart) +
+          correction.value +
+          value.substring(sourceEnd);
+        autofixesConsumed += correction.autofixesConsumed;
       }
 
       if (autofixesConsumed >= availableAutofixes) break;
@@ -189,7 +288,22 @@ export function processTypeBoxChange(
     onAutofixesConsumed?.(autofixesConsumed);
   }
 
-  emitProgressEvents(phrase, previousValue, rawValue, onProgress);
+  const rawCharacterTargetIndexes =
+    availableAutofixes > 0
+      ? alignRawCharacterIndexes(
+          phrase,
+          rawValue,
+          availableAutofixes,
+        )
+      : EMPTY_CHARACTER_ALIGNMENT;
+
+  emitProgressEvents(
+    phrase,
+    previousValue,
+    rawValue,
+    onProgress,
+    rawCharacterTargetIndexes,
+  );
 
   if (autofixesConsumed > 0) {
     emitAutofixProgressEvents(phrase, rawValue, value, onProgress);
