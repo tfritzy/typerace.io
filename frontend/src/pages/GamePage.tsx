@@ -27,6 +27,8 @@ import { GameReplay } from "../components/GameReplay";
 
 type UiGameType = "Public" | "Private" | "Practice";
 
+const GAME_DATA_WAIT_TIMEOUT_MS = 10_000;
+
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
@@ -156,7 +158,7 @@ export const GamePage = () => {
             if (!stillExists) {
               navigate("/", { replace: true });
             }
-          }, 500);
+          }, GAME_DATA_WAIT_TIMEOUT_MS);
         }
       }
     };
@@ -305,7 +307,7 @@ export const GamePage = () => {
 
     const timeout = setTimeout(() => {
       navigate("/", { replace: true });
-    }, 7000);
+    }, GAME_DATA_WAIT_TIMEOUT_MS);
 
     return () => clearTimeout(timeout);
   }, [databaseStatus, game, navigate]);

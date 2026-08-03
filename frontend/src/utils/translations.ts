@@ -34,7 +34,6 @@ export interface Translations {
   tooManyErrors: string;
   startPrompt?: {
     instruction: string;
-    constraint: string;
   };
 }
 
@@ -73,7 +72,6 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "You must fix all errors",
     startPrompt: {
       instruction: "Type!",
-      constraint: "no errors",
     },
   },
   [Language.Spanish]: {
@@ -111,7 +109,6 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Debes corregir todos los errores",
     startPrompt: {
       instruction: "Escribe!",
-      constraint: "sin errores",
     },
   },
   [Language.French]: {
@@ -148,7 +145,6 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Vous devez corriger toutes les erreurs",
     startPrompt: {
       instruction: "Tapez!",
-      constraint: "sans erreurs",
     },
   },
   [Language.German]: {
@@ -185,7 +181,6 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Du musst alle Fehler korrigieren",
     startPrompt: {
       instruction: "Tippe!",
-      constraint: "keine Fehler",
     },
   },
   [Language.Italian]: {
@@ -222,7 +217,6 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Devi correggere tutti gli errori",
     startPrompt: {
       instruction: "Digita!",
-      constraint: "nessun errore",
     },
   },
   [Language.Portuguese]: {
@@ -260,7 +254,6 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Você deve corrigir todos os erros",
     startPrompt: {
       instruction: "Digite!",
-      constraint: "sem erros",
     },
   },
   [Language.Ukrainian]: {
@@ -365,7 +358,6 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Je moet alle fouten corrigeren",
     startPrompt: {
       instruction: "Typ!",
-      constraint: "geen fouten",
     },
   },
   [Language.Swedish]: {
@@ -402,7 +394,6 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Du måste rätta alla fel",
     startPrompt: {
       instruction: "Skriv!",
-      constraint: "inga fel",
     },
   },
   [Language.Russian]: {
@@ -473,7 +464,6 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Tüm hataları düzeltmelisiniz",
     startPrompt: {
       instruction: "Yaz!",
-      constraint: "hata yok",
     },
   },
 };

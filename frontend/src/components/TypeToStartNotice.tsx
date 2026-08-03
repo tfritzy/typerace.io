@@ -5,7 +5,6 @@ import { RoughPaperFilter } from "./RoughPaperFilter";
 type TypeToStartNoticeProps = {
   prompt?: {
     instruction: string;
-    constraint: string;
   };
 };
 
@@ -35,12 +34,7 @@ export function TypeToStartNotice({ prompt }: TypeToStartNoticeProps) {
 
     setIsFontReady(false);
     void waitForStylesheet()
-      .then(() =>
-        document.fonts.load(
-          "1em Handlee",
-          `${prompt.instruction} ${prompt.constraint}`,
-        ),
-      )
+      .then(() => document.fonts.load("1em Handlee", prompt.instruction))
       .finally(() => {
         if (!cancelled) setIsFontReady(true);
       });
@@ -63,11 +57,8 @@ export function TypeToStartNotice({ prompt }: TypeToStartNoticeProps) {
         className="absolute inset-0 animate-[fadeIn_150ms_ease-out]"
         style={{ filter: "url(#rough-handwriting)" }}
       >
-        <div className="absolute left-14 top-1">
+        <div className="absolute left-14 top-2">
           <div className="text-4xl whitespace-nowrap">{prompt.instruction}</div>
-          <div className="mt-1 ml-2 text-2xl whitespace-nowrap opacity-90">
-            · {prompt.constraint}
-          </div>
         </div>
         <HandDrawnArrow className="absolute left-2 top-[30px] h-[72px] w-12" />
       </div>

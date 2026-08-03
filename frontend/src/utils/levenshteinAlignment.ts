@@ -10,9 +10,10 @@ export type AlignmentStep =
 // Standard Levenshtein alignment, except the target may end at any prefix.
 // On equal edit distances, prefer the longest prefix so a substitution wins
 // over deleting an otherwise complete final character.
-export function alignToClosestTargetPrefix(
+function align(
   source: string,
   target: string,
+  requireFullTarget: boolean,
 ): AlignmentStep[] {
   const distances = Array.from({ length: source.length + 1 }, () =>
     Array<number>(target.length + 1).fill(0),
@@ -37,13 +38,16 @@ export function alignToClosestTargetPrefix(
     }
   }
 
-  let closestTargetLength = 0;
-  for (let targetLength = 1; targetLength <= target.length; targetLength++) {
-    if (
-      distances[source.length][targetLength] <=
-      distances[source.length][closestTargetLength]
-    ) {
-      closestTargetLength = targetLength;
+  let closestTargetLength = target.length;
+  if (!requireFullTarget) {
+    closestTargetLength = 0;
+    for (let targetLength = 1; targetLength <= target.length; targetLength++) {
+      if (
+        distances[source.length][targetLength] <=
+        distances[source.length][closestTargetLength]
+      ) {
+        closestTargetLength = targetLength;
+      }
     }
   }
 
@@ -106,4 +110,18 @@ export function alignToClosestTargetPrefix(
   }
 
   return reversedSteps.reverse();
+}
+
+export function alignToClosestTargetPrefix(
+  source: string,
+  target: string,
+): AlignmentStep[] {
+  return align(source, target, false);
+}
+
+export function alignToTarget(
+  source: string,
+  target: string,
+): AlignmentStep[] {
+  return align(source, target, true);
 }

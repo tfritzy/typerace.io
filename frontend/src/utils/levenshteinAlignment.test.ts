@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { alignToClosestTargetPrefix } from "./levenshteinAlignment";
+import {
+  alignToClosestTargetPrefix,
+  alignToTarget,
+} from "./levenshteinAlignment";
 
 describe("alignToClosestTargetPrefix", () => {
   it("aligns extra source characters to deletions", () => {
@@ -25,5 +28,15 @@ describe("alignToClosestTargetPrefix", () => {
       sourceIndex: 4,
       targetIndex: 4,
     });
+  });
+});
+
+describe("alignToTarget", () => {
+  it("prices edits needed to reach the full target", () => {
+    const edits = alignToTarget("declinees", "declines ").filter(
+      (step) => step.type !== "Match",
+    );
+
+    expect(edits).toHaveLength(2);
   });
 });

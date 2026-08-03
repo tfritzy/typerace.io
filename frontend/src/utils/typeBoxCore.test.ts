@@ -91,90 +91,88 @@ describe("processTypeBoxChange", () => {
     });
   });
 
-  it("spends the available balance on errors from left to right", () => {
-    const result = processChange({
+  it("waits for the next word to start before spending an autofix", () => {
+    const space = processChange({
       phrase: "hello world",
       previousValue: "hexxo",
       rawValue: "hexxo ",
       autofixesRemaining: 1,
     });
+    const result = processChange({
+      phrase: "hello world",
+      previousValue: space.value,
+      rawValue: "hexxo w",
+      autofixesRemaining: 1,
+    });
 
+    expect(space).toMatchObject({
+      value: "hexxo ",
+      shouldSyncInput: false,
+      autofixesConsumed: 0,
+    });
     expect(result).toMatchObject({
-      value: "helxo ",
+      value: "helxo w",
       shouldSyncInput: true,
       autofixesConsumed: 1,
-      autofixProgressEvents: [
-        { correctCharCount: 2, eventType: "Backspace" },
-        { correctCharCount: 2, eventType: "Backspace" },
-        { correctCharCount: 2, eventType: "Backspace" },
-        { correctCharCount: 2, eventType: "Backspace" },
-        { correctCharCount: 3, eventType: "Correct" },
-        { correctCharCount: 3, eventType: "Incorrect" },
-        { correctCharCount: 3, eventType: "Correct" },
-        { correctCharCount: 3, eventType: "Correct" },
-      ],
     });
     expect(result.operationOrder[0]).toBe("consume");
   });
 
-  it("uses one autofix to remove an extra character that shifted the word", () => {
+  it("prices an extra character without removing it", () => {
     const shifted = processChange({
       phrase: "hello world",
       previousValue: "heyll",
       rawValue: "heyllo",
       autofixesRemaining: 1,
     });
+    const space = processChange({
+      phrase: "hello world",
+      previousValue: shifted.value,
+      rawValue: "heyllo ",
+      autofixesRemaining: 1,
+    });
+    const nextCharacter = processChange({
+      phrase: "hello world",
+      previousValue: space.value,
+      rawValue: "heyllo w",
+      autofixesRemaining: 1,
+    });
 
     expect(shifted).toMatchObject({
-      value: "hello",
-      shouldSyncInput: true,
+      value: "heyllo",
+      shouldSyncInput: false,
       progressEvents: [
         { correctCharCount: 2, eventType: "Correct" },
       ],
-      autofixesConsumed: 1,
-    });
-    expect(shifted.autofixProgressEvents.at(-1)).toEqual({
-      correctCharCount: 5,
-      eventType: "Correct",
-    });
-
-    const nextCharacter = processChange({
-      phrase: "hello world",
-      previousValue: shifted.value,
-      rawValue: "hello ",
-      autofixesRemaining: 0,
-    });
-
-    expect(nextCharacter).toMatchObject({
-      value: "hello ",
-      inputCorrection: null,
-      progressEvents: [
-        { correctCharCount: 6, eventType: "Correct" },
-      ],
       autofixesConsumed: 0,
     });
+    expect(space).toMatchObject({
+      value: "heyllo ",
+      shouldSyncInput: false,
+      autofixesConsumed: 0,
+    });
+    expect(nextCharacter).toMatchObject({
+      value: "hello  w",
+      shouldSyncInput: true,
+      autofixesConsumed: 1,
+    });
+    expect(nextCharacter.value).toHaveLength("heyllo w".length);
   });
 
   it("aligns the remaining characters after multiple insertions", () => {
     const result = processChange({
       phrase: "hello world",
-      previousValue: "he",
+      previousValue: "hexyll",
       rawValue: "hexyllo",
       autofixesRemaining: 2,
     });
 
     expect(result).toMatchObject({
-      value: "hello",
+      value: "helll o",
       shouldSyncInput: true,
-      progressEvents: [
-        { correctCharCount: 2, eventType: "Incorrect" },
-        { correctCharCount: 2, eventType: "Incorrect" },
-        { correctCharCount: 2, eventType: "Correct" },
-        { correctCharCount: 2, eventType: "Correct" },
-        { correctCharCount: 2, eventType: "Correct" },
-      ],
       autofixesConsumed: 2,
     });
+    expect(result.value).toHaveLength("hexyllo".length);
   });
 
   it("reports shifted characters as correct before applying the autofix", () => {
@@ -208,30 +206,113 @@ describe("processTypeBoxChange", () => {
   it("uses the same alignment to restore a missing character", () => {
     const result = processChange({
       phrase: "hello world",
-      previousValue: "helo ",
-      rawValue: "helo w",
+      previousValue: "helo w",
+      rawValue: "helo wo",
       autofixesRemaining: 1,
     });
 
     expect(result).toMatchObject({
-      value: "hello w",
+      value: "hellowo",
       shouldSyncInput: true,
       progressEvents: [
         { correctCharCount: 3, eventType: "Correct" },
       ],
       autofixesConsumed: 1,
     });
-    expect(result.autofixProgressEvents.at(-1)).toEqual({
-      correctCharCount: 7,
+    expect(result.value).toHaveLength("helo wo".length);
+  });
+
+  it("charges an autofix to correct letter casing", () => {
+    const result = processChange({
+      phrase: "Hello world",
+      previousValue: "hello ",
+      rawValue: "hello w",
+      autofixesRemaining: 1,
+    });
+
+    expect(result).toMatchObject({
+      value: "Hello w",
+      shouldSyncInput: true,
+      autofixesConsumed: 1,
+    });
+  });
+
+  it("does not apply remaining autofixes to the current word", () => {
+    const result = processChange({
+      phrase: "hello world",
+      previousValue: "hexlo ",
+      rawValue: "hexlo x",
+      autofixesRemaining: 2,
+    });
+
+    expect(result).toMatchObject({
+      value: "hello x",
+      shouldSyncInput: true,
+      autofixesConsumed: 1,
+    });
+  });
+
+  it("charges separately for substitutions while spaces remain free", () => {
+    const result = processChange({
+      phrase: "hello world",
+      previousValue: "haxxo ",
+      rawValue: "haxxo w",
+      autofixesRemaining: 3,
+    });
+
+    expect(result).toMatchObject({
+      value: "hello w",
+      shouldSyncInput: true,
+      autofixesConsumed: 3,
+    });
+  });
+
+  it("corrects a separator when no paid autofixes remain", () => {
+    const result = processChange({
+      phrase: "hello world",
+      previousValue: "hellox",
+      rawValue: "helloxw",
+      autofixesRemaining: 0,
+    });
+
+    expect(result).toMatchObject({
+      value: "hello w",
+      shouldSyncInput: true,
+      autofixesConsumed: 0,
+    });
+  });
+
+  it("corrects declineesa to declines a without moving the current word", () => {
+    const result = processChange({
+      phrase: "declines and",
+      previousValue: "declinees",
+      rawValue: "declineesa",
+      autofixesRemaining: 2,
+    });
+
+    expect(result).toMatchObject({
+      value: "declines a",
+      shouldSyncInput: true,
+      autofixesConsumed: 1,
+    });
+    expect(result.value).toHaveLength("declineesa".length);
+    expect(result.value[9]).toBe("a");
+    expect(result.autofixProgressEvents.at(-1)).toMatchObject({
       eventType: "Correct",
     });
   });
 
-  it("uses newly crossed target boundaries rather than typed spaces", () => {
+  it("waits for a non-space character after crossing a phrase boundary", () => {
     const crossedBoundary = processChange({
       phrase: "hello world",
       previousValue: "hezlo",
       rawValue: "hezlox",
+      autofixesRemaining: 2,
+    });
+    const nextWord = processChange({
+      phrase: "hello world",
+      previousValue: "hezlox ",
+      rawValue: "hezlox w",
       autofixesRemaining: 2,
     });
     const laterBoundary = processChange({
@@ -242,14 +323,16 @@ describe("processTypeBoxChange", () => {
     });
 
     expect(crossedBoundary).toMatchObject({
-      value: "hello ",
+      value: "hezlox",
       progressEvents: [{ correctCharCount: 2, eventType: "Incorrect" }],
+      autofixesConsumed: 0,
+    });
+    expect(nextWord).toMatchObject({
+      value: "hello  w",
+      shouldSyncInput: true,
       autofixesConsumed: 2,
     });
-    expect(crossedBoundary?.autofixProgressEvents.at(-1)).toEqual({
-      correctCharCount: 6,
-      eventType: "Correct",
-    });
+    expect(nextWord.value).toHaveLength("hezlox w".length);
     expect(laterBoundary).toMatchObject({
       value: "hexlo world ",
       inputCorrection: null,

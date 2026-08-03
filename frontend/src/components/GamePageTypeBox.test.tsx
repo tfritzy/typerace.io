@@ -65,7 +65,14 @@ describe("GamePageTypeBox autofix balance", () => {
     fireEvent.input(input, { target: { value: "hexlo" } });
     fireEvent.input(input, { target: { value: "hexlo " } });
 
-    expect(input.value).toBe("hello ");
+    expect(input.value).toBe("hexlo ");
+    expect(getByRole("status").getAttribute("aria-label")).toBe(
+      "2 auto-fixes remaining",
+    );
+
+    fireEvent.input(input, { target: { value: "hexlo w" } });
+
+    expect(input.value).toBe("hello w");
     expect(getByRole("status").getAttribute("aria-label")).toBe(
       "1 auto-fix remaining",
     );
@@ -74,8 +81,11 @@ describe("GamePageTypeBox autofix balance", () => {
     ).toHaveLength(2);
 
     fireEvent.input(input, { target: { value: "hello wxxld " } });
+    expect(input.value).toBe("hello wxxld ");
 
-    expect(input.value).toBe("hello woxld ");
+    fireEvent.input(input, { target: { value: "hello wxxld a" } });
+
+    expect(input.value).toBe("hello woxld a");
     expect(getByRole("status").getAttribute("aria-label")).toBe(
       "0 auto-fixes remaining. You must fix all errors",
     );

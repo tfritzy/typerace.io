@@ -121,6 +121,32 @@ describe("TypeBox autofix", () => {
   });
 });
 
+describe("TypeBox selection", () => {
+  it("places restored progress at the end of the input", () => {
+    const { getByRole } = render(
+      <TypeBox phrase="hello world" initialProgress={5} />,
+    );
+    const input = getByRole("textbox") as HTMLTextAreaElement;
+
+    expect(input.value).toBe("hello");
+    expect(input.selectionStart).toBe(5);
+    expect(input.selectionEnd).toBe(5);
+  });
+
+  it("returns an externally moved selection to the end", () => {
+    const { getByRole } = render(
+      <TypeBox phrase="hello world" initialProgress={5} />,
+    );
+    const input = getByRole("textbox") as HTMLTextAreaElement;
+
+    input.setSelectionRange(0, 0);
+    fireEvent.select(input);
+
+    expect(input.selectionStart).toBe(5);
+    expect(input.selectionEnd).toBe(5);
+  });
+});
+
 describe("TypeBox mobile input", () => {
   it("completes the phrase when the keyboard autocorrects the final word", () => {
     const phrase = "see you tomorrow";

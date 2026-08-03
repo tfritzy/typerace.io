@@ -7,10 +7,7 @@ import React, {
   forwardRef,
 } from "react";
 import { Cursor } from "./Cursor";
-import {
-  PhraseCharacters,
-  type PhraseCharactersRef,
-} from "./PhraseCharacters";
+import { PhraseCharacters, type PhraseCharactersRef } from "./PhraseCharacters";
 import { processTypeBoxChange } from "../utils/typeBoxCore";
 
 const BLOCKED_CURSOR_KEYS = new Set([
@@ -89,6 +86,21 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         targetRef.current?.scrollIntoView(SCROLL_OPTIONS);
       }
     }, []);
+
+    const resetCursorToEnd = useCallback(() => {
+      const input = inputRef.current;
+      if (!input) return;
+
+      const end = input.value.length;
+      if (input.selectionStart !== end || input.selectionEnd !== end) {
+        input.setSelectionRange(end, end);
+      }
+    }, []);
+
+    React.useLayoutEffect(() => {
+      resetCursorToEnd();
+    }, [initialInput, resetCursorToEnd]);
+
     React.useEffect(() => {
       if (overrideInputValue !== undefined) {
         if (inputRef.current) {
@@ -96,8 +108,16 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
         inputValueRef.current = overrideInputValue;
         updateRenderedInput(overrideInputValue);
+        resetCursorToEnd();
       }
-    }, [overrideInputValue, updateRenderedInput]);
+    }, [overrideInputValue, resetCursorToEnd, updateRenderedInput]);
+
+    React.useEffect(() => {
+      const handlePageShow = () => resetCursorToEnd();
+      handlePageShow();
+      window.addEventListener("pageshow", handlePageShow);
+      return () => window.removeEventListener("pageshow", handlePageShow);
+    }, [resetCursorToEnd]);
 
     React.useEffect(() => {
       if (targetRef.current && focused && !isComplete) {
@@ -110,13 +130,6 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         inputRef.current?.focus();
       },
     }));
-
-    const resetCursorToEnd = useCallback(() => {
-      if (inputRef.current) {
-        const length = inputRef.current.value.length;
-        inputRef.current.setSelectionRange(length, length);
-      }
-    }, []);
 
     const handleFocus = useCallback(() => {
       setFocused(true);
@@ -251,6 +264,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
               onPaste={handlePaste}
               onFocus={handleFocus}
               onBlur={handleBlur}
+              onSelect={resetCursorToEnd}
               onCompositionEnd={handleCompositionCommit}
               readOnly={isInputDisabled}
               id="type-box"

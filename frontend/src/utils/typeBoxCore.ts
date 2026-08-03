@@ -1,5 +1,6 @@
 import {
   alignToClosestTargetPrefix,
+  alignToTarget,
   type AlignmentStep,
 } from "./levenshteinAlignment";
 
@@ -84,37 +85,52 @@ function applyAlignment(
   steps: AlignmentStep[],
   availableAutofixes: number,
 ) {
-  let value = "";
+  const value = source.split("");
+  let changed = false;
   let autofixesConsumed = 0;
+  let sourceCursor = 0;
+  let targetCursor = 0;
+  const edits: Array<{ apply: boolean; cost: 0 | 1; start: number }> = [];
 
   for (const step of steps) {
-    if (step.type === "Insert") {
-      if (autofixesConsumed < availableAutofixes) {
-        value += target[step.targetIndex];
-        autofixesConsumed++;
-      }
+    if (step.type === "Match") {
+      sourceCursor++;
+      targetCursor++;
       continue;
     }
 
-    if (step.type === "Delete") {
-      if (autofixesConsumed < availableAutofixes) {
-        autofixesConsumed++;
-      } else {
-        value += source[step.sourceIndex];
-      }
-      continue;
-    }
+    const correctsToSpace =
+      step.type !== "Delete" && target[step.targetIndex] === " ";
+    edits.push({
+      apply: true,
+      cost: correctsToSpace ? 0 : 1,
+      start: step.type === "Insert" ? targetCursor : sourceCursor,
+    });
 
-    const shouldReplace =
-      step.type === "Replace" &&
-      autofixesConsumed < availableAutofixes;
-    value += shouldReplace
-      ? target[step.targetIndex]
-      : source[step.sourceIndex];
-    if (shouldReplace) autofixesConsumed++;
+    if (step.type !== "Insert") sourceCursor++;
+    if (step.type !== "Delete") targetCursor++;
   }
 
-  return { value, autofixesConsumed };
+  for (let editIndex = 0; editIndex < edits.length; editIndex++) {
+    const edit = edits[editIndex];
+    if (!edit.apply) continue;
+    if (edit.cost > 0 && autofixesConsumed >= availableAutofixes) continue;
+
+    const end = edits[editIndex + 1]?.start ?? target.length;
+    for (
+      let index = edit.start;
+      index < end && index < value.length && index < target.length;
+      index++
+    ) {
+      if (value[index] !== target[index]) {
+        value[index] = target[index];
+        changed = true;
+      }
+    }
+    autofixesConsumed += edit.cost;
+  }
+
+  return { value: value.join(""), autofixesConsumed, changed };
 }
 
 function alignRawCharacterIndexes(
@@ -197,6 +213,11 @@ function emitAutofixProgressEvents(
 
   const rawCorrectCharCount = getCorrectPrefix(phrase, rawValue);
   const correctedCharCount = getCorrectPrefix(phrase, correctedValue);
+  const correctedCharacterTargetIndexes = alignRawCharacterIndexes(
+    phrase,
+    correctedValue,
+    0,
+  );
 
   for (let index = rawValue.length; index > rawCorrectCharCount; index--) {
     onProgress(rawCorrectCharCount, "Backspace");
@@ -207,9 +228,16 @@ function emitAutofixProgressEvents(
     index < correctedValue.length;
     index++
   ) {
+    const alignedCharacterIndex = correctedCharacterTargetIndexes.has(index)
+      ? correctedCharacterTargetIndexes.get(index)
+      : index;
     onProgress(
       Math.min(correctedCharCount, index + 1),
-      correctedValue[index] === phrase[index] ? "Correct" : "Incorrect",
+      alignedCharacterIndex !== null &&
+        alignedCharacterIndex !== undefined &&
+        correctedValue[index] === phrase[alignedCharacterIndex]
+        ? "Correct"
+        : "Incorrect",
     );
   }
 }
@@ -243,28 +271,43 @@ export function processTypeBoxChange(
   let autofixesConsumed = 0;
   const availableAutofixes = Math.max(0, autofixesRemaining);
 
-  if (rawValue.length > previousValue.length && availableAutofixes > 0) {
+  if (rawValue.length > previousValue.length) {
     const lastCrossedIndex = Math.min(rawValue.length, phrase.length) - 1;
     for (
-      let boundaryIndex = previousValue.length;
-      boundaryIndex <= lastCrossedIndex;
-      boundaryIndex++
+      let triggerIndex = previousValue.length;
+      triggerIndex <= lastCrossedIndex;
+      triggerIndex++
     ) {
-      const isBoundary =
-        phrase[boundaryIndex] === " " || boundaryIndex === phrase.length - 1;
-      if (!isBoundary) continue;
+      const targetWordStart =
+        phrase.lastIndexOf(
+          " ",
+          Math.min(triggerIndex - 1, phrase.length - 1),
+        ) + 1;
+      const startsNextWord =
+        targetWordStart > 0 &&
+        rawValue[triggerIndex] !== " " &&
+        (previousValue.length <= targetWordStart ||
+          previousValue[targetWordStart] === " ");
+      const reachesPhraseEnd = triggerIndex === phrase.length - 1;
+      if (!startsNextWord && !reachesPhraseEnd) continue;
 
-      const wordStart = phrase.lastIndexOf(" ", boundaryIndex - 1) + 1;
+      const wordStart = startsNextWord
+        ? phrase.lastIndexOf(" ", targetWordStart - 2) + 1
+        : phrase.lastIndexOf(" ", triggerIndex - 1) + 1;
       const remainingAutofixes =
         availableAutofixes - autofixesConsumed;
-      const windowEnd = boundaryIndex + 1 + remainingAutofixes;
-      const sourceEnd = Math.min(value.length, windowEnd);
-      const targetEnd = Math.min(phrase.length, windowEnd);
+      const windowEnd = triggerIndex + 1 + remainingAutofixes;
+      const sourceEnd = startsNextWord
+        ? Math.min(value.length, triggerIndex)
+        : Math.min(value.length, windowEnd);
+      const targetEnd = startsNextWord
+        ? targetWordStart
+        : Math.min(phrase.length, windowEnd);
       if (sourceEnd <= wordStart || targetEnd <= wordStart) continue;
 
       const source = value.substring(wordStart, sourceEnd);
       const target = phrase.substring(wordStart, targetEnd);
-      const alignment = alignToClosestTargetPrefix(source, target);
+      const alignment = alignToTarget(source, target);
       const correction = applyAlignment(
         source,
         target,
@@ -272,7 +315,7 @@ export function processTypeBoxChange(
         remainingAutofixes,
       );
 
-      if (correction.autofixesConsumed > 0) {
+      if (correction.changed) {
         value =
           value.substring(0, wordStart) +
           correction.value +
@@ -283,6 +326,8 @@ export function processTypeBoxChange(
       if (autofixesConsumed >= availableAutofixes) break;
     }
   }
+
+  const wasCorrected = value !== rawValue;
 
   if (autofixesConsumed > 0) {
     onAutofixesConsumed?.(autofixesConsumed);
@@ -305,9 +350,9 @@ export function processTypeBoxChange(
     rawCharacterTargetIndexes,
   );
 
-  if (autofixesConsumed > 0) {
+  if (wasCorrected) {
     emitAutofixProgressEvents(phrase, rawValue, value, onProgress);
   }
 
-  return autofixesConsumed > 0 ? value : null;
+  return wasCorrected ? value : null;
 }
