@@ -184,6 +184,24 @@ body {
   animation: blink 1s linear infinite;
 }
 
+.phrase-character {
+  position: relative;
+  line-height: 1;
+  transition: all 150ms;
+}
+
+.phrase-character::before {
+  content: attr(data-error);
+  position: absolute;
+  top: -1em;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--destructive);
+  font-size: 0.75rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
 .box {
   background-color: var(--color-box-bg);
   border: var(--border-width, 1px) solid var(--color-box-border);

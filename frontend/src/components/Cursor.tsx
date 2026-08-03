@@ -5,24 +5,25 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  type MutableRefObject,
   type RefObject,
 } from "react";
 
 type CursorProps = {
   targetRef: RefObject<HTMLElement | null>;
-  targetIndex: number;
   fadeDelay?: number;
   visible?: boolean;
   color?: string;
+  updatePositionRef?: MutableRefObject<(() => void) | null>;
 };
 
 export const Cursor = memo(
   ({
     targetRef,
-    targetIndex,
     fadeDelay = 2000,
     visible = true,
     color,
+    updatePositionRef,
   }: CursorProps) => {
     const cursorRef = useRef<HTMLDivElement>(null);
     const positioned = useRef(false);
@@ -52,7 +53,16 @@ export const Cursor = memo(
       }
     }, [targetRef]);
 
-    useLayoutEffect(updatePosition, [targetIndex, updatePosition]);
+    useLayoutEffect(() => {
+      if (updatePositionRef) updatePositionRef.current = updatePosition;
+      updatePosition();
+
+      return () => {
+        if (updatePositionRef?.current === updatePosition) {
+          updatePositionRef.current = null;
+        }
+      };
+    }, [updatePosition, updatePositionRef]);
 
     useEffect(() => {
       const fadeInterval = setInterval(() => {

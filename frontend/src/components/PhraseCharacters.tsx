@@ -1,126 +1,181 @@
 import {
+  forwardRef,
   memo,
+  useCallback,
+  useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
   type MutableRefObject,
 } from "react";
 
-const NON_BREAKING_SPACE = "\u00A0";
 const SPACE_INDICATOR = "␣";
-const ERROR_INDICATOR_CLASS =
-  "pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[1em] leading-none text-destructive text-xs";
+const CHARACTER_CLASS = "phrase-character";
 const UNTYPED_CHARACTER_CLASS =
-  "transition-all duration-150 leading-none text-text-untyped";
+  `${CHARACTER_CLASS} text-text-untyped`;
 const ERROR_CHARACTER_CLASS =
-  "transition-all duration-150 leading-none text-destructive underline decoration-2 decoration-destructive";
+  `${CHARACTER_CLASS} text-destructive underline decoration-2 decoration-destructive`;
 const COMPLETED_CHARACTER_CLASS =
-  "transition-all duration-150 leading-none text-text-completed";
+  `${CHARACTER_CLASS} text-text-completed`;
 const CURRENT_CHARACTER_CLASS =
-  "transition-all duration-150 leading-none text-foreground";
-interface PhraseCharactersProps {
+  `${CHARACTER_CLASS} text-foreground`;
+
+type PhraseCharactersProps = {
   phrase: string;
   input: string;
   targetRef: MutableRefObject<HTMLElement | null>;
+};
+
+export type PhraseCharactersRef = {
+  setInput: (input: string) => void;
+};
+
+type InputState = {
+  phrase: string;
+  input: string;
+  completedThrough: number;
+};
+
+function getCompletedThrough(phrase: string, input: string) {
+  let completedThrough = 0;
+  for (let index = 0; index < input.length && index < phrase.length; index++) {
+    if (input[index] !== phrase[index]) break;
+    if (phrase[index] === " ") completedThrough = index + 1;
+  }
+  return completedThrough;
+}
+
+function firstChangedIndex(previousInput: string, input: string) {
+  const sharedLength = Math.min(previousInput.length, input.length);
+  let index = 0;
+  while (index < sharedLength && previousInput[index] === input[index]) index++;
+  return index;
+}
+
+function getCharacterClass(
+  phrase: string,
+  input: string,
+  index: number,
+  completedThrough: number,
+) {
+  if (index >= input.length) return UNTYPED_CHARACTER_CLASS;
+  if (input[index] !== phrase[index]) return ERROR_CHARACTER_CLASS;
+  if (input === phrase || index < completedThrough) {
+    return COMPLETED_CHARACTER_CLASS;
+  }
+  return CURRENT_CHARACTER_CLASS;
 }
 
 export const PhraseCharacters = memo(
-  ({ phrase, input, targetRef }: PhraseCharactersProps) => {
-    const characterRefs = useRef<Array<HTMLSpanElement | null>>([]);
-    const textRefs = useRef<Array<HTMLSpanElement | null>>([]);
-    const errorRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  forwardRef<PhraseCharactersRef, PhraseCharactersProps>(
+    ({ phrase, input, targetRef }, ref) => {
+      const characterRefs = useRef<Array<HTMLElement | null>>([]);
+      const stateRef = useRef<InputState | null>(null);
 
-    const characters = useMemo(
-      () => [
-        ...Array.from(phrase, (char, index) => (
-          <span
-            key={index}
-            ref={(element) => {
-              characterRefs.current[index] = element;
-            }}
-            data-char-index={index}
-            className="relative"
-          >
+      const characters = useMemo(
+        () => [
+          ...Array.from(phrase, (character, index) => (
             <span
+              key={index}
               ref={(element) => {
-                errorRefs.current[index] = element;
+                characterRefs.current[index] = element;
               }}
-              className={ERROR_INDICATOR_CLASS}
-            >
-              {NON_BREAKING_SPACE}
-            </span>
-            <span
-              ref={(element) => {
-                textRefs.current[index] = element;
-              }}
+              data-char-index={index}
+              data-error=""
               className={UNTYPED_CHARACTER_CLASS}
             >
-              {char}
+              {character}
             </span>
-          </span>
-        )),
-        <span
-          key="cursor-at-end"
-          ref={(element) => {
-            characterRefs.current[phrase.length] = element;
-          }}
-          data-char-index={phrase.length}
-        />,
-      ],
-      [phrase],
-    );
+          )),
+          <span
+            key="cursor-at-end"
+            ref={(element) => {
+              characterRefs.current[phrase.length] = element;
+            }}
+            data-char-index={phrase.length}
+          />,
+        ],
+        [phrase],
+      );
 
-    useLayoutEffect(() => {
-      let lastCompletedWordEnd = 0;
-      for (
-        let index = 0;
-        index < input.length && index < phrase.length;
-        index++
-      ) {
-        if (input[index] !== phrase[index]) break;
-        if (phrase[index] === " ") lastCompletedWordEnd = index + 1;
-      }
+      const setInput = useCallback(
+        (nextInput: string) => {
+          const previous =
+            stateRef.current?.phrase === phrase
+              ? stateRef.current
+              : { phrase, input: "", completedThrough: 0 };
+          const completedThrough = getCompletedThrough(phrase, nextInput);
+          const completionChanged =
+            (previous.input === phrase) !== (nextInput === phrase);
+          let start = firstChangedIndex(previous.input, nextInput);
 
-      const phraseComplete = input === phrase;
-      for (let index = 0; index < phrase.length; index++) {
-        const typedChar = input[index];
-        const isTyped = index < input.length;
-        const isCorrect = typedChar === phrase[index];
-        const isError = isTyped && !isCorrect;
+          if (
+            previous.completedThrough !== completedThrough ||
+            completionChanged
+          ) {
+            start = Math.min(
+              start,
+              previous.completedThrough,
+              completedThrough,
+            );
+          }
 
-        let className = UNTYPED_CHARACTER_CLASS;
-        if (isError) {
-          className = ERROR_CHARACTER_CLASS;
-        } else if (phraseComplete || index < lastCompletedWordEnd) {
-          className = COMPLETED_CHARACTER_CLASS;
-        } else if (
-          index >= lastCompletedWordEnd &&
-          index < input.length &&
-          isCorrect
-        ) {
-          className = CURRENT_CHARACTER_CLASS;
-        }
+          start = Math.min(start, phrase.length);
+          const end = completionChanged
+            ? phrase.length
+            : Math.min(
+                phrase.length,
+                Math.max(
+                  previous.input.length,
+                  nextInput.length,
+                  previous.completedThrough,
+                  completedThrough,
+                ),
+              );
+          for (let index = start; index < end; index++) {
+            const element = characterRefs.current[index];
+            if (!element) continue;
 
-        const textElement = textRefs.current[index];
-        if (textElement && textElement.className !== className) {
-          textElement.className = className;
-        }
+            const typedCharacter = nextInput[index];
+            const isTyped = index < nextInput.length;
+            const isError = isTyped && typedCharacter !== phrase[index];
+            const className = getCharacterClass(
+              phrase,
+              nextInput,
+              index,
+              completedThrough,
+            );
+            if (element.className !== className) {
+              element.className = className;
+            }
 
-        const errorElement = errorRefs.current[index];
-        const indicator = !isError
-          ? NON_BREAKING_SPACE
-          : typedChar === " "
-            ? SPACE_INDICATOR
-            : typedChar;
-        if (errorElement && errorElement.textContent !== indicator) {
-          errorElement.textContent = indicator;
-        }
-      }
+            const errorIndicator = !isError
+              ? ""
+              : typedCharacter === " "
+                ? SPACE_INDICATOR
+                : typedCharacter;
+            if (element.dataset.error !== errorIndicator) {
+              element.dataset.error = errorIndicator;
+            }
+          }
 
-      targetRef.current =
-        characterRefs.current[Math.min(input.length, phrase.length)] ?? null;
-    }, [input, phrase, targetRef]);
+          targetRef.current =
+            characterRefs.current[
+              Math.min(nextInput.length, phrase.length)
+            ] ?? null;
+          stateRef.current = {
+            phrase,
+            input: nextInput,
+            completedThrough,
+          };
+        },
+        [phrase, targetRef],
+      );
 
-    return characters;
-  },
+      useImperativeHandle(ref, () => ({ setInput }), [setInput]);
+      useLayoutEffect(() => setInput(input), [input, setInput]);
+
+      return characters;
+    },
+  ),
 );

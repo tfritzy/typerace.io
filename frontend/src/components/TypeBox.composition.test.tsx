@@ -120,3 +120,135 @@ describe("TypeBox autofix", () => {
     expect(onComplete).toHaveBeenCalledOnce();
   });
 });
+
+describe("TypeBox mobile input", () => {
+  it("completes the phrase when the keyboard autocorrects the final word", () => {
+    const phrase = "see you tomorrow";
+    const misspelledPhrase = "see you tomorroe";
+    const onProgress = vi.fn();
+    const onComplete = vi.fn();
+    const { getByRole } = render(
+      <TypeBox
+        phrase={phrase}
+        onProgress={onProgress}
+        onComplete={onComplete}
+      />,
+    );
+    const input = getByRole("textbox") as HTMLTextAreaElement;
+
+    for (let length = 1; length <= misspelledPhrase.length; length++) {
+      fireEvent.input(input, {
+        data: misspelledPhrase[length - 1],
+        inputType: "insertText",
+        target: { value: misspelledPhrase.slice(0, length) },
+      });
+    }
+
+    expect(input.value).toBe(misspelledPhrase);
+    expect(onComplete).not.toHaveBeenCalled();
+
+    fireEvent.input(input, {
+      data: "tomorrow",
+      inputType: "insertReplacementText",
+      target: { value: phrase },
+    });
+
+    expect(input.value).toBe(phrase);
+    expect(onComplete).toHaveBeenCalledOnce();
+  });
+  it("reports expected progress while typing and correcting errors", () => {
+    const onProgress = vi.fn();
+    const onComplete = vi.fn();
+    const { getByRole } = render(
+      <TypeBox
+        phrase="hello world"
+        onProgress={onProgress}
+        onComplete={onComplete}
+      />,
+    );
+    const input = getByRole("textbox") as HTMLTextAreaElement;
+    const type = (value: string) =>
+      fireEvent.input(input, {
+        data: value.at(-1),
+        inputType: "insertText",
+        target: { value },
+      });
+    const backspace = (value: string) =>
+      fireEvent.input(input, {
+        data: null,
+        inputType: "deleteContentBackward",
+        target: { value },
+      });
+
+    type("h");
+    type("he");
+    type("hel");
+    type("helo");
+    backspace("hel");
+    type("hell");
+    type("hellp");
+    backspace("hell");
+    for (const value of [
+      "hello",
+      "hello ",
+      "hello w",
+      "hello wo",
+      "hello wor",
+      "hello worl",
+      "hello world",
+    ]) {
+      type(value);
+    }
+
+    expect(onProgress.mock.calls).toEqual([
+      [1, "Correct"],
+      [2, "Correct"],
+      [3, "Correct"],
+      [3, "Incorrect"],
+      [3, "Backspace"],
+      [4, "Correct"],
+      [4, "Incorrect"],
+      [4, "Backspace"],
+      [5, "Correct"],
+      [6, "Correct"],
+      [7, "Correct"],
+      [8, "Correct"],
+      [9, "Correct"],
+      [10, "Correct"],
+      [11, "Correct"],
+    ]);
+    expect(onComplete).toHaveBeenCalledOnce();
+  });
+});
+
+describe("TypeBox character display", () => {
+  it("updates current, completed, and incorrect characters incrementally", () => {
+    const { container, getByRole } = render(
+      <TypeBox phrase="hello world" />,
+    );
+    const input = getByRole("textbox") as HTMLTextAreaElement;
+    const character = (index: number) =>
+      container.querySelector(
+        `[data-char-index="${index}"]`,
+      ) as HTMLElement;
+
+    fireEvent.input(input, { target: { value: "hello" } });
+    expect(character(0).className).toContain("text-foreground");
+    expect(character(5).className).toContain("text-text-untyped");
+
+    fireEvent.input(input, { target: { value: "hello " } });
+    expect(character(0).className).toContain("text-text-completed");
+    expect(character(5).className).toContain("text-text-completed");
+
+    fireEvent.input(input, { target: { value: "hello x" } });
+    expect(character(6).className).toContain("text-destructive");
+    expect(character(6).dataset.error).toBe("x");
+
+    fireEvent.input(input, { target: { value: "hello " } });
+    expect(character(6).className).toContain("text-text-untyped");
+    expect(character(6).dataset.error).toBe("");
+
+    fireEvent.input(input, { target: { value: "hello world" } });
+    expect(character(10).className).toContain("text-text-completed");
+  });
+});

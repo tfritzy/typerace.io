@@ -7,7 +7,10 @@ import React, {
   forwardRef,
 } from "react";
 import { Cursor } from "./Cursor";
-import { PhraseCharacters } from "./PhraseCharacters";
+import {
+  PhraseCharacters,
+  type PhraseCharactersRef,
+} from "./PhraseCharacters";
 import { processTypeBoxChange } from "../utils/typeBoxCore";
 
 const BLOCKED_CURSOR_KEYS = new Set([
@@ -72,28 +75,35 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
     const isInputDisabled = inputState !== "enabled";
     const initialInput = phrase.substring(0, initialProgress);
     const [focused, setFocused] = useState(true);
-    const [input, setInput] = useState(initialInput);
     const [isComplete, setIsComplete] = useState(false);
     const inputValueRef = useRef(initialInput);
 
     const targetRef = useRef<HTMLElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
-
+    const phraseCharactersRef = useRef<PhraseCharactersRef>(null);
+    const updateCursorPositionRef = useRef<(() => void) | null>(null);
+    const updateRenderedInput = useCallback((nextInput: string) => {
+      phraseCharactersRef.current?.setInput(nextInput);
+      updateCursorPositionRef.current?.();
+      if (document.activeElement === inputRef.current) {
+        targetRef.current?.scrollIntoView(SCROLL_OPTIONS);
+      }
+    }, []);
     React.useEffect(() => {
       if (overrideInputValue !== undefined) {
         if (inputRef.current) {
           inputRef.current.value = overrideInputValue;
         }
         inputValueRef.current = overrideInputValue;
-        setInput(overrideInputValue);
+        updateRenderedInput(overrideInputValue);
       }
-    }, [overrideInputValue]);
+    }, [overrideInputValue, updateRenderedInput]);
 
     React.useEffect(() => {
       if (targetRef.current && focused && !isComplete) {
         targetRef.current.scrollIntoView(SCROLL_OPTIONS);
       }
-    }, [input.length, focused, isComplete]);
+    }, [focused, isComplete]);
 
     useImperativeHandle(ref, () => ({
       focus: () => {
@@ -145,7 +155,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         }
 
         inputValueRef.current = nextValue;
-        setInput(nextValue);
+        updateRenderedInput(nextValue);
 
         if (nextValue === phrase && onComplete) {
           setIsComplete(true);
@@ -156,7 +166,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
                 inputRef.current.value = "";
               }
               inputValueRef.current = "";
-              setInput("");
+              updateRenderedInput("");
               setIsComplete(false);
             }, 0);
           }
@@ -170,6 +180,7 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
         onAutofixesConsumed,
         resetOnComplete,
         isInputDisabled,
+        updateRenderedInput,
       ],
     );
 
@@ -214,17 +225,18 @@ export const TypeBox = forwardRef<TypeBoxRef, TypeBoxProps>(
           <div className="type-box">
             <div className="text-start text-[24px] font-mono leading-12 height">
               <PhraseCharacters
+                ref={phraseCharactersRef}
                 phrase={phrase}
-                input={input}
+                input={inputValueRef.current}
                 targetRef={targetRef}
               />
             </div>
 
             <Cursor
               targetRef={targetRef}
-              targetIndex={Math.min(input.length, phrase.length)}
               fadeDelay={500}
               color={cursorColor}
+              updatePositionRef={updateCursorPositionRef}
               visible={
                 cursorState === "visible" ||
                 (cursorState === "auto" && focused && !isComplete)
