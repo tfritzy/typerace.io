@@ -1,12 +1,3 @@
-import {
-  alignToClosestTargetPrefix,
-  alignToTarget,
-  type AlignmentStep,
-} from "./levenshteinAlignment";
-
-const EMPTY_CHARACTER_ALIGNMENT: ReadonlyMap<number, number | null> =
-  new Map();
-
 export type TypeBoxProgressEventType =
   | "Correct"
   | "Incorrect"
@@ -53,306 +44,226 @@ export function getCompletedWordCount(
 }
 
 export type TypeBoxProgressCallback = (
-  correctCharCount: number,
+  progressIndex: number,
   eventType: TypeBoxProgressEventType,
 ) => void;
 
-function getLastCompletedWordEnd(phrase: string, input: string) {
-  let lastCompletedWordEnd = 0;
+export type TypeBoxChangeResult = {
+  inputCorrection: string | null;
+  value: string;
+  completedThrough: number;
+  requiresFixes: boolean;
+  canComplete: boolean;
+};
 
-  for (let index = 0; index < input.length; index++) {
-    if (input[index] !== phrase[index]) break;
-    if (phrase[index] === " ") lastCompletedWordEnd = index + 1;
-  }
-
-  return lastCompletedWordEnd;
+function getSharedPrefixLength(left: string, right: string) {
+  const sharedLength = Math.min(left.length, right.length);
+  let index = 0;
+  while (index < sharedLength && left[index] === right[index]) index++;
+  return index;
 }
 
-function getCorrectPrefix(phrase: string, input: string) {
-  let correctCharCount = 0;
-
-  for (let index = 0; index < input.length; index++) {
-    if (input[index] !== phrase[index]) break;
-    correctCharCount++;
-  }
-
-  return correctCharCount;
-}
-
-function applyAlignment(
-  source: string,
-  target: string,
-  steps: AlignmentStep[],
-  availableAutofixes: number,
+export function analyzeTypeBoxInput(
+  phrase: string,
+  input: string,
+  totalAllowedErrors: number,
 ) {
-  const value = source.split("");
-  let changed = false;
-  let autofixesConsumed = 0;
-  let sourceCursor = 0;
-  let targetCursor = 0;
-  const edits: Array<{ apply: boolean; cost: 0 | 1; start: number }> = [];
+  let completedThrough = 0;
+  const allowedErrors = Math.max(0, totalAllowedErrors);
+  let errorsUsed = 0;
+  let pendingErrors = 0;
+  let typedErrors = 0;
+  let firstDisallowedError = -1;
+  let boundaryRequiresFixes = false;
+  const scannedLength = Math.min(input.length, phrase.length);
 
-  for (const step of steps) {
-    if (step.type === "Match") {
-      sourceCursor++;
-      targetCursor++;
-      continue;
-    }
-
-    const correctsToSpace =
-      step.type !== "Delete" && target[step.targetIndex] === " ";
-    edits.push({
-      apply: true,
-      cost: correctsToSpace ? 0 : 1,
-      start: step.type === "Insert" ? targetCursor : sourceCursor,
-    });
-
-    if (step.type !== "Insert") sourceCursor++;
-    if (step.type !== "Delete") targetCursor++;
-  }
-
-  for (let editIndex = 0; editIndex < edits.length; editIndex++) {
-    const edit = edits[editIndex];
-    if (!edit.apply) continue;
-    if (edit.cost > 0 && autofixesConsumed >= availableAutofixes) continue;
-
-    const end = edits[editIndex + 1]?.start ?? target.length;
-    for (
-      let index = edit.start;
-      index < end && index < value.length && index < target.length;
-      index++
-    ) {
-      if (value[index] !== target[index]) {
-        value[index] = target[index];
-        changed = true;
+  for (let index = 0; index < scannedLength; index++) {
+    if (input[index] !== phrase[index]) {
+      typedErrors++;
+      pendingErrors++;
+      if (
+        firstDisallowedError < 0 &&
+        typedErrors > allowedErrors
+      ) {
+        firstDisallowedError = index;
       }
     }
-    autofixesConsumed += edit.cost;
-  }
 
-  return { value: value.join(""), autofixesConsumed, changed };
-}
-
-function alignRawCharacterIndexes(
-  phrase: string,
-  rawValue: string,
-  autofixesRemaining: number,
-): ReadonlyMap<number, number | null> {
-  if (phrase.startsWith(rawValue)) return EMPTY_CHARACTER_ALIGNMENT;
-
-  const rawCharacterTargetIndexes = new Map<number, number | null>();
-  const alignmentStart = getLastCompletedWordEnd(phrase, rawValue);
-  const source = rawValue.substring(alignmentStart);
-  const targetEnd = Math.min(
-    phrase.length,
-    alignmentStart + source.length + autofixesRemaining,
-  );
-  const target = phrase.substring(alignmentStart, targetEnd);
-
-  for (const step of alignToClosestTargetPrefix(source, target)) {
-    if (step.type === "Insert") continue;
-
-    rawCharacterTargetIndexes.set(
-      alignmentStart + step.sourceIndex,
-      step.type === "Delete"
-        ? null
-        : alignmentStart + step.targetIndex,
-    );
-  }
-
-  return rawCharacterTargetIndexes;
-}
-
-function emitProgressEvents(
-  phrase: string,
-  previousValue: string,
-  rawValue: string,
-  onProgress?: TypeBoxProgressCallback,
-  rawCharacterTargetIndexes: ReadonlyMap<number, number | null> = new Map(),
-) {
-  if (!onProgress) return;
-
-  const correctCharCount = getCorrectPrefix(phrase, rawValue);
-
-  if (rawValue.length < previousValue.length) {
-    const charactersDeleted = previousValue.length - rawValue.length;
-    for (let index = 0; index < charactersDeleted; index++) {
-      onProgress(correctCharCount, "Backspace");
+    if (
+      !boundaryRequiresFixes &&
+      phrase[index] === " " &&
+      input[index] === " "
+    ) {
+      if (errorsUsed + pendingErrors <= allowedErrors) {
+        errorsUsed += pendingErrors;
+        pendingErrors = 0;
+        completedThrough = index + 1;
+      } else {
+        boundaryRequiresFixes = true;
+      }
     }
-    return;
   }
 
-  const charactersAdded = rawValue.length - previousValue.length;
-  for (let index = 0; index < charactersAdded; index++) {
-    const characterIndex = previousValue.length + index;
-    const alignedCharacterIndex = rawCharacterTargetIndexes.has(
-      characterIndex,
-    )
-      ? rawCharacterTargetIndexes.get(characterIndex)
-      : characterIndex;
-    const eventType =
-      alignedCharacterIndex !== null &&
-      alignedCharacterIndex !== undefined &&
-      rawValue[characterIndex] === phrase[alignedCharacterIndex]
-        ? "Correct"
-        : "Incorrect";
-    onProgress(
-      Math.min(correctCharCount, characterIndex + 1),
-      eventType,
-    );
+  for (let index = phrase.length; index < input.length; index++) {
+    typedErrors++;
+    if (
+      firstDisallowedError < 0 &&
+      typedErrors > allowedErrors
+    ) {
+      firstDisallowedError = index;
+    }
   }
+
+  const canComplete =
+    input.length === phrase.length &&
+    !boundaryRequiresFixes &&
+    errorsUsed + pendingErrors <= allowedErrors;
+  if (canComplete) {
+    errorsUsed += pendingErrors;
+    completedThrough = phrase.length;
+  }
+
+  const requiresFixes =
+    boundaryRequiresFixes ||
+    (!canComplete && input.length >= phrase.length);
+  const reportedProgress =
+    firstDisallowedError >= 0
+      ? firstDisallowedError
+      : requiresFixes && input.length >= phrase.length
+        ? Math.max(0, phrase.length - 1)
+        : Math.min(input.length, phrase.length);
+
+  return {
+    completedThrough,
+    errorsUsed,
+    errorsToFix: Math.max(0, typedErrors - allowedErrors),
+    requiresFixes,
+    canComplete,
+    reportedProgress,
+  };
 }
 
-function emitAutofixProgressEvents(
+function getReportedProgress(
   phrase: string,
-  rawValue: string,
-  correctedValue: string,
-  onProgress?: TypeBoxProgressCallback,
+  input: string,
+  totalAllowedErrors: number,
 ) {
-  if (!onProgress) return;
-
-  const rawCorrectCharCount = getCorrectPrefix(phrase, rawValue);
-  const correctedCharCount = getCorrectPrefix(phrase, correctedValue);
-  const correctedCharacterTargetIndexes = alignRawCharacterIndexes(
+  return analyzeTypeBoxInput(
     phrase,
-    correctedValue,
-    0,
-  );
-
-  for (let index = rawValue.length; index > rawCorrectCharCount; index--) {
-    onProgress(rawCorrectCharCount, "Backspace");
-  }
-
-  for (
-    let index = rawCorrectCharCount;
-    index < correctedValue.length;
-    index++
-  ) {
-    const alignedCharacterIndex = correctedCharacterTargetIndexes.has(index)
-      ? correctedCharacterTargetIndexes.get(index)
-      : index;
-    onProgress(
-      Math.min(correctedCharCount, index + 1),
-      alignedCharacterIndex !== null &&
-        alignedCharacterIndex !== undefined &&
-        correctedValue[index] === phrase[alignedCharacterIndex]
-        ? "Correct"
-        : "Incorrect",
-    );
-  }
+    input,
+    totalAllowedErrors,
+  ).reportedProgress;
 }
 
 /**
- * Processes a native input change and returns a replacement only when the
- * browser's value must be corrected. A null result keeps rawValue as-is.
+ * Processes one native input change. Errors remain untouched and pending until
+ * a correct word boundary commits them. Browser input is always accepted as-is;
+ * this function only derives completion and progress information from it.
  */
 export function processTypeBoxChange(
   phrase: string,
   previousValue: string,
   rawValue: string,
-  autofixesRemaining: number,
+  totalAllowedErrors: number,
   onProgress?: TypeBoxProgressCallback,
-  onAutofixesConsumed?: (count: number) => void,
-): string | null {
-  if (rawValue === previousValue) return null;
-
-  if (rawValue.length < previousValue.length) {
-    const lastCompletedWordEnd = getLastCompletedWordEnd(
+): TypeBoxChangeResult {
+  if (rawValue === previousValue) {
+    const analysis = analyzeTypeBoxInput(
       phrase,
       previousValue,
+      totalAllowedErrors,
     );
-
-    if (rawValue.length < lastCompletedWordEnd) {
-      return phrase.substring(0, lastCompletedWordEnd);
-    }
+    return {
+      inputCorrection: null,
+      value: previousValue,
+      completedThrough: analysis.completedThrough,
+      requiresFixes: analysis.requiresFixes,
+      canComplete: analysis.canComplete,
+    };
   }
 
-  let value = rawValue;
-  let autofixesConsumed = 0;
-  const availableAutofixes = Math.max(0, autofixesRemaining);
-
-  if (rawValue.length > previousValue.length) {
-    const lastCrossedIndex = Math.min(rawValue.length, phrase.length) - 1;
-    for (
-      let triggerIndex = previousValue.length;
-      triggerIndex <= lastCrossedIndex;
-      triggerIndex++
-    ) {
-      const targetWordStart =
-        phrase.lastIndexOf(
-          " ",
-          Math.min(triggerIndex - 1, phrase.length - 1),
-        ) + 1;
-      const startsNextWord =
-        targetWordStart > 0 &&
-        rawValue[triggerIndex] !== " " &&
-        (previousValue.length <= targetWordStart ||
-          previousValue[targetWordStart] === " ");
-      const reachesPhraseEnd = triggerIndex === phrase.length - 1;
-      if (!startsNextWord && !reachesPhraseEnd) continue;
-
-      const wordStart = startsNextWord
-        ? phrase.lastIndexOf(" ", targetWordStart - 2) + 1
-        : phrase.lastIndexOf(" ", triggerIndex - 1) + 1;
-      const remainingAutofixes =
-        availableAutofixes - autofixesConsumed;
-      const windowEnd = triggerIndex + 1 + remainingAutofixes;
-      const sourceEnd = startsNextWord
-        ? Math.min(value.length, triggerIndex)
-        : Math.min(value.length, windowEnd);
-      const targetEnd = startsNextWord
-        ? targetWordStart
-        : Math.min(phrase.length, windowEnd);
-      if (sourceEnd <= wordStart || targetEnd <= wordStart) continue;
-
-      const source = value.substring(wordStart, sourceEnd);
-      const target = phrase.substring(wordStart, targetEnd);
-      const alignment = alignToTarget(source, target);
-      const correction = applyAlignment(
-        source,
-        target,
-        alignment,
-        remainingAutofixes,
-      );
-
-      if (correction.changed) {
-        value =
-          value.substring(0, wordStart) +
-          correction.value +
-          value.substring(sourceEnd);
-        autofixesConsumed += correction.autofixesConsumed;
-      }
-
-      if (autofixesConsumed >= availableAutofixes) break;
-    }
-  }
-
-  const wasCorrected = value !== rawValue;
-
-  if (autofixesConsumed > 0) {
-    onAutofixesConsumed?.(autofixesConsumed);
-  }
-
-  const rawCharacterTargetIndexes =
-    availableAutofixes > 0
-      ? alignRawCharacterIndexes(
-          phrase,
-          rawValue,
-          availableAutofixes,
-        )
-      : EMPTY_CHARACTER_ALIGNMENT;
-
-  emitProgressEvents(
-    phrase,
+  const sharedPrefixLength = getSharedPrefixLength(
     previousValue,
     rawValue,
-    onProgress,
-    rawCharacterTargetIndexes,
   );
+  const isPureAppend =
+    sharedPrefixLength === previousValue.length &&
+    rawValue.length > previousValue.length;
+  if (!isPureAppend) {
+    const previousAnalysis = analyzeTypeBoxInput(
+      phrase,
+      previousValue,
+      totalAllowedErrors,
+    );
+    let correction: string | null = null;
+    if (rawValue.length < previousAnalysis.completedThrough) {
+      correction = previousValue.substring(
+        0,
+        previousAnalysis.completedThrough,
+      );
+    } else if (sharedPrefixLength < previousAnalysis.completedThrough) {
+      correction = previousValue;
+    }
 
-  if (wasCorrected) {
-    emitAutofixProgressEvents(phrase, rawValue, value, onProgress);
+    if (correction !== null) {
+      return {
+        inputCorrection: correction,
+        value: correction,
+        completedThrough: previousAnalysis.completedThrough,
+        requiresFixes: previousAnalysis.requiresFixes,
+        canComplete: previousAnalysis.canComplete,
+      };
+    }
   }
 
-  return wasCorrected ? value : null;
+  const nextAnalysis = analyzeTypeBoxInput(
+    phrase,
+    rawValue,
+    totalAllowedErrors,
+  );
+
+  if (onProgress) {
+    for (
+      let index = previousValue.length;
+      index > sharedPrefixLength;
+      index--
+    ) {
+      onProgress(
+        getReportedProgress(
+          phrase,
+          previousValue.substring(0, index - 1),
+          totalAllowedErrors,
+        ),
+        "Backspace",
+      );
+    }
+
+    for (
+      let characterIndex = sharedPrefixLength;
+      characterIndex < rawValue.length;
+      characterIndex++
+    ) {
+      const inputAtEvent = rawValue.substring(0, characterIndex + 1);
+      onProgress(
+        characterIndex === rawValue.length - 1
+          ? nextAnalysis.reportedProgress
+          : getReportedProgress(
+              phrase,
+              inputAtEvent,
+              totalAllowedErrors,
+            ),
+        rawValue[characterIndex] === phrase[characterIndex]
+          ? "Correct"
+          : "Incorrect",
+      );
+    }
+  }
+
+  return {
+    inputCorrection: null,
+    value: rawValue,
+    completedThrough: nextAnalysis.completedThrough,
+    requiresFixes: nextAnalysis.requiresFixes,
+    canComplete: nextAnalysis.canComplete,
+  };
 }

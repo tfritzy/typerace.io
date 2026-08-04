@@ -15,6 +15,8 @@ const UNTYPED_CHARACTER_CLASS =
   `${CHARACTER_CLASS} text-text-untyped`;
 const ERROR_CHARACTER_CLASS =
   `${CHARACTER_CLASS} text-destructive underline decoration-2 decoration-destructive`;
+const COMPLETED_ERROR_CHARACTER_CLASS =
+  `${CHARACTER_CLASS} text-destructive opacity-60`;
 const COMPLETED_CHARACTER_CLASS =
   `${CHARACTER_CLASS} text-text-completed`;
 const CURRENT_CHARACTER_CLASS =
@@ -23,11 +25,12 @@ const CURRENT_CHARACTER_CLASS =
 type PhraseCharactersProps = {
   phrase: string;
   input: string;
+  completedThrough?: number;
   targetRef: MutableRefObject<HTMLElement | null>;
 };
 
 export type PhraseCharactersRef = {
-  setInput: (input: string) => void;
+  setInput: (input: string, completedThrough?: number) => void;
 };
 
 type InputState = {
@@ -59,8 +62,12 @@ function getCharacterClass(
   completedThrough: number,
 ) {
   if (index >= input.length) return UNTYPED_CHARACTER_CLASS;
-  if (input[index] !== phrase[index]) return ERROR_CHARACTER_CLASS;
-  if (input === phrase || index < completedThrough) {
+  if (input[index] !== phrase[index]) {
+    return index < completedThrough
+      ? COMPLETED_ERROR_CHARACTER_CLASS
+      : ERROR_CHARACTER_CLASS;
+  }
+  if (index < completedThrough) {
     return COMPLETED_CHARACTER_CLASS;
   }
   return CURRENT_CHARACTER_CLASS;
@@ -68,7 +75,7 @@ function getCharacterClass(
 
 export const PhraseCharacters = memo(
   forwardRef<PhraseCharactersRef, PhraseCharactersProps>(
-    ({ phrase, input, targetRef }, ref) => {
+    ({ phrase, input, completedThrough, targetRef }, ref) => {
       const characterRefs = useRef<Array<HTMLElement | null>>([]);
       const stateRef = useRef<InputState | null>(null);
 
@@ -99,14 +106,16 @@ export const PhraseCharacters = memo(
       );
 
       const setInput = useCallback(
-        (nextInput: string) => {
+        (nextInput: string, nextLockedThrough?: number) => {
           const previous =
             stateRef.current?.phrase === phrase
               ? stateRef.current
               : { phrase, input: "", completedThrough: 0 };
-          const completedThrough = getCompletedThrough(phrase, nextInput);
+          const completedThrough =
+            nextLockedThrough ?? getCompletedThrough(phrase, nextInput);
           const completionChanged =
-            (previous.input === phrase) !== (nextInput === phrase);
+            previous.completedThrough !== phrase.length &&
+            completedThrough === phrase.length;
           let start = firstChangedIndex(previous.input, nextInput);
 
           if (
@@ -173,7 +182,10 @@ export const PhraseCharacters = memo(
       );
 
       useImperativeHandle(ref, () => ({ setInput }), [setInput]);
-      useLayoutEffect(() => setInput(input), [input, setInput]);
+      useLayoutEffect(
+        () => setInput(input, completedThrough),
+        [input, completedThrough, setInput],
+      );
 
       return characters;
     },

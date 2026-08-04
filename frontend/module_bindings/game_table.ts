@@ -32,4 +32,5 @@ export default __t.row({
   placements: __t.array(__t.identity()),
   owner: __t.option(__t.identity()),
   attribution: __t.option(__t.string()),
+  allowedErrors: __t.i32(),
 });

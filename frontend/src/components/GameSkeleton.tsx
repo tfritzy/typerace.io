@@ -1,6 +1,6 @@
 import { EmptyPlayerProgressBars } from "./EmptyPlayerProgressBars";
 import { TypeBox } from "./TypeBox";
-import { AutofixRow } from "./AutofixRow";
+import { AllowedErrorsRow } from "./AllowedErrorsRow";
 
 export function GameSkeleton({ playerCount = 3 }: { playerCount?: number }) {
   return (
@@ -11,7 +11,7 @@ export function GameSkeleton({ playerCount = 3 }: { playerCount?: number }) {
             <EmptyPlayerProgressBars count={playerCount} />
           </div>
           <div className="mt-6 min-h-[550px] text-2xl leading-[1.6] sm:mt-8">
-            <AutofixRow loading />
+            <AllowedErrorsRow loading />
             <TypeBox
               phrase=""
               inputState="disabled-dimmed"

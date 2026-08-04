@@ -1,15 +1,18 @@
-import { AutofixIndicator } from "./AutofixIndicator";
+import { AllowedErrorsIndicator } from "./AllowedErrorsIndicator";
 
-type AutofixRowProps =
+type AllowedErrorsRowProps =
   | { loading: true }
   | {
       loading?: false;
+      total: number;
       remaining: number;
+      showFixWarning: boolean;
+      errorsToFix: number;
       completedWords: number;
       totalWords: number;
     };
 
-export function AutofixRow(props: AutofixRowProps) {
+export function AllowedErrorsRow(props: AllowedErrorsRowProps) {
   const loading = props.loading === true;
   const completedWords = loading ? 0 : props.completedWords;
   const totalWords = loading ? undefined : props.totalWords;
@@ -20,9 +23,14 @@ export function AutofixRow(props: AutofixRowProps) {
       aria-hidden={loading || undefined}
     >
       {loading ? (
-        <AutofixIndicator loading />
+        <AllowedErrorsIndicator loading />
       ) : (
-        <AutofixIndicator remaining={props.remaining} />
+        <AllowedErrorsIndicator
+          total={props.total}
+          remaining={props.remaining}
+          showFixWarning={props.showFixWarning}
+          errorsToFix={props.errorsToFix}
+        />
       )}
       <div
         className={`mr-2 flex -translate-y-0.5 select-none items-baseline font-sans leading-none ${

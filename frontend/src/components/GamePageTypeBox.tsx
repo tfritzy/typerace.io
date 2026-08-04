@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import {
   TypeBox,
   type TypeBoxCursorState,
@@ -6,8 +6,12 @@ import {
 } from "./TypeBox";
 import type { DbConnection } from "../../module_bindings";
 import { Countdown } from "./Countdown";
-import { getCompletedWordCount, getWordCount } from "@/utils/typeBoxCore";
-import { AutofixRow } from "./AutofixRow";
+import {
+  analyzeTypeBoxInput,
+  getCompletedWordCount,
+  getWordCount,
+} from "@/utils/typeBoxCore";
+import { AllowedErrorsRow } from "./AllowedErrorsRow";
 
 type GamePageTypeBoxProps = {
   phrase: string;
@@ -16,9 +20,8 @@ type GamePageTypeBoxProps = {
   conn: DbConnection | null;
   onFinish: () => void;
   inputState?: TypeBoxInputState;
-  initialProgress?: number;
-  autofixesRemaining: number;
-  onAutofixesConsumed: (count: number) => void;
+  initialInput?: string;
+  totalAllowedErrors: number;
   isParticipant?: boolean;
   cursorState?: TypeBoxCursorState;
   raceStartsAt: number | null;
@@ -32,31 +35,29 @@ export const GamePageTypeBox = memo(
     conn,
     onFinish,
     inputState = "enabled",
-    initialProgress = 0,
-    autofixesRemaining,
-    onAutofixesConsumed,
+    initialInput = "",
+    totalAllowedErrors,
     isParticipant = true,
     cursorState = "auto",
     raceStartsAt,
   }: GamePageTypeBoxProps) => {
     const totalWords = useMemo(() => getWordCount(phrase), [phrase]);
-    const [completedWords, setCompletedWords] = useState(() =>
-      getCompletedWordCount(phrase, initialProgress),
+    const [input, setInput] = useState(initialInput);
+    const analysis = analyzeTypeBoxInput(
+      phrase,
+      input,
+      totalAllowedErrors,
     );
-    const completedWordsRef = useRef(completedWords);
+    const completedWords = getCompletedWordCount(
+      phrase,
+      analysis.completedThrough,
+    );
+    const showFixWarning = analysis.errorsToFix > 0;
     const handleProgress = useCallback(
       (
         correctCharCount: number,
         eventType: "Correct" | "Incorrect" | "Backspace",
       ) => {
-        const nextCompletedWords = getCompletedWordCount(
-          phrase,
-          correctCharCount,
-        );
-        if (nextCompletedWords !== completedWordsRef.current) {
-          completedWordsRef.current = nextCompletedWords;
-          setCompletedWords(nextCompletedWords);
-        }
         if (!conn || !gameId) return;
 
         const eventTypeEnum = { tag: eventType };
@@ -76,8 +77,11 @@ export const GamePageTypeBox = memo(
     return (
       <div className="mt-6 min-h-[550px] text-2xl leading-[1.6] sm:mt-8">
         {isParticipant && (
-          <AutofixRow
-            remaining={autofixesRemaining}
+          <AllowedErrorsRow
+            total={totalAllowedErrors}
+            remaining={Math.max(0, totalAllowedErrors - analysis.errorsUsed)}
+            showFixWarning={showFixWarning}
+            errorsToFix={analysis.errorsToFix}
             completedWords={completedWords}
             totalWords={totalWords}
           />
@@ -90,12 +94,15 @@ export const GamePageTypeBox = memo(
             onComplete={handleComplete}
             inputState={inputState}
             height="430px"
-            initialProgress={initialProgress}
+            initialValue={initialInput}
             cursorState={cursorState}
-            autofixesRemaining={autofixesRemaining}
-            onAutofixesConsumed={onAutofixesConsumed}
+            onValueChange={setInput}
+            totalAllowedErrors={totalAllowedErrors}
           />
-          <Countdown raceStartsAt={raceStartsAt} />
+          <Countdown
+            raceStartsAt={raceStartsAt}
+            errorBorder={showFixWarning}
+          />
         </div>
       </div>
     );

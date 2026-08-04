@@ -24,6 +24,7 @@ import { GameSkeleton } from "../components/GameSkeleton";
 import { getPreferredGameType } from "../utils/gamePreferences";
 import { WinnerConfetti } from "../components/WinnerConfetti";
 import { GameReplay } from "../components/GameReplay";
+import { reconstructInputFromHistory } from "../utils/replayTimeline";
 
 type UiGameType = "Public" | "Private" | "Practice";
 
@@ -45,7 +46,7 @@ export const GamePage = () => {
   const initProgress = useRef({
     gameId: "",
     playerProgressId: "",
-    value: 0,
+    input: "",
   });
 
   useEffect(() => {
@@ -266,33 +267,6 @@ export const GamePage = () => {
 
   const currentPlayerId = conn?.identity;
 
-  const handleAutofixesConsumed = useCallback(
-    (consumed: number) => {
-      if (!conn || !gameId || !currentPlayerId) return;
-
-      setGamePlayerProgress((progressRows) => {
-        const index = progressRows.findIndex(
-          (progress) =>
-            progress.gameId === gameId &&
-            progress.playerId.isEqual(currentPlayerId),
-        );
-        if (index === -1) return progressRows;
-
-        const next = [...progressRows];
-        next[index] = {
-          ...next[index],
-          autofixesRemaining: Math.max(
-            0,
-            next[index].autofixesRemaining - consumed,
-          ),
-        };
-        return next;
-      });
-      conn.reducers.consumeAutofixes({ gameId, count: consumed });
-    },
-    [conn, currentPlayerId, gameId],
-  );
-
   const otherPlayerProgress = useMemo(() => {
     if (!currentPlayerId || !game?.phrase) return [];
     return gamePlayerProgress.filter(
@@ -344,16 +318,20 @@ export const GamePage = () => {
   if (initProgress.current.gameId !== gameId) {
     initProgress.current.gameId = gameId ?? "";
     initProgress.current.playerProgressId = "";
-    initProgress.current.value = 0;
+    initProgress.current.input = "";
   }
   if (
     currentPlayerProgress &&
     initProgress.current.playerProgressId !== currentPlayerProgress.id
   ) {
     initProgress.current.playerProgressId = currentPlayerProgress.id;
-    initProgress.current.value = currentPlayerProgress.progressIndex;
+    initProgress.current.input = reconstructInputFromHistory(
+      game.phrase,
+      currentPlayerProgress.characterHistory,
+      currentPlayerProgress.progressIndex,
+    );
   }
-  const initialProgress = initProgress.current.value;
+  const initialInput = initProgress.current.input;
   const hasCompletedRace = currentPlayerProgress
     ? currentPlayerProgress.progressIndex >= game.phrase.length
     : false;
@@ -465,16 +443,15 @@ export const GamePage = () => {
   } else {
     gameContent = (
       <GamePageTypeBox
-        key={gameId}
+        key={`${gameId}:${initProgress.current.playerProgressId}`}
         phrase={game.phrase}
         attribution={game.attribution}
         gameId={gameId!}
         conn={conn}
         onFinish={handleFinish}
         inputState={isDisabled ? "disabled-dimmed" : "enabled"}
-        initialProgress={initialProgress}
-        autofixesRemaining={currentPlayerProgress?.autofixesRemaining ?? 0}
-        onAutofixesConsumed={handleAutofixesConsumed}
+        initialInput={initialInput}
+        totalAllowedErrors={game.allowedErrors}
         isParticipant={isMemberOfRace}
         cursorState={isMemberOfRace ? "auto" : "hidden"}
         raceStartsAt={raceStartsAt}

@@ -3,9 +3,13 @@ import bufoLetsGo from "../assets/bufo-lets-goo.gif";
 
 interface CountdownProps {
   raceStartsAt: number | null;
+  errorBorder?: boolean;
 }
 
-export const Countdown = ({ raceStartsAt }: CountdownProps) => {
+export const Countdown = ({
+  raceStartsAt,
+  errorBorder = false,
+}: CountdownProps) => {
   const [cue, setCue] = useState<number | "go" | null>(null);
 
   useEffect(() => {
@@ -23,25 +27,28 @@ export const Countdown = ({ raceStartsAt }: CountdownProps) => {
   }, [raceStartsAt]);
 
   const isRacing = cue === "go";
-  const accent = "var(--accent-primary)";
+  const accent = errorBorder
+    ? "var(--destructive)"
+    : "var(--accent-primary)";
 
   return (
     <>
-      {cue !== null && (
+      {(cue !== null || errorBorder) && (
         <div
           key={cue}
           aria-hidden="true"
+          data-error-border={errorBorder || undefined}
           style={{
             position: "absolute",
             inset: 0,
             pointerEvents: "none",
             borderRadius: "calc(var(--radius, 8px) * 2)",
             border: `1px solid ${accent}`,
-            opacity: isRacing ? 0.7 : 0,
-            boxShadow: isRacing
+            opacity: errorBorder ? 0.8 : isRacing ? 0.7 : 0,
+            boxShadow: errorBorder || isRacing
               ? `0 0 9px 0 color-mix(in srgb, ${accent} 24%, transparent)`
               : "none",
-            animation: isRacing
+            animation: errorBorder || isRacing
               ? undefined
               : "countdownPulse 1s linear forwards",
           }}

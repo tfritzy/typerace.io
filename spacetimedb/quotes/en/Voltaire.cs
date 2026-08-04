@@ -16,7 +16,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "We should be considerate to the living; to the dead we owe only the truth.", Author = "Voltaire" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "God gave us the gift of life; it is up to us to give ourselves the gift of living well.", Author = "Voltaire" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "Man is free at the instant he wants to be.", Author = "Voltaire" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "All mortals are equal; it is not their birth, But virtue itself that makes the difference.", Author = "Voltaire" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "All mortals are equal; it is not their birth, but virtue itself that makes the difference.", Author = "Voltaire" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "Don't think money does everything or you are going to end up doing everything for money.", Author = "Voltaire" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "One always speaks badly when one has nothing to say.", Author = "Voltaire" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "The ancient Romans built their greatest masterpieces of architecture for wild beasts to fight in.", Author = "Voltaire" },
@@ -79,7 +79,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "Even in those cities which seem to enjoy the blessings of peace, and where the arts flourish, the inhabitants are devoured by envy, cares and anxieties, which are greater plagues than any experienced in a town when it is under siege.", Author = "Voltaire" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "In every province, the chief occupations, in order of importance, are lovemaking, malicious gossip, and talking nonsense.", Author = "Voltaire" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "Fools have a habit of believing that everything written by a famous author is admirable. For my part I read only to please myself and like only what suits my taste.", Author = "Voltaire" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "Optimism, What is that? Alas! It is the obstinacy of maintaining that everything is best when it is worst!", Author = "Voltaire" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "Optimism, what is that? Alas! It is the obstinacy of maintaining that everything is best when it is worst!", Author = "Voltaire" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Voltaire", Text = "Let us cultivate our garden.", Author = "Voltaire" },
         };
     }
