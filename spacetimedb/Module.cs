@@ -288,6 +288,8 @@ public static partial class Module
         public Identity? Owner;
         [Default("")]
         public string? Attribution;
+        [Default(0)]
+        public int AllowedErrors;
     }
 
     [Table(Name = "gamerecord", Public = true)]
@@ -877,7 +879,8 @@ public static partial class Module
             GameMode = gameMode,
             GameType = gameType,
             Placements = new List<Identity>(),
-            Owner = ctx.Sender
+            Owner = ctx.Sender,
+            AllowedErrors = GetAllowedErrorCount(phrase.Text)
         });
     }
 
@@ -898,13 +901,11 @@ public static partial class Module
 
     private static void InsertPlayerProgress(ReducerContext ctx, string gameId, string joinCode)
     {
-        var game = ctx.Db.game.Id.Find(gameId);
         var player = ctx.Db.player.Identity.Find(ctx.Sender);
         var playerName = player?.Name ?? "Unknown";
         var playerLevel = player?.Level ?? 1;
         var isAnonymous = player?.IsAnonymous ?? true;
         var playerPublicId = player?.PlayerId ?? "";
-        var autofixCount = game == null ? 0 : GetAutofixCount(game.Value.Phrase);
 
         ctx.Db.playerprogress.Insert(new PlayerProgress
         {
@@ -915,7 +916,6 @@ public static partial class Module
             PlayerName = playerName,
             PlayerLevel = playerLevel,
             ProgressIndex = 0,
-            AutofixesRemaining = autofixCount,
             IsBot = false,
             IsAnonymous = isAnonymous,
             CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
@@ -978,7 +978,6 @@ public static partial class Module
                     PlayerName = selectedBot.Name,
                     PlayerLevel = selectedBot.Level,
                     ProgressIndex = 0,
-                    AutofixesRemaining = 0,
                     IsBot = true,
                     IsAnonymous = false,
                     CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
@@ -1403,8 +1402,6 @@ public static partial class Module
         }
 
         var newGame = InsertGame(ctx, game.Value.GameMode, game.Value.GameType);
-        var autofixCount = GetAutofixCount(newGame.Phrase);
-
         Log.Info($"Created rematch game {newGame.Id} for original game {gameId}");
 
         foreach (var progress in ctx.Db.playerprogress.GameId.Filter(gameId))
@@ -1426,7 +1423,6 @@ public static partial class Module
                     PlayerName = playerName,
                     PlayerLevel = playerLevel,
                     ProgressIndex = 0,
-                    AutofixesRemaining = autofixCount,
                     IsBot = false,
                     IsAnonymous = isAnonymous,
                     CreatedAt = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
@@ -2201,37 +2197,7 @@ public static partial class Module
         ProcessProgressUpdate(ctx, existingProgress.Value, game.Value, newIndex, eventType);
     }
 
-    [Reducer]
-    public static void consumeAutofixes(ReducerContext ctx, string gameId, int count)
-    {
-        if (count <= 0)
-        {
-            return;
-        }
-
-        var game = ctx.Db.game.Id.Find(gameId);
-        if (game == null || game.Value.State != GameState.Racing)
-        {
-            Log.Info($"Cannot consume autofixes: game {gameId} is not in Racing state");
-            return;
-        }
-
-        var progress = FindPlayerProgress(ctx, ctx.Sender, gameId);
-        if (progress == null)
-        {
-            Log.Info($"No progress found for player {ctx.Sender} in game {gameId}");
-            return;
-        }
-
-        var updatedProgress = progress.Value;
-        updatedProgress.AutofixesRemaining = Math.Max(
-            0,
-            updatedProgress.AutofixesRemaining - count
-        );
-        ctx.Db.playerprogress.Id.Update(updatedProgress);
-    }
-
-    private static int GetAutofixCount(string phrase)
+    private static int GetAllowedErrorCount(string phrase)
     {
         return (int)Math.Ceiling(phrase.Length * 0.075);
     }

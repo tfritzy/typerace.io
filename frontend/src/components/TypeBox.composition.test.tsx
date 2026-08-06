@@ -93,17 +93,15 @@ describe("TypeBox dead-key composition", () => {
   );
 });
 
-describe("TypeBox autofix", () => {
-  it("syncs a final-word correction and reports its consumed balance", () => {
+describe("TypeBox allowed errors", () => {
+  it("keeps an allowed final error and completes", () => {
     const onComplete = vi.fn();
     const onProgress = vi.fn();
-    const onAutofixesConsumed = vi.fn();
     const { getByRole } = render(
       <TypeBox
         phrase="hello"
-        autofixesRemaining={1}
+        totalAllowedErrors={1}
         onProgress={onProgress}
-        onAutofixesConsumed={onAutofixesConsumed}
         onComplete={onComplete}
       />,
     );
@@ -111,12 +109,8 @@ describe("TypeBox autofix", () => {
 
     fireEvent.input(input, { target: { value: "hellx" } });
 
-    expect(input.value).toBe("hello");
-    expect(onProgress.mock.calls.slice(-2)).toEqual([
-      [4, "Backspace"],
-      [5, "Correct"],
-    ]);
-    expect(onAutofixesConsumed).toHaveBeenCalledWith(1);
+    expect(input.value).toBe("hellx");
+    expect(onProgress).toHaveBeenLastCalledWith(5, "Incorrect");
     expect(onComplete).toHaveBeenCalledOnce();
   });
 });
@@ -124,7 +118,7 @@ describe("TypeBox autofix", () => {
 describe("TypeBox selection", () => {
   it("places restored progress at the end of the input", () => {
     const { getByRole } = render(
-      <TypeBox phrase="hello world" initialProgress={5} />,
+      <TypeBox phrase="hello world" initialValue="hello" />,
     );
     const input = getByRole("textbox") as HTMLTextAreaElement;
 
@@ -135,7 +129,7 @@ describe("TypeBox selection", () => {
 
   it("returns an externally moved selection to the end", () => {
     const { getByRole } = render(
-      <TypeBox phrase="hello world" initialProgress={5} />,
+      <TypeBox phrase="hello world" initialValue="hello" />,
     );
     const input = getByRole("textbox") as HTMLTextAreaElement;
 

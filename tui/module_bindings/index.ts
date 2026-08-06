@@ -41,8 +41,6 @@ import ClientConnected from "./client_connected_reducer";
 export { ClientConnected };
 import ClientDisconnected from "./client_disconnected_reducer";
 export { ClientDisconnected };
-import ConsumeAutofixes from "./consume_autofixes_reducer";
-export { ConsumeAutofixes };
 import FillGameWithBots from "./fill_game_with_bots_reducer";
 export { FillGameWithBots };
 import JoinGame from "./join_game_reducer";
@@ -467,7 +465,6 @@ const reducersSchema = __reducers(
   __reducerSchema("ArchiveOldGames", ArchiveOldGames),
   __reducerSchema("CleanupOldScores", CleanupOldScores),
   __reducerSchema("CleanupOldXpGains", CleanupOldXpGains),
-  __reducerSchema("consumeAutofixes", ConsumeAutofixes),
   __reducerSchema("FillGameWithBots", FillGameWithBots),
   __reducerSchema("joinGame", JoinGame),
   __reducerSchema("joinPrivateGame", JoinPrivateGame),

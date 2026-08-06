@@ -65,8 +65,37 @@ export function applyReplayEvent(
   const expectedCharacter = phrase[input.length];
   if (eventType === "Correct") return input + expectedCharacter;
 
-  const incorrectCharacter = expectedCharacter === "×" ? "•" : "×";
+  const incorrectCharacter = expectedCharacter === "x" ? "×" : "x";
   return input + incorrectCharacter;
+}
+
+export function reconstructInputFromHistory(
+  phrase: string,
+  history: Uint8Array,
+  progressIndex: number,
+): string {
+  let input = "";
+
+  for (
+    let offset = 0;
+    offset + EVENT_SIZE_BYTES <= history.length;
+    offset += EVENT_SIZE_BYTES
+  ) {
+    const encodedType = history[offset + 2];
+    const eventType: ReplayEvent["eventType"] =
+      encodedType === CharacterEventType.Incorrect
+        ? "Incorrect"
+        : encodedType === CharacterEventType.Backspace
+          ? "Backspace"
+          : "Correct";
+    input = applyReplayEvent(input, phrase, eventType);
+  }
+
+  const earnedLength = Math.min(
+    phrase.length,
+    Math.max(0, progressIndex),
+  );
+  return input.slice(0, earnedLength);
 }
 
 export function getCorrectPrefixLength(input: string, phrase: string): number {

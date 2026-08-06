@@ -10,6 +10,8 @@ export function formatStopwatchTime(seconds: number): string {
 }
 
 export function getOrdinalPlacement(placement: number): string {
+  if (placement === -1) return "-";
+
   const suffixes = ["th", "st", "nd", "rd"];
   const value = placement % 100;
   return (

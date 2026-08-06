@@ -31,7 +31,7 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "I think of myself as a human being.", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "It flows through the slightest crack.", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "All of his classical techniques and standard styles are minimized, if not wiped out, and nothingness prevails. He is no longer confined.", Author = "Bruce Lee" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "Using no way as way; Having no limitation as limitation.", Author = "Bruce Lee" },
+            new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "Using no way as way; having no limitation as limitation.", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "'Being' is more valued than \"doing\".", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "To grow, to discover, we need involvement, which is something I experience every day - sometimes good, sometimes frustrating. No matter what, you must let your inner light guide you out of the darkness.", Author = "Bruce Lee" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Bruce_Lee", Text = "I believe in sleeping.", Author = "Bruce Lee" },

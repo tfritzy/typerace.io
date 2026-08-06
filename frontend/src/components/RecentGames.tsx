@@ -2,7 +2,7 @@ import { type GameRecord } from "../types/stdb";
 import { useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { Star } from "lucide-react";
-import { formatStopwatchTime } from "../utils/formatters";
+import { formatStopwatchTime, getOrdinalPlacement } from "../utils/formatters";
 
 interface RecentGamesProps {
     gameRecords: GameRecord[];
@@ -34,16 +34,6 @@ export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
             case 'Private': return 'Private';
             case 'Practice': return 'Practice';
             default: return 'Public';
-        }
-    };
-
-    const getPlacementSuffix = (placement: number) => {
-        if (placement >= 11 && placement <= 13) return 'th';
-        switch (placement % 10) {
-            case 1: return 'st';
-            case 2: return 'nd';
-            case 3: return 'rd';
-            default: return 'th';
         }
     };
 
@@ -101,7 +91,7 @@ export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
                         </div>
                         <div className="text-center text-muted-foreground flex items-center justify-center gap-1">
                             <Star className="w-4 h-4 fill-accent-primary text-accent-primary" style={{ opacity: gameRecord.placement === 1 ? 1 : 0 }} />
-                            <span>{gameRecord.placement}{getPlacementSuffix(gameRecord.placement)}</span>
+                            <span>{getOrdinalPlacement(gameRecord.placement)}</span>
                         </div>
                         <div className="text-muted-foreground text-center">
                             {formatTime(gameRecord.timeMs)}

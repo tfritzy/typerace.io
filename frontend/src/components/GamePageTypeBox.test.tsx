@@ -3,7 +3,6 @@
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import { useState } from "react";
 import { GamePageTypeBox } from "./GamePageTypeBox";
 
 vi.mock("./Cursor", () => ({
@@ -16,105 +15,136 @@ beforeAll(() => {
 
 afterEach(cleanup);
 
-function GamePageTypeBoxHarness({
-  phrase,
-  gameId,
-  initialAutofixes,
-}: {
-  phrase: string;
-  gameId: string;
-  initialAutofixes: number;
-}) {
-  const [autofixesRemaining, setAutofixesRemaining] =
-    useState(initialAutofixes);
-
-  return (
-    <GamePageTypeBox
-      phrase={phrase}
-      gameId={gameId}
-      conn={null}
-      onFinish={() => undefined}
-      raceStartsAt={null}
-      autofixesRemaining={autofixesRemaining}
-      onAutofixesConsumed={(consumed) =>
-        setAutofixesRemaining((remaining) =>
-          Math.max(0, remaining - consumed),
-        )
-      }
-    />
-  );
+function renderTypeBox(
+  phrase: string,
+  allowedErrors: number,
+  initialInput = "",
+) {
+  const onFinish = vi.fn();
+  return {
+    onFinish,
+    ...render(
+      <MemoryRouter>
+        <GamePageTypeBox
+          phrase={phrase}
+          gameId="game-1"
+          conn={null}
+          onFinish={onFinish}
+          raceStartsAt={null}
+          totalAllowedErrors={allowedErrors}
+          initialInput={initialInput}
+        />
+      </MemoryRouter>,
+    ),
+  };
 }
 
-describe("GamePageTypeBox autofix balance", () => {
-  it("spends the balance on errors from left to right", () => {
-    const { getByRole } = render(
-      <MemoryRouter>
-        <GamePageTypeBoxHarness
-          phrase="hello world again"
-          gameId="game-1"
-          initialAutofixes={2}
-        />
-      </MemoryRouter>,
-    );
-    const input = getByRole("textbox") as HTMLTextAreaElement;
-
-    const status = getByRole("status");
-    expect(status.getAttribute("aria-label")).toBe("2 auto-fixes remaining");
-    expect(status.querySelectorAll("[data-autofix-charge]")).toHaveLength(2);
-
-    fireEvent.input(input, { target: { value: "hexlo" } });
-    fireEvent.input(input, { target: { value: "hexlo " } });
-
-    expect(input.value).toBe("hexlo ");
-    expect(getByRole("status").getAttribute("aria-label")).toBe(
-      "2 auto-fixes remaining",
+describe("GamePageTypeBox allowed errors", () => {
+  it("restores reconstructed errors and their completed state", () => {
+    const { getByRole, container } = renderTypeBox(
+      "hello world",
+      1,
+      "hxllo ",
     );
 
-    fireEvent.input(input, { target: { value: "hexlo w" } });
-
-    expect(input.value).toBe("hello w");
-    expect(getByRole("status").getAttribute("aria-label")).toBe(
-      "1 auto-fix remaining",
+    expect((getByRole("textbox") as HTMLTextAreaElement).value).toBe(
+      "hxllo ",
     );
     expect(
-      getByRole("status").querySelectorAll("[data-autofix-charge]"),
-    ).toHaveLength(2);
-
-    fireEvent.input(input, { target: { value: "hello wxxld " } });
-    expect(input.value).toBe("hello wxxld ");
-
-    fireEvent.input(input, { target: { value: "hello wxxld a" } });
-
-    expect(input.value).toBe("hello woxld a");
+      getByRole("meter", { name: "Words completed" }).getAttribute(
+        "aria-valuenow",
+      ),
+    ).toBe("1");
     expect(getByRole("status").getAttribute("aria-label")).toBe(
-      "0 auto-fixes remaining. You must fix all errors",
+      "1 of 1 allowed errors used",
     );
+    expect(
+      container.querySelector('[data-char-index="1"]')?.className,
+    ).toContain("opacity-60");
   });
 
-  it("counts words only after they are committed", () => {
-    const { getByRole } = render(
-      <MemoryRouter>
-        <GamePageTypeBoxHarness
-          phrase="hello world"
-          gameId="game-words"
-          initialAutofixes={1}
-        />
-      </MemoryRouter>,
+  it("renders the full pending-to-completed error workflow", () => {
+    const { getByRole, container } = renderTypeBox(
+      "hello world again",
+      2,
     );
+    const input = getByRole("textbox") as HTMLTextAreaElement;
+    const status = getByRole("status");
+    const meter = getByRole("meter", { name: "Words completed" });
+
+    expect(status.querySelectorAll("[data-error-allowance]")).toHaveLength(2);
+    expect(
+      status.querySelector("[data-error-allowance]:not([data-used])"),
+    ).not.toBeNull();
+
+    fireEvent.input(input, { target: { value: "hexlo" } });
+    expect(status.getAttribute("aria-label")).toBe(
+      "0 of 2 allowed errors used",
+    );
+
+    fireEvent.input(input, { target: { value: "hexlo " } });
+    expect(meter.getAttribute("aria-valuenow")).toBe("1");
+    expect(status.getAttribute("aria-label")).toBe(
+      "1 of 2 allowed errors used",
+    );
+    expect(status.querySelector("[data-used] svg")?.classList).toContain(
+      "lucide-circle-x",
+    );
+    const completedError = container.querySelector(
+      '[data-char-index="2"]',
+    );
+    expect(completedError?.className).toContain("opacity-60");
+    expect(completedError?.className).not.toContain("underline");
+
+    fireEvent.input(input, { target: { value: "hexlo w" } });
+    expect(meter.getAttribute("aria-valuenow")).toBe("1");
+
+    fireEvent.input(input, { target: { value: "hexlo worxd " } });
+    expect(meter.getAttribute("aria-valuenow")).toBe("2");
+    expect(status.getAttribute("aria-label")).toBe(
+      "2 of 2 allowed errors used",
+    );
+    expect(
+      container.querySelector('[data-char-index="0"]')?.className,
+    ).toContain("text-text-completed");
+  });
+
+  it("commits preceding words when a following space is correct", () => {
+    const { getByRole, container } = renderTypeBox("one two three", 1);
+    const input = getByRole("textbox") as HTMLTextAreaElement;
+
+    fireEvent.input(input, { target: { value: "onextwo " } });
+
+    expect(
+      getByRole("meter", { name: "Words completed" }).getAttribute(
+        "aria-valuenow",
+      ),
+    ).toBe("2");
+    expect(
+      container.querySelector('[data-char-index="3"]')?.className,
+    ).toContain("opacity-60");
+  });
+
+  it("counts required fixes without blocking forward input", () => {
+    const { getByRole, queryByText } = renderTypeBox("hello world", 1);
     const input = getByRole("textbox") as HTMLTextAreaElement;
     const meter = getByRole("meter", { name: "Words completed" });
 
+    fireEvent.input(input, { target: { value: "hxxxo " } });
+    expect(input.value).toBe("hxxxo ");
     expect(meter.getAttribute("aria-valuenow")).toBe("0");
-    expect(meter.getAttribute("aria-valuemax")).toBe("2");
+    expect(queryByText("You must fix 2 errors to finish")).not.toBeNull();
+    expect(document.querySelector("[data-error-border]")).not.toBeNull();
 
-    fireEvent.input(input, { target: { value: "hello" } });
-    expect(meter.getAttribute("aria-valuenow")).toBe("0");
+    fireEvent.input(input, { target: { value: "hxxxo w" } });
+    expect(input.value).toBe("hxxxo w");
 
-    fireEvent.input(input, { target: { value: "hello " } });
+    fireEvent.input(input, { target: { value: "hexlo w" } });
+    expect(input.value).toBe("hexlo w");
     expect(meter.getAttribute("aria-valuenow")).toBe("1");
-
-    fireEvent.input(input, { target: { value: "hello world" } });
-    expect(meter.getAttribute("aria-valuenow")).toBe("2");
+    expect(document.querySelector("[data-error-border]")).toBeNull();
+    expect(getByRole("status").getAttribute("aria-label")).toBe(
+      "1 of 1 allowed errors used",
+    );
   });
-
 });

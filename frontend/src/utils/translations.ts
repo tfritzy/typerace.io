@@ -32,6 +32,7 @@ export interface Translations {
   place: string;
   accuracy: string;
   tooManyErrors: string;
+  fixErrorCount: (count: number) => string;
   startPrompt?: {
     instruction: string;
   };
@@ -70,6 +71,8 @@ const translations: Record<Language, Translations> = {
     accuracy: "Accuracy",
     tagline: "Multiplayer Typing Races",
     tooManyErrors: "You must fix all errors",
+    fixErrorCount: (count) =>
+      `You must fix ${count} ${count === 1 ? "error" : "errors"} to finish`,
     startPrompt: {
       instruction: "Type!",
     },
@@ -107,6 +110,8 @@ const translations: Record<Language, Translations> = {
     accuracy: "Precisión",
     tagline: "Carreras de mecanografía multijugador",
     tooManyErrors: "Debes corregir todos los errores",
+    fixErrorCount: (count) =>
+      `Debes corregir ${count} ${count === 1 ? "error" : "errores"} para terminar`,
     startPrompt: {
       instruction: "Escribe!",
     },
@@ -143,6 +148,8 @@ const translations: Record<Language, Translations> = {
     accuracy: "Précision",
     tagline: "Courses de dactylographie multijoueur",
     tooManyErrors: "Vous devez corriger toutes les erreurs",
+    fixErrorCount: (count) =>
+      `Vous devez corriger ${count} ${count === 1 ? "erreur" : "erreurs"} pour terminer`,
     startPrompt: {
       instruction: "Tapez!",
     },
@@ -179,6 +186,8 @@ const translations: Record<Language, Translations> = {
     accuracy: "Genauigkeit",
     tagline: "Multiplayer-Tippwettbewerbe",
     tooManyErrors: "Du musst alle Fehler korrigieren",
+    fixErrorCount: (count) =>
+      `Du musst ${count} Fehler korrigieren, um abzuschließen`,
     startPrompt: {
       instruction: "Tippe!",
     },
@@ -215,6 +224,8 @@ const translations: Record<Language, Translations> = {
     accuracy: "Precisione",
     tagline: "Gare di digitazione multiplayer",
     tooManyErrors: "Devi correggere tutti gli errori",
+    fixErrorCount: (count) =>
+      `Devi correggere ${count} ${count === 1 ? "errore" : "errori"} per terminare`,
     startPrompt: {
       instruction: "Digita!",
     },
@@ -252,6 +263,8 @@ const translations: Record<Language, Translations> = {
     accuracy: "Precisão",
     tagline: "Corridas de digitação multijogador",
     tooManyErrors: "Você deve corrigir todos os erros",
+    fixErrorCount: (count) =>
+      `Você deve corrigir ${count} ${count === 1 ? "erro" : "erros"} para terminar`,
     startPrompt: {
       instruction: "Digite!",
     },
@@ -289,6 +302,8 @@ const translations: Record<Language, Translations> = {
     accuracy: "Точність",
     tagline: "Багатокористувацькі змагання з друку",
     tooManyErrors: "Ви маєте виправити всі помилки",
+    fixErrorCount: (count) =>
+      `Ви маєте виправити ${count} ${count === 1 ? "помилку" : "помилки"}, щоб завершити`,
   },
   [Language.Arabic]: {
     publicMatch: "عامة",
@@ -322,6 +337,8 @@ const translations: Record<Language, Translations> = {
     accuracy: "الدقة",
     tagline: "سباق الكتابة الجماعي",
     tooManyErrors: "يجب تصحيح جميع الأخطاء",
+    fixErrorCount: (count) =>
+      `يجب تصحيح ${count} من الأخطاء للإنهاء`,
   },
   [Language.Dutch]: {
     publicMatch: "Openbaar",
@@ -356,6 +373,8 @@ const translations: Record<Language, Translations> = {
     accuracy: "Nauwkeurigheid",
     tagline: "Multiplayer typwedstrijden",
     tooManyErrors: "Je moet alle fouten corrigeren",
+    fixErrorCount: (count) =>
+      `Je moet ${count} ${count === 1 ? "fout" : "fouten"} corrigeren om te voltooien`,
     startPrompt: {
       instruction: "Typ!",
     },
@@ -392,6 +411,8 @@ const translations: Record<Language, Translations> = {
     accuracy: "Noggrannhet",
     tagline: "Multiplayer-skrivtävlingar",
     tooManyErrors: "Du måste rätta alla fel",
+    fixErrorCount: (count) =>
+      `Du måste rätta ${count} fel för att slutföra`,
     startPrompt: {
       instruction: "Skriv!",
     },
@@ -429,6 +450,8 @@ const translations: Record<Language, Translations> = {
     accuracy: "Точность",
     tagline: "Многопользовательские гонки печати",
     tooManyErrors: "Необходимо исправить все ошибки",
+    fixErrorCount: (count) =>
+      `Необходимо исправить ${count} ${count === 1 ? "ошибку" : "ошибки"}, чтобы завершить`,
   },
   [Language.Turkish]: {
     publicMatch: "Açık",
@@ -462,6 +485,8 @@ const translations: Record<Language, Translations> = {
     accuracy: "Doğruluk",
     tagline: "Çok oyunculu yazma yarışları",
     tooManyErrors: "Tüm hataları düzeltmelisiniz",
+    fixErrorCount: (count) =>
+      `Bitirmek için ${count} hata düzeltmelisiniz`,
     startPrompt: {
       instruction: "Yaz!",
     },
