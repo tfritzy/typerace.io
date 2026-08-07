@@ -1,0 +1,72 @@
+namespace StdbModule;
+
+public static partial class IndonesianQuotes
+{
+    public static class FiersaBesari
+    {
+        private const string Source = "https://id.wikiquote.org/wiki/Fiersa_Besari";
+
+        public static readonly Quote[] Quotes = new Quote[]
+        {
+            new Quote { Id = Source, Text = "Jika saatnya tiba, sedih akan menjadi tawa, perih akan menjadi cerita, kenangan akan menjadi guru, rindu akan menjadi temu, kau dan aku akan menjadi kita.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Beberapa rindu memang harus sembunyi-sembunyi. Bukan untuk disampaikan, hanya untuk dikirimkan lewat doa.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Aku tidak tahu di mana ujung perjalanan ini; aku tidak bisa menjanjikan apa pun. Tapi, selama aku mampu, mimpi-mimpi kita adalah prioritas.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Pada waktunya, dunia hanya perlu tahu kalau kita hebat. Kebahagiaan tidak membutuhkan penilaian orang lain.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Dulu kita selalu mengucap kata sayang di penghujung malam. Kini, kita tidak lebih dari dua orang asing yang merindukan masa lalu secara diam-diam.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Aku tidak tahu cara membencimu dengan baik dan benar, seperti kau tidak tahu cara menyayangiku dengan baik dan benar.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Cinta bukan melepas tapi merelakan. Bukan memaksa tapi memperjuangkan. Bukan menyerah tapi mengikhlaskan. Bukan merantai tapi memberi sayap.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Ketika kau melakukan usaha mendekati cita-citamu, di waktu yang bersamaan cita-citamu juga sedang mendekatimu. Alam semesta bekerja seperti itu.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Terkadang, pertemuan dan perpisahan terjadi terlalu cepat. Namun kenangan dan perasaan tinggal terlalu lama.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Perasaan laksana hujan, tak pernah datang dengan maksud yang jahat. Keadaan dan waktulah yang membuat kita membenci kedatangannya.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Tidak ada yang abadi, baik bahagia maupun luka. Suatu saat kita akan tiba di titik menertawakan rasa yang dulu sakit, atau menangisi rasa yang dulu indah.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Ketika kesetiaan menjadi barang mahal. Ketika kata maaf terlalu sulit untuk diucap. Ego siapa yang sedang kita beri makan?", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Hidup ini keras, buktikan dirimu kuat. Yang membedakan pemenang dan pecundang hanya satu: pemenang tahu cara berdiri saat jatuh, pecundang lebih nyaman tetap ada di posisi jatuh.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Cinta memang tak butuh alasan, tapi sebuah komitmen butuh alasan.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Orang pandai takkan memaksakan keyakinannya pada orang lain; orang yang pandai akan menerima perbedaan dan mampu berjalan beriringan dengan mereka yang tidak berprinsip sama.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Pembenci adalah pengagum yang sedang menyamar.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Seiring bertambahnya usia, makin aku menyadari bahwa fisik yang rupawan akan selalu kalah dengan perbincangan yang menyenangkan.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Cinta adalah harapan yang membuat segala yang tidak mungkin menjadi mungkin. Cinta adalah pemutus keputusasaan. Cinta adalah apa yang semestinya membuat bumi ini berputar.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Biarlah yang terluka menikmati waktunya. Biarlah yang bahagia lupa bahwa kelak mereka akan kembali terluka. Dan di sela-sela itu semua, bersyukurlah.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Kebaikan pada alam bisa dilakukan dengan hal yang paling sederhana. Jangan buang sampah sembarangan, misalnya, terlepas ada yang melihat ataupun tidak.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Setahuku, bercanda itu seharusnya lucu, bukan menyakitkan.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Kita adalah apa yang kita pikirkan, bukan apa yang mereka pikirkan. Kita adalah apa yang kita inginkan, bukan apa yang mereka inginkan. Tak usah berhenti melangkah. Jatuh dan terluka itu hal yang biasa. Semua akan menang pada waktunya.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Karena yang paling menyebalkan dari sebuah janji adalah: membuat seseorang menanti dan berekspektasi.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Jangan terlalu dipikirkan. Bagian tersulit dari mengerjakan sesuatu adalah memikirkannya terlalu lama.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Di ketinggian, aku merasa kecil. Aku merasa tidak menaklukkan gunung; justru gununglah yang menaklukkan kesombonganku.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Yang paling aku senangi dari petualangan adalah: sejauh apa pun jalan yang kita tempuh, tujuan akhir selalu rumah.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Bukanlah kenangan buruk yang akan membuat kita bersedih, tapi kenangan terindah yang takkan bisa terulang lagi.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Kita enggak akan pernah tahu kapan napas terakhir kita berhembus dan kapan kita meregang nyawa. Sudah saatnya kita belajar bersyukur. Tidak perlu dengan melakukan hal hebat. Cukup dimulai dengan menyayangi diri sendiri.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Satu-satunya penghalang langkah kita adalah rasa takut kita sendiri.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Karena perpisahan, semanis apa pun, seindah apa pun, tetaplah perpisahan. Ada cerita yang harus berubah menjadi kenangan.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Senja selalu menggiring keceriaan menuju kegelapan. Mungkin hanya mereka yang bersyukur yang mampu menyeka air mata untuk melihat bintang.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Aneh ya, kita enggak akan pernah tahu ke mana hidup membawa kita. Hidup ini seperti petualangan panjang, dengan hiasan suka dan duka, bahan cerita untuk anak-cucu kita kelak.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Tidak ada impian yang terlalu besar jika dibarengi dengan usaha yang sama besarnya. Dan usaha besar pun dimulai dari langkah kecil yang dilakukan terus-menerus.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Untuk menjadi anak bangsa terbaik tidak perlu rupawan, tidak perlu terkenal, tidak perlu meniru, dan tidak perlu sok jagoan. Kita hanya perlu menginspirasi orang-orang di sekitar kita untuk menjadi lebih baik.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Ah, kenangan. Terkadang, kita lebih senang mengenang, karena kenangan adalah satu-satunya hal yang tidak akan berubah. Dan terhadap kenangan, seseorang mampu merasakan kerinduan yang mendalam.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Senja memang membawa kita menuju kegelapan. Tapi, kalau kita tahu cara bersyukur, banyak bintang dalam gelap yang menunggu untuk kita nikmati.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Dan impian bukan sesuatu hal yang absolut. Ia dapat berubah, bertambah, bahkan berkurang.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Hidup itu sederhana, manusianya saja yang rumit.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Masa lalu sepahit apa pun itu, bukanlah untuk dilupakan, melainkan untuk diingat dengan persepsi yang tidak menyakitkan.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Kita berdua jauh dari sempurna. Bukankah ketidaksempurnaan kitalah yang bikin kita berdua saling menyempurnakan?", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Rasa ini tak kenal kedaluwarsa. Tak perlu selamanya, cukup sampai ujung usia.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Aku rindu hujan seperti aku merindukanmu. Sudah lama aku tidak memandang rintiknya memeluk bumi.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Aku adalah seorang pesimis yang cukup optimis. Pesimis bahwa negeri ini sudah tiba pada masa yang lebih baik, sekaligus optimis bahwa negeri ini akan tiba pada masa yang lebih baik.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Kami hanyalah anak manusia yang meskipun punya paham, prinsip, sejarah, latar belakang, dan warna kulit yang berbeda, namun darah kami tetaplah merah, dan yang kami hirup adalah udara yang sama.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Hidup adalah sebuah pilihan. Aku memilih untuk berani membuatmu bahagia karena terlalu takut melihatmu menangis.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Aku memang penakut kalau soal kehilangan kamu. Tapi, aku bukan pengecut yang enggak mau berjuang bareng kamu.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Kita mesti melepaskan apa yang sudah enggak bisa kita ubah dan belajar melanjutkan hidup.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Setiap manusia pernah melakukan kesalahan; itulah yang menjadikan kita manusia.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Orang bilang, jodoh takkan ke mana. Aku rasa mereka keliru. Jodoh akan ke mana-mana terlebih dahulu sebelum akhirnya menetap. Ketika waktunya telah tiba, ketika segala rasa sudah tidak bisa lagi dilawan, yang bisa kita lakukan hanyalah merangkul tanpa perlu banyak kompromi.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Setidaknya kau sudah mendengarkanku, dan mengizinkanku mendengarkanmu. Memiliki pendengar yang tahu kapan harus berbicara dan kapan harus diam itu menyenangkan.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Ada hal yang lebih berharga dibandingkan uang, dan ia bernama waktu. Uang yang hilang bisa diganti, namun waktu yang hilang takkan pernah bisa kembali.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Waktu enggak akan menunggu. Lepaskan yang sudah hilang, hargai yang masih ada.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Aku malah mensyukuri senja yang membawa kita pada kegelapan. Jika kita mau mengarungi gelapnya malam, mentari yang sama juga akan membawa kita pada indahnya pagi.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Orang-orang yang sering melihat bintang akan lebih merasa dirinya hanya setitik debu di alam semesta; orang-orang yang sering melihat bintang tahu caranya mensyukuri kesederhanaan.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Bahkan saat hidup sedang gelap seperti ini, akan selalu ada cahaya yang membantumu menemukan jalan keluar. Yang perlu kamu lakukan adalah berdoa dan belajar ikhlas.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Bukan seberapa lama hidup ini yang dihitung, tapi seberapa berarti kita menghabiskannya.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Tuhan tidak pernah mengambil apa yang sudah Dia beri; Tuhan cuma menukarnya dengan sesuatu yang lebih indah. Kitanya saja yang belum sadar.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Tidak ada jarak yang terlalu jauh atau waktu yang terlalu lama untuk dua orang yang saling memperjuangkan rasa.", Author = "Fiersa Besari" },
+            new Quote { Id = Source, Text = "Hidup ini indah, bila kau mengikhlaskan yang harus dilepas.", Author = "Fiersa Besari" },
+        };
+    }
+}

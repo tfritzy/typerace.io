@@ -43,6 +43,12 @@ const GameMode = __t.enum("GameMode", {English500: __t.unit(),
   TurkishQuotes: __t.unit(),
   Russian500: __t.unit(),
   RussianQuotes: __t.unit(),
+  Romanian500: __t.unit(),
+  RomanianQuotes: __t.unit(),
+  Indonesian500: __t.unit(),
+  IndonesianQuotes: __t.unit(),
+  Polish500: __t.unit(),
+  PolishQuotes: __t.unit(),
 });
 
 export default GameMode;

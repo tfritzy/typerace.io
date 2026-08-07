@@ -16,6 +16,9 @@ export enum Language {
   Swedish = "Swedish",
   Turkish = "Turkish",
   Russian = "Russian",
+  Romanian = "Romanian",
+  Indonesian = "Indonesian",
+  Polish = "Polish",
 }
 
 export interface LanguageInfo {
@@ -120,6 +123,34 @@ export const languages: LanguageInfo[] = [
       "Compita contra jogadores de todo o mundo em competições de digitação em tempo real. Melhore sua velocidade de digitação.",
   },
   {
+    language: Language.Indonesian,
+    flag: "🇮🇩",
+    countryCode: "id",
+    slug: "id",
+    randomWordsMode: "Indonesian500",
+    quotesMode: "IndonesianQuotes",
+    nativeName: "Bahasa Indonesia",
+    htmlLang: "id",
+    measurementMode: "wpm" as const,
+    title: "TypeRace.io | Balapan Mengetik Cepat dan Pelacak WPM",
+    description:
+      "Berlomba melawan pemain dari seluruh dunia dalam kompetisi mengetik waktu nyata. Tingkatkan kecepatan mengetik Anda.",
+  },
+  {
+    language: Language.Polish,
+    flag: "🇵🇱",
+    countryCode: "pl",
+    slug: "pl",
+    randomWordsMode: "Polish500",
+    quotesMode: "PolishQuotes",
+    nativeName: "Polski",
+    htmlLang: "pl",
+    measurementMode: "wpm" as const,
+    title: "TypeRace.io | Szybkie wyścigi pisania i pomiar WPM",
+    description:
+      "Ścigaj się z graczami z całego świata w zawodach pisania na żywo. Poprawiaj szybkość pisania.",
+  },
+  {
     language: Language.Ukrainian,
     flag: "🇺🇦",
     countryCode: "ua",
@@ -160,6 +191,20 @@ export const languages: LanguageInfo[] = [
     title: "TypeRace.io | Динамичные гонки печати и трекер скорости",
     description:
       "Соревнуйтесь с игроками со всего мира в гонках печати в реальном времени. Улучшайте скорость и точность набора текста.",
+  },
+  {
+    language: Language.Romanian,
+    flag: "🇷🇴",
+    countryCode: "ro",
+    slug: "ro",
+    randomWordsMode: "Romanian500",
+    quotesMode: "RomanianQuotes",
+    nativeName: "Română",
+    htmlLang: "ro",
+    measurementMode: "wpm" as const,
+    title: "TypeRace.io | Curse rapide de tastare și monitorizare WPM",
+    description:
+      "Concurează cu jucători din întreaga lume în competiții de tastare în timp real. Îmbunătățește-ți viteza de tastare.",
   },
   {
     language: Language.Swedish,
@@ -378,6 +423,36 @@ const languageStartupPhrases: Record<Language, string[]> = {
     "удача любит смелых",
     "пусть начнётся игра",
     "жду команды",
+  ],
+  [Language.Romanian]: [
+    "gata de luptă",
+    "sistemele sunt pregătite",
+    "începe cursa",
+    "gata de start",
+    "la atac",
+    "norocul îi ajută pe cei curajoși",
+    "să înceapă jocul",
+    "aștept comanda",
+  ],
+  [Language.Indonesian]: [
+    "siap bertanding",
+    "sistem siap",
+    "mulai balapan",
+    "siap berangkat",
+    "ayo mulai",
+    "keberuntungan berpihak pada yang berani",
+    "permainan dimulai",
+    "menunggu perintah",
+  ],
+  [Language.Polish]: [
+    "gotowi do wyścigu",
+    "systemy gotowe",
+    "rozpocznij wyścig",
+    "gotowi do startu",
+    "do dzieła",
+    "szczęście sprzyja odważnym",
+    "niech zacznie się gra",
+    "czekam na rozkaz",
   ],
   [Language.Turkish]: [
     "savaşa hazır",

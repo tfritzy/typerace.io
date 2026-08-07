@@ -31,6 +31,7 @@ export interface Translations {
   time: string;
   place: string;
   accuracy: string;
+  errorsAllowed: string;
   tooManyErrors: string;
   fixErrorCount: (count: number) => string;
   startPrompt?: {
@@ -69,6 +70,7 @@ const translations: Record<Language, Translations> = {
     time: "Time",
     place: "Place",
     accuracy: "Accuracy",
+    errorsAllowed: "Errors allowed",
     tagline: "Multiplayer Typing Races",
     tooManyErrors: "You must fix all errors",
     fixErrorCount: (count) =>
@@ -108,6 +110,7 @@ const translations: Record<Language, Translations> = {
     time: "Tiempo",
     place: "Posición",
     accuracy: "Precisión",
+    errorsAllowed: "Errores permitidos",
     tagline: "Carreras de mecanografía multijugador",
     tooManyErrors: "Debes corregir todos los errores",
     fixErrorCount: (count) =>
@@ -146,6 +149,7 @@ const translations: Record<Language, Translations> = {
     time: "Temps",
     place: "Place",
     accuracy: "Précision",
+    errorsAllowed: "Erreurs autorisées",
     tagline: "Courses de dactylographie multijoueur",
     tooManyErrors: "Vous devez corriger toutes les erreurs",
     fixErrorCount: (count) =>
@@ -184,6 +188,7 @@ const translations: Record<Language, Translations> = {
     time: "Zeit",
     place: "Platz",
     accuracy: "Genauigkeit",
+    errorsAllowed: "Erlaubte Fehler",
     tagline: "Multiplayer-Tippwettbewerbe",
     tooManyErrors: "Du musst alle Fehler korrigieren",
     fixErrorCount: (count) =>
@@ -222,6 +227,7 @@ const translations: Record<Language, Translations> = {
     time: "Tempo",
     place: "Posizione",
     accuracy: "Precisione",
+    errorsAllowed: "Errori consentiti",
     tagline: "Gare di digitazione multiplayer",
     tooManyErrors: "Devi correggere tutti gli errori",
     fixErrorCount: (count) =>
@@ -261,6 +267,7 @@ const translations: Record<Language, Translations> = {
     time: "Tempo",
     place: "Posição",
     accuracy: "Precisão",
+    errorsAllowed: "Erros permitidos",
     tagline: "Corridas de digitação multijogador",
     tooManyErrors: "Você deve corrigir todos os erros",
     fixErrorCount: (count) =>
@@ -300,6 +307,7 @@ const translations: Record<Language, Translations> = {
     time: "Час",
     place: "Місце",
     accuracy: "Точність",
+    errorsAllowed: "Дозволені помилки",
     tagline: "Багатокористувацькі змагання з друку",
     tooManyErrors: "Ви маєте виправити всі помилки",
     fixErrorCount: (count) =>
@@ -335,6 +343,7 @@ const translations: Record<Language, Translations> = {
     time: "الوقت",
     place: "المركز",
     accuracy: "الدقة",
+    errorsAllowed: "الأخطاء المسموح بها",
     tagline: "سباق الكتابة الجماعي",
     tooManyErrors: "يجب تصحيح جميع الأخطاء",
     fixErrorCount: (count) =>
@@ -371,6 +380,7 @@ const translations: Record<Language, Translations> = {
     time: "Tijd",
     place: "Plaats",
     accuracy: "Nauwkeurigheid",
+    errorsAllowed: "Toegestane fouten",
     tagline: "Multiplayer typwedstrijden",
     tooManyErrors: "Je moet alle fouten corrigeren",
     fixErrorCount: (count) =>
@@ -409,6 +419,7 @@ const translations: Record<Language, Translations> = {
     time: "Tid",
     place: "Plats",
     accuracy: "Noggrannhet",
+    errorsAllowed: "Tillåtna fel",
     tagline: "Multiplayer-skrivtävlingar",
     tooManyErrors: "Du måste rätta alla fel",
     fixErrorCount: (count) =>
@@ -448,10 +459,132 @@ const translations: Record<Language, Translations> = {
     time: "Время",
     place: "Место",
     accuracy: "Точность",
+    errorsAllowed: "Разрешённые ошибки",
     tagline: "Многопользовательские гонки печати",
     tooManyErrors: "Необходимо исправить все ошибки",
     fixErrorCount: (count) =>
       `Необходимо исправить ${count} ${count === 1 ? "ошибку" : "ошибки"}, чтобы завершить`,
+  },
+  [Language.Romanian]: {
+    publicMatch: "Public",
+    privateLobby: "Privat",
+    practiceMode: "Antrenament",
+    randomWords: "Cuvinte",
+    quotes: "Citate",
+    gameOptions: "Opțiuni de joc",
+    matchType: "Tipul cursei",
+    mode: "Mod",
+    siteStats: "Statistici",
+    privacyPolicy: "Politica de confidențialitate",
+    theme: "Temă",
+    waitingForPlayers: "Se așteaptă jucători...",
+    waitingForOwner: "Se așteaptă ca gazda să înceapă...",
+    shareLink:
+      "Distribuie acest link prietenilor pentru a-i invita la această cursă",
+    copied: "Copiat!",
+    gameLink: "Linkul jocului",
+    startGame: "Începe jocul",
+    mainMenu: "Meniul principal",
+    rematch: "Revanșă",
+    playAgain: "Joacă din nou",
+    watchReplay: "Vezi reluarea",
+    replay: "Reluare",
+    results: "Rezultate",
+    ownerRematchOnly: "Doar gazda poate începe o revanșă",
+    waitingForPlayer: "Se așteaptă un jucător...",
+    wpm: "CPM",
+    time: "Timp",
+    place: "Loc",
+    accuracy: "Precizie",
+    errorsAllowed: "Erori permise",
+    tagline: "Curse de tastare multiplayer",
+    tooManyErrors: "Trebuie să corectezi toate greșelile",
+    fixErrorCount: (count) =>
+      `Trebuie să corectezi ${count} ${count === 1 ? "greșeală" : "greșeli"} pentru a termina`,
+    startPrompt: {
+      instruction: "Tastează!",
+    },
+  },
+  [Language.Indonesian]: {
+    publicMatch: "Publik",
+    privateLobby: "Pribadi",
+    practiceMode: "Latihan",
+    randomWords: "Kata",
+    quotes: "Kutipan",
+    gameOptions: "Opsi permainan",
+    matchType: "Jenis pertandingan",
+    mode: "Mode",
+    siteStats: "Statistik situs",
+    privacyPolicy: "Kebijakan privasi",
+    theme: "Tema",
+    waitingForPlayers: "Menunggu pemain...",
+    waitingForOwner: "Menunggu pemilik memulai...",
+    shareLink: "Bagikan tautan ini kepada teman untuk mengundang mereka ke balapan",
+    copied: "Disalin!",
+    gameLink: "Tautan permainan",
+    startGame: "Mulai permainan",
+    mainMenu: "Menu utama",
+    rematch: "Tanding ulang",
+    playAgain: "Main lagi",
+    watchReplay: "Tonton tayangan ulang",
+    replay: "Tayangan ulang",
+    results: "Hasil",
+    ownerRematchOnly: "Hanya pemilik permainan yang dapat memulai pertandingan ulang",
+    waitingForPlayer: "Menunggu pemain...",
+    wpm: "KPM",
+    time: "Waktu",
+    place: "Peringkat",
+    accuracy: "Akurasi",
+    errorsAllowed: "Kesalahan yang diizinkan",
+    tagline: "Balapan mengetik multipemain",
+    tooManyErrors: "Anda harus memperbaiki semua kesalahan",
+    fixErrorCount: (count) =>
+      `Anda harus memperbaiki ${count} kesalahan untuk menyelesaikan balapan`,
+    startPrompt: {
+      instruction: "Ketik!",
+    },
+  },
+  [Language.Polish]: {
+    publicMatch: "Publiczny",
+    privateLobby: "Prywatny",
+    practiceMode: "Trening",
+    randomWords: "Słowa",
+    quotes: "Cytaty",
+    gameOptions: "Opcje gry",
+    matchType: "Typ rozgrywki",
+    mode: "Tryb",
+    siteStats: "Statystyki strony",
+    privacyPolicy: "Polityka prywatności",
+    theme: "Motyw",
+    waitingForPlayers: "Oczekiwanie na graczy...",
+    waitingForOwner: "Oczekiwanie na rozpoczęcie przez gospodarza...",
+    shareLink: "Udostępnij ten link znajomym, aby zaprosić ich do wyścigu",
+    copied: "Skopiowano!",
+    gameLink: "Link do gry",
+    startGame: "Rozpocznij grę",
+    mainMenu: "Menu główne",
+    rematch: "Rewanż",
+    playAgain: "Zagraj ponownie",
+    watchReplay: "Obejrzyj powtórkę",
+    replay: "Powtórka",
+    results: "Wyniki",
+    ownerRematchOnly: "Tylko gospodarz gry może rozpocząć rewanż",
+    waitingForPlayer: "Oczekiwanie na gracza...",
+    wpm: "WPM",
+    time: "Czas",
+    place: "Miejsce",
+    accuracy: "Dokładność",
+    errorsAllowed: "Dozwolone błędy",
+    tagline: "Wieloosobowe wyścigi pisania",
+    tooManyErrors: "Musisz poprawić wszystkie błędy",
+    fixErrorCount: (count) => {
+      const label =
+        count === 1 ? "błąd" : count >= 2 && count <= 4 ? "błędy" : "błędów";
+      return `Musisz poprawić ${count} ${label}, aby ukończyć`;
+    },
+    startPrompt: {
+      instruction: "Pisz!",
+    },
   },
   [Language.Turkish]: {
     publicMatch: "Açık",
@@ -483,6 +616,7 @@ const translations: Record<Language, Translations> = {
     time: "Süre",
     place: "Sıralama",
     accuracy: "Doğruluk",
+    errorsAllowed: "İzin verilen hatalar",
     tagline: "Çok oyunculu yazma yarışları",
     tooManyErrors: "Tüm hataları düzeltmelisiniz",
     fixErrorCount: (count) =>

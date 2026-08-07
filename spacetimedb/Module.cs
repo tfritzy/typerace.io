@@ -45,7 +45,13 @@ public enum GameMode
     SwedishQuotes,
     TurkishQuotes,
     Russian500,
-    RussianQuotes
+    RussianQuotes,
+    Romanian500,
+    RomanianQuotes,
+    Indonesian500,
+    IndonesianQuotes,
+    Polish500,
+    PolishQuotes
 }
 
 [Type]
@@ -200,6 +206,15 @@ public static partial class Module
             case GameMode.Russian500:
             case GameMode.RussianQuotes:
                 return 40.0 / 30.0;
+            case GameMode.Romanian500:
+            case GameMode.RomanianQuotes:
+                return 40.0 / 35.0;
+            case GameMode.Indonesian500:
+            case GameMode.IndonesianQuotes:
+                return 40.0 / 35.0;
+            case GameMode.Polish500:
+            case GameMode.PolishQuotes:
+                return 40.0 / 35.0;
             default:
                 return 1.0;
         }

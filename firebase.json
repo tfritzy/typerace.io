@@ -91,6 +91,18 @@
           "destination": "/ru/index.html"
         },
         {
+          "source": "/ro",
+          "destination": "/ro/index.html"
+        },
+        {
+          "source": "/id",
+          "destination": "/id/index.html"
+        },
+        {
+          "source": "/pl",
+          "destination": "/pl/index.html"
+        },
+        {
           "source": "/tr",
           "destination": "/tr/index.html"
         },
@@ -180,6 +192,18 @@
         {
           "source": "/ru",
           "destination": "/ru/index.html"
+        },
+        {
+          "source": "/ro",
+          "destination": "/ro/index.html"
+        },
+        {
+          "source": "/id",
+          "destination": "/id/index.html"
+        },
+        {
+          "source": "/pl",
+          "destination": "/pl/index.html"
         },
         {
           "source": "/tr",

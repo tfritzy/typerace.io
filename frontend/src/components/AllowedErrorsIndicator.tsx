@@ -24,7 +24,7 @@ export function AllowedErrorsIndicator(
     return (
       <div className="mb-2 flex items-center text-[11px] text-muted-foreground/50">
         <span className="font-medium uppercase tracking-[0.12em]">
-          Errors allowed
+          {getTranslations().errorsAllowed}
         </span>
       </div>
     );
@@ -46,7 +46,7 @@ export function AllowedErrorsIndicator(
     >
       <div className="flex shrink-0 items-center gap-2.5 text-[11px] text-muted-foreground">
         <span className="font-medium uppercase tracking-[0.12em]">
-          Errors allowed
+          {translations.errorsAllowed}
         </span>
         <span
           className="flex max-w-[60vw] flex-wrap items-center justify-end gap-1 sm:max-w-lg"
