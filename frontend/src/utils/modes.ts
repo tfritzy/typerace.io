@@ -19,6 +19,7 @@ export enum Language {
   Romanian = "Romanian",
   Indonesian = "Indonesian",
   Polish = "Polish",
+  Czech = "Czech",
 }
 
 export interface LanguageInfo {
@@ -149,6 +150,20 @@ export const languages: LanguageInfo[] = [
     title: "TypeRace.io | Szybkie wyścigi pisania i pomiar WPM",
     description:
       "Ścigaj się z graczami z całego świata w zawodach pisania na żywo. Poprawiaj szybkość pisania.",
+  },
+  {
+    language: Language.Czech,
+    flag: "🇨🇿",
+    countryCode: "cz",
+    slug: "cs",
+    randomWordsMode: "Czech500",
+    quotesMode: "CzechQuotes",
+    nativeName: "Čeština",
+    htmlLang: "cs",
+    measurementMode: "wpm" as const,
+    title: "TypeRace.io | Rychlé závody v psaní a měření WPM",
+    description:
+      "Závoděte s hráči z celého světa v psaní v reálném čase. Zlepšujte svou rychlost a přesnost psaní.",
   },
   {
     language: Language.Ukrainian,
@@ -453,6 +468,16 @@ const languageStartupPhrases: Record<Language, string[]> = {
     "szczęście sprzyja odważnym",
     "niech zacznie się gra",
     "czekam na rozkaz",
+  ],
+  [Language.Czech]: [
+    "připraven k závodu",
+    "systémy připraveny",
+    "zahájit závod",
+    "připraven ke startu",
+    "do toho",
+    "štěstí přeje odvážným",
+    "ať hra začne",
+    "čekám na povel",
   ],
   [Language.Turkish]: [
     "savaşa hazır",

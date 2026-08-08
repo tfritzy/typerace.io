@@ -36,7 +36,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Das höchste Leben ist Mathematik.", Author = "Novalis" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Der echte Dichter ist allwissend - er ist eine wirkliche Welt im Kleinen.", Author = "Novalis" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Die Tischzeit ist die merkwürdigste Periode des Tages und vielleicht der Zweck, die Blüte des Tages. Das Frühstück ist die Knospe.", Author = "Novalis" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Die Welt muss Romantik werden. So findet man ihren ursprünglichen Sinn wieder. Romantisieren ist nichts als eine qualitative Potenzierung. Das niedere Selbst wird mit einem besseren Selbst in dieser Operation identifiziert. So wie wir selbst eine solche qualitative Potenzenreihe sind.", Author = "Novalis" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Die individuelle Seele soll mit der Weltseele übereinstimmen.", Author = "Novalis" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Die Poësie lößt fremdes Dasein in Eignen auf.", Author = "Novalis" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Novalis", Text = "Ein Kind ist eine sichtbar gewordene Liebe.", Author = "Novalis" },

@@ -8,7 +8,6 @@ public static partial class EnglishQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://en.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "All things have been given to us for a purpose, and an artist must feel this more intensely. All that happens to us, including our humiliations, our misfortunes, our embarrassments, all is given to us as raw material, as clay, so that we may shape our art.", Author = "Jorge Luis Borges" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "Our nothingness differs little; it is a trivial and chance circumstance that you should be the reader of these exercises and I their author.", Author = "Jorge Luis Borges" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "Gibbon observes that in the Arabian book \"par excellence\", in the Koran, there are no camels; I believe if there were any doubt as to the authenticity of the Koran, this absence of camels would be sufficient to prove it is an Arabian work.", Author = "Jorge Luis Borges" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Jorge_Luis_Borges", Text = "I think we Argentines can emulate Mohammed, can believe in the possibility of being Argentine without abounding in local color.", Author = "Jorge Luis Borges" },

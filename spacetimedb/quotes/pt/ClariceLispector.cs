@@ -8,7 +8,6 @@ public static partial class PortugueseQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "farei o possível para não amar demais as pessoas, sobretudo por causa das pessoas. Às vezes o amor que se dá pesa, quase como responsabilidade na pessoa que o recebe. Eu tenho essa tendência geral para exagerar, e resolvi tentar não exigir dos outros senão o mínimo. É uma forma de paz...", Author = "Clarice Lispector" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Suponho que me entender não é uma questão de inteligência e sim de sentir, de entrar em contato. Ou toca, ou não toca!", Author = "Clarice Lispector" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Acho que sábado é a rosa da semana.", Author = "Clarice Lispector" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Amor é não ter. Inclusive amor é a desilusão do que se pensava que era amor. E não é prêmio por isso não envaidece", Author = "Clarice Lispector" },
@@ -61,7 +60,6 @@ public static partial class PortugueseQuotes
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "E ninguém é eu. E ninguém é você. Esta é a solidão.", Author = "Clarice Lispector" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "É uma infâmia nascer para morrer não se sabe quando nem onde", Author = "Clarice Lispector" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Ouve-me. Ouve o meu silêncio. O que falo nunca é o que falo e, sim, outra coisa. (...) Capta a “outra coisa” porque eu mesma não posso.", Author = "Clarice Lispector" },
-            new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Minha verdade espantada é que eu sempre estive só de ti e não sabia. Agora sei: sou só. Eu e minha liberdade que não sei usar. Grande responsabilidade da solidão. Quem não é perdido não conhece a liberdade e não a ama. Quanto a mim, assumo a minha solidão.", Author = "Clarice Lispector" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Ah viver é tão desconfortável. Tudo aperta: o corpo exige, o espírito não pára, viver parece ter sono e não poder dormir - viver é incômodo. Não se pode andar nu nem de corpo nem de espírito.", Author = "Clarice Lispector" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Abandone-se, tente tudo suavemente, não se esforce por conseguir - esqueça completamente o que aconteceu e tudo voltará com naturalidade.", Author = "Clarice Lispector" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Ali estava uma mulher que a gulodice do mais fino sonho jamais poderia imaginar.", Author = "Clarice Lispector" },
@@ -89,7 +87,6 @@ public static partial class PortugueseQuotes
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "A palavra é meu domínio sobre o mundo.", Author = "Clarice Lispector" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Sou brasileira naturalizada, quando, por questão de meses, poderia ser brasileira nata. Fiz da língua portuguesa a minha vida interior, o meu pensamento mais íntimo, usei-a para palavras de amor.", Author = "Clarice Lispector" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Ainda bem que sempre existe outro dia. E outros sonhos. E outros risos. E outras pessoas. E outras coisas.", Author = "Clarice Lispector" },
-            new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Na arte, a inspiração tem um toque de magia, porque é uma coisa absoluta, inexplicável. Não creio que venha de fora pra dentro, de forças sobrenaturais. Suponho que emerge do mais profundo \"eu\" da pessoa, do inconsciente individual, coletivo e cósmico.", Author = "Clarice Lispector" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Não entendo, apenas sinto. Tenho medo de um dia entender e deixar de sentir.", Author = "Clarice Lispector" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Não se preocupe em entender. Viver ultrapassa qualquer entendimento.", Author = "Clarice Lispector" },
             new Quote { Id = "https://pt.wikiquote.org/wiki/Clarice_Lispector", Text = "Amar não acaba. É como se o mundo estivesse à minha espera. E eu vou ao encontro do que me espera.", Author = "Clarice Lispector" },

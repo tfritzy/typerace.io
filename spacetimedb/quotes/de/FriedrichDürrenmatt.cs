@@ -10,7 +10,6 @@ public static partial class GermanQuotes
         {
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Dürrenmatt", Text = "Ein Widerstand um jeden Preis ist das Sinnloseste, was es geben kann.", Author = "Friedrich Dürrenmatt" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Dürrenmatt", Text = "Ich habe ins Blaue geschossen und ins Schwarze getroffen.", Author = "Friedrich Dürrenmatt" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Dürrenmatt", Text = "Er war berufen zum Sterben, allein der Tod ist ewig. Das Leben ist eine Schindluderei der Natur sondergleichen, eine obszöne Verwirrung des Kohlenstoffs, eine bösartige Wucherung der Erdoberfläche, ein unheilbarer Schorf. Aus Totem zusammengesetzt, zerfallen wir zu Totem.", Author = "Friedrich Dürrenmatt" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Dürrenmatt", Text = "Wir gehen an der Freiheit zugrunde, die wir gestatten und die wir uns gestatten", Author = "Friedrich Dürrenmatt" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Dürrenmatt", Text = "Was einmal gedacht wurde, kann nicht mehr zurückgenommen werden.", Author = "Friedrich Dürrenmatt" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Friedrich_Dürrenmatt", Text = "Je planmäßiger der Mensch vorgeht, um so wirkungsvoller trifft ihn der Zufall.", Author = "Friedrich Dürrenmatt" },

@@ -103,6 +103,10 @@
           "destination": "/pl/index.html"
         },
         {
+          "source": "/cs",
+          "destination": "/cs/index.html"
+        },
+        {
           "source": "/tr",
           "destination": "/tr/index.html"
         },
@@ -204,6 +208,10 @@
         {
           "source": "/pl",
           "destination": "/pl/index.html"
+        },
+        {
+          "source": "/cs",
+          "destination": "/cs/index.html"
         },
         {
           "source": "/tr",

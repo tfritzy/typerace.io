@@ -8,7 +8,6 @@ public static partial class FrenchQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Michel_Houellebecq", Text = "Le libéralisme économique, c’est l’extension du domaine de la lutte, son extension à tous les âges de la vie et à toutes les classes de la société. De même, le libéralisme sexuel, c’est l’extension du domaine de la lutte, son extension à tous les âges de la vie et à toutes les classes de la société.", Author = "Michel Houellebecq" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Michel_Houellebecq", Text = "D'abord révélée à l'animal sous la forme de la douleur physique, l'existence individuelle n'accède dans les sociétés humaines à la pleine conscience d'elle-même que par l'intermédiaire du ''mensonge'', avec lequel elle peut en pratique se confondre.", Author = "Michel Houellebecq" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Michel_Houellebecq", Text = "Dans un monde qui ne respecte que la jeunesse, les êtres sont peu à peu ''dévorés''.", Author = "Michel Houellebecq" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Michel_Houellebecq", Text = "Adolescent, Michel croyait que la souffrance donnait à l'homme une dignité supplémentaire. Il devait maintenant en convenir : il s'était trompé. Ce qui donnait à l'homme une dignité supplémentaire, c'était la télévision.", Author = "Michel Houellebecq" },

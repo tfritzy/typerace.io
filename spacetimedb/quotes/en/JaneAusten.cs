@@ -45,7 +45,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Jane_Austen", Text = "Ah! there is nothing like staying at home for real comfort.", Author = "Jane Austen" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Jane_Austen", Text = "To look almost pretty is an acquisition of higher delight to a girl who has been looking plain for the first fifteen years of her life than a beauty from her cradle can ever receive.", Author = "Jane Austen" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Jane_Austen", Text = "A woman especially, if she has the misfortune of knowing anything, should conceal it as well as she can.", Author = "Jane Austen" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Jane_Austen", Text = "Could they be perpetrated without being known, in a country like this, where social and literary intercourse is on such a footing, where every man is surrounded by a neighbourhood of voluntary spies, and where roads and newspapers lay everything open?", Author = "Jane Austen" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Jane_Austen", Text = "It would be mortifying to the feelings of many ladies, could they be made to understand how little the heart of man is affected by what is costly or new in their attire.", Author = "Jane Austen" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Jane_Austen", Text = "What could I do! Facts are such horrid things!", Author = "Jane Austen" },
         };

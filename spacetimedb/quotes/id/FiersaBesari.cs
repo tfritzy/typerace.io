@@ -56,7 +56,6 @@ public static partial class IndonesianQuotes
             new Quote { Id = Source, Text = "Aku memang penakut kalau soal kehilangan kamu. Tapi, aku bukan pengecut yang enggak mau berjuang bareng kamu.", Author = "Fiersa Besari" },
             new Quote { Id = Source, Text = "Kita mesti melepaskan apa yang sudah enggak bisa kita ubah dan belajar melanjutkan hidup.", Author = "Fiersa Besari" },
             new Quote { Id = Source, Text = "Setiap manusia pernah melakukan kesalahan; itulah yang menjadikan kita manusia.", Author = "Fiersa Besari" },
-            new Quote { Id = Source, Text = "Orang bilang, jodoh takkan ke mana. Aku rasa mereka keliru. Jodoh akan ke mana-mana terlebih dahulu sebelum akhirnya menetap. Ketika waktunya telah tiba, ketika segala rasa sudah tidak bisa lagi dilawan, yang bisa kita lakukan hanyalah merangkul tanpa perlu banyak kompromi.", Author = "Fiersa Besari" },
             new Quote { Id = Source, Text = "Setidaknya kau sudah mendengarkanku, dan mengizinkanku mendengarkanmu. Memiliki pendengar yang tahu kapan harus berbicara dan kapan harus diam itu menyenangkan.", Author = "Fiersa Besari" },
             new Quote { Id = Source, Text = "Ada hal yang lebih berharga dibandingkan uang, dan ia bernama waktu. Uang yang hilang bisa diganti, namun waktu yang hilang takkan pernah bisa kembali.", Author = "Fiersa Besari" },
             new Quote { Id = Source, Text = "Waktu enggak akan menunggu. Lepaskan yang sudah hilang, hargai yang masih ada.", Author = "Fiersa Besari" },

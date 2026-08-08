@@ -23,7 +23,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Benito_Pérez_Galdós", Text = "Desconfiemos siempre de las ideas de fácil adaptación al criterio vulgar; desconfiemos del amaneramiento de la opinión, que no es más que un remedio contra la incomodidad de pensar por cuenta propia.", Author = "Benito Pérez Galdós" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Benito_Pérez_Galdós", Text = "Un hombre tonto no es capaz de hacer en ningún momento de su vida los disparates que hacen a veces las naciones, dirigidas por centenares de hombres de talento.", Author = "Benito Pérez Galdós" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Benito_Pérez_Galdós", Text = "El agua ya no quiere ser agua, y es cristal resbaladizo: el aire no quiere ser aire, y es navaja de afeitar: el fuego no calienta, ni derrite, ni quema.", Author = "Benito Pérez Galdós" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Benito_Pérez_Galdós", Text = "No es la Discordia, es la crisis. La crisis financiera, que es la más terrible de las crisis. La pobreza, mas no de uno, sino de todos los españoles, la bancarrota de una nación, la sublimidad del desfalco, el trueno reducido a su más augusta expresión.", Author = "Benito Pérez Galdós" },
         };
     }
 }

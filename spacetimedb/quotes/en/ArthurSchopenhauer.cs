@@ -46,7 +46,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Schopenhauer", Text = "I have described religion as the metaphysics of the people.", Author = "Arthur Schopenhauer" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Schopenhauer", Text = "In philosophy at the universities truth occupies only a secondary place and, if called upon, she must get up and make room for another attribute.", Author = "Arthur Schopenhauer" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Schopenhauer", Text = "We should not pretend to be what we are not. The pretence of the impartial investigation of truth, with the resolve to make the established religion the result, indeed the measure and control of truth, is intolerable.", Author = "Arthur Schopenhauer" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Arthur_Schopenhauer", Text = "Indeed at times we feel tempted to think that they had finished with their seriously meant philosophical investigations ever before their twelfth year and that at that age they had for the rest of their lives settled their view on the nature of the world.", Author = "Arthur Schopenhauer" },
         };
     }
 }

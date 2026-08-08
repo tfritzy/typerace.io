@@ -14,8 +14,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/Emilia_Pardo_Bazán", Text = "Tengo por importante entre todos el concepto de que la novela ha dejado de ser obra de mero entretenimiento, modo de engañar gratamente unas cuantas horas, ascendiendo a estudio social, psicológico, histórico, pero al cabo estudio.", Author = "Emilia Pardo Bazán" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Emilia_Pardo_Bazán", Text = "Ya pasaron todas esas ideas sin fundamento, que son como los castillos de naipes que me hacía padre siendo yo chiquita.", Author = "Emilia Pardo Bazán" },
             new Quote { Id = "https://es.wikiquote.org/wiki/Emilia_Pardo_Bazán", Text = "La escuela poética, cuyo busilis está en nombrar las cosas de un modo absolutamente contrario a como las nombra todo el mundo...", Author = "Emilia Pardo Bazán" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Emilia_Pardo_Bazán", Text = "Para resumir: España, desde esta deshecha borrasca en que lo ha perdido todo, también ha perdido su leyenda; y sorprende descubrir la verdadera fisonomía de una nación a quien creímos pronta a los arranques del heroísmo desesperado, y, por el contrario, se nos presenta como anestesiada y atónita.", Author = "Emilia Pardo Bazán" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/Emilia_Pardo_Bazán", Text = "Y pues mi sinceridad me autoriza, tengo derecho a afirmar que la contraleyenda española, la leyenda negra, divulgada por esa asquerosa prensa amarilla, mancha e ignominia de la civilización en los Estados Unidos, es mil veces más embustera que la leyenda dorada.", Author = "Emilia Pardo Bazán" },
         };
     }
 }
