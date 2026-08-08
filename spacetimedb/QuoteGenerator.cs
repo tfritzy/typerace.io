@@ -27,6 +27,7 @@ public static class QuoteGenerator
             GameMode.RomanianQuotes => RomanianQuotes.Quotes,
             GameMode.IndonesianQuotes => IndonesianQuotes.Quotes,
             GameMode.PolishQuotes => PolishQuotes.Quotes,
+            GameMode.CzechQuotes => CzechQuotes.Quotes,
             _ => EnglishQuotes.Quotes
         };
 
