@@ -24,7 +24,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Friedrich_Nietzsche", Text = "We believe that we know something about the things themselves when we speak of trees, colors, snow, and flowers; and yet we possess nothing but metaphors for things - metaphors which correspond in no way to the original entities.", Author = "Friedrich Nietzsche" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Friedrich_Nietzsche", Text = "We obtain the concept, as we do the form, by overlooking what is individual and actual; whereas nature is acquainted with no forms and no concepts, and likewise with no species, but only with an X which remains inaccessible and undefinable for us.", Author = "Friedrich Nietzsche" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Friedrich_Nietzsche", Text = "As a \"rational\" being, he now places his behavior under the control of abstractions. He will no longer tolerate being carried away by sudden impressions, by intuitions.", Author = "Friedrich Nietzsche" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Friedrich_Nietzsche", Text = "As a genius of construction man raises himself far above the bee in the following way: whereas the bee builds with wax that he gathers from nature, man builds with the far more delicate conceptual material which he first has to manufacture from himself.", Author = "Friedrich Nietzsche" },
         };
     }
 }

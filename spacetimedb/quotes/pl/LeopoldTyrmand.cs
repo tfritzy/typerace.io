@@ -10,7 +10,6 @@ public static partial class PolishQuotes
         {
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Tyrmand", Text = "Dobroć wymaga reklamy, tak samo jak zbrodnia, aczkolwiek tę ostatnią reklamować jest łatwiej.", Author = "Leopold Tyrmand" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Tyrmand", Text = "Jeśli w kapitalizmie bezrobocie jest nieszczęściem, w komunizmie jest przestępstwem.", Author = "Leopold Tyrmand" },
-            new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Tyrmand", Text = "Kiedy kobiety nie umieją odmawiać (…), upada kultura i więdną sztuki piękne. Kiedy kobieta potrafi powstrzymać rękę, ściągającą jej majtki, ręka pisze Cierpienia młodego Wertera, układa elegie, tworzy piękno i sięga po pojedynkowy pistolet, którego strzał otwiera oceany uczuć subtelnych i tkliwych.", Author = "Leopold Tyrmand" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Tyrmand", Text = "Książki powinny same mówić o sobie i za siebie.", Author = "Leopold Tyrmand" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Tyrmand", Text = "Mężczyzna, mówiąc „kocham”, myśli: „będę cię kochał jutro, pragnę, aby jutro wyglądało tak, jak dziś…” Kobieta, mówiąc „kocham”, myśli „kocham cię dziś i nie chcę myśleć o jutrze…”", Author = "Leopold Tyrmand" },
             new Quote { Id = "https://pl.wikiquote.org/wiki/Leopold_Tyrmand", Text = "Nadzieja nadaje się do szyderczych przysłów.", Author = "Leopold Tyrmand" },

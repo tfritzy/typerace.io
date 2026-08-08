@@ -64,7 +64,6 @@ public static partial class EnglishQuotes
             new Quote { Id = "https://en.wikiquote.org/wiki/Mark_Twain", Text = "I must have a prodigious quantity of mind; it takes me as much as a week sometimes to make it up.", Author = "Mark Twain" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Mark_Twain", Text = "They spell it \"Vinci\" and pronounce it \"Vinchy\". Foreigners always spell better than they pronounce.", Author = "Mark Twain" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Mark_Twain", Text = "Virtue never has been as respectable as money.", Author = "Mark Twain" },
-            new Quote { Id = "https://en.wikiquote.org/wiki/Mark_Twain", Text = "Travel is fatal to prejudice, bigotry, and narrow-mindedness, and many of our people need it sorely on these accounts. Broad, wholesome, charitable views of men and things cannot be acquired by vegetating in one little corner of the earth all one's lifetime.", Author = "Mark Twain" },
             new Quote { Id = "https://en.wikiquote.org/wiki/Mark_Twain", Text = "The two greatest characters in the 19th century are Napoleon and Helen Keller. Napoleon tried to conquer the world by physical force and failed. Helen tried to conquer the world by power of mind - and succeeded!", Author = "Mark Twain" },
         };
     }

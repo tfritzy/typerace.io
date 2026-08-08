@@ -19,7 +19,6 @@ public static partial class IndonesianQuotes
             new Quote { Id = Source, Text = "Aku berjanji pada diriku untuk menulis sebaik mungkin, mengatakan yang sesungguhnya. Aku tidak mengatakan semuanya, tapi aku mengatakan hal yang aku mengerti itu benar. Aku menggunakan kemampuanku untuk berkata-kata.", Author = "Maya Angelou" },
             new Quote { Id = Source, Text = "Kamu tidak mungkin mengendalikan semua kejadian dalam hidup, tapi kamu bisa memilih untuk tidak kehilangan semangat karena kejadian tersebut.", Author = "Maya Angelou" },
             new Quote { Id = Source, Text = "Jika kita kehilangan cinta dan rasa hormat kepada sesama, di titik itulah kita pada akhirnya telah mati.", Author = "Maya Angelou" },
-            new Quote { Id = Source, Text = "Anda hanya bisa menjadi benar-benar berprestasi dalam hal yang Anda cintai. Jangan jadikan uang sebagai tujuan Anda. Sebaliknya, kejar hal-hal yang Anda sukai dan kemudian lakukanlah hal-hal itu dengan sangat baik sehingga orang-orang tidak bisa mengalihkan pandangan dari Anda.", Author = "Maya Angelou" },
         };
     }
 }

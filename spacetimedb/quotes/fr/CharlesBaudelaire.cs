@@ -8,7 +8,6 @@ public static partial class FrenchQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Charles_Baudelaire", Text = "Le vin est semblable à l'homme : on ne saura jamais jusqu'à quel point on peut l'estimer et le mépriser, l'aimer et le haïr, ni de combien d'actions sublimes ou de forfaits monstrueux il est capable. Ne soyons donc pas plus cruels envers lui qu'envers nous-mêmes, et traitons-le comme notre égal.", Author = "Charles Baudelaire" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Charles_Baudelaire", Text = "S'il existait un gouvernement qui eût intérêt à corrompre ses gouvernés, il n'aurait qu'à encourager l'usage du hachisch.", Author = "Charles Baudelaire" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Charles_Baudelaire", Text = "Hypocrite lecteur, — mon semblable, — mon frère !", Author = "Charles Baudelaire" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Charles_Baudelaire", Text = "Homme libre, toujours tu chériras la mer.", Author = "Charles Baudelaire" },

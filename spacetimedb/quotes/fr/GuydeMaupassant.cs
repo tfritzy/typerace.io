@@ -8,7 +8,6 @@ public static partial class FrenchQuotes
     {
         public static readonly Quote[] Quotes = new Quote[]
         {
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Guy_de_Maupassant", Text = "Puis, un calme profond, une attente épouvantée et silencieuse avait plané sur la cité. Beaucoup de bourgeois bedonnants, émasculés par le commerce, attendaient anxieusement les vainqueurs, tremblant qu’on ne considérât comme une arme leurs broches à rôtir ou leurs grands couteaux de cuisine.", Author = "Guy de Maupassant" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Guy_de_Maupassant", Text = "Mais Cornudet releva brusquement la tête, et parcourant la société d’un luisant et terrible : — « Je vous dis à tous que vous venez de faire une infamie » ! — Il se leva, gagna la porte, répéta encore une fois : « Une infamie ! » et disparut.", Author = "Guy de Maupassant" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Guy_de_Maupassant", Text = "Est-ce que nous voyons la cent millième partie de ce qui existe?", Author = "Guy de Maupassant" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Guy_de_Maupassant", Text = "D’où viennent ces influences mystérieuses qui changent en découragement notre bonheur et notre confiance en détresse ?", Author = "Guy de Maupassant" },
@@ -26,7 +25,6 @@ public static partial class FrenchQuotes
             new Quote { Id = "https://fr.wikiquote.org/wiki/Guy_de_Maupassant", Text = "Les grands artistes sont ceux qui imposent à l’humanité leur illusion particulière.", Author = "Guy de Maupassant" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Guy_de_Maupassant", Text = "J’en conclus que les Réalistes de talent devraient s’appeler plutôt des Illusionnistes.", Author = "Guy de Maupassant" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Guy_de_Maupassant", Text = "Nos yeux, nos oreilles, notre odorat, notre goût différents créent autant de vérités qu’il y a d’hommes sur la terre.", Author = "Guy de Maupassant" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Guy_de_Maupassant", Text = "Si les peuples comprenaient, s'ils faisaient justice eux-mêmes des pouvoirs meurtriers, s'ils refusaient de se laisser tuer sans raison, s'ils se servaient de leurs armes contre ceux qui les leur ont données pour massacrer, ce jour-là, la guerre serait morte.", Author = "Guy de Maupassant" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Guy_de_Maupassant", Text = "La ville arabe d’Alger est pleine d’agitation nocturne. Dès que le soir vient, Tunis est mort. Les petites rues étroites, tortueuses, inégales, semblent les couloirs d’une cité abandonnée, dont on a oublié d’éteindre le gaz, par places.", Author = "Guy de Maupassant" },
         };
     }

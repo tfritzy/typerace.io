@@ -41,7 +41,6 @@ public static partial class GermanQuotes
             new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Jede gute Erzählung, so wie gute Dichtung, umgibt sich von selber mit Lehren.", Author = "Jean Paul" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Jedes Ich ist Persönlichkeit, folglich geistige Individualität.", Author = "Jean Paul" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Mit einer Kindheit voll Liebe aber kann man ein halbes Leben hindurch für die kalte Welt haushalten.", Author = "Jean Paul" },
-            new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Es ist nicht gut, wenn in die Geschichte eines Mannes – und heckte er täglich die neuen Einfälle zu Schocken – das Schicksal selber ein Wortspiel wie ein Nestei gelegt hat; auf diesem Ei sitzt und brütet er sein Leben lang und will etwas herausbringen.", Author = "Jean Paul" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Armut ist die einzige Last, die schwerer wird, je mehr Geliebte daran tragen.", Author = "Jean Paul" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Dass du gewiss in Bayreuth selig sein wirst, so sehr sind dessen Häuser und Berge zu loben.", Author = "Jean Paul" },
             new Quote { Id = "https://de.wikiquote.org/wiki/Jean_Paul", Text = "Der Hauptfehler des Menschen bleibt, dass er so viele kleine hat.", Author = "Jean Paul" },

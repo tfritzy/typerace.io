@@ -16,7 +16,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Capuana", Text = "«Perché Dio ci ha creati?» «Non ci ha creati nessuno! La Natura ha prodotto un primo animale e da esso, per trasformazioni e perfezionamenti, siamo venuti fuori noi. Siamo figli di scimmia, animali come gli altri animali.»", Author = "Luigi Capuana" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Capuana", Text = "«I preti cattolici hanno preso Dio agli ebrei e hanno inventato Gesù Cristo.»", Author = "Luigi Capuana" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Capuana", Text = "Quando un Roccaverdina prende un drizzone, è capace di tutto, nel bene e nel male! ... Anche a costo di far scorazzare il collo a chi non c'entra.", Author = "Luigi Capuana" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Luigi_Capuana", Text = "Gli opuscoli del Galateo posseggono anch'essi un valore storico, e non solamente allorché versano intorno a memorie storiche propriamente dette, ma più quando senza volerlo apprestano documenti del suo tempo che vincono in pregio cento storie messe insieme.", Author = "Luigi Capuana" },
         };
     }
 }

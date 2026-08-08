@@ -63,7 +63,6 @@ public static partial class ItalianQuotes
             new Quote { Id = "https://it.wikiquote.org/wiki/Salvatore_Quasimodo", Text = "Alle fronde dei salici, per voto, | anche le nostre cetre erano appese: | oscillavano lievi al triste vento.", Author = "Salvatore Quasimodo" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Salvatore_Quasimodo", Text = "Mi richiama talvolta la tua voce, | e non so che cieli ed acque | mi si svegliano dentro: | una rete di sole che si smaglia | sui tuoi muri ch’erano a sera | un dondolio di lampade | dalle botteghe tarde | piene di vento e di tristezza.", Author = "Salvatore Quasimodo" },
             new Quote { Id = "https://it.wikiquote.org/wiki/Salvatore_Quasimodo", Text = "La loro morte copre uno spazio immenso, | in esso uomini d'ogni terra | non dimenticano Marzabotto | il suo feroce evo | di barbarie contemporanea.", Author = "Salvatore Quasimodo" },
-            new Quote { Id = "https://it.wikiquote.org/wiki/Salvatore_Quasimodo", Text = "Non maledire, eterno straniero nella tua patria, | e tu saluta, amico della libertà. | Il loro sangue è ancora fresco, silenzioso | il suo frutto. | Gli eroi sono diventati uomini: fortuna | per la civiltà. Di questi uomini | non resti mai poveral'Italia.", Author = "Salvatore Quasimodo" },
         };
     }
 }

@@ -26,7 +26,6 @@ public static partial class IndonesianQuotes
             new Quote { Id = Source, Text = "Kita dapat menjadi manusia sepenuhnya, tanpa berhenti menjadi wanita sepenuhnya.", Author = "Kartini" },
             new Quote { Id = Source, Text = "Adalah suatu pertolongan dan bantuan besar sekali bagi orang laki-laki jika perempuan berbudi tinggi dan terpelajar.", Author = "Kartini" },
             new Quote { Id = Source, Text = "Dan gadis-gadis terutama sangat susah hidupnya, karena mereka telah berada di tempat di mana alam setiap hari diperkosa. Bukankah itu memerkosa kodrat alam namanya, apabila perempuan harus tinggal dengan damai serumah dengan madunya?", Author = "Kartini" },
-            new Quote { Id = Source, Text = "Untuk sementara didiklah, berilah pelajaran kepada anak-anak perempuan kaum bangsawan: dari sinilah peradaban bangsa harus dimulai. Jadikanlah mereka ibu-ibu yang cakap, cerdas, dan baik. Maka mereka akan menyebarluaskan peradaban di antara bangsanya.", Author = "Kartini" },
             new Quote { Id = Source, Text = "Kami anak-anak perempuan tidak boleh mempunyai pendapat, kami harus menerima dan menyetujui serta mengamini semua yang dianggap baik oleh orang lain.", Author = "Kartini" },
             new Quote { Id = Source, Text = "Kita harus hidup bersama-sama dan untuk semua manusia. Tujuan hidup kita ialah membuat hidup lebih indah.", Author = "Kartini" },
             new Quote { Id = Source, Text = "Seorang guru bukan hanya sebagai pengasah pikiran saja, melainkan juga sebagai pendidik budi pekerti.", Author = "Kartini" },

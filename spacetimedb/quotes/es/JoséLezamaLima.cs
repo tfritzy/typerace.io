@@ -12,7 +12,6 @@ public static partial class SpanishQuotes
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Lezama_Lima", Text = "La grandeza del hombre consiste en que puede asimilar lo que le es desconocido. Asimilar, en la profundidad, es dar respuesta.", Author = "José Lezama Lima" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Lezama_Lima", Text = "La luz es el primer animal visible de lo invisible.", Author = "José Lezama Lima" },
             new Quote { Id = "https://es.wikiquote.org/wiki/José_Lezama_Lima", Text = "Sólo lo difícil es estimulante; sólo la resistencia que nos reta es capaz de enarcar, suscitar y mantener nuestra potencia de conocimiento.", Author = "José Lezama Lima" },
-            new Quote { Id = "https://es.wikiquote.org/wiki/José_Lezama_Lima", Text = "Heidegger sostiene que el hombre es un ser para la muerte; todo poeta, sin embargo, crea la resurrección, entona ante la muerte un hurra victorioso. Y si alguno piensa que exagero, quedará preso de los desastres, del demonio y de los círculos infernales.", Author = "José Lezama Lima" },
         };
     }
 }

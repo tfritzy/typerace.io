@@ -13,7 +13,6 @@ public static partial class FrenchQuotes
             new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Racine", Text = "Porus dans le tombeau descendrait en vainqueur.", Author = "Jean Racine" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Racine", Text = "Las de se faire aimer il veut se faire craindre", Author = "Jean Racine" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Racine", Text = "Toujours la tyrannie a d'heureuses prémices.", Author = "Jean Racine" },
-            new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Racine", Text = "Excité d'un désir curieux Cette nuit je l'ai vue arriver en ces lieux, Triste, levant au Ciel ses yeux mouillés de larmes, Qui brillaient au travers des flambeaux et des armes Belle, sans ornement, dans le simple appareil D'une Beauté qu'on vient d'arracher au sommeil.", Author = "Jean Racine" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Racine", Text = "Mais si de vos flatteurs vous suivez la maxime, Il vous faudra, Seigneur, courir de crime en crime, Soutenir vos rigueurs par d'autres cruautés, Et laver dans le sang vos bras ensanglantés.", Author = "Jean Racine" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Racine", Text = "La principale règle est de plaire et de toucher.", Author = "Jean Racine" },
             new Quote { Id = "https://fr.wikiquote.org/wiki/Jean_Racine", Text = "Hélas ! À quel amour on veut que je renonce !", Author = "Jean Racine" },
