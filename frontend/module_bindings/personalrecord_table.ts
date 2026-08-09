@@ -18,6 +18,7 @@ export default __t.row({
   get gameMode() {
     return GameMode;
   },
+  phraseLength: __t.option(__t.i32()),
   gameRecordId: __t.string(),
   wpm: __t.f64(),
 });

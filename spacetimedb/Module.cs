@@ -341,15 +341,14 @@ public static partial class Module
     }
 
     [Table(Name = "personalrecord", Public = true)]
-    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode), nameof(PhraseLength) })]
     public partial struct PersonalRecord
     {
         [PrimaryKey]
         public string Id;
-        [SpacetimeDB.Index.BTree]
         public Identity PlayerId;
-        [SpacetimeDB.Index.BTree]
         public GameMode GameMode;
+        public int? PhraseLength;
         public string GameRecordId;
         public double Wpm;
     }
@@ -1953,7 +1952,8 @@ public static partial class Module
             EloChange = eloChange
         });
 
-        UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, statsId, wpm);
+        UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, null, statsId, wpm);
+        UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, game.Phrase.Length, statsId, wpm);
 
         if (!progress.IsBot)
         {
@@ -1989,10 +1989,10 @@ public static partial class Module
         }
     }
 
-    private static void UpdatePersonalRecord(ReducerContext ctx, Identity playerId, GameMode gameMode, string gameRecordId, double wpm)
+    private static void UpdatePersonalRecord(ReducerContext ctx, Identity playerId, GameMode gameMode, int? phraseLength, string gameRecordId, double wpm)
     {
         PersonalRecord? existingRecord = null;
-        foreach (var record in ctx.Db.personalrecord.PlayerId_GameMode.Filter((playerId, gameMode)))
+        foreach (var record in ctx.Db.personalrecord.PlayerId_GameMode_PhraseLength.Filter((playerId, gameMode, phraseLength)))
         {
             existingRecord = record;
             break;
@@ -2010,6 +2010,7 @@ public static partial class Module
                 Id = IdGenerator.Generate("pr_", ctx.Rng),
                 PlayerId = playerId,
                 GameMode = gameMode,
+                PhraseLength = phraseLength,
                 GameRecordId = gameRecordId,
                 Wpm = wpm
             });

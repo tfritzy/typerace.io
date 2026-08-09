@@ -386,18 +386,13 @@ const tablesSchema = __schema(
   __table({
     name: 'personalrecord',
     indexes: [
-      { name: 'GameMode', algorithm: 'btree', columns: [
-        'gameMode',
-      ] },
       { name: 'Id', algorithm: 'btree', columns: [
         'id',
       ] },
-      { name: 'PlayerId_GameMode', algorithm: 'btree', columns: [
+      { name: 'PlayerId_GameMode_PhraseLength', algorithm: 'btree', columns: [
         'playerId',
         'gameMode',
-      ] },
-      { name: 'PlayerId', algorithm: 'btree', columns: [
-        'playerId',
+        'phraseLength',
       ] },
     ],
     constraints: [
