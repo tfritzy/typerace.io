@@ -1953,7 +1953,8 @@ public static partial class Module
         });
 
         UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, null, statsId, wpm);
-        UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, game.Phrase.Length, statsId, wpm);
+        var personalRecordLength = game.Phrase.Contains(' ') ? wordsTyped : game.Phrase.Length;
+        UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, personalRecordLength, statsId, wpm);
 
         if (!progress.IsBot)
         {
