@@ -300,6 +300,7 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         [Default("")]
         public string Day;
+        // Schema fields are append-only; reordering them requires a manual migration.
         [Default(0)]
         public double Accuracy;
     }
@@ -314,6 +315,7 @@ public static partial class Module
         public GameMode GameMode;
         public string GameRecordId;
         public double Wpm;
+        // Keep new schema fields at the end so existing databases migrate safely.
         [Default(null!)]
         public int? PhraseLength;
     }

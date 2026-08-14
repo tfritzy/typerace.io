@@ -1,131 +1,143 @@
-import { type GameRecord } from "../types/stdb";
-import { useNavigate } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import type { GameRecord } from "../types/stdb";
 import { formatStopwatchTime, getOrdinalPlacement } from "../utils/formatters";
+import { getLanguageFromMode } from "../utils/modes";
 
 interface RecentGamesProps {
-    gameRecords: GameRecord[];
+  gameRecords: GameRecord[];
 }
 
-const ITEMS_PER_PAGE = 10;
+interface RecentGameRowProps {
+  game: GameRecord;
+  onSelect: (gameId: string) => void;
+}
 
-export const RecentGames = ({ gameRecords }: RecentGamesProps) => {
-    const navigate = useNavigate();
-    const [currentPage, setCurrentPage] = useState(1);
+const PAGE_SIZE = 5;
 
-    const sortedGames = useMemo(() => {
-        return [...gameRecords]
-            .sort((a, b) => Number(b.date - a.date));
-    }, [gameRecords]);
+function compareMostRecent(a: GameRecord, b: GameRecord): number {
+  return a.date > b.date ? -1 : a.date < b.date ? 1 : 0;
+}
 
-    const totalPages = Math.ceil(sortedGames.length / ITEMS_PER_PAGE);
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    const currentGames = sortedGames.slice(startIndex, endIndex);
+function formatGameType(type: string): string {
+  return type === "Private" || type === "Practice" ? type : "Public";
+}
 
-    const formatGameMode = (mode: string) => {
-        return mode.replace(/(\d+)/, ' $1');
-    };
+function formatDuration(timeMs: bigint): string {
+  return formatStopwatchTime(Number(timeMs) / 1_000);
+}
 
-    const formatGameType = (type: string) => {
-        switch (type) {
-            case 'Public': return 'Public';
-            case 'Private': return 'Private';
-            case 'Practice': return 'Practice';
-            default: return 'Public';
-        }
-    };
+function formatPlayedAt(timestamp: bigint): string {
+  const date = new Date(Number(timestamp) / 1_000);
+  const day = date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+  const time = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+  return `${day} ${time}`;
+}
 
-    const formatTime = (timeMs: bigint) => {
-        return formatStopwatchTime(Number(timeMs) / 1000);
-    };
-
-    const formatDate = (timestamp: bigint) => {
-        const date = new Date(Number(timestamp) / 1000);
-        const dateStr = date.toLocaleDateString('en-US', {
-            month: '2-digit',
-            day: '2-digit',
-            year: 'numeric'
-        });
-        const timeStr = date.toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
-        return `${dateStr} ${timeStr}`;
-    };
-
-    if (sortedGames.length === 0) {
-        return (
-            <div className="box box-shadow rounded-xl p-6">
-                <div className="text-muted-foreground text-center">
-                    No games played yet
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="box box-shadow rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
-                <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-border text-foreground text-xs uppercase tracking-wider font-bold min-w-[700px]">
-                    <div>Game Mode</div>
-                    <div className="text-center">Type</div>
-                    <div className="text-center">Placement</div>
-                    <div className="text-center">Time</div>
-                    <div className="text-center">WPM</div>
-                    <div className="text-right">Date</div>
-                </div>
-                {currentGames.map((gameRecord) => (
-                    <button
-                        key={gameRecord.id}
-                        onClick={() => navigate(`/game/${gameRecord.gameId}`)}
-                        className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_2.5fr] gap-4 p-4 border-b border-border last:border-b-0 hover:bg-muted transition-colors cursor-pointer w-full text-left bg-transparent border-0 min-w-[700px]"
-                    >
-                        <div className="text-muted-foreground">
-                            {formatGameMode(gameRecord.gameMode.tag)}
-                        </div>
-                        <div className="text-center text-muted-foreground">
-                            {formatGameType(gameRecord.gameType.tag)}
-                        </div>
-                        <div className="text-center text-muted-foreground flex items-center justify-center gap-1">
-                            <Star className="w-4 h-4 fill-accent-primary text-accent-primary" style={{ opacity: gameRecord.placement === 1 ? 1 : 0 }} />
-                            <span>{getOrdinalPlacement(gameRecord.placement)}</span>
-                        </div>
-                        <div className="text-muted-foreground text-center">
-                            {formatTime(gameRecord.timeMs)}
-                        </div>
-                        <div className="text-muted-foreground text-center">
-                            {Math.round(gameRecord.wpm)}
-                        </div>
-                        <div className="text-muted-foreground text-right text-sm">
-                            {formatDate(gameRecord.date)}
-                        </div>
-                    </button>
-                ))}
-            </div>
-            {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 p-4 border-t border-border">
-                    <button
-                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                        disabled={currentPage === 1}
-                        className="px-3 py-1 rounded bg-muted hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed text-foreground transition-colors"
-                    >
-                        Previous
-                    </button>
-                    <span className="text-muted-foreground text-sm">
-                        Page {currentPage} of {totalPages}
-                    </span>
-                    <button
-                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                        disabled={currentPage === totalPages}
-                        className="px-3 py-1 rounded bg-muted hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed text-foreground transition-colors"
-                    >
-                        Next
-                    </button>
-                </div>
-            )}
+function RecentGameRow({ game, onSelect }: RecentGameRowProps) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(game.gameId)}
+      className="grid w-full min-w-[620px] cursor-pointer grid-cols-[1.4fr_.7fr_.8fr_.7fr_1.25fr] gap-4 border-0 border-b border-border bg-transparent px-2 py-3.5 text-left transition-colors last:border-b-0 hover:bg-muted"
+    >
+      <div>
+        <div className="text-sm font-medium text-secondary-foreground">
+          {getLanguageFromMode(game.gameMode.tag)}
         </div>
+        <div className="mt-0.5 text-xs text-muted-foreground">
+          {formatGameType(game.gameType.tag)}
+        </div>
+      </div>
+      <div className="self-center text-right font-semibold tabular-nums text-foreground">
+        {Math.round(game.wpm)}{" "}
+        <span className="text-[0.68rem] font-medium uppercase text-muted-foreground">
+          wpm
+        </span>
+      </div>
+      <div className="self-center text-right tabular-nums text-muted-foreground">
+        {formatDuration(game.timeMs)}
+      </div>
+      <div className="flex items-center justify-end gap-1 self-center text-right text-muted-foreground">
+        {game.placement === 1 && (
+          <Star className="h-3.5 w-3.5 fill-accent-primary text-accent-primary" />
+        )}
+        <span>{getOrdinalPlacement(game.placement)}</span>
+      </div>
+      <div className="self-center text-right text-xs text-muted-foreground">
+        {formatPlayedAt(game.date)}
+      </div>
+    </button>
+  );
+}
+
+export function RecentGames({ gameRecords }: RecentGamesProps) {
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const openGame = (gameId: string) => navigate(`/game/${gameId}`);
+  const sortedGames = useMemo(
+    () => [...gameRecords].sort(compareMostRecent),
+    [gameRecords],
+  );
+  const totalPages = Math.ceil(sortedGames.length / PAGE_SIZE);
+  const firstItem = (currentPage - 1) * PAGE_SIZE;
+  const currentGames = sortedGames.slice(firstItem, firstItem + PAGE_SIZE);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [gameRecords]);
+
+  if (sortedGames.length === 0) {
+    return (
+      <div className="py-8 text-center text-muted-foreground">
+        No games played yet
+      </div>
     );
-};
+  }
+
+  return (
+    <div>
+      <div className="overflow-x-auto">
+        {currentGames.map((game) => (
+          <RecentGameRow
+            key={game.id}
+            game={game}
+            onSelect={openGame}
+          />
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 border-t border-border p-4">
+          <button
+            type="button"
+            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            disabled={currentPage === 1}
+            className="rounded bg-muted px-3 py-1 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-30"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            type="button"
+            onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+            disabled={currentPage === totalPages}
+            className="rounded bg-muted px-3 py-1 text-foreground transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-30"
+          >
+            Next
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
