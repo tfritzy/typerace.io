@@ -1,6 +1,6 @@
 export type ContentTypeValue = "RandomWords" | "Quotes";
 
-export const WORD_COUNT_BUCKETS = [10, 15, 20, 25] as const;
+export const WORD_COUNT_BUCKETS = [8, 12, 16, 20] as const;
 export type WordCountBucket = (typeof WORD_COUNT_BUCKETS)[number];
 
 export enum Language {

@@ -18,9 +18,9 @@ export default __t.object("PersonalRecord", {
   get gameMode() {
     return GameMode;
   },
-  phraseLength: __t.option(__t.i32()),
   gameRecordId: __t.string(),
   wpm: __t.f64(),
+  phraseLength: __t.option(__t.i32()),
 });
 
 

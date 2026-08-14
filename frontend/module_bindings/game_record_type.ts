@@ -32,6 +32,7 @@ export default __t.object("GameRecord", {
   xpGained: __t.i32(),
   eloChange: __t.i32(),
   day: __t.string(),
+  accuracy: __t.f64(),
 });
 
 

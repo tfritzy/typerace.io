@@ -7,7 +7,7 @@ namespace StdbModule;
 
 public static class PhraseGenerator
 {
-    private static readonly int[] WordCounts = [10, 15, 20];
+    private static readonly int[] WordCounts = [8, 12, 16, 20];
 
     public static string SanitizeText(string text)
     {

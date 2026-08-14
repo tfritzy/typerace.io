@@ -261,6 +261,18 @@ public static partial class Module
         return count;
     }
 
+    private static double CalculateAccuracy(byte[] history)
+    {
+        var totalKeystrokes = history.Length / EVENT_SIZE_BYTES;
+        if (totalKeystrokes == 0)
+        {
+            return 0;
+        }
+
+        var correctKeystrokes = CountEventsByType(history, CharacterEventType.Correct);
+        return (double)correctKeystrokes / totalKeystrokes * 100;
+    }
+
     [Table(Name = "player", Public = true)]
     public partial struct Player
     {
@@ -338,6 +350,9 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         [Default("")]
         public string Day;
+        // Schema fields are append-only; reordering them requires a manual migration.
+        [Default(0)]
+        public double Accuracy;
     }
 
     [Table(Name = "personalrecord", Public = true)]
@@ -348,9 +363,11 @@ public static partial class Module
         public string Id;
         public Identity PlayerId;
         public GameMode GameMode;
-        public int? PhraseLength;
         public string GameRecordId;
         public double Wpm;
+        // Keep new schema fields at the end so existing databases migrate safely.
+        [Default(null!)]
+        public int? PhraseLength;
     }
 
     [Table(Name = "xpgain", Public = true)]
@@ -1918,6 +1935,7 @@ public static partial class Module
         var wpm = CalculateWpm(game.Phrase.Length, timeElapsed);
 
         var wordsTyped = game.Phrase.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+        var accuracy = CalculateAccuracy(progress.CharacterHistory);
 
         var updatedPlayer = player.Value;
         UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped, timeElapsed / 1000);
@@ -1949,7 +1967,8 @@ public static partial class Module
             Placement = placement,
             Wpm = wpm,
             XpGained = 0,
-            EloChange = eloChange
+            EloChange = eloChange,
+            Accuracy = accuracy
         });
 
         UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, null, statsId, wpm);

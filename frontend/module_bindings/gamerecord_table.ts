@@ -32,4 +32,5 @@ export default __t.row({
   xpGained: __t.i32(),
   eloChange: __t.i32(),
   day: __t.string(),
+  accuracy: __t.f64(),
 });
