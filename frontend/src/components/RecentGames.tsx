@@ -3,10 +3,10 @@ import { Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { GameRecord } from "../types/stdb";
 import { formatStopwatchTime, getOrdinalPlacement } from "../utils/formatters";
-import { getLanguageFromMode } from "../utils/modes";
+import { getGameModeLabel } from "../utils/modes";
 
 interface RecentGamesProps {
-  gameRecords: GameRecord[];
+  gameRecords: readonly GameRecord[];
 }
 
 interface RecentGameRowProps {
@@ -47,11 +47,12 @@ function RecentGameRow({ game, onSelect }: RecentGameRowProps) {
     <button
       type="button"
       onClick={() => onSelect(game.gameId)}
+      aria-label={`View ${getGameModeLabel(game.gameMode.tag)} race played ${formatPlayedAt(game.date)}`}
       className="grid w-full min-w-[620px] cursor-pointer grid-cols-[1.4fr_.7fr_.8fr_.7fr_1.25fr] gap-4 border-0 border-b border-border bg-transparent px-2 py-3.5 text-left transition-colors last:border-b-0 hover:bg-muted"
     >
       <div>
         <div className="text-sm font-medium text-secondary-foreground">
-          {getLanguageFromMode(game.gameMode.tag)}
+          {getGameModeLabel(game.gameMode.tag)}
         </div>
         <div className="mt-0.5 text-xs text-muted-foreground">
           {formatGameType(game.gameType.tag)}
@@ -68,7 +69,10 @@ function RecentGameRow({ game, onSelect }: RecentGameRowProps) {
       </div>
       <div className="flex items-center justify-end gap-1 self-center text-right text-muted-foreground">
         {game.placement === 1 && (
-          <Star className="h-3.5 w-3.5 fill-accent-primary text-accent-primary" />
+          <Star
+            aria-hidden
+            className="h-3.5 w-3.5 fill-accent-primary text-accent-primary"
+          />
         )}
         <span>{getOrdinalPlacement(game.placement)}</span>
       </div>

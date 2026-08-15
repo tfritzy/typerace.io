@@ -794,6 +794,7 @@ export const SiteStatsPage = () => {
               ))}
             </div>
             <Select
+              ariaLabel="Game mode"
               value={selectedGameMode}
               onChange={setSelectedGameMode}
               options={gameModeOptions}

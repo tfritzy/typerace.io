@@ -33,6 +33,7 @@ export default __t.object("Game", {
   owner: __t.option(__t.identity()),
   attribution: __t.option(__t.string()),
   allowedErrors: __t.i32(),
+  phraseLength: __t.option(__t.i32()),
 });
 
 

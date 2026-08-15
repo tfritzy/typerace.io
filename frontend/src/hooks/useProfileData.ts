@@ -78,10 +78,10 @@ export function useProfileData(
 
   useEffect(() => {
     setGameRecords([]);
-    if (!conn || !player || !playerIdentity) return;
+    if (!conn || !playerIdentity) return;
 
     const belongsToPlayer = (record: GameRecord) => (
-      record.playerId.isEqual(player.identity)
+      record.playerId.toHexString() === playerIdentity
     );
     const readRecords = () => {
       setGameRecords(
@@ -107,7 +107,7 @@ export function useProfileData(
     const subscription = conn.subscriptionBuilder()
       .onApplied(readRecords)
       .subscribe([
-        `SELECT * FROM gamerecord WHERE PlayerId = '${player.identity}'`,
+        `SELECT * FROM gamerecord WHERE PlayerId = '${playerIdentity}'`,
       ]);
 
     return () => {
@@ -119,10 +119,10 @@ export function useProfileData(
 
   useEffect(() => {
     setPersonalRecords([]);
-    if (!conn || !player || !playerIdentity) return;
+    if (!conn || !playerIdentity) return;
 
     const belongsToPlayer = (record: PersonalRecord) => (
-      record.playerId.isEqual(player.identity)
+      record.playerId.toHexString() === playerIdentity
     );
     const readRecords = () => {
       setPersonalRecords(
@@ -148,7 +148,7 @@ export function useProfileData(
     const subscription = conn.subscriptionBuilder()
       .onApplied(readRecords)
       .subscribe([
-        `SELECT * FROM personalrecord WHERE PlayerId = '${player.identity}'`,
+        `SELECT * FROM personalrecord WHERE PlayerId = '${playerIdentity}'`,
       ]);
 
     return () => {

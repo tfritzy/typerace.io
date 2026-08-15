@@ -12,7 +12,7 @@ import { WpmChart } from "../WpmChart";
 import { WpmDistributionChart } from "../WpmDistributionChart";
 
 interface ProfileActivityProps {
-  gameRecords: GameRecord[];
+  gameRecords: readonly GameRecord[];
 }
 
 const TIME_FRAME_OPTIONS: Array<{
@@ -44,8 +44,8 @@ export function ProfileActivity({ gameRecords }: ProfileActivityProps) {
   );
 
   return (
-    <div className="min-w-0">
-      <section className="mt-6">
+    <div className="flex min-w-0 flex-col gap-8">
+      <section>
         <div className="mb-2 grid grid-cols-[auto_minmax(0,1fr)] items-end gap-4 px-1">
           <h2 className="text-base font-semibold text-secondary-foreground">
             Pace
@@ -75,14 +75,14 @@ export function ProfileActivity({ gameRecords }: ProfileActivityProps) {
         <WpmChart data={visibleRecords} />
       </section>
 
-      <section className="mt-6">
+      <section>
         <h2 className="mb-2 ml-1 text-base font-semibold text-secondary-foreground">
           Distribution
         </h2>
         <WpmDistributionChart data={visibleRecords} />
       </section>
 
-      <section className="mt-6">
+      <section>
         <h2 className="mb-2 ml-1 text-base font-semibold text-secondary-foreground">
           Recent races
         </h2>
