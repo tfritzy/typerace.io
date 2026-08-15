@@ -322,6 +322,9 @@ public static partial class Module
         public string? Attribution;
         [Default(0)]
         public int AllowedErrors;
+        // Schema fields are append-only; reordering them requires a manual migration.
+        [Default(null!)]
+        public int? PhraseLength;
     }
 
     [Table(Name = "gamerecord", Public = true)]
@@ -916,7 +919,8 @@ public static partial class Module
             GameType = gameType,
             Placements = new List<Identity>(),
             Owner = ctx.Sender,
-            AllowedErrors = GetAllowedErrorCount(phrase.Text)
+            AllowedErrors = GetAllowedErrorCount(phrase.Text),
+            PhraseLength = phrase.WordCount
         });
     }
 
@@ -1972,7 +1976,8 @@ public static partial class Module
         });
 
         UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, null, statsId, wpm);
-        var personalRecordLength = game.Phrase.Contains(' ') ? wordsTyped : game.Phrase.Length;
+        var personalRecordLength = game.PhraseLength ??
+            (game.Phrase.Contains(' ') ? wordsTyped : game.Phrase.Length);
         UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, personalRecordLength, statsId, wpm);
 
         if (!progress.IsBot)

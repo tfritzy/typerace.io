@@ -1,11 +1,11 @@
 import type { GameRecord, PersonalRecord } from "../types/stdb";
 import {
-  getContentTypeFromMode,
+  getGameModeLabel,
   getLanguageFromMode,
+  type WordCountBucket,
   WORD_COUNT_BUCKETS,
 } from "./modes";
 
-export const MIN_RACES_FOR_LANGUAGE_RECORDS = 10;
 export const ALL_PROFILE_MODES = "all";
 
 export type ProfileTimeFrame = "all" | "week" | "month" | "3months";
@@ -18,18 +18,18 @@ type LengthRecord = Pick<
   PersonalRecord,
   "gameMode" | "gameRecordId" | "phraseLength" | "wpm"
 >;
-type FilterableRace = Pick<GameRecord, "date" | "gameMode" | "timeMs">;
+type FilterableRace = Pick<GameRecord, "date" | "gameMode">;
+type LanguageModeRace = Pick<GameRecord, "gameMode">;
 
 export interface PersonalRecordSlot {
-  wordCount: (typeof WORD_COUNT_BUCKETS)[number];
+  wordCount: WordCountBucket;
   wpm: number | null;
   accuracy: number | null;
   gameId: string | null;
 }
 
-export interface LanguagePersonalRecords {
-  language: string;
-  raceCount: number;
+export interface ProfilePersonalRecordsData {
+  language: string | null;
   slots: PersonalRecordSlot[];
 }
 
@@ -53,37 +53,58 @@ function emptyRecordSlots(): PersonalRecordSlot[] {
   }));
 }
 
-export function buildLanguagePersonalRecords(
-  personalRecords: readonly LengthRecord[],
-  races: readonly LanguageRace[],
-  minimumRaces = MIN_RACES_FOR_LANGUAGE_RECORDS,
-): LanguagePersonalRecords[] {
-  const racesById = new Map(races.map((race) => [race.id, race]));
+export function getMostPlayedLanguage(
+  races: Iterable<LanguageModeRace>,
+): string | null {
   const raceCounts = new Map<string, number>();
 
-  for (const race of racesById.values()) {
+  for (const race of races) {
     const language = getLanguageFromMode(race.gameMode.tag);
     raceCounts.set(language, (raceCounts.get(language) ?? 0) + 1);
   }
 
-  const groups = new Map<string, LanguagePersonalRecords>();
+  let mostPlayedLanguage: string | null = null;
+  let highestRaceCount = 0;
   for (const [language, raceCount] of raceCounts) {
-    if (raceCount < minimumRaces) continue;
-
-    groups.set(language, {
-      language,
-      raceCount,
-      slots: emptyRecordSlots(),
-    });
+    if (
+      raceCount > highestRaceCount ||
+      (
+        raceCount === highestRaceCount &&
+        (
+          mostPlayedLanguage === null ||
+          language.localeCompare(mostPlayedLanguage) < 0
+        )
+      )
+    ) {
+      mostPlayedLanguage = language;
+      highestRaceCount = raceCount;
+    }
   }
+
+  return mostPlayedLanguage;
+}
+
+export function buildProfilePersonalRecords(
+  personalRecords: readonly LengthRecord[],
+  races: readonly LanguageRace[],
+): ProfilePersonalRecordsData {
+  const racesById = new Map(races.map((race) => [race.id, race]));
+  const language = getMostPlayedLanguage(racesById.values());
+  const result: ProfilePersonalRecordsData = {
+    language,
+    slots: emptyRecordSlots(),
+  };
+  if (!language) return result;
 
   for (const record of personalRecords) {
     if (record.phraseLength === undefined) continue;
 
-    const language = getLanguageFromMode(record.gameMode.tag);
-    const slot = groups
-      .get(language)
-      ?.slots.find(({ wordCount }) => wordCount === record.phraseLength);
+    const recordLanguage = getLanguageFromMode(record.gameMode.tag);
+    if (recordLanguage !== language) continue;
+
+    const slot = result.slots.find(
+      ({ wordCount }) => wordCount === record.phraseLength,
+    );
 
     if (!slot || (slot.wpm !== null && slot.wpm >= record.wpm)) continue;
 
@@ -93,16 +114,7 @@ export function buildLanguagePersonalRecords(
     slot.gameId = race?.gameId ?? null;
   }
 
-  return Array.from(groups.values()).sort(
-    (a, b) => b.raceCount - a.raceCount || a.language.localeCompare(b.language),
-  );
-}
-
-function getProfileModeLabel(mode: string): string {
-  const contentType = getContentTypeFromMode(mode) === "Quotes"
-    ? "quotes"
-    : "words";
-  return `${getLanguageFromMode(mode)} ${contentType}`;
+  return result;
 }
 
 export function buildProfileModeOptions(
@@ -111,7 +123,7 @@ export function buildProfileModeOptions(
   const modes = new Set(records.map(({ gameMode }) => gameMode.tag));
 
   return Array.from(modes)
-    .map((value) => ({ value, label: getProfileModeLabel(value) }))
+    .map((value) => ({ value, label: getGameModeLabel(value) }))
     .sort((a, b) => a.label.localeCompare(b.label));
 }
 
@@ -126,12 +138,8 @@ export function filterProfileGameRecords<T extends FilterableRace>(
     ? null
     : BigInt(nowMs - days * 24 * 60 * 60 * 1_000) * 1_000n;
 
-  return records
-    .filter((record) => (
-      (mode === ALL_PROFILE_MODES || record.gameMode.tag === mode)
-      && (cutoff === null || record.date >= cutoff)
-    ))
-    .sort((a, b) => (
-      a.timeMs < b.timeMs ? -1 : a.timeMs > b.timeMs ? 1 : 0
-    ));
+  return records.filter((record) => (
+    (mode === ALL_PROFILE_MODES || record.gameMode.tag === mode)
+    && (cutoff === null || record.date >= cutoff)
+  ));
 }

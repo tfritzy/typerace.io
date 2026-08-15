@@ -9,7 +9,7 @@ import { useDatabase } from "../contexts/SpacetimeContext";
 import { useAuth } from "../firebase/AuthContext";
 import { useProfileData } from "../hooks/useProfileData";
 import { getDefaultSiteTitle, getLangHome } from "../utils/modes";
-import { buildLanguagePersonalRecords } from "../utils/profileStats";
+import { buildProfilePersonalRecords } from "../utils/profileStats";
 
 export function ProfilePage() {
   const { playerId } = useParams<{ playerId: string }>();
@@ -22,8 +22,8 @@ export function ProfilePage() {
   );
   const [isEditNameModalOpen, setIsEditNameModalOpen] = useState(false);
 
-  const languageRecords = useMemo(
-    () => buildLanguagePersonalRecords(personalRecords, gameRecords),
+  const personalRecordSummary = useMemo(
+    () => buildProfilePersonalRecords(personalRecords, gameRecords),
     [personalRecords, gameRecords],
   );
   const isOwnProfile = Boolean(
@@ -60,17 +60,16 @@ export function ProfilePage() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-16 pt-5 sm:pt-8">
-        <div className="content-container">
+      <main className="min-h-0 flex-1 overflow-y-auto px-4 pb-16 pt-2 sm:pt-3">
+        <div className="content-container flex flex-col gap-8">
           <ProfileHeader
             player={player}
+            mostPlayedLanguage={personalRecordSummary.language}
             canEdit={isOwnProfile}
             onEdit={() => setIsEditNameModalOpen(true)}
           />
 
-          <div className="mt-4">
-            <ProfilePersonalRecords groups={languageRecords} />
-          </div>
+          <ProfilePersonalRecords records={personalRecordSummary} />
 
           <ProfileActivity
             key={player.playerId}
@@ -78,7 +77,7 @@ export function ProfilePage() {
           />
 
           {isOwnProfile && (
-            <div className="mt-8 flex justify-center px-1">
+            <div className="flex justify-center px-1">
               <button
                 type="button"
                 onClick={handleSignOut}

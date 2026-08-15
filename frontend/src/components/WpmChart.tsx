@@ -14,6 +14,7 @@ import { memo, useMemo } from "react";
 import { Line } from "react-chartjs-2";
 import type { GameRecord } from "../types/stdb";
 import { formatStopwatchTime, getOrdinalPlacement } from "../utils/formatters";
+import { getGameModeLabel } from "../utils/modes";
 import { prepareWpmChartData } from "./wpmChartData";
 import { useChartColors } from "./useChartColors";
 
@@ -148,7 +149,7 @@ const WpmChartComponent = ({ data }: WpmChartProps) => {
                 `${context.parsed.y.toFixed(1)} WPM`,
                 `Time: ${formatStopwatchTime(Number(record.timeMs) / 1000)}`,
                 `Place: ${getOrdinalPlacement(record.placement)}`,
-                `Mode: ${record.gameMode.tag}`,
+                `Mode: ${getGameModeLabel(record.gameMode.tag)}`,
               ];
             },
           },

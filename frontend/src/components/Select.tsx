@@ -1,3 +1,6 @@
+import { useId } from "react";
+import { cn } from "../lib/utils";
+
 interface SelectOption<T extends string> {
   value: T;
   label: string;
@@ -6,7 +9,7 @@ interface SelectOption<T extends string> {
 interface SelectProps<T extends string> {
   value: T;
   onChange: (value: T) => void;
-  options: SelectOption<T>[];
+  options: readonly SelectOption<T>[];
   label?: string;
   ariaLabel?: string;
   className?: string;
@@ -22,16 +25,22 @@ export function Select<T extends string>({
   className = "",
   fluid = false,
 }: SelectProps<T>) {
+  const selectId = useId();
+
   return (
-    <div className={`flex flex-col gap-1 ${className}`}>
+    <div className={cn("flex flex-col gap-1", className)}>
       {label && (
-        <label className="text-xs font-medium text-muted-foreground">
+        <label
+          htmlFor={selectId}
+          className="text-xs font-medium text-muted-foreground"
+        >
           {label}
         </label>
       )}
-      <div className={`relative ${fluid ? "min-w-0" : "min-w-[150px]"}`}>
+      <div className={cn("relative", fluid ? "min-w-0" : "min-w-[150px]")}>
         <select
-          aria-label={ariaLabel ?? label}
+          id={selectId}
+          aria-label={ariaLabel}
           value={value}
           onChange={(event) => onChange(event.target.value as T)}
           className="h-[42px] w-full cursor-pointer appearance-none rounded-md border border-border bg-input py-2.5 pl-4 pr-10 text-sm text-foreground outline-none"

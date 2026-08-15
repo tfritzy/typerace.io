@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-  buildLanguagePersonalRecords,
+  buildProfilePersonalRecords,
   buildProfileModeOptions,
   filterProfileGameRecords,
+  getMostPlayedLanguage,
 } from "./profileStats";
 
 let nextRaceId = 0;
@@ -28,9 +29,9 @@ const record = (
   wpm,
 });
 
-describe("buildLanguagePersonalRecords", () => {
+describe("buildProfilePersonalRecords", () => {
   it("uses personal-record rows for the four game lengths", () => {
-    const groups = buildLanguagePersonalRecords(
+    const result = buildProfilePersonalRecords(
       [
         record("English500", 8, 82, "record-8"),
         record("English500", 12, 91, "record-12"),
@@ -43,32 +44,29 @@ describe("buildLanguagePersonalRecords", () => {
       ],
     );
 
-    expect(groups).toEqual([
-      {
-        language: "English",
-        raceCount: 10,
-        slots: [
-          {
-            wordCount: 8,
-            wpm: 82,
-            accuracy: 94.2,
-            gameId: "game-record-8",
-          },
-          {
-            wordCount: 12,
-            wpm: 91,
-            accuracy: 96.4,
-            gameId: "game-record-12",
-          },
-          { wordCount: 16, wpm: null, accuracy: null, gameId: null },
-          { wordCount: 20, wpm: null, accuracy: null, gameId: null },
-        ],
-      },
-    ]);
+    expect(result).toEqual({
+      language: "English",
+      slots: [
+        {
+          wordCount: 8,
+          wpm: 82,
+          accuracy: 94.2,
+          gameId: "game-record-8",
+        },
+        {
+          wordCount: 12,
+          wpm: 91,
+          accuracy: 96.4,
+          gameId: "game-record-12",
+        },
+        { wordCount: 16, wpm: null, accuracy: null, gameId: null },
+        { wordCount: 20, wpm: null, accuracy: null, gameId: null },
+      ],
+    });
   });
 
   it("groups modes under the language name and keeps the best record per length", () => {
-    const groups = buildLanguagePersonalRecords(
+    const result = buildProfilePersonalRecords(
       [
         record("Spanish500", 16, 80, "words"),
         record("SpanishQuotes", 16, 88, "quote"),
@@ -77,11 +75,10 @@ describe("buildLanguagePersonalRecords", () => {
         race("Spanish500", "words", 91),
         race("SpanishQuotes", "quote", 97),
       ],
-      1,
     );
 
-    expect(groups[0].language).toBe("Spanish");
-    expect(groups[0].slots[2]).toEqual({
+    expect(result.language).toBe("Spanish");
+    expect(result.slots[2]).toEqual({
       wordCount: 16,
       wpm: 88,
       accuracy: 97,
@@ -89,41 +86,78 @@ describe("buildLanguagePersonalRecords", () => {
     });
   });
 
-  it("only promotes substantially played languages", () => {
-    const groups = buildLanguagePersonalRecords(
+  it("only shows the most-played language without a minimum", () => {
+    const result = buildProfilePersonalRecords(
       [record("French500", 8, 70, "french")],
       [
         race("French500", "french"),
-        ...Array.from({ length: 9 }, () => race("French500")),
-        ...Array.from({ length: 9 }, () => race("German500")),
+        race("French500"),
+        race("German500"),
       ],
     );
 
-    expect(groups.map((group) => group.language)).toEqual(["French"]);
+    expect(result.language).toBe("French");
   });
 
-  it("does not count the same subscribed race twice", () => {
-    const duplicatedRace = race("English500", "duplicate");
-    const groups = buildLanguagePersonalRecords(
+  it("does not let duplicate subscribed races skew the language", () => {
+    const duplicatedRace = race("Spanish500", "duplicate");
+    const result = buildProfilePersonalRecords(
       [],
-      Array.from({ length: 10 }, () => duplicatedRace),
+      [
+        ...Array.from({ length: 10 }, () => duplicatedRace),
+        race("English500"),
+        race("EnglishQuotes"),
+      ],
     );
 
-    expect(groups).toEqual([]);
+    expect(result.language).toBe("English");
   });
 
   it("keeps a record visible when its matching race is unavailable", () => {
-    const groups = buildLanguagePersonalRecords(
+    const result = buildProfilePersonalRecords(
       [record("English500", 20, 110, "missing")],
       Array.from({ length: 10 }, () => race("English500")),
     );
 
-    expect(groups[0].slots[3]).toEqual({
+    expect(result.slots[3]).toEqual({
       wordCount: 20,
       wpm: 110,
       accuracy: null,
       gameId: null,
     });
+  });
+
+  it("returns empty slots when the player has not raced", () => {
+    expect(buildProfilePersonalRecords([], [])).toEqual({
+      language: null,
+      slots: [
+        { wordCount: 8, wpm: null, accuracy: null, gameId: null },
+        { wordCount: 12, wpm: null, accuracy: null, gameId: null },
+        { wordCount: 16, wpm: null, accuracy: null, gameId: null },
+        { wordCount: 20, wpm: null, accuracy: null, gameId: null },
+      ],
+    });
+  });
+});
+
+describe("getMostPlayedLanguage", () => {
+  it("groups word and quote modes by language", () => {
+    expect(getMostPlayedLanguage([
+      race("Spanish500"),
+      race("English500"),
+      race("SpanishQuotes"),
+    ])).toBe("Spanish");
+  });
+
+  it("returns no language when there are no races", () => {
+    expect(getMostPlayedLanguage([])).toBeNull();
+  });
+
+  it("uses alphabetical order to break a tie", () => {
+    expect(getMostPlayedLanguage([
+      race("Spanish500"),
+      race("EnglishQuotes"),
+    ])).toBe("English");
   });
 });
 
@@ -150,7 +184,7 @@ describe("profile activity filters", () => {
     ]);
   });
 
-  it("filters by mode and time frame, then sorts by pace", () => {
+  it("filters by mode and time frame without reordering races", () => {
     const fast = activityRace("English500", 2, 10_000n);
     const slow = activityRace("English500", 3, 20_000n);
     const old = activityRace("English500", 10, 5_000n);
@@ -161,6 +195,6 @@ describe("profile activity filters", () => {
       "English500",
       "week",
       nowMs,
-    )).toEqual([fast, slow]);
+    )).toEqual([slow, fast]);
   });
 });
