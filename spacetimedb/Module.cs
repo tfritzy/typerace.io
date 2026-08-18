@@ -141,8 +141,6 @@ public static partial class Module
     private const long PRACTICE_GAME_COUNTDOWN_MICROSECONDS = 4_000_000;
     private const long BOT_FILL_DELAY_MICROSECONDS = 5_000_000;
     private const long PRACTICE_GAME_COUNTDOWN_START_DELAY_MICROSECONDS = 1_000_000;
-    private const int EVENT_SIZE_BYTES = 3;
-    private const ushort MAX_DECISECONDS = ushort.MaxValue;
     private const long BOT_RECOGNITION_DELAY_MIN_MICROSECONDS = 100_000;
     private const long BOT_RECOGNITION_DELAY_RANGE_MICROSECONDS = 300_000;
     private const long BOT_HESITATION_DELAY_MIN_MICROSECONDS = 400_000;
@@ -225,42 +223,6 @@ public static partial class Module
         }
     }
 
-    private static byte[] EncodeCharacterEvent(long gameStartMicros, long eventMicros, CharacterEventType eventType)
-    {
-        var elapsedMicros = eventMicros - gameStartMicros;
-        var deciseconds = (ushort)Math.Min(elapsedMicros / 100_000, MAX_DECISECONDS);
-
-        return new byte[]
-        {
-            (byte)(deciseconds & 0xFF),
-            (byte)((deciseconds >> 8) & 0xFF),
-            (byte)eventType
-        };
-    }
-
-    private static void AppendCharacterEvent(ref byte[] history, long gameStartMicros, long eventMicros, CharacterEventType eventType)
-    {
-        var eventBytes = EncodeCharacterEvent(gameStartMicros, eventMicros, eventType);
-        var newHistory = new byte[history.Length + EVENT_SIZE_BYTES];
-        Array.Copy(history, newHistory, history.Length);
-        Array.Copy(eventBytes, 0, newHistory, history.Length, EVENT_SIZE_BYTES);
-        history = newHistory;
-    }
-
-    private static int CountEventsByType(byte[] history, CharacterEventType eventType)
-    {
-        int count = 0;
-        for (int i = 0; i <= history.Length - EVENT_SIZE_BYTES; i += EVENT_SIZE_BYTES)
-        {
-            var type = (CharacterEventType)history[i + 2];
-            if (type == eventType)
-            {
-                count++;
-            }
-        }
-        return count;
-    }
-
     [Table(Name = "player", Public = true)]
     public partial struct Player
     {
@@ -338,20 +300,22 @@ public static partial class Module
         [SpacetimeDB.Index.BTree]
         [Default("")]
         public string Day;
+        [Default(0)]
+        public double Accuracy;
     }
 
     [Table(Name = "personalrecord", Public = true)]
-    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode) })]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode), nameof(PhraseLength) })]
     public partial struct PersonalRecord
     {
         [PrimaryKey]
         public string Id;
-        [SpacetimeDB.Index.BTree]
         public Identity PlayerId;
-        [SpacetimeDB.Index.BTree]
         public GameMode GameMode;
         public string GameRecordId;
         public double Wpm;
+        [Default(null!)]
+        public int? PhraseLength;
     }
 
     [Table(Name = "xpgain", Public = true)]
@@ -1108,7 +1072,7 @@ public static partial class Module
                     int charsToDelete = progressIndex - wordStart;
 
                     var updatedProgress = progress.Value;
-                    AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, CharacterEventType.Incorrect);
+                    CharacterHistoryUtils.Append(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, CharacterEventType.Incorrect);
 
                     long recognitionDelay = BOT_RECOGNITION_DELAY_MIN_MICROSECONDS + (long)(ctx.Rng.NextDouble() * BOT_RECOGNITION_DELAY_RANGE_MICROSECONDS);
                     long backspaceInterval = (long)(adjustedTypingRate * BOT_BACKSPACE_SPEED_MULTIPLIER);
@@ -1116,7 +1080,7 @@ public static partial class Module
                     for (int i = 0; i <= charsToDelete; i++)
                     {
                         long eventTime = ctx.Timestamp.MicrosecondsSinceUnixEpoch + recognitionDelay + i * backspaceInterval;
-                        AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, eventTime, CharacterEventType.Backspace);
+                        CharacterHistoryUtils.Append(ref updatedProgress.CharacterHistory, game.Value.RacingStartedAt, eventTime, CharacterEventType.Backspace);
                     }
 
                     updatedProgress.ProgressIndex = wordStart;
@@ -1919,6 +1883,7 @@ public static partial class Module
         var wpm = CalculateWpm(game.Phrase.Length, timeElapsed);
 
         var wordsTyped = game.Phrase.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+        var accuracy = CharacterHistoryUtils.CalculateAccuracy(progress.CharacterHistory);
 
         var updatedPlayer = player.Value;
         UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped, timeElapsed / 1000);
@@ -1950,10 +1915,13 @@ public static partial class Module
             Placement = placement,
             Wpm = wpm,
             XpGained = 0,
-            EloChange = eloChange
+            EloChange = eloChange,
+            Accuracy = accuracy
         });
 
-        UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, statsId, wpm);
+        UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, null, statsId, wpm);
+        var personalRecordLength = game.Phrase.Contains(' ') ? wordsTyped : game.Phrase.Length;
+        UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, personalRecordLength, statsId, wpm);
 
         if (!progress.IsBot)
         {
@@ -1989,10 +1957,10 @@ public static partial class Module
         }
     }
 
-    private static void UpdatePersonalRecord(ReducerContext ctx, Identity playerId, GameMode gameMode, string gameRecordId, double wpm)
+    private static void UpdatePersonalRecord(ReducerContext ctx, Identity playerId, GameMode gameMode, int? phraseLength, string gameRecordId, double wpm)
     {
         PersonalRecord? existingRecord = null;
-        foreach (var record in ctx.Db.personalrecord.PlayerId_GameMode.Filter((playerId, gameMode)))
+        foreach (var record in ctx.Db.personalrecord.PlayerId_GameMode_PhraseLength.Filter((playerId, gameMode, phraseLength)))
         {
             existingRecord = record;
             break;
@@ -2010,6 +1978,7 @@ public static partial class Module
                 Id = IdGenerator.Generate("pr_", ctx.Rng),
                 PlayerId = playerId,
                 GameMode = gameMode,
+                PhraseLength = phraseLength,
                 GameRecordId = gameRecordId,
                 Wpm = wpm
             });
@@ -2162,7 +2131,7 @@ public static partial class Module
 
         var updatedProgress = progress;
         updatedProgress.ProgressIndex = newIndex;
-        AppendCharacterEvent(ref updatedProgress.CharacterHistory, game.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, eventType);
+        CharacterHistoryUtils.Append(ref updatedProgress.CharacterHistory, game.RacingStartedAt, ctx.Timestamp.MicrosecondsSinceUnixEpoch, eventType);
 
         var elapsedMicros = ctx.Timestamp.MicrosecondsSinceUnixEpoch - game.RacingStartedAt;
         updatedProgress.Wpm = CalculateWpm(newIndex, elapsedMicros);

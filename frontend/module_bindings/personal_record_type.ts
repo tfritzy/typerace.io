@@ -20,6 +20,7 @@ export default __t.object("PersonalRecord", {
   },
   gameRecordId: __t.string(),
   wpm: __t.f64(),
+  phraseLength: __t.option(__t.i32()),
 });
 
 
