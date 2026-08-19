@@ -127,7 +127,7 @@ describe("TypeBox selection", () => {
     expect(input.selectionEnd).toBe(5);
   });
 
-  it("returns an externally moved selection to the end", () => {
+  it("returns an externally moved caret to the end", () => {
     const { getByRole } = render(
       <TypeBox phrase="hello world" initialValue="hello" />,
     );
@@ -138,6 +138,19 @@ describe("TypeBox selection", () => {
 
     expect(input.selectionStart).toBe(5);
     expect(input.selectionEnd).toBe(5);
+  });
+
+  it("does not override a browser-managed selection range", () => {
+    const { getByRole } = render(
+      <TypeBox phrase="hello world" initialValue="hello" />,
+    );
+    const input = getByRole("textbox") as HTMLTextAreaElement;
+
+    input.setSelectionRange(1, 4);
+    fireEvent.select(input);
+
+    expect(input.selectionStart).toBe(1);
+    expect(input.selectionEnd).toBe(4);
   });
 });
 
@@ -167,13 +180,23 @@ describe("TypeBox mobile input", () => {
     expect(input.value).toBe(misspelledPhrase);
     expect(onComplete).not.toHaveBeenCalled();
 
+    const finalWordStart = misspelledPhrase.lastIndexOf(" ") + 1;
+    input.setSelectionRange(finalWordStart, misspelledPhrase.length);
+    fireEvent.select(input);
+    input.setRangeText(
+      "tomorrow",
+      input.selectionStart,
+      input.selectionEnd,
+      "end",
+    );
     fireEvent.input(input, {
       data: "tomorrow",
       inputType: "insertReplacementText",
-      target: { value: phrase },
     });
 
     expect(input.value).toBe(phrase);
+    expect(input.selectionStart).toBe(phrase.length);
+    expect(input.selectionEnd).toBe(phrase.length);
     expect(onComplete).toHaveBeenCalledOnce();
   });
   it("reports expected progress while typing and correcting errors", () => {

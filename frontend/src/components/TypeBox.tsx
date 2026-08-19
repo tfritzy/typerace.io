@@ -112,6 +112,13 @@ export const TypeBox = memo(forwardRef<TypeBoxRef, TypeBoxProps>(
       }
     }, []);
 
+    const handleSelect = useCallback(() => {
+      const input = inputRef.current;
+      if (input && input.selectionStart === input.selectionEnd) {
+        resetCursorToEnd();
+      }
+    }, [resetCursorToEnd]);
+
     React.useLayoutEffect(() => {
       resetCursorToEnd();
     }, [initialInput, resetCursorToEnd]);
@@ -219,15 +226,17 @@ export const TypeBox = memo(forwardRef<TypeBoxRef, TypeBoxProps>(
         }
 
         handleChange(event.currentTarget.value);
+        resetCursorToEnd();
       },
-      [handleChange],
+      [handleChange, resetCursorToEnd],
     );
 
     const handleCompositionCommit = useCallback(
       (event: React.CompositionEvent<HTMLTextAreaElement>) => {
         handleChange(event.currentTarget.value);
+        resetCursorToEnd();
       },
-      [handleChange],
+      [handleChange, resetCursorToEnd],
     );
 
     const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -284,7 +293,7 @@ export const TypeBox = memo(forwardRef<TypeBoxRef, TypeBoxProps>(
               onPaste={handlePaste}
               onFocus={handleFocus}
               onBlur={handleBlur}
-              onSelect={resetCursorToEnd}
+              onSelect={handleSelect}
               onCompositionEnd={handleCompositionCommit}
               readOnly={isInputDisabled}
               id="type-box"
