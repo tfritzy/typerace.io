@@ -71,7 +71,7 @@ export function ProfilePersonalRecords({
               label={`${slot.wordCount} words`}
             />
             <span className={cn(
-              "mt-2 text-base font-semibold tabular-nums",
+              "mt-0.5 text-base font-semibold tabular-nums",
               slot.wpm === null
                 ? "text-muted-foreground"
                 : "text-foreground",

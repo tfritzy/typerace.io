@@ -6,7 +6,6 @@ import {
   Trophy,
   type LucideIcon,
 } from "lucide-react";
-import { cn } from "../../lib/utils";
 import type { Player } from "../../types/stdb";
 import { formatNumber, formatTimeSpent } from "../../utils/formatters";
 import {
@@ -27,12 +26,7 @@ interface CareerStatProps {
 
 function CareerStat({ icon: Icon, label, value }: CareerStatProps) {
   return (
-    <li
-      className={cn(
-        profileMetricCardClass,
-        "snap-start",
-      )}
-    >
+    <li className={profileMetricCardClass}>
       <ProfileMetricLabel icon={Icon} label={label} />
       <span className="mt-2 whitespace-nowrap text-base font-semibold tabular-nums text-foreground">
         {value}
@@ -78,7 +72,7 @@ export function ProfileCareerStats({
         Career stats
       </h2>
 
-      <ul className="m-0 grid list-none snap-x grid-flow-col auto-cols-[minmax(9rem,1fr)] gap-3 overflow-x-auto p-0 pb-1 md:grid-flow-row md:grid-cols-5 md:auto-cols-auto md:overflow-visible md:pb-0">
+      <ul className="m-0 grid list-none grid-flow-col auto-cols-[minmax(9rem,1fr)] gap-3 overflow-x-auto p-0 pb-1 md:grid-flow-row md:grid-cols-5 md:auto-cols-auto md:overflow-visible md:pb-0">
         {stats.map((stat) => (
           <CareerStat key={stat.label} {...stat} />
         ))}
