@@ -135,7 +135,7 @@ const WpmDistributionChartComponent = ({ data }: WpmDistributionChartProps) => {
   );
 
   return (
-    <div className="w-full rounded-lg border border-border bg-card px-6 pb-4 pt-5 box-shadow">
+    <div className="w-full rounded-lg border border-border/60 bg-card px-6 pb-4 pt-5">
       <div className="mb-3 flex flex-wrap items-baseline gap-x-5 gap-y-2 text-xs">
         <span className="text-muted-foreground">
           Total{" "}

@@ -6,8 +6,13 @@ import {
   Trophy,
   type LucideIcon,
 } from "lucide-react";
+import { cn } from "../../lib/utils";
 import type { Player } from "../../types/stdb";
 import { formatNumber, formatTimeSpent } from "../../utils/formatters";
+import {
+  ProfileMetricLabel,
+  profileMetricCardClass,
+} from "./ProfileMetric";
 
 interface ProfileCareerStatsProps {
   player: Player;
@@ -22,17 +27,17 @@ interface CareerStatProps {
 
 function CareerStat({ icon: Icon, label, value }: CareerStatProps) {
   return (
-    <div className="flex min-w-0 items-center justify-self-center gap-3">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-input/50 text-accent-primary">
-        <Icon aria-hidden className="h-[17px] w-[17px]" strokeWidth={1.75} />
+    <li
+      className={cn(
+        profileMetricCardClass,
+        "snap-start",
+      )}
+    >
+      <ProfileMetricLabel icon={Icon} label={label} />
+      <span className="mt-2 whitespace-nowrap text-base font-semibold tabular-nums text-foreground">
+        {value}
       </span>
-      <div className="flex min-w-0 flex-col-reverse">
-        <dt className="text-xs text-muted-foreground">{label}</dt>
-        <dd className="m-0 whitespace-nowrap text-base font-semibold tabular-nums text-foreground">
-          {value}
-        </dd>
-      </div>
-    </div>
+    </li>
   );
 }
 
@@ -43,31 +48,41 @@ export function ProfileCareerStats({
   const stats: CareerStatProps[] = [
     {
       icon: Languages,
-      label: "most played",
+      label: "top language",
       value: mostPlayedLanguage ?? "–",
     },
-    { icon: Flag, label: "races", value: formatNumber(player.totalGames) },
-    { icon: Trophy, label: "wins", value: formatNumber(player.wins) },
+    {
+      icon: Flag,
+      label: "games played",
+      value: formatNumber(player.totalGames),
+    },
+    { icon: Trophy, label: "total wins", value: formatNumber(player.wins) },
     {
       icon: Keyboard,
-      label: "words",
+      label: "words typed",
       value: formatNumber(player.totalWordsTyped),
     },
     {
       icon: Clock3,
-      label: "typing",
+      label: "typing time",
       value: formatTimeSpent(Number(player.totalTimeSpentMs)),
     },
   ];
 
   return (
-    <dl
-      aria-label="Career stats"
-      className="grid grid-cols-2 gap-5 rounded-full border border-border bg-input/30 px-5 py-5 shadow-[inset_0_2px_4px_rgb(0_0_0/0.14),inset_0_-1px_1px_rgb(255_255_255/0.04)] sm:grid-cols-3 sm:gap-8 sm:px-6 lg:grid-cols-5"
-    >
-      {stats.map((stat) => (
-        <CareerStat key={stat.label} {...stat} />
-      ))}
-    </dl>
+    <section aria-labelledby="career-stats-heading">
+      <h2
+        id="career-stats-heading"
+        className="mb-2 ml-1 text-base font-semibold text-secondary-foreground"
+      >
+        Career stats
+      </h2>
+
+      <ul className="m-0 grid list-none snap-x grid-flow-col auto-cols-[minmax(9rem,1fr)] gap-3 overflow-x-auto p-0 pb-1 md:grid-flow-row md:grid-cols-5 md:auto-cols-auto md:overflow-visible md:pb-0">
+        {stats.map((stat) => (
+          <CareerStat key={stat.label} {...stat} />
+        ))}
+      </ul>
+    </section>
   );
 }

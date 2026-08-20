@@ -2,18 +2,15 @@ import { Pencil } from "lucide-react";
 import type { Player } from "../../types/stdb";
 import { xpProgressToNextLevel } from "../../utils/xpCalculator";
 import { PlayerAvatar } from "../PlayerAvatar";
-import { ProfileCareerStats } from "./ProfileCareerStats";
 
 interface ProfileHeaderProps {
   player: Player;
-  mostPlayedLanguage: string | null;
   canEdit: boolean;
   onEdit: () => void;
 }
 
 export function ProfileHeader({
   player,
-  mostPlayedLanguage,
   canEdit,
   onEdit,
 }: ProfileHeaderProps) {
@@ -23,10 +20,10 @@ export function ProfileHeader({
   );
 
   return (
-    <header className="flex flex-col gap-8 rounded-lg border border-border bg-card px-5 pb-3 pt-5 sm:px-8 sm:pb-5 sm:pt-8">
+    <header className="rounded-lg border border-border/60 bg-card p-5 sm:p-8">
       <div className="flex min-w-0 flex-col items-start gap-4 sm:flex-row sm:gap-6">
         <PlayerAvatar
-          size={80}
+          size={64}
           identity={player.identity.toHexString()}
           isHighlighted
           isBot={player.isBot}
@@ -80,11 +77,6 @@ export function ProfileHeader({
           </div>
         </div>
       </div>
-
-      <ProfileCareerStats
-        player={player}
-        mostPlayedLanguage={mostPlayedLanguage}
-      />
     </header>
   );
 }

@@ -48,7 +48,7 @@ export function ProfileActivity({ gameRecords }: ProfileActivityProps) {
       <section>
         <div className="mb-2 grid grid-cols-[auto_minmax(0,1fr)] items-end gap-4 px-1">
           <h2 className="text-base font-semibold text-secondary-foreground">
-            Pace
+            Race history
           </h2>
 
           <div className="flex min-w-0 justify-end gap-3">
@@ -77,7 +77,7 @@ export function ProfileActivity({ gameRecords }: ProfileActivityProps) {
 
       <section>
         <h2 className="mb-2 ml-1 text-base font-semibold text-secondary-foreground">
-          Distribution
+          Race distribution
         </h2>
         <WpmDistributionChart data={visibleRecords} />
       </section>
@@ -86,7 +86,7 @@ export function ProfileActivity({ gameRecords }: ProfileActivityProps) {
         <h2 className="mb-2 ml-1 text-base font-semibold text-secondary-foreground">
           Recent races
         </h2>
-        <div className="rounded-lg border border-border bg-card p-5 sm:p-6">
+        <div className="rounded-lg border border-border/60 bg-card p-5 sm:p-6">
           <RecentGames gameRecords={visibleRecords} />
         </div>
       </section>

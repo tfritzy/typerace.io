@@ -3,6 +3,7 @@ import { LogOut } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { EditNameModal } from "../components/EditNameModal";
 import { ProfileActivity } from "../components/profile/ProfileActivity";
+import { ProfileCareerStats } from "../components/profile/ProfileCareerStats";
 import { ProfileHeader } from "../components/profile/ProfileHeader";
 import { ProfilePersonalRecords } from "../components/profile/ProfilePersonalRecords";
 import { useDatabase } from "../contexts/SpacetimeContext";
@@ -64,9 +65,13 @@ export function ProfilePage() {
         <div className="content-container flex flex-col gap-8">
           <ProfileHeader
             player={player}
-            mostPlayedLanguage={personalRecordSummary.language}
             canEdit={isOwnProfile}
             onEdit={() => setIsEditNameModalOpen(true)}
+          />
+
+          <ProfileCareerStats
+            player={player}
+            mostPlayedLanguage={personalRecordSummary.language}
           />
 
           <ProfilePersonalRecords records={personalRecordSummary} />

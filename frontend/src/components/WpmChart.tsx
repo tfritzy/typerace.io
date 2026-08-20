@@ -186,7 +186,7 @@ const WpmChartComponent = ({ data }: WpmChartProps) => {
   );
 
   return (
-    <div className="w-full rounded-lg border border-border bg-card px-6 pb-3 pt-6 box-shadow">
+    <div className="w-full rounded-lg border border-border/60 bg-card px-6 pb-3 pt-6">
       <div className="relative h-[400px] w-full">
         <Line data={chartData} options={options} />
       </div>
