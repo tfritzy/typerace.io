@@ -1,6 +1,6 @@
 export type ContentTypeValue = "RandomWords" | "Quotes";
 
-export const WORD_COUNT_BUCKETS = [10, 15, 20, 25] as const;
+export const WORD_COUNT_BUCKETS = [8, 12, 16, 20] as const;
 export type WordCountBucket = (typeof WORD_COUNT_BUCKETS)[number];
 
 export enum Language {
@@ -255,17 +255,9 @@ export function getLanguageFromMode(modeTag: string): Language {
   const langInfo = languages.find(
     (l) =>
       l.randomWordsMode === modeTag ||
-      l.quotesMode === modeTag ||
-      WORD_COUNT_BUCKETS.some((count) => modeTag === `${l.language}${count}`),
+      l.quotesMode === modeTag,
   );
   return langInfo?.language || Language.English;
-}
-
-export function getWordModeTag(
-  language: Language,
-  wordCount: WordCountBucket,
-): string {
-  return `${language}${wordCount}`;
 }
 
 export function getLanguageFromSlug(slug: string | undefined): LanguageInfo {
@@ -320,6 +312,13 @@ export function getContentTypeFromMode(modeTag: string): ContentTypeValue {
     return "Quotes";
   }
   return "RandomWords";
+}
+
+export function getGameModeLabel(modeTag: string): string {
+  const contentType = getContentTypeFromMode(modeTag) === "Quotes"
+    ? "quotes"
+    : "words";
+  return `${getLanguageFromMode(modeTag)} ${contentType}`;
 }
 
 const languageStartupPhrases: Record<Language, string[]> = {
