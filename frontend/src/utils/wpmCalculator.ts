@@ -66,31 +66,20 @@ export function getWpmPerKeystroke(
   raceStartTimestamp: bigint,
 ): number[][] {
   const wpms: number[][] = [];
-  const stack: boolean[] = [];
-  let correctChars = 0;
+  let progressChars = 0;
 
   for (const evt of events) {
-    if (evt.eventType.tag === "Correct") {
-      if (stack.length === 0 || stack[stack.length - 1]) {
-        stack.push(true);
-        correctChars += 1;
-      } else {
-        stack.push(false);
-      }
-    } else if (evt.eventType.tag === "Incorrect") {
-      stack.push(false);
+    if (evt.eventType.tag === "Backspace") {
+      progressChars = Math.max(0, progressChars - 1);
     } else {
-      stack.pop();
-      if (correctChars > stack.length) {
-        correctChars = stack.length;
-      }
+      progressChars += 1;
     }
 
     const elapsedSeconds = Math.max(
       Number(evt.timestamp - raceStartTimestamp) / 1_000_000,
       0,
     );
-    wpms.push([elapsedSeconds, getWpm(correctChars, elapsedSeconds)]);
+    wpms.push([elapsedSeconds, getWpm(progressChars, elapsedSeconds)]);
   }
 
   return wpms;
