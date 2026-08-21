@@ -8,15 +8,20 @@ import {
   startTransition,
   type ReactNode,
 } from "react";
-import { type Game, type PlayerProgress } from "../types/stdb";
+import {
+  type Game,
+  type GameRecord,
+  type PersonalRecord,
+  type PlayerProgress,
+} from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
-import { PlayerStatsRow } from "../components/PlayerStatsRow";
-import { AllPlayersResults } from "../components/AllPlayersResults";
+import { PlayerStatsRow } from "../components/race-results/PlayerStatsRow";
+import { AllPlayersResults } from "../components/race-results/AllPlayersResults";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
 import { useDatabase } from "../contexts/SpacetimeContext";
-import { getMaxPlayerCount } from "../utils/modes";
+import { getContentTypeFromMode, getMaxPlayerCount } from "../utils/modes";
 import { GhostCursor } from "../components/GhostCursor";
 import { getPlayerColorHex } from "../utils/colorMapping";
 import { EmptyPlayerProgressBars } from "../components/EmptyPlayerProgressBars";
@@ -30,6 +35,12 @@ type UiGameType = "Public" | "Private" | "Practice";
 
 const GAME_DATA_WAIT_TIMEOUT_MS = 10_000;
 
+function getCategoryLength(phrase: string): number {
+  return phrase.includes(" ")
+    ? phrase.split(" ").filter(Boolean).length
+    : phrase.length;
+}
+
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
@@ -42,6 +53,7 @@ export const GamePage = () => {
   const [gamePlayerProgress, setGamePlayerProgress] = useState<
     PlayerProgress[]
   >([]);
+  const [hasNewPersonalRecord, setHasNewPersonalRecord] = useState(false);
   const latencyDeltaRef = useRef(latencyDeltaMs);
   const initProgress = useRef({
     gameId: "",
@@ -56,6 +68,7 @@ export const GamePage = () => {
   useEffect(() => {
     setGame(null);
     setGamePlayerProgress([]);
+    setHasNewPersonalRecord(false);
     setHasFinished(false);
     setIsWatchingReplay(false);
     setCountdownComplete(false);
@@ -64,6 +77,7 @@ export const GamePage = () => {
 
   useEffect(() => {
     if (!conn || !gameId) return;
+    setHasNewPersonalRecord(false);
     let progressDeleteRedirect: ReturnType<typeof setTimeout> | undefined;
     let countdownTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -164,11 +178,53 @@ export const GamePage = () => {
       }
     };
 
+    const isCurrentGamePersonalRecord = (record: PersonalRecord) => {
+      if (!conn.identity || !record.playerId.isEqual(conn.identity)) {
+        return false;
+      }
+
+      return conn.db.gamerecord.id.find(record.gameRecordId)?.gameId === gameId;
+    };
+
+    const syncCurrentGamePersonalRecord = () => {
+      setHasNewPersonalRecord(
+        Array.from(conn.db.personalrecord.iter()).some(
+          (record) =>
+            record.phraseLength !== undefined &&
+            isCurrentGamePersonalRecord(record),
+        ),
+      );
+    };
+
+    const handlePersonalRecordInsert = (
+      _ctx: any,
+      record: PersonalRecord,
+    ) => {
+      if (
+        record.phraseLength !== undefined &&
+        isCurrentGamePersonalRecord(record)
+      ) {
+        setHasNewPersonalRecord(true);
+      }
+    };
+
+    const handleGameRecordInsert = (_ctx: any, record: GameRecord) => {
+      if (
+        record.gameId === gameId &&
+        conn.identity &&
+        record.playerId.isEqual(conn.identity)
+      ) {
+        syncCurrentGamePersonalRecord();
+      }
+    };
+
     conn.db.game.onInsert(handleGameInsert);
     conn.db.game.onUpdate(handleGameUpdate);
     conn.db.playerprogress.onInsert(handleProgressInsert);
     conn.db.playerprogress.onUpdate(handleProgressUpdate);
     conn.db.playerprogress.onDelete(handleProgressDelete);
+    conn.db.personalrecord.onInsert(handlePersonalRecordInsert);
+    conn.db.gamerecord.onInsert(handleGameRecordInsert);
 
     const progressQuery = `SELECT * FROM playerprogress WHERE GameId = '${gameId}'`;
     const gameQuery = `SELECT * FROM game WHERE Id = '${gameId}'`;
@@ -177,6 +233,8 @@ export const GamePage = () => {
     if (conn.identity) {
       subscriptionQueries.push(
         `SELECT * FROM playerprogress WHERE PlayerId = '${conn.identity}'`,
+        `SELECT * FROM gamerecord WHERE PlayerId = '${conn.identity}' AND GameId = '${gameId}'`,
+        `SELECT * FROM personalrecord WHERE PlayerId = '${conn.identity}'`,
       );
     }
 
@@ -193,6 +251,7 @@ export const GamePage = () => {
           conn.db.playerprogress.iter(),
         ).filter((pp) => pp.gameId.toString() === gameId);
         setGamePlayerProgress(currentGameProgress);
+        syncCurrentGamePersonalRecord();
       })
       .subscribe(subscriptionQueries);
 
@@ -202,6 +261,8 @@ export const GamePage = () => {
       conn.db.playerprogress.removeOnDelete(handleProgressDelete);
       conn.db.game.removeOnInsert(handleGameInsert);
       conn.db.game.removeOnUpdate(handleGameUpdate);
+      conn.db.personalrecord.removeOnInsert(handlePersonalRecordInsert);
+      conn.db.gamerecord.removeOnInsert(handleGameRecordInsert);
       clearTimeout(progressDeleteRedirect);
       clearTimeout(countdownTimer);
       pageSubscription.unsubscribe();
@@ -295,6 +356,7 @@ export const GamePage = () => {
   }
 
   const gameTypeTag = game.gameType?.tag ?? "Public";
+  const contentType = getContentTypeFromMode(game.gameMode.tag);
   const actionBarGameType: UiGameType =
     gameTypeTag === "Private" || gameTypeTag === "Practice"
       ? gameTypeTag
@@ -409,6 +471,11 @@ export const GamePage = () => {
               playerProgress={currentPlayerProgress}
               raceStartTimestamp={game.racingStartedAt}
               placement={currentPlayerProgress.placement}
+              categoryLength={getCategoryLength(game.phrase)}
+              contentType={contentType}
+              isPersonalRecord={
+                contentType === "RandomWords" && hasNewPersonalRecord
+              }
             />
           )}
           <AllPlayersResults

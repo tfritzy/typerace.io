@@ -12,14 +12,14 @@ import {
 import type { ChartOptions } from "chart.js";
 import { Chart } from "react-chartjs-2";
 import { memo } from "react";
-import type { PlayerProgress } from "../types/stdb";
+import type { PlayerProgress } from "../../types/stdb";
 import {
   decodeCharacterHistory,
   getErrorCountsBySecond,
   getRawWpmByBucket,
   getWpmByBucket,
-} from "../utils/wpmCalculator";
-import { getDisplayColorHex } from "../utils/colorMapping";
+} from "../../utils/wpmCalculator";
+import { getDisplayColorHex } from "../../utils/colorMapping";
 
 ChartJS.register(
   LinearScale,

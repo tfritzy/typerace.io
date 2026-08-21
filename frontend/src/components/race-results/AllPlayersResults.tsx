@@ -1,8 +1,8 @@
 import { useState } from "react";
-import type { PlayerProgress } from "../types/stdb";
+import type { PlayerProgress } from "../../types/stdb";
 import { RaceResultsChart } from "./RaceResultsChart";
-import { PlayerAvatar } from "./PlayerAvatar";
-import { useDatabase } from "../contexts/SpacetimeContext";
+import { PlayerAvatar } from "../PlayerAvatar";
+import { useDatabase } from "../../contexts/SpacetimeContext";
 
 interface AllPlayersResultsProps {
     allPlayerProgress: PlayerProgress[];
