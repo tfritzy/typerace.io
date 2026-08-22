@@ -352,6 +352,8 @@ export const GamePage = () => {
 
   const gameTypeTag = game.gameType?.tag ?? "Public";
   const contentType = getContentTypeFromMode(game.gameMode.tag);
+  const isPersonalRecord =
+    contentType === "RandomWords" && hasNewPersonalRecord;
   const actionBarGameType: UiGameType =
     gameTypeTag === "Private" || gameTypeTag === "Practice"
       ? gameTypeTag
@@ -461,15 +463,16 @@ export const GamePage = () => {
     } else {
       gameContent = (
         <div key="stats-section" className="w-full animate-slideUpFadeIn pb-4">
-          <RaceDetailsRow gameMode={game.gameMode} phrase={game.phrase} />
+          <RaceDetailsRow
+            gameMode={game.gameMode}
+            phrase={game.phrase}
+            isPersonalRecord={isPersonalRecord}
+          />
           {currentPlayerProgress && (
             <PlayerStatsRow
               playerProgress={currentPlayerProgress}
               raceStartTimestamp={game.racingStartedAt}
               placement={currentPlayerProgress.placement}
-              isPersonalRecord={
-                contentType === "RandomWords" && hasNewPersonalRecord
-              }
             />
           )}
           <AllPlayersResults

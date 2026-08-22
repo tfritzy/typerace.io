@@ -14,13 +14,12 @@ const playerProgress = {
   time: 60_000_000n,
 } as PlayerProgress;
 
-function renderStats(placement = 2, isPersonalRecord = false) {
+function renderStats(placement = 2) {
   return render(
     <PlayerStatsRow
       playerProgress={playerProgress}
       raceStartTimestamp={0n}
       placement={placement}
-      isPersonalRecord={isPersonalRecord}
     />,
   );
 }
@@ -42,13 +41,12 @@ describe("PlayerStatsRow", () => {
     expect(cards[3].className).toContain("bg-card");
   });
 
-  it("announces a personal record without accenting the stats", () => {
-    const { container, getByRole } = renderStats(2, true);
+  it("does not accent ordinary results", () => {
+    const { container } = renderStats(2);
     const cards = Array.from(
       container.querySelectorAll("[data-result-stat]"),
     );
 
-    expect(getByRole("status").textContent).toContain("New personal record!");
     expect(cards.every((card) => card.className.includes("bg-card"))).toBe(true);
   });
 });
