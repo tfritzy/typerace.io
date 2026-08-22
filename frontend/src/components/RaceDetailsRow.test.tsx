@@ -23,7 +23,7 @@ describe("getPhraseWordCount", () => {
 });
 
 describe("RaceDetailsRow", () => {
-  it("puts accented inline details above the personal-record announcement", () => {
+  it("keeps inline details muted above the personal-record announcement", () => {
     const { container, getByLabelText, getByRole } = render(
       <RaceDetailsRow
         gameMode={{ tag: "English500" } as GameMode}
@@ -39,7 +39,8 @@ describe("RaceDetailsRow", () => {
 
     expect(status.textContent).toContain("New personal record!");
     expect(details).toHaveLength(3);
-    expect(detailsRow?.className).toContain("text-accent-primary");
+    expect(detailsRow.className).toContain("text-muted-foreground");
+    expect(detailsRow.className).not.toContain("text-accent-primary");
     expect(details.every((detail) =>
       !detail.className.includes("bg-accent-primary/10")
     )).toBe(true);
