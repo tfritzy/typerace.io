@@ -53,13 +53,13 @@ export const RaceDetailsRow = memo(
         )}
         <dl
           aria-label="Race details"
-          className={`grid min-h-9 grid-cols-3 gap-3 text-xs font-semibold tracking-wide ${isPersonalRecord ? "text-accent-primary" : "text-secondary-foreground"}`}
+          className={`flex min-h-7 flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs font-medium tracking-wide ${isPersonalRecord ? "text-accent-primary" : "text-muted-foreground"}`}
         >
-          {details.map((detail) => (
+          {details.map((detail, index) => (
             <div
               key={detail.label}
               data-race-detail
-              className={`flex min-w-0 items-center justify-center rounded-lg border px-2 py-2 ${isPersonalRecord ? "border-accent-primary/40 bg-accent-primary/10" : "border-border bg-card"}`}
+              className={`flex min-w-0 items-center gap-2 ${index > 0 ? "before:content-['·'] before:text-muted-foreground" : ""}`}
             >
               <dt className="sr-only">{detail.label}</dt>
               <dd className="truncate">{detail.value}</dd>

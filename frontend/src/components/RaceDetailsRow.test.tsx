@@ -23,8 +23,8 @@ describe("getPhraseWordCount", () => {
 });
 
 describe("RaceDetailsRow", () => {
-  it("puts the announcement above an accented details row for a personal record", () => {
-    const { container, getByRole } = render(
+  it("puts the announcement above accented inline details for a personal record", () => {
+    const { container, getByLabelText, getByRole } = render(
       <RaceDetailsRow
         gameMode={{ tag: "English500" } as GameMode}
         phrase="one two three"
@@ -35,11 +35,13 @@ describe("RaceDetailsRow", () => {
     const details = Array.from(
       container.querySelectorAll("[data-race-detail]"),
     );
+    const detailsRow = getByLabelText("Race details");
 
     expect(status.textContent).toContain("New personal record!");
     expect(details).toHaveLength(3);
+    expect(detailsRow?.className).toContain("text-accent-primary");
     expect(details.every((detail) =>
-      detail.className.includes("bg-accent-primary/10")
+      !detail.className.includes("bg-accent-primary/10")
     )).toBe(true);
     expect(status.compareDocumentPosition(details[0])).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
