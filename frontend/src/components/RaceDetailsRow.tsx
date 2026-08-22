@@ -31,9 +31,9 @@ export const RaceDetailsRow = memo(
     const wordLabel = t.words;
 
     const details = [
+      { label: "Word length", value: `${wordCount} ${wordLabel}` },
       { label: "Language", value: language.nativeName },
       { label: "Mode", value: mode },
-      { label: "Word length", value: `${wordCount} ${wordLabel}` },
     ];
 
     return (
