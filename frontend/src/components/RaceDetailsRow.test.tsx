@@ -23,7 +23,7 @@ describe("getPhraseWordCount", () => {
 });
 
 describe("RaceDetailsRow", () => {
-  it("puts the announcement above accented inline details for a personal record", () => {
+  it("puts accented inline details above the personal-record announcement", () => {
     const { container, getByLabelText, getByRole } = render(
       <RaceDetailsRow
         gameMode={{ tag: "English500" } as GameMode}
@@ -43,7 +43,7 @@ describe("RaceDetailsRow", () => {
     expect(details.every((detail) =>
       !detail.className.includes("bg-accent-primary/10")
     )).toBe(true);
-    expect(status.compareDocumentPosition(details[0])).toBe(
+    expect(detailsRow.compareDocumentPosition(status)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
   });

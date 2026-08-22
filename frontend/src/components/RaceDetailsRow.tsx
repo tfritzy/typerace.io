@@ -40,20 +40,9 @@ export const RaceDetailsRow = memo(
 
     return (
       <div className="mb-3">
-        {isPersonalRecord && (
-          <div
-            role="status"
-            className="mb-3 flex items-center justify-center gap-2 rounded-lg border border-accent-primary/40 bg-accent-primary/10 px-4 py-3 text-accent-primary"
-          >
-            <Trophy aria-hidden className="h-5 w-5" />
-            <span className="text-sm font-bold uppercase tracking-wider">
-              {t.newPersonalRecord}
-            </span>
-          </div>
-        )}
         <dl
           aria-label="Race details"
-          className={`flex min-h-7 flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs font-medium tracking-wide ${isPersonalRecord ? "text-accent-primary" : "text-muted-foreground"}`}
+          className={`flex min-h-7 flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs font-medium tracking-wide ${isPersonalRecord ? "mb-3 text-accent-primary" : "text-muted-foreground"}`}
         >
           {details.map((detail, index) => (
             <div
@@ -66,6 +55,17 @@ export const RaceDetailsRow = memo(
             </div>
           ))}
         </dl>
+        {isPersonalRecord && (
+          <div
+            role="status"
+            className="flex items-center justify-center gap-2 rounded-lg border border-accent-primary/40 bg-accent-primary/10 px-4 py-3 text-accent-primary"
+          >
+            <Trophy aria-hidden className="h-5 w-5" />
+            <span className="text-sm font-bold uppercase tracking-wider">
+              {t.newPersonalRecord}
+            </span>
+          </div>
+        )}
       </div>
     );
   },
