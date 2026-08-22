@@ -42,7 +42,7 @@ export const RaceDetailsRow = memo(
       <div className="mb-3">
         <dl
           aria-label="Race details"
-          className={`flex min-h-7 flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs font-medium tracking-wide text-muted-foreground ${isPersonalRecord ? "mb-3" : ""}`}
+          className={`flex min-h-9 flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium tracking-wide text-muted-foreground ${isPersonalRecord ? "mb-3" : ""}`}
         >
           {details.map((detail, index) => (
             <div
