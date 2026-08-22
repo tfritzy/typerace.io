@@ -473,12 +473,14 @@ export const GamePage = () => {
               playerProgress={currentPlayerProgress}
               raceStartTimestamp={game.racingStartedAt}
               placement={currentPlayerProgress.placement}
+              isPersonalRecord={isPersonalRecord}
             />
           )}
           <AllPlayersResults
             allPlayerProgress={gamePlayerProgress}
             raceStartTimestamp={game.racingStartedAt}
             initialSelectedPlayerId={currentPlayerProgress?.playerId.toHexString()}
+            isPersonalRecord={isPersonalRecord}
           />
           <ActionBar
             mode={game.gameMode}

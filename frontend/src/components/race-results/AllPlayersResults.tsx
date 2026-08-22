@@ -8,12 +8,14 @@ interface AllPlayersResultsProps {
     allPlayerProgress: PlayerProgress[];
     raceStartTimestamp: bigint;
     initialSelectedPlayerId?: string;
+    isPersonalRecord?: boolean;
 }
 
 export const AllPlayersResults = ({
     allPlayerProgress,
     raceStartTimestamp,
-    initialSelectedPlayerId
+    initialSelectedPlayerId,
+    isPersonalRecord = false
 }: AllPlayersResultsProps) => {
     const { conn } = useDatabase();
     if (!allPlayerProgress || allPlayerProgress.length === 0) {
@@ -31,7 +33,10 @@ export const AllPlayersResults = ({
     const isSelectedCurrentPlayer = !!(currentPlayerId && selectedPlayerProgress.playerId.isEqual(currentPlayerId));
 
     return (
-        <div className="rounded-lg p-3 bg-card border border-border">
+        <div
+            data-race-results
+            className={`rounded-lg border p-3 ${isPersonalRecord ? "border-accent-primary/40 bg-accent-primary/10" : "border-border bg-card"}`}
+        >
             {allPlayerProgress.length > 1 && (
                 <div className="flex gap-3 mb-3 flex-wrap">
                     {allPlayerProgress.map((pp) => {

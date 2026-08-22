@@ -14,12 +14,13 @@ const playerProgress = {
   time: 60_000_000n,
 } as PlayerProgress;
 
-function renderStats(placement = 2) {
+function renderStats(placement = 2, isPersonalRecord = false) {
   return render(
     <PlayerStatsRow
       playerProgress={playerProgress}
       raceStartTimestamp={0n}
       placement={placement}
+      isPersonalRecord={isPersonalRecord}
     />,
   );
 }
@@ -48,5 +49,16 @@ describe("PlayerStatsRow", () => {
     );
 
     expect(cards.every((card) => card.className.includes("bg-card"))).toBe(true);
+  });
+
+  it("accents every stat for a personal record", () => {
+    const { container } = renderStats(2, true);
+    const cards = Array.from(
+      container.querySelectorAll("[data-result-stat]"),
+    );
+
+    expect(cards.every((card) =>
+      card.className.includes("bg-accent-primary/10")
+    )).toBe(true);
   });
 });

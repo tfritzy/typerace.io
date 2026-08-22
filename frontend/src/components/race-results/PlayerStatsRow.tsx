@@ -9,6 +9,7 @@ interface PlayerStatsRowProps {
   playerProgress: PlayerProgress;
   raceStartTimestamp: bigint;
   placement: number;
+  isPersonalRecord?: boolean;
 }
 
 export const PlayerStatsRow = memo(
@@ -16,6 +17,7 @@ export const PlayerStatsRow = memo(
     playerProgress,
     raceStartTimestamp,
     placement,
+    isPersonalRecord = false,
   }: PlayerStatsRowProps) => {
     const finalWpm = getFinalWpm(playerProgress);
     const raceTime = getRaceTime(playerProgress);
@@ -34,22 +36,22 @@ export const PlayerStatsRow = memo(
           <ResultStatCard
             label={t.place}
             value={getOrdinalPlacement(placement)}
-            isAccent={isFirstPlace}
+            isAccent={isPersonalRecord || isFirstPlace}
           />
           <ResultStatCard
             label={t.wpm}
             value={Math.round(finalWpm)}
-            isAccent={isHighWpm}
+            isAccent={isPersonalRecord || isHighWpm}
           />
           <ResultStatCard
             label={t.time}
             value={formatStopwatchTime(raceTime)}
-            isAccent={isFirstPlace}
+            isAccent={isPersonalRecord || isFirstPlace}
           />
           <ResultStatCard
             label={t.accuracy}
             value={`${Math.round(accuracy)}%`}
-            isAccent={isPerfectAccuracy}
+            isAccent={isPersonalRecord || isPerfectAccuracy}
           />
         </div>
       </div>
