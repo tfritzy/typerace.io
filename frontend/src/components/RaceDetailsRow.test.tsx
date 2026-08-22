@@ -23,8 +23,8 @@ describe("getPhraseWordCount", () => {
 });
 
 describe("RaceDetailsRow", () => {
-  it("keeps inline details muted above the personal-record announcement", () => {
-    const { container, getByLabelText, getByRole } = render(
+  it("puts an accented random-words bar below the personal-record announcement", () => {
+    const { getByLabelText, getByRole } = render(
       <RaceDetailsRow
         gameMode={{ tag: "English500" } as GameMode}
         phrase="one two three"
@@ -32,21 +32,32 @@ describe("RaceDetailsRow", () => {
       />,
     );
     const status = getByRole("status");
-    const details = Array.from(
-      container.querySelectorAll("[data-race-detail]"),
-    );
     const detailsRow = getByLabelText("Race details");
 
     expect(status.textContent).toContain("New personal record!");
-    expect(details).toHaveLength(3);
-    expect(detailsRow.className).toContain("text-muted-foreground");
-    expect(detailsRow.className).toContain("bg-card");
-    expect(detailsRow.className).not.toContain("text-accent-primary");
-    expect(details.every((detail) =>
-      !detail.className.includes("bg-accent-primary/10")
-    )).toBe(true);
-    expect(detailsRow.compareDocumentPosition(status)).toBe(
+    expect(detailsRow.textContent).toBe("3 English random words");
+    expect(detailsRow.className).toContain("text-accent-primary");
+    expect(detailsRow.className).toContain("bg-accent-primary/10");
+    expect(detailsRow.querySelector(".lucide-shuffle")).not.toBeNull();
+    expect(status.compareDocumentPosition(detailsRow)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
+  });
+
+  it("describes a quote with its author and word count", () => {
+    const { getByLabelText } = render(
+      <RaceDetailsRow
+        gameMode={{ tag: "EnglishQuotes" } as GameMode}
+        phrase="one two three four"
+        attribution="Author"
+      />,
+    );
+
+    expect(getByLabelText("Race details").textContent).toBe(
+      "English quote by “Author”, 4 words",
+    );
+    expect(
+      getByLabelText("Race details").querySelector(".lucide-quote"),
+    ).not.toBeNull();
   });
 });

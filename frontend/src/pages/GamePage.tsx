@@ -466,6 +466,7 @@ export const GamePage = () => {
           <RaceDetailsRow
             gameMode={game.gameMode}
             phrase={game.phrase}
+            attribution={game.attribution}
             isPersonalRecord={isPersonalRecord}
           />
           {currentPlayerProgress && (
