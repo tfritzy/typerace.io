@@ -489,6 +489,7 @@ export const GamePage = () => {
             rematchDisabled={rematchDisabled}
             conn={conn || undefined}
             isParticipant={isMemberOfRace}
+            isPersonalRecord={isPersonalRecord}
             onWatchReplay={() => setIsWatchingReplay(true)}
           />
         </div>
