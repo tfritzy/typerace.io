@@ -4,15 +4,12 @@ import type { PlayerProgress } from "../../types/stdb";
 import { getFinalWpm, getRaceTime, getAccuracy } from "../../utils/wpmCalculator";
 import { formatStopwatchTime, getOrdinalPlacement } from "../../utils/formatters";
 import { getTranslations } from "../../utils/translations";
-import type { ContentTypeValue } from "../../utils/modes";
 import { ResultStatCard } from "./ResultStatCard";
 
 interface PlayerStatsRowProps {
   playerProgress: PlayerProgress;
   raceStartTimestamp: bigint;
   placement: number;
-  categoryLength: number;
-  contentType: ContentTypeValue;
   isPersonalRecord?: boolean;
 }
 
@@ -21,8 +18,6 @@ export const PlayerStatsRow = memo(
     playerProgress,
     raceStartTimestamp,
     placement,
-    categoryLength,
-    contentType,
     isPersonalRecord = false,
   }: PlayerStatsRowProps) => {
     const finalWpm = getFinalWpm(playerProgress);
@@ -35,9 +30,7 @@ export const PlayerStatsRow = memo(
 
     const isFirstPlace = placement === 1;
     const isPerfectAccuracy = accuracy === 100;
-    const category = contentType === "RandomWords"
-      ? `${categoryLength} ${t.word}`
-      : t.quotes;
+    const isHighWpm = finalWpm >= 100;
     return (
       <div className="mb-3">
         {isPersonalRecord && (
@@ -51,31 +44,26 @@ export const PlayerStatsRow = memo(
             </span>
           </div>
         )}
-        <div className="grid min-h-[90px] grid-cols-2 gap-3 sm:grid-cols-5">
+        <div className="grid min-h-[90px] grid-cols-2 gap-3 sm:grid-cols-4">
           <ResultStatCard
             label={t.place}
             value={getOrdinalPlacement(placement)}
-            isAccent={isPersonalRecord || isFirstPlace}
+            isAccent={isFirstPlace}
           />
           <ResultStatCard
             label={t.wpm}
             value={Math.round(finalWpm)}
-            isAccent={isPersonalRecord || isFirstPlace}
+            isAccent={isHighWpm}
           />
           <ResultStatCard
             label={t.time}
             value={formatStopwatchTime(raceTime)}
-            isAccent={isPersonalRecord || isFirstPlace}
+            isAccent={isFirstPlace}
           />
           <ResultStatCard
             label={t.accuracy}
             value={`${Math.round(accuracy)}%`}
-            isAccent={isPersonalRecord || isPerfectAccuracy}
-          />
-          <ResultStatCard
-            label={t.category}
-            value={category}
-            isAccent={isPersonalRecord || isFirstPlace}
+            isAccent={isPerfectAccuracy}
           />
         </div>
       </div>

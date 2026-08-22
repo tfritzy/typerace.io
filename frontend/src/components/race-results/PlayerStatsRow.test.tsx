@@ -20,39 +20,35 @@ function renderStats(placement = 2, isPersonalRecord = false) {
       playerProgress={playerProgress}
       raceStartTimestamp={0n}
       placement={placement}
-      categoryLength={12}
-      contentType="RandomWords"
       isPersonalRecord={isPersonalRecord}
     />,
   );
 }
 
 describe("PlayerStatsRow", () => {
-  it("renders a consistent five-card row with first-place highlights", () => {
-    const { container, getByText } = renderStats(1);
+  it("renders four cards with the existing first-place highlights", () => {
+    const { container } = renderStats(1);
     const cards = Array.from(
       container.querySelectorAll("[data-result-stat]"),
     );
 
-    expect(cards).toHaveLength(5);
-    expect(getByText("12 Word")).not.toBeNull();
+    expect(cards).toHaveLength(4);
     expect(
       cards.filter((card) =>
         card.className.includes("bg-accent-primary/10"),
       ),
-    ).toHaveLength(4);
+    ).toHaveLength(2);
+    expect(cards[1].className).toContain("bg-card");
     expect(cards[3].className).toContain("bg-card");
   });
 
-  it("highlights every stat and announces a personal record", () => {
+  it("announces a personal record without accenting the stats", () => {
     const { container, getByRole } = renderStats(2, true);
     const cards = Array.from(
       container.querySelectorAll("[data-result-stat]"),
     );
 
     expect(getByRole("status").textContent).toContain("New personal record!");
-    expect(cards.every((card) =>
-      card.className.includes("bg-accent-primary/10")
-    )).toBe(true);
+    expect(cards.every((card) => card.className.includes("bg-card"))).toBe(true);
   });
 });

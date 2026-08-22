@@ -17,6 +17,7 @@ import {
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { PlayerStatsRow } from "../components/race-results/PlayerStatsRow";
 import { AllPlayersResults } from "../components/race-results/AllPlayersResults";
+import { RaceDetailsRow } from "../components/RaceDetailsRow";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
@@ -34,12 +35,6 @@ import { reconstructInputFromHistory } from "../utils/replayTimeline";
 type UiGameType = "Public" | "Private" | "Practice";
 
 const GAME_DATA_WAIT_TIMEOUT_MS = 10_000;
-
-function getCategoryLength(phrase: string): number {
-  return phrase.includes(" ")
-    ? phrase.split(" ").filter(Boolean).length
-    : phrase.length;
-}
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
@@ -466,13 +461,12 @@ export const GamePage = () => {
     } else {
       gameContent = (
         <div key="stats-section" className="w-full animate-slideUpFadeIn pb-4">
+          <RaceDetailsRow gameMode={game.gameMode} phrase={game.phrase} />
           {currentPlayerProgress && (
             <PlayerStatsRow
               playerProgress={currentPlayerProgress}
               raceStartTimestamp={game.racingStartedAt}
               placement={currentPlayerProgress.placement}
-              categoryLength={getCategoryLength(game.phrase)}
-              contentType={contentType}
               isPersonalRecord={
                 contentType === "RandomWords" && hasNewPersonalRecord
               }

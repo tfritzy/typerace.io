@@ -252,12 +252,18 @@ export const languages: LanguageInfo[] = [
 ].sort((a, b) => a.language.localeCompare(b.language));
 
 export function getLanguageFromMode(modeTag: string): Language {
+  return getLanguageInfoFromMode(modeTag).language;
+}
+
+export function getLanguageInfoFromMode(modeTag: string): LanguageInfo {
   const langInfo = languages.find(
     (l) =>
       l.randomWordsMode === modeTag ||
       l.quotesMode === modeTag,
   );
-  return langInfo?.language || Language.English;
+  return (
+    langInfo || languages.find((l) => l.language === Language.English)!
+  );
 }
 
 export function getLanguageFromSlug(slug: string | undefined): LanguageInfo {
