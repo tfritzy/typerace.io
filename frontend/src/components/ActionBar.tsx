@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import type { DbConnection } from "../../module_bindings";
 import { type GameMode } from "../types/stdb";
@@ -36,8 +36,17 @@ export const ActionBar = ({
   const showRematch = isParticipant && isPrivateGame && !!gameId;
   const canRematch = showRematch && !rematchDisabled;
   const personalRecordClasses = isPersonalRecord
-    ? "border-accent-primary/40 bg-accent-primary/10 text-accent-primary"
-    : "bg-transparent text-foreground";
+    ? "text-accent-primary"
+    : "text-foreground";
+  const actionBarStyle = {
+    animationDelay: "0.2s",
+    ...(isPersonalRecord && {
+      "--color-box-bg":
+        "color-mix(in srgb, var(--accent-primary) 10%, transparent)",
+      "--color-box-border":
+        "color-mix(in srgb, var(--accent-primary) 40%, transparent)",
+    }),
+  } as CSSProperties;
 
   const handleRematch = useCallback(() => {
     if (conn && gameId && canRematch) {
@@ -82,7 +91,11 @@ export const ActionBar = ({
   ]);
 
   return (
-    <div className="flex gap-3 mt-3 animate-slideUpFadeIn" style={{ animationDelay: '0.2s' }}>
+    <div
+      data-action-bar
+      className="flex gap-3 mt-3 animate-slideUpFadeIn"
+      style={actionBarStyle}
+    >
       <button
         onClick={() => navigate(getLangHome())}
         className={`box rounded-lg px-8 py-4 text-base font-semibold cursor-pointer opacity-80 flex-1 ${personalRecordClasses}`}
