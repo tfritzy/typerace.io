@@ -34,7 +34,7 @@ export const RaceDetailsRow = memo(
     const isQuote = getContentTypeFromMode(gameMode.tag) === "Quotes";
     const wordCount = getPhraseWordCount(phrase);
     const description = isQuote
-      ? `${wordCount} ${t.words}, ${language.nativeName} ${t.quote}${attribution ? ` ${t.by} “${attribution}”` : ""}`
+      ? `${wordCount} ${t.words} ${language.nativeName} ${t.quote}${attribution ? ` ${t.by} “${attribution}”` : ""}`
       : `${wordCount} ${language.nativeName} ${t.randomWords.toLocaleLowerCase(language.htmlLang)}`;
     const ModeIcon = isQuote ? Quote : Dices;
 
