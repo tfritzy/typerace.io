@@ -3,6 +3,7 @@ import type { PlayerProgress } from "../types/stdb";
 import { RaceResultsChart } from "./RaceResultsChart";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { useDatabase } from "../contexts/SpacetimeContext";
+import { Box } from "./Box";
 
 interface AllPlayersResultsProps {
   allPlayerProgress: PlayerProgress[];
@@ -38,9 +39,7 @@ export const AllPlayersResults = ({
   );
 
   return (
-    <div
-      className={`rounded-lg border p-3 ${isPersonalRecord ? "border-accent-primary/40 bg-accent-primary/10" : "border-border bg-card"}`}
-    >
+    <Box tone={isPersonalRecord ? "accent" : "default"} className="rounded-lg p-3">
       {allPlayerProgress.length > 1 && (
         <div className="mb-3 flex flex-wrap gap-3">
           {allPlayerProgress.map((progress) => {
@@ -77,6 +76,6 @@ export const AllPlayersResults = ({
         raceStartTimestamp={raceStartTimestamp}
         isCurrentPlayer={isSelectedCurrentPlayer}
       />
-    </div>
+    </Box>
   );
 };

@@ -1,4 +1,4 @@
-import { useEffect, useCallback, type CSSProperties } from "react";
+import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { DbConnection } from "../../module_bindings";
 import { type GameMode } from "../types/stdb";
@@ -6,6 +6,7 @@ import type { GameTypeValue } from "../components/MatchTypeSelector";
 import { getLangHome, getLangPrefix } from "../utils/modes";
 import { getTranslations } from "../utils/translations";
 import { storeGameSearchPreferences } from "../utils/gamePreferences";
+import { Box } from "./Box";
 
 type ActionBarProps = {
   mode?: GameMode;
@@ -35,18 +36,7 @@ export const ActionBar = ({
   const showPlayAgain = isParticipant && !isPrivateGame;
   const showRematch = isParticipant && isPrivateGame && !!gameId;
   const canRematch = showRematch && !rematchDisabled;
-  const personalRecordClasses = isPersonalRecord
-    ? "text-accent-primary"
-    : "text-foreground";
-  const actionBarStyle = {
-    animationDelay: "0.2s",
-    ...(isPersonalRecord && {
-      "--color-box-bg":
-        "color-mix(in srgb, var(--accent-primary) 10%, transparent)",
-      "--color-box-border":
-        "color-mix(in srgb, var(--accent-primary) 40%, transparent)",
-    }),
-  } as CSSProperties;
+  const boxTone = isPersonalRecord ? "accent" : "default";
 
   const handleRematch = useCallback(() => {
     if (conn && gameId && canRematch) {
@@ -93,32 +83,48 @@ export const ActionBar = ({
   return (
     <div
       className="flex gap-3 mt-3 animate-slideUpFadeIn"
-      style={actionBarStyle}
+      style={{ animationDelay: "0.2s" }}
     >
-      <button
-        onClick={() => navigate(getLangHome())}
-        className={`box rounded-lg px-8 py-4 text-base font-semibold cursor-pointer opacity-80 flex-1 ${personalRecordClasses}`}
+      <Box
+        asChild
+        tone={boxTone}
+        className="rounded-lg px-8 py-4 text-base font-semibold cursor-pointer opacity-80 flex-1"
       >
-        {t.mainMenu} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">M</span>
-      </button>
-      {onWatchReplay && (
-        <button
-          onClick={onWatchReplay}
-          className={`box rounded-lg px-8 py-4 text-base font-semibold cursor-pointer opacity-80 flex-1 ${personalRecordClasses}`}
-        >
-          {t.watchReplay} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">W</span>
+        <button onClick={() => navigate(getLangHome())}>
+          {t.mainMenu}{" "}
+          <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">
+            M
+          </span>
         </button>
+      </Box>
+      {onWatchReplay && (
+        <Box
+          asChild
+          tone={boxTone}
+          className="rounded-lg px-8 py-4 text-base font-semibold cursor-pointer opacity-80 flex-1"
+        >
+          <button onClick={onWatchReplay}>
+            {t.watchReplay}{" "}
+            <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">
+              W
+            </span>
+          </button>
+        </Box>
       )}
       {showRematch && (
         <div className="relative flex-1 group">
-          <button
-            onClick={handleRematch}
-            disabled={!canRematch}
-            className={`box rounded-lg px-8 py-4 text-base font-semibold w-full ${personalRecordClasses} ${canRematch ? 'cursor-pointer opacity-80' : 'cursor-not-allowed opacity-40'
-              }`}
+          <Box
+            asChild
+            tone={boxTone}
+            className={`rounded-lg px-8 py-4 text-base font-semibold w-full ${canRematch ? "cursor-pointer opacity-80" : "cursor-not-allowed opacity-40"}`}
           >
-            {t.rematch} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">R</span>
-          </button>
+            <button onClick={handleRematch} disabled={!canRematch}>
+              {t.rematch}{" "}
+              <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">
+                R
+              </span>
+            </button>
+          </Box>
           {!canRematch && (
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-foreground text-sm rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
               {t.ownerRematchOnly}
@@ -128,12 +134,18 @@ export const ActionBar = ({
         </div>
       )}
       {showPlayAgain && (
-        <button
-          onClick={handlePlayAgain}
-          className={`box rounded-lg px-8 py-4 text-base font-semibold cursor-pointer opacity-80 flex-1 ${personalRecordClasses}`}
+        <Box
+          asChild
+          tone={boxTone}
+          className="rounded-lg px-8 py-4 text-base font-semibold cursor-pointer opacity-80 flex-1"
         >
-          {t.playAgain} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">P</span>
-        </button>
+          <button onClick={handlePlayAgain}>
+            {t.playAgain}{" "}
+            <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">
+              P
+            </span>
+          </button>
+        </Box>
       )}
     </div>
   );

@@ -6,6 +6,7 @@ import {
   getLanguageInfoFromMode,
 } from "../utils/modes";
 import { getTranslations } from "../utils/translations";
+import { Box } from "./Box";
 
 interface RaceDetailsRowProps {
   gameMode: GameMode;
@@ -41,26 +42,27 @@ export const RaceDetailsRow = memo(
     return (
       <div className="mb-3">
         {isPersonalRecord && (
-          <div
+          <Box
             role="status"
-            className="mb-3 flex min-h-11 items-center justify-center gap-2 rounded-lg border border-accent-primary/40 bg-accent-primary/10 px-4 py-2 text-accent-primary"
+            tone="accent"
+            className="mb-3 flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2"
           >
             <Trophy aria-hidden className="h-5 w-5" />
             <span className="text-sm font-bold uppercase tracking-wider">
               {t.newPersonalRecord}
             </span>
-          </div>
+          </Box>
         )}
-        <p
-          aria-label="Race details"
-          className={`flex min-h-11 flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-lg border px-3 py-2 text-xs font-medium tracking-wide ${isPersonalRecord ? "border-accent-primary/40 bg-accent-primary/10 text-accent-primary" : "border-border bg-card text-muted-foreground"}`}
+        <Box
+          asChild
+          tone={isPersonalRecord ? "accent" : "default"}
+          className={`flex min-h-11 flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-lg px-3 py-2 text-xs font-medium tracking-wide ${isPersonalRecord ? "" : "text-muted-foreground"}`}
         >
-          <ModeIcon
-            aria-hidden
-            className="h-3.5 w-3.5 shrink-0"
-          />
-          <span>{description}</span>
-        </p>
+          <p aria-label="Race details">
+            <ModeIcon aria-hidden className="h-3.5 w-3.5 shrink-0" />
+            <span>{description}</span>
+          </p>
+        </Box>
       </div>
     );
   },
