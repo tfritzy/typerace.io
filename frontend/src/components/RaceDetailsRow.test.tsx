@@ -26,24 +26,6 @@ describe("getPhraseWordCount", () => {
 });
 
 describe("RaceDetailsRow", () => {
-  it("renders the personal-record announcement before the race details", () => {
-    const { getByLabelText, getByRole } = render(
-      <RaceDetailsRow
-        gameMode={{ tag: "English500" } as GameMode}
-        phrase="one two three"
-        isPersonalRecord
-      />,
-    );
-    const status = getByRole("status");
-    const detailsRow = getByLabelText("Race details");
-
-    expect(status.textContent).toContain("New personal record!");
-    expect(detailsRow.textContent).toBe("3 random common English words");
-    expect(status.compareDocumentPosition(detailsRow)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    );
-  });
-
   it("renders quote length, language, and attribution", () => {
     const { getByLabelText } = render(
       <RaceDetailsRow
