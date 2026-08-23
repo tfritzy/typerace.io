@@ -1,8 +1,8 @@
 import { memo } from "react";
-import type { PlayerProgress } from "../../types/stdb";
-import { getFinalWpm, getRaceTime, getAccuracy } from "../../utils/wpmCalculator";
-import { formatStopwatchTime, getOrdinalPlacement } from "../../utils/formatters";
-import { getTranslations } from "../../utils/translations";
+import type { PlayerProgress } from "../types/stdb";
+import { getFinalWpm, getRaceTime, getAccuracy } from "../utils/wpmCalculator";
+import { formatStopwatchTime, getOrdinalPlacement } from "../utils/formatters";
+import { getTranslations } from "../utils/translations";
 import { ResultStatCard } from "./ResultStatCard";
 
 interface PlayerStatsRowProps {

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 interface ResultStatCardProps {
   label: string;
@@ -13,7 +13,6 @@ export function ResultStatCard({
 }: ResultStatCardProps) {
   return (
     <div
-      data-result-stat
       className={`flex min-w-0 flex-col items-center justify-center rounded-lg border p-3 text-center transition-all duration-300 ${
         isAccent
           ? "border-accent-primary/40 bg-accent-primary/10"

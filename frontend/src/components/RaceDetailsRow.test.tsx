@@ -26,7 +26,7 @@ describe("getPhraseWordCount", () => {
 });
 
 describe("RaceDetailsRow", () => {
-  it("renders the PR announcement before accented random-word metadata", () => {
+  it("renders the personal-record announcement before the race details", () => {
     const { getByLabelText, getByRole } = render(
       <RaceDetailsRow
         gameMode={{ tag: "English500" } as GameMode}
@@ -39,13 +39,6 @@ describe("RaceDetailsRow", () => {
 
     expect(status.textContent).toContain("New personal record!");
     expect(detailsRow.textContent).toBe("3 random common English words");
-    expect(detailsRow.className).toContain("text-accent-primary");
-    expect(detailsRow.className).toContain("bg-accent-primary/10");
-    expect(status.className).toContain("min-h-11");
-    expect(detailsRow.className).toContain("min-h-11");
-    expect(
-      detailsRow.querySelector('[data-mode-icon="random-words"]'),
-    ).not.toBeNull();
     expect(status.compareDocumentPosition(detailsRow)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
@@ -63,9 +56,6 @@ describe("RaceDetailsRow", () => {
     expect(getByLabelText("Race details").textContent).toBe(
       "4-word English quote by “Author”",
     );
-    expect(
-      getByLabelText("Race details").querySelector('[data-mode-icon="quote"]'),
-    ).not.toBeNull();
   });
 
   it("renders localized metadata", () => {

@@ -57,7 +57,6 @@ export const RaceDetailsRow = memo(
         >
           <ModeIcon
             aria-hidden
-            data-mode-icon={isQuote ? "quote" : "random-words"}
             className="h-3.5 w-3.5 shrink-0"
           />
           <span>{description}</span>

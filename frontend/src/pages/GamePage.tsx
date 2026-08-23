@@ -15,8 +15,8 @@ import {
   type PlayerProgress,
 } from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
-import { PlayerStatsRow } from "../components/race-results/PlayerStatsRow";
-import { AllPlayersResults } from "../components/race-results/AllPlayersResults";
+import { PlayerStatsRow } from "../components/PlayerStatsRow";
+import { AllPlayersResults } from "../components/AllPlayersResults";
 import { RaceDetailsRow } from "../components/RaceDetailsRow";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
@@ -174,7 +174,7 @@ export const GamePage = () => {
       }
     };
 
-    const matchesPersonalRecord = (record: PersonalRecord) => {
+    const isCurrentGamePersonalRecord = (record: PersonalRecord) => {
       return isPersonalRecordForGame(
         record,
         conn.identity,
@@ -183,9 +183,11 @@ export const GamePage = () => {
       );
     };
 
-    const syncPersonalRecordStatus = () => {
+    const syncCurrentGamePersonalRecord = () => {
       setHasNewPersonalRecord(
-        Array.from(conn.db.personalrecord.iter()).some(matchesPersonalRecord),
+        Array.from(conn.db.personalrecord.iter()).some(
+          isCurrentGamePersonalRecord,
+        ),
       );
     };
 
@@ -193,7 +195,7 @@ export const GamePage = () => {
       _ctx: any,
       record: PersonalRecord,
     ) => {
-      if (matchesPersonalRecord(record)) {
+      if (isCurrentGamePersonalRecord(record)) {
         setHasNewPersonalRecord(true);
       }
     };
@@ -204,7 +206,7 @@ export const GamePage = () => {
         conn.identity &&
         record.playerId.isEqual(conn.identity)
       ) {
-        syncPersonalRecordStatus();
+        syncCurrentGamePersonalRecord();
       }
     };
 
@@ -241,7 +243,7 @@ export const GamePage = () => {
           conn.db.playerprogress.iter(),
         ).filter((pp) => pp.gameId.toString() === gameId);
         setGamePlayerProgress(currentGameProgress);
-        syncPersonalRecordStatus();
+        syncCurrentGamePersonalRecord();
       })
       .subscribe(subscriptionQueries);
 

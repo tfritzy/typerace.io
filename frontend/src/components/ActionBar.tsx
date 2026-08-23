@@ -18,22 +18,6 @@ type ActionBarProps = {
   isPersonalRecord?: boolean;
 };
 
-type ActionBarStyle = CSSProperties & {
-  "--color-box-bg"?: string;
-  "--color-box-border"?: string;
-};
-
-const actionButtonClasses =
-  "box flex-1 cursor-pointer rounded-lg px-8 py-4 text-base font-semibold opacity-80";
-
-function ShortcutKey({ children }: { children: string }) {
-  return (
-    <span className="ml-1 rounded-xs border border-border px-1 font-light text-secondary-foreground">
-      {children}
-    </span>
-  );
-}
-
 export const ActionBar = ({
   mode,
   gameType,
@@ -51,10 +35,10 @@ export const ActionBar = ({
   const showPlayAgain = isParticipant && !isPrivateGame;
   const showRematch = isParticipant && isPrivateGame && !!gameId;
   const canRematch = showRematch && !rematchDisabled;
-  const actionTextClasses = isPersonalRecord
+  const personalRecordClasses = isPersonalRecord
     ? "text-accent-primary"
     : "text-foreground";
-  const actionBarStyle: ActionBarStyle = {
+  const actionBarStyle = {
     animationDelay: "0.2s",
     ...(isPersonalRecord && {
       "--color-box-bg":
@@ -62,7 +46,7 @@ export const ActionBar = ({
       "--color-box-border":
         "color-mix(in srgb, var(--accent-primary) 40%, transparent)",
     }),
-  };
+  } as CSSProperties;
 
   const handleRematch = useCallback(() => {
     if (conn && gameId && canRematch) {
@@ -108,37 +92,37 @@ export const ActionBar = ({
 
   return (
     <div
-      data-action-bar
       className="flex gap-3 mt-3 animate-slideUpFadeIn"
       style={actionBarStyle}
     >
       <button
         onClick={() => navigate(getLangHome())}
-        className={`${actionButtonClasses} ${actionTextClasses}`}
+        className={`box rounded-lg px-8 py-4 text-base font-semibold cursor-pointer opacity-80 flex-1 ${personalRecordClasses}`}
       >
-        {t.mainMenu} <ShortcutKey>M</ShortcutKey>
+        {t.mainMenu} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">M</span>
       </button>
       {onWatchReplay && (
         <button
           onClick={onWatchReplay}
-          className={`${actionButtonClasses} ${actionTextClasses}`}
+          className={`box rounded-lg px-8 py-4 text-base font-semibold cursor-pointer opacity-80 flex-1 ${personalRecordClasses}`}
         >
-          {t.watchReplay} <ShortcutKey>W</ShortcutKey>
+          {t.watchReplay} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">W</span>
         </button>
       )}
       {showRematch && (
-        <div className="group relative flex-1">
+        <div className="relative flex-1 group">
           <button
             onClick={handleRematch}
             disabled={!canRematch}
-            className={`box w-full rounded-lg px-8 py-4 text-base font-semibold ${actionTextClasses} ${canRematch ? "cursor-pointer opacity-80" : "cursor-not-allowed opacity-40"}`}
+            className={`box rounded-lg px-8 py-4 text-base font-semibold w-full ${personalRecordClasses} ${canRematch ? 'cursor-pointer opacity-80' : 'cursor-not-allowed opacity-40'
+              }`}
           >
-            {t.rematch} <ShortcutKey>R</ShortcutKey>
+            {t.rematch} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">R</span>
           </button>
           {!canRematch && (
-            <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-black/90 px-3 py-2 text-sm text-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 text-foreground text-sm rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200">
               {t.ownerRematchOnly}
-              <div className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-black/90" />
+              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/90"></div>
             </div>
           )}
         </div>
@@ -146,9 +130,9 @@ export const ActionBar = ({
       {showPlayAgain && (
         <button
           onClick={handlePlayAgain}
-          className={`${actionButtonClasses} ${actionTextClasses}`}
+          className={`box rounded-lg px-8 py-4 text-base font-semibold cursor-pointer opacity-80 flex-1 ${personalRecordClasses}`}
         >
-          {t.playAgain} <ShortcutKey>P</ShortcutKey>
+          {t.playAgain} <span className="ml-1 border px-1 rounded-xs font-light border-border text-secondary-foreground">P</span>
         </button>
       )}
     </div>

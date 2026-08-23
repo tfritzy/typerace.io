@@ -2,60 +2,60 @@ import { describe, expect, it } from "vitest";
 import type { PersonalRecord } from "../types/stdb";
 import { isPersonalRecordForGame } from "./personalRecord";
 
-const playerId = {} as PersonalRecord["playerId"];
-const differentPlayerId = {} as PersonalRecord["playerId"];
+const currentPlayerId = {} as PersonalRecord["playerId"];
+const otherPlayerId = {} as PersonalRecord["playerId"];
 
 function personalRecord(
   phraseLength: number | undefined,
-  recordPlayerId = playerId,
+  playerId = currentPlayerId,
 ): PersonalRecord {
   return {
     phraseLength,
     gameRecordId: "record-1",
     playerId: {
       isEqual: (candidate: PersonalRecord["playerId"]) =>
-        candidate === recordPlayerId,
+        candidate === playerId,
     },
   } as PersonalRecord;
 }
 
 describe("isPersonalRecordForGame", () => {
-  it("accepts a matching length record", () => {
+  it("matches a length record linked to the current game and player", () => {
     expect(
       isPersonalRecordForGame(
         personalRecord(12),
-        playerId,
+        currentPlayerId,
         "game-1",
         () => ({ gameId: "game-1" }),
       ),
     ).toBe(true);
   });
 
-  it("rejects overall and mismatched records", () => {
-    const findGameRecord = () => ({ gameId: "game-1" });
+  it("rejects overall records and records for another player or game", () => {
+    const findCurrentGame = () => ({ gameId: "game-1" });
 
     expect(
       isPersonalRecordForGame(
         personalRecord(undefined),
-        playerId,
+        currentPlayerId,
         "game-1",
-        findGameRecord,
+        findCurrentGame,
       ),
     ).toBe(false);
     expect(
       isPersonalRecordForGame(
-        personalRecord(12, differentPlayerId),
-        playerId,
+        personalRecord(12, otherPlayerId),
+        currentPlayerId,
         "game-1",
-        findGameRecord,
+        findCurrentGame,
       ),
     ).toBe(false);
     expect(
       isPersonalRecordForGame(
         personalRecord(12),
-        playerId,
+        currentPlayerId,
         "game-2",
-        findGameRecord,
+        findCurrentGame,
       ),
     ).toBe(false);
   });
