@@ -1,4 +1,6 @@
-import { Language, getLanguageFromSlug } from "./modes";
+import { Language, getLanguageFromSlug, type LanguageInfo } from "./modes";
+
+type RaceLanguage = Pick<LanguageInfo, "language" | "nativeName">;
 
 export interface Translations {
   publicMatch: string;
@@ -6,10 +8,10 @@ export interface Translations {
   practiceMode: string;
   randomWords: string;
   quotes: string;
-  randomWordsDescription: (wordCount: number, languageName: string) => string;
+  randomWordsDescription: (wordCount: number, language: RaceLanguage) => string;
   quoteDescription: (
     wordCount: number,
-    languageName: string,
+    language: RaceLanguage,
     attribution?: string,
   ) => string;
   gameOptions: string;
@@ -50,10 +52,14 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Practice",
     randomWords: "Random Words",
     quotes: "Quotes",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} random common ${languageName} words`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount}-word ${languageName} quote${attribution ? ` by “${attribution}”` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      language.language === Language.English
+        ? `${wordCount} random common English words`
+        : `${wordCount} random common words (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      language.language === Language.English
+        ? `${wordCount}-word English quote${attribution ? ` by “${attribution}”` : ""}`
+        : `${wordCount}-word quote (${language.nativeName})${attribution ? ` by “${attribution}”` : ""}`,
     gameOptions: "Game Options",
     matchType: "Match Type",
     mode: "Mode",
@@ -91,10 +97,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Práctica",
     randomWords: "Palabras aleatorias",
     quotes: "Citas",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} palabras comunes aleatorias en ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount} palabras de una cita en ${languageName}${attribution ? ` de “${attribution}”` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} palabras comunes aleatorias (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} palabras en una cita (${language.nativeName})${attribution ? ` de “${attribution}”` : ""}`,
     gameOptions: "Opciones de juego",
     matchType: "Tipo de partida",
     mode: "Modo",
@@ -133,10 +139,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Entraînement",
     randomWords: "Mots aléatoires",
     quotes: "Citations",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} mots courants aléatoires en ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount} mots d’une citation en ${languageName}${attribution ? ` de « ${attribution} »` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} mots courants aléatoires (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} mots dans une citation (${language.nativeName})${attribution ? ` de « ${attribution} »` : ""}`,
     gameOptions: "Options de jeu",
     matchType: "Type de partie",
     mode: "Mode",
@@ -174,10 +180,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Übung",
     randomWords: "Zufällige Wörter",
     quotes: "Zitate",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} zufällige häufige Wörter auf ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount}-Wörter-Zitat auf ${languageName}${attribution ? ` von „${attribution}“` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} zufällige häufige Wörter (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount}-Wörter-Zitat (${language.nativeName})${attribution ? ` von „${attribution}“` : ""}`,
     gameOptions: "Spieloptionen",
     matchType: "Spieltyp",
     mode: "Modus",
@@ -215,10 +221,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Pratica",
     randomWords: "Parole casuali",
     quotes: "Citazioni",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} parole comuni casuali in ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount} parole da una citazione in ${languageName}${attribution ? ` di “${attribution}”` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} parole comuni casuali (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} parole in una citazione (${language.nativeName})${attribution ? ` di “${attribution}”` : ""}`,
     gameOptions: "Opzioni di gioco",
     matchType: "Tipo di partita",
     mode: "Modalità",
@@ -256,10 +262,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Prática",
     randomWords: "Palavras aleatórias",
     quotes: "Citações",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} palavras comuns aleatórias em ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount} palavras de uma citação em ${languageName}${attribution ? ` de “${attribution}”` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} palavras comuns aleatórias (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} palavras em uma citação (${language.nativeName})${attribution ? ` de “${attribution}”` : ""}`,
     gameOptions: "Opções de jogo",
     matchType: "Tipo de partida",
     mode: "Modo",
@@ -298,10 +304,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Практика",
     randomWords: "Випадкові слова",
     quotes: "Цитати",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} випадкових поширених слів мовою ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount} слів у цитаті мовою ${languageName}${attribution ? ` від «${attribution}»` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} випадкових поширених слів (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} слів у цитаті (${language.nativeName})${attribution ? ` від «${attribution}»` : ""}`,
     gameOptions: "Налаштування гри",
     matchType: "Тип матчу",
     mode: "Режим",
@@ -340,10 +346,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "تدريب",
     randomWords: "كلمات عشوائية",
     quotes: "اقتباسات",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} كلمة شائعة عشوائية باللغة ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount} كلمة في اقتباس باللغة ${languageName}${attribution ? ` بقلم «${attribution}»` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} كلمة شائعة عشوائية (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} كلمة في اقتباس (${language.nativeName})${attribution ? ` بقلم «${attribution}»` : ""}`,
     gameOptions: "خيارات اللعبة",
     matchType: "نوع المباراة",
     mode: "الوضع",
@@ -381,10 +387,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Oefenen",
     randomWords: "Willekeurige woorden",
     quotes: "Citaten",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} willekeurige veelvoorkomende woorden in het ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount} woorden tellend citaat in het ${languageName}${attribution ? ` van “${attribution}”` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} willekeurige veelvoorkomende woorden (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} woorden in een citaat (${language.nativeName})${attribution ? ` van “${attribution}”` : ""}`,
     gameOptions: "Spelopties",
     matchType: "Wedstrijdtype",
     mode: "Modus",
@@ -423,10 +429,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Övning",
     randomWords: "Slumpmässiga ord",
     quotes: "Citat",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} slumpmässiga vanliga ord på ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount} ord långt citat på ${languageName}${attribution ? ` av “${attribution}”` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} slumpmässiga vanliga ord (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} ord långt citat (${language.nativeName})${attribution ? ` av “${attribution}”` : ""}`,
     gameOptions: "Spelalternativ",
     matchType: "Matchtyp",
     mode: "Läge",
@@ -464,10 +470,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Практика",
     randomWords: "Случайные слова",
     quotes: "Цитаты",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} случайных распространённых слов на языке ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount} слов в цитате на языке ${languageName}${attribution ? ` от «${attribution}»` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} случайных распространённых слов (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} слов в цитате (${language.nativeName})${attribution ? ` от «${attribution}»` : ""}`,
     gameOptions: "Настройки игры",
     matchType: "Тип матча",
     mode: "Режим",
@@ -506,10 +512,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Antrenament",
     randomWords: "Cuvinte aleatorii",
     quotes: "Citate",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} cuvinte comune aleatorii în ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount} cuvinte dintr-un citat în ${languageName}${attribution ? ` de “${attribution}”` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} cuvinte comune aleatorii (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} cuvinte într-un citat (${language.nativeName})${attribution ? ` de “${attribution}”` : ""}`,
     gameOptions: "Opțiuni de joc",
     matchType: "Tipul cursei",
     mode: "Mod",
@@ -548,10 +554,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Latihan",
     randomWords: "Kata acak",
     quotes: "Kutipan",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} kata umum acak dalam ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount} kata dalam kutipan berbahasa ${languageName}${attribution ? ` oleh “${attribution}”` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} kata umum acak (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} kata dalam kutipan (${language.nativeName})${attribution ? ` oleh “${attribution}”` : ""}`,
     gameOptions: "Opsi permainan",
     matchType: "Jenis pertandingan",
     mode: "Mode",
@@ -589,10 +595,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Trening",
     randomWords: "Losowe słowa",
     quotes: "Cytaty",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} losowych popularnych słów w języku ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount} słów w cytacie w języku ${languageName}${attribution ? ` autorstwa „${attribution}”` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} losowych popularnych słów (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} słów w cytacie (${language.nativeName})${attribution ? ` autorstwa „${attribution}”` : ""}`,
     gameOptions: "Opcje gry",
     matchType: "Typ rozgrywki",
     mode: "Tryb",
@@ -633,10 +639,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Trénink",
     randomWords: "Náhodná slova",
     quotes: "Citáty",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${wordCount} náhodných běžných slov v jazyce ${languageName}`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${wordCount} slov v citátu v jazyce ${languageName}${attribution ? ` od „${attribution}“` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} náhodných běžných slov (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} slov v citátu (${language.nativeName})${attribution ? ` od „${attribution}“` : ""}`,
     gameOptions: "Nastavení hry",
     matchType: "Typ závodu",
     mode: "Režim",
@@ -677,10 +683,10 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Alıştırma",
     randomWords: "Rastgele kelimeler",
     quotes: "Alıntılar",
-    randomWordsDescription: (wordCount, languageName) =>
-      `${languageName} dilinde ${wordCount} rastgele yaygın kelime`,
-    quoteDescription: (wordCount, languageName, attribution) =>
-      `${languageName} dilinde ${wordCount} kelimelik alıntı${attribution ? `, yazan “${attribution}”` : ""}`,
+    randomWordsDescription: (wordCount, language) =>
+      `${wordCount} rastgele yaygın kelime (${language.nativeName})`,
+    quoteDescription: (wordCount, language, attribution) =>
+      `${wordCount} kelimelik alıntı (${language.nativeName})${attribution ? `, yazan “${attribution}”` : ""}`,
     gameOptions: "Oyun Seçenekleri",
     matchType: "Maç Türü",
     mode: "Mod",

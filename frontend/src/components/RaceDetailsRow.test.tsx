@@ -3,26 +3,11 @@
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import type { GameMode } from "../types/stdb";
-import { getPhraseWordCount, RaceDetailsRow } from "./RaceDetailsRow";
+import { RaceDetailsRow } from "./RaceDetailsRow";
 
 afterEach(() => {
   cleanup();
   localStorage.clear();
-});
-
-describe("getPhraseWordCount", () => {
-  it("returns the word count for whitespace-delimited text", () => {
-    expect(getPhraseWordCount("one two   three\nfour")).toBe(4);
-  });
-
-  it("returns the character count for text without whitespace", () => {
-    expect(getPhraseWordCount("日本語")).toBe(3);
-  });
-
-  it("trims whitespace before counting", () => {
-    expect(getPhraseWordCount("  one two  ")).toBe(2);
-    expect(getPhraseWordCount("   ")).toBe(0);
-  });
 });
 
 describe("RaceDetailsRow", () => {
@@ -50,7 +35,7 @@ describe("RaceDetailsRow", () => {
     );
 
     expect(getByLabelText("Race details").textContent).toBe(
-      "3 palabras comunes aleatorias en Español",
+      "3 palabras comunes aleatorias (Español)",
     );
   });
 });

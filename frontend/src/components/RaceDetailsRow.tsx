@@ -6,6 +6,7 @@ import {
   getLanguageInfoFromMode,
 } from "../utils/modes";
 import { getTranslations } from "../utils/translations";
+import { getPhraseLength } from "../utils/phrase";
 import { Box } from "./Box";
 
 interface RaceDetailsRowProps {
@@ -13,14 +14,6 @@ interface RaceDetailsRowProps {
   phrase: string;
   attribution?: string;
   isPersonalRecord?: boolean;
-}
-
-export function getPhraseWordCount(phrase: string): number {
-  const trimmedPhrase = phrase.trim();
-  if (!trimmedPhrase) return 0;
-  return /\s/u.test(trimmedPhrase)
-    ? trimmedPhrase.split(/\s+/u).length
-    : Array.from(trimmedPhrase).length;
 }
 
 export const RaceDetailsRow = memo(
@@ -33,10 +26,10 @@ export const RaceDetailsRow = memo(
     const language = getLanguageInfoFromMode(gameMode.tag);
     const t = getTranslations();
     const isQuote = getContentTypeFromMode(gameMode.tag) === "Quotes";
-    const wordCount = getPhraseWordCount(phrase);
+    const phraseLength = getPhraseLength(phrase);
     const description = isQuote
-      ? t.quoteDescription(wordCount, language.nativeName, attribution)
-      : t.randomWordsDescription(wordCount, language.nativeName);
+      ? t.quoteDescription(phraseLength, language, attribution)
+      : t.randomWordsDescription(phraseLength, language);
     const ModeIcon = isQuote ? Quote : Dice5;
 
     return (
