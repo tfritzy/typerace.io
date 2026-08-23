@@ -11,22 +11,22 @@ afterEach(() => {
 });
 
 describe("getPhraseWordCount", () => {
-  it("counts whitespace-separated words", () => {
+  it("returns the word count for whitespace-delimited text", () => {
     expect(getPhraseWordCount("one two   three\nfour")).toBe(4);
   });
 
-  it("counts characters for phrases without spaces", () => {
+  it("returns the character count for text without whitespace", () => {
     expect(getPhraseWordCount("日本語")).toBe(3);
   });
 
-  it("ignores surrounding whitespace", () => {
+  it("trims whitespace before counting", () => {
     expect(getPhraseWordCount("  one two  ")).toBe(2);
     expect(getPhraseWordCount("   ")).toBe(0);
   });
 });
 
 describe("RaceDetailsRow", () => {
-  it("puts an accented random-words bar below the personal-record announcement", () => {
+  it("renders the PR announcement before accented random-word metadata", () => {
     const { getByLabelText, getByRole } = render(
       <RaceDetailsRow
         gameMode={{ tag: "English500" } as GameMode}
@@ -51,7 +51,7 @@ describe("RaceDetailsRow", () => {
     );
   });
 
-  it("describes a quote with its author and word count", () => {
+  it("renders quote length, language, and attribution", () => {
     const { getByLabelText } = render(
       <RaceDetailsRow
         gameMode={{ tag: "EnglishQuotes" } as GameMode}
@@ -68,7 +68,7 @@ describe("RaceDetailsRow", () => {
     ).not.toBeNull();
   });
 
-  it("uses the selected language's description", () => {
+  it("renders localized metadata", () => {
     localStorage.setItem("typerace_lang_slug", "es");
     const { getByLabelText } = render(
       <RaceDetailsRow

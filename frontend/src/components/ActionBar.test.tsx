@@ -8,7 +8,7 @@ import { ActionBar } from "./ActionBar";
 afterEach(cleanup);
 
 describe("ActionBar", () => {
-  it("overrides the box theme variables for a personal record", () => {
+  it("applies personal-record colors to every action button", () => {
     const { container, getByRole } = render(
       <MemoryRouter>
         <ActionBar isParticipant={false} isPersonalRecord />

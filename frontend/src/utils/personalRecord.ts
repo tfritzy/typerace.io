@@ -6,14 +6,14 @@ type GameRecordLookup = (
 
 export function isPersonalRecordForGame(
   record: PersonalRecord,
-  currentPlayerId: PersonalRecord["playerId"] | undefined,
+  playerId: PersonalRecord["playerId"] | undefined,
   gameId: string,
   findGameRecord: GameRecordLookup,
 ): boolean {
   return !!(
     record.phraseLength !== undefined &&
-    currentPlayerId &&
-    record.playerId.isEqual(currentPlayerId) &&
+    playerId &&
+    record.playerId.isEqual(playerId) &&
     findGameRecord(record.gameRecordId)?.gameId === gameId
   );
 }

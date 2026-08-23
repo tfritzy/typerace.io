@@ -26,7 +26,7 @@ function renderStats(placement = 2, isPersonalRecord = false) {
 }
 
 describe("PlayerStatsRow", () => {
-  it("renders four cards with the existing first-place highlights", () => {
+  it("renders four cards and accents place and time for first place", () => {
     const { container } = renderStats(1);
     const cards = Array.from(
       container.querySelectorAll("[data-result-stat]"),
@@ -42,7 +42,7 @@ describe("PlayerStatsRow", () => {
     expect(cards[3].className).toContain("bg-card");
   });
 
-  it("does not accent ordinary results", () => {
+  it("renders neutral cards when no accent condition is met", () => {
     const { container } = renderStats(2);
     const cards = Array.from(
       container.querySelectorAll("[data-result-stat]"),
@@ -51,7 +51,7 @@ describe("PlayerStatsRow", () => {
     expect(cards.every((card) => card.className.includes("bg-card"))).toBe(true);
   });
 
-  it("accents every stat for a personal record", () => {
+  it("accents all four cards for a personal record", () => {
     const { container } = renderStats(2, true);
     const cards = Array.from(
       container.querySelectorAll("[data-result-stat]"),

@@ -174,7 +174,7 @@ export const GamePage = () => {
       }
     };
 
-    const isCurrentGamePersonalRecord = (record: PersonalRecord) => {
+    const matchesPersonalRecord = (record: PersonalRecord) => {
       return isPersonalRecordForGame(
         record,
         conn.identity,
@@ -183,11 +183,9 @@ export const GamePage = () => {
       );
     };
 
-    const syncCurrentGamePersonalRecord = () => {
+    const syncPersonalRecordStatus = () => {
       setHasNewPersonalRecord(
-        Array.from(conn.db.personalrecord.iter()).some(
-          isCurrentGamePersonalRecord,
-        ),
+        Array.from(conn.db.personalrecord.iter()).some(matchesPersonalRecord),
       );
     };
 
@@ -195,7 +193,7 @@ export const GamePage = () => {
       _ctx: any,
       record: PersonalRecord,
     ) => {
-      if (isCurrentGamePersonalRecord(record)) {
+      if (matchesPersonalRecord(record)) {
         setHasNewPersonalRecord(true);
       }
     };
@@ -206,7 +204,7 @@ export const GamePage = () => {
         conn.identity &&
         record.playerId.isEqual(conn.identity)
       ) {
-        syncCurrentGamePersonalRecord();
+        syncPersonalRecordStatus();
       }
     };
 
@@ -243,7 +241,7 @@ export const GamePage = () => {
           conn.db.playerprogress.iter(),
         ).filter((pp) => pp.gameId.toString() === gameId);
         setGamePlayerProgress(currentGameProgress);
-        syncCurrentGamePersonalRecord();
+        syncPersonalRecordStatus();
       })
       .subscribe(subscriptionQueries);
 
