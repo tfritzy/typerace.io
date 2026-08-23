@@ -56,7 +56,7 @@ describe("RaceDetailsRow", () => {
     );
 
     expect(getByLabelText("Race details").textContent).toBe(
-      "4 words English quote by “Author”",
+      "4-word English quote by “Author”",
     );
     expect(
       getByLabelText("Race details").querySelector('[data-mode-icon="quote"]'),
