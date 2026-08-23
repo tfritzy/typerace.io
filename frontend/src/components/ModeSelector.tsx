@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { type GameMode } from "../types/stdb";
-import { ChevronDown, Globe, Lock, Target, Quote, Shuffle } from "lucide-react";
+import { ChevronDown, Globe, Lock, Target, Quote, Dices } from "lucide-react";
 import { getContentTypeFromMode, type ContentTypeValue, type LanguageInfo } from "../utils/modes";
 import { LanguageDropdown } from "./LanguageDropdown";
 import { getTranslations } from "../utils/translations";
@@ -70,7 +70,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
     return (
         <>
             <div className="hidden md:flex items-center justify-center gap-1 flex-wrap">
-                <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
+                <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Dices size={16} />} label={t.randomWords} />
                 <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label={t.quotes} disabled={!quotesAvailableForLanguage} />
                 <span className="mx-2 text-border-hover select-none">|</span>
                 <ModeButton isSelected={gameType === "Public"} onClick={() => setGameType("Public")} icon={<Globe size={16} />} label={t.publicMatch} />
@@ -114,7 +114,7 @@ export function GameOptionsSelector({ selectedMode, onModeSelect, gameType, setG
                             <div className="p-4 pb-8">
                                 <h3 className="text-secondary-foreground text-sm font-medium mb-3 uppercase tracking-wider">{t.mode}</h3>
                                 <div className="flex flex-wrap gap-2 mb-6">
-                                    <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Shuffle size={16} />} label={t.randomWords} />
+                                    <ModeButton isSelected={contentType === "RandomWords"} onClick={() => handleContentTypeChange("RandomWords")} icon={<Dices size={16} />} label={t.randomWords} />
                                     <ModeButton isSelected={contentType === "Quotes"} onClick={() => handleContentTypeChange("Quotes")} icon={<Quote size={16} />} label={t.quotes} disabled={!quotesAvailableForLanguage} />
                                 </div>
                                 <h3 className="text-secondary-foreground text-sm font-medium mb-3 uppercase tracking-wider">{t.matchType}</h3>

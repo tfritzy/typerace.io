@@ -1,4 +1,4 @@
-import { Quote, Shuffle, Trophy } from "lucide-react";
+import { Quote, Dices, Trophy } from "lucide-react";
 import { memo } from "react";
 import type { GameMode } from "../types/stdb";
 import {
@@ -36,7 +36,7 @@ export const RaceDetailsRow = memo(
     const description = isQuote
       ? `${language.nativeName} ${t.quote}${attribution ? ` ${t.by} “${attribution}”` : ""}, ${wordCount} ${t.words}`
       : `${wordCount} ${language.nativeName} ${t.randomWords.toLocaleLowerCase(language.htmlLang)}`;
-    const ModeIcon = isQuote ? Quote : Shuffle;
+    const ModeIcon = isQuote ? Quote : Dices;
 
     return (
       <div className="mb-3">
@@ -55,7 +55,11 @@ export const RaceDetailsRow = memo(
           aria-label="Race details"
           className={`flex min-h-9 flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-lg border px-3 py-2 text-xs font-medium tracking-wide ${isPersonalRecord ? "border-accent-primary/40 bg-accent-primary/10 text-accent-primary" : "border-border bg-card text-muted-foreground"}`}
         >
-          <ModeIcon aria-hidden className="h-3.5 w-3.5 shrink-0" />
+          <ModeIcon
+            aria-hidden
+            data-mode-icon={isQuote ? "quote" : "random-words"}
+            className="h-3.5 w-3.5 shrink-0"
+          />
           <span>{description}</span>
         </p>
       </div>

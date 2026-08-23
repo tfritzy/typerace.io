@@ -38,7 +38,9 @@ describe("RaceDetailsRow", () => {
     expect(detailsRow.textContent).toBe("3 English random words");
     expect(detailsRow.className).toContain("text-accent-primary");
     expect(detailsRow.className).toContain("bg-accent-primary/10");
-    expect(detailsRow.querySelector(".lucide-shuffle")).not.toBeNull();
+    expect(
+      detailsRow.querySelector('[data-mode-icon="random-words"]'),
+    ).not.toBeNull();
     expect(status.compareDocumentPosition(detailsRow)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
@@ -57,7 +59,7 @@ describe("RaceDetailsRow", () => {
       "English quote by “Author”, 4 words",
     );
     expect(
-      getByLabelText("Race details").querySelector(".lucide-quote"),
+      getByLabelText("Race details").querySelector('[data-mode-icon="quote"]'),
     ).not.toBeNull();
   });
 });
