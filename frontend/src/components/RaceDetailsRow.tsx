@@ -1,4 +1,4 @@
-import { Quote, Dices, Trophy } from "lucide-react";
+import { Quote, Dice5, Trophy } from "lucide-react";
 import { memo } from "react";
 import type { GameMode } from "../types/stdb";
 import {
@@ -37,7 +37,7 @@ export const RaceDetailsRow = memo(
     const description = isQuote
       ? t.quoteDescription(wordCount, language.nativeName, attribution)
       : t.randomWordsDescription(wordCount, language.nativeName);
-    const ModeIcon = isQuote ? Quote : Dices;
+    const ModeIcon = isQuote ? Quote : Dice5;
 
     return (
       <div className="mb-3">
