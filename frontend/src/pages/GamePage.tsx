@@ -31,6 +31,7 @@ import { getPreferredGameType } from "../utils/gamePreferences";
 import { WinnerConfetti } from "../components/WinnerConfetti";
 import { GameReplay } from "../components/GameReplay";
 import { reconstructInputFromHistory } from "../utils/replayTimeline";
+import { isPersonalRecordForGame } from "../utils/personalRecord";
 
 type UiGameType = "Public" | "Private" | "Practice";
 
@@ -174,19 +175,18 @@ export const GamePage = () => {
     };
 
     const isCurrentGamePersonalRecord = (record: PersonalRecord) => {
-      if (!conn.identity || !record.playerId.isEqual(conn.identity)) {
-        return false;
-      }
-
-      return conn.db.gamerecord.id.find(record.gameRecordId)?.gameId === gameId;
+      return isPersonalRecordForGame(
+        record,
+        conn.identity,
+        gameId,
+        (gameRecordId) => conn.db.gamerecord.id.find(gameRecordId),
+      );
     };
 
     const syncCurrentGamePersonalRecord = () => {
       setHasNewPersonalRecord(
         Array.from(conn.db.personalrecord.iter()).some(
-          (record) =>
-            record.phraseLength !== undefined &&
-            isCurrentGamePersonalRecord(record),
+          isCurrentGamePersonalRecord,
         ),
       );
     };
@@ -195,10 +195,7 @@ export const GamePage = () => {
       _ctx: any,
       record: PersonalRecord,
     ) => {
-      if (
-        record.phraseLength !== undefined &&
-        isCurrentGamePersonalRecord(record)
-      ) {
+      if (isCurrentGamePersonalRecord(record)) {
         setHasNewPersonalRecord(true);
       }
     };

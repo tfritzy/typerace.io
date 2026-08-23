@@ -34,10 +34,8 @@ export const RaceDetailsRow = memo(
     const isQuote = getContentTypeFromMode(gameMode.tag) === "Quotes";
     const wordCount = getPhraseWordCount(phrase);
     const description = isQuote
-      ? `${wordCount}-${t.word.toLocaleLowerCase(language.htmlLang)} ${language.nativeName} ${t.quote}${attribution ? ` ${t.by} “${attribution}”` : ""}`
-      : language.htmlLang === "en"
-        ? `${wordCount} random common English words`
-        : `${wordCount} ${language.nativeName} ${t.randomWords.toLocaleLowerCase(language.htmlLang)}`;
+      ? t.quoteDescription(wordCount, language.nativeName, attribution)
+      : t.randomWordsDescription(wordCount, language.nativeName);
     const ModeIcon = isQuote ? Quote : Dices;
 
     return (
@@ -45,7 +43,7 @@ export const RaceDetailsRow = memo(
         {isPersonalRecord && (
           <div
             role="status"
-            className="mb-3 flex items-center justify-center gap-2 rounded-lg border border-accent-primary/40 bg-accent-primary/10 px-4 py-3 text-accent-primary"
+            className="mb-3 flex min-h-11 items-center justify-center gap-2 rounded-lg border border-accent-primary/40 bg-accent-primary/10 px-4 py-2 text-accent-primary"
           >
             <Trophy aria-hidden className="h-5 w-5" />
             <span className="text-sm font-bold uppercase tracking-wider">
@@ -55,7 +53,7 @@ export const RaceDetailsRow = memo(
         )}
         <p
           aria-label="Race details"
-          className={`flex min-h-9 flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-lg border px-3 py-2 text-xs font-medium tracking-wide ${isPersonalRecord ? "border-accent-primary/40 bg-accent-primary/10 text-accent-primary" : "border-border bg-card text-muted-foreground"}`}
+          className={`flex min-h-11 flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-lg border px-3 py-2 text-xs font-medium tracking-wide ${isPersonalRecord ? "border-accent-primary/40 bg-accent-primary/10 text-accent-primary" : "border-border bg-card text-muted-foreground"}`}
         >
           <ModeIcon
             aria-hidden

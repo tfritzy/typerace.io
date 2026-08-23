@@ -31,29 +31,27 @@ export const PlayerStatsRow = memo(
     const isPerfectAccuracy = accuracy === 100;
     const isHighWpm = finalWpm >= 100;
     return (
-      <div className="mb-3">
-        <div className="grid min-h-[90px] grid-cols-2 gap-3 sm:grid-cols-4">
-          <ResultStatCard
-            label={t.place}
-            value={getOrdinalPlacement(placement)}
-            isAccent={isPersonalRecord || isFirstPlace}
-          />
-          <ResultStatCard
-            label={t.wpm}
-            value={Math.round(finalWpm)}
-            isAccent={isPersonalRecord || isHighWpm}
-          />
-          <ResultStatCard
-            label={t.time}
-            value={formatStopwatchTime(raceTime)}
-            isAccent={isPersonalRecord || isFirstPlace}
-          />
-          <ResultStatCard
-            label={t.accuracy}
-            value={`${Math.round(accuracy)}%`}
-            isAccent={isPersonalRecord || isPerfectAccuracy}
-          />
-        </div>
+      <div className="mb-3 grid min-h-[90px] grid-cols-2 gap-3 sm:grid-cols-4">
+        <ResultStatCard
+          label={t.place}
+          value={getOrdinalPlacement(placement)}
+          isAccent={isPersonalRecord || isFirstPlace}
+        />
+        <ResultStatCard
+          label={t.wpm}
+          value={Math.round(finalWpm)}
+          isAccent={isPersonalRecord || isHighWpm}
+        />
+        <ResultStatCard
+          label={t.time}
+          value={formatStopwatchTime(raceTime)}
+          isAccent={isPersonalRecord || isFirstPlace}
+        />
+        <ResultStatCard
+          label={t.accuracy}
+          value={`${Math.round(accuracy)}%`}
+          isAccent={isPersonalRecord || isPerfectAccuracy}
+        />
       </div>
     );
   },

@@ -5,7 +5,10 @@ import { afterEach, describe, expect, it } from "vitest";
 import type { GameMode } from "../types/stdb";
 import { getPhraseWordCount, RaceDetailsRow } from "./RaceDetailsRow";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  localStorage.clear();
+});
 
 describe("getPhraseWordCount", () => {
   it("counts whitespace-separated words", () => {
@@ -38,6 +41,8 @@ describe("RaceDetailsRow", () => {
     expect(detailsRow.textContent).toBe("3 random common English words");
     expect(detailsRow.className).toContain("text-accent-primary");
     expect(detailsRow.className).toContain("bg-accent-primary/10");
+    expect(status.className).toContain("min-h-11");
+    expect(detailsRow.className).toContain("min-h-11");
     expect(
       detailsRow.querySelector('[data-mode-icon="random-words"]'),
     ).not.toBeNull();
@@ -61,5 +66,19 @@ describe("RaceDetailsRow", () => {
     expect(
       getByLabelText("Race details").querySelector('[data-mode-icon="quote"]'),
     ).not.toBeNull();
+  });
+
+  it("uses the selected language's description", () => {
+    localStorage.setItem("typerace_lang_slug", "es");
+    const { getByLabelText } = render(
+      <RaceDetailsRow
+        gameMode={{ tag: "Spanish500" } as GameMode}
+        phrase="uno dos tres"
+      />,
+    );
+
+    expect(getByLabelText("Race details").textContent).toBe(
+      "3 palabras comunes aleatorias en Español",
+    );
   });
 });

@@ -5,11 +5,13 @@ export interface Translations {
   privateLobby: string;
   practiceMode: string;
   randomWords: string;
-  word: string;
-  words: string;
-  quote: string;
   quotes: string;
-  by: string;
+  randomWordsDescription: (wordCount: number, languageName: string) => string;
+  quoteDescription: (
+    wordCount: number,
+    languageName: string,
+    attribution?: string,
+  ) => string;
   gameOptions: string;
   matchType: string;
   mode: string;
@@ -29,7 +31,6 @@ export interface Translations {
   replay: string;
   results: string;
   newPersonalRecord: string;
-  category: string;
   ownerRematchOnly: string;
   waitingForPlayer: string;
   tagline: string;
@@ -48,11 +49,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Private",
     practiceMode: "Practice",
     randomWords: "Random Words",
-    word: "Word",
-    words: "words",
-    quote: "quote",
     quotes: "Quotes",
-    by: "by",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} random common ${languageName} words`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount}-word ${languageName} quote${attribution ? ` by “${attribution}”` : ""}`,
     gameOptions: "Game Options",
     matchType: "Match Type",
     mode: "Mode",
@@ -72,7 +73,6 @@ const translations: Record<Language, Translations> = {
     replay: "Replay",
     results: "Results",
     newPersonalRecord: "New personal record!",
-    category: "Category",
     ownerRematchOnly: "Only the game owner can start a rematch",
     waitingForPlayer: "Waiting for player...",
     wpm: "WPM",
@@ -90,11 +90,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privado",
     practiceMode: "Práctica",
     randomWords: "Palabras aleatorias",
-    word: "Palabra",
-    words: "palabras",
-    quote: "cita",
     quotes: "Citas",
-    by: "de",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} palabras comunes aleatorias en ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount} palabras de una cita en ${languageName}${attribution ? ` de “${attribution}”` : ""}`,
     gameOptions: "Opciones de juego",
     matchType: "Tipo de partida",
     mode: "Modo",
@@ -115,7 +115,6 @@ const translations: Record<Language, Translations> = {
     replay: "Repetir",
     results: "Resultados",
     newPersonalRecord: "¡Nuevo récord personal!",
-    category: "Categoría",
     ownerRematchOnly: "Solo el anfitrión puede iniciar una revancha",
     waitingForPlayer: "Esperando jugador...",
     wpm: "PPM",
@@ -133,11 +132,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privé",
     practiceMode: "Entraînement",
     randomWords: "Mots aléatoires",
-    word: "Mot",
-    words: "mots",
-    quote: "citation",
     quotes: "Citations",
-    by: "de",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} mots courants aléatoires en ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount} mots d’une citation en ${languageName}${attribution ? ` de « ${attribution} »` : ""}`,
     gameOptions: "Options de jeu",
     matchType: "Type de partie",
     mode: "Mode",
@@ -157,7 +156,6 @@ const translations: Record<Language, Translations> = {
     replay: "Rejouer",
     results: "Résultats",
     newPersonalRecord: "Nouveau record personnel !",
-    category: "Catégorie",
     ownerRematchOnly: "Seul le propriétaire peut lancer une revanche",
     waitingForPlayer: "En attente d'un joueur...",
     wpm: "MPM",
@@ -175,11 +173,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privat",
     practiceMode: "Übung",
     randomWords: "Zufällige Wörter",
-    word: "Wort",
-    words: "Wörter",
-    quote: "Zitat",
     quotes: "Zitate",
-    by: "von",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} zufällige häufige Wörter auf ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount}-Wörter-Zitat auf ${languageName}${attribution ? ` von „${attribution}“` : ""}`,
     gameOptions: "Spieloptionen",
     matchType: "Spieltyp",
     mode: "Modus",
@@ -199,7 +197,6 @@ const translations: Record<Language, Translations> = {
     replay: "Wiederholen",
     results: "Ergebnisse",
     newPersonalRecord: "Neuer persönlicher Rekord!",
-    category: "Kategorie",
     ownerRematchOnly: "Nur der Gastgeber kann eine Revanche starten",
     waitingForPlayer: "Warte auf Spieler...",
     wpm: "WPM",
@@ -217,11 +214,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privata",
     practiceMode: "Pratica",
     randomWords: "Parole casuali",
-    word: "Parola",
-    words: "parole",
-    quote: "citazione",
     quotes: "Citazioni",
-    by: "di",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} parole comuni casuali in ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount} parole da una citazione in ${languageName}${attribution ? ` di “${attribution}”` : ""}`,
     gameOptions: "Opzioni di gioco",
     matchType: "Tipo di partita",
     mode: "Modalità",
@@ -241,7 +238,6 @@ const translations: Record<Language, Translations> = {
     replay: "Rivedi",
     results: "Risultati",
     newPersonalRecord: "Nuovo record personale!",
-    category: "Categoria",
     ownerRematchOnly: "Solo l'host può avviare una rivincita",
     waitingForPlayer: "In attesa di un giocatore...",
     wpm: "PPM",
@@ -259,11 +255,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privada",
     practiceMode: "Prática",
     randomWords: "Palavras aleatórias",
-    word: "Palavra",
-    words: "palavras",
-    quote: "citação",
     quotes: "Citações",
-    by: "de",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} palavras comuns aleatórias em ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount} palavras de uma citação em ${languageName}${attribution ? ` de “${attribution}”` : ""}`,
     gameOptions: "Opções de jogo",
     matchType: "Tipo de partida",
     mode: "Modo",
@@ -284,7 +280,6 @@ const translations: Record<Language, Translations> = {
     replay: "Repetir",
     results: "Resultados",
     newPersonalRecord: "Novo recorde pessoal!",
-    category: "Categoria",
     ownerRematchOnly: "Apenas o anfitrião pode iniciar uma revanche",
     waitingForPlayer: "Aguardando jogador...",
     wpm: "PPM",
@@ -302,11 +297,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Приватна",
     practiceMode: "Практика",
     randomWords: "Випадкові слова",
-    word: "Слово",
-    words: "слів",
-    quote: "цитата",
     quotes: "Цитати",
-    by: "від",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} випадкових поширених слів мовою ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount} слів у цитаті мовою ${languageName}${attribution ? ` від «${attribution}»` : ""}`,
     gameOptions: "Налаштування гри",
     matchType: "Тип матчу",
     mode: "Режим",
@@ -327,7 +322,6 @@ const translations: Record<Language, Translations> = {
     replay: "Повторити",
     results: "Результати",
     newPersonalRecord: "Новий особистий рекорд!",
-    category: "Категорія",
     ownerRematchOnly: "Тільки хост може почати реванш",
     waitingForPlayer: "Очікування гравця...",
     wpm: "СХМ",
@@ -345,11 +339,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "خاصة",
     practiceMode: "تدريب",
     randomWords: "كلمات عشوائية",
-    word: "كلمة",
-    words: "كلمات",
-    quote: "اقتباس",
     quotes: "اقتباسات",
-    by: "بقلم",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} كلمة شائعة عشوائية باللغة ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount} كلمة في اقتباس باللغة ${languageName}${attribution ? ` بقلم «${attribution}»` : ""}`,
     gameOptions: "خيارات اللعبة",
     matchType: "نوع المباراة",
     mode: "الوضع",
@@ -369,7 +363,6 @@ const translations: Record<Language, Translations> = {
     replay: "إعادة",
     results: "النتائج",
     newPersonalRecord: "رقم قياسي شخصي جديد!",
-    category: "الفئة",
     ownerRematchOnly: "فقط المضيف يمكنه بدء إعادة المباراة",
     waitingForPlayer: "في انتظار لاعب...",
     wpm: "ك/د",
@@ -387,11 +380,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privé",
     practiceMode: "Oefenen",
     randomWords: "Willekeurige woorden",
-    word: "Woord",
-    words: "woorden",
-    quote: "citaat",
     quotes: "Citaten",
-    by: "van",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} willekeurige veelvoorkomende woorden in het ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount} woorden tellend citaat in het ${languageName}${attribution ? ` van “${attribution}”` : ""}`,
     gameOptions: "Spelopties",
     matchType: "Wedstrijdtype",
     mode: "Modus",
@@ -412,7 +405,6 @@ const translations: Record<Language, Translations> = {
     replay: "Opnieuw afspelen",
     results: "Resultaten",
     newPersonalRecord: "Nieuw persoonlijk record!",
-    category: "Categorie",
     ownerRematchOnly: "Alleen de host kan een herkansing starten",
     waitingForPlayer: "Wachten op speler...",
     wpm: "WPM",
@@ -430,11 +422,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privat",
     practiceMode: "Övning",
     randomWords: "Slumpmässiga ord",
-    word: "Ord",
-    words: "ord",
-    quote: "citat",
     quotes: "Citat",
-    by: "av",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} slumpmässiga vanliga ord på ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount} ord långt citat på ${languageName}${attribution ? ` av “${attribution}”` : ""}`,
     gameOptions: "Spelalternativ",
     matchType: "Matchtyp",
     mode: "Läge",
@@ -454,7 +446,6 @@ const translations: Record<Language, Translations> = {
     replay: "Spela upp igen",
     results: "Resultat",
     newPersonalRecord: "Nytt personligt rekord!",
-    category: "Kategori",
     ownerRematchOnly: "Bara värden kan starta en returmatch",
     waitingForPlayer: "Väntar på spelare...",
     wpm: "WPM",
@@ -472,11 +463,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Приватный",
     practiceMode: "Практика",
     randomWords: "Случайные слова",
-    word: "Слово",
-    words: "слов",
-    quote: "цитата",
     quotes: "Цитаты",
-    by: "от",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} случайных распространённых слов на языке ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount} слов в цитате на языке ${languageName}${attribution ? ` от «${attribution}»` : ""}`,
     gameOptions: "Настройки игры",
     matchType: "Тип матча",
     mode: "Режим",
@@ -497,7 +488,6 @@ const translations: Record<Language, Translations> = {
     replay: "Повторить",
     results: "Результаты",
     newPersonalRecord: "Новый личный рекорд!",
-    category: "Категория",
     ownerRematchOnly: "Только владелец игры может начать реванш",
     waitingForPlayer: "Ожидание игрока...",
     wpm: "С/М",
@@ -515,11 +505,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privat",
     practiceMode: "Antrenament",
     randomWords: "Cuvinte aleatorii",
-    word: "Cuvânt",
-    words: "cuvinte",
-    quote: "citat",
     quotes: "Citate",
-    by: "de",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} cuvinte comune aleatorii în ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount} cuvinte dintr-un citat în ${languageName}${attribution ? ` de “${attribution}”` : ""}`,
     gameOptions: "Opțiuni de joc",
     matchType: "Tipul cursei",
     mode: "Mod",
@@ -540,7 +530,6 @@ const translations: Record<Language, Translations> = {
     replay: "Reluare",
     results: "Rezultate",
     newPersonalRecord: "Un nou record personal!",
-    category: "Categorie",
     ownerRematchOnly: "Doar gazda poate începe o revanșă",
     waitingForPlayer: "Se așteaptă un jucător...",
     wpm: "CPM",
@@ -558,11 +547,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Pribadi",
     practiceMode: "Latihan",
     randomWords: "Kata acak",
-    word: "Kata",
-    words: "kata",
-    quote: "kutipan",
     quotes: "Kutipan",
-    by: "oleh",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} kata umum acak dalam ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount} kata dalam kutipan berbahasa ${languageName}${attribution ? ` oleh “${attribution}”` : ""}`,
     gameOptions: "Opsi permainan",
     matchType: "Jenis pertandingan",
     mode: "Mode",
@@ -582,7 +571,6 @@ const translations: Record<Language, Translations> = {
     replay: "Tayangan ulang",
     results: "Hasil",
     newPersonalRecord: "Rekor pribadi baru!",
-    category: "Kategori",
     ownerRematchOnly: "Hanya pemilik permainan yang dapat memulai pertandingan ulang",
     waitingForPlayer: "Menunggu pemain...",
     wpm: "KPM",
@@ -600,11 +588,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Prywatny",
     practiceMode: "Trening",
     randomWords: "Losowe słowa",
-    word: "Słowo",
-    words: "słów",
-    quote: "cytat",
     quotes: "Cytaty",
-    by: "autorstwa",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} losowych popularnych słów w języku ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount} słów w cytacie w języku ${languageName}${attribution ? ` autorstwa „${attribution}”` : ""}`,
     gameOptions: "Opcje gry",
     matchType: "Typ rozgrywki",
     mode: "Tryb",
@@ -624,7 +612,6 @@ const translations: Record<Language, Translations> = {
     replay: "Powtórka",
     results: "Wyniki",
     newPersonalRecord: "Nowy rekord życiowy!",
-    category: "Kategoria",
     ownerRematchOnly: "Tylko gospodarz gry może rozpocząć rewanż",
     waitingForPlayer: "Oczekiwanie na gracza...",
     wpm: "WPM",
@@ -645,11 +632,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Soukromá",
     practiceMode: "Trénink",
     randomWords: "Náhodná slova",
-    word: "Slovo",
-    words: "slov",
-    quote: "citát",
     quotes: "Citáty",
-    by: "od",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${wordCount} náhodných běžných slov v jazyce ${languageName}`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${wordCount} slov v citátu v jazyce ${languageName}${attribution ? ` od „${attribution}“` : ""}`,
     gameOptions: "Nastavení hry",
     matchType: "Typ závodu",
     mode: "Režim",
@@ -669,7 +656,6 @@ const translations: Record<Language, Translations> = {
     replay: "Záznam",
     results: "Výsledky",
     newPersonalRecord: "Nový osobní rekord!",
-    category: "Kategorie",
     ownerRematchOnly: "Odvetu může spustit pouze vlastník hry",
     waitingForPlayer: "Čekání na hráče...",
     wpm: "WPM",
@@ -690,11 +676,11 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Özel",
     practiceMode: "Alıştırma",
     randomWords: "Rastgele kelimeler",
-    word: "Kelime",
-    words: "kelime",
-    quote: "alıntı",
     quotes: "Alıntılar",
-    by: "yazan",
+    randomWordsDescription: (wordCount, languageName) =>
+      `${languageName} dilinde ${wordCount} rastgele yaygın kelime`,
+    quoteDescription: (wordCount, languageName, attribution) =>
+      `${languageName} dilinde ${wordCount} kelimelik alıntı${attribution ? `, yazan “${attribution}”` : ""}`,
     gameOptions: "Oyun Seçenekleri",
     matchType: "Maç Türü",
     mode: "Mod",
@@ -714,7 +700,6 @@ const translations: Record<Language, Translations> = {
     replay: "Tekrar oynat",
     results: "Sonuçlar",
     newPersonalRecord: "Yeni kişisel rekor!",
-    category: "Kategori",
     ownerRematchOnly: "Yalnızca ev sahibi rövanş başlatabilir",
     waitingForPlayer: "Oyuncu bekleniyor...",
     wpm: "WPM",
