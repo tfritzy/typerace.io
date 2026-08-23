@@ -35,7 +35,9 @@ export const RaceDetailsRow = memo(
     const wordCount = getPhraseWordCount(phrase);
     const description = isQuote
       ? `${wordCount}-${t.word.toLocaleLowerCase(language.htmlLang)} ${language.nativeName} ${t.quote}${attribution ? ` ${t.by} “${attribution}”` : ""}`
-      : `${wordCount} ${language.nativeName} ${t.randomWords.toLocaleLowerCase(language.htmlLang)}`;
+      : language.htmlLang === "en"
+        ? `${wordCount} random common English words`
+        : `${wordCount} ${language.nativeName} ${t.randomWords.toLocaleLowerCase(language.htmlLang)}`;
     const ModeIcon = isQuote ? Quote : Dices;
 
     return (

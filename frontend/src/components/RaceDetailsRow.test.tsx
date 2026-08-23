@@ -35,7 +35,7 @@ describe("RaceDetailsRow", () => {
     const detailsRow = getByLabelText("Race details");
 
     expect(status.textContent).toContain("New personal record!");
-    expect(detailsRow.textContent).toBe("3 English random words");
+    expect(detailsRow.textContent).toBe("3 random common English words");
     expect(detailsRow.className).toContain("text-accent-primary");
     expect(detailsRow.className).toContain("bg-accent-primary/10");
     expect(
