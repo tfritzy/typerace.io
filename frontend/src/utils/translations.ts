@@ -1,4 +1,8 @@
-import { Language, getLanguageFromSlug, type LanguageInfo } from "./modes";
+import {
+  Language,
+  getLanguageFromSlug,
+  type LanguageInfo,
+} from "./modes";
 
 type RaceLanguage = Pick<LanguageInfo, "language" | "nativeName">;
 
@@ -8,9 +12,8 @@ export interface Translations {
   practiceMode: string;
   randomWords: string;
   words: string;
-  quote: string;
   quotes: string;
-  by: string;
+  quote: (attribution?: string) => string;
   randomWordsDescription: (wordCount: number, language: RaceLanguage) => string;
   quoteDescription: (
     wordCount: number,
@@ -55,9 +58,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Practice",
     randomWords: "Random Words",
     words: "words",
-    quote: "quote",
     quotes: "Quotes",
-    by: "of",
+    quote: (attribution) => attribution ? `Quote of “${attribution}”` : "Quote",
     randomWordsDescription: (wordCount, language) =>
       language.language === Language.English
         ? `${wordCount} random common English words`
@@ -103,9 +105,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Práctica",
     randomWords: "Palabras aleatorias",
     words: "palabras",
-    quote: "cita",
     quotes: "Citas",
-    by: "de",
+    quote: (attribution) => attribution ? `Cita de “${attribution}”` : "Cita",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} palabras comunes aleatorias (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -148,9 +149,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Entraînement",
     randomWords: "Mots aléatoires",
     words: "mots",
-    quote: "citation",
     quotes: "Citations",
-    by: "de",
+    quote: (attribution) => attribution ? `Citation de “${attribution}”` : "Citation",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} mots courants aléatoires (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -192,9 +192,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Übung",
     randomWords: "Zufällige Wörter",
     words: "Wörter",
-    quote: "Zitat",
     quotes: "Zitate",
-    by: "von",
+    quote: (attribution) => attribution ? `Zitat von “${attribution}”` : "Zitat",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} zufällige häufige Wörter (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -236,9 +235,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Pratica",
     randomWords: "Parole casuali",
     words: "parole",
-    quote: "citazione",
     quotes: "Citazioni",
-    by: "di",
+    quote: (attribution) => attribution ? `Citazione di “${attribution}”` : "Citazione",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} parole comuni casuali (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -280,9 +278,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Prática",
     randomWords: "Palavras aleatórias",
     words: "palavras",
-    quote: "citação",
     quotes: "Citações",
-    by: "de",
+    quote: (attribution) => attribution ? `Citação de “${attribution}”` : "Citação",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} palavras comuns aleatórias (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -325,9 +322,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Практика",
     randomWords: "Випадкові слова",
     words: "слів",
-    quote: "цитата",
     quotes: "Цитати",
-    by: "від",
+    quote: (attribution) => attribution ? `Цитата від “${attribution}”` : "Цитата",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} випадкових поширених слів (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -370,9 +366,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "تدريب",
     randomWords: "كلمات عشوائية",
     words: "كلمات",
-    quote: "اقتباس",
     quotes: "اقتباسات",
-    by: "بقلم",
+    quote: (attribution) => attribution ? `اقتباس بقلم “${attribution}”` : "اقتباس",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} كلمة شائعة عشوائية (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -414,9 +409,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Oefenen",
     randomWords: "Willekeurige woorden",
     words: "woorden",
-    quote: "citaat",
     quotes: "Citaten",
-    by: "van",
+    quote: (attribution) => attribution ? `Citaat van “${attribution}”` : "Citaat",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} willekeurige veelvoorkomende woorden (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -459,9 +453,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Övning",
     randomWords: "Slumpmässiga ord",
     words: "ord",
-    quote: "citat",
     quotes: "Citat",
-    by: "av",
+    quote: (attribution) => attribution ? `Citat av “${attribution}”` : "Citat",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} slumpmässiga vanliga ord (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -503,9 +496,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Практика",
     randomWords: "Случайные слова",
     words: "слов",
-    quote: "цитата",
     quotes: "Цитаты",
-    by: "от",
+    quote: (attribution) => attribution ? `Цитата от “${attribution}”` : "Цитата",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} случайных распространённых слов (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -548,9 +540,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Antrenament",
     randomWords: "Cuvinte aleatorii",
     words: "cuvinte",
-    quote: "citat",
     quotes: "Citate",
-    by: "de",
+    quote: (attribution) => attribution ? `Citat de “${attribution}”` : "Citat",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} cuvinte comune aleatorii (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -593,9 +584,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Latihan",
     randomWords: "Kata acak",
     words: "kata",
-    quote: "kutipan",
     quotes: "Kutipan",
-    by: "oleh",
+    quote: (attribution) => attribution ? `Kutipan oleh “${attribution}”` : "Kutipan",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} kata umum acak (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -637,9 +627,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Trening",
     randomWords: "Losowe słowa",
     words: "słów",
-    quote: "cytat",
     quotes: "Cytaty",
-    by: "autorstwa",
+    quote: (attribution) => attribution ? `Cytat autorstwa “${attribution}”` : "Cytat",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} losowych popularnych słów (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -684,9 +673,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Trénink",
     randomWords: "Náhodná slova",
     words: "slov",
-    quote: "citát",
     quotes: "Citáty",
-    by: "od",
+    quote: (attribution) => attribution ? `Citát od “${attribution}”` : "Citát",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} náhodných běžných slov (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -731,9 +719,8 @@ const translations: Record<Language, Translations> = {
     practiceMode: "Alıştırma",
     randomWords: "Rastgele kelimeler",
     words: "kelime",
-    quote: "alıntı",
     quotes: "Alıntılar",
-    by: "yazan",
+    quote: (attribution) => attribution ? `Alıntı, yazan “${attribution}”` : "Alıntı",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} rastgele yaygın kelime (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>

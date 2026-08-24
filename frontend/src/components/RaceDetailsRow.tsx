@@ -1,9 +1,17 @@
-import { Dice5, Languages, Quote, Ruler, Trophy } from "lucide-react";
+import {
+  Dice5,
+  Languages,
+  Quote,
+  Ruler,
+  Trophy,
+  type LucideIcon,
+} from "lucide-react";
 import { memo } from "react";
 import type { GameMode } from "../types/stdb";
 import {
   getContentTypeFromMode,
   getLanguageInfoFromMode,
+  type ContentTypeValue,
 } from "../utils/modes";
 import { getTranslations } from "../utils/translations";
 import { getPhraseLength } from "../utils/phrase";
@@ -16,6 +24,12 @@ interface RaceDetailsRowProps {
   isPersonalRecord?: boolean;
 }
 
+interface ModeDetail {
+  icon: LucideIcon;
+  iconKind: string;
+  label: string;
+}
+
 export const RaceDetailsRow = memo(
   ({
     gameMode,
@@ -25,13 +39,21 @@ export const RaceDetailsRow = memo(
   }: RaceDetailsRowProps) => {
     const language = getLanguageInfoFromMode(gameMode.tag);
     const t = getTranslations();
-    const isQuote = getContentTypeFromMode(gameMode.tag) === "Quotes";
+    const contentType = getContentTypeFromMode(gameMode.tag);
     const phraseLength = getPhraseLength(phrase);
-    const ModeIcon = isQuote ? Quote : Dice5;
-    const quoteLabel = `${t.quote.charAt(0).toLocaleUpperCase()}${t.quote.slice(1)}`;
-    const mode = isQuote
-      ? `${quoteLabel}${attribution ? ` ${t.by} “${attribution}”` : ""}`
-      : t.randomWords;
+    const modeDetails = {
+      RandomWords: {
+        icon: Dice5,
+        iconKind: "random-words",
+        label: t.randomWords,
+      },
+      Quotes: {
+        icon: Quote,
+        iconKind: "quote",
+        label: t.quote(attribution),
+      },
+    } satisfies Record<ContentTypeValue, ModeDetail>;
+    const modeDetail = modeDetails[contentType];
 
     const details = [
       {
@@ -42,9 +64,9 @@ export const RaceDetailsRow = memo(
       },
       {
         label: "Mode",
-        value: mode,
-        icon: ModeIcon,
-        iconKind: isQuote ? "quote" : "random-words",
+        value: modeDetail.label,
+        icon: modeDetail.icon,
+        iconKind: modeDetail.iconKind,
       },
       {
         label: "Language",
