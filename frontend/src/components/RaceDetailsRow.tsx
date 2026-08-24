@@ -1,18 +1,7 @@
-import {
-  Dice5,
-  Languages,
-  Quote,
-  Ruler,
-  Trophy,
-  type LucideIcon,
-} from "lucide-react";
+import { Dice5, Languages, Quote, Ruler, Trophy } from "lucide-react";
 import { memo } from "react";
 import type { GameMode } from "../types/stdb";
-import {
-  getContentTypeFromMode,
-  getLanguageInfoFromMode,
-  type ContentTypeValue,
-} from "../utils/modes";
+import { getLanguageInfoFromMode } from "../utils/modes";
 import { getTranslations } from "../utils/translations";
 import { getPhraseLength } from "../utils/phrase";
 import { Box } from "./Box";
@@ -24,12 +13,6 @@ interface RaceDetailsRowProps {
   isPersonalRecord?: boolean;
 }
 
-interface ModeDetail {
-  icon: LucideIcon;
-  iconKind: string;
-  label: string;
-}
-
 export const RaceDetailsRow = memo(
   ({
     gameMode,
@@ -39,21 +22,11 @@ export const RaceDetailsRow = memo(
   }: RaceDetailsRowProps) => {
     const language = getLanguageInfoFromMode(gameMode.tag);
     const t = getTranslations();
-    const contentType = getContentTypeFromMode(gameMode.tag);
     const phraseLength = getPhraseLength(phrase);
-    const modeDetails = {
-      RandomWords: {
-        icon: Dice5,
-        iconKind: "random-words",
-        label: t.randomWords,
-      },
-      Quotes: {
-        icon: Quote,
-        iconKind: "quote",
-        label: t.quote(attribution),
-      },
-    } satisfies Record<ContentTypeValue, ModeDetail>;
-    const modeDetail = modeDetails[contentType];
+    const isQuote = gameMode.tag.endsWith("Quotes");
+    const ModeIcon = isQuote ? Quote : Dice5;
+    const modeIconKind = isQuote ? "quote" : "random-words";
+    const modeLabel = isQuote ? t.quote(attribution) : t.randomWords;
 
     const details = [
       {
@@ -64,9 +37,9 @@ export const RaceDetailsRow = memo(
       },
       {
         label: "Mode",
-        value: modeDetail.label,
-        icon: modeDetail.icon,
-        iconKind: modeDetail.iconKind,
+        value: modeLabel,
+        icon: ModeIcon,
+        iconKind: modeIconKind,
       },
       {
         label: "Language",

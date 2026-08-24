@@ -1,10 +1,5 @@
 export type ContentTypeValue = "RandomWords" | "Quotes";
 
-const contentTypeByModeSuffix = {
-  "500": "RandomWords",
-  Quotes: "Quotes",
-} as const satisfies Record<string, ContentTypeValue>;
-
 export const WORD_COUNT_BUCKETS = [8, 12, 16, 20] as const;
 export type WordCountBucket = (typeof WORD_COUNT_BUCKETS)[number];
 
@@ -319,20 +314,17 @@ export function getLangPrefix(): string {
 }
 
 export function getContentTypeFromMode(modeTag: string): ContentTypeValue {
-  for (const [suffix, contentType] of Object.entries(contentTypeByModeSuffix)) {
-    if (modeTag.endsWith(suffix)) return contentType;
+  if (modeTag.endsWith("Quotes")) {
+    return "Quotes";
   }
-
-  throw new Error(`Unknown game mode: ${modeTag}`);
+  return "RandomWords";
 }
 
 export function getGameModeLabel(modeTag: string): string {
-  const contentTypeLabels = {
-    RandomWords: "words",
-    Quotes: "quotes",
-  } satisfies Record<ContentTypeValue, string>;
-
-  return `${getLanguageFromMode(modeTag)} ${contentTypeLabels[getContentTypeFromMode(modeTag)]}`;
+  const contentType = getContentTypeFromMode(modeTag) === "Quotes"
+    ? "quotes"
+    : "words";
+  return `${getLanguageFromMode(modeTag)} ${contentType}`;
 }
 
 const languageStartupPhrases: Record<Language, string[]> = {
