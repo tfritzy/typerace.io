@@ -20,9 +20,15 @@ describe("RaceDetailsRow", () => {
       />,
     );
 
-    expect(getByLabelText("Race details").textContent).toBe(
-      "4-word English quote by “Author”",
-    );
+    const details = getByLabelText("Race details");
+    expect(Array.from(details.querySelectorAll("dd"), ({ textContent }) => textContent)).toEqual([
+      "4 words",
+      "Quote of “Author”",
+      "English",
+    ]);
+    expect(details.querySelector('[data-detail-icon="length"]')).not.toBeNull();
+    expect(details.querySelector('[data-detail-icon="quote"]')).not.toBeNull();
+    expect(details.querySelector('[data-detail-icon="language"]')).not.toBeNull();
   });
 
   it("renders localized metadata", () => {
@@ -34,8 +40,14 @@ describe("RaceDetailsRow", () => {
       />,
     );
 
-    expect(getByLabelText("Race details").textContent).toBe(
-      "3 palabras comunes aleatorias (Español)",
-    );
+    const details = getByLabelText("Race details");
+    expect(Array.from(details.querySelectorAll("dd"), ({ textContent }) => textContent)).toEqual([
+      "3 palabras",
+      "Palabras aleatorias",
+      "Español",
+    ]);
+    expect(details.querySelector('[data-detail-icon="length"]')).not.toBeNull();
+    expect(details.querySelector('[data-detail-icon="random-words"]')).not.toBeNull();
+    expect(details.querySelector('[data-detail-icon="language"]')).not.toBeNull();
   });
 });

@@ -7,7 +7,10 @@ export interface Translations {
   privateLobby: string;
   practiceMode: string;
   randomWords: string;
+  words: string;
+  quote: string;
   quotes: string;
+  by: string;
   randomWordsDescription: (wordCount: number, language: RaceLanguage) => string;
   quoteDescription: (
     wordCount: number,
@@ -51,7 +54,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Private",
     practiceMode: "Practice",
     randomWords: "Random Words",
+    words: "words",
+    quote: "quote",
     quotes: "Quotes",
+    by: "of",
     randomWordsDescription: (wordCount, language) =>
       language.language === Language.English
         ? `${wordCount} random common English words`
@@ -96,7 +102,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privado",
     practiceMode: "Práctica",
     randomWords: "Palabras aleatorias",
+    words: "palabras",
+    quote: "cita",
     quotes: "Citas",
+    by: "de",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} palabras comunes aleatorias (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -138,7 +147,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privé",
     practiceMode: "Entraînement",
     randomWords: "Mots aléatoires",
+    words: "mots",
+    quote: "citation",
     quotes: "Citations",
+    by: "de",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} mots courants aléatoires (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -179,7 +191,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privat",
     practiceMode: "Übung",
     randomWords: "Zufällige Wörter",
+    words: "Wörter",
+    quote: "Zitat",
     quotes: "Zitate",
+    by: "von",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} zufällige häufige Wörter (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -220,7 +235,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privata",
     practiceMode: "Pratica",
     randomWords: "Parole casuali",
+    words: "parole",
+    quote: "citazione",
     quotes: "Citazioni",
+    by: "di",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} parole comuni casuali (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -261,7 +279,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privada",
     practiceMode: "Prática",
     randomWords: "Palavras aleatórias",
+    words: "palavras",
+    quote: "citação",
     quotes: "Citações",
+    by: "de",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} palavras comuns aleatórias (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -303,7 +324,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Приватна",
     practiceMode: "Практика",
     randomWords: "Випадкові слова",
+    words: "слів",
+    quote: "цитата",
     quotes: "Цитати",
+    by: "від",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} випадкових поширених слів (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -345,7 +369,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "خاصة",
     practiceMode: "تدريب",
     randomWords: "كلمات عشوائية",
+    words: "كلمات",
+    quote: "اقتباس",
     quotes: "اقتباسات",
+    by: "بقلم",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} كلمة شائعة عشوائية (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -386,7 +413,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privé",
     practiceMode: "Oefenen",
     randomWords: "Willekeurige woorden",
+    words: "woorden",
+    quote: "citaat",
     quotes: "Citaten",
+    by: "van",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} willekeurige veelvoorkomende woorden (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -428,7 +458,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privat",
     practiceMode: "Övning",
     randomWords: "Slumpmässiga ord",
+    words: "ord",
+    quote: "citat",
     quotes: "Citat",
+    by: "av",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} slumpmässiga vanliga ord (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -469,7 +502,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Приватный",
     practiceMode: "Практика",
     randomWords: "Случайные слова",
+    words: "слов",
+    quote: "цитата",
     quotes: "Цитаты",
+    by: "от",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} случайных распространённых слов (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -511,7 +547,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Privat",
     practiceMode: "Antrenament",
     randomWords: "Cuvinte aleatorii",
+    words: "cuvinte",
+    quote: "citat",
     quotes: "Citate",
+    by: "de",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} cuvinte comune aleatorii (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -553,7 +592,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Pribadi",
     practiceMode: "Latihan",
     randomWords: "Kata acak",
+    words: "kata",
+    quote: "kutipan",
     quotes: "Kutipan",
+    by: "oleh",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} kata umum acak (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -594,7 +636,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Prywatny",
     practiceMode: "Trening",
     randomWords: "Losowe słowa",
+    words: "słów",
+    quote: "cytat",
     quotes: "Cytaty",
+    by: "autorstwa",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} losowych popularnych słów (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -638,7 +683,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Soukromá",
     practiceMode: "Trénink",
     randomWords: "Náhodná slova",
+    words: "slov",
+    quote: "citát",
     quotes: "Citáty",
+    by: "od",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} náhodných běžných slov (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>
@@ -682,7 +730,10 @@ const translations: Record<Language, Translations> = {
     privateLobby: "Özel",
     practiceMode: "Alıştırma",
     randomWords: "Rastgele kelimeler",
+    words: "kelime",
+    quote: "alıntı",
     quotes: "Alıntılar",
+    by: "yazan",
     randomWordsDescription: (wordCount, language) =>
       `${wordCount} rastgele yaygın kelime (${language.nativeName})`,
     quoteDescription: (wordCount, language, attribution) =>

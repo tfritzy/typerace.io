@@ -1,4 +1,4 @@
-import { Quote, Dice5, Trophy } from "lucide-react";
+import { Dice5, Languages, Quote, Ruler, Trophy } from "lucide-react";
 import { memo } from "react";
 import type { GameMode } from "../types/stdb";
 import {
@@ -27,10 +27,32 @@ export const RaceDetailsRow = memo(
     const t = getTranslations();
     const isQuote = getContentTypeFromMode(gameMode.tag) === "Quotes";
     const phraseLength = getPhraseLength(phrase);
-    const description = isQuote
-      ? t.quoteDescription(phraseLength, language, attribution)
-      : t.randomWordsDescription(phraseLength, language);
     const ModeIcon = isQuote ? Quote : Dice5;
+    const quoteLabel = `${t.quote.charAt(0).toLocaleUpperCase()}${t.quote.slice(1)}`;
+    const mode = isQuote
+      ? `${quoteLabel}${attribution ? ` ${t.by} “${attribution}”` : ""}`
+      : t.randomWords;
+
+    const details = [
+      {
+        label: "Length",
+        value: `${phraseLength} ${t.words}`,
+        icon: Ruler,
+        iconKind: "length",
+      },
+      {
+        label: "Mode",
+        value: mode,
+        icon: ModeIcon,
+        iconKind: isQuote ? "quote" : "random-words",
+      },
+      {
+        label: "Language",
+        value: language.nativeName,
+        icon: Languages,
+        iconKind: "language",
+      },
+    ];
 
     return (
       <div className="mb-3">
@@ -46,16 +68,37 @@ export const RaceDetailsRow = memo(
             </span>
           </Box>
         )}
-        <Box
-          asChild
-          tone={isPersonalRecord ? "accent" : "default"}
-          className={`flex min-h-11 flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-lg px-3 py-2 text-xs font-medium tracking-wide ${isPersonalRecord ? "" : "text-muted-foreground"}`}
+        <dl
+          aria-label="Race details"
+          className="grid min-h-11 grid-cols-3 gap-3 text-xs font-semibold tracking-wide"
         >
-          <p aria-label="Race details">
-            <ModeIcon aria-hidden className="h-3.5 w-3.5 shrink-0" />
-            <span>{description}</span>
-          </p>
-        </Box>
+          {details.map((detail) => {
+            const DetailIcon = detail.icon;
+
+            return (
+              <Box
+                asChild
+                key={detail.label}
+                tone={isPersonalRecord ? "accent" : "default"}
+                className="flex min-w-0 items-center justify-center rounded-lg px-2 py-2"
+              >
+                <div>
+                  <dt className="sr-only">{detail.label}</dt>
+                  <dd className="flex min-w-0 items-center justify-center gap-2">
+                    {DetailIcon && (
+                      <DetailIcon
+                        aria-hidden
+                        data-detail-icon={detail.iconKind}
+                        className="h-3.5 w-3.5 shrink-0"
+                      />
+                    )}
+                    <span className="truncate">{detail.value}</span>
+                  </dd>
+                </div>
+              </Box>
+            );
+          })}
+        </dl>
       </div>
     );
   },
