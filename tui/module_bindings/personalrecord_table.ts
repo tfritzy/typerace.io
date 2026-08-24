@@ -19,6 +19,8 @@ export default __t.row({
     return GameMode;
   },
   gameRecordId: __t.string(),
+  gameId: __t.string(),
   wpm: __t.f64(),
+  accuracy: __t.f64(),
   phraseLength: __t.option(__t.i32()),
 });

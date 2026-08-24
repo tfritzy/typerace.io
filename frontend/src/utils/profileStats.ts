@@ -16,7 +16,7 @@ type LanguageRace = Pick<
 >;
 type LengthRecord = Pick<
   PersonalRecord,
-  "gameMode" | "gameRecordId" | "phraseLength" | "wpm"
+  "accuracy" | "gameId" | "gameMode" | "gameRecordId" | "phraseLength" | "wpm"
 >;
 type FilterableRace = Pick<GameRecord, "date" | "gameMode">;
 type LanguageModeRace = Pick<GameRecord, "gameMode">;
@@ -110,8 +110,12 @@ export function buildProfilePersonalRecords(
 
     const race = racesById.get(record.gameRecordId);
     slot.wpm = record.wpm;
-    slot.accuracy = race && race.accuracy > 0 ? race.accuracy : null;
-    slot.gameId = race?.gameId ?? null;
+    slot.accuracy = record.accuracy > 0
+      ? record.accuracy
+      : race && race.accuracy > 0
+        ? race.accuracy
+        : null;
+    slot.gameId = record.gameId || race?.gameId || null;
   }
 
   return result;

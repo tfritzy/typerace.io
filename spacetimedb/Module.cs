@@ -302,6 +302,10 @@ public static partial class Module
         public string Day;
         [Default(0)]
         public double Accuracy;
+        [Default(0)]
+        public int PhraseLength;
+        [Default(false)]
+        public bool IsPersonalBest;
     }
 
     [Table(Name = "personalrecord", Public = true)]
@@ -313,7 +317,11 @@ public static partial class Module
         public Identity PlayerId;
         public GameMode GameMode;
         public string GameRecordId;
+        [Default("")]
+        public string GameId;
         public double Wpm;
+        [Default(0)]
+        public double Accuracy;
         [Default(null!)]
         public int? PhraseLength;
     }
@@ -1883,6 +1891,7 @@ public static partial class Module
         var wpm = CalculateWpm(game.Phrase.Length, timeElapsed);
 
         var wordsTyped = game.Phrase.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+        var phraseLength = game.Phrase.Contains(' ') ? wordsTyped : game.Phrase.Length;
         var accuracy = CharacterHistoryUtils.CalculateAccuracy(progress.CharacterHistory);
 
         var updatedPlayer = player.Value;
@@ -1899,6 +1908,9 @@ public static partial class Module
         var year = dateTime.Year;
         var month = dateTime.Month;
         var day = dateTime.ToString("yyyy-MM-dd");
+        var storesPersonalRecords = !player.Value.IsAnonymous;
+        var isPersonalBest = storesPersonalRecords
+            && IsPersonalRecord(ctx, progress.PlayerId, game.GameMode, phraseLength, wpm);
 
         ctx.Db.gamerecord.Insert(new GameRecord
         {
@@ -1916,12 +1928,15 @@ public static partial class Module
             Wpm = wpm,
             XpGained = 0,
             EloChange = eloChange,
-            Accuracy = accuracy
+            Accuracy = accuracy,
+            PhraseLength = phraseLength,
+            IsPersonalBest = isPersonalBest
         });
 
-        UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, null, statsId, wpm);
-        var personalRecordLength = game.Phrase.Contains(' ') ? wordsTyped : game.Phrase.Length;
-        UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, personalRecordLength, statsId, wpm);
+        if (storesPersonalRecords)
+        {
+            UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, phraseLength, statsId, game.Id, wpm, accuracy);
+        }
 
         if (!progress.IsBot)
         {
@@ -1957,14 +1972,25 @@ public static partial class Module
         }
     }
 
-    private static void UpdatePersonalRecord(ReducerContext ctx, Identity playerId, GameMode gameMode, int? phraseLength, string gameRecordId, double wpm)
+    private static PersonalRecord? FindPersonalRecord(ReducerContext ctx, Identity playerId, GameMode gameMode, int? phraseLength)
     {
-        PersonalRecord? existingRecord = null;
         foreach (var record in ctx.Db.personalrecord.PlayerId_GameMode_PhraseLength.Filter((playerId, gameMode, phraseLength)))
         {
-            existingRecord = record;
-            break;
+            return record;
         }
+
+        return null;
+    }
+
+    private static bool IsPersonalRecord(ReducerContext ctx, Identity playerId, GameMode gameMode, int? phraseLength, double wpm)
+    {
+        var existingRecord = FindPersonalRecord(ctx, playerId, gameMode, phraseLength);
+        return existingRecord == null || wpm > existingRecord.Value.Wpm;
+    }
+
+    private static void UpdatePersonalRecord(ReducerContext ctx, Identity playerId, GameMode gameMode, int? phraseLength, string gameRecordId, string gameId, double wpm, double accuracy)
+    {
+        var existingRecord = FindPersonalRecord(ctx, playerId, gameMode, phraseLength);
 
         if (existingRecord == null || wpm > existingRecord.Value.Wpm)
         {
@@ -1980,7 +2006,9 @@ public static partial class Module
                 GameMode = gameMode,
                 PhraseLength = phraseLength,
                 GameRecordId = gameRecordId,
-                Wpm = wpm
+                GameId = gameId,
+                Wpm = wpm,
+                Accuracy = accuracy
             });
 
             Log.Info($"Updated personal record for player {playerId} in mode {gameMode}: {wpm} WPM");

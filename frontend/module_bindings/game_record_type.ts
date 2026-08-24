@@ -33,6 +33,8 @@ export default __t.object("GameRecord", {
   eloChange: __t.i32(),
   day: __t.string(),
   accuracy: __t.f64(),
+  phraseLength: __t.i32(),
+  isPersonalBest: __t.bool(),
 });
 
 

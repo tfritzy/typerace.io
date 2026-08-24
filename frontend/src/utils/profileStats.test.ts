@@ -22,7 +22,11 @@ const record = (
   phraseLength: number | undefined,
   wpm: number,
   gameRecordId: string,
+  gameId = `game-${gameRecordId}`,
+  accuracy = 0,
 ) => ({
+  accuracy,
+  gameId,
   gameMode: { tag: mode } as never,
   gameRecordId,
   phraseLength,
@@ -113,18 +117,27 @@ describe("buildProfilePersonalRecords", () => {
     expect(result.language).toBe("English");
   });
 
-  it("keeps a record visible when its matching race is unavailable", () => {
+  it("uses the personal record's game link when its race is unavailable", () => {
     const result = buildProfilePersonalRecords(
-      [record("English500", 20, 110, "missing")],
+      [record("English500", 20, 110, "missing", "game-missing", 98.5)],
       Array.from({ length: 10 }, () => race("English500")),
     );
 
     expect(result.slots[3]).toEqual({
       wordCount: 20,
       wpm: 110,
-      accuracy: null,
-      gameId: null,
+      accuracy: 98.5,
+      gameId: "game-missing",
     });
+  });
+
+  it("falls back to the matching race for records created before GameId", () => {
+    const result = buildProfilePersonalRecords(
+      [record("English500", 20, 110, "legacy", "")],
+      [race("English500", "legacy")],
+    );
+
+    expect(result.slots[3].gameId).toBe("game-legacy");
   });
 
   it("returns empty slots when the player has not raced", () => {
