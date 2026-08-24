@@ -1959,6 +1959,12 @@ public static partial class Module
 
     private static void UpdatePersonalRecord(ReducerContext ctx, Identity playerId, GameMode gameMode, int? phraseLength, string gameRecordId, double wpm)
     {
+        var player = ctx.Db.player.Identity.Find(playerId);
+        if (player == null || player.Value.IsAnonymous)
+        {
+            return;
+        }
+
         PersonalRecord? existingRecord = null;
         foreach (var record in ctx.Db.personalrecord.PlayerId_GameMode_PhraseLength.Filter((playerId, gameMode, phraseLength)))
         {
