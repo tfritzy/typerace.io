@@ -28,27 +28,6 @@ export const RaceDetailsRow = memo(
     const modeIconKind = isQuote ? "quote" : "random-words";
     const modeLabel = isQuote ? t.quote(attribution) : t.randomWords;
 
-    const details = [
-      {
-        label: "Length",
-        value: `${phraseLength} ${t.words}`,
-        icon: Ruler,
-        iconKind: "length",
-      },
-      {
-        label: "Mode",
-        value: modeLabel,
-        icon: ModeIcon,
-        iconKind: modeIconKind,
-      },
-      {
-        label: "Language",
-        value: language.nativeName,
-        icon: Languages,
-        iconKind: "language",
-      },
-    ];
-
     return (
       <div className="mb-3">
         {isPersonalRecord && (
@@ -67,32 +46,57 @@ export const RaceDetailsRow = memo(
           aria-label="Race details"
           className="grid min-h-11 grid-cols-3 gap-3 text-xs font-semibold tracking-wide"
         >
-          {details.map((detail) => {
-            const DetailIcon = detail.icon;
-
-            return (
-              <Box
-                asChild
-                key={detail.label}
-                tone={isPersonalRecord ? "accent" : "default"}
-                className="flex min-w-0 items-center justify-center rounded-lg px-2 py-2"
-              >
-                <div>
-                  <dt className="sr-only">{detail.label}</dt>
-                  <dd className="flex min-w-0 items-center justify-center gap-2">
-                    {DetailIcon && (
-                      <DetailIcon
-                        aria-hidden
-                        data-detail-icon={detail.iconKind}
-                        className="h-3.5 w-3.5 shrink-0"
-                      />
-                    )}
-                    <span className="truncate">{detail.value}</span>
-                  </dd>
-                </div>
-              </Box>
-            );
-          })}
+          <Box
+            asChild
+            tone={isPersonalRecord ? "accent" : "default"}
+            className="flex min-w-0 items-center justify-center rounded-lg px-2 py-2"
+          >
+            <div>
+              <dt className="sr-only">Length</dt>
+              <dd className="flex min-w-0 items-center justify-center gap-2">
+                <Ruler
+                  aria-hidden
+                  data-detail-icon="length"
+                  className="h-3.5 w-3.5 shrink-0"
+                />
+                <span className="truncate">{phraseLength} {t.words}</span>
+              </dd>
+            </div>
+          </Box>
+          <Box
+            asChild
+            tone={isPersonalRecord ? "accent" : "default"}
+            className="flex min-w-0 items-center justify-center rounded-lg px-2 py-2"
+          >
+            <div>
+              <dt className="sr-only">Mode</dt>
+              <dd className="flex min-w-0 items-center justify-center gap-2">
+                <ModeIcon
+                  aria-hidden
+                  data-detail-icon={modeIconKind}
+                  className="h-3.5 w-3.5 shrink-0"
+                />
+                <span className="truncate">{modeLabel}</span>
+              </dd>
+            </div>
+          </Box>
+          <Box
+            asChild
+            tone={isPersonalRecord ? "accent" : "default"}
+            className="flex min-w-0 items-center justify-center rounded-lg px-2 py-2"
+          >
+            <div>
+              <dt className="sr-only">Language</dt>
+              <dd className="flex min-w-0 items-center justify-center gap-2">
+                <Languages
+                  aria-hidden
+                  data-detail-icon="language"
+                  className="h-3.5 w-3.5 shrink-0"
+                />
+                <span className="truncate">{language.nativeName}</span>
+              </dd>
+            </div>
+          </Box>
         </dl>
       </div>
     );
