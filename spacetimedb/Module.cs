@@ -317,13 +317,13 @@ public static partial class Module
         public Identity PlayerId;
         public GameMode GameMode;
         public string GameRecordId;
-        [Default("")]
-        public string GameId;
         public double Wpm;
-        [Default(0)]
-        public double Accuracy;
         [Default(null!)]
         public int? PhraseLength;
+        [Default("")]
+        public string GameId;
+        [Default(0)]
+        public double Accuracy;
     }
 
     [Table(Name = "xpgain", Public = true)]
