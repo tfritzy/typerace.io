@@ -20,6 +20,7 @@ import {
   getPreferredGameType,
   getPreferredMode,
 } from "../utils/gamePreferences";
+import { TypeToStartNotice } from "../components/TypeToStartNotice";
 
 export const LobbyPage = () => {
   const { lang } = useParams<{ lang?: string }>();
@@ -70,6 +71,7 @@ export const LobbyPage = () => {
         <div className="flex-[4]" />
         <div className="content-container">
           <div className="text-3xl relative">
+            <TypeToStartNotice prompt={translations.startPrompt} />
             <TypeBox
               ref={typeBoxRef}
               phrase={startupPhrase}

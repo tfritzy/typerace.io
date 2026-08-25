@@ -36,6 +36,7 @@ export interface Translations {
   errorsAllowed: string;
   tooManyErrors: string;
   fixErrorCount: (count: number) => string;
+  startPrompt?: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -77,6 +78,7 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "You must fix all errors",
     fixErrorCount: (count) =>
       `You must fix ${count} ${count === 1 ? "error" : "errors"} to finish`,
+    startPrompt: "Type!",
   },
   [Language.Spanish]: {
     publicMatch: "Público",
@@ -117,6 +119,7 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Debes corregir todos los errores",
     fixErrorCount: (count) =>
       `Debes corregir ${count} ${count === 1 ? "error" : "errores"} para terminar`,
+    startPrompt: "Escribe!",
   },
   [Language.French]: {
     publicMatch: "Public",
@@ -156,6 +159,7 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Vous devez corriger toutes les erreurs",
     fixErrorCount: (count) =>
       `Vous devez corriger ${count} ${count === 1 ? "erreur" : "erreurs"} pour terminer`,
+    startPrompt: "Tapez!",
   },
   [Language.German]: {
     publicMatch: "Öffentlich",
@@ -195,6 +199,7 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Du musst alle Fehler korrigieren",
     fixErrorCount: (count) =>
       `Du musst ${count} Fehler korrigieren, um abzuschließen`,
+    startPrompt: "Tippe!",
   },
   [Language.Italian]: {
     publicMatch: "Pubblica",
@@ -234,6 +239,7 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Devi correggere tutti gli errori",
     fixErrorCount: (count) =>
       `Devi correggere ${count} ${count === 1 ? "errore" : "errori"} per terminare`,
+    startPrompt: "Digita!",
   },
   [Language.Portuguese]: {
     publicMatch: "Pública",
@@ -274,6 +280,7 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Você deve corrigir todos os erros",
     fixErrorCount: (count) =>
       `Você deve corrigir ${count} ${count === 1 ? "erro" : "erros"} para terminar`,
+    startPrompt: "Digite!",
   },
   [Language.Ukrainian]: {
     publicMatch: "Публічна",
@@ -392,6 +399,7 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Je moet alle fouten corrigeren",
     fixErrorCount: (count) =>
       `Je moet ${count} ${count === 1 ? "fout" : "fouten"} corrigeren om te voltooien`,
+    startPrompt: "Typ!",
   },
   [Language.Swedish]: {
     publicMatch: "Offentlig",
@@ -430,6 +438,7 @@ const translations: Record<Language, Translations> = {
     tagline: "Multiplayer-skrivtävlingar",
     tooManyErrors: "Du måste rätta alla fel",
     fixErrorCount: (count) => `Du måste rätta ${count} fel för att slutföra`,
+    startPrompt: "Skriv!",
   },
   [Language.Russian]: {
     publicMatch: "Публичный",
@@ -510,6 +519,7 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Trebuie să corectezi toate greșelile",
     fixErrorCount: (count) =>
       `Trebuie să corectezi ${count} ${count === 1 ? "greșeală" : "greșeli"} pentru a termina`,
+    startPrompt: "Tastează!",
   },
   [Language.Indonesian]: {
     publicMatch: "Publik",
@@ -551,6 +561,7 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Anda harus memperbaiki semua kesalahan",
     fixErrorCount: (count) =>
       `Anda harus memperbaiki ${count} kesalahan untuk menyelesaikan balapan`,
+    startPrompt: "Ketik!",
   },
   [Language.Polish]: {
     publicMatch: "Publiczny",
@@ -593,6 +604,7 @@ const translations: Record<Language, Translations> = {
         count === 1 ? "błąd" : count >= 2 && count <= 4 ? "błędy" : "błędów";
       return `Musisz poprawić ${count} ${label}, aby ukończyć`;
     },
+    startPrompt: "Pisz!",
   },
   [Language.Czech]: {
     publicMatch: "Veřejná",
@@ -635,6 +647,7 @@ const translations: Record<Language, Translations> = {
         count === 1 ? "chybu" : count >= 2 && count <= 4 ? "chyby" : "chyb";
       return `Pro dokončení musíte opravit ${count} ${label}`;
     },
+    startPrompt: "Pište!",
   },
   [Language.Turkish]: {
     publicMatch: "Açık",
@@ -673,6 +686,7 @@ const translations: Record<Language, Translations> = {
     tagline: "Çok oyunculu yazma yarışları",
     tooManyErrors: "Tüm hataları düzeltmelisiniz",
     fixErrorCount: (count) => `Bitirmek için ${count} hata düzeltmelisiniz`,
+    startPrompt: "Yaz!",
   },
 };
 
