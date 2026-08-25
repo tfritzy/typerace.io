@@ -1,7 +1,7 @@
 import type { GameRecord, PersonalRecord } from "../types/stdb";
 import {
   getGameModeLabel,
-  getLanguageFromMode,
+  getLanguageInfoFromMode,
   type WordCountBucket,
   WORD_COUNT_BUCKETS,
 } from "./modes";
@@ -59,7 +59,7 @@ export function getMostPlayedLanguage(
   const raceCounts = new Map<string, number>();
 
   for (const race of races) {
-    const language = getLanguageFromMode(race.gameMode.tag);
+    const language = getLanguageInfoFromMode(race.gameMode.tag).language;
     raceCounts.set(language, (raceCounts.get(language) ?? 0) + 1);
   }
 
@@ -99,7 +99,9 @@ export function buildProfilePersonalRecords(
   for (const record of personalRecords) {
     if (record.phraseLength === undefined) continue;
 
-    const recordLanguage = getLanguageFromMode(record.gameMode.tag);
+    const recordLanguage = getLanguageInfoFromMode(
+      record.gameMode.tag,
+    ).language;
     if (recordLanguage !== language) continue;
 
     const slot = result.slots.find(

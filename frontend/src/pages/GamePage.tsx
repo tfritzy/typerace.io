@@ -12,6 +12,7 @@ import { type Game, type PlayerProgress } from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { PlayerStatsRow } from "../components/PlayerStatsRow";
 import { AllPlayersResults } from "../components/AllPlayersResults";
+import { RaceDetailsRow } from "../components/RaceDetailsRow";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
 import { ActionBar } from "../components/ActionBar";
@@ -404,6 +405,11 @@ export const GamePage = () => {
     } else {
       gameContent = (
         <div key="stats-section" className="w-full animate-slideUpFadeIn pb-4">
+          <RaceDetailsRow
+            gameMode={game.gameMode}
+            phrase={game.phrase}
+            attribution={game.attribution}
+          />
           {currentPlayerProgress && (
             <PlayerStatsRow
               playerProgress={currentPlayerProgress}

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Languages } from "lucide-react";
 import {
   languages,
   getLanguageFromSlug,
@@ -41,6 +41,7 @@ export function LanguageDropdown() {
         className="inline-flex min-w-0 max-w-full items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer bg-secondary text-secondary-foreground"
         onClick={() => setIsOpen(!isOpen)}
       >
+        <Languages aria-hidden size={16} className="shrink-0" />
         <span className="truncate">{currentLang.nativeName}</span>
         <ChevronDown
           size={14}

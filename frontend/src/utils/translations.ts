@@ -5,7 +5,9 @@ export interface Translations {
   privateLobby: string;
   practiceMode: string;
   randomWords: string;
+  wordCountUnit: string;
   quotes: string;
+  quoteAttribution: (attribution?: string) => string;
   gameOptions: string;
   matchType: string;
   mode: string;
@@ -41,8 +43,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "Public",
     privateLobby: "Private",
     practiceMode: "Practice",
-    randomWords: "Words",
+    randomWords: "Random Words",
+    wordCountUnit: "words",
     quotes: "Quotes",
+    quoteAttribution: (attribution) =>
+      attribution ? `Quote by “${attribution}”` : "Quote",
     gameOptions: "Game Options",
     matchType: "Match Type",
     mode: "Mode",
@@ -77,8 +82,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "Público",
     privateLobby: "Privado",
     practiceMode: "Práctica",
-    randomWords: "Palabras",
+    randomWords: "Palabras aleatorias",
+    wordCountUnit: "palabras",
     quotes: "Citas",
+    quoteAttribution: (attribution) =>
+      attribution ? `Cita de “${attribution}”` : "Cita",
     gameOptions: "Opciones de juego",
     matchType: "Tipo de partida",
     mode: "Modo",
@@ -114,8 +122,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "Public",
     privateLobby: "Privé",
     practiceMode: "Entraînement",
-    randomWords: "Mots",
+    randomWords: "Mots aléatoires",
+    wordCountUnit: "mots",
     quotes: "Citations",
+    quoteAttribution: (attribution) =>
+      attribution ? `Citation de “${attribution}”` : "Citation",
     gameOptions: "Options de jeu",
     matchType: "Type de partie",
     mode: "Mode",
@@ -150,8 +161,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "Öffentlich",
     privateLobby: "Privat",
     practiceMode: "Übung",
-    randomWords: "Wörter",
+    randomWords: "Zufällige Wörter",
+    wordCountUnit: "Wörter",
     quotes: "Zitate",
+    quoteAttribution: (attribution) =>
+      attribution ? `Zitat von “${attribution}”` : "Zitat",
     gameOptions: "Spieloptionen",
     matchType: "Spieltyp",
     mode: "Modus",
@@ -186,8 +200,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "Pubblica",
     privateLobby: "Privata",
     practiceMode: "Pratica",
-    randomWords: "Parole",
+    randomWords: "Parole casuali",
+    wordCountUnit: "parole",
     quotes: "Citazioni",
+    quoteAttribution: (attribution) =>
+      attribution ? `Citazione di “${attribution}”` : "Citazione",
     gameOptions: "Opzioni di gioco",
     matchType: "Tipo di partita",
     mode: "Modalità",
@@ -222,8 +239,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "Pública",
     privateLobby: "Privada",
     practiceMode: "Prática",
-    randomWords: "Palavras",
+    randomWords: "Palavras aleatórias",
+    wordCountUnit: "palavras",
     quotes: "Citações",
+    quoteAttribution: (attribution) =>
+      attribution ? `Citação de “${attribution}”` : "Citação",
     gameOptions: "Opções de jogo",
     matchType: "Tipo de partida",
     mode: "Modo",
@@ -259,8 +279,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "Публічна",
     privateLobby: "Приватна",
     practiceMode: "Практика",
-    randomWords: "Слова",
+    randomWords: "Випадкові слова",
+    wordCountUnit: "слів",
     quotes: "Цитати",
+    quoteAttribution: (attribution) =>
+      attribution ? `Цитата від “${attribution}”` : "Цитата",
     gameOptions: "Налаштування гри",
     matchType: "Тип матчу",
     mode: "Режим",
@@ -296,8 +319,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "عامة",
     privateLobby: "خاصة",
     practiceMode: "تدريب",
-    randomWords: "كلمات",
+    randomWords: "كلمات عشوائية",
+    wordCountUnit: "كلمات",
     quotes: "اقتباسات",
+    quoteAttribution: (attribution) =>
+      attribution ? `اقتباس بقلم “${attribution}”` : "اقتباس",
     gameOptions: "خيارات اللعبة",
     matchType: "نوع المباراة",
     mode: "الوضع",
@@ -325,15 +351,17 @@ const translations: Record<Language, Translations> = {
     errorsAllowed: "الأخطاء المسموح بها",
     tagline: "سباق الكتابة الجماعي",
     tooManyErrors: "يجب تصحيح جميع الأخطاء",
-    fixErrorCount: (count) =>
-      `يجب تصحيح ${count} من الأخطاء للإنهاء`,
+    fixErrorCount: (count) => `يجب تصحيح ${count} من الأخطاء للإنهاء`,
   },
   [Language.Dutch]: {
     publicMatch: "Openbaar",
     privateLobby: "Privé",
     practiceMode: "Oefenen",
-    randomWords: "Woorden",
+    randomWords: "Willekeurige woorden",
+    wordCountUnit: "woorden",
     quotes: "Citaten",
+    quoteAttribution: (attribution) =>
+      attribution ? `Citaat van “${attribution}”` : "Citaat",
     gameOptions: "Spelopties",
     matchType: "Wedstrijdtype",
     mode: "Modus",
@@ -369,8 +397,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "Offentlig",
     privateLobby: "Privat",
     practiceMode: "Övning",
-    randomWords: "Ord",
+    randomWords: "Slumpmässiga ord",
+    wordCountUnit: "ord",
     quotes: "Citat",
+    quoteAttribution: (attribution) =>
+      attribution ? `Citat av “${attribution}”` : "Citat",
     gameOptions: "Spelalternativ",
     matchType: "Matchtyp",
     mode: "Läge",
@@ -398,15 +429,17 @@ const translations: Record<Language, Translations> = {
     errorsAllowed: "Tillåtna fel",
     tagline: "Multiplayer-skrivtävlingar",
     tooManyErrors: "Du måste rätta alla fel",
-    fixErrorCount: (count) =>
-      `Du måste rätta ${count} fel för att slutföra`,
+    fixErrorCount: (count) => `Du måste rätta ${count} fel för att slutföra`,
   },
   [Language.Russian]: {
     publicMatch: "Публичный",
     privateLobby: "Приватный",
     practiceMode: "Практика",
-    randomWords: "Слова",
+    randomWords: "Случайные слова",
+    wordCountUnit: "слов",
     quotes: "Цитаты",
+    quoteAttribution: (attribution) =>
+      attribution ? `Цитата от “${attribution}”` : "Цитата",
     gameOptions: "Настройки игры",
     matchType: "Тип матча",
     mode: "Режим",
@@ -442,8 +475,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "Public",
     privateLobby: "Privat",
     practiceMode: "Antrenament",
-    randomWords: "Cuvinte",
+    randomWords: "Cuvinte aleatorii",
+    wordCountUnit: "cuvinte",
     quotes: "Citate",
+    quoteAttribution: (attribution) =>
+      attribution ? `Citat de “${attribution}”` : "Citat",
     gameOptions: "Opțiuni de joc",
     matchType: "Tipul cursei",
     mode: "Mod",
@@ -479,8 +515,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "Publik",
     privateLobby: "Pribadi",
     practiceMode: "Latihan",
-    randomWords: "Kata",
+    randomWords: "Kata acak",
+    wordCountUnit: "kata",
     quotes: "Kutipan",
+    quoteAttribution: (attribution) =>
+      attribution ? `Kutipan oleh “${attribution}”` : "Kutipan",
     gameOptions: "Opsi permainan",
     matchType: "Jenis pertandingan",
     mode: "Mode",
@@ -489,7 +528,8 @@ const translations: Record<Language, Translations> = {
     theme: "Tema",
     waitingForPlayers: "Menunggu pemain...",
     waitingForOwner: "Menunggu pemilik memulai...",
-    shareLink: "Bagikan tautan ini kepada teman untuk mengundang mereka ke balapan",
+    shareLink:
+      "Bagikan tautan ini kepada teman untuk mengundang mereka ke balapan",
     copied: "Disalin!",
     gameLink: "Tautan permainan",
     startGame: "Mulai permainan",
@@ -499,7 +539,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Tonton tayangan ulang",
     replay: "Tayangan ulang",
     results: "Hasil",
-    ownerRematchOnly: "Hanya pemilik permainan yang dapat memulai pertandingan ulang",
+    ownerRematchOnly:
+      "Hanya pemilik permainan yang dapat memulai pertandingan ulang",
     waitingForPlayer: "Menunggu pemain...",
     wpm: "KPM",
     time: "Waktu",
@@ -515,8 +556,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "Publiczny",
     privateLobby: "Prywatny",
     practiceMode: "Trening",
-    randomWords: "Słowa",
+    randomWords: "Losowe słowa",
+    wordCountUnit: "słów",
     quotes: "Cytaty",
+    quoteAttribution: (attribution) =>
+      attribution ? `Cytat autorstwa “${attribution}”` : "Cytat",
     gameOptions: "Opcje gry",
     matchType: "Typ rozgrywki",
     mode: "Tryb",
@@ -554,8 +598,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "Veřejná",
     privateLobby: "Soukromá",
     practiceMode: "Trénink",
-    randomWords: "Slova",
+    randomWords: "Náhodná slova",
+    wordCountUnit: "slov",
     quotes: "Citáty",
+    quoteAttribution: (attribution) =>
+      attribution ? `Citát od “${attribution}”` : "Citát",
     gameOptions: "Nastavení hry",
     matchType: "Typ závodu",
     mode: "Režim",
@@ -593,8 +640,11 @@ const translations: Record<Language, Translations> = {
     publicMatch: "Açık",
     privateLobby: "Özel",
     practiceMode: "Alıştırma",
-    randomWords: "Kelimeler",
+    randomWords: "Rastgele kelimeler",
+    wordCountUnit: "kelime",
     quotes: "Alıntılar",
+    quoteAttribution: (attribution) =>
+      attribution ? `Alıntı, yazan “${attribution}”` : "Alıntı",
     gameOptions: "Oyun Seçenekleri",
     matchType: "Maç Türü",
     mode: "Mod",
@@ -622,8 +672,7 @@ const translations: Record<Language, Translations> = {
     errorsAllowed: "İzin verilen hatalar",
     tagline: "Çok oyunculu yazma yarışları",
     tooManyErrors: "Tüm hataları düzeltmelisiniz",
-    fixErrorCount: (count) =>
-      `Bitirmek için ${count} hata düzeltmelisiniz`,
+    fixErrorCount: (count) => `Bitirmek için ${count} hata düzeltmelisiniz`,
   },
 };
 

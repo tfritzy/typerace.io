@@ -251,13 +251,11 @@ export const languages: LanguageInfo[] = [
   },
 ].sort((a, b) => a.language.localeCompare(b.language));
 
-export function getLanguageFromMode(modeTag: string): Language {
+export function getLanguageInfoFromMode(modeTag: string): LanguageInfo {
   const langInfo = languages.find(
-    (l) =>
-      l.randomWordsMode === modeTag ||
-      l.quotesMode === modeTag,
+    (l) => l.randomWordsMode === modeTag || l.quotesMode === modeTag,
   );
-  return langInfo?.language || Language.English;
+  return langInfo || languages.find((l) => l.language === Language.English)!;
 }
 
 export function getLanguageFromSlug(slug: string | undefined): LanguageInfo {
@@ -318,7 +316,7 @@ export function getGameModeLabel(modeTag: string): string {
   const contentType = getContentTypeFromMode(modeTag) === "Quotes"
     ? "quotes"
     : "words";
-  return `${getLanguageFromMode(modeTag)} ${contentType}`;
+  return `${getLanguageInfoFromMode(modeTag).language} ${contentType}`;
 }
 
 const languageStartupPhrases: Record<Language, string[]> = {
@@ -504,7 +502,7 @@ export function getMaxPlayerCount(gameTypeTag: string): number {
 }
 
 export function getRandomStartupPhrase(gameModeTag: string): string {
-  const language = getLanguageFromMode(gameModeTag);
+  const language = getLanguageInfoFromMode(gameModeTag).language;
   const phrases =
     languageStartupPhrases[language] ||
     languageStartupPhrases[Language.English];
