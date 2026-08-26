@@ -4,6 +4,9 @@ import { cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { GamePageTypeBox } from "./GamePageTypeBox";
+import { RaceStateProvider } from "../contexts/RaceStateContext";
+import { RaceStateStore } from "../state/raceState";
+import type { PlayerProgress } from "../types/stdb";
 
 vi.mock("./Cursor", () => ({
   Cursor: () => null,
@@ -21,25 +24,48 @@ function renderTypeBox(
   initialInput = "",
 ) {
   const onFinish = vi.fn();
+  const raceState = new RaceStateStore();
+  raceState.setPlayers(
+    [
+      {
+        playerId: { toHexString: () => "local" },
+        progressIndex: 0,
+      } as PlayerProgress,
+    ],
+    { input: initialInput },
+  );
   return {
     onFinish,
+    raceState,
     ...render(
       <MemoryRouter>
-        <GamePageTypeBox
-          phrase={phrase}
-          gameId="game-1"
-          conn={null}
-          onFinish={onFinish}
-          raceStartsAt={null}
-          totalAllowedErrors={allowedErrors}
-          initialInput={initialInput}
-        />
+        <RaceStateProvider store={raceState}>
+          <GamePageTypeBox
+            phrase={phrase}
+            gameId="game-1"
+            conn={null}
+            onFinish={onFinish}
+            raceStartsAt={null}
+            totalAllowedErrors={allowedErrors}
+            initialInput={initialInput}
+          />
+        </RaceStateProvider>
       </MemoryRouter>,
     ),
   };
 }
 
 describe("GamePageTypeBox allowed errors", () => {
+  it("publishes input to race state while typing", () => {
+    const { getByRole, raceState } = renderTypeBox("hello", 0);
+    const input = getByRole("textbox") as HTMLTextAreaElement;
+
+    fireEvent.input(input, { target: { value: "he" } });
+
+    expect(raceState.getSnapshot().input).toBe("he");
+    expect(raceState.getPlayerSnapshot("local")?.progressIndex).toBe(0);
+  });
+
   it("restores reconstructed errors and their completed state", () => {
     const { getByRole, container } = renderTypeBox(
       "hello world",

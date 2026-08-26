@@ -7,38 +7,46 @@ import { useDatabase } from "../contexts/SpacetimeContext";
 import {
   applyReplayEvent,
   buildReplayTimeline,
-  getCorrectPrefixLength,
 } from "../utils/replayTimeline";
+import {
+  analyzeTypeBoxInput,
+  getCompletedWordCount,
+  getWordCount,
+} from "../utils/typeBoxCore";
+import {
+  useRaceState,
+  useRaceStateStore,
+} from "../contexts/RaceStateContext";
 import { GhostCursor } from "./GhostCursor";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { TypeBox } from "./TypeBox";
+import { AllowedErrorsRow } from "./AllowedErrorsRow";
 
 type GameReplayProps = {
   phrase: string;
   attribution?: string;
-  players: PlayerProgress[];
+  players: readonly PlayerProgress[];
   raceStartTimestamp: bigint;
+  totalAllowedErrors: number;
   initialPlayerId?: string;
   onExit: () => void;
 };
 
-function createEmptyInputs(players: PlayerProgress[]): Record<string, string> {
-  return Object.fromEntries(
-    players.map((player) => [player.playerId.toHexString(), ""]),
-  );
-}
-
 export function GameReplay({
   phrase,
   attribution,
-  players,
+  players: initialPlayers,
   raceStartTimestamp,
+  totalAllowedErrors,
   initialPlayerId,
   onExit,
 }: GameReplayProps) {
   const { conn } = useDatabase();
-  const currentPlayerId = conn?.identity;
+  const raceState = useRaceState();
+  const raceStore = useRaceStateStore();
   const translations = getTranslations();
+  const [players] = useState(() => [...initialPlayers]);
+  const [liveInput] = useState(raceState.input);
   const timeline = useMemo(
     () => buildReplayTimeline(players, raceStartTimestamp),
     [players, raceStartTimestamp],
@@ -49,68 +57,59 @@ export function GameReplay({
     ? initialPlayerId!
     : (players[0]?.playerId.toHexString() ?? "");
   const [selectedPlayerId, setSelectedPlayerId] = useState(defaultPlayerId);
-  const [inputs, setInputs] = useState(() => createEmptyInputs(players));
+  const selectedPlayerIdRef = useRef(selectedPlayerId);
+  const inputsRef = useRef(new Map<string, string>());
   const [replayNumber, setReplayNumber] = useState(0);
-  const inputsRef = useRef(inputs);
-  const playersRef = useRef(players);
-  const startedAtRef = useRef(performance.now());
-  const nextEventIndexRef = useRef(0);
-  playersRef.current = players;
 
   useEffect(() => {
-    const emptyInputs = createEmptyInputs(playersRef.current);
-    inputsRef.current = emptyInputs;
-    setInputs(emptyInputs);
-    nextEventIndexRef.current = 0;
-    startedAtRef.current = performance.now();
-  }, [phrase, raceStartTimestamp, replayNumber]);
+    inputsRef.current = new Map(
+      players.map((player) => [player.playerId.toHexString(), ""]),
+    );
+    raceStore.setPlayers(players, {
+      input: "",
+      getProgressIndex: () => 0,
+    });
 
-  useEffect(() => {
-    const nextInputs = { ...inputsRef.current };
-    let changed = false;
-
-    for (const player of players) {
-      const playerId = player.playerId.toHexString();
-      if (!(playerId in nextInputs)) {
-        nextInputs[playerId] = "";
-        changed = true;
-      }
-    }
-
-    if (changed) {
-      inputsRef.current = nextInputs;
-      setInputs(nextInputs);
-    }
-  }, [players]);
-
-  useEffect(() => {
-    if (timeline.length === 0) return;
-
+    const startedAt = performance.now();
+    let nextEventIndex = 0;
     let frameId = 0;
 
     const playFrame = (now: number) => {
-      const elapsedMs = now - startedAtRef.current;
-      let changed = false;
-      let nextEventIndex = nextEventIndexRef.current;
+      const elapsedMs = now - startedAt;
+      const changedPlayerIds = new Set<string>();
+      let selectedInput: string | undefined;
 
       while (
         nextEventIndex < timeline.length &&
         timeline[nextEventIndex].elapsedMs <= elapsedMs
       ) {
-        const event = timeline[nextEventIndex];
-
-        inputsRef.current[event.playerId] = applyReplayEvent(
-          inputsRef.current[event.playerId] ?? "",
+        const event = timeline[nextEventIndex++];
+        const input = applyReplayEvent(
+          inputsRef.current.get(event.playerId) ?? "",
           phrase,
           event.eventType,
         );
-        nextEventIndex++;
-        changed = true;
+        inputsRef.current.set(event.playerId, input);
+        changedPlayerIds.add(event.playerId);
+        if (event.playerId === selectedPlayerIdRef.current) {
+          selectedInput = input;
+        }
       }
-      nextEventIndexRef.current = nextEventIndex;
 
-      if (changed) setInputs({ ...inputsRef.current });
-
+      if (changedPlayerIds.size > 0) {
+        const progress = new Map<string, number>();
+        for (const playerId of changedPlayerIds) {
+          progress.set(
+            playerId,
+            analyzeTypeBoxInput(
+              phrase,
+              inputsRef.current.get(playerId) ?? "",
+              totalAllowedErrors,
+            ).reportedProgress,
+          );
+        }
+        raceStore.patch({ input: selectedInput, progress });
+      }
       if (nextEventIndex < timeline.length) {
         frameId = requestAnimationFrame(playFrame);
       }
@@ -118,12 +117,23 @@ export function GameReplay({
 
     frameId = requestAnimationFrame(playFrame);
     return () => cancelAnimationFrame(frameId);
-  }, [phrase, replayNumber, timeline]);
+  }, [phrase, players, raceStore, replayNumber, timeline, totalAllowedErrors]);
 
-  const selectedInput = inputs[selectedPlayerId] ?? "";
+  const selectPlayer = (playerId: string) => {
+    selectedPlayerIdRef.current = playerId;
+    setSelectedPlayerId(playerId);
+    raceStore.setInput(inputsRef.current.get(playerId) ?? "");
+  };
+
+  const exitReplay = () => {
+    raceStore.setPlayers(players, { input: liveInput });
+    onExit();
+  };
+
   const selectedPlayer = players.find(
     (player) => player.playerId.toHexString() === selectedPlayerId,
   );
+  const currentPlayerId = conn?.identity;
   const isSelectedCurrentPlayer = !!(
     currentPlayerId && selectedPlayer?.playerId.isEqual(currentPlayerId)
   );
@@ -131,13 +141,23 @@ export function GameReplay({
     selectedPlayer?.playerColor?.tag ?? "",
     isSelectedCurrentPlayer,
   );
+  const inputAnalysis = analyzeTypeBoxInput(
+    phrase,
+    raceState.input,
+    totalAllowedErrors,
+  );
+  const completedWords = getCompletedWordCount(
+    phrase,
+    inputAnalysis.completedThrough,
+  );
+  const totalWords = getWordCount(phrase);
 
   return (
     <div className="w-full pb-4 animate-[fadeIn_150ms_ease-out]">
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <button
           type="button"
-          onClick={onExit}
+          onClick={exitReplay}
           className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft size={16} />
@@ -159,7 +179,7 @@ export function GameReplay({
               <button
                 type="button"
                 key={playerId}
-                onClick={() => setSelectedPlayerId(playerId)}
+                onClick={() => selectPlayer(playerId)}
                 className={`inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-semibold transition-colors ${
                   isSelected
                     ? "bg-secondary text-secondary-foreground"
@@ -180,19 +200,34 @@ export function GameReplay({
       </div>
 
       <div className="text-2xl leading-[1.6]">
+        <AllowedErrorsRow
+          total={totalAllowedErrors}
+          remaining={Math.max(
+            0,
+            totalAllowedErrors - inputAnalysis.errorsUsed,
+          )}
+          showFixWarning={inputAnalysis.errorsToFix > 0}
+          errorsToFix={inputAnalysis.errorsToFix}
+          completedWords={completedWords}
+          totalWords={totalWords}
+        />
         <TypeBox
           phrase={phrase}
           attribution={attribution}
           inputState="disabled"
           cursorState="visible"
           cursorColor={selectedPlayerColor}
-          overrideInputValue={selectedInput}
+          overrideInputValue={raceState.input}
+          totalAllowedErrors={totalAllowedErrors}
           height="430px"
         />
       </div>
 
-      {players
-        .filter((player) => player.playerId.toHexString() !== selectedPlayerId)
+      {raceState.players
+        .filter(
+          (player) =>
+            player.playerId.toHexString() !== selectedPlayerId,
+        )
         .map((player) => {
           const playerId = player.playerId.toHexString();
           const isCurrentPlayer = !!(
@@ -201,10 +236,7 @@ export function GameReplay({
           return (
             <GhostCursor
               key={playerId}
-              charIndex={getCorrectPrefixLength(
-                inputs[playerId] ?? "",
-                phrase,
-              )}
+              charIndex={player.progressIndex}
               color={getDisplayColorHex(
                 player.playerColor?.tag,
                 isCurrentPlayer,

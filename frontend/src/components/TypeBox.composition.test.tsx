@@ -265,6 +265,31 @@ describe("TypeBox mobile input", () => {
 });
 
 describe("TypeBox character display", () => {
+  it("respects completed allowed-error words in controlled input", () => {
+    const { container, rerender } = render(
+      <TypeBox
+        phrase="hello world"
+        overrideInputValue=""
+        totalAllowedErrors={1}
+      />,
+    );
+
+    rerender(
+      <TypeBox
+        phrase="hello world"
+        overrideInputValue="hxllo "
+        totalAllowedErrors={1}
+      />,
+    );
+
+    expect(
+      container.querySelector('[data-char-index="0"]')?.className,
+    ).toContain("text-text-completed");
+    expect(
+      container.querySelector('[data-char-index="1"]')?.className,
+    ).toContain("opacity-60");
+  });
+
   it("updates current, completed, and incorrect characters incrementally", () => {
     const { container, getByRole } = render(
       <TypeBox phrase="hello world" />,

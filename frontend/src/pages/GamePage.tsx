@@ -29,6 +29,12 @@ import { GameSkeleton } from "../components/GameSkeleton";
 import { getPreferredGameType } from "../utils/gamePreferences";
 import { WinnerConfetti } from "../components/WinnerConfetti";
 import { GameReplay } from "../components/GameReplay";
+import {
+  RaceStateProvider,
+  useRacePlayers,
+  useRaceStateStore,
+} from "../contexts/RaceStateContext";
+import { RaceStateStore } from "../state/raceState";
 import { reconstructInputFromHistory } from "../utils/replayTimeline";
 
 type UiGameType = "Public" | "Private" | "Practice";
@@ -37,23 +43,32 @@ const GAME_DATA_WAIT_TIMEOUT_MS = 10_000;
 
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
+  const store = useMemo(() => new RaceStateStore(), [gameId]);
+
+  return (
+    <RaceStateProvider store={store}>
+      <GamePageContent />
+    </RaceStateProvider>
+  );
+};
+
+const GamePageContent = () => {
+  const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
   const { conn, status: databaseStatus, latencyDeltaMs } = useDatabase();
+  const raceStore = useRaceStateStore();
+  const racePlayers = useRacePlayers();
   const [hasFinished, setHasFinished] = useState(false);
   const [isWatchingReplay, setIsWatchingReplay] = useState(false);
   const [countdownComplete, setCountdownComplete] = useState(false);
   const [raceStartsAt, setRaceStartsAt] = useState<number | null>(null);
   const [game, setGame] = useState<Game | null>(null);
-  const [gamePlayerProgress, setGamePlayerProgress] = useState<
-    PlayerProgress[]
-  >([]);
   const [hasNewPersonalRecord, setHasNewPersonalRecord] = useState(false);
   const latencyDeltaRef = useRef(latencyDeltaMs);
-  const initProgress = useRef({
-    gameId: "",
-    playerProgressId: "",
-    input: "",
-  });
+  const gamePlayerProgress = useMemo(
+    () => [...racePlayers],
+    [racePlayers],
+  );
 
   useEffect(() => {
     latencyDeltaRef.current = latencyDeltaMs;
@@ -61,7 +76,6 @@ export const GamePage = () => {
 
   useEffect(() => {
     setGame(null);
-    setGamePlayerProgress([]);
     setHasNewPersonalRecord(false);
     setHasFinished(false);
     setIsWatchingReplay(false);
@@ -119,12 +133,7 @@ export const GamePage = () => {
 
     const handleProgressInsert = (_ctx: any, pp: PlayerProgress) => {
       if (pp.gameId.toString() === gameId) {
-        setGamePlayerProgress((prev) => {
-          if (prev.some((p) => p.id === pp.id)) {
-            return prev;
-          }
-          return [...prev, pp];
-        });
+        raceStore.upsertPlayer(pp);
       }
 
       if (conn.identity && pp.playerId.isEqual(conn.identity)) {
@@ -140,22 +149,13 @@ export const GamePage = () => {
       newPP: PlayerProgress,
     ) => {
       if (newPP.gameId.toString() === gameId) {
-        setGamePlayerProgress((prev) => {
-          const existingIndex = prev.findIndex((pp) => pp.id === newPP.id);
-          if (existingIndex === -1) {
-            return [...prev, newPP];
-          }
-
-          const next = [...prev];
-          next[existingIndex] = newPP;
-          return next;
-        });
+        raceStore.upsertPlayer(newPP);
       }
     };
 
     const handleProgressDelete = (_ctx: any, pp: PlayerProgress) => {
       if (pp.gameId.toString() === gameId) {
-        setGamePlayerProgress((prev) => prev.filter((p) => p.id !== pp.id));
+        raceStore.removePlayer(pp.playerId.toHexString());
         if (conn.identity && pp.playerId.isEqual(conn.identity)) {
           clearTimeout(progressDeleteRedirect);
           progressDeleteRedirect = setTimeout(() => {
@@ -224,7 +224,20 @@ export const GamePage = () => {
         const currentGameProgress = Array.from(
           conn.db.playerprogress.iter(),
         ).filter((pp) => pp.gameId.toString() === gameId);
-        setGamePlayerProgress(currentGameProgress);
+        const ownProgress = currentGameProgress.find(
+          (progress) =>
+            conn.identity && progress.playerId.isEqual(conn.identity),
+        );
+        raceStore.setPlayers(currentGameProgress, {
+          input:
+            currentGame && ownProgress
+              ? reconstructInputFromHistory(
+                  currentGame.phrase,
+                  ownProgress.characterHistory,
+                  ownProgress.progressIndex,
+                )
+              : "",
+        });
         syncCurrentGamePersonalRecord();
       })
       .subscribe(subscriptionQueries);
@@ -240,7 +253,7 @@ export const GamePage = () => {
       clearTimeout(countdownTimer);
       pageSubscription.unsubscribe();
     };
-  }, [conn, gameId, navigate]);
+  }, [conn, gameId, navigate, raceStore]);
 
   useEffect(() => {
     if (!conn || !game) return;
@@ -303,12 +316,12 @@ export const GamePage = () => {
 
   const otherPlayerProgress = useMemo(() => {
     if (!currentPlayerId || !game?.phrase) return [];
-    return gamePlayerProgress.filter(
-      (pp) =>
-        !pp.playerId.isEqual(currentPlayerId) &&
-        pp.progressIndex < game.phrase.length,
+    return racePlayers.filter(
+      (player) =>
+        !player.playerId.isEqual(currentPlayerId) &&
+        player.progressIndex < game.phrase.length,
     );
-  }, [gamePlayerProgress, currentPlayerId, game?.phrase]);
+  }, [racePlayers, currentPlayerId, game?.phrase]);
 
   useEffect(() => {
     if (game || databaseStatus !== "connected") return;
@@ -346,26 +359,9 @@ export const GamePage = () => {
     game.owner?.isEqual(currentPlayerId);
   const isCountdown = game.state?.tag === "Countdown";
 
-  const currentPlayerProgress = gamePlayerProgress.find(
-    (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
+  const currentPlayerProgress = racePlayers.find(
+    (player) => currentPlayerId && player.playerId.isEqual(currentPlayerId),
   );
-  if (initProgress.current.gameId !== gameId) {
-    initProgress.current.gameId = gameId ?? "";
-    initProgress.current.playerProgressId = "";
-    initProgress.current.input = "";
-  }
-  if (
-    currentPlayerProgress &&
-    initProgress.current.playerProgressId !== currentPlayerProgress.id
-  ) {
-    initProgress.current.playerProgressId = currentPlayerProgress.id;
-    initProgress.current.input = reconstructInputFromHistory(
-      game.phrase,
-      currentPlayerProgress.characterHistory,
-      currentPlayerProgress.progressIndex,
-    );
-  }
-  const initialInput = initProgress.current.input;
   const hasCompletedRace = currentPlayerProgress
     ? currentPlayerProgress.progressIndex >= game.phrase.length
     : false;
@@ -381,7 +377,7 @@ export const GamePage = () => {
 
   const progressBars: ReactNode[] = [];
   for (let index = 0; index < totalSlots; index++) {
-    const pp = gamePlayerProgress[index];
+    const pp = racePlayers[index];
     const isCurrentPlayer =
       pp && currentPlayerId && pp.playerId.isEqual(currentPlayerId);
 
@@ -431,6 +427,7 @@ export const GamePage = () => {
           attribution={game.attribution}
           players={gamePlayerProgress}
           raceStartTimestamp={game.racingStartedAt}
+          totalAllowedErrors={game.allowedErrors}
           initialPlayerId={currentPlayerId?.toHexString()}
           onExit={() => setIsWatchingReplay(false)}
         />
@@ -483,14 +480,14 @@ export const GamePage = () => {
   } else {
     gameContent = (
       <GamePageTypeBox
-        key={`${gameId}:${initProgress.current.playerProgressId}`}
+        key={`${gameId}:${currentPlayerProgress?.id ?? "spectator"}`}
         phrase={game.phrase}
         attribution={game.attribution}
         gameId={gameId!}
         conn={conn}
         onFinish={handleFinish}
         inputState={isDisabled ? "disabled-dimmed" : "enabled"}
-        initialInput={initialInput}
+        initialInput={raceStore.getSnapshot().input}
         totalAllowedErrors={game.allowedErrors}
         isParticipant={isMemberOfRace}
         cursorState={isMemberOfRace ? "auto" : "hidden"}
@@ -514,11 +511,11 @@ export const GamePage = () => {
       </div>
       {!isRaceFinished &&
         !isLobby &&
-        otherPlayerProgress.map((pp) => (
+        otherPlayerProgress.map((player) => (
           <GhostCursor
-            key={pp.id.toString()}
-            charIndex={pp.progressIndex}
-            color={getPlayerColorHex(pp.playerColor?.tag ?? "")}
+            key={player.id.toString()}
+            charIndex={player.progressIndex}
+            color={getPlayerColorHex(player.playerColor?.tag ?? "")}
           />
         ))}
     </div>

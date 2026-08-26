@@ -11,7 +11,7 @@ export type ReplayEvent = {
 };
 
 export function buildReplayTimeline(
-  players: PlayerProgress[],
+  players: readonly PlayerProgress[],
   _raceStartTimestamp: bigint,
 ): ReplayEvent[] {
   let eventCount = 0;
@@ -96,10 +96,4 @@ export function reconstructInputFromHistory(
     Math.max(0, progressIndex),
   );
   return input.slice(0, earnedLength);
-}
-
-export function getCorrectPrefixLength(input: string, phrase: string): number {
-  let index = 0;
-  while (index < input.length && input[index] === phrase[index]) index++;
-  return index;
 }

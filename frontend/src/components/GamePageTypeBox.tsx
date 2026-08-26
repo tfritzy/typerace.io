@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useRef } from "react";
 import {
   TypeBox,
   type TypeBoxCursorState,
@@ -12,6 +12,10 @@ import {
   getWordCount,
 } from "@/utils/typeBoxCore";
 import { AllowedErrorsRow } from "./AllowedErrorsRow";
+import {
+  useRaceInput,
+  useRaceStateStore,
+} from "../contexts/RaceStateContext";
 
 type GamePageTypeBoxProps = {
   phrase: string;
@@ -41,8 +45,10 @@ export const GamePageTypeBox = memo(
     cursorState = "auto",
     raceStartsAt,
   }: GamePageTypeBoxProps) => {
+    const raceState = useRaceStateStore();
+    const input = useRaceInput();
+    const initialInputRef = useRef(initialInput);
     const totalWords = useMemo(() => getWordCount(phrase), [phrase]);
-    const [input, setInput] = useState(initialInput);
     const analysis = analyzeTypeBoxInput(
       phrase,
       input,
@@ -67,12 +73,17 @@ export const GamePageTypeBox = memo(
           eventType: eventTypeEnum,
         });
       },
-      [conn, gameId, phrase],
+      [conn, gameId],
     );
 
     const handleComplete = useCallback(() => {
       onFinish();
     }, [onFinish]);
+
+    const handleValueChange = useCallback(
+      (value: string) => raceState.setInput(value),
+      [raceState],
+    );
 
     return (
       <div className="mt-6 min-h-[550px] text-2xl leading-[1.6] sm:mt-8">
@@ -94,9 +105,9 @@ export const GamePageTypeBox = memo(
             onComplete={handleComplete}
             inputState={inputState}
             height="430px"
-            initialValue={initialInput}
+            initialValue={initialInputRef.current}
             cursorState={cursorState}
-            onValueChange={setInput}
+            onValueChange={handleValueChange}
             totalAllowedErrors={totalAllowedErrors}
           />
           <Countdown
