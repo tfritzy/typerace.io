@@ -8,7 +8,11 @@ import {
   startTransition,
   type ReactNode,
 } from "react";
-import { type Game, type PlayerProgress } from "../types/stdb";
+import {
+  type Game,
+  type PersonalRecord,
+  type PlayerProgress,
+} from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
 import { PlayerStatsRow } from "../components/PlayerStatsRow";
 import { AllPlayersResults } from "../components/AllPlayersResults";
@@ -43,6 +47,7 @@ export const GamePage = () => {
   const [gamePlayerProgress, setGamePlayerProgress] = useState<
     PlayerProgress[]
   >([]);
+  const [hasNewPersonalRecord, setHasNewPersonalRecord] = useState(false);
   const latencyDeltaRef = useRef(latencyDeltaMs);
   const initProgress = useRef({
     gameId: "",
@@ -57,6 +62,7 @@ export const GamePage = () => {
   useEffect(() => {
     setGame(null);
     setGamePlayerProgress([]);
+    setHasNewPersonalRecord(false);
     setHasFinished(false);
     setIsWatchingReplay(false);
     setCountdownComplete(false);
@@ -65,6 +71,7 @@ export const GamePage = () => {
 
   useEffect(() => {
     if (!conn || !gameId) return;
+    setHasNewPersonalRecord(false);
     let progressDeleteRedirect: ReturnType<typeof setTimeout> | undefined;
     let countdownTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -165,11 +172,34 @@ export const GamePage = () => {
       }
     };
 
+    const isCurrentGamePersonalRecord = (record: PersonalRecord) =>
+      !!conn.identity &&
+      record.playerId.isEqual(conn.identity) &&
+      record.gameId === gameId;
+
+    const syncCurrentGamePersonalRecord = () => {
+      setHasNewPersonalRecord(
+        Array.from(conn.db.personalrecord.iter()).some(
+          isCurrentGamePersonalRecord,
+        ),
+      );
+    };
+
+    const handlePersonalRecordInsert = (
+      _ctx: any,
+      record: PersonalRecord,
+    ) => {
+      if (isCurrentGamePersonalRecord(record)) {
+        setHasNewPersonalRecord(true);
+      }
+    };
+
     conn.db.game.onInsert(handleGameInsert);
     conn.db.game.onUpdate(handleGameUpdate);
     conn.db.playerprogress.onInsert(handleProgressInsert);
     conn.db.playerprogress.onUpdate(handleProgressUpdate);
     conn.db.playerprogress.onDelete(handleProgressDelete);
+    conn.db.personalrecord.onInsert(handlePersonalRecordInsert);
 
     const progressQuery = `SELECT * FROM playerprogress WHERE GameId = '${gameId}'`;
     const gameQuery = `SELECT * FROM game WHERE Id = '${gameId}'`;
@@ -178,6 +208,7 @@ export const GamePage = () => {
     if (conn.identity) {
       subscriptionQueries.push(
         `SELECT * FROM playerprogress WHERE PlayerId = '${conn.identity}'`,
+        `SELECT * FROM personalrecord WHERE PlayerId = '${conn.identity}' AND GameId = '${gameId}'`,
       );
     }
 
@@ -194,6 +225,7 @@ export const GamePage = () => {
           conn.db.playerprogress.iter(),
         ).filter((pp) => pp.gameId.toString() === gameId);
         setGamePlayerProgress(currentGameProgress);
+        syncCurrentGamePersonalRecord();
       })
       .subscribe(subscriptionQueries);
 
@@ -201,6 +233,7 @@ export const GamePage = () => {
       conn.db.playerprogress.removeOnInsert(handleProgressInsert);
       conn.db.playerprogress.removeOnUpdate(handleProgressUpdate);
       conn.db.playerprogress.removeOnDelete(handleProgressDelete);
+      conn.db.personalrecord.removeOnInsert(handlePersonalRecordInsert);
       conn.db.game.removeOnInsert(handleGameInsert);
       conn.db.game.removeOnUpdate(handleGameUpdate);
       clearTimeout(progressDeleteRedirect);
@@ -409,6 +442,7 @@ export const GamePage = () => {
             gameMode={game.gameMode}
             phrase={game.phrase}
             attribution={game.attribution}
+            isPersonalRecord={hasNewPersonalRecord}
           />
           {currentPlayerProgress && (
             <PlayerStatsRow

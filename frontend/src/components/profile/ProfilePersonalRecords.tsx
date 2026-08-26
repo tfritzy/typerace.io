@@ -19,7 +19,7 @@ function getRecordLabel(
   slot: PersonalRecordSlot,
 ): string {
   if (slot.wpm === null) {
-    return `No ${slot.wordCount}-word personal record yet`;
+    return `No ${slot.wordCount}-word personal best yet`;
   }
 
   const languageLabel = language ? `${language} ` : "";
@@ -27,11 +27,11 @@ function getRecordLabel(
     ? "accuracy unavailable"
     : `${Math.round(slot.accuracy)}% accuracy`;
   const wpm = Math.round(slot.wpm);
-  return `View ${languageLabel}${slot.wordCount}-word personal record: ${wpm} WPM, ${accuracyLabel}`;
+  return `View ${languageLabel}${slot.wordCount}-word personal best: ${wpm} WPM, ${accuracyLabel}`;
 }
 
 function getAccuracyLabel(slot: PersonalRecordSlot): string {
-  if (slot.wpm === null) return "No record yet";
+  if (slot.wpm === null) return "No best yet";
   if (slot.accuracy === null) return "Accuracy unavailable";
   return `${Math.round(slot.accuracy)}% accuracy`;
 }
@@ -41,8 +41,8 @@ export function ProfilePersonalRecords({
 }: ProfilePersonalRecordsProps) {
   const navigate = useNavigate();
   const heading = records.language
-    ? `${records.language} personal records`
-    : "Personal records";
+    ? `${records.language} personal bests`
+    : "Personal bests";
 
   return (
     <section aria-labelledby="personal-records-heading">

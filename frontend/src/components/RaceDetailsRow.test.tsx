@@ -58,4 +58,30 @@ describe("RaceDetailsRow", () => {
       details.querySelector('[data-detail-icon="language"]'),
     ).not.toBeNull();
   });
+
+  it("shows the word count in the personal-best banner", () => {
+    const { getByRole } = render(
+      <RaceDetailsRow
+        gameMode={{ tag: "English500" } as GameMode}
+        phrase="one two three"
+        isPersonalRecord
+      />,
+    );
+
+    expect(getByRole("status").textContent).toContain(
+      "New 3-word personal best",
+    );
+  });
+
+  it("does not show the personal-record banner for quote mode", () => {
+    const { queryByRole } = render(
+      <RaceDetailsRow
+        gameMode={{ tag: "EnglishQuotes" } as GameMode}
+        phrase="one two three"
+        isPersonalRecord
+      />,
+    );
+
+    expect(queryByRole("status")).toBeNull();
+  });
 });

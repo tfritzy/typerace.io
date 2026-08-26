@@ -26,6 +26,7 @@ export interface Translations {
   watchReplay: string;
   replay: string;
   results: string;
+  newPersonalBest: (wordCount: number) => string;
   ownerRematchOnly: string;
   waitingForPlayer: string;
   tagline: string;
@@ -67,6 +68,7 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Watch replay",
     replay: "Replay",
     results: "Results",
+    newPersonalBest: (wordCount) => `New ${wordCount}-word personal best`,
     ownerRematchOnly: "Only the game owner can start a rematch",
     waitingForPlayer: "Waiting for player...",
     wpm: "WPM",
@@ -108,6 +110,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Ver repetición",
     replay: "Repetir",
     results: "Resultados",
+    newPersonalBest: (wordCount) =>
+      `¡Nueva mejor marca personal en ${wordCount} palabras!`,
     ownerRematchOnly: "Solo el anfitrión puede iniciar una revancha",
     waitingForPlayer: "Esperando jugador...",
     wpm: "PPM",
@@ -148,6 +152,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Voir le replay",
     replay: "Rejouer",
     results: "Résultats",
+    newPersonalBest: (wordCount) =>
+      `Nouveau meilleur score personnel sur ${wordCount} mots !`,
     ownerRematchOnly: "Seul le propriétaire peut lancer une revanche",
     waitingForPlayer: "En attente d'un joueur...",
     wpm: "MPM",
@@ -188,6 +194,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Wiederholung ansehen",
     replay: "Wiederholen",
     results: "Ergebnisse",
+    newPersonalBest: (wordCount) =>
+      `Neue persönliche Bestleistung über ${wordCount} Wörter!`,
     ownerRematchOnly: "Nur der Gastgeber kann eine Revanche starten",
     waitingForPlayer: "Warte auf Spieler...",
     wpm: "WPM",
@@ -228,6 +236,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Guarda replay",
     replay: "Rivedi",
     results: "Risultati",
+    newPersonalBest: (wordCount) =>
+      `Nuovo miglior risultato personale su ${wordCount} parole!`,
     ownerRematchOnly: "Solo l'host può avviare una rivincita",
     waitingForPlayer: "In attesa di un giocatore...",
     wpm: "PPM",
@@ -269,6 +279,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Ver replay",
     replay: "Repetir",
     results: "Resultados",
+    newPersonalBest: (wordCount) =>
+      `Nova melhor marca pessoal em ${wordCount} palavras!`,
     ownerRematchOnly: "Apenas o anfitrião pode iniciar uma revanche",
     waitingForPlayer: "Aguardando jogador...",
     wpm: "PPM",
@@ -310,6 +322,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Переглянути повтор",
     replay: "Повторити",
     results: "Результати",
+    newPersonalBest: (wordCount) =>
+      `Новий особистий максимум на ${wordCount} слів!`,
     ownerRematchOnly: "Тільки хост може почати реванш",
     waitingForPlayer: "Очікування гравця...",
     wpm: "СХМ",
@@ -349,6 +363,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "مشاهدة الإعادة",
     replay: "إعادة",
     results: "النتائج",
+    newPersonalBest: (wordCount) =>
+      `أفضل نتيجة شخصية جديدة في ${wordCount} كلمة!`,
     ownerRematchOnly: "فقط المضيف يمكنه بدء إعادة المباراة",
     waitingForPlayer: "في انتظار لاعب...",
     wpm: "ك/د",
@@ -388,6 +404,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Herhaling bekijken",
     replay: "Opnieuw afspelen",
     results: "Resultaten",
+    newPersonalBest: (wordCount) =>
+      `Nieuwe persoonlijke beste prestatie voor ${wordCount} woorden!`,
     ownerRematchOnly: "Alleen de host kan een herkansing starten",
     waitingForPlayer: "Wachten op speler...",
     wpm: "WPM",
@@ -428,6 +446,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Se repris",
     replay: "Spela upp igen",
     results: "Resultat",
+    newPersonalBest: (wordCount) =>
+      `Nytt personbästa på ${wordCount} ord!`,
     ownerRematchOnly: "Bara värden kan starta en returmatch",
     waitingForPlayer: "Väntar på spelare...",
     wpm: "WPM",
@@ -468,6 +488,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Смотреть повтор",
     replay: "Повторить",
     results: "Результаты",
+    newPersonalBest: (wordCount) =>
+      `Новый личный максимум на ${wordCount} слов!`,
     ownerRematchOnly: "Только владелец игры может начать реванш",
     waitingForPlayer: "Ожидание игрока...",
     wpm: "С/М",
@@ -508,6 +530,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Vezi reluarea",
     replay: "Reluare",
     results: "Rezultate",
+    newPersonalBest: (wordCount) =>
+      `Un nou maxim personal la ${wordCount} cuvinte!`,
     ownerRematchOnly: "Doar gazda poate începe o revanșă",
     waitingForPlayer: "Se așteaptă un jucător...",
     wpm: "CPM",
@@ -549,6 +573,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Tonton tayangan ulang",
     replay: "Tayangan ulang",
     results: "Hasil",
+    newPersonalBest: (wordCount) =>
+      `Pencapaian terbaik pribadi baru untuk ${wordCount} kata!`,
     ownerRematchOnly:
       "Hanya pemilik permainan yang dapat memulai pertandingan ulang",
     waitingForPlayer: "Menunggu pemain...",
@@ -590,6 +616,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Obejrzyj powtórkę",
     replay: "Powtórka",
     results: "Wyniki",
+    newPersonalBest: (wordCount) =>
+      `Nowy najlepszy wynik osobisty na ${wordCount} słów!`,
     ownerRematchOnly: "Tylko gospodarz gry może rozpocząć rewanż",
     waitingForPlayer: "Oczekiwanie na gracza...",
     wpm: "WPM",
@@ -633,6 +661,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Sledovat záznam",
     replay: "Záznam",
     results: "Výsledky",
+    newPersonalBest: (wordCount) =>
+      `Nové osobní maximum na ${wordCount} slov!`,
     ownerRematchOnly: "Odvetu může spustit pouze vlastník hry",
     waitingForPlayer: "Čekání na hráče...",
     wpm: "WPM",
@@ -676,6 +706,8 @@ const translations: Record<Language, Translations> = {
     watchReplay: "Tekrarı izle",
     replay: "Tekrar oynat",
     results: "Sonuçlar",
+    newPersonalBest: (wordCount) =>
+      `${wordCount} kelimede yeni kişisel en iyi derece!`,
     ownerRematchOnly: "Yalnızca ev sahibi rövanş başlatabilir",
     waitingForPlayer: "Oyuncu bekleniyor...",
     wpm: "WPM",
