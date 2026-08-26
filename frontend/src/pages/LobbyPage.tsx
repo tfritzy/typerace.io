@@ -37,7 +37,10 @@ export const LobbyPage = () => {
 
   useEffect(() => {
     document.title = currentLang.title;
-  }, [currentLang.title]);
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute("content", currentLang.description);
+  }, [currentLang.title, currentLang.description]);
 
   const handleModeSelect = useCallback((mode: GameMode) => {
     setSelectedMode(mode);

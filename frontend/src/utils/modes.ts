@@ -49,7 +49,7 @@ export const languages: LanguageInfo[] = [
     measurementMode: "wpm" as const,
     title: "TypeRace.io | A real, modern type-racing platform",
     description:
-      "Race against players worldwide in real-time typing competitions. Test and improve your typing speed in multiplayer races.",
+      "Race against friends and other players around the world in real-time typing competitions.",
   },
   {
     language: Language.Spanish,
@@ -64,7 +64,7 @@ export const languages: LanguageInfo[] = [
     title:
       "TypeRace.io | Una plataforma moderna y auténtica de carreras de mecanografía",
     description:
-      "Compite contra jugadores de todo el mundo en carreras de mecanografía en tiempo real. Mejora tu velocidad de escritura.",
+      "Compite contra tus amigos y otros jugadores de todo el mundo en competiciones de mecanografía en tiempo real.",
   },
   {
     language: Language.French,
@@ -78,7 +78,7 @@ export const languages: LanguageInfo[] = [
     measurementMode: "wpm" as const,
     title: "TypeRace.io | Une véritable plateforme moderne de course de frappe",
     description:
-      "Affrontez des joueurs du monde entier dans des compétitions de frappe en temps réel. Améliorez votre vitesse de frappe.",
+      "Affrontez vos amis et d’autres joueurs du monde entier dans des compétitions de frappe en temps réel.",
   },
   {
     language: Language.German,
@@ -92,7 +92,7 @@ export const languages: LanguageInfo[] = [
     measurementMode: "wpm" as const,
     title: "TypeRace.io | Eine echte, moderne Plattform für Tipprennen",
     description:
-      "Tritt gegen Spieler weltweit in Echtzeit-Tippwettbewerben an. Verbessere deine Tippgeschwindigkeit.",
+      "Tritt in Echtzeit-Tippwettbewerben gegen Freunde und andere Spieler aus aller Welt an.",
   },
   {
     language: Language.Italian,
@@ -107,7 +107,7 @@ export const languages: LanguageInfo[] = [
     title:
       "TypeRace.io | Una vera e moderna piattaforma per gare di battitura",
     description:
-      "Gareggia contro giocatori di tutto il mondo in competizioni di digitazione in tempo reale. Migliora la tua velocità di battitura.",
+      "Sfida i tuoi amici e altri giocatori da tutto il mondo in gare di battitura in tempo reale.",
   },
   {
     language: Language.Portuguese,
@@ -122,7 +122,7 @@ export const languages: LanguageInfo[] = [
     title:
       "TypeRace.io | Uma plataforma real e moderna de corridas de digitação",
     description:
-      "Compita contra jogadores de todo o mundo em competições de digitação em tempo real. Melhore sua velocidade de digitação.",
+      "Compita contra seus amigos e outros jogadores do mundo todo em competições de digitação em tempo real.",
   },
   {
     language: Language.Indonesian,
@@ -137,7 +137,7 @@ export const languages: LanguageInfo[] = [
     title:
       "TypeRace.io | Platform balap mengetik modern yang sesungguhnya",
     description:
-      "Berlomba melawan pemain dari seluruh dunia dalam kompetisi mengetik waktu nyata. Tingkatkan kecepatan mengetik Anda.",
+      "Berlomba melawan teman dan pemain lain dari seluruh dunia dalam kompetisi mengetik waktu nyata.",
   },
   {
     language: Language.Polish,
@@ -152,7 +152,7 @@ export const languages: LanguageInfo[] = [
     title:
       "TypeRace.io | Prawdziwa, nowoczesna platforma do wyścigów w pisaniu na klawiaturze",
     description:
-      "Ścigaj się z graczami z całego świata w zawodach pisania na żywo. Poprawiaj szybkość pisania.",
+      "Rywalizuj ze znajomymi i innymi graczami z całego świata w konkursach szybkiego pisania rozgrywanych w czasie rzeczywistym.",
   },
   {
     language: Language.Czech,
@@ -167,7 +167,7 @@ export const languages: LanguageInfo[] = [
     title:
       "TypeRace.io | Skutečná moderní platforma pro závody v psaní",
     description:
-      "Závoděte s hráči z celého světa v psaní v reálném čase. Zlepšujte svou rychlost a přesnost psaní.",
+      "Poměřte se s přáteli a dalšími hráči z celého světa v závodech v psaní na klávesnici v reálném čase.",
   },
   {
     language: Language.Ukrainian,
@@ -182,7 +182,7 @@ export const languages: LanguageInfo[] = [
     title:
       "TypeRace.io | Справжня сучасна платформа для перегонів із набору тексту",
     description:
-      "Змагайтеся з гравцями з усього світу в змаганнях з друку в реальному часі. Покращуйте швидкість друку.",
+      "Змагайтеся з друзями та іншими гравцями з усього світу в турнірах зі швидкісного набору тексту в реальному часі.",
   },
   {
     language: Language.Dutch,
@@ -196,7 +196,7 @@ export const languages: LanguageInfo[] = [
     measurementMode: "wpm" as const,
     title: "TypeRace.io | Een echt, modern platform voor typeraces",
     description:
-      "Race tegen spelers wereldwijd in real-time typwedstrijden. Verbeter je typsnelheid.",
+      "Neem het in realtime typewedstrijden op tegen vrienden en andere spelers van over de hele wereld.",
   },
   {
     language: Language.Russian,
@@ -211,7 +211,7 @@ export const languages: LanguageInfo[] = [
     title:
       "TypeRace.io | Настоящая современная платформа для гонок на скорость набора текста",
     description:
-      "Соревнуйтесь с игроками со всего мира в гонках печати в реальном времени. Улучшайте скорость и точность набора текста.",
+      "Соревнуйтесь с друзьями и другими игроками со всего мира в гонках на скорость печати в реальном времени.",
   },
   {
     language: Language.Romanian,
@@ -226,7 +226,7 @@ export const languages: LanguageInfo[] = [
     title:
       "TypeRace.io | O platformă reală și modernă pentru curse de tastare",
     description:
-      "Concurează cu jucători din întreaga lume în competiții de tastare în timp real. Îmbunătățește-ți viteza de tastare.",
+      "Concurează cu prietenii și cu alți jucători din întreaga lume în competiții de tastare în timp real.",
   },
   {
     language: Language.Swedish,
@@ -240,7 +240,7 @@ export const languages: LanguageInfo[] = [
     measurementMode: "wpm" as const,
     title: "TypeRace.io | En riktig, modern plattform för skrivrace",
     description:
-      "Tävla mot spelare världen över i skrivtävlingar i realtid. Förbättra din skrivhastighet.",
+      "Tävla mot vänner och andra spelare från hela världen i skrivtävlingar i realtid.",
   },
   {
     language: Language.Turkish,
@@ -254,7 +254,7 @@ export const languages: LanguageInfo[] = [
     measurementMode: "wpm" as const,
     title: "TypeRace.io | Gerçek ve modern bir yazma yarışı platformu",
     description:
-      "Dünya genelindeki oyuncularla gerçek zamanlı yazma yarışmalarında yarışın. Yazma hızınızı geliştirin.",
+      "Arkadaşlarınızla ve dünyanın dört bir yanından diğer oyuncularla gerçek zamanlı yazma yarışlarında rekabet edin.",
   },
 ].sort((a, b) => a.language.localeCompare(b.language));
 
