@@ -18,6 +18,7 @@ export interface Translations {
   waitingForOwner: string;
   shareLink: string;
   copied: string;
+  copyResults: string;
   gameLink: string;
   startGame: string;
   mainMenu: string;
@@ -60,6 +61,7 @@ const translations: Record<Language, Translations> = {
     waitingForOwner: "Waiting for owner to start...",
     shareLink: "Share this link with friends to invite them to this race",
     copied: "Copied!",
+    copyResults: "Copy results",
     gameLink: "Game Link",
     startGame: "Start Game",
     mainMenu: "Main Menu",
@@ -102,6 +104,7 @@ const translations: Record<Language, Translations> = {
     shareLink:
       "Comparte este enlace con tus amigos para invitarlos a esta carrera",
     copied: "¡Copiado!",
+    copyResults: "Copiar resultados",
     gameLink: "Enlace de partida",
     startGame: "Iniciar partida",
     mainMenu: "Menú principal",
@@ -144,6 +147,7 @@ const translations: Record<Language, Translations> = {
     waitingForOwner: "En attente du lancement...",
     shareLink: "Partagez ce lien avec vos amis pour les inviter à cette course",
     copied: "Copié !",
+    copyResults: "Copier les résultats",
     gameLink: "Lien de la partie",
     startGame: "Lancer la partie",
     mainMenu: "Menu principal",
@@ -186,6 +190,7 @@ const translations: Record<Language, Translations> = {
     waitingForOwner: "Warte auf den Gastgeber...",
     shareLink: "Teile diesen Link mit Freunden, um sie zum Rennen einzuladen",
     copied: "Kopiert!",
+    copyResults: "Ergebnisse kopieren",
     gameLink: "Spiellink",
     startGame: "Spiel starten",
     mainMenu: "Hauptmenü",
@@ -228,6 +233,7 @@ const translations: Record<Language, Translations> = {
     waitingForOwner: "In attesa dell'host...",
     shareLink: "Condividi questo link con gli amici per invitarli alla gara",
     copied: "Copiato!",
+    copyResults: "Copia risultati",
     gameLink: "Link della partita",
     startGame: "Inizia partita",
     mainMenu: "Menu principale",
@@ -271,6 +277,7 @@ const translations: Record<Language, Translations> = {
     shareLink:
       "Compartilhe este link com amigos para convidá-los para esta corrida",
     copied: "Copiado!",
+    copyResults: "Copiar resultados",
     gameLink: "Link da partida",
     startGame: "Iniciar partida",
     mainMenu: "Menu principal",
@@ -314,6 +321,7 @@ const translations: Record<Language, Translations> = {
     shareLink:
       "Поділіться цим посиланням з друзями, щоб запросити їх до змагання",
     copied: "Скопійовано!",
+    copyResults: "Копіювати результати",
     gameLink: "Посилання на гру",
     startGame: "Почати гру",
     mainMenu: "Головне меню",
@@ -355,6 +363,7 @@ const translations: Record<Language, Translations> = {
     waitingForOwner: "في انتظار بدء المضيف...",
     shareLink: "شارك هذا الرابط مع أصدقائك لدعوتهم إلى السباق",
     copied: "تم النسخ!",
+    copyResults: "نسخ النتائج",
     gameLink: "رابط اللعبة",
     startGame: "بدء اللعبة",
     mainMenu: "القائمة الرئيسية",
@@ -396,6 +405,7 @@ const translations: Record<Language, Translations> = {
     shareLink:
       "Deel deze link met vrienden om ze uit te nodigen voor deze race",
     copied: "Gekopieerd!",
+    copyResults: "Resultaten kopiëren",
     gameLink: "Spellink",
     startGame: "Spel starten",
     mainMenu: "Hoofdmenu",
@@ -438,6 +448,7 @@ const translations: Record<Language, Translations> = {
     waitingForOwner: "Väntar på att värden startar...",
     shareLink: "Dela denna länk med vänner för att bjuda in dem till tävlingen",
     copied: "Kopierat!",
+    copyResults: "Kopiera resultat",
     gameLink: "Spellänk",
     startGame: "Starta spel",
     mainMenu: "Huvudmeny",
@@ -480,6 +491,7 @@ const translations: Record<Language, Translations> = {
     shareLink:
       "Поделитесь этой ссылкой с друзьями, чтобы пригласить их в гонку",
     copied: "Скопировано!",
+    copyResults: "Копировать результаты",
     gameLink: "Ссылка на игру",
     startGame: "Начать игру",
     mainMenu: "Главное меню",
@@ -522,6 +534,7 @@ const translations: Record<Language, Translations> = {
     shareLink:
       "Distribuie acest link prietenilor pentru a-i invita la această cursă",
     copied: "Copiat!",
+    copyResults: "Copiază rezultatele",
     gameLink: "Linkul jocului",
     startGame: "Începe jocul",
     mainMenu: "Meniul principal",
@@ -565,6 +578,7 @@ const translations: Record<Language, Translations> = {
     shareLink:
       "Bagikan tautan ini kepada teman untuk mengundang mereka ke balapan",
     copied: "Disalin!",
+    copyResults: "Salin hasil",
     gameLink: "Tautan permainan",
     startGame: "Mulai permainan",
     mainMenu: "Menu utama",
@@ -608,6 +622,7 @@ const translations: Record<Language, Translations> = {
     waitingForOwner: "Oczekiwanie na rozpoczęcie przez gospodarza...",
     shareLink: "Udostępnij ten link znajomym, aby zaprosić ich do wyścigu",
     copied: "Skopiowano!",
+    copyResults: "Kopiuj wyniki",
     gameLink: "Link do gry",
     startGame: "Rozpocznij grę",
     mainMenu: "Menu główne",
@@ -653,6 +668,7 @@ const translations: Record<Language, Translations> = {
     waitingForOwner: "Čekání na spuštění hostitelem...",
     shareLink: "Sdílejte tento odkaz s přáteli a pozvěte je do závodu",
     copied: "Zkopírováno!",
+    copyResults: "Kopírovat výsledky",
     gameLink: "Odkaz na hru",
     startGame: "Spustit hru",
     mainMenu: "Hlavní nabídka",
@@ -698,6 +714,7 @@ const translations: Record<Language, Translations> = {
     waitingForOwner: "Ev sahibinin başlatması bekleniyor...",
     shareLink: "Bu bağlantıyı arkadaşlarınızla paylaşarak yarışa davet edin",
     copied: "Kopyalandı!",
+    copyResults: "Sonuçları kopyala",
     gameLink: "Oyun bağlantısı",
     startGame: "Oyunu Başlat",
     mainMenu: "Ana Menü",

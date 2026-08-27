@@ -1,5 +1,6 @@
 import type { PlayerProgress } from "../types/stdb";
 import { CharacterEventType } from "./wpmCalculator";
+import { analyzeTypeBoxInput } from "./typeBoxCore";
 
 const EVENT_SIZE_BYTES = 3;
 
@@ -98,8 +99,14 @@ export function reconstructInputFromHistory(
   return input.slice(0, earnedLength);
 }
 
-export function getCorrectPrefixLength(input: string, phrase: string): number {
-  let index = 0;
-  while (index < input.length && input[index] === phrase[index]) index++;
-  return index;
+export function getReplayProgress(
+  input: string,
+  phrase: string,
+  allowedErrors: number,
+): number {
+  return analyzeTypeBoxInput(
+    phrase,
+    input,
+    allowedErrors,
+  ).reportedProgress;
 }

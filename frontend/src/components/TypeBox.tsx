@@ -129,10 +129,24 @@ export const TypeBox = memo(forwardRef<TypeBoxRef, TypeBoxProps>(
           inputRef.current.value = overrideInputValue;
         }
         setInputValue(overrideInputValue);
-        updateRenderedInput(overrideInputValue);
+        updateRenderedInput(
+          overrideInputValue,
+          analyzeTypeBoxInput(
+            phrase,
+            overrideInputValue,
+            totalAllowedErrors,
+          ).completedThrough,
+        );
         resetCursorToEnd();
       }
-    }, [overrideInputValue, resetCursorToEnd, setInputValue, updateRenderedInput]);
+    }, [
+      overrideInputValue,
+      phrase,
+      resetCursorToEnd,
+      setInputValue,
+      totalAllowedErrors,
+      updateRenderedInput,
+    ]);
 
     React.useEffect(() => {
       const handlePageShow = () => resetCursorToEnd();

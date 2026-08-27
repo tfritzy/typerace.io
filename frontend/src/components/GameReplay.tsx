@@ -7,7 +7,7 @@ import { useDatabase } from "../contexts/SpacetimeContext";
 import {
   applyReplayEvent,
   buildReplayTimeline,
-  getCorrectPrefixLength,
+  getReplayProgress,
 } from "../utils/replayTimeline";
 import { GhostCursor } from "./GhostCursor";
 import { PlayerAvatar } from "./PlayerAvatar";
@@ -18,6 +18,7 @@ type GameReplayProps = {
   attribution?: string;
   players: PlayerProgress[];
   raceStartTimestamp: bigint;
+  allowedErrors: number;
   initialPlayerId?: string;
   onExit: () => void;
 };
@@ -33,6 +34,7 @@ export function GameReplay({
   attribution,
   players,
   raceStartTimestamp,
+  allowedErrors,
   initialPlayerId,
   onExit,
 }: GameReplayProps) {
@@ -187,6 +189,7 @@ export function GameReplay({
           cursorState="visible"
           cursorColor={selectedPlayerColor}
           overrideInputValue={selectedInput}
+          totalAllowedErrors={allowedErrors}
           height="430px"
         />
       </div>
@@ -201,9 +204,10 @@ export function GameReplay({
           return (
             <GhostCursor
               key={playerId}
-              charIndex={getCorrectPrefixLength(
+              charIndex={getReplayProgress(
                 inputs[playerId] ?? "",
                 phrase,
+                allowedErrors,
               )}
               color={getDisplayColorHex(
                 player.playerColor?.tag,
