@@ -10,6 +10,9 @@ interface PlayerStatsRowProps {
   placement: number;
 }
 
+const STAT_CARD_CLASS =
+  "flex min-w-0 flex-col items-center justify-center rounded-lg border border-border bg-card p-3 transition-all duration-300";
+
 export const PlayerStatsRow = memo(
   ({ playerProgress, raceStartTimestamp, placement }: PlayerStatsRowProps) => {
     const finalWpm = getFinalWpm(playerProgress);
@@ -25,8 +28,8 @@ export const PlayerStatsRow = memo(
     const isHighWpm = finalWpm >= 100;
 
     return (
-      <div className="flex gap-3 mb-3 items-stretch min-h-[90px] flex-wrap">
-        <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-2 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
+      <div className="mb-3 grid min-h-[90px] grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className={STAT_CARD_CLASS}>
           <div
             className={`text-[10px] uppercase tracking-[1.2px] mb-1 font-semibold ${isFirstPlace ? "text-accent-primary" : "text-muted-foreground"}`}
           >
@@ -39,7 +42,7 @@ export const PlayerStatsRow = memo(
           </div>
         </div>
 
-        <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
+        <div className={STAT_CARD_CLASS}>
           <div
             className={`text-[10px] uppercase tracking-[1.2px] mb-1 font-semibold ${isHighWpm ? "text-accent-primary" : "text-muted-foreground"}`}
           >
@@ -52,7 +55,7 @@ export const PlayerStatsRow = memo(
           </div>
         </div>
 
-        <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
+        <div className={STAT_CARD_CLASS}>
           <div
             className={`text-[10px] uppercase tracking-[1.2px] mb-1 font-semibold ${isFirstPlace ? "text-accent-primary" : "text-muted-foreground"}`}
           >
@@ -65,7 +68,7 @@ export const PlayerStatsRow = memo(
           </div>
         </div>
 
-        <div className="basis-[calc(50%-0.375rem)] max-w-[calc(50%-0.375rem)] min-w-[140px] sm:basis-auto sm:max-w-none sm:flex-1 sm:min-w-0 border rounded-lg p-3 flex flex-col items-center justify-center transition-all duration-300 bg-card border-border">
+        <div className={STAT_CARD_CLASS}>
           <div
             className={`text-[10px] uppercase tracking-[1.2px] mb-1 font-semibold ${isPerfectAccuracy ? "text-accent-primary" : "text-muted-foreground"}`}
           >

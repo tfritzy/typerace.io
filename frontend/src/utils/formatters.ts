@@ -9,6 +9,16 @@ export function formatStopwatchTime(seconds: number): string {
   return `${secs}.${deciseconds}s`;
 }
 
+export function formatShareTime(seconds: number): string {
+  const totalHundredths = Math.floor(seconds * 100);
+  const minutes = Math.floor(totalHundredths / 6_000);
+  const remainingHundredths = totalHundredths % 6_000;
+  const wholeSeconds = Math.floor(remainingHundredths / 100);
+  const hundredths = remainingHundredths % 100;
+
+  return `${String(minutes).padStart(2, "0")}:${String(wholeSeconds).padStart(2, "0")}.${String(hundredths).padStart(2, "0")}`;
+}
+
 export function getOrdinalPlacement(placement: number): string {
   if (placement === -1) return "-";
 

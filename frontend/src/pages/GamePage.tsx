@@ -30,6 +30,7 @@ import { getPreferredGameType } from "../utils/gamePreferences";
 import { WinnerConfetti } from "../components/WinnerConfetti";
 import { GameReplay } from "../components/GameReplay";
 import { reconstructInputFromHistory } from "../utils/replayTimeline";
+import { formatRaceResultForClipboard } from "../utils/raceResultShare";
 
 type UiGameType = "Public" | "Private" | "Practice";
 
@@ -378,6 +379,15 @@ export const GamePage = () => {
   const isOwner =
     currentPlayerId && game.owner && currentPlayerId.isEqual(game.owner);
   const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;
+  const getCopyResultsText = currentPlayerProgress
+    ? () =>
+        formatRaceResultForClipboard({
+          playerProgress: currentPlayerProgress,
+          raceStartTimestamp: game.racingStartedAt,
+          phrase: game.phrase,
+          modeTag: game.gameMode.tag,
+        })
+    : undefined;
 
   const progressBars: ReactNode[] = [];
   for (let index = 0; index < totalSlots; index++) {
@@ -431,6 +441,7 @@ export const GamePage = () => {
           attribution={game.attribution}
           players={gamePlayerProgress}
           raceStartTimestamp={game.racingStartedAt}
+          allowedErrors={game.allowedErrors}
           initialPlayerId={currentPlayerId?.toHexString()}
           onExit={() => setIsWatchingReplay(false)}
         />
@@ -464,6 +475,7 @@ export const GamePage = () => {
             conn={conn || undefined}
             isParticipant={isMemberOfRace}
             onWatchReplay={() => setIsWatchingReplay(true)}
+            getCopyResultsText={getCopyResultsText}
           />
         </div>
       );

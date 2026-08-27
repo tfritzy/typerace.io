@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { CharacterEventType } from "./wpmCalculator";
-import { reconstructInputFromHistory } from "./replayTimeline";
+import {
+  getReplayProgress,
+  reconstructInputFromHistory,
+} from "./replayTimeline";
 
 function encodeHistory(events: CharacterEventType[]) {
   return new Uint8Array(
@@ -20,5 +23,15 @@ describe("reconstructInputFromHistory", () => {
     ]);
 
     expect(reconstructInputFromHistory("hello", history, 3)).toBe("hex");
+  });
+});
+
+describe("getReplayProgress", () => {
+  it("reaches completion when an error is allowed", () => {
+    expect(getReplayProgress("hxllo", "hello", 1)).toBe(5);
+  });
+
+  it("stops at an error when the allowance is exhausted", () => {
+    expect(getReplayProgress("hxllo", "hello", 0)).toBe(1);
   });
 });

@@ -113,6 +113,21 @@ describe("TypeBox allowed errors", () => {
     expect(onProgress).toHaveBeenLastCalledWith(5, "Incorrect");
     expect(onComplete).toHaveBeenCalledOnce();
   });
+
+  it("renders replay overrides with allowed-error completion", () => {
+    const { container } = render(
+      <TypeBox
+        phrase="hello"
+        overrideInputValue="hellx"
+        totalAllowedErrors={1}
+        inputState="disabled"
+      />,
+    );
+
+    const completedError = container.querySelector('[data-char-index="4"]');
+    expect(completedError?.className).toContain("opacity-60");
+    expect(completedError?.className).not.toContain("underline");
+  });
 });
 
 describe("TypeBox selection", () => {
