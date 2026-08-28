@@ -1,0 +1,47 @@
+using SpacetimeDB;
+
+namespace StdbModule;
+[Type]
+public enum GameMode
+{
+    English500,
+    Spanish500,
+    French500,
+    German500,
+    Italian500,
+    Portuguese500,
+    Japanese500,
+    Korean500,
+    Chinese500,
+    Ukrainian500,
+    Arabic500,
+    Hindi500,
+    Dutch500,
+    Swedish500,
+    Turkish500,
+    EnglishQuotes,
+    SpanishQuotes,
+    FrenchQuotes,
+    GermanQuotes,
+    ItalianQuotes,
+    PortugueseQuotes,
+    JapaneseQuotes,
+    KoreanQuotes,
+    ChineseQuotes,
+    UkrainianQuotes,
+    ArabicQuotes,
+    HindiQuotes,
+    DutchQuotes,
+    SwedishQuotes,
+    TurkishQuotes,
+    Russian500,
+    RussianQuotes,
+    Romanian500,
+    RomanianQuotes,
+    Indonesian500,
+    IndonesianQuotes,
+    Polish500,
+    PolishQuotes,
+    Czech500,
+    CzechQuotes
+}
