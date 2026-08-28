@@ -1,6 +1,14 @@
 import Avatar from "boring-avatars";
 import { Crown } from "lucide-react";
-import { memo, useState, useEffect, useCallback, useMemo } from "react";
+import {
+  memo,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  type ReactNode,
+} from "react";
+import { usePlayerAvatar } from "../hooks/usePlayerAvatar";
 import { getPlayerAvatarColors } from "../utils/colorMapping";
 
 type PlayerAvatarProps = {
@@ -34,6 +42,8 @@ export const PlayerAvatar = memo(
     const [fallbackColors, setFallbackColors] = useState(
       getAvatarColorsFromCSS,
     );
+    const [imageFailed, setImageFailed] = useState(false);
+    const photoUrl = usePlayerAvatar(isLoading ? undefined : identity);
 
     const onThemeChange = useCallback(() => {
       setFallbackColors(getAvatarColorsFromCSS());
@@ -43,6 +53,10 @@ export const PlayerAvatar = memo(
       window.addEventListener("themechange", onThemeChange);
       return () => window.removeEventListener("themechange", onThemeChange);
     }, [onThemeChange]);
+
+    useEffect(() => {
+      setImageFailed(false);
+    }, [photoUrl]);
 
     const avatarColors = useMemo(
       () =>
@@ -73,6 +87,40 @@ export const PlayerAvatar = memo(
     const crownColor = placement ? getCrownColor(placement) : null;
     const medalColor = placement ? getMedalColor(placement) : null;
     const borderColor = placement ? getBorderColor(placement) : null;
+
+    const renderAvatar = (): ReactNode => {
+      if (isLoading || photoUrl === undefined) {
+        return (
+          <div
+            className="bg-muted rounded-full"
+            style={{ width: size, height: size }}
+          />
+        );
+      }
+
+      if (photoUrl && !imageFailed) {
+        return (
+          <img
+            src={photoUrl}
+            alt="Authentication profile"
+            width={size}
+            height={size}
+            className="rounded-full object-cover"
+            referrerPolicy="no-referrer"
+            onError={() => setImageFailed(true)}
+          />
+        );
+      }
+
+      return (
+        <Avatar
+          size={size}
+          name={identity}
+          variant={isBot ? "abstract" : "beam"}
+          colors={avatarColors}
+        />
+      );
+    };
 
     return (
       <div
@@ -112,19 +160,7 @@ export const PlayerAvatar = memo(
             {placement}
           </div>
         )}
-        {isLoading ? (
-          <div
-            className="bg-muted rounded-full"
-            style={{ width: size, height: size }}
-          />
-        ) : (
-          <Avatar
-            size={size}
-            name={identity}
-            variant={isBot ? "abstract" : "beam"}
-            colors={avatarColors}
-          />
-        )}
+        {renderAvatar()}
       </div>
     );
   },

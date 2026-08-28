@@ -12,9 +12,14 @@ public static partial class Module
         if (existingPlayer != null)
         {
             var updatedPlayer = existingPlayer.Value;
+            var wasAnonymous = updatedPlayer.IsAnonymous;
             updatedPlayer.IsAnonymous = isAnonymous;
 
-            if (!isAnonymous && updatedPlayer.Name.StartsWith("Anonymous "))
+            if (
+                wasAnonymous
+                && !isAnonymous
+                && updatedPlayer.Name.StartsWith("Anonymous ")
+            )
             {
                 var newAdjective = GenerateNonAnonymousAdjective(ctx.Rng);
                 updatedPlayer.Name = updatedPlayer.Name.Replace("Anonymous", newAdjective);
@@ -22,8 +27,11 @@ public static partial class Module
             }
 
             ctx.Db.player.Identity.Update(updatedPlayer);
+            if (isAnonymous)
+            {
+                RemovePlayerAvatar(ctx);
+            }
             Log.Info($"Updated anonymous status for {ctx.Sender} to {isAnonymous}");
         }
     }
-
 }

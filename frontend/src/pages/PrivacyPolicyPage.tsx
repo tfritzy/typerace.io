@@ -13,7 +13,7 @@ export const PrivacyPolicyPage = () => {
                 <div className="content-container">
                     <div className="box p-8 my-8 text-foreground">
                         <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
-                        <p className="text-sm text-muted-foreground mb-6">Last Updated: November 22, 2024</p>
+                        <p className="text-sm text-muted-foreground mb-6">Last Updated: August 28, 2026</p>
 
                         <section className="mb-6">
                             <h2 className="text-2xl font-semibold mb-3">Introduction</h2>
@@ -32,6 +32,7 @@ export const PrivacyPolicyPage = () => {
                             <ul className="list-disc list-inside mb-3 ml-4 leading-relaxed">
                                 <li>Email address (when using email authentication)</li>
                                 <li>Authentication credentials from third-party providers (Google, GitHub)</li>
+                                <li>Profile image supplied by your authentication provider, when enabled</li>
                                 <li>Display name you choose for your profile</li>
                             </ul>
 
@@ -46,7 +47,7 @@ export const PrivacyPolicyPage = () => {
                                 <li>ELO ratings for competitive matches</li>
                                 <li>Game history and records</li>
                                 <li>Total words typed and games played</li>
-                                <li>Profile customization preferences (avatar color)</li>
+                                <li>Profile customization preferences</li>
                             </ul>
 
                             <h3 className="text-xl font-semibold mb-2 mt-4">Anonymous Usage</h3>
@@ -88,7 +89,7 @@ export const PrivacyPolicyPage = () => {
                                 We do not sell, trade, or rent your personal information to third parties. We may share information in the following circumstances:
                             </p>
                             <ul className="list-disc list-inside mb-3 ml-4 leading-relaxed">
-                                <li><strong>Public Game Data:</strong> Your display name, statistics, and game results are visible to other players in public matches and on leaderboards</li>
+                                <li><strong>Public Game Data:</strong> Your display name, enabled profile image, statistics, and game results are visible to other players in public matches and on leaderboards</li>
                                 <li><strong>Service Providers:</strong> We use Firebase (Google) and SpacetimeDB for authentication and data storage services</li>
                                 <li><strong>Legal Requirements:</strong> We may disclose your information if required by law or in response to valid legal requests</li>
                             </ul>

@@ -14,6 +14,9 @@ export interface Translations {
   siteStats: string;
   privacyPolicy: string;
   theme: string;
+  profileSettings: string;
+  useAuthenticationAvatar: string;
+  authenticationAvatarDescription: string;
   waitingForPlayers: string;
   waitingForOwner: string;
   shareLink: string;
@@ -57,6 +60,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Site stats",
     privacyPolicy: "Privacy policy",
     theme: "Theme",
+    profileSettings: "Profile settings",
+    useAuthenticationAvatar: "Use authentication avatar",
+    authenticationAvatarDescription:
+      "Show the profile image supplied by your sign-in provider.",
     waitingForPlayers: "Waiting for players...",
     waitingForOwner: "Waiting for owner to start...",
     shareLink: "Share this link with friends to invite them to this race",
@@ -99,6 +106,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Estadísticas",
     privacyPolicy: "Política de privacidad",
     theme: "Tema",
+    profileSettings: "Configuración del perfil",
+    useAuthenticationAvatar: "Usar avatar de autenticación",
+    authenticationAvatarDescription:
+      "Muestra la imagen de perfil proporcionada por tu proveedor de inicio de sesión.",
     waitingForPlayers: "Esperando jugadores...",
     waitingForOwner: "Esperando al anfitrión...",
     shareLink:
@@ -143,6 +154,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Statistiques",
     privacyPolicy: "Politique de confidentialité",
     theme: "Thème",
+    profileSettings: "Paramètres du profil",
+    useAuthenticationAvatar: "Utiliser l’avatar du compte",
+    authenticationAvatarDescription:
+      "Afficher l’image de profil fournie par votre fournisseur de connexion.",
     waitingForPlayers: "En attente de joueurs...",
     waitingForOwner: "En attente du lancement...",
     shareLink: "Partagez ce lien avec vos amis pour les inviter à cette course",
@@ -186,6 +201,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Statistiken",
     privacyPolicy: "Datenschutz",
     theme: "Design",
+    profileSettings: "Profileinstellungen",
+    useAuthenticationAvatar: "Profilbild des Anbieters verwenden",
+    authenticationAvatarDescription:
+      "Zeigt das Profilbild deines Anmeldeanbieters an.",
     waitingForPlayers: "Warte auf Spieler...",
     waitingForOwner: "Warte auf den Gastgeber...",
     shareLink: "Teile diesen Link mit Freunden, um sie zum Rennen einzuladen",
@@ -229,6 +248,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Statistiche",
     privacyPolicy: "Privacy",
     theme: "Tema",
+    profileSettings: "Impostazioni del profilo",
+    useAuthenticationAvatar: "Usa l’avatar di autenticazione",
+    authenticationAvatarDescription:
+      "Mostra l’immagine del profilo fornita dal provider di accesso.",
     waitingForPlayers: "In attesa di giocatori...",
     waitingForOwner: "In attesa dell'host...",
     shareLink: "Condividi questo link con gli amici per invitarli alla gara",
@@ -272,6 +295,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Estatísticas",
     privacyPolicy: "Política de privacidade",
     theme: "Tema",
+    profileSettings: "Configurações do perfil",
+    useAuthenticationAvatar: "Usar avatar de autenticação",
+    authenticationAvatarDescription:
+      "Mostra a imagem de perfil fornecida pelo seu provedor de login.",
     waitingForPlayers: "Aguardando jogadores...",
     waitingForOwner: "Aguardando o anfitrião...",
     shareLink:
@@ -316,6 +343,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Статистика",
     privacyPolicy: "Політика конфіденційності",
     theme: "Тема",
+    profileSettings: "Налаштування профілю",
+    useAuthenticationAvatar: "Використовувати аватар облікового запису",
+    authenticationAvatarDescription:
+      "Показувати зображення профілю від постачальника входу.",
     waitingForPlayers: "Очікування гравців...",
     waitingForOwner: "Очікування на хоста...",
     shareLink:
@@ -359,6 +390,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "الإحصائيات",
     privacyPolicy: "سياسة الخصوصية",
     theme: "المظهر",
+    profileSettings: "إعدادات الملف الشخصي",
+    useAuthenticationAvatar: "استخدام صورة حساب تسجيل الدخول",
+    authenticationAvatarDescription:
+      "اعرض صورة الملف الشخصي المقدمة من موفر تسجيل الدخول.",
     waitingForPlayers: "في انتظار اللاعبين...",
     waitingForOwner: "في انتظار بدء المضيف...",
     shareLink: "شارك هذا الرابط مع أصدقائك لدعوتهم إلى السباق",
@@ -400,6 +435,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Statistieken",
     privacyPolicy: "Privacybeleid",
     theme: "Thema",
+    profileSettings: "Profielinstellingen",
+    useAuthenticationAvatar: "Authenticatie-avatar gebruiken",
+    authenticationAvatarDescription:
+      "Toon de profielafbeelding van je aanmeldprovider.",
     waitingForPlayers: "Wachten op spelers...",
     waitingForOwner: "Wachten op de host...",
     shareLink:
@@ -444,6 +483,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Statistik",
     privacyPolicy: "Integritetspolicy",
     theme: "Tema",
+    profileSettings: "Profilinställningar",
+    useAuthenticationAvatar: "Använd autentiseringsavatar",
+    authenticationAvatarDescription:
+      "Visa profilbilden från din inloggningsleverantör.",
     waitingForPlayers: "Väntar på spelare...",
     waitingForOwner: "Väntar på att värden startar...",
     shareLink: "Dela denna länk med vänner för att bjuda in dem till tävlingen",
@@ -486,6 +529,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Статистика",
     privacyPolicy: "Политика конфиденциальности",
     theme: "Тема",
+    profileSettings: "Настройки профиля",
+    useAuthenticationAvatar: "Использовать аватар учётной записи",
+    authenticationAvatarDescription:
+      "Показывать изображение профиля от поставщика входа.",
     waitingForPlayers: "Ожидание игроков...",
     waitingForOwner: "Ожидание запуска владельцем...",
     shareLink:
@@ -529,6 +576,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Statistici",
     privacyPolicy: "Politica de confidențialitate",
     theme: "Temă",
+    profileSettings: "Setări profil",
+    useAuthenticationAvatar: "Folosește avatarul de autentificare",
+    authenticationAvatarDescription:
+      "Afișează imaginea de profil oferită de furnizorul de autentificare.",
     waitingForPlayers: "Se așteaptă jucători...",
     waitingForOwner: "Se așteaptă ca gazda să înceapă...",
     shareLink:
@@ -573,6 +624,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Statistik situs",
     privacyPolicy: "Kebijakan privasi",
     theme: "Tema",
+    profileSettings: "Pengaturan profil",
+    useAuthenticationAvatar: "Gunakan avatar autentikasi",
+    authenticationAvatarDescription:
+      "Tampilkan gambar profil dari penyedia masuk Anda.",
     waitingForPlayers: "Menunggu pemain...",
     waitingForOwner: "Menunggu pemilik memulai...",
     shareLink:
@@ -618,6 +673,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Statystyki strony",
     privacyPolicy: "Polityka prywatności",
     theme: "Motyw",
+    profileSettings: "Ustawienia profilu",
+    useAuthenticationAvatar: "Używaj awatara logowania",
+    authenticationAvatarDescription:
+      "Wyświetlaj zdjęcie profilowe od dostawcy logowania.",
     waitingForPlayers: "Oczekiwanie na graczy...",
     waitingForOwner: "Oczekiwanie na rozpoczęcie przez gospodarza...",
     shareLink: "Udostępnij ten link znajomym, aby zaprosić ich do wyścigu",
@@ -664,6 +723,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "Statistiky webu",
     privacyPolicy: "Zásady ochrany soukromí",
     theme: "Motiv",
+    profileSettings: "Nastavení profilu",
+    useAuthenticationAvatar: "Používat avatar z přihlášení",
+    authenticationAvatarDescription:
+      "Zobrazit profilový obrázek od poskytovatele přihlášení.",
     waitingForPlayers: "Čekání na hráče...",
     waitingForOwner: "Čekání na spuštění hostitelem...",
     shareLink: "Sdílejte tento odkaz s přáteli a pozvěte je do závodu",
@@ -710,6 +773,10 @@ const translations: Record<Language, Translations> = {
     siteStats: "İstatistikler",
     privacyPolicy: "Gizlilik politikası",
     theme: "Tema",
+    profileSettings: "Profil ayarları",
+    useAuthenticationAvatar: "Kimlik doğrulama avatarını kullan",
+    authenticationAvatarDescription:
+      "Oturum açma sağlayıcınızın sunduğu profil resmini göster.",
     waitingForPlayers: "Oyuncular bekleniyor...",
     waitingForOwner: "Ev sahibinin başlatması bekleniyor...",
     shareLink: "Bu bağlantıyı arkadaşlarınızla paylaşarak yarışa davet edin",
