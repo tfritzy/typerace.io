@@ -21,6 +21,42 @@ type PlayerAvatarProps = {
   isBot?: boolean;
 };
 
+type AvatarPhotoProps = {
+  photoUrl: string;
+  size: number;
+  fallback: ReactNode;
+};
+
+function AvatarPhoto({ photoUrl, size, fallback }: AvatarPhotoProps) {
+  const [status, setStatus] = useState<"loading" | "loaded" | "failed">(
+    "loading",
+  );
+
+  if (status === "failed") return fallback;
+
+  return (
+    <div
+      className="relative overflow-hidden rounded-full"
+      style={{ width: size, height: size }}
+    >
+      {status === "loading" && <div className="absolute inset-0 bg-muted" />}
+      <img
+        src={photoUrl}
+        alt=""
+        aria-hidden
+        width={size}
+        height={size}
+        className={`rounded-full object-cover ${
+          status === "loaded" ? "visible" : "invisible"
+        }`}
+        referrerPolicy="no-referrer"
+        onLoad={() => setStatus("loaded")}
+        onError={() => setStatus("failed")}
+      />
+    </div>
+  );
+}
+
 function getAvatarColorsFromCSS(): string[] {
   const style = getComputedStyle(document.documentElement);
   return [
@@ -42,7 +78,6 @@ export const PlayerAvatar = memo(
     const [fallbackColors, setFallbackColors] = useState(
       getAvatarColorsFromCSS,
     );
-    const [imageFailed, setImageFailed] = useState(false);
     const photoUrl = usePlayerAvatar(isLoading ? undefined : identity);
 
     const onThemeChange = useCallback(() => {
@@ -53,10 +88,6 @@ export const PlayerAvatar = memo(
       window.addEventListener("themechange", onThemeChange);
       return () => window.removeEventListener("themechange", onThemeChange);
     }, [onThemeChange]);
-
-    useEffect(() => {
-      setImageFailed(false);
-    }, [photoUrl]);
 
     const avatarColors = useMemo(
       () =>
@@ -98,26 +129,23 @@ export const PlayerAvatar = memo(
         );
       }
 
-      if (photoUrl && !imageFailed) {
-        return (
-          <img
-            src={photoUrl}
-            alt="Authentication profile"
-            width={size}
-            height={size}
-            className="rounded-full object-cover"
-            referrerPolicy="no-referrer"
-            onError={() => setImageFailed(true)}
-          />
-        );
-      }
-
-      return (
+      const generatedAvatar = (
         <Avatar
           size={size}
           name={identity}
           variant={isBot ? "abstract" : "beam"}
           colors={avatarColors}
+        />
+      );
+
+      if (!photoUrl) return generatedAvatar;
+
+      return (
+        <AvatarPhoto
+          key={photoUrl}
+          photoUrl={photoUrl}
+          size={size}
+          fallback={generatedAvatar}
         />
       );
     };
