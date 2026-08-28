@@ -1,5 +1,6 @@
-import { Pencil } from "lucide-react";
+import { Pencil, Settings } from "lucide-react";
 import type { Player } from "../../types/stdb";
+import { getTranslations } from "../../utils/translations";
 import { xpProgressToNextLevel } from "../../utils/xpCalculator";
 import { PlayerAvatar } from "../PlayerAvatar";
 
@@ -7,13 +8,16 @@ interface ProfileHeaderProps {
   player: Player;
   canEdit: boolean;
   onEdit: () => void;
+  onOpenSettings: () => void;
 }
 
 export function ProfileHeader({
   player,
   canEdit,
   onEdit,
+  onOpenSettings,
 }: ProfileHeaderProps) {
+  const t = getTranslations();
   const levelProgress = xpProgressToNextLevel(
     player.xp,
     player.xpRequiredForNextLevel,
@@ -38,15 +42,26 @@ export function ProfileHeader({
               {player.name}
             </h1>
             {canEdit && (
-              <button
-                type="button"
-                onClick={onEdit}
-                className="cursor-pointer rounded-md border-0 bg-transparent p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                title="Edit name"
-                aria-label="Edit name"
-              >
-                <Pencil aria-hidden size={16} strokeWidth={2} />
-              </button>
+              <div className="flex shrink-0 items-center gap-1">
+                <button
+                  type="button"
+                  onClick={onEdit}
+                  className="cursor-pointer rounded-md border-0 bg-transparent p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  title="Edit name"
+                  aria-label="Edit name"
+                >
+                  <Pencil aria-hidden size={16} strokeWidth={2} />
+                </button>
+                <button
+                  type="button"
+                  onClick={onOpenSettings}
+                  className="cursor-pointer rounded-md border-0 bg-transparent p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  title={t.profileSettings}
+                  aria-label={t.profileSettings}
+                >
+                  <Settings aria-hidden size={17} strokeWidth={2} />
+                </button>
+              </div>
             )}
           </div>
 

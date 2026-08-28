@@ -128,6 +128,11 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
             }, CONNECTION_STABLE_MS);
             console.log("Connected to SpacetimeDB");
             connected.reducers.syncAnonymousStatus({ isAnonymous: !user });
+            if (user) {
+              connected.reducers.syncAuthenticationAvatar({
+                photoUrl: user.photoURL ?? undefined,
+              });
+            }
             connectionRef.current = connected;
             setConn(connected);
             setStatus("connected");

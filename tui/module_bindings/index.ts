@@ -57,6 +57,8 @@ import Rematch from "./rematch_reducer";
 export { Rematch };
 import SetPlayerName from "./set_player_name_reducer";
 export { SetPlayerName };
+import SetUseAuthenticationAvatar from "./set_use_authentication_avatar_reducer";
+export { SetUseAuthenticationAvatar };
 import StartCountdown from "./start_countdown_reducer";
 export { StartCountdown };
 import StartGame from "./start_game_reducer";
@@ -65,6 +67,8 @@ import StartPrivateGame from "./start_private_game_reducer";
 export { StartPrivateGame };
 import SyncAnonymousStatus from "./sync_anonymous_status_reducer";
 export { SyncAnonymousStatus };
+import SyncAuthenticationAvatar from "./sync_authentication_avatar_reducer";
+export { SyncAuthenticationAvatar };
 import UpdateBotProgress from "./update_bot_progress_reducer";
 export { UpdateBotProgress };
 import UpdateProgress from "./update_progress_reducer";
@@ -101,12 +105,18 @@ import GamerecordRow from "./gamerecord_table";
 export { GamerecordRow };
 import GlobalstatsRow from "./globalstats_table";
 export { GlobalstatsRow };
+import MyPlayerSettingsRow from "./my_player_settings_table";
+export { MyPlayerSettingsRow };
 import PersonalrecordRow from "./personalrecord_table";
 export { PersonalrecordRow };
 import PlayerRow from "./player_table";
 export { PlayerRow };
+import PlayeravatarRow from "./playeravatar_table";
+export { PlayeravatarRow };
 import PlayerprogressRow from "./playerprogress_table";
 export { PlayerprogressRow };
+import PlayersettingsRow from "./playersettings_table";
+export { PlayersettingsRow };
 import XpgainRow from "./xpgain_table";
 export { XpgainRow };
 
@@ -151,10 +161,14 @@ import PersonalRecord from "./personal_record_type";
 export { PersonalRecord };
 import Player from "./player_type";
 export { Player };
+import PlayerAvatar from "./player_avatar_type";
+export { PlayerAvatar };
 import PlayerColor from "./player_color_type";
 export { PlayerColor };
 import PlayerProgress from "./player_progress_type";
 export { PlayerProgress };
+import PlayerSettings from "./player_settings_type";
+export { PlayerSettings };
 import ScoreCleaner from "./score_cleaner_type";
 export { ScoreCleaner };
 import XpGain from "./xp_gain_type";
@@ -417,6 +431,17 @@ const tablesSchema = __schema(
     ],
   }, PlayerRow),
   __table({
+    name: 'playeravatar',
+    indexes: [
+      { name: 'Identity', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+    ],
+    constraints: [
+      { name: 'playeravatar_Identity_key', constraint: 'unique', columns: ['identity'] },
+    ],
+  }, PlayeravatarRow),
+  __table({
     name: 'playerprogress',
     indexes: [
       { name: 'GameId', algorithm: 'btree', columns: [
@@ -437,6 +462,17 @@ const tablesSchema = __schema(
     ],
   }, PlayerprogressRow),
   __table({
+    name: 'playersettings',
+    indexes: [
+      { name: 'Identity', algorithm: 'btree', columns: [
+        'identity',
+      ] },
+    ],
+    constraints: [
+      { name: 'playersettings_Identity_key', constraint: 'unique', columns: ['identity'] },
+    ],
+  }, PlayersettingsRow),
+  __table({
     name: 'xpgain',
     indexes: [
       { name: 'Id', algorithm: 'btree', columns: [
@@ -453,6 +489,13 @@ const tablesSchema = __schema(
       { name: 'xpgain_Id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, XpgainRow),
+  __table({
+    name: 'myPlayerSettings',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyPlayerSettingsRow),
 );
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
@@ -468,10 +511,12 @@ const reducersSchema = __reducers(
   __reducerSchema("publishScore", PublishScore),
   __reducerSchema("rematch", Rematch),
   __reducerSchema("setPlayerName", SetPlayerName),
+  __reducerSchema("setUseAuthenticationAvatar", SetUseAuthenticationAvatar),
   __reducerSchema("StartCountdown", StartCountdown),
   __reducerSchema("StartGame", StartGame),
   __reducerSchema("startPrivateGame", StartPrivateGame),
   __reducerSchema("syncAnonymousStatus", SyncAnonymousStatus),
+  __reducerSchema("syncAuthenticationAvatar", SyncAuthenticationAvatar),
   __reducerSchema("UpdateBotProgress", UpdateBotProgress),
   __reducerSchema("updateProgress", UpdateProgress),
 );

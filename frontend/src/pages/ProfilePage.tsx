@@ -6,6 +6,7 @@ import { ProfileActivity } from "../components/profile/ProfileActivity";
 import { ProfileCareerStats } from "../components/profile/ProfileCareerStats";
 import { ProfileHeader } from "../components/profile/ProfileHeader";
 import { ProfilePersonalRecords } from "../components/profile/ProfilePersonalRecords";
+import { ProfileSettingsModal } from "../components/profile/ProfileSettingsModal";
 import { useDatabase } from "../contexts/SpacetimeContext";
 import { useAuth } from "../firebase/AuthContext";
 import { useProfileData } from "../hooks/useProfileData";
@@ -22,6 +23,7 @@ export function ProfilePage() {
     playerId,
   );
   const [isEditNameModalOpen, setIsEditNameModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const personalRecordSummary = useMemo(
     () => buildProfilePersonalRecords(personalRecords, gameRecords),
@@ -67,6 +69,7 @@ export function ProfilePage() {
             player={player}
             canEdit={isOwnProfile}
             onEdit={() => setIsEditNameModalOpen(true)}
+            onOpenSettings={() => setIsSettingsModalOpen(true)}
           />
 
           <ProfileCareerStats
@@ -101,6 +104,13 @@ export function ProfilePage() {
           currentName={player.name}
           onSave={saveName}
           onClose={() => setIsEditNameModalOpen(false)}
+        />
+      )}
+
+      {isOwnProfile && (
+        <ProfileSettingsModal
+          open={isSettingsModalOpen}
+          onClose={() => setIsSettingsModalOpen(false)}
         />
       )}
     </div>
