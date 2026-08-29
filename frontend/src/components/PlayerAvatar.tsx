@@ -36,18 +36,17 @@ function AvatarPhoto({ photoUrl, size, fallback }: AvatarPhotoProps) {
 
   return (
     <div
-      className="relative overflow-hidden rounded-full"
+      className="relative overflow-hidden rounded-full bg-muted"
       style={{ width: size, height: size }}
     >
-      {status === "loading" && <div className="absolute inset-0 bg-muted" />}
       <img
         src={photoUrl}
         alt=""
         aria-hidden
         width={size}
         height={size}
-        className={`rounded-full object-cover ${
-          status === "loaded" ? "visible" : "invisible"
+        className={`rounded-full object-cover transition-opacity duration-200 motion-reduce:transition-none ${
+          status === "loaded" ? "opacity-100" : "opacity-0"
         }`}
         referrerPolicy="no-referrer"
         onLoad={() => setStatus("loaded")}
