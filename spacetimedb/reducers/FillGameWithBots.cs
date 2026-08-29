@@ -27,25 +27,17 @@ public static partial class Module
 
             int targetElo = humanPlayerElos.Count > 0 ? (int)humanPlayerElos.Average() : 1000;
 
-            var eligibleBots = GetEligibleBots(ctx, game.Value.GameMode, targetElo, args.GameId);
+            var selectedBots = SelectBots(ctx, game.Value.GameMode, targetElo, botsToAdd);
 
-            if (eligibleBots.Count == 0)
+            if (selectedBots.Count < botsToAdd)
             {
-                Log.Info($"No eligible bot players available to fill game {args.GameId}");
+                Log.Info($"Could only select {selectedBots.Count} of {botsToAdd} bots for game {args.GameId}");
                 return;
             }
 
-            var selectedBots = new List<Player>();
-            for (int i = 0; i < botsToAdd && eligibleBots.Count > 0; i++)
+            foreach (var selected in selectedBots)
             {
-                var botIndex = ctx.Rng.Next(eligibleBots.Count);
-                var selectedBot = eligibleBots[botIndex];
-                selectedBots.Add(selectedBot);
-                eligibleBots.RemoveAt(botIndex);
-            }
-
-            foreach (var selectedBot in selectedBots)
-            {
+                var selectedBot = selected.Bot;
                 ctx.Db.playerprogress.Insert(new PlayerProgress
                 {
                     Id = IdGenerator.Generate("pp_", ctx.Rng),
@@ -65,7 +57,7 @@ public static partial class Module
                     PlayerColor = GenerateRandomColor(ctx.Rng)
                 });
 
-                Log.Info($"Added bot {selectedBot.Name} (ELO: {GetBotElo(ctx, selectedBot.Identity, game.Value.GameMode)}) to game {args.GameId} (target ELO: {targetElo})");
+                Log.Info($"Added bot {selectedBot.Name} (ELO: {selected.Elo}) to game {args.GameId} (target ELO: {targetElo})");
             }
 
             var updatedGame = game.Value;

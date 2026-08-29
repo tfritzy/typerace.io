@@ -4,6 +4,9 @@ namespace StdbModule;
 
 public static partial class Module
 {
+    private const int INITIAL_PLAYER_ELO = 800;
+    private const int INITIAL_BOT_ELO = 1000;
+
     private static int UpdatePlayerElo(ReducerContext ctx, Identity playerId, Game game, int placement)
     {
         if (game.GameType == GameType.Private || game.GameType == GameType.Practice)
@@ -49,15 +52,20 @@ public static partial class Module
             return elo;
         }
 
+        var player = ctx.Db.player.Identity.Find(playerId);
+        var initialElo = player != null && player.Value.IsBot
+            ? INITIAL_BOT_ELO
+            : INITIAL_PLAYER_ELO;
+
         var newElo = ctx.Db.elo.Insert(new Elo
         {
             Id = IdGenerator.Generate("elo_", ctx.Rng),
             PlayerId = playerId,
             GameMode = gameMode,
-            Rating = 1000
+            Rating = initialElo
         });
 
-        Log.Info($"Created initial ELO for player {playerId} in mode {gameMode}: 1000");
+        Log.Info($"Created initial ELO for player {playerId} in mode {gameMode}: {initialElo}");
         return newElo;
     }
 
