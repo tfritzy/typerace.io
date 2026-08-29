@@ -67,7 +67,7 @@ export function ProfileHeader({
 
           <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
             <span className="whitespace-nowrap text-xs font-medium text-muted-foreground sm:text-sm">
-              Level {player.level}
+              Level {player.isBot ? 1 : player.level}
             </span>
             <span className="whitespace-nowrap font-mono text-xs tabular-nums text-muted-foreground sm:text-sm">
               {player.xp}/{player.xpRequiredForNextLevel}

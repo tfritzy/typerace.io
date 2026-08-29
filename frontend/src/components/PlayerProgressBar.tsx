@@ -79,7 +79,7 @@ export const PlayerProgressBar = memo(
               : "opacity-100 animate-[slideInFromLeft_0.5s_ease-out]"
           }`}
         >
-          {isLoading || isAnonymous ? (
+          {isLoading || isAnonymous || isBot ? (
             <PlayerAvatar
               key="avatar"
               size={40}
@@ -137,7 +137,7 @@ export const PlayerProgressBar = memo(
                       )}
                     </div>
                     <span className="text-xs font-medium text-muted-foreground">
-                      Lvl {level}
+                      Lvl {isBot ? 1 : level}
                     </span>
                   </>
                 )}
