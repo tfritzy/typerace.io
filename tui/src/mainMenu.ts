@@ -2,6 +2,7 @@ import { BoxRenderable, type CliRenderer } from "@opentui/core";
 import { DbConnection } from "../module_bindings";
 import { TypeBox } from "./typebox";
 import { PlayerProgress } from "./stdb";
+import { startupPhrases } from "./constants";
 
 export class MainMenu {
   private screen: BoxRenderable;
@@ -26,7 +27,7 @@ export class MainMenu {
     this.typeBox = new TypeBox(
       renderer,
       this.screen,
-      "Hell",
+      startupPhrases[Math.floor(Math.random() * startupPhrases.length)],
       () => {},
       () => {
         conn.reducers.joinGame({

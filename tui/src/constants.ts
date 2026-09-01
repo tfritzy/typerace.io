@@ -1,0 +1,16 @@
+export const startupPhrases = [
+    "glhf",
+    "glgl",
+    "let's go",
+    "ready to plunder",
+    "systems primed",
+    "bring it",
+    "oh, it's on",
+    "let's do this",
+    "it's go time",
+    "put me in coach",
+    "you're on",
+    "lock and load",
+    "let's roll",
+    "dropping the hammer",
+  ]

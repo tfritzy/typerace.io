@@ -2,6 +2,7 @@ import { BoxRenderable, CliRenderer } from "@opentui/core";
 import { ResultBox } from "./resultBox";
 import { Game, PlayerProgress } from "../stdb";
 import { WpmChart } from "./wpmChart";
+import { formatTime } from "../util/formatTime";
 
 export class ResultsView {
   private screen: BoxRenderable;
@@ -102,7 +103,7 @@ export class ResultsView {
   public updateOwnPlayerProgress(pp: PlayerProgress) {
     this.placeBox.setText(this.formatPlace(pp.placement), pp.placement <= 1);
     this.wpmBox.setText(pp.wpm.toFixed(0), pp.wpm >= 100);
-    this.timeBox.setText(pp.time.toLocaleString(), pp.placement <= 1);
+    this.timeBox.setText(formatTime(Number(pp.time) / 1000), pp.placement <= 1);
     this.accuracyBox.setText("100%", true);
     this.wpmChart.updatePlayerProgress(pp);
   }
