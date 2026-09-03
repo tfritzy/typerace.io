@@ -47,7 +47,7 @@ describe("getWordAccuracyBlocks", () => {
 });
 
 describe("formatRaceResultForClipboard", () => {
-  it("formats a compact daily-game-style result without placement", () => {
+  it("formats a compact daily-game-style result with placement", () => {
     const playerProgress = {
       placement: 1,
       progressIndex: 7,
@@ -72,8 +72,7 @@ describe("formatRaceResultForClipboard", () => {
       }),
     ).toBe(
       [
-        "⌨️ typerace.io",
-        "",
+        "🏆 1st place",
         "⚡ 1 wpm",
         "🏹 100% accuracy",
         "⏱️ 01:14.03",
@@ -109,7 +108,8 @@ describe("formatRaceResultForClipboard", () => {
       modeTag: "EnglishQuotes",
     });
 
-    expect(result).toContain("⌨️ typerace.io\n");
+    expect(result).not.toContain("⌨️ typerace.io");
+    expect(result).toContain("🏆 1st place\n");
     expect(result).toContain(
       "\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F} 2 words",
     );

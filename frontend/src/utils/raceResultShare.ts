@@ -1,5 +1,5 @@
 import type { PlayerProgress } from "../types/stdb";
-import { formatShareTime } from "./formatters";
+import { formatShareTime, getOrdinalPlacement } from "./formatters";
 import { Language, getLanguageInfoFromMode } from "./modes";
 import { getPhraseLength } from "./phrase";
 import {
@@ -114,8 +114,7 @@ export function formatRaceResultForClipboard({
   const blocks = getWordAccuracyBlocks(phrase, playerProgress.characterHistory);
 
   return [
-    "⌨️ typerace.io",
-    "",
+    `🏆 ${getOrdinalPlacement(playerProgress.placement)} place`,
     `⚡ ${finalWpm} wpm`,
     `🏹 ${accuracy}% accuracy`,
     `⏱️ ${raceTime}`,
