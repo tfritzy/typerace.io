@@ -4,17 +4,17 @@ import { formatStopwatchTime, getOrdinalPlacement } from "../utils/formatters";
 import { memo } from "react";
 import { getTranslations } from "../utils/translations";
 
-interface PlayerStatsRowProps {
+interface RaceStatsRowProps {
   playerProgress: PlayerProgress;
   raceStartTimestamp: bigint;
-  placement: number;
+  isFinished: boolean;
 }
 
 const STAT_CARD_CLASS =
   "flex min-w-0 flex-col items-center justify-center rounded-lg border border-border bg-card p-3 transition-all duration-300";
 
-export const PlayerStatsRow = memo(
-  ({ playerProgress, raceStartTimestamp, placement }: PlayerStatsRowProps) => {
+export const RaceStatsRow = memo(
+  ({ playerProgress, raceStartTimestamp, isFinished }: RaceStatsRowProps) => {
     const finalWpm = getFinalWpm(playerProgress);
     const raceTime = getRaceTime(playerProgress);
     const accuracy = getAccuracy(
@@ -23,9 +23,10 @@ export const PlayerStatsRow = memo(
     );
     const t = getTranslations();
 
-    const isFirstPlace = placement === 1;
-    const isPerfectAccuracy = accuracy === 100;
-    const isHighWpm = finalWpm >= 100;
+    const isFirstPlace = isFinished && playerProgress.placement === 1;
+    const isPerfectAccuracy = isFinished && accuracy === 100;
+    const isHighWpm = isFinished && finalWpm >= 100;
+    const unavailableFigure = "–";
 
     return (
       <div className="mb-3 grid min-h-[90px] grid-cols-2 gap-3 sm:grid-cols-4">
@@ -38,7 +39,9 @@ export const PlayerStatsRow = memo(
           <div
             className={`text-4xl font-bold leading-none font-mono ${isFirstPlace ? "text-accent-primary" : "text-secondary-foreground"}`}
           >
-            {getOrdinalPlacement(placement)}
+            {isFinished
+              ? getOrdinalPlacement(playerProgress.placement)
+              : unavailableFigure}
           </div>
         </div>
 
@@ -51,7 +54,7 @@ export const PlayerStatsRow = memo(
           <div
             className={`text-4xl font-bold leading-none font-mono ${isHighWpm ? "text-accent-primary" : "text-secondary-foreground"}`}
           >
-            {Math.round(finalWpm)}
+            {isFinished ? Math.round(finalWpm) : unavailableFigure}
           </div>
         </div>
 
@@ -64,7 +67,7 @@ export const PlayerStatsRow = memo(
           <div
             className={`text-4xl font-bold leading-none font-mono ${isFirstPlace ? "text-accent-primary" : "text-secondary-foreground"}`}
           >
-            {formatStopwatchTime(raceTime)}
+            {isFinished ? formatStopwatchTime(raceTime) : unavailableFigure}
           </div>
         </div>
 
@@ -77,7 +80,7 @@ export const PlayerStatsRow = memo(
           <div
             className={`text-4xl font-bold leading-none font-mono ${isPerfectAccuracy ? "text-accent-primary" : "text-secondary-foreground"}`}
           >
-            {Math.round(accuracy)}%
+            {isFinished ? `${Math.round(accuracy)}%` : unavailableFigure}
           </div>
         </div>
       </div>
@@ -85,4 +88,4 @@ export const PlayerStatsRow = memo(
   },
 );
 
-PlayerStatsRow.displayName = "PlayerStatsRow";
+RaceStatsRow.displayName = "RaceStatsRow";

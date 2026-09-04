@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import {
   useEffect,
   useCallback,
@@ -14,8 +14,8 @@ import {
   type PlayerProgress,
 } from "../types/stdb";
 import { PlayerProgressBar } from "../components/PlayerProgressBar";
-import { PlayerStatsRow } from "../components/PlayerStatsRow";
-import { AllPlayersResults } from "../components/AllPlayersResults";
+import { RaceStatsRow } from "../components/RaceStatsRow";
+import { RaceResultsChart } from "../components/RaceResultsChart";
 import { RaceDetailsRow } from "../components/RaceDetailsRow";
 import { GamePageTypeBox } from "../components/GamePageTypeBox";
 import { GameLobby } from "../components/GameLobby";
@@ -39,6 +39,7 @@ const GAME_DATA_WAIT_TIMEOUT_MS = 10_000;
 export const GamePage = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { conn, status: databaseStatus, latencyDeltaMs } = useDatabase();
   const [hasFinished, setHasFinished] = useState(false);
   const [isWatchingReplay, setIsWatchingReplay] = useState(false);
@@ -48,6 +49,9 @@ export const GamePage = () => {
   const [gamePlayerProgress, setGamePlayerProgress] = useState<
     PlayerProgress[]
   >([]);
+  const [locallyViewedPlayerId, setLocallyViewedPlayerId] = useState<
+    string | null
+  >(null);
   const [hasNewPersonalRecord, setHasNewPersonalRecord] = useState(false);
   const latencyDeltaRef = useRef(latencyDeltaMs);
   const initProgress = useRef({
@@ -63,6 +67,7 @@ export const GamePage = () => {
   useEffect(() => {
     setGame(null);
     setGamePlayerProgress([]);
+    setLocallyViewedPlayerId(null);
     setHasNewPersonalRecord(false);
     setHasFinished(false);
     setIsWatchingReplay(false);
@@ -225,7 +230,11 @@ export const GamePage = () => {
         const currentGameProgress = Array.from(
           conn.db.playerprogress.iter(),
         ).filter((pp) => pp.gameId.toString() === gameId);
-        setGamePlayerProgress(currentGameProgress);
+        setGamePlayerProgress(
+          currentGameProgress.sort(
+            (left, right) => Number(left.createdAt - right.createdAt),
+          ),
+        );
         syncCurrentGamePersonalRecord();
       })
       .subscribe(subscriptionQueries);
@@ -292,6 +301,13 @@ export const GamePage = () => {
     startTransition(() => setHasFinished(true));
   }, []);
 
+  const handleWatchReplay = useCallback(() => setIsWatchingReplay(true), []);
+  const handleExitReplay = useCallback(() => setIsWatchingReplay(false), []);
+  const handleViewPlayer = useCallback(
+    (playerId: string) => setLocallyViewedPlayerId(playerId),
+    [],
+  );
+
   const handleKickPlayer = useCallback(
     (targetPlayerId: PlayerProgress["playerId"]) => {
       if (!conn || !gameId) return;
@@ -301,6 +317,9 @@ export const GamePage = () => {
   );
 
   const currentPlayerId = conn?.identity;
+  const currentPlayerProgress = gamePlayerProgress.find(
+    (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
+  );
 
   const otherPlayerProgress = useMemo(() => {
     if (!currentPlayerId || !game?.phrase) return [];
@@ -320,6 +339,18 @@ export const GamePage = () => {
 
     return () => clearTimeout(timeout);
   }, [databaseStatus, game, navigate]);
+
+  const getCopyResultsText = useCallback(() => {
+    if (!currentPlayerProgress || !game) return "";
+
+    return formatRaceResultForClipboard({
+      playerProgress: currentPlayerProgress,
+      raceStartTimestamp: game.racingStartedAt,
+      phrase: game.phrase,
+      modeTag: game.gameMode.tag,
+      gameUrl: `${window.location.origin}${window.location.pathname}?i=${gamePlayerProgress.indexOf(currentPlayerProgress)}`,
+    });
+  }, [currentPlayerProgress, game, gamePlayerProgress]);
 
   if (!game) {
     return (
@@ -347,9 +378,13 @@ export const GamePage = () => {
     game.owner?.isEqual(currentPlayerId);
   const isCountdown = game.state?.tag === "Countdown";
 
-  const currentPlayerProgress = gamePlayerProgress.find(
-    (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
-  );
+  const viewedPlayerProgress =
+    gamePlayerProgress.find(
+      (pp) => pp.playerId.toHexString() === locallyViewedPlayerId,
+    ) ??
+    gamePlayerProgress[Number(searchParams.get("i") ?? NaN)] ??
+    currentPlayerProgress ??
+    gamePlayerProgress[0];
   if (initProgress.current.gameId !== gameId) {
     initProgress.current.gameId = gameId ?? "";
     initProgress.current.playerProgressId = "";
@@ -379,15 +414,6 @@ export const GamePage = () => {
   const isOwner =
     currentPlayerId && game.owner && currentPlayerId.isEqual(game.owner);
   const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;
-  const getCopyResultsText = currentPlayerProgress
-    ? () =>
-        formatRaceResultForClipboard({
-          playerProgress: currentPlayerProgress,
-          raceStartTimestamp: game.racingStartedAt,
-          phrase: game.phrase,
-          modeTag: game.gameMode.tag,
-        })
-    : undefined;
 
   const progressBars: ReactNode[] = [];
   for (let index = 0; index < totalSlots; index++) {
@@ -415,7 +441,11 @@ export const GamePage = () => {
           phraseLength={game.phrase.length}
           identityHash={pp.playerId.toHexString()}
           playerPublicId={pp.playerPublicId}
-          isCurrentPlayer={isCurrentPlayer}
+          isEmphasized={
+            isRaceFinished
+              ? pp.id === viewedPlayerProgress?.id
+              : Boolean(isCurrentPlayer)
+          }
           wpm={pp.wpm}
           placement={pp.placement}
           isBot={pp.isBot}
@@ -425,6 +455,7 @@ export const GamePage = () => {
               ? () => handleKickPlayer(pp.playerId)
               : undefined
           }
+          onClick={isRaceFinished ? handleViewPlayer : undefined}
           playerColorTag={isCurrentPlayer ? undefined : pp.playerColor?.tag}
         />
       </div>,
@@ -442,8 +473,10 @@ export const GamePage = () => {
           players={gamePlayerProgress}
           raceStartTimestamp={game.racingStartedAt}
           allowedErrors={game.allowedErrors}
-          initialPlayerId={currentPlayerId?.toHexString()}
-          onExit={() => setIsWatchingReplay(false)}
+          viewedPlayerId={
+            viewedPlayerProgress?.playerId.toHexString() ?? ""
+          }
+          onExit={handleExitReplay}
         />
       );
     } else {
@@ -455,18 +488,26 @@ export const GamePage = () => {
             attribution={game.attribution}
             isPersonalRecord={hasNewPersonalRecord}
           />
-          {currentPlayerProgress && (
-            <PlayerStatsRow
-              playerProgress={currentPlayerProgress}
-              raceStartTimestamp={game.racingStartedAt}
-              placement={currentPlayerProgress.placement}
-            />
+          {viewedPlayerProgress && (
+            <>
+              <RaceStatsRow
+                playerProgress={viewedPlayerProgress}
+                raceStartTimestamp={game.racingStartedAt}
+                isFinished={
+                  viewedPlayerProgress.progressIndex >= game.phrase.length
+                }
+              />
+              <div className="mb-3 rounded-lg border border-border bg-card p-3">
+                <RaceResultsChart
+                  playerProgress={viewedPlayerProgress}
+                  raceStartTimestamp={game.racingStartedAt}
+                  isCurrentPlayer={
+                    viewedPlayerProgress === currentPlayerProgress
+                  }
+                />
+              </div>
+            </>
           )}
-          <AllPlayersResults
-            allPlayerProgress={gamePlayerProgress}
-            raceStartTimestamp={game.racingStartedAt}
-            initialSelectedPlayerId={currentPlayerProgress?.playerId.toHexString()}
-          />
           <ActionBar
             mode={game.gameMode}
             gameType={actionBarGameType}
@@ -474,8 +515,10 @@ export const GamePage = () => {
             rematchDisabled={rematchDisabled}
             conn={conn || undefined}
             isParticipant={isMemberOfRace}
-            onWatchReplay={() => setIsWatchingReplay(true)}
-            getCopyResultsText={getCopyResultsText}
+            onWatchReplay={handleWatchReplay}
+            getCopyResultsText={
+              currentPlayerProgress ? getCopyResultsText : undefined
+            }
           />
         </div>
       );

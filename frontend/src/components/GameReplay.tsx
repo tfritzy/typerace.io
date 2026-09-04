@@ -10,7 +10,6 @@ import {
   getReplayProgress,
 } from "../utils/replayTimeline";
 import { GhostCursor } from "./GhostCursor";
-import { PlayerAvatar } from "./PlayerAvatar";
 import { TypeBox } from "./TypeBox";
 
 type GameReplayProps = {
@@ -19,7 +18,7 @@ type GameReplayProps = {
   players: PlayerProgress[];
   raceStartTimestamp: bigint;
   allowedErrors: number;
-  initialPlayerId?: string;
+  viewedPlayerId: string;
   onExit: () => void;
 };
 
@@ -35,7 +34,7 @@ export function GameReplay({
   players,
   raceStartTimestamp,
   allowedErrors,
-  initialPlayerId,
+  viewedPlayerId,
   onExit,
 }: GameReplayProps) {
   const { conn } = useDatabase();
@@ -45,12 +44,6 @@ export function GameReplay({
     () => buildReplayTimeline(players, raceStartTimestamp),
     [players, raceStartTimestamp],
   );
-  const defaultPlayerId = players.some(
-    (player) => player.playerId.toHexString() === initialPlayerId,
-  )
-    ? initialPlayerId!
-    : (players[0]?.playerId.toHexString() ?? "");
-  const [selectedPlayerId, setSelectedPlayerId] = useState(defaultPlayerId);
   const [inputs, setInputs] = useState(() => createEmptyInputs(players));
   const [replayNumber, setReplayNumber] = useState(0);
   const inputsRef = useRef(inputs);
@@ -122,9 +115,9 @@ export function GameReplay({
     return () => cancelAnimationFrame(frameId);
   }, [phrase, replayNumber, timeline]);
 
-  const selectedInput = inputs[selectedPlayerId] ?? "";
+  const selectedInput = inputs[viewedPlayerId] ?? "";
   const selectedPlayer = players.find(
-    (player) => player.playerId.toHexString() === selectedPlayerId,
+    (player) => player.playerId.toHexString() === viewedPlayerId,
   );
   const isSelectedCurrentPlayer = !!(
     currentPlayerId && selectedPlayer?.playerId.isEqual(currentPlayerId)
@@ -153,32 +146,6 @@ export function GameReplay({
           <RotateCcw size={16} />
           {translations.replay}
         </button>
-        <div className="ml-auto flex flex-wrap justify-end gap-2">
-          {players.map((player) => {
-            const playerId = player.playerId.toHexString();
-            const isSelected = playerId === selectedPlayerId;
-            return (
-              <button
-                type="button"
-                key={playerId}
-                onClick={() => setSelectedPlayerId(playerId)}
-                className={`inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-semibold transition-colors ${
-                  isSelected
-                    ? "bg-secondary text-secondary-foreground"
-                    : "bg-card text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <PlayerAvatar
-                  size={22}
-                  identity={playerId}
-                  playerColorTag={player.playerColor?.tag}
-                  isBot={player.isBot}
-                />
-                {player.playerName}
-              </button>
-            );
-          })}
-        </div>
       </div>
 
       <div className="text-2xl leading-[1.6]">
@@ -195,7 +162,7 @@ export function GameReplay({
       </div>
 
       {players
-        .filter((player) => player.playerId.toHexString() !== selectedPlayerId)
+        .filter((player) => player.playerId.toHexString() !== viewedPlayerId)
         .map((player) => {
           const playerId = player.playerId.toHexString();
           const isCurrentPlayer = !!(
