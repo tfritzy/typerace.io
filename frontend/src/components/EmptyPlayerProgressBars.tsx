@@ -12,7 +12,7 @@ export function EmptyPlayerProgressBars({ count }: { count: number }) {
         phraseLength={1}
         identityHash={`loading-${index}`}
         playerPublicId=""
-        isCurrentPlayer={false}
+        isEmphasized={false}
         isLoading
       />
     </div>

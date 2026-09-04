@@ -1,7 +1,15 @@
 import { PlayerAvatar } from "./PlayerAvatar";
 import { Bot, X } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
-import { memo, useMemo, useState, useEffect, useCallback } from "react";
+import {
+  memo,
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+  type KeyboardEvent,
+  type MouseEvent,
+} from "react";
 import { getPlayerProgressGradient } from "../utils/colorMapping";
 import { getInitialTheme } from "../utils/themes";
 import { getLanguageFromSlug } from "@/utils/modes";
@@ -13,13 +21,14 @@ type PlayerProgressBarProps = {
   phraseLength: number;
   identityHash: string;
   playerPublicId: string;
-  isCurrentPlayer?: boolean;
+  isEmphasized: boolean;
   isLoading?: boolean;
   wpm?: number;
   placement?: number;
   isBot?: boolean;
   isAnonymous?: boolean;
   onKick?: () => void;
+  onClick?: (playerId: string) => void;
   playerColorTag?: string;
 };
 
@@ -31,13 +40,14 @@ export const PlayerProgressBar = memo(
     phraseLength,
     identityHash,
     playerPublicId,
-    isCurrentPlayer = false,
+    isEmphasized,
     isLoading = false,
     wpm,
     placement,
     isBot = false,
     isAnonymous = false,
     onKick,
+    onClick,
     playerColorTag,
   }: PlayerProgressBarProps) => {
     const progressPercentage = (progressIndex / phraseLength) * 100;
@@ -53,6 +63,31 @@ export const PlayerProgressBar = memo(
       window.addEventListener("themechange", onThemeChange);
       return () => window.removeEventListener("themechange", onThemeChange);
     }, [onThemeChange]);
+
+    const handleClick = useCallback(
+      () => onClick?.(identityHash),
+      [identityHash, onClick],
+    );
+    const handleKeyDown = useCallback(
+      (event: KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handleClick();
+        }
+      },
+      [handleClick],
+    );
+    const stopClickPropagation = useCallback(
+      (event: MouseEvent) => event.stopPropagation(),
+      [],
+    );
+    const handleKick = useCallback(
+      (event: MouseEvent) => {
+        event.stopPropagation();
+        onKick?.();
+      },
+      [onKick],
+    );
 
     const progressGradient = useMemo(
       () =>
@@ -71,7 +106,17 @@ export const PlayerProgressBar = memo(
     }
 
     return (
-      <div className="box w-full rounded-lg p-4 py-4 relative">
+      <div
+        role={onClick ? "button" : undefined}
+        tabIndex={onClick ? 0 : undefined}
+        aria-pressed={onClick ? isEmphasized : undefined}
+        aria-label={onClick ? `View ${name}` : undefined}
+        onClick={onClick ? handleClick : undefined}
+        onKeyDown={onClick ? handleKeyDown : undefined}
+        className={`box relative w-full rounded-lg p-4 py-4 transition-all ${
+          onClick ? "cursor-pointer hover:border-muted-foreground" : ""
+        }`}
+      >
         <div
           className={`w-full flex items-center gap-4 transition-all duration-500 ${
             isLoading
@@ -84,7 +129,7 @@ export const PlayerProgressBar = memo(
               key="avatar"
               size={40}
               identity={identityHash}
-              isHighlighted={isCurrentPlayer}
+              isHighlighted={isEmphasized}
               isLoading={isLoading}
               placement={placement}
               playerColorTag={playerColorTag}
@@ -94,13 +139,14 @@ export const PlayerProgressBar = memo(
             <Link
               key="avatar-link"
               to={`/profile/${playerPublicId}`}
+              onClick={stopClickPropagation}
               className="shrink-0"
             >
               <PlayerAvatar
                 key="avatar"
                 size={40}
                 identity={identityHash}
-                isHighlighted={isCurrentPlayer}
+                isHighlighted={isEmphasized}
                 isLoading={isLoading}
                 placement={placement}
                 playerColorTag={playerColorTag}
@@ -120,7 +166,7 @@ export const PlayerProgressBar = memo(
                   <>
                     <div className="flex items-center gap-1">
                       <span
-                        className={`text-sm font-semibold ${isCurrentPlayer ? "text-foreground" : "text-muted-foreground"}`}
+                        className={`text-sm font-semibold ${isEmphasized ? "text-foreground" : "text-muted-foreground"}`}
                       >
                         {name}
                       </span>
@@ -144,7 +190,7 @@ export const PlayerProgressBar = memo(
               </div>
               {!isLoading && wpm !== undefined && wpm > 0 && (
                 <span
-                  className={`text-sm font-semibold ${isCurrentPlayer ? "text-foreground" : "text-muted-foreground"}`}
+                  className={`text-sm font-semibold ${isEmphasized ? "text-foreground" : "text-muted-foreground"}`}
                 >
                   {speedLabel}
                 </span>
@@ -156,14 +202,14 @@ export const PlayerProgressBar = memo(
                 style={{
                   width: `${Math.min(100, progressPercentage)}%`,
                   background: progressGradient,
-                  opacity: isCurrentPlayer ? 1 : 0.35,
+                  opacity: isEmphasized ? 1 : 0.35,
                 }}
               />
             </div>
           </div>
           {onKick && (
             <button
-              onClick={onKick}
+              onClick={handleKick}
               className="absolute right-2 top-2 p-0.5 rounded-full bg-card text-muted-foreground opacity-50 hover:opacity-100 hover:text-foreground transition-all duration-200 cursor-pointer"
               aria-label="Kick player"
             >

@@ -10,7 +10,6 @@ import {
 } from "./wpmCalculator";
 
 const EVENT_SIZE_BYTES = 3;
-const SHARE_URL = "https://typerace.io";
 const ENGLAND_FLAG =
   "\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}";
 
@@ -19,6 +18,7 @@ type RaceResultShareOptions = {
   raceStartTimestamp: bigint;
   phrase: string;
   modeTag: string;
+  gameUrl: string;
 };
 
 function getCharacterWordIndexes(phrase: string): Array<number | undefined> {
@@ -100,6 +100,7 @@ export function formatRaceResultForClipboard({
   raceStartTimestamp,
   phrase,
   modeTag,
+  gameUrl,
 }: RaceResultShareOptions): string {
   const finalWpm = Math.round(getFinalWpm(playerProgress));
   const accuracy = Math.round(
@@ -122,6 +123,6 @@ export function formatRaceResultForClipboard({
     "",
     blocks,
     "",
-    SHARE_URL,
+    gameUrl,
   ].join("\n");
 }

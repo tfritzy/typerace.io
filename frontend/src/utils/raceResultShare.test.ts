@@ -69,6 +69,7 @@ describe("formatRaceResultForClipboard", () => {
         raceStartTimestamp: 0n,
         phrase: "cat dog",
         modeTag: "English500",
+        gameUrl: "https://typerace.io/game/game_123?i=2",
       }),
     ).toBe(
       [
@@ -80,7 +81,7 @@ describe("formatRaceResultForClipboard", () => {
         "",
         "🟩 🟩",
         "",
-        "https://typerace.io",
+        "https://typerace.io/game/game_123?i=2",
       ].join("\n"),
     );
   });
@@ -106,6 +107,7 @@ describe("formatRaceResultForClipboard", () => {
       raceStartTimestamp: 0n,
       phrase: "Be kind",
       modeTag: "EnglishQuotes",
+      gameUrl: "https://typerace.io/en/game/game_123?i=0",
     });
 
     expect(result).not.toContain("⌨️ typerace.io");
