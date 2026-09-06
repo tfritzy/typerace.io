@@ -38,7 +38,8 @@ function dayKey(date: Date): string {
 
 function getIntensity(count: number, maximum: number): 0 | 1 | 2 | 3 | 4 {
   if (count === 0 || maximum === 0) return 0;
-  return Math.min(4, Math.ceil((count / maximum) * 4)) as 1 | 2 | 3 | 4;
+  const normalizedCount = Math.log1p(count) / Math.log1p(maximum);
+  return Math.min(4, Math.ceil(normalizedCount * 4)) as 1 | 2 | 3 | 4;
 }
 
 export function buildActivityGrid(

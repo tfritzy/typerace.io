@@ -77,9 +77,9 @@ describe("buildActivityGrid", () => {
     );
   });
 
-  it("scales activity intensity against the busiest day", () => {
+  it("scales activity intensity logarithmically against the busiest day", () => {
     const now = new Date(2026, 8, 5, 12);
-    const records = [1, 2, 3, 4].flatMap((count, dayOffset) => (
+    const records = [1, 10, 100, 1_000].flatMap((count, dayOffset) => (
       Array.from({ length: count }, () => (
         race(new Date(2026, 8, 1 + dayOffset, 12))
       ))
