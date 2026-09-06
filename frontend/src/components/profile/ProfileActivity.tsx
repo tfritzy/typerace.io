@@ -10,6 +10,7 @@ import { RecentGames } from "../RecentGames";
 import { Select } from "../Select";
 import { WpmChart } from "../WpmChart";
 import { WpmDistributionChart } from "../WpmDistributionChart";
+import { ProfileActivityGrid } from "./ProfileActivityGrid";
 
 interface ProfileActivityProps {
   gameRecords: readonly GameRecord[];
@@ -45,6 +46,13 @@ export function ProfileActivity({ gameRecords }: ProfileActivityProps) {
 
   return (
     <div className="flex min-w-0 flex-col gap-8">
+      <section>
+        <h2 className="mb-2 ml-1 text-base font-semibold text-secondary-foreground">
+          Activity
+        </h2>
+        <ProfileActivityGrid gameRecords={gameRecords} />
+      </section>
+
       <section>
         <div className="mb-2 grid grid-cols-[auto_minmax(0,1fr)] items-end gap-4 px-1">
           <h2 className="text-base font-semibold text-secondary-foreground">
