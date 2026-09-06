@@ -48,6 +48,34 @@ export type TypeBoxProgressCallback = (
   eventType: TypeBoxProgressEventType,
 ) => void;
 
+type InputAnalysis = {
+  completedThrough: number;
+  errorsUsed: number;
+  errorsToFix: number;
+  requiresFixes: boolean;
+  canComplete: boolean;
+  reportedProgress: number;
+};
+
+type ScanState = {
+  committedThrough: number;
+  committedErrors: number;
+  pendingErrors: number;
+  typedErrors: number;
+  firstDisallowedError: number | null;
+  boundaryRequiresFixes: boolean;
+};
+
+type AnalysisCache = {
+  phrase: string;
+  input: string;
+  totalAllowedErrors: number;
+  scanState: ScanState;
+  analysis: InputAnalysis;
+};
+
+let analysisCache: AnalysisCache | undefined;
+
 export type TypeBoxChangeResult = {
   inputCorrection: string | null;
   value: string;
@@ -63,84 +91,139 @@ function getSharedPrefixLength(left: string, right: string) {
   return index;
 }
 
+function createScanState(): ScanState {
+  return {
+    committedThrough: 0,
+    committedErrors: 0,
+    pendingErrors: 0,
+    typedErrors: 0,
+    firstDisallowedError: null,
+    boundaryRequiresFixes: false,
+  };
+}
+
+function scanCharacter(
+  state: ScanState,
+  phrase: string,
+  input: string,
+  index: number,
+  allowedErrors: number,
+) {
+  if (index >= phrase.length) {
+    state.typedErrors++;
+  } else {
+    if (input[index] !== phrase[index]) {
+      state.typedErrors++;
+      state.pendingErrors++;
+    }
+
+    if (
+      !state.boundaryRequiresFixes &&
+      phrase[index] === " " &&
+      input[index] === " "
+    ) {
+      if (
+        state.committedErrors + state.pendingErrors <=
+        allowedErrors
+      ) {
+        state.committedErrors += state.pendingErrors;
+        state.pendingErrors = 0;
+        state.committedThrough = index + 1;
+      } else {
+        state.boundaryRequiresFixes = true;
+      }
+    }
+  }
+
+  if (
+    state.firstDisallowedError === null &&
+    state.typedErrors > allowedErrors
+  ) {
+    state.firstDisallowedError = index;
+  }
+}
+
+function buildInputAnalysis(
+  state: ScanState,
+  phraseLength: number,
+  inputLength: number,
+  allowedErrors: number,
+): InputAnalysis {
+  const canComplete =
+    inputLength === phraseLength &&
+    !state.boundaryRequiresFixes &&
+    state.committedErrors + state.pendingErrors <= allowedErrors;
+  const requiresFixes =
+    state.boundaryRequiresFixes ||
+    (!canComplete && inputLength >= phraseLength);
+
+  return {
+    completedThrough: canComplete
+      ? phraseLength
+      : state.committedThrough,
+    errorsUsed: canComplete
+      ? state.committedErrors + state.pendingErrors
+      : state.committedErrors,
+    errorsToFix: Math.max(0, state.typedErrors - allowedErrors),
+    requiresFixes,
+    canComplete,
+    reportedProgress:
+      state.firstDisallowedError ??
+      (requiresFixes && inputLength >= phraseLength
+        ? Math.max(0, phraseLength - 1)
+        : Math.min(inputLength, phraseLength)),
+  };
+}
+
 export function analyzeTypeBoxInput(
   phrase: string,
   input: string,
   totalAllowedErrors: number,
-) {
-  let completedThrough = 0;
+): InputAnalysis {
+  if (
+    analysisCache?.phrase === phrase &&
+    analysisCache.input === input &&
+    analysisCache.totalAllowedErrors === totalAllowedErrors
+  ) {
+    return analysisCache.analysis;
+  }
+
+  // Normal typing appends one character. Reuse the scanner state in that case;
+  // edits elsewhere in the input fall back to a complete scan.
+  let scanState: ScanState;
+  let startIndex: number;
+  if (
+    analysisCache?.phrase === phrase &&
+    analysisCache.totalAllowedErrors === totalAllowedErrors &&
+    input.length === analysisCache.input.length + 1 &&
+    input.startsWith(analysisCache.input)
+  ) {
+    scanState = analysisCache.scanState;
+    startIndex = input.length - 1;
+  } else {
+    scanState = createScanState();
+    startIndex = 0;
+  }
   const allowedErrors = Math.max(0, totalAllowedErrors);
-  let errorsUsed = 0;
-  let pendingErrors = 0;
-  let typedErrors = 0;
-  let firstDisallowedError = -1;
-  let boundaryRequiresFixes = false;
-  const scannedLength = Math.min(input.length, phrase.length);
 
-  for (let index = 0; index < scannedLength; index++) {
-    if (input[index] !== phrase[index]) {
-      typedErrors++;
-      pendingErrors++;
-      if (
-        firstDisallowedError < 0 &&
-        typedErrors > allowedErrors
-      ) {
-        firstDisallowedError = index;
-      }
-    }
-
-    if (
-      !boundaryRequiresFixes &&
-      phrase[index] === " " &&
-      input[index] === " "
-    ) {
-      if (errorsUsed + pendingErrors <= allowedErrors) {
-        errorsUsed += pendingErrors;
-        pendingErrors = 0;
-        completedThrough = index + 1;
-      } else {
-        boundaryRequiresFixes = true;
-      }
-    }
+  for (let index = startIndex; index < input.length; index++) {
+    scanCharacter(scanState, phrase, input, index, allowedErrors);
   }
 
-  for (let index = phrase.length; index < input.length; index++) {
-    typedErrors++;
-    if (
-      firstDisallowedError < 0 &&
-      typedErrors > allowedErrors
-    ) {
-      firstDisallowedError = index;
-    }
-  }
-
-  const canComplete =
-    input.length === phrase.length &&
-    !boundaryRequiresFixes &&
-    errorsUsed + pendingErrors <= allowedErrors;
-  if (canComplete) {
-    errorsUsed += pendingErrors;
-    completedThrough = phrase.length;
-  }
-
-  const requiresFixes =
-    boundaryRequiresFixes ||
-    (!canComplete && input.length >= phrase.length);
-  const reportedProgress =
-    firstDisallowedError >= 0
-      ? firstDisallowedError
-      : requiresFixes && input.length >= phrase.length
-        ? Math.max(0, phrase.length - 1)
-        : Math.min(input.length, phrase.length);
-
-  return {
-    completedThrough,
-    errorsUsed,
-    errorsToFix: Math.max(0, typedErrors - allowedErrors),
-    requiresFixes,
-    canComplete,
-    reportedProgress,
+  const analysis = buildInputAnalysis(
+    scanState,
+    phrase.length,
+    input.length,
+    allowedErrors,
+  );
+  analysisCache = {
+    phrase,
+    input,
+    totalAllowedErrors,
+    scanState,
+    analysis,
   };
+  return analysis;
 }
 
 function getReportedProgress(
@@ -182,13 +265,12 @@ export function processTypeBoxChange(
     };
   }
 
-  const sharedPrefixLength = getSharedPrefixLength(
-    previousValue,
-    rawValue,
-  );
   const isPureAppend =
-    sharedPrefixLength === previousValue.length &&
-    rawValue.length > previousValue.length;
+    rawValue.length > previousValue.length &&
+    rawValue.startsWith(previousValue);
+  const sharedPrefixLength = isPureAppend
+    ? previousValue.length
+    : getSharedPrefixLength(previousValue, rawValue);
   if (!isPureAppend) {
     const previousAnalysis = analyzeTypeBoxInput(
       phrase,

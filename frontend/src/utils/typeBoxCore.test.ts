@@ -43,6 +43,48 @@ describe("word progress", () => {
 });
 
 describe("allowed errors", () => {
+  it("preserves analysis while incrementally appending characters", () => {
+    const inputs = [
+      "",
+      "o",
+      "ox",
+      "oxe",
+      "oxe ",
+      "oxe t",
+      "oxe tx",
+      "oxe txo",
+      "oxe txo!",
+    ];
+    const analyses = inputs.map((input) =>
+      analyzeTypeBoxInput("one two", input, 1),
+    );
+
+    expect(analyses[4]).toEqual({
+      completedThrough: 4,
+      errorsUsed: 1,
+      errorsToFix: 0,
+      requiresFixes: false,
+      canComplete: false,
+      reportedProgress: 4,
+    });
+    expect(analyses[7]).toEqual({
+      completedThrough: 4,
+      errorsUsed: 1,
+      errorsToFix: 1,
+      requiresFixes: true,
+      canComplete: false,
+      reportedProgress: 5,
+    });
+    expect(analyses[8]).toEqual({
+      completedThrough: 4,
+      errorsUsed: 1,
+      errorsToFix: 2,
+      requiresFixes: true,
+      canComplete: false,
+      reportedProgress: 5,
+    });
+  });
+
   it("keeps errors pending, ignores corrected errors, and commits at later boundaries", () => {
     const pending = processChange("hello world", "hexl", "hexlo", 2);
     expect(pending).toMatchObject({
