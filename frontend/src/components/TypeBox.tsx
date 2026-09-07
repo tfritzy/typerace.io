@@ -13,6 +13,7 @@ import {
   analyzeTypeBoxInput,
   processTypeBoxChange,
 } from "../utils/typeBoxCore";
+import { FocusWithin } from "./FocusWithin";
 
 const BLOCKED_CURSOR_KEYS = new Set([
   "ArrowLeft",
@@ -269,8 +270,8 @@ export const TypeBox = memo(forwardRef<TypeBoxRef, TypeBoxProps>(
       inputValueRef.current,
       totalAllowedErrors,
     );
-
     return (
+      <FocusWithin>
       <div
         className={`relative box-with-focus w-full px-6 py-3 cursor-text flex items-start ${inputState === "disabled-dimmed" ? "opacity-60" : ""}`}
         style={containerStyle}
@@ -325,6 +326,7 @@ export const TypeBox = memo(forwardRef<TypeBoxRef, TypeBoxProps>(
           )}
         </div>
       </div>
+      </FocusWithin>
     );
   },
 ));
