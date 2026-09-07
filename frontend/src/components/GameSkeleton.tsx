@@ -10,14 +10,16 @@ export function GameSkeleton({ playerCount = 3 }: { playerCount?: number }) {
           <div className="mb-3 grid gap-3">
             <EmptyPlayerProgressBars count={playerCount} />
           </div>
-          <div className="mt-6 min-h-[550px] text-2xl leading-[1.6] sm:mt-8">
-            <AllowedErrorsRow loading />
-            <TypeBox
-              phrase=""
-              inputState="disabled-dimmed"
-              cursorState="hidden"
-              height="430px"
-            />
+          <div className="h-[760px] sm:h-[668px] lg:h-[620px]">
+            <div className="mt-6 min-h-[550px] text-2xl leading-[1.6] sm:mt-8">
+              <AllowedErrorsRow loading />
+              <TypeBox
+                phrase=""
+                inputState="disabled-dimmed"
+                cursorState="hidden"
+                height="430px"
+              />
+            </div>
           </div>
         </div>
       </div>

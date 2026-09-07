@@ -31,6 +31,7 @@ function renderTypeBox(
           conn={null}
           onFinish={onFinish}
           raceStartsAt={null}
+          countdownComplete={false}
           totalAllowedErrors={allowedErrors}
           initialInput={initialInput}
         />

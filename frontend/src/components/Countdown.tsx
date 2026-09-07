@@ -3,39 +3,40 @@ import bufoLetsGo from "../assets/bufo-lets-goo.gif";
 
 interface CountdownProps {
   raceStartsAt: number | null;
+  countdownComplete: boolean;
   errorBorder?: boolean;
 }
 
 export const Countdown = ({
   raceStartsAt,
+  countdownComplete,
   errorBorder = false,
 }: CountdownProps) => {
-  const [cue, setCue] = useState<number | "go" | null>(null);
+  const [cue, setCue] = useState<number | null>(null);
 
   useEffect(() => {
     setCue(null);
-    if (raceStartsAt === null) return;
+    if (raceStartsAt === null || countdownComplete) return;
 
     const remainingMs = raceStartsAt - performance.now();
     const timers = [3, 2, 1].flatMap((count) => {
       const delayMs = remainingMs - count * 1000;
       return delayMs >= 0 ? [setTimeout(() => setCue(count), delayMs)] : [];
     });
-    timers.push(setTimeout(() => setCue("go"), Math.max(0, remainingMs)));
 
     return () => timers.forEach(clearTimeout);
-  }, [raceStartsAt]);
+  }, [countdownComplete, raceStartsAt]);
 
-  const isRacing = cue === "go";
+  const isRacing = countdownComplete && raceStartsAt !== null;
   const accent = errorBorder
     ? "var(--destructive)"
     : "var(--accent-primary)";
 
   return (
     <>
-      {(cue !== null || errorBorder) && (
+      {(cue !== null || isRacing || errorBorder) && (
         <div
-          key={cue}
+          key={isRacing ? "go" : cue}
           aria-hidden="true"
           data-error-border={errorBorder || undefined}
           style={{
@@ -55,7 +56,7 @@ export const Countdown = ({
         />
       )}
 
-      {typeof cue === "number" && (
+      {!isRacing && typeof cue === "number" && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
           <div
             key={cue}
@@ -70,17 +71,22 @@ export const Countdown = ({
         </div>
       )}
 
-      {isRacing && (
-        <div className="absolute top-0 left-0 pointer-events-none z-50 -translate-x-full -ml-1">
-          <img
-            src={bufoLetsGo}
-            alt=""
-            aria-hidden="true"
-            className="w-10 h-10 sm:w-14 sm:h-14"
-            style={{ animation: "countdownCelebrate 2s ease-out forwards" }}
-          />
-        </div>
-      )}
+      <div
+        aria-hidden="true"
+        className="absolute top-0 left-0 pointer-events-none z-50 -translate-x-full -ml-1"
+        style={{ visibility: isRacing ? "visible" : "hidden" }}
+      >
+        <img
+          src={bufoLetsGo}
+          alt=""
+          className="w-10 h-10 sm:w-14 sm:h-14"
+          style={{
+            animation: isRacing
+              ? "countdownCelebrate 2s ease-out forwards"
+              : undefined,
+          }}
+        />
+      </div>
 
       <style>{`
         @keyframes countdownPulse {

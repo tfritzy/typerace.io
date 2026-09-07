@@ -320,6 +320,10 @@ export const GamePage = () => {
   const currentPlayerProgress = gamePlayerProgress.find(
     (pp) => currentPlayerId && pp.playerId.isEqual(currentPlayerId),
   );
+  const hasCompletedRace = currentPlayerProgress
+    ? currentPlayerProgress.progressIndex >= (game?.phrase.length ?? Infinity)
+    : false;
+  const isRaceFinished = hasFinished || hasCompletedRace;
 
   const otherPlayerProgress = useMemo(() => {
     if (!currentPlayerId || !game?.phrase) return [];
@@ -402,15 +406,11 @@ export const GamePage = () => {
     );
   }
   const initialInput = initProgress.current.input;
-  const hasCompletedRace = currentPlayerProgress
-    ? currentPlayerProgress.progressIndex >= game.phrase.length
-    : false;
   const hasWonRace =
     currentPlayerProgress?.placement === 1 && (hasFinished || hasCompletedRace);
   const isMemberOfRace = !!currentPlayerProgress;
   const isDisabled =
     isInLobby || (isCountdown && !countdownComplete) || !currentPlayerProgress;
-  const isRaceFinished = hasFinished || hasCompletedRace;
   const isOwner =
     currentPlayerId && game.owner && currentPlayerId.isEqual(game.owner);
   const rematchDisabled = game.gameType?.tag === "Private" && !isOwner;
@@ -550,21 +550,28 @@ export const GamePage = () => {
         isParticipant={isMemberOfRace}
         cursorState={isMemberOfRace ? "auto" : "hidden"}
         raceStartsAt={raceStartsAt}
+        countdownComplete={countdownComplete}
       />
     );
   }
 
   return (
     <div className="relative flex-1 min-h-0 flex flex-col">
-      {hasWonRace && <WinnerConfetti key={gameId} />}
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4">
-        <div className="content-container w-full my-auto">
+        <div className="content-container relative w-full my-auto">
+          <WinnerConfetti key={gameId} active={hasWonRace} />
           <div
             className={`mb-3 grid gap-3 ${totalSlots > 3 ? "sm:grid-cols-2" : ""}`}
           >
             {progressBars}
           </div>
-          {gameContent}
+          {isLobby ? (
+            gameContent
+          ) : (
+            <div className="h-[760px] sm:h-[668px] lg:h-[620px]">
+              {gameContent}
+            </div>
+          )}
         </div>
       </div>
       {!isRaceFinished &&

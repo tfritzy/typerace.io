@@ -113,12 +113,12 @@ export const PlayerProgressBar = memo(
         aria-label={onClick ? `View ${name}` : undefined}
         onClick={onClick ? handleClick : undefined}
         onKeyDown={onClick ? handleKeyDown : undefined}
-        className={`box relative w-full rounded-lg p-4 py-4 transition-all ${
+        className={`box relative h-[78px] w-full rounded-lg p-4 py-4 transition-all ${
           onClick ? "cursor-pointer hover:border-muted-foreground" : ""
         }`}
       >
         <div
-          className={`w-full flex items-center gap-4 transition-all duration-500 ${
+          className={`flex h-11 w-full items-center gap-4 transition-all duration-500 ${
             isLoading
               ? "opacity-20"
               : "opacity-100 animate-[slideInFromLeft_0.5s_ease-out]"
@@ -155,18 +155,18 @@ export const PlayerProgressBar = memo(
             </Link>
           )}
 
-          <div className="flex-1 flex flex-col gap-2">
-            <div className="flex items-center gap-2 justify-between">
-              <div className="flex items-center gap-2">
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <div className="flex min-h-5 items-center justify-between gap-2">
+              <div className="flex min-w-0 flex-1 items-center gap-2">
                 {isLoading ? (
                   <span className="text-sm font-semibold text-muted-foreground">
                     Waiting...
                   </span>
                 ) : (
                   <>
-                    <div className="flex items-center gap-1">
+                    <div className="flex min-w-0 items-center gap-1">
                       <span
-                        className={`text-sm font-semibold ${isEmphasized ? "text-foreground" : "text-muted-foreground"}`}
+                        className={`truncate text-sm font-semibold ${isEmphasized ? "text-foreground" : "text-muted-foreground"}`}
                       >
                         {name}
                       </span>
@@ -182,19 +182,17 @@ export const PlayerProgressBar = memo(
                         </div>
                       )}
                     </div>
-                    <span className="text-xs font-medium text-muted-foreground">
+                    <span className="shrink-0 text-xs font-medium text-muted-foreground">
                       Lvl {isBot ? 1 : level}
                     </span>
                   </>
                 )}
               </div>
-              {!isLoading && wpm !== undefined && wpm > 0 && (
-                <span
-                  className={`text-sm font-semibold ${isEmphasized ? "text-foreground" : "text-muted-foreground"}`}
-                >
-                  {speedLabel}
-                </span>
-              )}
+              <span
+                className={`min-w-[5.25rem] shrink-0 text-right text-sm font-semibold ${speedLabel ? "visible" : "invisible"} ${isEmphasized ? "text-foreground" : "text-muted-foreground"}`}
+              >
+                {speedLabel || ""}
+              </span>
             </div>
             <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
               <div

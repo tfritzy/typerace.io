@@ -25,6 +25,7 @@ type GamePageTypeBoxProps = {
   isParticipant?: boolean;
   cursorState?: TypeBoxCursorState;
   raceStartsAt: number | null;
+  countdownComplete: boolean;
 };
 
 export const GamePageTypeBox = memo(
@@ -40,6 +41,7 @@ export const GamePageTypeBox = memo(
     isParticipant = true,
     cursorState = "auto",
     raceStartsAt,
+    countdownComplete,
   }: GamePageTypeBoxProps) => {
     const totalWords = useMemo(() => getWordCount(phrase), [phrase]);
     const [input, setInput] = useState(initialInput);
@@ -101,6 +103,7 @@ export const GamePageTypeBox = memo(
           />
           <Countdown
             raceStartsAt={raceStartsAt}
+            countdownComplete={countdownComplete}
             errorBorder={showFixWarning}
           />
         </div>
