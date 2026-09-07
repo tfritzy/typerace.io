@@ -41,6 +41,7 @@ export interface Translations {
   errorsAllowed: string;
   tooManyErrors: string;
   fixErrorCount: (count: number) => string;
+  focusTypeBoxPrompt: <T>(hotkey: T) => [string, T, string];
   startPrompt?: string;
 }
 
@@ -89,6 +90,7 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "You must fix all errors",
     fixErrorCount: (count) =>
       `You must fix ${count} ${count === 1 ? "error" : "errors"} to finish`,
+    focusTypeBoxPrompt: (hotkey) => ["Click or press ", hotkey, " to focus"],
     startPrompt: "Type!",
   },
   [Language.Spanish]: {
@@ -137,6 +139,11 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Debes corregir todos los errores",
     fixErrorCount: (count) =>
       `Debes corregir ${count} ${count === 1 ? "error" : "errores"} para terminar`,
+    focusTypeBoxPrompt: (hotkey) => [
+      "Haz clic o pulsa ",
+      hotkey,
+      " para enfocar",
+    ],
     startPrompt: "Escribe!",
   },
   [Language.French]: {
@@ -184,6 +191,11 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Vous devez corriger toutes les erreurs",
     fixErrorCount: (count) =>
       `Vous devez corriger ${count} ${count === 1 ? "erreur" : "erreurs"} pour terminer`,
+    focusTypeBoxPrompt: (hotkey) => [
+      "Cliquez ou appuyez sur ",
+      hotkey,
+      " pour activer",
+    ],
     startPrompt: "Tapez!",
   },
   [Language.German]: {
@@ -231,6 +243,11 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Du musst alle Fehler korrigieren",
     fixErrorCount: (count) =>
       `Du musst ${count} Fehler korrigieren, um abzuschließen`,
+    focusTypeBoxPrompt: (hotkey) => [
+      "Klicke oder drücke ",
+      hotkey,
+      " zum Fokussieren",
+    ],
     startPrompt: "Tippe!",
   },
   [Language.Italian]: {
@@ -278,6 +295,11 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Devi correggere tutti gli errori",
     fixErrorCount: (count) =>
       `Devi correggere ${count} ${count === 1 ? "errore" : "errori"} per terminare`,
+    focusTypeBoxPrompt: (hotkey) => [
+      "Fai clic o premi ",
+      hotkey,
+      " per attivare",
+    ],
     startPrompt: "Digita!",
   },
   [Language.Portuguese]: {
@@ -326,6 +348,11 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Você deve corrigir todos os erros",
     fixErrorCount: (count) =>
       `Você deve corrigir ${count} ${count === 1 ? "erro" : "erros"} para terminar`,
+    focusTypeBoxPrompt: (hotkey) => [
+      "Clique ou pressione ",
+      hotkey,
+      " para focar",
+    ],
     startPrompt: "Digite!",
   },
   [Language.Ukrainian]: {
@@ -374,6 +401,11 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Ви маєте виправити всі помилки",
     fixErrorCount: (count) =>
       `Ви маєте виправити ${count} ${count === 1 ? "помилку" : "помилки"}, щоб завершити`,
+    focusTypeBoxPrompt: (hotkey) => [
+      "Клацніть або натисніть ",
+      hotkey,
+      ", щоб активувати поле",
+    ],
   },
   [Language.Arabic]: {
     publicMatch: "عامة",
@@ -419,6 +451,11 @@ const translations: Record<Language, Translations> = {
     tagline: "سباق الكتابة الجماعي",
     tooManyErrors: "يجب تصحيح جميع الأخطاء",
     fixErrorCount: (count) => `يجب تصحيح ${count} من الأخطاء للإنهاء`,
+    focusTypeBoxPrompt: (hotkey) => [
+      "انقر أو اضغط على ",
+      hotkey,
+      " للتركيز",
+    ],
   },
   [Language.Dutch]: {
     publicMatch: "Openbaar",
@@ -466,6 +503,11 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Je moet alle fouten corrigeren",
     fixErrorCount: (count) =>
       `Je moet ${count} ${count === 1 ? "fout" : "fouten"} corrigeren om te voltooien`,
+    focusTypeBoxPrompt: (hotkey) => [
+      "Klik of druk op ",
+      hotkey,
+      " om te focussen",
+    ],
     startPrompt: "Typ!",
   },
   [Language.Swedish]: {
@@ -512,6 +554,11 @@ const translations: Record<Language, Translations> = {
     tagline: "Multiplayer-skrivtävlingar",
     tooManyErrors: "Du måste rätta alla fel",
     fixErrorCount: (count) => `Du måste rätta ${count} fel för att slutföra`,
+    focusTypeBoxPrompt: (hotkey) => [
+      "Klicka eller tryck på ",
+      hotkey,
+      " för att fokusera",
+    ],
     startPrompt: "Skriv!",
   },
   [Language.Russian]: {
@@ -560,6 +607,11 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Необходимо исправить все ошибки",
     fixErrorCount: (count) =>
       `Необходимо исправить ${count} ${count === 1 ? "ошибку" : "ошибки"}, чтобы завершить`,
+    focusTypeBoxPrompt: (hotkey) => [
+      "Щёлкните или нажмите ",
+      hotkey,
+      ", чтобы активировать поле",
+    ],
   },
   [Language.Romanian]: {
     publicMatch: "Public",
@@ -607,6 +659,11 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Trebuie să corectezi toate greșelile",
     fixErrorCount: (count) =>
       `Trebuie să corectezi ${count} ${count === 1 ? "greșeală" : "greșeli"} pentru a termina`,
+    focusTypeBoxPrompt: (hotkey) => [
+      "Fă clic sau apasă ",
+      hotkey,
+      " pentru a focaliza",
+    ],
     startPrompt: "Tastează!",
   },
   [Language.Indonesian]: {
@@ -656,6 +713,11 @@ const translations: Record<Language, Translations> = {
     tooManyErrors: "Anda harus memperbaiki semua kesalahan",
     fixErrorCount: (count) =>
       `Anda harus memperbaiki ${count} kesalahan untuk menyelesaikan balapan`,
+    focusTypeBoxPrompt: (hotkey) => [
+      "Klik atau tekan ",
+      hotkey,
+      " untuk fokus",
+    ],
     startPrompt: "Ketik!",
   },
   [Language.Polish]: {
@@ -706,6 +768,11 @@ const translations: Record<Language, Translations> = {
         count === 1 ? "błąd" : count >= 2 && count <= 4 ? "błędy" : "błędów";
       return `Musisz poprawić ${count} ${label}, aby ukończyć`;
     },
+    focusTypeBoxPrompt: (hotkey) => [
+      "Kliknij lub naciśnij ",
+      hotkey,
+      ", aby aktywować pole",
+    ],
     startPrompt: "Pisz!",
   },
   [Language.Czech]: {
@@ -756,6 +823,11 @@ const translations: Record<Language, Translations> = {
         count === 1 ? "chybu" : count >= 2 && count <= 4 ? "chyby" : "chyb";
       return `Pro dokončení musíte opravit ${count} ${label}`;
     },
+    focusTypeBoxPrompt: (hotkey) => [
+      "Klikněte nebo stiskněte ",
+      hotkey,
+      " pro aktivaci",
+    ],
     startPrompt: "Pište!",
   },
   [Language.Turkish]: {
@@ -802,6 +874,11 @@ const translations: Record<Language, Translations> = {
     tagline: "Çok oyunculu yazma yarışları",
     tooManyErrors: "Tüm hataları düzeltmelisiniz",
     fixErrorCount: (count) => `Bitirmek için ${count} hata düzeltmelisiniz`,
+    focusTypeBoxPrompt: (hotkey) => [
+      "Odaklanmak için tıklayın veya ",
+      hotkey,
+      " tuşuna basın",
+    ],
     startPrompt: "Yaz!",
   },
 };
