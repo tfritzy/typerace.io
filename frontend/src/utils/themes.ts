@@ -20,6 +20,7 @@ export interface ThemeSettings {
   backgroundColor: string;
   textColor: string;
   borderColor: string;
+  borderHoverColor?: string;
   accentColor: string;
 }
 
@@ -170,7 +171,8 @@ export function resolveTheme(
       gridLine: `rgba(${fgRgba}, 0.06)`,
       textCompleted: isDark ? `rgba(${fgRgba}, 0.15)` : `rgba(${fgRgba}, 0.2)`,
       textUntyped: isDark ? `rgba(${fgRgba}, 0.35)` : `rgba(${fgRgba}, 0.4)`,
-      borderHover: isDark ? `rgba(${fgRgba}, 0.25)` : `rgba(${fgRgba}, 0.25)`,
+      borderHover:
+        settings.borderHoverColor ?? `rgba(${fgRgba}, 0.25)`,
     },
     avatarColors: [settings.accentColor, accentDark, isDark ? popover : card],
     previewColors,
@@ -214,11 +216,12 @@ export const THEME_PRESETS: Record<ThemeTag, ThemePreset> = {
   },
   Cobalt2: {
     name: "Cobalt2",
-    backgroundColor: "#193549",
+    backgroundColor: "#122738",
     textColor: "#ffffff",
     borderColor: "#0d3a58",
+    borderHoverColor: "#ffc600",
     accentColor: "#ffc600",
-    previewColors: ["#193549", "#ffc600", "#0088ff", "#ff628c"],
+    previewColors: ["#122738", "#ffc600", "#0088ff", "#ff628c"],
   },
   Dracula: {
     name: "Dracula",

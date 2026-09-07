@@ -4,7 +4,6 @@ import {
   THEME_PRESETS,
   applyTheme,
   getInitialTheme,
-  previewTheme,
   type ThemeTag,
 } from "../utils/themes";
 
@@ -43,7 +42,6 @@ function ThemeList({
             key={tag}
             type="button"
             aria-pressed={isSelected}
-            onMouseEnter={() => previewTheme(tag)}
             onClick={() => onSelect(tag)}
             className={`flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-1.5 text-left text-sm transition-colors ${
               isSelected ? "bg-muted font-semibold" : "hover:bg-muted"
@@ -69,14 +67,12 @@ export const ThemeShowcaseModal = ({
   onClose,
 }: ThemeShowcaseModalProps) => {
   const [selectedTheme, setSelectedTheme] = useState(getInitialTheme);
-  const committedTheme = useRef(getInitialTheme());
   const popoverRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
 
     const currentTheme = getInitialTheme();
-    committedTheme.current = currentTheme;
     setSelectedTheme(currentTheme);
 
     const handlePointerDown = (event: MouseEvent) => {
@@ -100,12 +96,10 @@ export const ThemeShowcaseModal = ({
     return () => {
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
-      applyTheme(committedTheme.current);
     };
   }, [open]);
 
   const selectTheme = (tag: ThemeTag) => {
-    committedTheme.current = tag;
     setSelectedTheme(tag);
     applyTheme(tag);
   };
@@ -117,7 +111,6 @@ export const ThemeShowcaseModal = ({
       ref={popoverRef}
       role="dialog"
       aria-label="Choose a theme"
-      onMouseLeave={() => applyTheme(committedTheme.current)}
       className="absolute bottom-full right-0 z-50 mb-2 w-48 max-w-[calc(100vw-2rem)] overflow-hidden rounded-md border border-border bg-popover shadow-xl animate-[themePopoverIn_120ms_ease-out]"
     >
       <div className="max-h-[70vh] overflow-y-auto">
