@@ -77,7 +77,9 @@ export function ProfileStreakStat({
         place="top"
         positionStrategy="fixed"
         offset={8}
-        className="!z-50 !max-w-[250px] !rounded-lg !border !border-border !bg-popover !px-3 !py-2.5 !text-popover-foreground !opacity-100 !shadow-lg"
+        delayHide={40}
+        opacity={1}
+        className="!z-50 !max-w-[250px] !rounded-lg !border !border-border !bg-popover !px-3 !py-2.5 !text-popover-foreground !shadow-lg"
         classNameArrow="!bg-popover"
       >
         <div className="flex flex-col gap-1.5 text-left">
