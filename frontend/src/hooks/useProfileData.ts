@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 import type { DbConnection, EventContext } from "../../module_bindings";
-import type { GameRecord, PersonalRecord, Player } from "../types/stdb";
+import type {
+  GameRecord,
+  PersonalRecord,
+  Player,
+  PlayerStreak,
+} from "../types/stdb";
 
 interface ProfileData {
   player: Player | null;
+  playerStreak: PlayerStreak | null;
   gameRecords: GameRecord[];
   personalRecords: PersonalRecord[];
 }
@@ -21,6 +27,7 @@ export function useProfileData(
   playerId: string | undefined,
 ): ProfileData {
   const [player, setPlayer] = useState<Player | null>(null);
+  const [playerStreak, setPlayerStreak] = useState<PlayerStreak | null>(null);
   const [gameRecords, setGameRecords] = useState<GameRecord[]>([]);
   const [personalRecords, setPersonalRecords] = useState<PersonalRecord[]>([]);
 
@@ -75,6 +82,54 @@ export function useProfileData(
   }, [conn, playerId]);
 
   const playerIdentity = player?.identity.toHexString() ?? null;
+
+  useEffect(() => {
+    setPlayerStreak(null);
+    if (!conn || !playerIdentity) return;
+
+    const belongsToPlayer = (streak: PlayerStreak) => (
+      streak.playerId.toHexString() === playerIdentity
+    );
+    const readStreak = () => {
+      setPlayerStreak(
+        Array.from(conn.db.playerstreak.iter()).find(belongsToPlayer) ?? null,
+      );
+    };
+    const handleInsert = (_ctx: EventContext, streak: PlayerStreak) => {
+      if (belongsToPlayer(streak)) setPlayerStreak(streak);
+    };
+    const handleUpdate = (
+      _ctx: EventContext,
+      previous: PlayerStreak,
+      updated: PlayerStreak,
+    ) => {
+      if (belongsToPlayer(updated)) {
+        setPlayerStreak(updated);
+      } else if (belongsToPlayer(previous)) {
+        setPlayerStreak(null);
+      }
+    };
+    const handleDelete = (_ctx: EventContext, streak: PlayerStreak) => {
+      if (belongsToPlayer(streak)) setPlayerStreak(null);
+    };
+
+    conn.db.playerstreak.onInsert(handleInsert);
+    conn.db.playerstreak.onUpdate(handleUpdate);
+    conn.db.playerstreak.onDelete(handleDelete);
+
+    const subscription = conn.subscriptionBuilder()
+      .onApplied(readStreak)
+      .subscribe([
+        `SELECT * FROM playerstreak WHERE PlayerId = '${playerIdentity}'`,
+      ]);
+
+    return () => {
+      conn.db.playerstreak.removeOnInsert(handleInsert);
+      conn.db.playerstreak.removeOnUpdate(handleUpdate);
+      conn.db.playerstreak.removeOnDelete(handleDelete);
+      subscription.unsubscribe();
+    };
+  }, [conn, playerIdentity]);
 
   useEffect(() => {
     setGameRecords([]);
@@ -158,5 +213,5 @@ export function useProfileData(
     };
   }, [conn, playerIdentity]);
 
-  return { player, gameRecords, personalRecords };
+  return { player, playerStreak, gameRecords, personalRecords };
 }

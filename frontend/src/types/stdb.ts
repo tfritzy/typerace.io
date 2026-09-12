@@ -6,6 +6,7 @@ export type Game = Infer<typeof Bindings.Game>;
 export type Player = Infer<typeof Bindings.Player>;
 export type PlayerAvatar = Infer<typeof Bindings.PlayerAvatar>;
 export type PlayerSettings = Infer<typeof Bindings.PlayerSettings>;
+export type PlayerStreak = Infer<typeof Bindings.PlayerStreak>;
 export type GameRecord = Infer<typeof Bindings.GameRecord>;
 export type PlayerProgress = Infer<typeof Bindings.PlayerProgress>;
 export type XpGain = Infer<typeof Bindings.XpGain>;

@@ -18,7 +18,7 @@ export function ProfilePage() {
   const navigate = useNavigate();
   const { conn } = useDatabase();
   const { signOut } = useAuth();
-  const { player, gameRecords, personalRecords } = useProfileData(
+  const { player, playerStreak, gameRecords, personalRecords } = useProfileData(
     conn,
     playerId,
   );
@@ -74,6 +74,7 @@ export function ProfilePage() {
 
           <ProfileCareerStats
             player={player}
+            playerStreak={playerStreak}
             mostPlayedLanguage={personalRecordSummary.language}
           />
 
