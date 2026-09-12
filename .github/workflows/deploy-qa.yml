@@ -73,3 +73,5 @@ jobs:
       - name: Publish SpacetimeDB Module (QA)
         run: |
           spacetime publish -c -y -s maincloud --project-path spacetimedb typerace-qa
+          spacetime call -s maincloud typerace-qa RunMigrations
+          spacetime call -s maincloud typerace-qa EnsureStreakCheckerScheduled

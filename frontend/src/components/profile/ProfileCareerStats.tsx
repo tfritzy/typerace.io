@@ -3,18 +3,19 @@ import {
   Flag,
   Keyboard,
   Languages,
-  Trophy,
   type LucideIcon,
 } from "lucide-react";
-import type { Player } from "../../types/stdb";
+import type { Player, PlayerStreak } from "../../types/stdb";
 import { formatNumber, formatTimeSpent } from "../../utils/formatters";
 import {
   ProfileMetricLabel,
   profileMetricCardClass,
 } from "./ProfileMetric";
+import { ProfileStreakStat } from "./ProfileStreakStat";
 
 interface ProfileCareerStatsProps {
   player: Player;
+  playerStreak: PlayerStreak | null;
   mostPlayedLanguage: string | null;
 }
 
@@ -27,9 +28,14 @@ interface CareerStatProps {
 function CareerStat({ icon: Icon, label, value }: CareerStatProps) {
   return (
     <li className={profileMetricCardClass}>
-      <ProfileMetricLabel icon={Icon} label={label} />
-      <span className="mt-2 whitespace-nowrap text-base font-semibold tabular-nums text-foreground">
-        {value}
+      <ProfileMetricLabel label={label} />
+      <span className="mt-2 flex items-center gap-2 whitespace-nowrap text-base font-semibold tabular-nums text-foreground">
+        <Icon
+          aria-hidden
+          className="h-4 w-4 shrink-0 text-foreground"
+          strokeWidth={1.75}
+        />
+        <span>{value}</span>
       </span>
     </li>
   );
@@ -37,6 +43,7 @@ function CareerStat({ icon: Icon, label, value }: CareerStatProps) {
 
 export function ProfileCareerStats({
   player,
+  playerStreak,
   mostPlayedLanguage,
 }: ProfileCareerStatsProps) {
   const stats: CareerStatProps[] = [
@@ -50,7 +57,6 @@ export function ProfileCareerStats({
       label: "games played",
       value: formatNumber(player.totalGames),
     },
-    { icon: Trophy, label: "total wins", value: formatNumber(player.wins) },
     {
       icon: Keyboard,
       label: "words typed",
@@ -73,7 +79,9 @@ export function ProfileCareerStats({
       </h2>
 
       <ul className="m-0 grid list-none grid-flow-col auto-cols-[minmax(9rem,1fr)] gap-3 overflow-x-auto p-0 pb-1 md:grid-flow-row md:grid-cols-5 md:auto-cols-auto md:overflow-visible md:pb-0">
-        {stats.map((stat) => (
+        <CareerStat {...stats[0]} />
+        <ProfileStreakStat playerStreak={playerStreak} />
+        {stats.slice(1).map((stat) => (
           <CareerStat key={stat.label} {...stat} />
         ))}
       </ul>

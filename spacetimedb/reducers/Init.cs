@@ -25,6 +25,9 @@ public static partial class Module
 
         Log.Info("Initialized score cleaner with 5-minute interval");
 
+        EnsureStreakCheckerScheduled(ctx);
+        Log.Info("Initialized streak checker with 5-minute interval");
+
         for (int i = 0; i < 100; i++)
         {
             var botName = RobotNameGenerator.Generate(ctx.Rng);
