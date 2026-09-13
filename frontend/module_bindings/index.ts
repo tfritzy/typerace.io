@@ -449,10 +449,17 @@ const tablesSchema = __schema(
       { name: 'Id', algorithm: 'btree', columns: [
         'id',
       ] },
+      { name: 'PlayerId_GameId', algorithm: 'btree', columns: [
+        'playerId',
+        'gameId',
+      ] },
       { name: 'PlayerId_GameMode_PhraseLength', algorithm: 'btree', columns: [
         'playerId',
         'gameMode',
         'phraseLength',
+      ] },
+      { name: 'PlayerId', algorithm: 'btree', columns: [
+        'playerId',
       ] },
     ],
     constraints: [

@@ -111,7 +111,8 @@ export const SiteStatsPage = () => {
       .onApplied(() => {
         setGlobalStats(Array.from(conn.db.globalstats.iter()));
       })
-      .subscribe([`SELECT * FROM globalstats`]);
+      // This lower bound includes every stored date and lets the subscription use the Date index.
+      .subscribe([`SELECT * FROM globalstats WHERE Date >= '0000-01-01'`]);
 
     return () => {
       conn.db.globalstats.removeOnInsert(handleStatsInsert);
@@ -145,7 +146,8 @@ export const SiteStatsPage = () => {
       .onApplied(() => {
         setAbandonedGames(Array.from(conn.db.abandonedgames.iter()));
       })
-      .subscribe([`SELECT * FROM abandonedgames`]);
+      // Archive timestamps are positive, so this preserves all rows while using the ArchivedAt index.
+      .subscribe([`SELECT * FROM abandonedgames WHERE ArchivedAt > 0`]);
 
     return () => {
       conn.db.abandonedgames.removeOnInsert(handleGameInsert);

@@ -5,6 +5,8 @@ namespace StdbModule;
 public static partial class Module
 {
     [Table(Name = "personalrecord", Public = true)]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId) })]
+    [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameId) })]
     [SpacetimeDB.Index.BTree(Columns = new[] { nameof(PlayerId), nameof(GameMode), nameof(PhraseLength) })]
     public partial struct PersonalRecord
     {

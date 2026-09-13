@@ -449,10 +449,17 @@ const tablesSchema = __schema(
       { name: 'Id', algorithm: 'btree', columns: [
         'id',
       ] },
+      { name: 'PlayerId_GameId', algorithm: 'btree', columns: [
+        'playerId',
+        'gameId',
+      ] },
       { name: 'PlayerId_GameMode_PhraseLength', algorithm: 'btree', columns: [
         'playerId',
         'gameMode',
         'phraseLength',
+      ] },
+      { name: 'PlayerId', algorithm: 'btree', columns: [
+        'playerId',
       ] },
     ],
     constraints: [
@@ -591,7 +598,7 @@ const reducersSchema = __reducers(
   __reducerSchema("startPrivateGame", StartPrivateGame),
   __reducerSchema("syncAnonymousStatus", SyncAnonymousStatus),
   __reducerSchema("syncAuthenticationAvatar", SyncAuthenticationAvatar),
-  __reducerSchema("SyncTimezone", SyncTimezone),
+  __reducerSchema("syncTimezone", SyncTimezone),
   __reducerSchema("UpdateBotProgress", UpdateBotProgress),
   __reducerSchema("updateProgress", UpdateProgress),
 );
