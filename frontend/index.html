@@ -15,10 +15,6 @@
       onerror="this.dataset.loaded='error'"
     >
     <!-- Favicons -->
-    <link rel="icon" type="image/png" sizes="192x192" href="/favicons/android-chrome-192x192.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
-    <link rel="icon" type="image/x-icon" href="/favicons/favicon.ico" />
     <link id="theme-favicon" rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
     <link rel="manifest" href="/favicons/site.webmanifest" />
@@ -147,7 +143,13 @@
           var tileColor=/^#[0-9a-f]{6}$/i.test(t.ac)?t.ac:'#7e9cd8';
           var glyphColor=/^#[0-9a-f]{6}$/i.test(t.bg)?t.bg:'#1f1f28';
           var faviconSvg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="56" fill="'+tileColor+'"/><g fill="none" stroke="'+glyphColor+'" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"><path d="M146 146v174c0 30 24 54 54 54"/><path d="M146 202h56"/><path d="M311 374V202"/><path d="M311 250c8-30 31-48 65-48"/></g></svg>';
-          if(favicon)favicon.href='data:image/svg+xml,'+encodeURIComponent(faviconSvg);
+          var faviconHref='data:image/svg+xml,'+encodeURIComponent(faviconSvg);
+          if(favicon){
+            favicon.href=faviconHref;
+            window.addEventListener('load',function(){
+              favicon.href=faviconHref;
+            },{once:true});
+          }
           document.documentElement.dataset.mode = dk ? 'dark' : 'light';
           r.setProperty('--background',t.bg);
           r.setProperty('--foreground',t.fg);
