@@ -390,6 +390,24 @@ export function applyCustomTheme(settings: ThemeSettings): void {
   applyResolvedTheme(theme, "custom");
 }
 
+function updateFavicon(theme: ResolvedTheme): void {
+  const favicon = document.querySelector<HTMLLinkElement>("#theme-favicon");
+  if (!favicon) return;
+
+  const svg = [
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
+    `<rect width="512" height="512" rx="56" fill="${theme.colors.accentPrimary}"/>`,
+    `<g fill="none" stroke="${theme.colors.background}" stroke-width="56" stroke-linecap="round" stroke-linejoin="round">`,
+    '<path d="M146 146v174c0 30 24 54 54 54"/>',
+    '<path d="M146 202h56"/>',
+    '<path d="M311 374V202"/>',
+    '<path d="M311 250c8-30 31-48 65-48"/>',
+    "</g></svg>",
+  ].join("");
+
+  favicon.href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
 function applyResolvedTheme(
   theme: ResolvedTheme,
   tag: string,
@@ -458,6 +476,7 @@ function applyResolvedTheme(
   root.style.setProperty("--radius", "8px");
 
   root.dataset.mode = theme.mode;
+  updateFavicon(theme);
 
   if (persist) {
     try {

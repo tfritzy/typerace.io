@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img">
+  <title>TypeRace.io</title>
+  <rect width="512" height="512" rx="56" fill="#7e9cd8"/>
+  <g
+    fill="none"
+    stroke="#1f1f28"
+    stroke-width="56"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M146 146v174c0 30 24 54 54 54"/>
+    <path d="M146 202h56"/>
+    <path d="M311 374V202"/>
+    <path d="M311 250c8-30 31-48 65-48"/>
+  </g>
+</svg>

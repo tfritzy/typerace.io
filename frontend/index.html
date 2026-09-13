@@ -19,11 +19,12 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
     <link rel="icon" type="image/x-icon" href="/favicons/favicon.ico" />
+    <link id="theme-favicon" rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
     <link rel="manifest" href="/favicons/site.webmanifest" />
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#282828" />
+    <meta name="theme-color" content="#1f1f28" />
     
     <!-- SEO Meta Tags -->
     <title>TypeRace.io | A real, modern type-racing platform</title>
@@ -97,6 +98,10 @@
       (function() {
         try {
           var themes = {
+            EverforestDark:{bg:'#2d353b',fg:'#d3c6aa',ac:'#a7c080',bc:'#475258',bw:1,br:8},
+            GitHubDarkDimmed:{bg:'#22272e',fg:'#adbac7',ac:'#57ab5a',bc:'#444c56',bw:1,br:8},
+            NightOwl:{bg:'#011627',fg:'#d6deeb',ac:'#82aaff',bc:'#122d42',bw:1,br:8},
+            Cobalt2:{bg:'#122738',fg:'#ffffff',ac:'#ffc600',bc:'#0d3a58',bw:1,br:8},
             Dracula:{bg:'#282a36',fg:'#f8f8f2',ac:'#bd93f9',bc:'rgba(248,248,242,0.1)',bw:1,br:8},
             Monokai:{bg:'#272822',fg:'#f8f8f2',ac:'#a6e22e',bc:'rgba(248,248,242,0.1)',bw:1,br:8},
             Nord:{bg:'#2e3440',fg:'#eceff4',ac:'#88c0d0',bc:'rgba(236,239,244,0.1)',bw:1,br:12},
@@ -104,7 +109,6 @@
             GruvboxDark:{bg:'#282828',fg:'#ebdbb2',ac:'#fabd2f',bc:'rgba(235,219,178,0.1)',bw:1,br:8},
             CatppuccinMocha:{bg:'#1e1e2e',fg:'#cdd6f4',ac:'#cba6f7',bc:'rgba(205,214,244,0.1)',bw:1,br:8},
             OneDark:{bg:'#282c34',fg:'#abb2bf',ac:'#61afef',bc:'rgba(171,178,191,0.1)',bw:1,br:8},
-            RosePine:{bg:'#191724',fg:'#e0def4',ac:'#c4a7e7',bc:'rgba(224,222,244,0.1)',bw:1,br:8},
             AyuDark:{bg:'#0d1017',fg:'#bfbdb6',ac:'#e6b450',bc:'rgba(191,189,182,0.1)',bw:1,br:8},
             Kanagawa:{bg:'#1f1f28',fg:'#dcd7ba',ac:'#7e9cd8',bc:'rgba(220,215,186,0.1)',bw:1,br:8},
             Pico8:{bg:'#1D2B53',fg:'#FFF1E8',ac:'#29ADFF',bc:'rgba(255,241,232,0.20)',bw:2,br:0},
@@ -123,7 +127,7 @@
             } catch(_){}
           }
           if (!t) {
-            t = themes.GruvboxDark;
+            t = themes.Kanagawa;
           }
           function p(h){h=h.replace('#','');return[parseInt(h.substring(0,2),16),parseInt(h.substring(2,4),16),parseInt(h.substring(4,6),16)];}
           function cl(v){return Math.max(0,Math.min(255,Math.round(v)));}
@@ -139,6 +143,11 @@
           var acCon=(0.299*p(t.ac)[0]+0.587*p(t.ac)[1]+0.114*p(t.ac)[2])/255>0.5?'#000000':'#ffffff';
           var ioOp=dk?0.25:0.45;
           var r=document.documentElement.style;
+          var favicon=document.getElementById('theme-favicon');
+          var tileColor=/^#[0-9a-f]{6}$/i.test(t.ac)?t.ac:'#7e9cd8';
+          var glyphColor=/^#[0-9a-f]{6}$/i.test(t.bg)?t.bg:'#1f1f28';
+          var faviconSvg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="56" fill="'+tileColor+'"/><g fill="none" stroke="'+glyphColor+'" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"><path d="M146 146v174c0 30 24 54 54 54"/><path d="M146 202h56"/><path d="M311 374V202"/><path d="M311 250c8-30 31-48 65-48"/></g></svg>';
+          if(favicon)favicon.href='data:image/svg+xml,'+encodeURIComponent(faviconSvg);
           document.documentElement.dataset.mode = dk ? 'dark' : 'light';
           r.setProperty('--background',t.bg);
           r.setProperty('--foreground',t.fg);
