@@ -32,7 +32,6 @@ export function ProfileStreakStat({
         <Flame
           aria-hidden
           className="h-4 w-4 shrink-0 text-foreground"
-          strokeWidth={1.75}
         />
 
         <span className="whitespace-nowrap text-base font-semibold tabular-nums text-foreground">

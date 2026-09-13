@@ -1,6 +1,6 @@
 spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
 
-spacetime sql typerace "SELECT * from player" -s local
+spacetime sql typerace "SELECT * from playertimezone" -s local
 
 spacetime publish --project-path spacetimedb typerace -s local
 spacetime publish --project-path spacetimedb typerace -s local

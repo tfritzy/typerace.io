@@ -18,5 +18,6 @@
 
   <ItemGroup>
     <Compile Include="../spacetimedb/util/StreakRules.cs" Link="StreakRules.cs" />
+    <Compile Include="../spacetimedb/util/StreakTime.cs" Link="StreakTime.cs" />
   </ItemGroup>
 </Project>

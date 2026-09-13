@@ -1,3 +1,9 @@
+# Testing
+
+- Prefer a small number of high-value, high-level tests that exercise user-visible behavior and important boundaries.
+- Consolidate representative cases when one behavioral test can cover them clearly. Avoid creating a separate test for every helper, input permutation, or implementation detail.
+- Add lower-level regression tests only when the behavior cannot be covered clearly at a higher level.
+
 # Adding a language
 
 Treat a language as complete only when both its random-word and quote modes work end to end. Use the checklist below; do not add a dropdown entry that routes to an English fallback.

@@ -1,4 +1,3 @@
-using System.Globalization;
 using SpacetimeDB;
 
 namespace StdbModule;
@@ -10,26 +9,20 @@ public static partial class Module
     [Reducer]
     public static void CheckPlayerStreaks(ReducerContext ctx, StreakChecker args)
     {
-        var today = DateOnly.FromDateTime(
-            DateTimeOffset.FromUnixTimeMilliseconds(
-                ctx.Timestamp.MicrosecondsSinceUnixEpoch / 1_000
-            ).UtcDateTime
-        );
-        var todayKey = today.ToString(StreakDayFormat, CultureInfo.InvariantCulture);
-        var tomorrowKey = today.AddDays(1).ToString(
-            StreakDayFormat,
-            CultureInfo.InvariantCulture
-        );
+        var now = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
+        var nowKey = StreakTime.FormatUtcTimestamp(now);
 
         var dueStreaks = ctx.Db.playerstreak.NextCheckDay
-            .Filter((string.Empty, tomorrowKey))
-            .Where(streak => string.CompareOrdinal(streak.NextCheckDay, todayKey) <= 0)
+            .Filter((string.Empty, nowKey))
+            .Where(streak => string.CompareOrdinal(streak.NextCheckDay, nowKey) <= 0)
             .Take(MaxStreakChecksPerRun)
             .ToList();
 
         foreach (var streak in dueStreaks)
         {
-            var updated = ApplyMissedDaysBefore(streak, today);
+            var utcOffsetMinutes = GetPlayerUtcOffsetMinutes(ctx, streak.PlayerId);
+            var localDay = StreakTime.GetLocalDay(now, utcOffsetMinutes);
+            var updated = ApplyMissedDaysBefore(streak, localDay, utcOffsetMinutes);
             ctx.Db.playerstreak.PlayerId.Update(updated);
         }
 

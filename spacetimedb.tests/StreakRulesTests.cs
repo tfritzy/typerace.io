@@ -78,6 +78,19 @@ public sealed class StreakRulesTests
     }
 
     [Fact]
+    public void MovingToAnEarlierLocalDayDoesNotChangeTheStreak()
+    {
+        var streak = StreakRules.Start(Monday);
+
+        var updated = StreakRules.ApplyMissedDaysBefore(
+            streak,
+            Monday.AddDays(-1)
+        );
+
+        Assert.Equal(streak, updated);
+    }
+
+    [Fact]
     public void MissingAThirdWeekdayBreaksTheStreak()
     {
         var streak = StreakRules.Start(Monday) with { Protections = 2 };

@@ -55,6 +55,11 @@ internal static class StreakRules
         DateOnly endExclusive
     )
     {
+        if (endExclusive < state.LastActiveDay)
+        {
+            return state;
+        }
+
         if (state.Count == 0)
         {
             return state with { NextCheckDay = null };

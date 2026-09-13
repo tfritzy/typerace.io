@@ -104,7 +104,7 @@ public static partial class Module
         if (storesPersonalRecords)
         {
             UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, phraseLength, statsId, game.Id, wpm, accuracy);
-            UpdatePlayerStreak(ctx, progress.PlayerId, day);
+            UpdatePlayerStreak(ctx, progress.PlayerId, timestamp);
         }
 
         if (!progress.IsBot)

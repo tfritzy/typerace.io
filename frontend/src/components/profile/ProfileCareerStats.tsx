@@ -33,7 +33,6 @@ function CareerStat({ icon: Icon, label, value }: CareerStatProps) {
         <Icon
           aria-hidden
           className="h-4 w-4 shrink-0 text-foreground"
-          strokeWidth={1.75}
         />
         <span>{value}</span>
       </span>

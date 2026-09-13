@@ -75,6 +75,8 @@ import SyncAnonymousStatus from "./sync_anonymous_status_reducer";
 export { SyncAnonymousStatus };
 import SyncAuthenticationAvatar from "./sync_authentication_avatar_reducer";
 export { SyncAuthenticationAvatar };
+import SyncTimezone from "./sync_timezone_reducer";
+export { SyncTimezone };
 import UpdateBotProgress from "./update_bot_progress_reducer";
 export { UpdateBotProgress };
 import UpdateProgress from "./update_progress_reducer";
@@ -129,6 +131,8 @@ import PlayersettingsRow from "./playersettings_table";
 export { PlayersettingsRow };
 import PlayerstreakRow from "./playerstreak_table";
 export { PlayerstreakRow };
+import PlayertimezoneRow from "./playertimezone_table";
+export { PlayertimezoneRow };
 import XpgainRow from "./xpgain_table";
 export { XpgainRow };
 
@@ -185,6 +189,8 @@ import PlayerSettings from "./player_settings_type";
 export { PlayerSettings };
 import PlayerStreak from "./player_streak_type";
 export { PlayerStreak };
+import PlayerTimezone from "./player_timezone_type";
+export { PlayerTimezone };
 import ScoreCleaner from "./score_cleaner_type";
 export { ScoreCleaner };
 import StreakChecker from "./streak_checker_type";
@@ -527,6 +533,17 @@ const tablesSchema = __schema(
     ],
   }, PlayerstreakRow),
   __table({
+    name: 'playertimezone',
+    indexes: [
+      { name: 'PlayerId', algorithm: 'btree', columns: [
+        'playerId',
+      ] },
+    ],
+    constraints: [
+      { name: 'playertimezone_PlayerId_key', constraint: 'unique', columns: ['playerId'] },
+    ],
+  }, PlayertimezoneRow),
+  __table({
     name: 'xpgain',
     indexes: [
       { name: 'Id', algorithm: 'btree', columns: [
@@ -574,6 +591,7 @@ const reducersSchema = __reducers(
   __reducerSchema("startPrivateGame", StartPrivateGame),
   __reducerSchema("syncAnonymousStatus", SyncAnonymousStatus),
   __reducerSchema("syncAuthenticationAvatar", SyncAuthenticationAvatar),
+  __reducerSchema("syncTimezone", SyncTimezone),
   __reducerSchema("UpdateBotProgress", UpdateBotProgress),
   __reducerSchema("updateProgress", UpdateProgress),
 );

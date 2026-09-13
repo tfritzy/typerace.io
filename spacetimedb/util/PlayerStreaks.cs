@@ -8,17 +8,17 @@ public static partial class Module
     private const string StreakDayFormat = "yyyy-MM-dd";
     private const string NoStreakCheckDay = "9999-12-31";
 
-    private static void UpdatePlayerStreak(ReducerContext ctx, Identity playerId, string activeDay)
+    private static void UpdatePlayerStreak(ReducerContext ctx, Identity playerId, long timestampMicros)
     {
-        if (!TryParseStreakDay(activeDay, out var currentDay))
-        {
-            return;
-        }
+        var utcOffsetMinutes = GetPlayerUtcOffsetMinutes(ctx, playerId);
+        var currentDay = StreakTime.GetLocalDay(timestampMicros, utcOffsetMinutes);
 
         var existing = ctx.Db.playerstreak.PlayerId.Find(playerId);
         if (existing == null)
         {
-            ctx.Db.playerstreak.Insert(CreatePlayerStreak(playerId, currentDay));
+            ctx.Db.playerstreak.Insert(
+                CreatePlayerStreak(playerId, currentDay, utcOffsetMinutes)
+            );
             return;
         }
 
@@ -28,42 +28,74 @@ public static partial class Module
             return;
         }
 
-        var updated = ApplyCompletedGame(existing.Value, currentDay);
+        var updated = ApplyCompletedGame(existing.Value, currentDay, utcOffsetMinutes);
         ctx.Db.playerstreak.PlayerId.Update(updated);
     }
 
-    private static PlayerStreak CreatePlayerStreak(Identity playerId, DateOnly activeDay)
+    private static int GetPlayerUtcOffsetMinutes(ReducerContext ctx, Identity playerId)
+    {
+        return ctx.Db.playertimezone.PlayerId.Find(playerId)?.UtcOffsetMinutes ?? 0;
+    }
+
+    private static PlayerStreak CreatePlayerStreak(
+        Identity playerId,
+        DateOnly activeDay,
+        int utcOffsetMinutes = 0
+    )
     {
         return ApplyStreakState(
             new PlayerStreak { PlayerId = playerId },
-            StreakRules.Start(activeDay)
+            StreakRules.Start(activeDay),
+            utcOffsetMinutes
         );
     }
 
-    private static PlayerStreak ApplyCompletedGame(PlayerStreak streak, DateOnly activeDay)
+    private static PlayerStreak ApplyCompletedGame(
+        PlayerStreak streak,
+        DateOnly activeDay,
+        int utcOffsetMinutes = 0
+    )
     {
-        if (!TryGetStreakState(streak, out var state))
-        {
-            return streak;
-        }
-
-        return ApplyStreakState(streak, StreakRules.CompleteGame(state, activeDay));
-    }
-
-    private static PlayerStreak ApplyMissedDaysBefore(PlayerStreak streak, DateOnly endExclusive)
-    {
-        if (!TryGetStreakState(streak, out var state))
+        if (!TryGetStreakState(streak, utcOffsetMinutes, out var state))
         {
             return streak;
         }
 
         return ApplyStreakState(
             streak,
-            StreakRules.ApplyMissedDaysBefore(state, endExclusive)
+            StreakRules.CompleteGame(state, activeDay),
+            utcOffsetMinutes
         );
     }
 
-    private static bool TryGetStreakState(PlayerStreak streak, out StreakState state)
+    private static PlayerStreak ApplyMissedDaysBefore(
+        PlayerStreak streak,
+        DateOnly endExclusive,
+        int utcOffsetMinutes = 0,
+        int? storedUtcOffsetMinutes = null
+    )
+    {
+        if (!TryGetStreakState(
+            streak,
+            storedUtcOffsetMinutes ?? utcOffsetMinutes,
+            out var state
+        ))
+        {
+            return streak;
+        }
+
+        return ApplyStreakState(
+            streak,
+            StreakRules.ApplyMissedDaysBefore(state, endExclusive),
+            utcOffsetMinutes
+        );
+    }
+
+    private static bool TryGetStreakState(
+        PlayerStreak streak,
+        int utcOffsetMinutes,
+        out StreakState state
+    )
     {
         if (!TryParseStreakDay(streak.LastActiveDay, out var lastActiveDay))
         {
@@ -76,6 +108,13 @@ public static partial class Module
         {
             nextCheckDay = parsedNextCheckDay;
         }
+        else if (StreakTime.TryParseUtcTimestamp(
+            streak.NextCheckDay,
+            out var nextCheckAt
+        ))
+        {
+            nextCheckDay = StreakTime.GetLocalDay(nextCheckAt, utcOffsetMinutes);
+        }
 
         state = new StreakState(
             Count: streak.Streak,
@@ -86,7 +125,11 @@ public static partial class Module
         return true;
     }
 
-    private static PlayerStreak ApplyStreakState(PlayerStreak streak, StreakState state)
+    private static PlayerStreak ApplyStreakState(
+        PlayerStreak streak,
+        StreakState state,
+        int utcOffsetMinutes
+    )
     {
         streak.Streak = state.Count;
         streak.LastActiveDay = state.LastActiveDay.ToString(
@@ -96,9 +139,8 @@ public static partial class Module
         streak.Protections = state.Protections;
         if (state.NextCheckDay is DateOnly nextCheckDay)
         {
-            streak.NextCheckDay = nextCheckDay.ToString(
-                StreakDayFormat,
-                CultureInfo.InvariantCulture
+            streak.NextCheckDay = StreakTime.FormatUtcTimestamp(
+                StreakTime.GetUtcMidnightMicros(nextCheckDay, utcOffsetMinutes)
             );
         }
         else

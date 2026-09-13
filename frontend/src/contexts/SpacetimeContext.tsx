@@ -127,6 +127,9 @@ export const SpacetimeProvider = ({ children }: SpacetimeProviderProps) => {
               connectionStableTimeoutRef.current = null;
             }, CONNECTION_STABLE_MS);
             console.log("Connected to SpacetimeDB");
+            connected.reducers.syncTimezone({
+              utcOffsetMinutes: -new Date().getTimezoneOffset(),
+            });
             connected.reducers.syncAnonymousStatus({ isAnonymous: !user });
             if (user) {
               connected.reducers.syncAuthenticationAvatar({
