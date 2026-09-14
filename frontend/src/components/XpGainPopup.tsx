@@ -1,68 +1,106 @@
-import { useEffect } from "react";
-import type { XpGain } from "../types/stdb";
+import { useEffect, useState } from "react";
+import type { XpAward } from "../types/stdb";
 
 interface XpGainPopupProps {
-    xpGain: XpGain;
-    onComplete: () => void;
+  xpAward: XpAward;
+  onComplete: () => void;
 }
 
-export const XpGainPopup = ({ xpGain, onComplete }: XpGainPopupProps) => {
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            onComplete();
-        }, 5000);
+const EFFECT_DELAY_MS = 300;
+const COMPLETED_HOLD_MS = 5_000;
 
-        return () => clearTimeout(timer);
-    }, [onComplete]);
+function formatEffectValue(operator: { tag: string }, value: number) {
+  const symbol = operator.tag === "Add" ? "+" : "×";
+  return `${symbol}${new Intl.NumberFormat(undefined, {
+    maximumFractionDigits: 2,
+  }).format(value)}`;
+}
 
-    return (
-        <div
-            className="rounded-lg px-4 py-3 shadow-lg min-w-[280px] animate-[modalFadeIn_0.3s_ease-out,modalFadeOut_0.3s_ease-in_5.3s_forwards] bg-card border border-border"
-        >
-            <div className="space-y-0.5 text-xs">
-                {xpGain.multipliers.map((multiplier, index) => (
-                    <MultiplierRow
-                        key={index}
-                        label={multiplier.label}
-                        value={multiplier.value}
-                    />
-                ))}
+function calculateVisibleTotal(
+  effects: XpAward["effects"],
+  visibleEffectCount: number,
+) {
+  const total = effects
+    .slice(0, visibleEffectCount)
+    .reduce((current, effect) => {
+      if (effect.operator.tag === "Multiply") return current * effect.value;
+      return current + effect.value;
+    }, 0);
 
-                <div className="my-2 border-t border-border" />
+  return Math.round(total);
+}
 
-                <div
-                    className="flex items-center justify-between py-2 px-3 rounded font-semibold text-sm bg-secondary text-secondary-foreground"
-                >
-                    <span>Total XP</span>
-                    <span
-                        className="tabular-nums text-base text-secondary-foreground"
-                    >
-                        +{xpGain.totalXp}
-                    </span>
-                </div>
-            </div>
+export const XpGainPopup = ({ xpAward, onComplete }: XpGainPopupProps) => {
+  const revealCompleteMs =
+    400 + Math.max(0, xpAward.effects.length - 1) * EFFECT_DELAY_MS;
+  const lifetimeMs = revealCompleteMs + COMPLETED_HOLD_MS;
+  const [visibleEffectCount, setVisibleEffectCount] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const visibleTotal =
+    visibleEffectCount === xpAward.effects.length
+      ? xpAward.totalXp
+      : calculateVisibleTotal(xpAward.effects, visibleEffectCount);
+
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setIsVisible(true), 0),
+      ...xpAward.effects.map((_, index) =>
+        setTimeout(
+          () => setVisibleEffectCount(index + 1),
+          200 + index * EFFECT_DELAY_MS,
+        ),
+      ),
+      setTimeout(() => setIsVisible(false), lifetimeMs - 180),
+      setTimeout(onComplete, lifetimeMs),
+    ];
+
+    return () => timers.forEach(clearTimeout);
+  }, [lifetimeMs, onComplete, xpAward.effects]);
+
+  return (
+    <div
+      className={`w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-border bg-card shadow-xl transition-all duration-200 motion-reduce:transition-none ${
+        isVisible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
+      }`}
+    >
+      <div className="px-4 pb-3 pt-4">
+        <div className="mb-3 flex items-center gap-2.5">
+          <div className="flex size-8 items-center justify-center rounded-md bg-accent-primary/10 font-mono text-[0.65rem] font-bold tracking-tight text-accent-primary ring-1 ring-accent-primary/20">
+            XP
+          </div>
+          <div className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            Experience earned
+          </div>
         </div>
-    );
-};
-
-interface MultiplierRowProps {
-    label: string;
-    value: string;
-}
-
-const MultiplierRow = ({ label, value }: MultiplierRowProps) => {
-    const isBonus = value.includes('×') && !value.includes('×1.0');
-
-    return (
-        <div
-            className={`flex items-center justify-between py-1.5 px-2 ${isBonus ? 'text-secondary-foreground' : 'text-muted-foreground'}`}
-        >
-            <span className="font-medium text-sm">{label}</span>
-            <span
-                className={`font-bold tabular-nums text-sm tracking-wide ${isBonus ? 'text-secondary-foreground' : 'text-muted-foreground'}`}
+        <div className="space-y-0.5">
+          {xpAward.effects.map((effect, index) => (
+            <div
+              key={`${effect.category}:${effect.label}:${index}`}
+              className={`flex items-center justify-between gap-6 rounded px-1 py-1.5 transition-all duration-200 motion-reduce:transition-none ${
+                index < visibleEffectCount
+                  ? "translate-x-0 opacity-100"
+                  : "translate-x-2 opacity-0"
+              }`}
             >
-                {value}
-            </span>
+              <div className="min-w-0 truncate text-sm font-medium text-card-foreground">
+                {effect.label}
+              </div>
+              <span className="shrink-0 font-mono text-sm font-semibold tabular-nums text-accent-primary">
+                {formatEffectValue(effect.operator, effect.value)}
+              </span>
+            </div>
+          ))}
         </div>
-    );
+        <div className="mt-2 flex items-center justify-between rounded-md border border-accent-primary/20 bg-accent-primary/5 px-3 py-2.5">
+          <span className="text-sm font-semibold text-card-foreground">Total</span>
+          <span
+            key={visibleEffectCount}
+            className="font-mono text-base font-bold tabular-nums text-accent-primary"
+          >
+            +{visibleTotal} XP
+          </span>
+        </div>
+      </div>
+    </div>
+  );
 };

@@ -62,11 +62,6 @@ public static partial class Module
         var phraseLength = game.Phrase.Contains(' ') ? wordsTyped : game.Phrase.Length;
         var accuracy = CharacterHistoryUtils.CalculateAccuracy(progress.CharacterHistory);
 
-        var updatedPlayer = player.Value;
-        UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped, timeElapsed / 1000);
-        LevelUpPlayer(ref updatedPlayer);
-        ctx.Db.player.Identity.Update(updatedPlayer);
-
         var eloChange = UpdatePlayerElo(ctx, progress.PlayerId, game, placement);
 
         var statsId = IdGenerator.Generate("gr_", ctx.Rng);
@@ -79,6 +74,27 @@ public static partial class Module
         var storesPersonalRecords = !player.Value.IsAnonymous;
         var isPersonalBest = storesPersonalRecords
             && IsPersonalRecord(ctx, progress.PlayerId, game.GameMode, phraseLength, wpm);
+
+        int? advancedStreak = null;
+        if (storesPersonalRecords)
+        {
+            advancedStreak = UpdatePlayerStreak(ctx, progress.PlayerId, timestamp);
+        }
+
+        var updatedPlayer = player.Value;
+        UpdatePlayerStats(ref updatedPlayer, placement, wordsTyped, timeElapsed / 1000);
+        var xpGained = AwardXpForGame(
+            ctx,
+            ref updatedPlayer,
+            progress,
+            game,
+            placement,
+            phraseLength,
+            accuracy,
+            advancedStreak
+        );
+        LevelUpPlayer(ref updatedPlayer);
+        ctx.Db.player.Identity.Update(updatedPlayer);
 
         ctx.Db.gamerecord.Insert(new GameRecord
         {
@@ -94,7 +110,7 @@ public static partial class Module
             TimeMs = timeElapsed / 1000,
             Placement = placement,
             Wpm = wpm,
-            XpGained = 0,
+            XpGained = xpGained,
             EloChange = eloChange,
             Accuracy = accuracy,
             PhraseLength = phraseLength,
@@ -104,7 +120,6 @@ public static partial class Module
         if (storesPersonalRecords)
         {
             UpdatePersonalRecord(ctx, progress.PlayerId, game.GameMode, phraseLength, statsId, game.Id, wpm, accuracy);
-            UpdatePlayerStreak(ctx, progress.PlayerId, timestamp);
         }
 
         if (!progress.IsBot)
@@ -113,6 +128,57 @@ public static partial class Module
         }
 
         Log.Info($"Player {progress.PlayerId} finished game {game.Id} in place {placement}, typed {wordsTyped} words");
+    }
+
+    private static int AwardXpForGame(
+        ReducerContext ctx,
+        ref Player player,
+        PlayerProgress progress,
+        Game game,
+        int placement,
+        int baseRaceXp,
+        double accuracy,
+        int? advancedStreak)
+    {
+        if (player.IsAnonymous)
+        {
+            return 0;
+        }
+
+        var awardEffects = XpAwardRules.Calculate(baseRaceXp, placement, accuracy, advancedStreak);
+        var totalXp = XpAwardRules.CalculateTotal(awardEffects);
+
+        player.Xp += totalXp;
+        player.LastGameDate = ctx.Timestamp.MicrosecondsSinceUnixEpoch;
+
+        if (!player.IsBot)
+        {
+            ctx.Db.xpaward.Insert(new XpAward
+            {
+                Id = IdGenerator.Generate("xpa_", ctx.Rng),
+                PlayerId = progress.PlayerId,
+                GameId = game.Id,
+                Timestamp = ctx.Timestamp.MicrosecondsSinceUnixEpoch,
+                Effects = awardEffects.Select(effect => new XpEffect
+                {
+                    Category = effect.Category,
+                    Label = effect.Label,
+                    Operator = effect.Operator switch
+                    {
+                        XpAwardOperator.Add => XpOperator.Add,
+                        XpAwardOperator.Multiply => XpOperator.Multiply,
+                        _ => throw new InvalidOperationException(
+                            $"Unsupported XP operator: {effect.Operator}"
+                        )
+                    },
+                    Value = effect.Value
+                }).ToList(),
+                TotalXp = totalXp
+            });
+        }
+
+        Log.Info($"Player {progress.PlayerId} earned {totalXp} XP for game {game.Id}");
+        return totalXp;
     }
 
     private static void UpdatePlayerStats(ref Player player, int placement, int wordsTyped, long timeElapsedMs)
@@ -182,19 +248,6 @@ public static partial class Module
 
             Log.Info($"Updated personal record for player {playerId} in mode {gameMode}: {wpm} WPM");
         }
-    }
-
-    private static bool IsFirstGameOfDay(long lastGameDate, long currentDate)
-    {
-        if (lastGameDate == 0)
-        {
-            return true;
-        }
-
-        var lastGameDay = DateTimeOffset.FromUnixTimeMilliseconds(lastGameDate / 1000).Date;
-        var currentDay = DateTimeOffset.FromUnixTimeMilliseconds(currentDate / 1000).Date;
-
-        return currentDay > lastGameDay;
     }
 
     private static int XpRequiredForLevel(int level)

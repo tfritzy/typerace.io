@@ -7,6 +7,11 @@ public static partial class Module
     [Reducer]
     public static void RunMigrations(ReducerContext ctx)
     {
+        RunMigration(
+            ctx,
+            "schedule-xp-gain-cleanup-v1",
+            EnsureXpGainCleanerScheduled
+        );
     }
 
     private static void RunMigration(
