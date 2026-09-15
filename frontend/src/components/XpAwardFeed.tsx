@@ -12,22 +12,20 @@ export function XpAwardFeed() {
     if (!conn?.identity) return;
 
     const identity = conn.identity;
-    let subscriptionApplied = false;
     const handleInsert = (_ctx: unknown, award: XpAward) => {
-      if (!subscriptionApplied || !award.playerId.isEqual(identity)) return;
+      if (!award.playerId.isEqual(identity)) return;
+
       setAwards((current) =>
         current.some((item) => item.id === award.id)
           ? current
           : [...current, award],
       );
+      conn.reducers.acknowledgeXpAward({ awardId: award.id });
     };
 
     conn.db.xpaward.onInsert(handleInsert);
     const subscription = conn
       .subscriptionBuilder()
-      .onApplied(() => {
-        subscriptionApplied = true;
-      })
       .subscribe([`SELECT * FROM xpaward WHERE PlayerId = '${identity}'`]);
 
     return () => {
@@ -44,8 +42,17 @@ export function XpAwardFeed() {
   if (!current) return null;
 
   return (
-    <aside aria-live="polite" className="pointer-events-none fixed right-4 top-20 z-50">
-      <XpGainPopup key={current.id} xpAward={current} onComplete={dismissCurrent} />
+    <aside
+      aria-live="polite"
+      className="pointer-events-none fixed inset-x-0 top-20 z-50 px-4"
+    >
+      <div className="content-container flex justify-end">
+        <XpGainPopup
+          key={current.id}
+          xpAward={current}
+          onComplete={dismissCurrent}
+        />
+      </div>
     </aside>
   );
 }

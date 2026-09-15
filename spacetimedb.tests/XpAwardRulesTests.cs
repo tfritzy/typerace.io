@@ -7,33 +7,42 @@ public sealed class XpAwardRulesTests
     [Fact]
     public void AwardsFlatRacePlacementAccuracyAndStreakEffects()
     {
-        var effects = XpAwardRules.Calculate(42, 1, 100, 7);
+        var effects = XpAwardRules.Calculate(42, true, 1, 100, 7);
 
         Assert.Collection(
             effects,
-            effect => Assert.Equal(new XpAwardEffect("race", "Race complete", XpAwardOperator.Add, 42), effect),
+            effect => Assert.Equal(new XpAwardEffect("streak", "7-day streak", XpAwardOperator.Add, 500), effect),
+            effect => Assert.Equal(new XpAwardEffect("race", "Phrase length", XpAwardOperator.Add, 42), effect),
+            effect => Assert.Equal(new XpAwardEffect("difficulty", "Quote difficulty", XpAwardOperator.Add, 42), effect),
             effect => Assert.Equal(new XpAwardEffect("placement", "First place", XpAwardOperator.Add, 25), effect),
-            effect => Assert.Equal(new XpAwardEffect("accuracy", "Perfect accuracy", XpAwardOperator.Add, 25), effect),
-            effect => Assert.Equal(new XpAwardEffect("streak", "7-day streak", XpAwardOperator.Add, 500), effect)
+            effect => Assert.Equal(new XpAwardEffect("accuracy", "Perfect accuracy", XpAwardOperator.Add, 25), effect)
         );
-        Assert.Equal(592, XpAwardRules.CalculateTotal(effects));
+        Assert.Equal(634, XpAwardRules.CalculateTotal(effects));
     }
 
     [Fact]
-    public void OnlyIncludesBonusesWhoseThresholdsWereMet()
+    public void AwardsOneBaseXpPerCharacterAndSmallerResultBonuses()
     {
-        var effects = XpAwardRules.Calculate(30, 2, 94.9, null);
+        var characterXp = "one two".Length;
+        var effects = XpAwardRules.Calculate(characterXp, false, 4, 72.4, null);
 
-        Assert.Equal(new XpAwardEffect("race", "Race complete", XpAwardOperator.Add, 30), Assert.Single(effects));
+        Assert.Collection(
+            effects,
+            effect => Assert.Equal(new XpAwardEffect("race", "Phrase length", XpAwardOperator.Add, 7), effect),
+            effect => Assert.Equal(new XpAwardEffect("placement", "4th place", XpAwardOperator.Add, 3), effect),
+            effect => Assert.Equal(new XpAwardEffect("accuracy", "72% accuracy", XpAwardOperator.Add, 3), effect)
+        );
+        Assert.Equal(13, XpAwardRules.CalculateTotal(effects));
     }
 
     [Fact]
     public void HighAccuracyUsesOneFlatAccuracyBonus()
     {
-        var effects = XpAwardRules.Calculate(30, 2, 97, null);
+        var effects = XpAwardRules.Calculate(30, false, 2, 97, null);
 
-        Assert.Equal(new XpAwardEffect("accuracy", "High accuracy", XpAwardOperator.Add, 15), effects[1]);
-        Assert.Equal(45, XpAwardRules.CalculateTotal(effects));
+        Assert.Equal(new XpAwardEffect("placement", "Second place", XpAwardOperator.Add, 10), effects[1]);
+        Assert.Equal(new XpAwardEffect("accuracy", "97% accuracy", XpAwardOperator.Add, 15), effects[2]);
+        Assert.Equal(55, XpAwardRules.CalculateTotal(effects));
     }
 
     [Theory]
@@ -45,10 +54,10 @@ public sealed class XpAwardRulesTests
     [InlineData(730, 2_000)]
     public void UsesTheLargestStreakMilestoneBonus(int streak, int expectedXp)
     {
-        var effects = XpAwardRules.Calculate(30, 2, 90, streak);
+        var effects = XpAwardRules.Calculate(30, false, 2, 90, streak);
 
-        Assert.Equal("streak", effects[1].Category);
-        Assert.Equal(XpAwardOperator.Add, effects[1].Operator);
-        Assert.Equal((float)expectedXp, effects[1].Value);
+        Assert.Equal("streak", effects[0].Category);
+        Assert.Equal(XpAwardOperator.Add, effects[0].Operator);
+        Assert.Equal((float)expectedXp, effects[0].Value);
     }
 }

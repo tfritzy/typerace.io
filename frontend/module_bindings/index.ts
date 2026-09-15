@@ -31,6 +31,8 @@ import {
 } from "spacetimedb";
 
 // Import and reexport all reducer arg types
+import AcknowledgeXpAward from "./acknowledge_xp_award_reducer";
+export { AcknowledgeXpAward };
 import ArchiveOldGames from "./archive_old_games_reducer";
 export { ArchiveOldGames };
 import CheckPlayerStreaks from "./check_player_streaks_reducer";
@@ -603,6 +605,7 @@ const tablesSchema = __schema(
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
+  __reducerSchema("acknowledgeXpAward", AcknowledgeXpAward),
   __reducerSchema("ArchiveOldGames", ArchiveOldGames),
   __reducerSchema("CheckPlayerStreaks", CheckPlayerStreaks),
   __reducerSchema("CleanupOldScores", CleanupOldScores),

@@ -89,7 +89,8 @@ public static partial class Module
             progress,
             game,
             placement,
-            phraseLength,
+            game.Phrase.Length,
+            game.GameMode.ToString().EndsWith("Quotes", StringComparison.Ordinal),
             accuracy,
             advancedStreak
         );
@@ -136,7 +137,8 @@ public static partial class Module
         PlayerProgress progress,
         Game game,
         int placement,
-        int baseRaceXp,
+        int characterCount,
+        bool isQuoteMode,
         double accuracy,
         int? advancedStreak)
     {
@@ -145,7 +147,13 @@ public static partial class Module
             return 0;
         }
 
-        var awardEffects = XpAwardRules.Calculate(baseRaceXp, placement, accuracy, advancedStreak);
+        var awardEffects = XpAwardRules.Calculate(
+            characterCount,
+            isQuoteMode,
+            placement,
+            accuracy,
+            advancedStreak
+        );
         var totalXp = XpAwardRules.CalculateTotal(awardEffects);
 
         player.Xp += totalXp;
