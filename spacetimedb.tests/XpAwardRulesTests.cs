@@ -13,11 +13,11 @@ public sealed class XpAwardRulesTests
             effects,
             effect => Assert.Equal(new XpAwardEffect("streak", "7-day streak", XpAwardOperator.Add, 500), effect),
             effect => Assert.Equal(new XpAwardEffect("race", "Phrase length", XpAwardOperator.Add, 42), effect),
-            effect => Assert.Equal(new XpAwardEffect("difficulty", "Quote difficulty", XpAwardOperator.Add, 42), effect),
+            effect => Assert.Equal(new XpAwardEffect("difficulty", "Phrase difficulty", XpAwardOperator.Add, 21), effect),
             effect => Assert.Equal(new XpAwardEffect("placement", "First place", XpAwardOperator.Add, 25), effect),
             effect => Assert.Equal(new XpAwardEffect("accuracy", "Perfect accuracy", XpAwardOperator.Add, 25), effect)
         );
-        Assert.Equal(634, XpAwardRules.CalculateTotal(effects));
+        Assert.Equal(613, XpAwardRules.CalculateTotal(effects));
     }
 
     [Fact]

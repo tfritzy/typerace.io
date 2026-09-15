@@ -49,7 +49,11 @@ internal static class XpAwardRules
 
         if (isQuoteMode)
         {
-            effects.Add(Add("difficulty", "Quote difficulty", characterXp));
+            var difficultyXp = (int)Math.Round(
+                characterXp * 0.5,
+                MidpointRounding.AwayFromZero
+            );
+            effects.Add(Add("difficulty", "Phrase difficulty", difficultyXp));
         }
 
         effects.Add(GetPlacementEffect(placement));
