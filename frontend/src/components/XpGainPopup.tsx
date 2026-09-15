@@ -113,48 +113,12 @@ export const XpGainPopup = ({ xpAward, onComplete }: XpGainPopupProps) => {
 
   return (
     <div
-      className={`w-[min(15rem,calc(100vw-2rem))] rounded-md border border-border bg-card text-card-foreground transition-all duration-200 motion-reduce:transition-none ${
+      className={`w-[min(15rem,calc(100vw-2rem))] transition-all duration-200 motion-reduce:transition-none ${
         isVisible ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
       }`}
     >
       <div className="p-3">
-        {xpAward.effects.length > 0 && (
-          <div className="space-y-2">
-            {xpAward.effects.map((effect, index) => (
-              <div
-                key={`${effect.category}:${effect.label}:${index}`}
-                className={`flex items-baseline justify-between gap-3 text-xs leading-[1.125rem] transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
-                  index < visibleEffectCount
-                    ? "translate-x-0 opacity-100"
-                    : "-translate-x-1.5 opacity-0"
-                }`}
-              >
-                <span className="flex min-w-0 items-center gap-2 font-medium text-muted-foreground">
-                  {(() => {
-                    const Icon = effectIcons[effect.category] ?? Circle;
-                    return (
-                      <Icon
-                        aria-hidden="true"
-                        className="size-3.5 shrink-0 text-muted-foreground"
-                        strokeWidth={1.75}
-                      />
-                    );
-                  })()}
-                  <span className="truncate">{effect.label}</span>
-                </span>
-                <span className="shrink-0 font-mono font-medium tabular-nums text-muted-foreground">
-                  {formatEffectValue(effect.operator, effect.value)}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <div
-          className={`flex items-baseline justify-between gap-3 ${
-            xpAward.effects.length > 0 ? "mt-3" : ""
-          }`}
-        >
+        <div className="flex items-baseline justify-between gap-3">
           <span className="text-xs font-medium text-card-foreground">Total</span>
           <p
             aria-label={`Total ${xpAward.totalXp} xp`}
@@ -174,6 +138,38 @@ export const XpGainPopup = ({ xpAward, onComplete }: XpGainPopupProps) => {
             </span>
           </p>
         </div>
+
+        {xpAward.effects.length > 0 && (
+          <div className="mt-3 space-y-2 pl-2">
+            {xpAward.effects.map((effect, index) => (
+              <div
+                key={`${effect.category}:${effect.label}:${index}`}
+                className={`flex items-baseline justify-between gap-3 text-xs leading-[1.125rem] transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+                  index < visibleEffectCount
+                    ? "translate-x-0 opacity-100"
+                    : "-translate-x-1.5 opacity-0"
+                }`}
+              >
+                <span className="flex min-w-0 items-center gap-2 text-muted-foreground">
+                  {(() => {
+                    const Icon = effectIcons[effect.category] ?? Circle;
+                    return (
+                      <Icon
+                        aria-hidden="true"
+                        className="size-3.5 shrink-0 text-muted-foreground"
+                        strokeWidth={1.75}
+                      />
+                    );
+                  })()}
+                  <span className="truncate">{effect.label}</span>
+                </span>
+                <span className="shrink-0 text-muted-foreground">
+                  {formatEffectValue(effect.operator, effect.value)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

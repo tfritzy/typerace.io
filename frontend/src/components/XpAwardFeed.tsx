@@ -44,7 +44,7 @@ export function XpAwardFeed() {
   return (
     <aside
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 top-20 z-50 px-4"
+      className="pointer-events-none fixed inset-x-0 top-14 z-50 px-4"
     >
       <div className="content-container flex justify-end">
         <XpGainPopup
