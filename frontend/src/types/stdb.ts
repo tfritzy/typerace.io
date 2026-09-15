@@ -10,6 +10,7 @@ export type PlayerStreak = Infer<typeof Bindings.PlayerStreak>;
 export type GameRecord = Infer<typeof Bindings.GameRecord>;
 export type PlayerProgress = Infer<typeof Bindings.PlayerProgress>;
 export type XpGain = Infer<typeof Bindings.XpGain>;
+export type XpAward = Infer<typeof Bindings.XpAward>;
 export type GameScore = Infer<typeof Bindings.GameScore>;
 export type GameHighScore = Infer<typeof Bindings.GameHighScore>;
 export type GameState = Infer<typeof Bindings.GameState>;

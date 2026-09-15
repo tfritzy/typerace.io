@@ -19,5 +19,6 @@
   <ItemGroup>
     <Compile Include="../spacetimedb/util/StreakRules.cs" Link="StreakRules.cs" />
     <Compile Include="../spacetimedb/util/StreakTime.cs" Link="StreakTime.cs" />
+    <Compile Include="../spacetimedb/util/XpAwardRules.cs" Link="XpAwardRules.cs" />
   </ItemGroup>
 </Project>

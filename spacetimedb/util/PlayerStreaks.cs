@@ -8,7 +8,7 @@ public static partial class Module
     private const string StreakDayFormat = "yyyy-MM-dd";
     private const string NoStreakCheckDay = "9999-12-31";
 
-    private static void UpdatePlayerStreak(ReducerContext ctx, Identity playerId, long timestampMicros)
+    private static int? UpdatePlayerStreak(ReducerContext ctx, Identity playerId, long timestampMicros)
     {
         var utcOffsetMinutes = GetPlayerUtcOffsetMinutes(ctx, playerId);
         var currentDay = StreakTime.GetLocalDay(timestampMicros, utcOffsetMinutes);
@@ -19,17 +19,20 @@ public static partial class Module
             ctx.Db.playerstreak.Insert(
                 CreatePlayerStreak(playerId, currentDay, utcOffsetMinutes)
             );
-            return;
+            return 1;
         }
 
         if (!TryParseStreakDay(existing.Value.LastActiveDay, out var lastActiveDay)
             || currentDay < lastActiveDay)
         {
-            return;
+            return null;
         }
 
         var updated = ApplyCompletedGame(existing.Value, currentDay, utcOffsetMinutes);
         ctx.Db.playerstreak.PlayerId.Update(updated);
+        return currentDay > lastActiveDay && updated.Streak >= 1
+            ? updated.Streak
+            : null;
     }
 
     private static int GetPlayerUtcOffsetMinutes(ReducerContext ctx, Identity playerId)

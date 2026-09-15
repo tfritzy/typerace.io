@@ -31,6 +31,8 @@ import {
 } from "spacetimedb";
 
 // Import and reexport all reducer arg types
+import AcknowledgeXpAward from "./acknowledge_xp_award_reducer";
+export { AcknowledgeXpAward };
 import ArchiveOldGames from "./archive_old_games_reducer";
 export { ArchiveOldGames };
 import CheckPlayerStreaks from "./check_player_streaks_reducer";
@@ -133,6 +135,8 @@ import PlayerstreakRow from "./playerstreak_table";
 export { PlayerstreakRow };
 import PlayertimezoneRow from "./playertimezone_table";
 export { PlayertimezoneRow };
+import XpawardRow from "./xpaward_table";
+export { XpawardRow };
 import XpgainRow from "./xpgain_table";
 export { XpgainRow };
 
@@ -195,12 +199,18 @@ import ScoreCleaner from "./score_cleaner_type";
 export { ScoreCleaner };
 import StreakChecker from "./streak_checker_type";
 export { StreakChecker };
+import XpAward from "./xp_award_type";
+export { XpAward };
+import XpEffect from "./xp_effect_type";
+export { XpEffect };
 import XpGain from "./xp_gain_type";
 export { XpGain };
 import XpGainCleaner from "./xp_gain_cleaner_type";
 export { XpGainCleaner };
 import XpMultiplier from "./xp_multiplier_type";
 export { XpMultiplier };
+import XpOperator from "./xp_operator_type";
+export { XpOperator };
 
 /** The schema information for all tables in this module. This is defined the same was as the tables would have been defined in the server. */
 const tablesSchema = __schema(
@@ -551,6 +561,23 @@ const tablesSchema = __schema(
     ],
   }, PlayertimezoneRow),
   __table({
+    name: 'xpaward',
+    indexes: [
+      { name: 'Id', algorithm: 'btree', columns: [
+        'id',
+      ] },
+      { name: 'PlayerId', algorithm: 'btree', columns: [
+        'playerId',
+      ] },
+      { name: 'Timestamp', algorithm: 'btree', columns: [
+        'timestamp',
+      ] },
+    ],
+    constraints: [
+      { name: 'xpaward_Id_key', constraint: 'unique', columns: ['id'] },
+    ],
+  }, XpawardRow),
+  __table({
     name: 'xpgain',
     indexes: [
       { name: 'Id', algorithm: 'btree', columns: [
@@ -578,6 +605,7 @@ const tablesSchema = __schema(
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
+  __reducerSchema("acknowledgeXpAward", AcknowledgeXpAward),
   __reducerSchema("ArchiveOldGames", ArchiveOldGames),
   __reducerSchema("CheckPlayerStreaks", CheckPlayerStreaks),
   __reducerSchema("CleanupOldScores", CleanupOldScores),
