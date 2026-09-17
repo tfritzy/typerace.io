@@ -24,6 +24,11 @@ const SiteStatsPage = lazy(() =>
     default: SiteStatsPage,
   })),
 );
+const LeaderboardPage = lazy(() =>
+  import("./pages/LeaderboardPage").then(({ LeaderboardPage }) => ({
+    default: LeaderboardPage,
+  })),
+);
 function App() {
   return (
     <BrowserRouter>
@@ -32,6 +37,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/" element={<LobbyPage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/:lang" element={<LobbyPage />} />
             <Route element={<DatabaseRequired />}>
               <Route path="/game" element={<FindGamePage />} />

@@ -133,6 +133,8 @@ import PlayerstreakRow from "./playerstreak_table";
 export { PlayerstreakRow };
 import PlayertimezoneRow from "./playertimezone_table";
 export { PlayertimezoneRow };
+import TopPlayersByLevelRow from "./top_players_by_level_table";
+export { TopPlayersByLevelRow };
 import XpgainRow from "./xpgain_table";
 export { XpgainRow };
 
@@ -574,6 +576,13 @@ const tablesSchema = __schema(
     constraints: [
     ],
   }, MyPlayerSettingsRow),
+  __table({
+    name: 'topPlayersByLevel',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, TopPlayersByLevelRow),
 );
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
