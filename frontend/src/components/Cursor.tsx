@@ -87,7 +87,7 @@ export const Cursor = memo(
     return (
       <div
         ref={cursorRef}
-        className={`fixed left-0 top-0 h-10 max-w-0 -translate-x-0.5 -translate-y-px transition-transform duration-[70ms] ease-out will-change-transform ${visible ? "opacity-100" : "opacity-0"} ${isBlinking && visible ? "animate-blink" : ""}`}
+        className={`fixed left-0 top-0 h-10 max-w-0 -translate-x-0.5 -translate-y-px transition-transform duration-[60ms] ease-[cubic-bezier(0.3,0.45,0.7,1)] will-change-transform ${visible ? "opacity-100" : "opacity-0"} ${isBlinking && visible ? "animate-blink" : ""}`}
       >
         <div
           className="h-full rounded-full border-r-2 border-r-accent"
