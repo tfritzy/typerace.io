@@ -557,7 +557,7 @@ export const GamePage = () => {
 
   return (
     <div className="relative flex-1 min-h-0 flex flex-col">
-      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center px-4">
+      <div className="flex-1 min-h-0 overflow-x-hidden overflow-y-auto flex flex-col items-center px-4 pt-2">
         <div className="content-container relative w-full my-auto">
           <WinnerConfetti key={gameId} active={hasWonRace} />
           <div
