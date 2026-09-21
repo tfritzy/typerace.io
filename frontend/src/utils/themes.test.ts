@@ -37,8 +37,8 @@ describe("theme favicon", () => {
       applyTheme(tag);
       const svg = readFaviconSvg();
 
+      expect(svg).toContain(`<rect width="512" height="512" fill="${theme.colors.background}"/>`);
       expect(svg).toContain(`fill="${theme.colors.accentPrimary}"`);
-      expect(svg).toContain(`stroke="${theme.colors.background}"`);
     }
 
     const customTheme: ThemeSettings = {
@@ -50,6 +50,6 @@ describe("theme favicon", () => {
     applyCustomTheme(customTheme);
 
     expect(readFaviconSvg()).toContain('fill="#abcdef"');
-    expect(readFaviconSvg()).toContain('stroke="#102030"');
+    expect(readFaviconSvg()).toContain('fill="#102030"');
   });
 });
