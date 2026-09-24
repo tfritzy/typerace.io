@@ -75,6 +75,9 @@ public static partial class Module
         var isPersonalBest = storesPersonalRecords
             && IsPersonalRecord(ctx, progress.PlayerId, game.GameMode, phraseLength, wpm);
 
+        var oldStreak = storesPersonalRecords
+            ? ctx.Db.playerstreak.PlayerId.Find(progress.PlayerId)?.Streak ?? 0
+            : 0;
         int? advancedStreak = null;
         if (storesPersonalRecords)
         {
@@ -95,6 +98,44 @@ public static partial class Module
             advancedStreak
         );
         LevelUpPlayer(ref updatedPlayer);
+
+        if (!player.Value.IsBot && !player.Value.IsAnonymous)
+        {
+            if (player.Value.TotalGames == 0)
+            {
+                StatDistributionUtils.AddPlayerToBucket(ctx, StatType.GamesPlayed, updatedPlayer.TotalGames);
+                StatDistributionUtils.AddPlayerToBucket(ctx, StatType.WordsTyped, updatedPlayer.TotalWordsTyped);
+                StatDistributionUtils.AddPlayerToBucket(ctx, StatType.Levels, updatedPlayer.Level);
+                StatDistributionUtils.AddPlayerToBucket(ctx, StatType.Streaks, advancedStreak ?? oldStreak);
+            }
+            else
+            {
+                StatDistributionUtils.MovePlayerBetweenBuckets(
+                    ctx,
+                    StatType.GamesPlayed,
+                    player.Value.TotalGames,
+                    updatedPlayer.TotalGames
+                );
+                StatDistributionUtils.MovePlayerBetweenBuckets(
+                    ctx,
+                    StatType.WordsTyped,
+                    player.Value.TotalWordsTyped,
+                    updatedPlayer.TotalWordsTyped
+                );
+                StatDistributionUtils.MovePlayerBetweenBuckets(
+                    ctx,
+                    StatType.Levels,
+                    player.Value.Level,
+                    updatedPlayer.Level
+                );
+                StatDistributionUtils.MovePlayerBetweenBuckets(
+                    ctx,
+                    StatType.Streaks,
+                    oldStreak,
+                    advancedStreak ?? oldStreak
+                );
+            }
+        }
         ctx.Db.player.Identity.Update(updatedPlayer);
 
         ctx.Db.gamerecord.Insert(new GameRecord

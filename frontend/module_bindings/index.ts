@@ -135,6 +135,8 @@ import PlayerstreakRow from "./playerstreak_table";
 export { PlayerstreakRow };
 import PlayertimezoneRow from "./playertimezone_table";
 export { PlayertimezoneRow };
+import StatdistributionRow from "./statdistribution_table";
+export { StatdistributionRow };
 import XpawardRow from "./xpaward_table";
 export { XpawardRow };
 import XpgainRow from "./xpgain_table";
@@ -197,6 +199,8 @@ import PlayerTimezone from "./player_timezone_type";
 export { PlayerTimezone };
 import ScoreCleaner from "./score_cleaner_type";
 export { ScoreCleaner };
+import StatDistribution from "./stat_distribution_type";
+export { StatDistribution };
 import StreakChecker from "./streak_checker_type";
 export { StreakChecker };
 import XpAward from "./xp_award_type";
@@ -560,6 +564,17 @@ const tablesSchema = __schema(
       { name: 'playertimezone_PlayerId_key', constraint: 'unique', columns: ['playerId'] },
     ],
   }, PlayertimezoneRow),
+  __table({
+    name: 'statdistribution',
+    indexes: [
+      { name: 'StatType', algorithm: 'btree', columns: [
+        'statType',
+      ] },
+    ],
+    constraints: [
+      { name: 'statdistribution_StatType_key', constraint: 'unique', columns: ['statType'] },
+    ],
+  }, StatdistributionRow),
   __table({
     name: 'xpaward',
     indexes: [
