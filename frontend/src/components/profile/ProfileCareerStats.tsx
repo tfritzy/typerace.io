@@ -5,13 +5,15 @@ import {
   Languages,
   type LucideIcon,
 } from "lucide-react";
-import type { Player, PlayerStreak } from "../../types/stdb";
+import type { Player, PlayerStreak, StatDistribution } from "../../types/stdb";
 import { formatNumber, formatTimeSpent } from "../../utils/formatters";
+
 import {
   ProfileMetricLabel,
   profileMetricCardClass,
 } from "./ProfileMetric";
 import { ProfileStreakStat } from "./ProfileStreakStat";
+import { PercentileBadge } from "./PercentileBadge";
 
 interface ProfileCareerStatsProps {
   player: Player;
@@ -23,11 +25,21 @@ interface CareerStatProps {
   icon: LucideIcon;
   label: string;
   value: string;
+  rawValue?: number;
+  distribution?: StatDistribution;
+  type?: string;
 }
 
-function CareerStat({ icon: Icon, label, value }: CareerStatProps) {
+function CareerStat({
+  icon: Icon,
+  label,
+  value,
+  rawValue,
+  distribution,
+  type,
+}: CareerStatProps) {
   return (
-    <li className={profileMetricCardClass}>
+    <li data-type={type} className={profileMetricCardClass}>
       <ProfileMetricLabel label={label} />
       <span className="mt-2 flex items-center gap-2 whitespace-nowrap text-base font-semibold tabular-nums text-foreground">
         <Icon
@@ -35,10 +47,12 @@ function CareerStat({ icon: Icon, label, value }: CareerStatProps) {
           className="h-4 w-4 shrink-0 text-foreground"
         />
         <span>{value}</span>
+        <PercentileBadge distribution={distribution} value={rawValue} />
       </span>
     </li>
   );
 }
+
 
 export function ProfileCareerStats({
   player,
@@ -55,16 +69,19 @@ export function ProfileCareerStats({
       icon: Flag,
       label: "games played",
       value: formatNumber(player.totalGames),
+      rawValue: player.totalGames,
     },
     {
       icon: Keyboard,
       label: "words typed",
       value: formatNumber(player.totalWordsTyped),
+      rawValue: player.totalWordsTyped,
     },
     {
       icon: Clock3,
       label: "typing time",
       value: formatTimeSpent(Number(player.totalTimeSpentMs)),
+      rawValue: Number(player.totalTimeSpentMs),
     },
   ];
 

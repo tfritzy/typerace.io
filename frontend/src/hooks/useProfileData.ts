@@ -5,6 +5,7 @@ import type {
   PersonalRecord,
   Player,
   PlayerStreak,
+  StatDistribution,
 } from "../types/stdb";
 
 interface ProfileData {
@@ -12,6 +13,7 @@ interface ProfileData {
   playerStreak: PlayerStreak | null;
   gameRecords: GameRecord[];
   personalRecords: PersonalRecord[];
+  statDistributions: Map<StatDistribution["statType"], StatDistribution>;
 }
 
 function upsertById<T extends { id: string }>(items: T[], item: T): T[] {
@@ -30,6 +32,9 @@ export function useProfileData(
   const [playerStreak, setPlayerStreak] = useState<PlayerStreak | null>(null);
   const [gameRecords, setGameRecords] = useState<GameRecord[]>([]);
   const [personalRecords, setPersonalRecords] = useState<PersonalRecord[]>([]);
+  const [statDistributions, setStatDistributions] = useState<
+    Map<StatDistribution["statType"], StatDistribution>
+  >(() => new Map());
 
   useEffect(() => {
     setPlayer(null);
@@ -213,5 +218,65 @@ export function useProfileData(
     };
   }, [conn, playerIdentity]);
 
-  return { player, playerStreak, gameRecords, personalRecords };
+  useEffect(() => {
+    setStatDistributions(new Map());
+    if (!conn) return;
+
+    const readDistributions = () => {
+      setStatDistributions(
+        new Map(Array.from(conn.db.statdistribution.iter()).map(
+          (distribution) => [distribution.statType, distribution],
+        )),
+      );
+    };
+    const handleInsert = (_ctx: EventContext, distribution: StatDistribution) => {
+      setStatDistributions((previous) => {
+        const next = new Map(previous);
+        next.set(distribution.statType, distribution);
+        return next;
+      });
+    };
+    const handleUpdate = (
+      _ctx: EventContext,
+      previous: StatDistribution,
+      updated: StatDistribution,
+    ) => {
+      setStatDistributions((current) => {
+        const next = new Map(current);
+        next.delete(previous.statType);
+        next.set(updated.statType, updated);
+        return next;
+      });
+    };
+    const handleDelete = (_ctx: EventContext, distribution: StatDistribution) => {
+      setStatDistributions((previous) => {
+        const next = new Map(previous);
+        next.delete(distribution.statType);
+        return next;
+      });
+    };
+
+    conn.db.statdistribution.onInsert(handleInsert);
+    conn.db.statdistribution.onUpdate(handleUpdate);
+    conn.db.statdistribution.onDelete(handleDelete);
+
+    const subscription = conn.subscriptionBuilder()
+      .onApplied(readDistributions)
+      .subscribe(["SELECT * FROM statdistribution"]);
+
+    return () => {
+      conn.db.statdistribution.removeOnInsert(handleInsert);
+      conn.db.statdistribution.removeOnUpdate(handleUpdate);
+      conn.db.statdistribution.removeOnDelete(handleDelete);
+      subscription.unsubscribe();
+    };
+  }, [conn]);
+
+  return {
+    player,
+    playerStreak,
+    gameRecords,
+    personalRecords,
+    statDistributions,
+  };
 }

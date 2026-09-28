@@ -1,13 +1,11 @@
-spacetime version use 1.10.0
-
 spacetime generate --lang typescript --out-dir frontend/module_bindings --project-path spacetimedb
 
-spacetime sql typerace "SELECT * from playertimezone" -s local
+spacetime sql typerace "SELECT * from statdistribution" -s maincloud typerace
 
 spacetime publish --project-path spacetimedb typerace -s local
 
 RUN MIGRATIONS:
-spacetime call typerace RunMigrations -s local
+spacetime call typerace RunMigrations --server maincloud typerace
 
 QA ENVIRONMENT DEPLOYMENT:
 spacetime publish -c -y --project-path spacetimedb --server maincloud typerace-qa
