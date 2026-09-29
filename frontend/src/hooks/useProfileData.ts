@@ -14,6 +14,7 @@ interface ProfileData {
   gameRecords: GameRecord[];
   personalRecords: PersonalRecord[];
   statDistributions: Map<StatDistribution["statType"], StatDistribution>;
+  statValues: Map<string, number>;
 }
 
 function upsertById<T extends { id: string }>(items: T[], item: T): T[] {
@@ -35,6 +36,15 @@ export function useProfileData(
   const [statDistributions, setStatDistributions] = useState<
     Map<StatDistribution["statType"], StatDistribution>
   >(() => new Map());
+  const [statValues, setStatValues] = useState(
+    () =>
+      new Map<string, number>([
+        ["GamesPlayed", player?.totalGames || 0],
+        ["Streaks", 0],
+        ["WordsTyped", player?.totalWordsTyped || 0],
+        ["Levels", player?.level || 0],
+      ]),
+  );
 
   useEffect(() => {
     setPlayer(null);
@@ -47,9 +57,8 @@ export function useProfileData(
         ) ?? null,
       );
     };
-    const belongsToProfile = (candidate: Player) => (
-      candidate.playerId === playerId
-    );
+    const belongsToProfile = (candidate: Player) =>
+      candidate.playerId === playerId;
     const handleInsert = (_ctx: EventContext, inserted: Player) => {
       if (belongsToProfile(inserted)) setPlayer(inserted);
     };
@@ -72,7 +81,8 @@ export function useProfileData(
     conn.db.player.onUpdate(handleUpdate);
     conn.db.player.onDelete(handleDelete);
 
-    const subscription = conn.subscriptionBuilder()
+    const subscription = conn
+      .subscriptionBuilder()
       .onApplied(resolvePlayer)
       .subscribe([
         `SELECT * FROM player WHERE PlayerId = '${escapeSqlString(playerId)}'`,
@@ -92,9 +102,8 @@ export function useProfileData(
     setPlayerStreak(null);
     if (!conn || !playerIdentity) return;
 
-    const belongsToPlayer = (streak: PlayerStreak) => (
-      streak.playerId.toHexString() === playerIdentity
-    );
+    const belongsToPlayer = (streak: PlayerStreak) =>
+      streak.playerId.toHexString() === playerIdentity;
     const readStreak = () => {
       setPlayerStreak(
         Array.from(conn.db.playerstreak.iter()).find(belongsToPlayer) ?? null,
@@ -122,7 +131,8 @@ export function useProfileData(
     conn.db.playerstreak.onUpdate(handleUpdate);
     conn.db.playerstreak.onDelete(handleDelete);
 
-    const subscription = conn.subscriptionBuilder()
+    const subscription = conn
+      .subscriptionBuilder()
       .onApplied(readStreak)
       .subscribe([
         `SELECT * FROM playerstreak WHERE PlayerId = '${playerIdentity}'`,
@@ -140,9 +150,8 @@ export function useProfileData(
     setGameRecords([]);
     if (!conn || !playerIdentity) return;
 
-    const belongsToPlayer = (record: GameRecord) => (
-      record.playerId.toHexString() === playerIdentity
-    );
+    const belongsToPlayer = (record: GameRecord) =>
+      record.playerId.toHexString() === playerIdentity;
     const readRecords = () => {
       setGameRecords(
         Array.from(conn.db.gamerecord.iter()).filter(belongsToPlayer),
@@ -155,16 +164,17 @@ export function useProfileData(
     };
     const handleDelete = (_ctx: EventContext, record: GameRecord) => {
       if (belongsToPlayer(record)) {
-        setGameRecords((previous) => (
-          previous.filter(({ id }) => id !== record.id)
-        ));
+        setGameRecords((previous) =>
+          previous.filter(({ id }) => id !== record.id),
+        );
       }
     };
 
     conn.db.gamerecord.onInsert(handleInsert);
     conn.db.gamerecord.onDelete(handleDelete);
 
-    const subscription = conn.subscriptionBuilder()
+    const subscription = conn
+      .subscriptionBuilder()
       .onApplied(readRecords)
       .subscribe([
         `SELECT * FROM gamerecord WHERE PlayerId = '${playerIdentity}'`,
@@ -181,9 +191,8 @@ export function useProfileData(
     setPersonalRecords([]);
     if (!conn || !playerIdentity) return;
 
-    const belongsToPlayer = (record: PersonalRecord) => (
-      record.playerId.toHexString() === playerIdentity
-    );
+    const belongsToPlayer = (record: PersonalRecord) =>
+      record.playerId.toHexString() === playerIdentity;
     const readRecords = () => {
       setPersonalRecords(
         Array.from(conn.db.personalrecord.iter()).filter(belongsToPlayer),
@@ -196,16 +205,17 @@ export function useProfileData(
     };
     const handleDelete = (_ctx: EventContext, record: PersonalRecord) => {
       if (belongsToPlayer(record)) {
-        setPersonalRecords((previous) => (
-          previous.filter(({ id }) => id !== record.id)
-        ));
+        setPersonalRecords((previous) =>
+          previous.filter(({ id }) => id !== record.id),
+        );
       }
     };
 
     conn.db.personalrecord.onInsert(handleInsert);
     conn.db.personalrecord.onDelete(handleDelete);
 
-    const subscription = conn.subscriptionBuilder()
+    const subscription = conn
+      .subscriptionBuilder()
       .onApplied(readRecords)
       .subscribe([
         `SELECT * FROM personalrecord WHERE PlayerId = '${playerIdentity}'`,
@@ -224,12 +234,18 @@ export function useProfileData(
 
     const readDistributions = () => {
       setStatDistributions(
-        new Map(Array.from(conn.db.statdistribution.iter()).map(
-          (distribution) => [distribution.statType, distribution],
-        )),
+        new Map(
+          Array.from(conn.db.statdistribution.iter()).map((distribution) => [
+            distribution.statType,
+            distribution,
+          ]),
+        ),
       );
     };
-    const handleInsert = (_ctx: EventContext, distribution: StatDistribution) => {
+    const handleInsert = (
+      _ctx: EventContext,
+      distribution: StatDistribution,
+    ) => {
       setStatDistributions((previous) => {
         const next = new Map(previous);
         next.set(distribution.statType, distribution);
@@ -248,7 +264,10 @@ export function useProfileData(
         return next;
       });
     };
-    const handleDelete = (_ctx: EventContext, distribution: StatDistribution) => {
+    const handleDelete = (
+      _ctx: EventContext,
+      distribution: StatDistribution,
+    ) => {
       setStatDistributions((previous) => {
         const next = new Map(previous);
         next.delete(distribution.statType);
@@ -260,7 +279,8 @@ export function useProfileData(
     conn.db.statdistribution.onUpdate(handleUpdate);
     conn.db.statdistribution.onDelete(handleDelete);
 
-    const subscription = conn.subscriptionBuilder()
+    const subscription = conn
+      .subscriptionBuilder()
       .onApplied(readDistributions)
       .subscribe(["SELECT * FROM statdistribution"]);
 
@@ -272,11 +292,23 @@ export function useProfileData(
     };
   }, [conn]);
 
+  useEffect(() => {
+    setStatValues(
+      new Map<string, number>([
+        ["GamesPlayed", player?.totalGames || 0],
+        ["Streaks", 0],
+        ["WordsTyped", player?.totalWordsTyped || 0],
+        ["Levels", player?.level || 0],
+      ]),
+    );
+  }, [player?.totalGames, player?.totalWordsTyped, player?.level]);
+
   return {
     player,
     playerStreak,
     gameRecords,
     personalRecords,
     statDistributions,
+    statValues,
   };
 }

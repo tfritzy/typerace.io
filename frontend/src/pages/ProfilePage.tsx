@@ -12,16 +12,21 @@ import { useAuth } from "../firebase/AuthContext";
 import { useProfileData } from "../hooks/useProfileData";
 import { getDefaultSiteTitle, getLangHome } from "../utils/modes";
 import { buildProfilePersonalRecords } from "../utils/profileStats";
+import { DistributionsChart } from "@/components/profile/DistributionsChart";
 
 export function ProfilePage() {
   const { playerId } = useParams<{ playerId: string }>();
   const navigate = useNavigate();
   const { conn } = useDatabase();
   const { signOut } = useAuth();
-  const { player, playerStreak, gameRecords, personalRecords } = useProfileData(
-    conn,
-    playerId,
-  );
+  const {
+    player,
+    playerStreak,
+    gameRecords,
+    personalRecords,
+    statDistributions,
+    statValues,
+  } = useProfileData(conn, playerId);
   const [isEditNameModalOpen, setIsEditNameModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
@@ -80,10 +85,14 @@ export function ProfilePage() {
 
           <ProfilePersonalRecords records={personalRecordSummary} />
 
-          <ProfileActivity
-            key={player.playerId}
-            gameRecords={gameRecords}
-          />
+          <ProfileActivity key={player.playerId} gameRecords={gameRecords} />
+
+          {statDistributions && (
+            <DistributionsChart
+              distributions={statDistributions}
+              statValues={statValues}
+            />
+          )}
 
           {isOwnProfile && (
             <div className="flex justify-center px-1">
